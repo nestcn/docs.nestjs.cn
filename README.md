@@ -12,6 +12,17 @@
 
 > 使用 Git 安装一个项目：
 
+| TypeScript        | JavaScript  |
+| ------------- |:-------------:| 
+| `$ git clone https://github.com/nestjs/typescript-starter.git project| $ git clone https://github.com/nestjs/javascript-starter.git project|
+$ cd project
+$ npm install
+$ npm run start
+``` | 
+
+
+
+
 ## TypeScript
 
 ```
@@ -35,3 +46,5 @@ $ npm run start
 ```
 $ npm i --save @nestjs/core @nestjs/common @nestjs/microservices @nestjs/websockets @nestjs/testing reflect-metadata rxjs
 ```
+
+## [查看 4.5 文档](/4.5/)

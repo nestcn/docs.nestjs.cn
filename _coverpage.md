@@ -11,4 +11,4 @@
 
 
 [GitHub](https://github.com/nestjs/nest)
-[Get Started](#quick-start)
+[Get Started](4.5/FirstSteps.md)

@@ -3,7 +3,7 @@
 
 - 概述
   - [第一步](FirstSteps.md)
-  - [Controllers](Controllers.md)
+  - [控制器](Controllers.md)
   - [Components](Components.md)
   - [Modules](Modules.md)
   - [Middlewares](Middlewares.md)

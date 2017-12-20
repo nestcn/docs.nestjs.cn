@@ -86,10 +86,20 @@ export class CatsController {
 }
 ```
 
-> 请求对象代表HTTP请求，并具有请求查询字符串，参数，HTTP标题和 （在这里阅读更多），但在大多数情况下，没有必要手动抓住它们。 我们可以使用专用的装饰器，比如@Body（）或@Query（），它们都是可用的。 下面是装饰者和普通表达对象的比较。
+> 请求对象代表HTTP请求，并具有请求查询字符串，参数，HTTP标题和 （在这里阅读更多），但在大多数情况下，没有必要手动抓住它们。 我们可以使用专用的装饰器，比如@Body（）或@Query（），它们都是可用的。 下面是装饰器和普通表达对象的比较。
 
-```
-```
+|装饰器|普通表达对象|
+|----------|-----------|
+|@Request()	|req|
+|@Response()	|res|
+|@Next()	|next|
+|@Session()	|req.session|
+|@Param(param?: string)	|req.params / req.params[param]         |
+|@Body(param?: string)	|req.body / req.body[param]|
+|@Query(param?: string)	|req.query / req.query[param]|
+|@Headers(param?: string)	|req.headers / req.headers[param]|
+
+
 
 # 更多端点
 

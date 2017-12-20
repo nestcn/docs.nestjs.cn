@@ -12,12 +12,24 @@
 
 > 使用 Git 安装一个项目：
 
+## TypeScript
+
 ```
 $ git clone https://github.com/nestjs/typescript-starter.git project
 $ cd project
 $ npm install
 $ npm run start
 ```
+
+## JavaScript
+
+```
+$ git clone https://github.com/nestjs/javascript-starter.git project
+$ cd project
+$ npm install
+$ npm run start
+```
+
 > 使用 NPM 安装一个项目：
 
 ```

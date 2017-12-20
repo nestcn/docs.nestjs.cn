@@ -146,6 +146,7 @@
 ### O
 
 - Object 对象
+- OpenAPI (不翻)
 
 ### P
 
@@ -179,9 +180,10 @@
 - Service 服务
 - Service Container 服务容器
 - Service Providers 服务提供器
-- Session 会话 (可不翻)
-- Sequelize （不翻）
-- SQL （不翻）
+- Session 会话 (可不翻) &
+- Sequelize （不翻） &
+- SQL （不翻）&
+- Swagger (不翻)
 
 ### T
 

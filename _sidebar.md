@@ -41,7 +41,7 @@
   - [分层注入](HierarchicalInjector.md)
   - [类型混淆](MixinClass.md)
 
-  - 秘籍
+- 秘籍
   - [SQL (TypeORM)](SQLT.md)
   - [MongoDB (Mongoose)](MongoDB.md)
   - [MongoDB E2E (Mockgoose)](MongoDBE2E.md)

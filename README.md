@@ -15,7 +15,7 @@
 
 ## TypeScript & JavaScript
 
-```
+```bash
 $ git clone https://github.com/nestjs/typescript-starter.git project
 $ cd project
 $ npm install
@@ -25,7 +25,7 @@ $ npm run start
 
 > 使用 NPM 安装一个项目：
 
-```
+```bash
 $ npm i --save @nestjs/core @nestjs/common @nestjs/microservices @nestjs/websockets @nestjs/testing reflect-metadata rxjs
 ```
 

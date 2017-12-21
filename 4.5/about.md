@@ -56,7 +56,7 @@
 - Context 情境 &
 - Controller 控制器 &
 - Controller Action 控制器行为
-- constructor 构造函数
+- Constructor 构造函数
 - Cookie (不翻)
 - Credentials 凭证
 - Closure 闭包

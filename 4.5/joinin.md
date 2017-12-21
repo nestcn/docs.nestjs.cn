@@ -91,8 +91,8 @@ Nestcn 官方文档会持续更新，为了保证后续的修改能更新上，�
   - [样例](4.5/examples.md)
 
 
-- SUPPORT ME
-- [Changelog](4.5/changelog.md)
+- 支持
+  - [更新日志](4.5/changelog.md)
 
 原文文档： https://docs.nestjs.com/
 

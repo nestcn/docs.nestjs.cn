@@ -1,6 +1,6 @@
 # 介绍
 
-> Nest是构建高效，可扩展的 Node.js Web 应用程序的框架。 它使用现代的 JavaScript 或 TypeScript（保留与纯 JavaScript 的兼容性），并结合 OOP（面向对象编程），FP（函数式编程）和FRP（函数响应式编程）的元素。Nest 基于 Express，可以方便地使用各种可用的第三方插件。
+> Nest是构建高效，可扩展的 Node.js Web 应用程序的框架。 它使用现代的 JavaScript 或 TypeScript（保留与纯 JavaScript 的兼容性），并结合 OOP（面向对象编程），FP（函数式编程）和 FRP（函数响应式编程）的元素。Nest 基于 Express，可以方便地使用各种可用的第三方插件。
 
 # 原理
 

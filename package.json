@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/meepobrother/docs.git"
+    "url": "git+https://github.com/nestcn/docs.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/meepobrother/docs/issues"
+    "url": "https://github.com/nestcn/docs/issues"
   },
-  "homepage": "https://github.com/meepobrother/docs#readme",
+  "homepage": "https://github.com/nestcn/docs#readme",
   "devDependencies": {
     "docsify-cli": "^4.1.12"
   }

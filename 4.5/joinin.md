@@ -73,7 +73,6 @@ Nestcn 官方文档会持续更新，为了保证后续的修改能更新上，�
   - [类型混淆](4.5/mixinClass.md)
 
 - 秘籍
-  - [SQL (4.5/TypeORM)](4.5/SQLT.md)
   - [MongoDB (4.5/Mongoose)](4.5/mongodb.md)
   - [MongoDB E2E (4.5/Mockgoose)](4.5/mongodbe2e.md)
   - [SQL (4.5/Sequelize)](4.5/sqls.md)

@@ -8,6 +8,7 @@
 要创建一个基本的控制器，你必须将 `元数据`（metadata） 附加到类中。Nest 元数据知道如何映射您的控制器到适当的路由。要附加元数据到我们正在使用的装饰器 (在这种情况下 `@Controller('cats')` )。
 
 > cats.controller.ts
+
 ```JavaScript
 import { Controller, Get } from '@nestjs/common';
 
@@ -50,6 +51,7 @@ export class CatsController {
 
 
 `cats.controller.ts`
+
 ```Javascript
 import { Controller, Get, Req } from '@nestjs/common';
 
@@ -107,6 +109,7 @@ export class CatsController {
 > 如前面所说，默认情况下，响应的状态码总是200，除了 POST 请求外，此时它是201，我们可以通过在处理程序层添加`@HttpCode（...）` 装饰器来轻松更改此行为。
 
 `cats.controller.ts`
+
 ```Javascript
 import { Controller, Get, Post, HttpStatus } from '@nestjs/common';
 
@@ -148,7 +151,8 @@ findOne(@Param() params) {
 
 
 > cats.controller.ts
-```
+
+```Javascript
 @Get()
 async findAll(): Promise<any[]> {
   return [];
@@ -162,7 +166,8 @@ async findAll(): Promise<any[]> {
 此外, Nest 路由处理程序更强大。它可以返回一个 Rxjs observable 的流,使得在简单的 web 应用程序和 微服务 之间的迁移更加容易。
 
 > cats.controller.ts
-```
+
+```Javascript
 @Get()
 findAll(): Observable<any[]> {
   return Observable.of([]);
@@ -180,6 +185,7 @@ findAll(): Observable<any[]> {
 我们来创建 CreateCatDto：
 
 > dto/create-cat.dto.ts
+
 ```Javascript
 export class CreateCatDto {
   readonly name: string;
@@ -192,6 +198,7 @@ export class CreateCatDto {
  现在我们可以使用 CatsController 中的模式：
 
 > cats.controller.ts
+
 ```Javascript
 @Post()
 async create(@Body() createCatDto: CreateCatDto) {
@@ -210,7 +217,8 @@ async create(@Body() createCatDto: CreateCatDto) {
 控制器总是属于模块，这就是为什么我们在 `@Module()` 装饰器中保存控制器数组。 由于除了根ApplicationModule，我们没有其他模块，现在就让我们使用它：
 
 > app.module.ts
-```
+
+```Javascript
 import { Module } from '@nestjs/common';
 import { CatsController } from './cats/cats.controller';
 

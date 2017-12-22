@@ -9,7 +9,7 @@
 
 > cats.controller.ts
 
-```JavaScript
+```typescript
 import { Controller, Get } from '@nestjs/common';
 
 @Controller('cats')
@@ -52,7 +52,7 @@ export class CatsController {
 
 `cats.controller.ts`
 
-```Javascript
+```typescript
 import { Controller, Get, Req } from '@nestjs/common';
 
 @Controller('cats')
@@ -86,7 +86,7 @@ export class CatsController {
 
 > cats.controller.ts
 
-```Javascript
+```typescript
 import { Controller, Get, Post } from '@nestjs/common';
 
 @Controller('cats')
@@ -110,7 +110,7 @@ export class CatsController {
 
 `cats.controller.ts`
 
-```Javascript
+```typescript
 import { Controller, Get, Post, HttpStatus } from '@nestjs/common';
 
 @Controller('cats')
@@ -133,7 +133,7 @@ export class CatsController {
 
 当需要将动态数据作为 URL 的一部分接受时, 使用静态路径的路由无法提供帮助。要使用路由参数定义路由，只需在路由的路径中指定路由参数，如下所示。
 
-```Javascript
+```typescript
 @Get(':id')
 findOne(@Param() params) {
   console.log(params.id);
@@ -152,7 +152,7 @@ findOne(@Param() params) {
 
 > cats.controller.ts
 
-```Javascript
+```typescript
 @Get()
 async findAll(): Promise<any[]> {
   return [];
@@ -167,7 +167,7 @@ async findAll(): Promise<any[]> {
 
 > cats.controller.ts
 
-```Javascript
+```typescript
 @Get()
 findAll(): Observable<any[]> {
   return Observable.of([]);
@@ -186,7 +186,7 @@ findAll(): Observable<any[]> {
 
 > dto/create-cat.dto.ts
 
-```Javascript
+```typescript
 export class CreateCatDto {
   readonly name: string;
   readonly age: number;
@@ -199,7 +199,7 @@ export class CreateCatDto {
 
 > cats.controller.ts
 
-```Javascript
+```typescript
 @Post()
 async create(@Body() createCatDto: CreateCatDto) {
   // TODO: Add some logic here
@@ -218,7 +218,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 > app.module.ts
 
-```Javascript
+```typescript
 import { Module } from '@nestjs/common';
 import { CatsController } from './cats/cats.controller';
 
@@ -238,7 +238,7 @@ export class ApplicationModule {}
 操纵响应的第二种方法是使用 express 响应对象。这是 Nest 4 目前唯一可用的选项。要注入响应对象，我们需要使用 `@Res()` 装饰器。 为了对比差异，我将重写 CatsController：
 
 
-```Javascript
+```typescript
 import { Controller, Get, Post, Res, Body, HttpStatus } from '@nestjs/common';
 import { CreateCatDto } from './dto/create-cat.dto';
 

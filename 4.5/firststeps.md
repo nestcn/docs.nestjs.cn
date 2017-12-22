@@ -48,7 +48,7 @@ src
  `server.ts` 包含一个异步函数，它负责引导我们的应用程序：
 
 
-```JavaScript
+```typescript
 import { NestFactory } from '@nestjs/core';
 import { ApplicationModule } from './modules/app.module';
 

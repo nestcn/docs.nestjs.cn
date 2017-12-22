@@ -46,7 +46,7 @@ src
 | app.controller.ts | 带有单个路由的基本控制器示例。     |   
 
 
- server.ts 包含一个异步函数，它负责引导我们的应用程序：
+ `server.ts` 包含一个异步函数，它负责引导我们的应用程序：
 
 
 ```JavaScript

@@ -33,27 +33,27 @@ Nestcn 官方文档会持续更新，为了保证后续的修改能更新上，�
 
 
 - 概述
-  - [第一步](4.5/firstSteps.md)
+  - [第一步](4.5/firststeps.md)
   - [控制器](4.5/controllers.md)
   - [组件](4.5/components.md)
   - [模块](4.5/modules.md)
   - [中间件](4.5/middlewares.md)
-  - [异常过滤器](4.5/exceptionFilters.md)  
+  - [异常过滤器](4.5/exceptionfilters.md)  
   - [管道](4.5/pipes.md)
   - [看守器](4.5/guards.md)
   - [拦截器](4.5/interceptors.md)
-  - [自定义装饰器](4.5/customDecorators.md)
+  - [自定义装饰器](4.5/customdecorators.md)
 
 - 基础
-  - [依赖注入](4.5/dependencyInjection.md)
-  - [异步组件](4.5/asyncComponents.md)
-  - [循环依赖](4.5/circularDependency.md)
+  - [依赖注入](4.5/dependencyinjection.md)
+  - [异步组件](4.5/asynccomponents.md)
+  - [循环依赖](4.5/circulardependency.md)
   - [单元测试](4.5/unit.md)
   - [E2E 测试](4.5/e2e.md)
 
 - WEBSOCKETS
   - [网关](4.5/gateways.md)
-  - [异常过滤器](4.5/exceptionFilters2.md)
+  - [异常过滤器](4.5/exceptionfilters2.md)
   - [管道](4.5/pipes2.md)
   - [看守器](4.5/guards2.md)
   - [拦截器](4.5/interceptors2.md)
@@ -62,14 +62,14 @@ Nestcn 官方文档会持续更新，为了保证后续的修改能更新上，�
 - 微服务
   - [基本信息](4.5/basics.md)
   - [Redis](4.5/redis.md)
-  - [异常过滤器](4.5/exceptionFilters3.md)
+  - [异常过滤器](4.5/exceptionfilters3.md)
   - [管道](4.5/pipes3.md)
   - [看守器](4.5/guards3.md)
   - [拦截器](4.5/interceptors3.md)
-  - [自定义传输](4.5/customTransport.md)
+  - [自定义传输](4.5/customtransport.md)
 
 - 高级
-  - [分层注入](4.5/hierarchicalInjector.md)
+  - [分层注入](4.5/hierarchicalinjector.md)
   - [类型混淆](4.5/mixinClass.md)
 
 - 秘籍
@@ -83,7 +83,7 @@ Nestcn 官方文档会持续更新，为了保证后续的修改能更新上，�
 
 - FAQ
   - [Express 实例](4.5/expressinstance.md)
-  - [全局路由前缀](4.5/globalroutePrefix.md)
+  - [全局路由前缀](4.5/globalrouteprefix.md)
   - [生命周期事件](4.5/lifecycleevents.md)
   - [混合应用](4.5/hybridapplication.md)
   - [HTTPS 和 多服务](4.5/httpsmultipleservers.md)

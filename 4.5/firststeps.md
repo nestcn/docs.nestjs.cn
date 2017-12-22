@@ -17,7 +17,6 @@
 
  使用 [Starter repository](https://github.com/nestjs/typescript-starter) 建立新项目非常简单。 只要确保你已经安装了 npm，然后在你的 OS 终端中使用以下命令：
 
-## TypeScript & JavaScript
 
 ```
 $ git clone https://github.com/nestjs/typescript-starter.git project

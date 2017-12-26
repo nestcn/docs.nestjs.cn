@@ -67,12 +67,12 @@ export class CatsController {
 
 # 依赖注入
 
-Nest 是建立在强大的设计模式之上的，这通常称为依赖注入。 在官方的角度文献中有一篇关于这个概念的好文章。
+Nest 是建立在强大的设计模式之上的，这通常称为依赖注入。 在官方的 Angular 文献中有一篇关于这个概念的**[好文章](https://angular.io/guide/dependency-injection)**。
 
 
-!> 在此处了解更多关于嵌套依赖注入的内容。
+!> 在[此处](/4.5/dependencyinjection.md)了解更多关于嵌套依赖注入的内容。
 
-使用 `TypeScript` 管理依赖关系是非常容易的，因为Nest只会按类型识别您的依赖关系。 这一行：
+使用 `TypeScript` 管理依赖关系是非常容易的，因为 Nest 只会按类型识别您的依赖关系。 这一行：
 
 ```typescript
 constructor(private readonly catsService: CatsService) {}
@@ -82,7 +82,7 @@ constructor(private readonly catsService: CatsService) {}
 
 # 最后一步
 
-最后一件事是告诉模块，一个名为 `CatsService` 的东西确实存在。 唯一的方法是打开 `app.module.ts` 文件，并将服务放入 `@Module()装饰器` 的`components` 数组中。
+最后一件事是告诉模块，一个叫做 `CatsService` 的东西确实是存在的。 解决这个问题的唯一的方法是打开 `app.module.ts` 文件，并将服务放入 `@Module()装饰器` 的`components` 数组中。
 
 > app.module.ts
 
@@ -98,7 +98,7 @@ import { CatsService } from './cats/cats.service';
 export class ApplicationModule {}
 ```
 
-现在，Nest将顺利解决 `CatsController` 类的依赖关系。 这就是我们的目录结构现在的样子：
+现在，Nest 将顺利解决 `CatsController` 类的依赖关系。 这就是我们的目录结构现在的样子：
 
 ```text
 -| src/

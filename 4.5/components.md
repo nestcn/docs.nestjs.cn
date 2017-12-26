@@ -63,7 +63,7 @@ export class CatsController {
 }
 ```
 
-`CatsService` 通过类构造函数注入。不要害怕 `private` `readonly` 缩短语法。这意味着我们在同一位置创建并初始化了 `catsService` 成员。
+这个 `Catsservice` 是通过类的构造器注入进来的。不必在意这个 `private` `readonly` 简写语法，它代表我们已经在这儿创建和初始化了这个 `Catsservice` 成员。
 
 # 依赖注入
 

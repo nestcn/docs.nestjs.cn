@@ -1,14 +1,14 @@
 # 组件
 
-几乎所有东西都是一个组件 `Service`，`Repository`，`Factory`，`Helper`，它们可以通过构造函数注入到控制器或其他组件中。
+几乎所有的事物都是一个组件 `Service`，`Repository`，`Factory`，`Helper`，可以通过构造函数将一个组件注入控制器或者另一个组件中。
 
 <center>![图1](https://docs.nestjs.com/assets/Components_1.png)</center>
 
-在前一章中，我们已经构建了一个简单的 `CatsController`。
+在上一章中，我们已经构建了一个简单的控制器 `CatsController`。
 
 控制器应该只处理HTTP请求并将更复杂的任务委托给组件。 这些组件是一个普通的 `TypeScript` 类，带有 `@Component()` 装饰器。
 
-!> 由于 Nest 使设计的可能性更大，所以我们强烈建议遵循 SOLID 原则。
+!> Nest 为了更好的程序设计性，依赖关系组织更加符合面向对象的方式，我们强烈建议程序开发时遵循 SOLID 原则。
 
 我们来创建一个 `CatsService` 组件：
 
@@ -32,11 +32,12 @@ export class CatsService {
 }
 ```
 
-没有什么特别的组件。 这里有一个 `CatsService` ，一个基本的类有一个属性和两个方法。 唯一的区别是它有 `@Component()装饰器`。 `@Component()附加元数据`，因此 Nest 知道这个类是一个 Nest 组件。
+组件没有什么特别的。这里是一个 `CatsService` ，一个具有一个属性和两个方法的基本类。 唯一的区别是它有 `@Component()` 装饰器。 `@Component()` 附加元数据，因此 Nest 知道这个类是一个 Nest 组件。
 
-!> 这里有一个 `Cat` 界面。 我没有提到它，因为这个模式和我们在前一章中创建的 `CreateCatDto` 类完全一样。
 
-由于我们已经完成了服务类，让我们在 `CatsController` 中使用它：
+!> 这里有个`Cat` 的接口我没有提到它, 因为结构与我们在上一章中创建的 `CreateCatDto` 类完全相同。
+
+既然我们已经完成了服务类, 让我们在 `CatsController` 中使用它:
 
 > cats.controller.ts
 
@@ -62,11 +63,12 @@ export class CatsController {
 }
 ```
 
-`CatsService` 是通过类构造函数注入的。 不要害怕私有只读语法的缩短。 这意味着我们已经在相同的位置创建并初始化了 `catsService` 成员。
+`CatsService` 通过类构造函数注入。不要害怕 `private` `readonly` 缩短语法。这意味着我们在同一位置创建并初始化了 `catsService` 成员。
 
-依赖注入
+# 依赖注入
 
-Nest 是建立在强大的设计模式之上的，通常被称为依赖注入`（Dependency Injection）`。 在官方的 `Angular` 文档中有关于这个概念的很好的文章。
+Nest 是建立在强大的设计模式之上的，这通常称为依赖注入。 在官方的角度文献中有一篇关于这个概念的好文章。
+
 
 !> 在此处了解更多关于嵌套依赖注入的内容。
 

@@ -177,14 +177,14 @@
 
 ### S
 
-- Schema 数据库结构
-- Service 服务
+- Schema 结构 &
+- Service 服务 &
 - Service Container 服务容器
 - Service Providers 服务提供器
 - Session 会话 (可不翻) &
 - Sequelize （不翻） &
 - SQL （不翻）&
-- Swagger (不翻)
+- Swagger (不翻) &
 
 ### T
 

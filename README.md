@@ -27,3 +27,5 @@ $ npm i --save @nestjs/core @nestjs/common @nestjs/microservices @nestjs/websock
 ```
 
 ## [查看 4.5 文档](/4.5/)
+
+## [参与文档翻译](/4.5/joinin.md)

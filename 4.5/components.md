@@ -67,7 +67,7 @@ export class CatsController {
 
 # 依赖注入
 
-Nest 是建立在强大的设计模式之上的，这通常称为依赖注入。 在官方的 Angular 文献中有一篇关于这个概念的**[好文章](https://angular.io/guide/dependency-injection)**。
+Nest 是建立在强大的设计模式之上的，这通常称为依赖注入。 在官方的 Angular 文献中有一篇关于这个概念的[好文章](https://angular.io/guide/dependency-injection)。
 
 
 !> 在[此处](/4.5/dependencyinjection.md)了解更多关于嵌套依赖注入的内容。

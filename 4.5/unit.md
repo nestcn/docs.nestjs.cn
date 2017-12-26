@@ -29,7 +29,7 @@ describe('CatsController', () => {
   });
 });
 ```
-!>  将你的测试文件保存在已测试的类附近. 测试文件应该有一个 `.spec` 或 `.test` 后缀.
+?>  将你的测试文件保存在已测试的类附近. 测试文件应该有一个 `.spec` 或 `.test` 后缀.
 
 这有一个使用 [Jest](https://github.com/facebook/jest) 库的例子. 我们使用 `new` 关键词手动创建了 `CatsController` 和 `CatsService` 的示例，我们没有使用任何 Nest 的工具。这种测试就称为隔离测试。
 
@@ -72,4 +72,4 @@ describe('CatsController', () => {
 
 有时你可能想使用测试替身（test doubles）来替代真实的实例。这很容易，因为 Nest 允许使用 [自定义组件（custom components）](https://docs.nestjs.com/fundamentals/dependency-injection) 来覆盖原本的组件（component）。
 
-!> 阅读更多关于 `TestingModule` 类的内容，请移步  **[这里](/4.5/e2e.md)** .
+?> 阅读更多关于 `TestingModule` 类的内容，请移步  **[这里](/4.5/e2e.md)** .

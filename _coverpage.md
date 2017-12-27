@@ -11,4 +11,4 @@
 
 
 [GitHub](https://github.com/nestjs/nest)
-[开始使用](4.5/firststeps.md)
+[开始使用](/4.5/firststeps.md)

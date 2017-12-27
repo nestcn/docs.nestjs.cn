@@ -2,7 +2,6 @@
 
 在 Nest 中，有一个异常层，其责任是捕获未处理的异常，并将适当的响应返回给最终用户。
 
-
 每个异常都是由全局异常过滤器处理的，当它无法识别时（不是HttpException继承的类HttpException），用户会收到下面的JSON响应：
 
 ```
@@ -90,22 +89,22 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 为了减少样板代码，Nest提供了一系列扩展核心的可用异常HttpException。所有这些都可以在@nestjs/common包中找到：
 
-+ BadRequestException
-+ UnauthorizedException
-+ NotFoundException
-+ ForbiddenException
-+ NotAcceptableException
-+ RequestTimeoutException
-+ ConflictException
-+ GoneException
-+ PayloadTooLargeException
-+ UnsupportedMediaTypeException
-+ UnprocessableException
-+ InternalServerErrorException
-+ NotImplementedException
-+ BadGatewayException
-+ ServiceUnavailableException当
-+ GatewayTimeoutException
+- BadRequestException
+- UnauthorizedException
+- NotFoundException
+- ForbiddenException
+- NotAcceptableException
+- RequestTimeoutException
+- ConflictException
+- GoneException
+- PayloadTooLargeException
+- UnsupportedMediaTypeException
+- UnprocessableException
+- InternalServerErrorException
+- NotImplementedException
+- BadGatewayException
+- ServiceUnavailableException当
+- GatewayTimeoutException
 
 ## 异常过滤器（Exception Filters）
 基本异常处理程序很好，但有时您可能想要完全控制异常层，例如添加一些日志记录或使用不同的JSON模式。我们喜欢通用的解决方案，使您的生活更轻松，这就是为什么称为异常过滤器的功能被创建 的原因

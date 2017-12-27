@@ -28,7 +28,7 @@ const user = req.user;
 
 `user.decorator.ts`
 
-```typeScript
+```typescript
 import { createRouteParamDecorator } from '@nestjs/common';
 
 export const User = createRouteParamDecorator((data, req) => {
@@ -38,7 +38,7 @@ export const User = createRouteParamDecorator((data, req) => {
 
 现在你可以在任何你想要的地方方便地使用它。
 
-```typeScript
+```typescript
 @Get()
 async findOne(@User() user: UserEntity) {
   console.log(user);
@@ -49,7 +49,7 @@ async findOne(@User() user: UserEntity) {
 
 当你的装饰器的行为依赖于某些条件时，你可以使用 `data` 给装饰器工厂函数传参。例如，下面的构造：
 
-```typeScript
+```typescript
 @Get()
 async findOne(@User('test') user: UserEntity) {
   console.log(user);
@@ -60,7 +60,7 @@ async findOne(@User('test') user: UserEntity) {
 
 `user.decorator.ts`
 
-```typeScript
+```typescript
 import { createRouteParamDecorator } from '@nestjs/common';
 
 export const User = createRouteParamDecorator((data, req) => {
@@ -73,7 +73,7 @@ export const User = createRouteParamDecorator((data, req) => {
 
 Nest 对待自定义的路由参数装饰器和内置的装饰器一样（@Body()，@Param() 和 @Query()）。这意味着管道也会因为自定义注释参数（在本例中为 `user` 参数）而被执行。此外，你还可以直接将管道应用到自定义装饰器上： 
 
-```typeScript
+```typescript
 @Get()
 async findOne(@User(new ValidationPipe()) user: UserEntity) {
   console.log(user);

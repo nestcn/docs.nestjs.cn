@@ -34,12 +34,12 @@ export class LoggerMiddleware implements NestMiddleware {
 
 该 `resolve()` 方法必须返回正则表达式中间件 `(req, res, next) => void`
 
-# 依赖注入
+## 依赖注入
 
 说到中间件, 也不例外。与组件和控制器相同, 它们可以通过属于同一模块的构造函数来注入依赖项。
 
 
-# 中间件放在哪里
+## 中间件放在哪里
 
 中间件不能在 `@Module()` 装饰器中列出。我们必须使用 `configure()` 模块类的方法来设置它们。包含中间件的模块必须实现 `NestModule` 接口。让我们设置 `LoggerMiddleware` 在 `ApplicationModule` 关卡上。
 
@@ -63,7 +63,7 @@ export class ApplicationModule implements NestModule {
 }
 ```
 
-!> 我们可以通过这里 `(inside forRoutes())`  的单一对象, 只是使用 `RequestMethod.ALL` 。
+?> 我们可以通过这里 `(inside forRoutes())`  的单一对象, 只是使用 `RequestMethod.ALL` 。
 
 
 在上面的例子中, 我们已经设置了 `LoggerMiddleware` 的 `/cats` 的路由处理程序, 我们已经在 CatsController 注册。MiddlewareConsumer 是一个帮助类。它提供了几种使用中间件的方法。他们都可以简单地链接。让我们来看看这些方法。
@@ -88,9 +88,9 @@ export class ApplicationModule implements NestModule {
 }
 ```
 
-!> 该 `apply()` 方法可以采用单个中间件或一组中间件。
+?> 该 `apply()` 方法可以采用单个中间件或一组中间件。
 
-# 将参数传递给中间件
+## 将参数传递给中间件
 
 有时中间件的行为取决于自定义值，例如用户角色数组，选项对象等。我们可以将其他参数传递给 `resolve()` 来使用 `with()` 方法。看下面的例子：
 
@@ -134,7 +134,7 @@ export class LoggerMiddleware implements NestMiddleware {
 
 该 `name` 的属性值将是 `ApplicationModule`。
 
-# 异步中间件
+## 异步中间件
 
 从解析 `resolve()` 返回异步函数没有禁忌。另外，也可以制作这个 `resolve()` 方法 `async`。这种模式被称为异步中间件。
 
@@ -188,6 +188,6 @@ export class ApplicationModule implements NestModule {
 }
 ```
 
-!> 当您的中间件没有任何依赖关系时，我们可以考虑使用功能中间件。
+?> 当您的中间件没有任何依赖关系时，我们可以考虑使用功能中间件。
 
 

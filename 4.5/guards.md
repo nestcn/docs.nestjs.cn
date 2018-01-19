@@ -1,6 +1,6 @@
 # 看守器
 
-看守器是一个使用 `@Guard()` 装饰器的类。 看守器应该实施 `CanActivate` 接口。
+看守器是一个使用 `@Guard()` 装饰器的类。 看守器应该使用 `CanActivate` 接口。
 
 ![](https://docs.nestjs.com/assets/Guards_1.png)
 

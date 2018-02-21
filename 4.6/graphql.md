@@ -455,7 +455,7 @@ export class AuthorResolver {
 
 ### 重构
 
-我们在这里使用了一个本地 PubSub 实例。相反, 我们应该将 PubSub 定义为一个组件, 通过构造函数 (使用 @Inject () 装饰器) 注入它, 并在整个应用程序中重用它。[您可以在此了解有关嵌套自定义组件的更多信息](4.5/dependencyinjection)。
+我们在这里使用了一个本地 PubSub 实例。相反, 我们应该将 PubSub 定义为一个组件, 通过构造函数 (使用 @Inject () 装饰器) 注入它, 并在整个应用程序中重用它。[您可以在此了解有关嵌套自定义组件的更多信息](4.6/dependencyinjection)。
 
 ### 类型定义
 

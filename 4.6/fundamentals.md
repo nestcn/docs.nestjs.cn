@@ -42,7 +42,7 @@ const connectionFactory = {
 用例:
 
 - 提供一个值, 必须使用其他组件 (或自定义包功能) 进行计算
-- 提供待摊值, 例如数据库连接 (阅读有关[异步组件](4.5/asynccomponents)的更多信息)
+- 提供待摊值, 例如数据库连接 (阅读有关[异步组件](4.6/asynccomponents)的更多信息)
 
 
 ### 使用类（class）
@@ -95,11 +95,11 @@ class CatsRepository {
 },
 ```
 
-?> 阅读更多关于自定义组件的[信息](4.5/dependencyinjection)
+?> 阅读更多关于自定义组件的[信息](4.6/dependencyinjection)
 
 这些异步组件可能只是由 token (在本例中为 AsyncDbConnection 令牌) 注入其他组件。当异步组件将被解析(resolved)时，每个依赖于异步组件的组件都将被实例化。
 
-以上示例用于演示目的。如果你正在寻找更详细的，请看[这里](4.5/sqltypeorm)。
+以上示例用于演示目的。如果你正在寻找更详细的，请看[这里](4.6/sqltypeorm)。
 
 ## 循环依赖
 
@@ -249,7 +249,7 @@ describe('CatsController', () => {
 
 有时你可能想使用测试替身（test doubles）来替代真实的实例。这很容易，因为 Nest 允许使用 [自定义组件（custom components）](https://docs.nestjs.com/fundamentals/dependency-injection) 来覆盖原本的组件（component）。
 
-?> 阅读更多关于 `TestingModule` 类的内容，请移步  **[这里](4.5/e2e.md)** .
+?> 阅读更多关于 `TestingModule` 类的内容，请移步  **[这里](4.6/e2e.md)** .
 
 
 ## E2E 测试

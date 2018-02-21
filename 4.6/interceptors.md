@@ -147,10 +147,10 @@ export class CacheInterceptor implements NestInterceptor {
 }
 ```
 
-下面是一个带有硬编码 `isCached` 变量和缓存响应 `[]` 的 `CacheInterceptor`。由于我们正在返回通过 of 运算符创建的新流, 因此不会调用路由处理程序。若要创建通用解决方案, 可以使用 Reflector 并创建自定义修饰器。在[看守器](4.5/guards)的文章里有很好的描述。这就是一切。
+下面是一个带有硬编码 `isCached` 变量和缓存响应 `[]` 的 `CacheInterceptor`。由于我们正在返回通过 of 运算符创建的新流, 因此不会调用路由处理程序。若要创建通用解决方案, 可以使用 Reflector 并创建自定义修饰器。在[看守器](4.6/guards)的文章里有很好的描述。这就是一切。
 
 
-!> 在拦截器中引发的异常可以被异常筛选([exception filters](4.5/exceptionfilters))捕获。
+!> 在拦截器中引发的异常可以被异常筛选([exception filters](4.6/exceptionfilters))捕获。
 
 ## 全局拦截器
 

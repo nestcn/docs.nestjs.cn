@@ -26,6 +26,6 @@ $ npm run start
 $ npm i --save @nestjs/core @nestjs/common @nestjs/microservices @nestjs/websockets @nestjs/testing reflect-metadata rxjs
 ```
 
-## [查看 4.5 文档](/4.5/)
+## [查看 4.6 文档](/4.6/)
 
-## [参与文档翻译](/4.5/joinin.md)
+## [参与文档翻译](/4.6/joinin.md)

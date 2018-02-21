@@ -208,7 +208,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 # 处理 errors
 
-这里有一个关于处理异常的独立[章节](4.5/exceptionfilters.md)。
+这里有一个关于处理异常的独立[章节](4.6/exceptionfilters.md)。
 
 # 最后一步
 

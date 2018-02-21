@@ -32,62 +32,7 @@ Nestcn 官方文档会持续更新，为了保证后续的修改能更新上，�
 ## 任务列表
 
 
-- 概述
-  - [异常过滤器](4.5/exceptionfilters.md)  
-  - [管道](4.5/pipes.md)
-  - [看守器](4.5/guards.md)
-  - [拦截器](4.5/interceptors.md)
-  - [自定义装饰器](4.5/customdecorators.md)
 
-- 基础
-  - [依赖注入](4.5/dependencyinjection.md)
-  - [异步组件](4.5/asynccomponents.md)
-  - [循环依赖](4.5/circulardependency.md)
-  - [单元测试](4.5/unit.md)
-  - [E2E 测试](4.5/e2e.md)
-
-- WEBSOCKETS
-  - [网关](4.5/gateways.md)
-  - [异常过滤器](4.5/exceptionfilters2.md)
-  - [管道](4.5/pipes2.md)
-  - [看守器](4.5/guards2.md)
-  - [拦截器](4.5/interceptors2.md)
-  - [适配器](4.5/adapter.md)
-
-- 微服务
-  - [基本信息](4.5/basics.md)
-  - [Redis](4.5/redis.md)
-  - [异常过滤器](4.5/exceptionfilters3.md)
-  - [管道](4.5/pipes3.md)
-  - [看守器](4.5/guards3.md)
-  - [拦截器](4.5/interceptors3.md)
-  - [自定义传输](4.5/customtransport.md)
-
-- 高级
-  - [分层注入](4.5/hierarchicalinjector.md)
-  - [类型混淆](4.5/mixinClass.md)
-
-- 秘籍
-  - [SQL (4.5/TypeORM)](4.5/SQLT.md)
-  - [MongoDB (4.5/Mongoose)](4.5/mongodb.md)
-  - [MongoDB E2E (4.5/Mockgoose)](4.5/mongodbe2e.md)
-  - [SQL (4.5/Sequelize)](4.5/sqls.md)
-  - [集成认证](4.5/passportintegration.md)
-  - [CQRS](4.5/cors.md)
-  - [OpenAPI (4.5/Swagger)](4.5/openapi.md)
-  - [GraphQL](4.5/graphql.md)
-
-- FAQ
-  - [Express 实例](4.5/expressinstance.md)
-  - [全局路由前缀](4.5/globalrouteprefix.md)
-  - [生命周期事件](4.5/lifecycleevents.md)
-  - [混合应用](4.5/hybridapplication.md)
-  - [HTTPS 和 多服务](4.5/httpsmultipleservers.md)
-  - [样例](4.5/examples.md)
-
-
-- 支持
-  - [更新日志](4.5/changelog.md)
 
 原文文档： https://docs.nestjs.com/
 
@@ -111,7 +56,7 @@ Nestcn 官方文档会持续更新，为了保证后续的修改能更新上，�
 
 ## 对照表
 
-请必须严格按照「[专有名词翻译对照表](4.5/about.md)」来翻译
+请必须严格按照「[专有名词翻译对照表](4.6/about.md)」来翻译
 
 # 开始翻译
 
@@ -119,7 +64,7 @@ Nestcn 官方文档会持续更新，为了保证后续的修改能更新上，�
 
 
 1. Fork 项目；
-2. 在 https://raw.githubusercontent.com/nestcn/docs/master4.5/_sidebar.md 找到对应的文件，请必须基于 同一个文件进行翻译；
+2. 在 https://raw.githubusercontent.com/nestcn/docs/master4.6/_sidebar.md 找到对应的文件，请必须基于 同一个文件进行翻译；
 3. 翻译完成后自己 Review 两遍；
 4. 然后提交 PR。
 

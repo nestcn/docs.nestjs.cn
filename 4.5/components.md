@@ -1,4 +1,4 @@
-# 组件
+## 组件
 
 几乎所有的事物都是一个组件 `Service`，`Repository`，`Factory`，`Helper`，可以通过构造函数将一个组件注入控制器或者另一个组件中。
 
@@ -65,7 +65,7 @@ export class CatsController {
 
 这个 `Catsservice` 是通过类的构造器注入进来的。不必在意这个 `private` `readonly` 简写语法，它代表我们已经在这儿创建和初始化了这个 `Catsservice` 成员。
 
-# 依赖注入
+## 依赖注入
 
 Nest 是建立在强大的设计模式之上的，这通常称为依赖注入。 在官方的 Angular 文献中有一篇关于这个概念的[好文章](https://angular.io/guide/dependency-injection)。
 
@@ -80,7 +80,7 @@ constructor(private readonly catsService: CatsService) {}
 
 有一件重要的事情你必须要知道，`tsconfig.json` 文件中 `emitDecoratorMetadata` 选项设置为 `true`。
 
-# 最后一步
+## 最后一步
 
 最后一件事是告诉模块，一个叫做 `CatsService` 的东西确实是存在的。 解决这个问题的唯一的方法是打开 `app.module.ts` 文件，并将服务放入 `@Module()装饰器` 的`components` 数组中。
 

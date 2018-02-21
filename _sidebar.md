@@ -19,7 +19,7 @@
   - [异步组件](4.5/asyncComponents.md)
   - [循环依赖](4.5/circularDependency.md)
   - [单元测试](4.5/unittesting.md)
-  - [E2E 测试](4.5/e2e.md)
+  - [E2E 测试](4.5/e2etesting.md)
 
 - WEBSOCKETS
   - [网关](4.5/gateways.md)

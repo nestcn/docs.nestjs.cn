@@ -21,6 +21,12 @@
   - [单元测试](4.5/unittesting.md)
   - [E2E 测试](4.5/testing.md)
 
+- 技术
+  - [MVC](4.5/mvc.md)
+  - [SQL](4.5/sql.md)
+  - [mongodb](4.5/mongodb)
+  - [身份验证](4.5/authentication)  
+
 - WEBSOCKETS
   - [网关](4.5/gateways.md)
   - [异常过滤器](4.5/exceptionfilters2.md)
@@ -41,6 +47,7 @@
 - 高级
   - [分层注入](4.5/hierarchicalinjector.md)
   - [类型混淆](4.5/mixinclass.md)
+  - [执行上下文](4.5/executioncontext.md)
 
 - 秘籍
   - [SQL (4.5/TypeORM)](4.5/SQLT.md)

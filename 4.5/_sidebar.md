@@ -14,12 +14,7 @@
   - [拦截器](4.5/interceptors.md)
   - [自定义装饰器](4.5/customdecorators.md)
 
-- 基础
-  - [依赖注入](4.5/fundamentals?id=依赖注入)
-  - [异步组件](4.5/fundamentals?id=异步组件)
-  - [循环依赖](4.5/fundamentals?id=循环依赖)
-  - [单元测试](4.5/fundamentals?id=单元测试)
-  - [E2E 测试](4.5/fundamentals?id=e2e-测试)
+- [基础](4.5/fundamentals?id=依赖注入)
 
 - 技术
   - [MVC](4.5/techniques?id=mvc)

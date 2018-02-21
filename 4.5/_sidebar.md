@@ -15,26 +15,26 @@
   - [自定义装饰器](4.5/customdecorators.md)
 
 - 基础
-  - [依赖注入](4.5/fundamentals?id=dependencyinjection)
-  - [异步组件](4.5/fundamentals?id=asynccomponents)
-  - [循环依赖](4.5/fundamentals?id=circulardependency)
-  - [单元测试](4.5/fundamentals?id=unittesting)
-  - [E2E 测试](4.5/fundamentals?id=e2etesting)
+  - [依赖注入](4.5/fundamentals?id=依赖注入)
+  - [异步组件](4.5/fundamentals?id=异步组件)
+  - [循环依赖](4.5/fundamentals?id=循环依赖)
+  - [单元测试](4.5/fundamentals?id=单元测试)
+  - [E2E 测试](4.5/fundamentals?id=e2e-测试)
 
 - 技术
   - [MVC](4.5/techniques?id=mvc)
-  - [SQL](4.5/techniques?id=SQL)
+  - [SQL](4.5/techniques?id=sql)
   - [mongodb](4.5/techniques?id=mongodb)
-  - [身份验证](4.5/techniques?id=authentication)  
+  - [身份验证](4.5/techniques?id=身份验证（Passport）)  
 
 - GraphQL
   - [快速开始](4.5/graphql?id=快速开始)
-  - [解析器映射](4.5/graphql?id=resolversmap)
-  - [变更](4.5/graphql?id=mutations)
-  - [订阅](4.5/graphql?id=subscriptions)
+  - [解析器映射](4.5/graphql?id=解析器映射)
+  - [变更](4.5/graphql?id=变更（Mutations）)
+  - [订阅](4.5/graphql?id=订阅（Subscriptions）)
   - [看守器和拦截器](4.5/graphql?id=看守器和拦截器)
-  - [schema 拼接](4.5/graphql?id=schemastitching)
-  - [IDE](4.5/graphql?id=IDE)
+  - [schema 拼接](4.5/graphql?id=schema-拼接)
+  - [IDE](4.5/graphql?id=ide)
 
 - WEBSOCKETS
   - [网关](4.5/websockets?id=gateways)

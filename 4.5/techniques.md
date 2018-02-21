@@ -235,9 +235,9 @@ export class PhotoService {
 (待翻译，不建议使用 MongoDB)
 
 
-<a name="authentication"></a>
 
-## 身份验证 （Passport） {#authentication}
+
+## 身份验证（Passport）
 
 Passport 是最受欢迎的认证库，几乎全球所有的 node.js 开发人员都知道，并且已经在很多生产应用程序中使用。将此工具与 Nest 框架集成非常简单。为了演示目的，我将设置 Passport-jwt 策略。
 

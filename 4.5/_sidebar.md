@@ -15,11 +15,11 @@
   - [自定义装饰器](4.5/customdecorators.md)
 
 - 基础
-  - [依赖注入](4.5/dependencyinjection.md)
-  - [异步组件](4.5/asynccomponents.md)
-  - [循环依赖](4.5/circulardependency.md)
-  - [单元测试](4.5/unittesting.md)
-  - [E2E 测试](4.5/testing.md)
+  - [依赖注入](4.5/fundamentals?id=dependencyinjection)
+  - [异步组件](4.5/fundamentals?id=asynccomponents)
+  - [循环依赖](4.5/fundamentals?id=circulardependency)
+  - [单元测试](4.5/fundamentals?id=unittesting)
+  - [E2E 测试](4.5/fundamentals?id=e2etesting)
 
 - 技术
   - [MVC](4.5/techniques?id=mvc)

@@ -20,7 +20,7 @@
 
 - [GraphQL](4.5/graphql)
 
-- WEBSOCKETS
+- [WEBSOCKETS](4.5/websockets)
   - [网关](4.5/websockets?id=gateways)
   - [异常过滤器](4.5/websockets?id=exceptionfilters)
   - [管道](4.5/websockets?id=pipes)

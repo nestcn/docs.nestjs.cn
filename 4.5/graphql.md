@@ -89,7 +89,8 @@ export class ApplicationModule implements NestModule {
 
 在[这里](https://www.apollographql.com/docs/graphql-tools/resolvers.html), 您可以更多地了解解析程序映射的实际内容。
 
-## 解析器映射
+<a name="resolversmap"></a>
+## 解析器映射 {#resolversmap}
 
 使用时 graphql-tools，您必须手动创建解析器映射。以下示例是从 Apollo 文档复制并粘贴的，您可以在其中阅读更多内容：
 
@@ -263,7 +264,8 @@ type Query {
 
 ?> [此处](http://graphql.cn/learn/queries/)了解有关 GraphQL 查询的更多信息。
 
-##  变更（Mutations ）
+<a name="mutations"></a>
+##  变更（Mutations） {#mutations}
 
 在 GraphQL 中，为了修改服务器端数据，我们使用了变更（Mutations）。[了解更多](http://graphql.cn/learn/queries/#mutations)
 
@@ -392,8 +394,8 @@ type Mutation {
 
 该 upvotePost(postId: Int!): Post 变更是在这里吧！
 
-
-## 订阅 （Subscriptions）
+<a name="=ubscriptions"></a>
+## 订阅 （Subscriptions） {#subscriptions}
 
 订阅只是查询和变更等另一种 GraphQL 操作类型。它允许通过双向传输层创建实时订阅，主要通过 websockets 实现。[阅读更多](https://www.apollographql.com/docs/graphql-subscriptions/)的订阅。
 
@@ -524,7 +526,8 @@ async upvotePost(_, { postId }) {
 
 写一次，随处使用:)
 
-## Schema 拼接
+<a name="schemastitching"></a>
+## Schema 拼接 {#schemastitching}
 
 Schema 拼接功能允许从多个底层GraphQL API创建单个GraphQL模式。你可以在[这里](https://www.apollographql.com/docs/graphql-tools/schema-stitching.html)阅读更多。
 

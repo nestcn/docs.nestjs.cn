@@ -1,10 +1,10 @@
-# 依赖注入
+## 依赖注入
 
 有很多情况下, 当你想绑定的东西直接到 Nest 容器。您应该知道的是, Nest 是通过 tokens 来注入依赖关系的。通常, token 只是一种类型。如果要提供自定义组件, 则需要创建一个 token。通常, 自定义 token 是纯字符串。遵循最佳做法, 您应该将此 token 保存在分隔的文件中, 例如, constants.ts。
 
 让我们来看看可用的选项:
 
-## 使用 Value
+### 使用 Value
 
 ```typescript
 const connectionProvider = { provide: 'ConnectionToken', useValue: null };
@@ -21,7 +21,7 @@ const connectionProvider = { provide: 'ConnectionToken', useValue: null };
 - 将特定值绑定到容器，例如第三方库
 
 
-## 使用工厂（Factory）
+### 使用工厂（Factory）
 
 ```typescript
 const connectionFactory = {
@@ -45,7 +45,7 @@ const connectionFactory = {
 - 提供待摊值, 例如数据库连接 (阅读有关[异步组件](4.5/asynccomponents)的更多信息)
 
 
-## 使用类（class）
+### 使用类（class）
 
 ```typescript
 const configServiceProvider = {
@@ -64,7 +64,7 @@ const configServiceProvider = {
 
 - 重写默认类的实现。
 
-## 注入
+### 注入
 
 
 要通过构造函数注入自定义组件，我们使用 `@Inject()` 装饰器。这个装饰器需要1个参数 - token 。

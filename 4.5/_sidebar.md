@@ -22,18 +22,27 @@
   - [E2E 测试](4.5/testing.md)
 
 - 技术
-  - [MVC](4.5/mvc.md)
-  - [SQL](4.5/sql.md)
-  - [mongodb](4.5/mongodb)
-  - [身份验证](4.5/authentication)  
+  - [MVC](4.5/techniques?id=mvc)
+  - [SQL](4.5/techniques?id=SQL)
+  - [mongodb](4.5/techniques?id=mongodb)
+  - [身份验证](4.5/techniques?id=authentication)  
+
+- GraphQL
+  - [快速开始](4.5/graphql?id=快速开始)
+  - [解析器映射](4.5/graphql?id=resolversmap)
+  - [变更](4.5/graphql?id=mutations)
+  - [订阅](4.5/graphql?id=subscriptions)
+  - [看守器和拦截器](4.5/graphql?id=看守器和拦截器)
+  - [schema 拼接](4.5/graphql?id=schemastitching)
+  - [IDE](4.5/graphql?id=IDE)
 
 - WEBSOCKETS
-  - [网关](4.5/gateways.md)
-  - [异常过滤器](4.5/exceptionfilters2.md)
-  - [管道](4.5/pipes2.md)
-  - [看守器](4.5/guards2.md)
-  - [拦截器](4.5/interceptors2.md)
-  - [适配器](4.5/adapter.md)
+  - [网关](4.5/websockets?id=gateways)
+  - [异常过滤器](4.5/websockets?id=exceptionfilters)
+  - [管道](4.5/websockets?id=pipes)
+  - [看守器](4.5/websockets?id=guards)
+  - [拦截器](4.5/websockets?id=interceptors)
+  - [适配器](4.5/websockets?id=adapter)
 
 - 微服务
   - [基本信息](4.5/basics.md)

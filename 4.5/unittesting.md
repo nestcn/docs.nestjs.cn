@@ -72,4 +72,4 @@ describe('CatsController', () => {
 
 有时你可能想使用测试替身（test doubles）来替代真实的实例。这很容易，因为 Nest 允许使用 [自定义组件（custom components）](https://docs.nestjs.com/fundamentals/dependency-injection) 来覆盖原本的组件（component）。
 
-?> 阅读更多关于 `TestingModule` 类的内容，请移步  **[这里](/4.5/e2e.md)** .
+?> 阅读更多关于 `TestingModule` 类的内容，请移步  **[这里](4.5/e2e.md)** .

@@ -42,7 +42,7 @@ const connectionFactory = {
 用例:
 
 - 提供一个值, 必须使用其他组件 (或自定义包功能) 进行计算
-- 提供待摊值, 例如数据库连接 (阅读有关[异步组件](/4.5/asynccomponents)的更多信息)
+- 提供待摊值, 例如数据库连接 (阅读有关[异步组件](4.5/asynccomponents)的更多信息)
 
 
 ## 使用类（class）

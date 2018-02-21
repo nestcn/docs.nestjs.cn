@@ -111,7 +111,7 @@ Nestcn 官方文档会持续更新，为了保证后续的修改能更新上，�
 
 ## 对照表
 
-请必须严格按照「[专有名词翻译对照表](/4.5/about.md)」来翻译
+请必须严格按照「[专有名词翻译对照表](4.5/about.md)」来翻译
 
 # 开始翻译
 
@@ -119,7 +119,7 @@ Nestcn 官方文档会持续更新，为了保证后续的修改能更新上，�
 
 
 1. Fork 项目；
-2. 在 https://raw.githubusercontent.com/nestcn/docs/master/4.5/_sidebar.md 找到对应的文件，请必须基于 同一个文件进行翻译；
+2. 在 https://raw.githubusercontent.com/nestcn/docs/master4.5/_sidebar.md 找到对应的文件，请必须基于 同一个文件进行翻译；
 3. 翻译完成后自己 Review 两遍；
 4. 然后提交 PR。
 

@@ -232,8 +232,98 @@ export class PhotoService {
 
 ## MongoDB
 
-(待翻译，不建议使用 MongoDB)
+有2种处理 MongoDB 的方法。您可以使用 TypeORM 提供 MongoDB 支持 或者 Mongoose 这是最流行的 MongoDB 对象建模工具。如果你想留在 TypeORM, 你可以按照这些步骤。否则, 我们将使用一个专门的 @nestjs/mongoose 包。
 
+首先, 我们需要安装所有必需的依赖项:
+
+```bash
+$ npm install --save @nestjs/mongoose mongoose
+```
+
+安装过程完成后, 我们可以将 MongooseModule 导入到根 ApplicationModule 中。
+
+> app.module.ts
+
+```typescript
+import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+
+@Module({
+  imports: [MongooseModule.forRoot('mongodb://localhost/nest')],
+})
+export class ApplicationModule {}
+```
+
+forRoot() 方法接受与来自 Mongoose 包的 mongoose.connect() 相同的配置对象。
+
+### 模块注入
+
+在Mongoose, 一切都是从一个模式派生。让我们定义 CatSchema:
+
+> cats/schemas/cat.schema.ts
+
+```typescript
+import * as mongoose from 'mongoose';
+
+export const CatSchema = new mongoose.Schema({
+  name: String,
+  age: Number,
+  breed: String,
+});
+```
+CatsSchema 属于 cats 名录。此目录表示 CatsModule。这是您决定将您的架构文件保存到的位置。从我的角度来看, 最好的方法是将它们几乎放在他们的域中, 放在相应的模块目录中。
+
+让我们看看 CatsModule:
+
+> cats/cats.module.ts
+
+```typescript
+import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+import { CatsController } from './cats.controller';
+import { CatsService } from './cats.service';
+import { CatSchema } from './schemas/cat.schema';
+
+@Module({
+  imports: [MongooseModule.forFeature([{ name: 'Cat', schema: CatSchema }])],
+  controllers: [CatsController],
+  components: [CatsService],
+})
+export class CatsModule {}
+```
+
+此模块使用 forFeature () 方法定义应在当前范围内注册的模型。
+
+现在, 我们可以使用 @InjectModel() 修饰器向 CatsService 注入 CatModel:
+
+> cats/cats.service.ts
+
+```typescript
+import { Model } from 'mongoose';
+import { Component } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Cat } from './interfaces/cat.interface';
+import { CreateCatDto } from './dto/create-cat.dto';
+import { CatSchema } from './schemas/cat.schema';
+
+@Component()
+export class CatsService {
+  constructor(@InjectModel(CatSchema) private readonly catModel: Model<Cat>) {}
+
+  async create(createCatDto: CreateCatDto): Promise<Cat> {
+    const createdCat = new this.catModel(createCatDto);
+    return await createdCat.save();
+  }
+
+  async findAll(): Promise<Cat[]> {
+    return await this.catModel.find().exec();
+  }
+}
+```
+
+就这样。完整的源代码在[这里](https://github.com/nestjs/nest/tree/master/examples/14-mongoose-module)可用。
+
+?> 不要忘记将 CatsModule 导入根 ApplicationModule。
 
 
 

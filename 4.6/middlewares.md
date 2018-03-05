@@ -4,7 +4,7 @@
 
 <center>![图1](https://docs.nestjs.com/assets/Middlewares_1.png)</center>
 
-Nest中间件实际上等于表示中间件。 从Express官方文档复制的中间件功能有很多：
+Nest中间件实际上等价于 [express](http://expressjs.com/en/guide/using-middleware.html) 中间件。 从Express官方文档复制的中间件功能有很多：
 
 
 > 中间件函数可以执行以下任务:

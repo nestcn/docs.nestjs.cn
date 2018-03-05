@@ -133,11 +133,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
 }
 ```
 
-这 `response` 是一个 express 本地响应对象。`exception` 是一个当前处理的异常。
+这个 `response` 是一个原生的 [express 对象](http://www.expressjs.com.cn/4x/api.html#res)。`exception` 是当前被处理的异常。
 
-?> 每个异常过滤器都应该实现这个 `ExceptionFilter` 接口。它强制提供 `catch()`具有适当签名的方法。
+?> 每个异常过滤器都应该实现这个 `ExceptionFilter` 接口。它强制你提供具有正确特征的 `catch()`的方法。
 
-所述 `@Catch()` 装饰结合所需的元数据到异常过滤器。它告诉 Nest，这个过滤器正在寻找 `HttpException`。在 `@Catch()` 需要的参数是以无限算的，所以你可以设置该过滤器的几个类型的异常，只是用逗号将它们分开。
+所述 `@Catch()` 装饰结合所需的元数据到异常过滤器。它告诉 Nest，这个过滤器正在寻找 `HttpException`。 `@Catch()` 的参数是无限个数的，所以你可以为多个类型的异常设置该过滤器，只需要用逗号将它们分开。
 
 最后一步是通知 Nest `HttpExceptionFilter` 应该在 `create()` 方法内使用。
 

@@ -165,7 +165,7 @@ export class PhotoModule {}
 
 [与这里相同](4.6/techniques?id=身份验证（passport）)
 
-## CORS
+## CQRS
 
 最简单的CRUD应用程序的流程可以使用以下步骤来描述：
 

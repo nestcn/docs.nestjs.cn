@@ -4,7 +4,7 @@
 
 <center>![图1](https://docs.nestjs.com/assets/Middlewares_1.png)</center>
 
-Nest中间件实际上等于表示中间件。 从Express官方文档复制的中间件功能有很多：
+Nest中间件实际上等价于 [express](http://www.expressjs.com.cn/guide/using-middleware.html) 中间件。 从Express官方文档复制的中间件功能有很多：
 
 
 > 中间件函数可以执行以下任务:
@@ -32,7 +32,7 @@ export class LoggerMiddleware implements NestMiddleware {
 }
 ```
 
-该 `resolve()` 方法必须返回正则表达式中间件 `(req, res, next) => void`
+该 `resolve()` 方法必须返回规的 express 中间件 `(req, res, next) => void`
 
 ## 依赖注入
 
@@ -136,7 +136,7 @@ export class LoggerMiddleware implements NestMiddleware {
 
 ## 异步中间件
 
-从解析 `resolve()` 返回异步函数没有禁忌。另外，也可以制作这个 `resolve()` 方法 `async`。这种模式被称为异步中间件。
+从 `resolve()` 方法中返回异步函数没有禁忌。所以，`resolve()` 方法也可以写成 `async` 的。这种模式被称为 **延迟中间件** 。
 
 > logger.middleware.ts
 
@@ -157,7 +157,9 @@ export class LoggerMiddleware implements NestMiddleware {
 }
 ```
 
-`LoggerMiddleware` 很短。它没有成员，没有额外的方法，没有依赖关系。为什么我们不能只使用一个简单的函数？这是一个很好的问题，因为事实上 - 我们可以做到。这种类型的中间件称为功能中间件。让我们把记录器转换成函数。
+## 函数式中间件
+
+`LoggerMiddleware` 很短。它没有成员，没有额外的方法，没有依赖关系。为什么我们不能只使用一个简单的函数？这是一个很好的问题，因为事实上 - 我们可以做到。这种类型的中间件称为函数式中间件。让我们把 logger 转换成函数。
 
 > logger.middleware.ts
 
@@ -188,6 +190,6 @@ export class ApplicationModule implements NestModule {
 }
 ```
 
-?> 当您的中间件没有任何依赖关系时，我们可以考虑使用功能中间件。
+?> 当您的中间件没有任何依赖关系时，我们可以考虑使用函数式中间件。
 
 

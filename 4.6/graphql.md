@@ -2,9 +2,9 @@
 
 ## 快速开始
 
-GraphQL 是一种 api 新思想的方法。这是 GraphQL 和 REST 之间一个很好的[比较](https://dev-blog.apollodata.com/graphql-vs-rest-5d425123e34b) (译者注： GraphQL 替代 REST 是必然趋势)。在这组文章中, 我不打算解释 GraphQL 是什么, 而是演示如何使用专用的 @nestjs/GraphQL 模块。
+GraphQL 是一种用于 API 的查询语言。这是 GraphQL 和 REST 之间一个很好的[比较](https://dev-blog.apollodata.com/graphql-vs-rest-5d425123e34b) (译者注： GraphQL 替代 REST 是必然趋势)。在这组文章中, 我不打算解释 GraphQL 是什么, 而是演示如何使用 @nestjs/GraphQL 模块。
 
-GraphQLModule 只不过是 [Apollo](https://www.apollographql.com) 服务器周围的一个包装。我们不重新发明车轮, 但提供一个准备模块代替, 这带来了一个干净的方式让与 GraphQL 和 Nest 在一起。
+GraphQLModule 只不过是 [Apollo](https://www.apollographql.com) 服务器周围的一个包装。我们没有造轮子, 但提供一个准备模块来代替, 这让 GraphQL 和 Nest 有了比较简洁的融合方式。
 
 
 ### 安装
@@ -43,12 +43,12 @@ export class ApplicationModule implements NestModule {
 }
 ```
 
-就这样。我们传递一个空对象作为 GraphQL schema 和 req（请求对象）rootValue。此外，还有其他一些可用的graphqlExpress 选项，你可以在[这里](https://www.apollographql.com/docs/apollo-server/setup.html#graphqlOptions)阅读它们。
+就这样。我们传递一个空对象作为 GraphQL schema 和 req（请求对象）rootValue。此外，还有其他一些可用的 graphqlExpress 选项，你可以在[这里](https://www.apollographql.com/docs/apollo-server/setup.html#graphqlOptions)阅读它们。
 
 
 ### Schema
 
-要创建 schema, 我们使用的是 @nestjs/graphql 包的一部分的 GraphQLFactory。这个组件提供了一个 createSchema() 接受同一个对象作为一个 makeExecutableSchema() 函数的方法，这里详细描述。
+要创建 schema, 我们使用的是 @nestjs/graphql 包的一部分 GraphQLFactory。这个组件提供了一个 createSchema() 接受同一个对象作为一个 makeExecutableSchema() 函数的方法，这里详细描述。
 
 schema 选项对象至少需要resolvers和typeDefs属性。您可以手动传递类型定义, 或者使用 GraphQLFactory 的实用程序 mergeTypesByPaths() 方法。让我们看一下下面的示例:
 

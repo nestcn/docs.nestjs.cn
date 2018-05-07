@@ -178,7 +178,7 @@ export class DatabaseModule {
 }
 ```
 
-它默认定义了 `Connection` 组件，但另外 - 根据传递的选项和实体 - 创建一个提供者集合，例如存储库组件。 实际上，动态模块扩展了模块元数据。 当您需要动态注册组件时，这个实质特性非常有用。 然后你可以通过以下方式导入 `DatabaseModule`：
+它默认定义了 `Connection` 组件，但另外 - 根据传递的 `options` 和 `entities` - 创建一个提供者集合，例如存储库组件。 实际上，动态模块扩展了模块元数据。 当您需要动态注册组件时，这个实质特性非常有用。 然后你可以通过以下方式导入 `DatabaseModule`：
 
 ```typescript
 import { Module } from '@nestjs/common';

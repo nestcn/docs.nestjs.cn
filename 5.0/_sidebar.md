@@ -5,6 +5,7 @@
 - 概述
   - [第一步](5.0/firststeps)
   - [控制器](5.0/controllers)
+  - [提供者](5.0/providers)
   - [组件](5.0/components)
   - [模块](5.0/modules)
   - [中间件](5.0/middlewares)

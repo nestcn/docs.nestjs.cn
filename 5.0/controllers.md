@@ -22,7 +22,7 @@ export class CatsController {
 ```
 
 
-# 装饰器
+## 装饰器
 
  在上面的例子中，我们使用了定义基本控制器所需的 `@Controller('cats')` 装饰器 。 这个装饰器是强制性的。 `cats` 是每个在类中注册的每个路由的可选前缀。使用前缀可以避免在所有路由共享通用前缀时出现冲突的情况， `findAll()` 方法附近的 `@Get()` 修饰符告诉 Nest 创建此路由路径的端点，并将每个相应的请求映射到此处理程序。由于我们为每个路由（`cats`）声明了前缀，所以 Nest 会在这里映射每个 `/cats` 的 GET 请求。
 
@@ -40,7 +40,7 @@ export class CatsController {
 
 !> 注意！ 禁止同时使用这两种方法。 Nest 检测处理程序是否正在使用 `@Res（）`或 `@Next（）`，如果是这样,此单个路由的「标准」方式将被禁用。
 
-# Request 对象
+## Request 对象
 
 许多端点需要访问客户端的请求细节。 实际上，Nest 正使用 特定的库 请求对象。 我们可以强制 Nest 使用 `@Req（）` 装饰器将请求对象注入处理程序。
 
@@ -59,7 +59,7 @@ export class CatsController {
 }
 ```
 
-「Request」对象表示 HTTP 请求，并具有「Request」查询字符串，参数，HTTP 标头 和 正文的属性（在[这里](http://www.expressjs.com.cn/4x/api.html#req)阅读更多），但在大多数情况下, 不必手动获取它们。 我们可以使用专用的装饰器，比如 `@Body()`或 可以直接使用的装饰器 `@Query()` 。 下面是装饰器和 普通表达对象的比较。
+「Request」对象表示 HTTP 请求，并具有「Request」查询字符串，参数，HTTP 标头 和 正文的属性（在[这里](http://www.expressjs.com.cn/4x/api.html##req)阅读更多），但在大多数情况下, 不必手动获取它们。 我们可以使用专用的装饰器，比如 `@Body()`或 可以直接使用的装饰器 `@Query()` 。 下面是装饰器和 普通表达对象的比较。
 
 
 |||
@@ -75,7 +75,7 @@ export class CatsController {
 
 
 
-# 更多端点
+## 更多端点
 
 我们已经创建了一个端点来获取数据（GET 路由）。 提供创建新记录的方式也是很好的。让我们创建 POST 处理程序:
 
@@ -97,7 +97,7 @@ export class CatsController {
 ```
 这很容易。 Nest 以同样的方式提供了其他的端点装饰器 - `@Put()`，`@Delete()`，`@Patch()`，`@Options()`，`@Head()` 和 `@All()`。
 
-# 状态码操作
+## 状态码操作
 
 > 如前面所说，默认情况下，响应的状态码总是200，除了 POST 请求外，此时它是201，我们可以通过在处理程序层添加`@HttpCode（...）` 装饰器来轻松更改此行为。
 
@@ -120,7 +120,7 @@ export class CatsController {
 ```
 
 
-# 路由参数
+## 路由参数
 
 当需要将动态数据作为 URL 的一部分接受时, 使用静态路径的路由无法提供帮助。要使用路由参数定义路由，只需在路由的路径中指定路由参数，如下所示。
 
@@ -132,7 +132,7 @@ findOne(@Param() params) {
 }
 ```
 
-# Async / await
+## Async / await
 
 我们喜欢现代 JavaScript，而且我们知道数据读取大多是异步的。 这就是为什么 Nest 支持异步函数，并且与他们一起工作得非常好。
 
@@ -167,7 +167,7 @@ findAll(): Observable<any[]> {
 
  没有推荐的方法。 你可以使用任何你想要的。
 
-# POST 处理程序
+## POST 处理程序
 
 奇怪的是, 这个 POST 路由处理程序不接受任何客户端参数。我们至少应该在 `@Body()` 这里添加参数来解决这个问题。
 
@@ -196,11 +196,11 @@ async create(@Body() createCatDto: CreateCatDto) {}
 ```
 
 
-# 处理 errors
+## 处理 errors
 
 这里有一个关于处理异常的独立[章节](5.0/exceptionfilters.md)。
 
-# 最后一步
+## 最后一步
 
 控制器已经准备就绪，可以使用，但是 Nest 不知道 CatsController 是否存在，所以它不会创建这个类的一个实例。 我们需要告诉它。
 
@@ -221,7 +221,7 @@ export class ApplicationModule {}
 !> 我们将元数据附加到 module 类，所以现在 Nest 可以很容易地反映出哪些控制器必须被安装。
 
 
-# 特定库 方式
+## 特定库 方式
 
 到目前为止，我们已经讨论了 Nest 操作响应的标准方式。操作响应的第二种方法是使用特定于库的响应对象。为了注入响应对象，我们需要使用 `@Res()` 装饰器。为了对比差异，我们重写 CatsController：
 

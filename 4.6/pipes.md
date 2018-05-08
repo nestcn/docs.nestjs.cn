@@ -14,7 +14,7 @@
 
 ## 它是什么样子的？
 
-我们从 `ValidationPipe` 开始。 现在只需要一个值并返回相同的值。
+我们从 `ValidationPipe` 开始。 pipe 的参数只有一个值，然后需要把整个值返回回去。
 
 > validation.pipe.ts
 
@@ -49,13 +49,13 @@ export interface ArgumentMetadata {
 
 |参数    |   描述|
 |-----|-----|
-|type|告诉我们该属性是一个 `body @Body()`，`query @Query()`，`param @Param()` 还是自定义参数 [在这里阅读更多](https://docs.nestjs.cn/custom-decorators)。|
-|metatype|属性的元类型，例如 `String`。 如果在函数签名中省略类型声明，则不确定。|
-|data|传递给装饰器的字符串，例如 `@Body('string')`。 如果您将括号留空，则不确定。|
+|type|告诉我们该属性是一个 `body @Body()`，`query @Query()`，`param @Param()` 还是自定义参数 [在这里阅读更多](https://docs.nestjs.cn/5.0//custom-decorators)。|
+|metatype|属性的元类型，例如 `String`。 如果要省略函数签名中的类型声明, 则为 `undefined`。|
+|data|传递给装饰器的字符串，例如 `@Body('string')`。 如果您将括号留空，则为 `undefined` 。|
 
 !> `TypeScript `接口在编译期间消失，所以如果你使用接口而不是类，那么元类型的值将是一个 `Object`。
  
-## 它是如何工作的？
+## 重点是什么
 
 我们来关注一下 `CatsController` 的 `create()` 方法：
 
@@ -80,15 +80,55 @@ export class CreateCatDto {
 }
 ```
 
-这个对象总是要正确的，所以我们必须验证这三个成员。我们可以在路由处理程序方法中做到这一点，但是我们会打破单个责任规则（SRP）。第二个想法是创建一个验证器类并在那里委托任务，但是每次在方法开始的时候我们都必须使用这个验证器。那么验证中间件呢？ 这是一个好主意，但不可能创建一个通用的中间件，可以在整个应用程序中使用。
+此对象始终必须是正确的，所以我们必须验证这三个成员。我们可以在路由处理程序方法中进行，但我们会破坏单个责任规则 (SRP)。第二个想法是创建一个验证程序类并在那里委派任务, 但是我们必须每次在每个方法开始时都使用此验证程序。那么, 验证中间件呢？这是一个好主意, 但不可能创建一个通用的中间件, 可以在整个应用程序中使用。
 
 这是第一个用例，当你应该考虑使用管道。
+
+## 对象 schema 验证
+
+经常遇到的一种方法是使用基于 schema 的验证。 [Joi](https://github.com/hapijs/joi) 库是一个工具它允许您使用可读的 API 以非常简单的方式创建架构。为了创建使用对象架构的管道, 我们需要创建一个以 schema 为构造函数参数的简单类。
+
+```typescript
+import * as Joi from 'joi';
+import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException } from '@nestjs/common';
+
+@Injectable()
+export class JoiValidationPipe implements PipeTransform {
+  constructor(private readonly schema) {}
+
+  transform(value: any, metadata: ArgumentMetadata) {
+    const { error } = Joi.validate(value, this.schema);
+    if (error) {
+      throw new BadRequestException('Validation failed');
+    }
+    return value;
+  }
+}
+```
+管道绑定非常简单 - 我们需要使用 `@UsePipes()` 装饰器并使用有效的 Joi 模式创建管道实例。
+
+```typescript
+@Post()
+@UsePipes(new JoiValidationPipe(createCatSchema))
+async create(@Body() createCatDto: CreateCatDto) {
+  this.catsService.create(createCatDto);
+}
+```
+
 
 ## 类验证器
 
 本节仅适用于 `TypeScript`。
 
-`Nest` 与类验证器一起工作良好，这个惊人的库允许您使用基于装饰器的验证。 由于我们可以访问处理过的属性的元类型，所以基于装饰器的验证对于管道功能是非常强大的。 让我们添加一些装饰到 `CreateCatDto`。
+`Nest` 与类验证器一起工作良好，这个惊人的库允许您使用基于装饰器的验证。 由于我们可以访问处理过的属性的元类型，所以基于装饰器的验证对于管道功能是非常强大的。 
+但是，在我们开始之前，我们需要安装所需的软件包：
+
+```
+npm i --save class-validator class-transformer
+```
+
+一旦安装了这些库，我们可以为这个 CreateCatDto 类添加一些装饰器 。
+
 
 > create-cat.dto.ts
 
@@ -107,40 +147,39 @@ export class CreateCatDto {
 }
 ```
 
-现在是完成 `ValidationPipe` 类的时候了。
+完成后，我们可以创建一个 `ValidationPipe` 类。
 
 > validation.pipe.ts
 
 ```typescript
-import { PipeTransform, Pipe, ArgumentMetadata, BadRequestException } from '@nestjs/common';
+import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException } from '@nestjs/common';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 
-@Pipe()
+@Injectable()
 export class ValidationPipe implements PipeTransform<any> {
-    async transform(value, metadata: ArgumentMetadata) {
-      const { metatype } = metadata;
-      if (!metatype || !this.toValidate(metatype)) {
-          return value;
-      }
-      const object = plainToClass(metatype, value);
-      const errors = await validate(object);
-      if (errors.length > 0) {
-          throw new BadRequestException('Validation failed');
-      }
+  async transform(value, { metatype }: ArgumentMetadata) {
+    if (!metatype || !this.toValidate(metatype)) {
       return value;
     }
-
-    private toValidate(metatype): boolean {
-      const types = [String, Boolean, Number, Array, Object];
-      return !types.find((type) => metatype === type);
+    const object = plainToClass(metatype, value);
+    const errors = await validate(object);
+    if (errors.length > 0) {
+      throw new BadRequestException('Validation failed');
     }
+    return value;
+  }
+
+  private toValidate(metatype): boolean {
+    const types = [String, Boolean, Number, Array, Object];
+    return !types.find((type) => metatype === type);
+  }
 }
 ```
 
-!> 我已经使用了类转换器库。它是由同一个作者作为类验证器库，所以他们一起玩。
+!> 我已经使用了[类转换器](https://github.com/typestack/class-transformer)库。它是由同一个 author 作为类验证器库，所以他们一起运行得很好。
 
-我们来看看这个代码。首先，请注意 `transform()` 函数是异步的。这是可能的，因为Nest支持同步和异步管道。另外，还有一个辅助函数 `toValidate()`。它负责从验证过程中排除原生 `JavaScript` 类型。最后一个重要的是我们必须返回相同的价值。这个管道是一个验证特定的管道，所以我们需要返回完全相同的属性以避免重写。
+我们来看看这个代码。首先，请注意 `transform()` 函数是异步的。这是可能的，因为 Nest 支持同步和异步管道。另外，还有一个辅助函数 `toValidate()`。它负责从验证过程中排除原生 `JavaScript` 类型。最后一个重要的是我们必须返回相同的价值。这个管道是一个验证特定的管道，所以我们需要返回完全相同的属性以避免重写（如前所述，管道将输入转换为所需的输出）。
 
 最后一步是设置 `ValidationPipe` 。管道，与异常过滤器相同，它们可以是方法范围的，控制器范围的和全局范围的。另外，管道可以是参数范围的。我们可以直接将管道实例绑定到路由参数装饰器，例如`@Body()`。让我们来看看下面的例子：
 
@@ -167,7 +206,16 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 !> `@UsePipes()` 修饰器是从 `@nestjs/common` 包中导入的。
 
-由于 `ValidationPipe` 被创建为尽可能通用，所以我们将把它设置为一个全局作用域的管道，用于整个应用程序中的每个路由处理器。
+这个实例 `ValidationPipe` 已经被直接创建了，另一种可用的方法是传递类 (不是实例), 使框架成为实例化责任并启用依赖项注入。
+> cat.controller.ts
+```typescript
+@Post()
+@UsePipes(ValidationPipe)
+async create(@Body() createCatDto: CreateCatDto) {
+  this.catsService.create(createCatDto);
+}
+```
+由于  ValidationPipe 创建时应尽可能通用，因此我们将其设置为全局范围的管道，用于整个应用程序中的每个路由处理程序。
 
 > main.ts
 
@@ -182,6 +230,28 @@ bootstrap();
 
 !> `useGlobalPipes()` 方法不会为网关和微服务设置管道。
 
+全局管道用于整个应用程序，用于每个控制器和每个路由处理程序。在依赖注入方面，从任何模块外部注册的全局管道（如上面的例子中所述）不能注入依赖关系，因为它们不属于任何模块。为了解决这个问题，您可以使用以下构造直接从任何模块设置管道 ：
+
+> app.module.ts
+
+```typescript
+import { Module } from '@nestjs/common';
+import { APP_PIPE } from '@nestjs/core';
+
+@Module({
+  providers: [
+    {
+      provide: APP_PIPE,
+      useClass: CustomGlobalPipe,
+    },
+  ],
+})
+export class ApplicationModule {}
+```
+
+?> 另一种选择是使用[执行上下文](/5.0/executioncontext)功能。此外, useClass 不是处理自定义提供程序注册的唯一方法。在[这里](/5.0/fundamentals?id=dependency-injection)了解更多。
+
+
 ## 变压器管道
 
 验证不是唯一的用例。 在本章的开始部分，我已经提到管道也可以将输入数据转换为所需的输出。 这是真的，因为从 `transform` 函数返回的值完全覆盖了参数的前一个值。 有时从客户端传来的数据需要经过一些修改。 此外，有些部分可能会丢失，所以我们必须应用默认值。 变压器管道填补了客户端和请求处理程序的请求之间的空白。
@@ -189,11 +259,11 @@ bootstrap();
 > parse-int.pipe.ts
 
 ```typescript
-import { PipeTransform, Pipe, ArgumentMetadata, HttpStatus, BadRequestException } from '@nestjs/common';
+import { PipeTransform, Injectable, ArgumentMetadata, HttpStatus, BadRequestException } from '@nestjs/common';
 
-@Pipe()
-export class ParseIntPipe implements PipeTransform<string> {
-  async transform(value: string, metadata: ArgumentMetadata) {
+@Injectable()
+export class ParseIntPipe implements PipeTransform<string, number> {
+  async transform(value: string, metadata: ArgumentMetadata): number {
     const val = parseInt(value, 10);
     if (isNaN(val)) {
       throw new BadRequestException('Validation failed');
@@ -212,28 +282,47 @@ async findOne(@Param('id', new ParseIntPipe()) id) {
 }
 ```
 
-## 全局管道
+由于上述构造，ParseIntPipe 在请求之前将执行甚至触及相应的处理程序。
 
-全局管道不属于任何范围。 他们生活在模块之外，因此，他们不能注入依赖。 我们需要立即创建一个实例。 但有时，全局管道依赖于其他对象。 我们如何解决这个问题？
-
-解决方案非常简单。 实际上，每个 `Nest` 应用程序实例都是一个创建的Nest上下文。 `Nest` 上下文是 `Nest` 容器的一个包装，它包含所有实例化的类。 我们可以直接使用应用程序对象从任何导入的模块中获取任何现有的实例。
-
-假设我们在 `SharedModule` 中注册了一个 `ValidationPipe` 。 这个 `SharedModule` 被导入到根模块中。 我们可以使用以下语法选择 `ValidationPipe` 实例：
+另一个有用的例子是通过 id 从数据库中选择一个现有的用户实体：
 
 ```typescript
-const app = await NestFactory.create(ApplicationModule);
-const validationPipe = app
-  .select(SharedModule)
-  .get(ValidationPipe);
+@Get(':id')
+findOne(@Param('id', UserByIdPipe) userEntity: UserEntity) {
+  return userEntity;
+}
 
-app.useGlobalPipes(validationPipe);
+## 内置的 ValidationPipe
+
+幸运的是, 您不必自行构建这些管道, 因为 ValidationPipe 和 ParseIntPipe 都是内置管道 (请记住, ValidationPipe 需要安装 class-validator 和 class-transformer 包)。
+
+内置的 ValidationPipe 提供了比本章所描述的更多的选择, 它一直保持基本的, 为了简单和减少学习曲线。如果你看一下你的控制器函数中的 createCatDto, 你会发现它不是一个实际的 createCatDto 实例。这是因为此管道仅验证负载, 而不将其转换为预期类型。但是, 如果您希望管道变更有效负载, 可以通过传递适当的选项来配置它:
+
+> cats.controller.ts
+
+```typescript
+@Post()
+@UsePipes(new ValidationPipe({ transform: false }))
+async create(@Body() createCatDto: CreateCatDto) {
+  this.catsService.create(createCatDto);
+}
 ```
+由于此管道基于 class-validator 和class-transformer 库，因此可以获得更多。看看构造函数的可选选项。
 
-要获取 `ValidationPipe` 实例，我们必须使用2个方法，在下表中有详细描述：
+```typescript
+export interface ValidationPipeOptions extends ValidatorOptions {
+  transform?: boolean;
+}
+```
+有一个 transform 属性和所有 class-validator 选项 (从 ValidatorOptions 接口继承):
 
-|参数|描述|
-|-----|-----|
-|`get()`| 使得可以检索已处理模块中可用的组件或控制器的实例。|
-|`select()`| 允许您浏览模块树，例如，从所选模块中提取特定实例。|
+|选项|类型|描述|
+|----|----|-----|
+|skipMissingProperties | boolean | 如果设置为 true，验证器将跳过对验证对象中缺少的全部属性的验证。 |
+| whitelist | boolean | 如果设置为true，验证器将剥离任何不使用任何装饰器的属性的验证对象。|
+|forbidNonWhitelisted	| boolean	| 如果设置为 true，而不是剥离未列入白名单的属性，则验证器将引发异常。|
+|groups	|string[]	|在验证对象时使用的组。|
+|dismissDefaultMessages |	boolean	| 如果设置为 true，验证将不会使用默认消息。undefined 如果未明确设置，错误消息始终会显示。|
+|validationError.target |	boolean	| 指示是否应暴露目标 ValidationError |
+|validationError.value	| boolean	| 指示验证值是否应暴露于 ValidationError |
 
-!> 默认情况下选择根模块。 要选择任何其他模块，您需要遍历整个模块堆栈（一步一步）。

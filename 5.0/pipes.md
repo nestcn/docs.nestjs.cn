@@ -14,7 +14,7 @@
 
 ## 它是什么样子的？
 
-我们从 `ValidationPipe` 开始。 现在只需要一个值并返回相同的值,就像一个键值对
+我们从 `ValidationPipe` 开始。 现在它只取得一个类型的值，并且会返回同样类型的值。
 
 > validation.pipe.ts
 

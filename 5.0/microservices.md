@@ -4,8 +4,7 @@
 
 Nest 微服务是一种使用与HTTP不同的传输层的应用程序。
 
-<center>![](https://docs.nestjs.com/v5/assets/Microservices_1.png)
-</center>
+![](https://docs.nestjs.com/v5/assets/Microservices_1.png)
 
 ### 安装
 

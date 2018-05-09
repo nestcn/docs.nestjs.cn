@@ -1,7 +1,3 @@
-- 介绍
-  - [介绍](5.0/introduction)
-  - [翻译说明](5.0/about)
-
 - 概述
   - [第一步](5.0/firststeps)
   - [控制器](5.0/controllers)
@@ -28,7 +24,9 @@
 
 - [秘籍](5.0/recipes)
 
-- [高级](5.0/advanced)
+- [CLI](5.0/cli)
 
 - [FAQ](5.0/faq)
+
+- [迁移指南](5.0/migrationguide)
 

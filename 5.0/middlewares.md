@@ -14,7 +14,7 @@ Nest 中间件实际上等价于 [express](http://www.expressjs.com.cn/guide/usi
 - 调用堆栈中的下一个中间件函数。
 - 如果当前的中间件函数没有结束请求-响应周期, 它必须调用 `next()` 将控制传递给下一个中间件函数。否则, 请求将被挂起。
 
-Nest 中间件可以是一个函数，也可以是一个带有 `@Middleware()` 装饰器的类。 这个类应该实现 `NestMiddleware` 接口。 我们来创建一个例子，`LoggerMiddleware` 类:
+Nest 中间件可以是一个函数，也可以是一个带有 `@Injectable()` 装饰器的类。 这个类应该实现 `NestMiddleware` 接口。 我们来创建一个例子，`LoggerMiddleware` 类:
 
 > logger.middleware.ts
 

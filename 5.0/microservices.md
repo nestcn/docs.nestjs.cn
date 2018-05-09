@@ -4,8 +4,7 @@
 
 Nest 微服务是一种使用与HTTP不同的传输层的应用程序。
 
-<center>![](https://docs.nestjs.com/v5/assets/Microservices_1.png)
-</center>
+![](https://docs.nestjs.com/v5/assets/Microservices_1.png)
 
 ### 安装
 
@@ -126,6 +125,75 @@ call(): Observable<number> {
 
 `send()` 方法接受两个参数，`pattern` 和 `data`。`pattern` 必须与 `@MessagePattern()` 装饰器中定义的模式相同，而 `data` 是要传输到另一个微服务的消息。
 
+## Redis
+
+第二个内置传输器基于 [Redis](https://redis.io/) 数据库。此传输器利用发布/订阅功能。
+
+![](https://docs.nestjs.com/v5/assets/Redis_1.png)
+
+### 安装
+
+在开始之前，我们必须安装所需的软件包:
+
+```
+$ npm i --save redis
+```
+
+### 概述
+
+为了从TCP传输策略切换到Redis **pub/sub**，我们需要更改传递给 `createMicroservice()` 方法的选项对象。
+
+> main.ts
+
+```typescript
+const app = await NestFactory.createMicroservice(ApplicationModule, {
+  transport: Transport.REDIS,
+  options: {
+    url: 'redis://localhost:6379',
+  },
+});
+```
+
+### 选项
+
+有许多可用的选项可以确定传输器的行为。
+
+|                        |                             |
+| :--------------------- | :-------------------------- |
+| `url`                  | 连接网址                     |
+| `retryAttempts`        | 连接尝试的总数                |
+| `retryDelay`           | 连接重试延迟（ms）            |
+
+## NATS
+
+[NATS](https://nats.io) 是一个简单、高性能的开源消息传递系统。
+
+### 安装
+
+在开始之前，我们必须安装所需的软件包:
+
+```
+$ npm i --save nats
+```
+
+### 概述
+
+为了切换到 **NATS** 传输器，我们需要修改传递到 `createMicroservice()` 方法的选项对象。
+
+> main.ts
+
+```typescript
+const app = await NestFactory.createMicroservice(ApplicationModule, {
+  transport: Transport.NATS,
+  options: {
+    url: 'nats://localhost:4222',
+  },
+});
+```
+
+### 选项
+
+有许多可用的选项可以确定传输器的行为。它们在 [这里](https://github.com/nats-io/node-nats#connect-options) 有很好的描述。
 
 ## gRPC
 
@@ -254,3 +322,93 @@ call(): Observable<any> {
 ```
 
 [这里](https://github.com/nestjs/nest/tree/master/sample/04-grpc) 提供了一个完整的示例。
+
+## 异常过滤器 (Exception filters)
+
+HTTP异常过滤器层和相应的微服务层之间的唯一区别在于，不要抛出 `HttpException`，而应该使用 `RpcException`。
+
+?> `RpcException` 类是从 `@nestjs/microservices` 包导入的。
+
+Nest将处理引发的异常，并因此返回具有以下结构的 `error` 对象:
+
+```
+{
+  status: 'error',
+  message: 'Invalid credentials.'
+}
+```
+
+### 过滤器
+
+**异常过滤器** 的工作方式与主过滤器相同，只有一个小的区别。`catch()` 方法必须返回一个 `Observable`。
+
+> rpc-exception.filter.ts
+
+```typescript
+import { Catch, RpcExceptionFilter, ArgumentsHost } from '@nestjs/common';
+import { Observable, throwError } from 'rxjs';
+import { RpcException } from '@nestjs/microservices';
+
+@Catch(RpcException)
+export class ExceptionFilter implements RpcExceptionFilter {
+  catch(exception: RpcException, host: ArgumentsHost): Observable<any> {
+    return throwError(exception.getError());
+  }
+}
+```
+
+!> 不能设置全局的微服务异常过滤器。
+
+下面是一个使用手动实例化 **方法作用域** 过滤器(也可以使用类作用域)的示例:
+
+```typescript
+@UseFilters(new ExceptionFilter())
+@MessagePattern({ cmd: 'sum' })
+sum(data: number[]): number {
+  return (data || []).reduce((a, b) => a + b);
+}
+```
+
+## 管道 (Pipes)
+
+微服务管道和普通管道没有区别。唯一需要注意的是，不要抛出 `HttpException` ，而应该使用 `RpcException`。
+
+?> `RpcException` 类是从 `@nestjs/microservices` 包导入的。
+
+下面是一个使用手动实例化 **方法作用域** 管道(也可以使用类作用域)的示例:
+
+```typescript
+@UsePipes(new ValidationPipe())
+@MessagePattern({ cmd: 'sum' })
+sum(data: number[]): number {
+  return (data || []).reduce((a, b) => a + b);
+}
+```
+
+## 看守器 (Guards)
+
+微服看守器和普通看守器没有区别。唯一需要注意的是，不要抛出 `HttpException` ，而应该使用 `RpcException`。
+
+?> `RpcException` 类是从 `@nestjs/microservices` 包导入的。
+
+下面是一个使用 **方法作用域** 看守器(也可以使用类作用域)的示例:
+
+```typescript
+@UseGuards(AuthGuard)
+@MessagePattern({ cmd: 'sum' })
+sum(data: number[]): number {
+  return (data || []).reduce((a, b) => a + b);
+}
+```
+
+## 拦截器 (Interceptors)
+
+常规拦截器和微服务拦截器之间没有区别。下面是一个使用手动实例化 **方法作用域** 拦截器(也可以使用类作用域)的示例:
+
+```typescript
+@UseInterceptors(new TransformInterceptor())
+@MessagePattern({ cmd: 'sum' })
+sum(data: number[]): number {
+  return (data || []).reduce((a, b) => a + b);
+}
+```

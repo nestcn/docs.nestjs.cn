@@ -2,7 +2,7 @@
 
 ## SQL (TypeORM)
 
-!> 在本文中，您将学习如何使用自定义提供者机制从零开始创建基于 **TypeORM** 包的 `DatabaseModule` 。由于该解决方案包含许多开销，因此您可以使用开箱即用的 `@nestjs/typeorm` 软件包。要了解更多信息，请参阅 [此处](5.0/techniques?id=数据库)。
+!> 在本文中，您将学习如何使用自定义提供者机制从零开始创建基于 **TypeORM** 包的 `DatabaseModule` 。由于该解决方案包含许多开销，因此您可以使用开箱即用的 `@nestjs/typeorm` 软件包。要了解更多信息，请参阅 [此处](5.0/techniques?id=数据库（TypeORM）)。
 
 
 [TypeORM](https://github.com/typeorm/typeorm) 无疑是 node.js 世界中最成熟的对象关系映射器（ORM）。由于它是用 TypeScript 编写的，所以它在 Nest 框架下运行得非常好。在开始使用这个库前，我们必须安装所有必需的依赖关系：

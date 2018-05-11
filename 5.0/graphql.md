@@ -15,6 +15,10 @@ GraphQLModule 只不过是 [Apollo](https://www.apollographql.com) 服务器的�
 $ npm i --save @nestjs/graphql apollo-server-express graphql-tools graphql
 ```
 
+译者注： fastify 请参考：
+https://github.com/coopnd/fastify-apollo
+
+
 ### Apollo 中间件
 
 安装软件包后，我们可以应用 `apollo-server-express` 软件包提供的 GraphQL 中间件 ：

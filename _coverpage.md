@@ -11,5 +11,4 @@
 - 构建微服务应用
 
 [GitHub](https://github.com/nestjs/nest)
-[4.6](/4.6/firststeps.md)
 [5.0](/5.0/firststeps.md)

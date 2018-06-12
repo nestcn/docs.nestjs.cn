@@ -16,7 +16,7 @@
 
 ## HttpException
 
-包 `HttpException` 内 有一个内置的类 `@nestjs/common`。核心异常处理程序与此类会很好地工作。当你抛出 `HttpException` 对象时，它将被处理程序捕获并转换为相关的 JSON 响应。
+包`@nestjs/common` 内 有一个内置的类 `HttpException`。核心异常处理程序与此类会很好地工作。当你抛出 `HttpException` 对象时，它将被处理程序捕获并转换为相关的 JSON 响应。
 
 在 `CatsController`，我们有一个 `create()` 方法（`POST` 路由）。让我们假设这个路由处理器由于某种原因会抛出一个异常。我们要强制编译它：
 

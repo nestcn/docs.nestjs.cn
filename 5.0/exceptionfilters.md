@@ -236,6 +236,7 @@ export class ApplicationModule {}
 为了处理每个发生的异常（无论异常类型如何），可以将括号留空（`@Catch()`）：
 
 > any-exception.filter.ts
+
 ```typescript
 import { ExceptionFilter, Catch, ArgumentsHost } from '@nestjs/common';
 

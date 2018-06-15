@@ -1,6 +1,6 @@
 # 管道
 
-管道是具有 `@Pipe()` 装饰器的类。管道应实现 `PipeTransform` 接口。
+管道是具有 `@Injectable()` 装饰器的类。管道应实现 `PipeTransform` 接口。
 
 ![](https://docs.nestjs.com/assets/Pipe_1.png)
 
@@ -21,7 +21,7 @@
 ```typescript
 import { PipeTransform, Pipe, ArgumentMetadata } from '@nestjs/common';
 
-@Pipe()
+@Injectable()
 export class ValidationPipe implements PipeTransform<any> {
   transform(value: any, metadata: ArgumentMetadata) {
     return value;
@@ -117,7 +117,7 @@ import { PipeTransform, Pipe, ArgumentMetadata, BadRequestException } from '@nes
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 
-@Pipe()
+@Injectable()
 export class ValidationPipe implements PipeTransform<any> {
     async transform(value, metadata: ArgumentMetadata) {
       const { metatype } = metadata;
@@ -192,7 +192,7 @@ bootstrap();
 ```typescript
 import { PipeTransform, Pipe, ArgumentMetadata, HttpStatus, BadRequestException } from '@nestjs/common';
 
-@Pipe()
+@Injectable()
 export class ParseIntPipe implements PipeTransform<string> {
   async transform(value: string, metadata: ArgumentMetadata) {
     const val = parseInt(value, 10);

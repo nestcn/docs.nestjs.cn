@@ -1,6 +1,6 @@
 # 拦截器
 
-拦截器是`@Interceptor()` 装饰器注解的类。拦截器应该实现 `NestInterceptor` 接口。
+拦截器是`@Injectable()` 装饰器注解的类。拦截器应该实现 `NestInterceptor` 接口。
 
 ![](https://docs.nestjs.com/assets/Interceptors_1.png)
 

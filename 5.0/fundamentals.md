@@ -195,6 +195,7 @@ export class CommonModule {}
 
 Nest提供了可以简单地注入到任何组件中的`ModuleRef`类。
 > cats.service.ts
+
 ```typescript
 @Injectable()
 export class CatsService implements OnModuleInit {
@@ -236,6 +237,7 @@ $ npm i --save-dev @nestjs/testing
  在下面的例子中，我们有两个不同的类，分别是`CatsController`和`CatsService`。如前所述，Jest被用作一个完整的测试框架。该框架的行为像一个测试运行者，并提供断言函数和测试双工实用程序，以帮助模拟，间谍等。我们已经手动强制执行`catsService.findAll()`方法来返回结果变量，一旦被调用。由此，我们可以测试`catsController.findAll()`是否返回预期的结果。
 
  > cats.controller.spec.ts
+
  ```typescript
  import { CatsController } from './cats.controller';
 import { CatsService } from './cats.service';
@@ -267,6 +269,7 @@ describe('CatsController', () => {
 `@nestjs/testing`包给了我们一套提升测试过程的实用程序。让我们重写前面的例子，但现在使用暴露的`Test`类。
 
 > cats.controller.spec.ts
+
 ```typescript
 import { Test } from '@nestjs/testing';
 import { CatsController } from './cats.controller';
@@ -308,6 +311,7 @@ describe('CatsController', () => {
 当应用程序增长时，很难手动测试每个API端点的行为。端到端测试帮助我们确保一切工作正常并符合项目要求。为了执行e2e测试，我们使用与**单元测试**相同的配置，但另外我们利用允许模拟HTTP请求的超类库。
 
 >cats.e2e-spec.ts
+
 ```typescript
 import * as request from 'supertest';
 import { Test } from '@nestjs/testing';

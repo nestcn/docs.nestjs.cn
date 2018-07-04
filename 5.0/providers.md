@@ -34,7 +34,7 @@ export class CatsService {
 
 ?> Cat 上面有一个接口。我们没有提到它，因为这个模式与 CreateCatDto 我们在前一章中创建的类完全相同。
 
-由于我们已经完成了服务类，所以我们在以下内容中使用它 CatsController ：
+由于我们已经完成了服务类，让我们在 CatsController 里使用它 ：
 
 > cats.controller.ts
 
@@ -60,7 +60,7 @@ export class CatsController {
 }
 ```
 
-在 CatsService 通过类构造函数注入。不要害怕 private readonly 缩短的语法。这意味着我们已经在同一位置创建并初始化了 catsService 成员。
+CatsService 通过类构造函数注入。不要害怕 private readonly 缩短的语法。这意味着我们已经在同一位置创建并初始化了 catsService 成员。
 
 ## 依赖注入
 

@@ -32,7 +32,7 @@ export class CatsService {
 
 这是一个 CatsService 基本类，有一个属性和两个方法。唯一的新特点是它使用 `@Injectable()` 装饰器。该 `@Injectable()` 附加的元数据，从而 Nest 知道这个类是一个 Nest 提供者。
 
-?> Cat 上面有一个界面。我们没有提到它，因为这个模式与 CreateCatDto 我们在前一章中创建的类完全相同。
+?> Cat 上面有一个接口。我们没有提到它，因为这个模式与 CreateCatDto 我们在前一章中创建的类完全相同。
 
 由于我们已经完成了服务类，所以我们在以下内容中使用它 CatsController ：
 

@@ -91,7 +91,7 @@ import { CatsService } from './cats.service';
 export class CatsModule {}
 ```
 
-现在，每个导入 `CatsModule` 的模块都可以访问该模块 ，并将`CatsService`与导入该模块的所有模块共享相同的实例。
+现在，每个导入 `CatsModule` 的模块都可以访问 `CatsService` ，并且它们将共享相同的 `CatsService` 实例。
 
 
 # 模块重新导出

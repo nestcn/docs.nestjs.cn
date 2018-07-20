@@ -77,7 +77,7 @@ export class LoggingInterceptor implements NestInterceptor {
 export class CatsController {}
 ```
 
-?> @UseInterceptors() 装饰器从 @nestjs/common 导入包。
+?> @UseInterceptors() 装饰器需要import @nestjs/common。
 
 由此，每个定义的路由处理器 CatsController 都会使用 LoggingInterceptor。当有人调用 GET `/cats` 端点时，您将在控制台窗口中看到以下输出：
 
@@ -249,7 +249,7 @@ export class CacheInterceptor implements NestInterceptor {
 
 这里有一个 CacheInterceptor 与硬编码的 isCached 变量和硬编码的 `response[]` 。我们在这里通过运算符创建返回了一个新的流, 因此路由处理程序根本不会被调用。当有人调用使用 CacheInterceptor 的端点时, 响应 (硬编码的空数组) 将返回 immedietely。为了创建通用解决方案, 您可以利用反射器并创建自定义修饰符。该反射器是很好地描述在看守器章。
 
-返回流的可能性给了我们许多可能性。让我们考虑另一个常见的用例。假设您想处理超时。当端点在一段时间后没有返回任何内容时, 我们希望响应错误响应。
+返回流给了我们许多可能性。让我们考虑另一个常见的用例。假设您想处理 timeout 。当端点在一段时间后没有返回任何内容时, 我们希望得到错误响应。
 
 > timeout.interceptor.ts
 

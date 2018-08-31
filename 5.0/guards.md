@@ -121,7 +121,21 @@ import { APP_GUARD } from '@nestjs/core';
 })
 export class ApplicationModule {}
 ```
-？> 另一种选择是使用执行上下文功能。另外，useClass并不是处理自定义提供商注册的唯一方法。在[这里](/5.0/fundamentalsid=dependencyinjection)了解更多
+还有, 控制器里的看守器, 在依赖注入方面, 可以类似地看成普通的可注入类来注入。例如:
+```typescript
+import { Module } from '@nestjs/common';
+import { UserService } from '../service';
+import { UserGuard } from '../guard';
+
+@Module({
+  providers: [
+    UserService, UserGuard
+  ],
+})
+export class ServiceModule {}
+```
+
+？> 另一种选择是使用执行上下文功能, 虽然它可能会过于臃肿, 且消耗资源。另外，useClass并不是处理自定义提供商注册的唯一方法。在[这里](/5.0/fundamentalsid=dependencyinjection)了解更多
 
 
 

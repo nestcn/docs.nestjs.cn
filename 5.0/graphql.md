@@ -2,7 +2,7 @@
 
 ## 快速开始
 
-GraphQL 是一种用于 API 的查询语言。这是 GraphQL 和 REST 之间一个很好的[比较](https://dev-blog.apollodata.com/graphql-vs-rest-5d425123e34b) (译者注： GraphQL 替代 REST 是必然趋势)。在这组文章中, 我们不会解释什么是 GraphQL, 而是演示如何使用 `@nestjs/GraphQL` 模块。
+GraphQL 是一种用于 API 的查询语言。这是 GraphQL 和 REST 之间一个很好的[比较](https://dev-blog.apollodata.com/graphql-vs-rest-5d425123e34b) 。在这组文章中, 我们不会解释什么是 GraphQL, 而是演示如何使用 `@nestjs/GraphQL` 模块。
 
 GraphQLModule 只不过是 [Apollo](https://www.apollographql.com) 服务器的包装器。我们没有造轮子, 而是提供一个现成的模块, 这让 GraphQL 和 Nest 有了比较简洁的融合方式。
 
@@ -17,6 +17,57 @@ $ npm i --save @nestjs/graphql apollo-server-express graphql-tools graphql
 
 译者注： fastify 请参考：
 https://github.com/coopnd/fastify-apollo
+
+### 入门
+
+一旦安装了软件包，我们就可以注册`GraphQlModule`
+
+> app.module.ts
+
+```
+import { Module } from '@nestjs/common';
+import { GraphQLModule } from '@nestjs/graphql';
+
+@Module({
+  imports: [
+    GraphQLModule.forRoot({
+      typePaths: ['./**/*.graphql'],
+    }),
+  ],
+})
+export class ApplicationModule {}
+```
+
+`typePaths` 属性指示 `GraphQLModule` 应在何处查找 GraphQL 文件。此外, 所有选项都将传递到基础的 Apollo 实例 (在[这里](https://www.apollographql.com/docs/apollo-server/v2/api/apollo-server.html#constructor-options-lt-ApolloServer-gt)阅读更多的可用设置)。例如, 如果要禁用 `playground` 并关闭 `debug` 模式, 只需通过以下选项:
+
+> app.module.ts
+
+```
+import { Module } from '@nestjs/common';
+import { GraphQLModule } from '@nestjs/graphql';
+
+@Module({
+  imports: [
+    GraphQLModule.forRoot({
+      typePaths: ['./**/*.graphql'],
+      debug: false,
+      playground: false,
+    }),
+  ],
+})
+export class ApplicationModule {}
+```
+
+如上所述, 所有这些设置都将转发到 ApolloServer 构造函数。
+
+### Playground
+
+Playground 是一个图形化的，交互式的浏览器内 GraphQL IDE，默认情况下可与 GraphQL 服务器本身 URL 相同。当您的应用程序在后台运行时，打开 Web 浏览器并访问： http://localhost:3000/graphql （主机和端口可能因您的配置而异）。
+
+![](https://docs.nestjs.com/assets/playground.png)
+
+### Async 配置
+
 
 
 ### Apollo 中间件

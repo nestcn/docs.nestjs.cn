@@ -124,98 +124,26 @@ GraphQLModule.forRootAsync({
 
 它的工作原理与 `useClass` 有一个关键的区别—— `GraphQLModule` 将查找导入的模块重用已经创建的 `ConfigService`, 而不是单独实例化它。
 
-## 例子
+### 例子
 
 [这里](https://github.com/nestjs/nest/tree/master/sample/12-graphql-apollo)这里提供完整的案例。
 
+## 解析图
 
 
+如果您正在使用 graphql-tools，则必须手动创建解析图。以下示例从 [Apollo文档](https://www.apollographql.com/docs/graphql-tools/generate-schema.html) 中复制，您可以在其中阅读有关它的更多信息：
 
-
-
-
-### Apollo 中间件
-
-安装软件包后，我们可以应用 `apollo-server-express` 软件包提供的 GraphQL 中间件 ：
-
-> app.module.ts
-
-```typescript
-import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
-import { graphqlExpress } from 'apollo-server-express';
-import { GraphQLModule } from '@nestjs/graphql';
-
-@Module({
-  imports: [GraphQLModule],
-})
-export class ApplicationModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(graphqlExpress(req => ({ schema: {}, rootValue: req })))
-      .forRoutes('/graphql');
-  }
-}
 ```
-
-就这样。我们传递一个空对象作为 GraphQL `schema` 和 `req`（请求对象）`rootValue`。此外，还有其他一些可用的 `graphqlExpress` 选项，你可以在[这里](https://www.apollographql.com/docs/apollo-server/setup.html#graphqlOptions)阅读它们。
-
-
-### Schema
-
-为了创建 schema, 我们使用的是 `GraphQLFactory` 它是 `@nestjs/graphql` 包的一部分。此组件提供了一个createSchema ( )方法，该方法接受与makeexecumbleschema ( )函数相同的对象，[这里](https://www.apollographql.com/docs/graphql-tools/generate-schema.html#makeExecutableSchema)详细描述。
-
-schema 选项对象至少需要 `resolvers` 和 `typeDefs` 属性。您可以手动传递类型定义, 或者使用 `GraphQLFactory` 的实用程序 `mergeTypesByPaths()` 方法。让我们看一下下面的示例:
-
-> app.module.ts
-
-```typescript
-import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
-import { graphqlExpress } from 'apollo-server-express';
-import { GraphQLModule, GraphQLFactory } from '@nestjs/graphql';
-
-@Module({
-  imports: [GraphQLModule],
-})
-export class ApplicationModule implements NestModule {
-  constructor(private readonly graphQLFactory: GraphQLFactory) {}
-
-  configure(consumer: MiddlewareConsumer) {
-    const typeDefs = this.graphQLFactory.mergeTypesByPaths('./**/*.graphql');
-    const schema = this.graphQLFactory.createSchema({ typeDefs });
-
-    consumer
-      .apply(graphqlExpress(req => ({ schema, rootValue: req })))
-      .forRoutes('/graphql');
-  }
-}
-```
-
-?> 在[此处](http://graphql.cn/learn/schema/)了解关于GraphQL Schema 的更多信息。
-
-
-在这种情况下，`GraphQLFactory` 将遍历每个目录，并合并具有 `.graphql` 扩展名的文件。之后，我们可以使用这些特定的类型定义来创建一个 `schema` 。`resolvers` 将自动反映出来。
-
-
-在[这里](https://www.apollographql.com/docs/graphql-tools/resolvers.html), 您可以更多地了解解析器映射的实际内容。
-
-## 解析器映射
-
-当使用 `graphql-tools` 时，您必须手动创建解析器映射。以下示例是从[Apollo文档](https://www.apollographql.com/docs/graphql-tools/generate-schema.html)复制并粘贴的，您可以在其中阅读更多内容：
-
-```typescript
 import { find, filter } from 'lodash';
 
 // example data
 const authors = [
   { id: 1, firstName: 'Tom', lastName: 'Coleman' },
   { id: 2, firstName: 'Sashko', lastName: 'Stubailo' },
-  { id: 3, firstName: 'Mikhail', lastName: 'Novikov' },
 ];
 const posts = [
   { id: 1, authorId: 1, title: 'Introduction to GraphQL', votes: 2 },
   { id: 2, authorId: 2, title: 'Welcome to Meteor', votes: 3 },
-  { id: 3, authorId: 2, title: 'Advanced GraphQL', votes: 1 },
-  { id: 4, authorId: 3, title: 'Launchpad is Cool', votes: 7 },
 ];
 
 const resolverMap = {
@@ -232,84 +160,87 @@ const resolverMap = {
 };
 ```
 
-使用该 `@nestjs/graphql` 包，解析器映射是使用元数据自动生成的。我们用等效的 Nest-Way 代码重写上面的例子。
 
-```typescript
-import { Query, Resolver, ResolveProperty } from '@nestjs/graphql';
+使用 `@nestjs/graphql` 包，解析器映射将使用装饰器提供的元数据自动生成。让我们用等同的 Nest 代码重写上面的例子。
+
+```
+import { Query, Resolver, ResolveProperty, Args, Parent } from '@nestjs/graphql';
 import { find, filter } from 'lodash';
 
 // example data
 const authors = [
   { id: 1, firstName: 'Tom', lastName: 'Coleman' },
   { id: 2, firstName: 'Sashko', lastName: 'Stubailo' },
-  { id: 3, firstName: 'Mikhail', lastName: 'Novikov' },
 ];
 const posts = [
   { id: 1, authorId: 1, title: 'Introduction to GraphQL', votes: 2 },
   { id: 2, authorId: 2, title: 'Welcome to Meteor', votes: 3 },
-  { id: 3, authorId: 2, title: 'Advanced GraphQL', votes: 1 },
-  { id: 4, authorId: 3, title: 'Launchpad is Cool', votes: 7 },
 ];
 
 @Resolver('Author')
 export class AuthorResolver {
   @Query()
-  author(obj, args, context, info) {
-    return find(authors, { id: args.id });
+  author(@Args('id') id: number) {
+    return find(authors, { id });
   }
 
   @ResolveProperty()
-  posts(author, args, context, info) {
+  posts(@Parent() author) {
     return filter(posts, { authorId: author.id });
   }
 }
 ```
+`@Resolver()` 装饰器不影响查询和对象变动 (`@Query()` 和 `@Mutation()` 装饰器)。这只会通知 Nest, 每个 `@ResolveProperty()` 有一个父节点, `Author` 在这种情况下是父节点。
 
-该 `@Resolver()` 装饰并不影响查询和变更。它只告诉 Nest 每个 `@ResolveProperty()` 都有一个父级，在本例中是 `Author`。
-
-?> 如果您使用的是 `@Resolver()` 修饰器, 则不必将类标记为 `@Injectable()`, 否则, 它将是必需的。
+?> 如果使用 @Resolver() 装饰器, 则不必将类标记为 `@Injectable()`, 否则必须这么做。
 
 
-通常, 我们会使用类似 `getAuthor()` 或 `getPosts()` 作为方法名。我们也可以轻松地做到这一点:
+通常, 我们会使用像 `getAuthor()` 或 `getPosts()` 之类的方法来命名。我们可以很容易地做到这一点, 以及移动命名之间的装饰器的括号。
 
-```typescript
-import { Query, Resolver, ResolveProperty } from '@nestjs/graphql';
+```
+import { Query, Resolver, ResolveProperty, Parent, Args } from '@nestjs/graphql';
 import { find, filter } from 'lodash';
 
 // example data
 const authors = [
   { id: 1, firstName: 'Tom', lastName: 'Coleman' },
   { id: 2, firstName: 'Sashko', lastName: 'Stubailo' },
-  { id: 3, firstName: 'Mikhail', lastName: 'Novikov' },
 ];
 const posts = [
   { id: 1, authorId: 1, title: 'Introduction to GraphQL', votes: 2 },
   { id: 2, authorId: 2, title: 'Welcome to Meteor', votes: 3 },
-  { id: 3, authorId: 2, title: 'Advanced GraphQL', votes: 1 },
-  { id: 4, authorId: 3, title: 'Launchpad is Cool', votes: 7 },
 ];
 
 @Resolver('Author')
 export class AuthorResolver {
   @Query('author')
-  getAuthor(obj, args, context, info) {
-    return find(authors, { id: args.id });
+  getAuthor(@Args('id') id: number) {
+    return find(authors, { id });
   }
 
   @ResolveProperty('posts')
-  getPosts(author, args, context, info) {
+  getPosts(@Parent() author) {
     return filter(posts, { authorId: author.id });
   }
 }
 ```
 
-?> `@Resolver()` 装饰可以在方法级别被使用。
+?> 这个 @Resolver()装饰器可以在方法级别被使用。
+
+在上面的示例中，您可能会注意到我们使用专用装饰器来引用以下参数。下面是提供的装饰器和它们代表的普通Apollo参数的比较。
+
+|||
+|---|---|
+| @Root() 和 @Parent() |	root/parent |
+| @Context(param?:string)	| context/context[param] |
+| @Info(param?:string)	| info/info[param] |
+| @Args(param?:string)	| args/args[param] |
 
 ### 重构
 
-上述代码背后的想法是为了展示 Apollo 和 Nest-way 之间的区别，以便简单地转换代码。现在，我们要做一个小的重构来利用 Nest 架构的优势，使其成为一个真实的例子。
+上面代码背后的思想是展示 Apollo 和 Nest-way 之间的区别，从而允许您的代码进行简单的转换。现在，我们要做一个小重构来利用 Nest 体系结构的优势，让它成为一个真实的例子。
 
-```typescript
+```
 @Resolver('Author')
 export class AuthorResolver {
   constructor(
@@ -318,22 +249,20 @@ export class AuthorResolver {
   ) {}
 
   @Query('author')
-  async getAuthor(obj, args, context, info) {
-    const { id } = args;
+  async getAuthor(@Args('id') id: number) {
     return await this.authorsService.findOneById(id);
   }
 
   @ResolveProperty('posts')
-  async getPosts(author, args, context, info) {
+  async getPosts(@Parent() author) {
     const { id } = author;
     return await this.postsService.findAll({ authorId: id });
   }
 }
 ```
+基本上，我们去掉了本地定义的模拟数据。相反，我们同时使用 `AuthorsService` 和 `PostsService` 从我们的数据存储中检索实体。在这里完成之后，我们必须在某个地方注册 `AuthorResolver`，例如在新创建的 `AuthorsModule` 中。
 
-现在我们必须在某个地方注册 `AuthorResolver`, 例如在新创建的 `AuthorsModule` 中。
-
-```typescript
+```
 @Module({
   imports: [PostsModule],
   providers: [AuthorsService, AuthorResolver],
@@ -341,15 +270,15 @@ export class AuthorResolver {
 export class AuthorsModule {}
 ```
 
-`GraphQLModule` 将负责反映「元数据」, 并自动将类转换为正确的解析器映射。你必须做的唯一一件事就是在某个地方导入此模块, 因此 Nest 将知道 `AuthorsModule` 存在。
+`GraphQLModule` 将自动反应元数据并将类转换为正确的解析器映射。唯一需要注意的是，您需要在某个地方导入这个模块，这样 Nest 就知道 `AuthorsModule`   确实存在了。
 
 ### 类型定义
 
-最后一个缺失的部分是类型定义（[阅读更多](http://graphql.cn/learn/schema/#type-language)）文件。让我们在解析器类附近创建它。
+最后一个缺失的部分是类型定义（[更多](http://graphql.org/learn/schema/#type-language)）文件。让我们在解析器类附近创建它。
 
 > author-types.graphql
 
-```javascript
+```
 type Author {
   id: Int!
   firstName: String
@@ -367,10 +296,10 @@ type Query {
   author(id: Int!): Author
 }
 ```
+就这样。我们创建了一个`author(id: Int!)` 查询。
 
-就这样。我们创建了一个 `author(id: Int!)` 查询。
+?> 在[此处](http://graphql.org/learn/queries/) 了解有关 GraphQL 查询的更多信息。
 
-?> [此处](http://graphql.cn/learn/queries/)了解有关 GraphQL 查询的更多信息。
 
 ##  变更（Mutations）
 
@@ -768,40 +697,3 @@ const linkTypeDefs = `
 ```
 
 就这样。
-
-## IDE 
-
-最受欢迎的 GraphQL 浏览器 IDE 称为 GraphiQL。要在您的应用程序中使用 GraphiQL，您需要设置一个中间件。这个特殊的中间件附带了 `apollo-server-express` ，我们必须安装。它的名字是 `graphiqlExpress()`。
-
-为了建立一个中间件，我们需要再次打开一个 `app.module.ts` 文件：
-
-> app.module.ts
-
-```typescript
-import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
-import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
-import { GraphQLModule, GraphQLFactory } from '@nestjs/graphql';
-
-@Module({
-  imports: [GraphQLModule],
-})
-export class ApplicationModule implements NestModule {
-  constructor(private readonly graphQLFactory: GraphQLFactory) {}
-
-  configure(consumer: MiddlewareConsumer) {
-    const typeDefs = this.graphQLFactory.mergeTypesByPaths('./**/*.graphql');
-    const schema = this.graphQLFactory.createSchema({ typeDefs });
-
-    consumer
-      .apply(graphiqlExpress({ endpointURL: '/graphql' }))
-      .forRoutes('/graphiql')
-      .apply(graphqlExpress(req => ({ schema, rootValue: req })))
-      .forRoutes('/graphql');
-  }
-}
-```
-
-?> `graphiqlExpress()` 提供了一些其他选项, 请在[此处](https://www.apollographql.com/docs/apollo-server/graphiql.html)阅读更多信息。
-
-
-现在，当你打开 http://localhost:PORT/graphiql 你应该看到一个图形交互式 GraphiQL IDE。

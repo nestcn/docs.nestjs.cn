@@ -69,6 +69,70 @@ Playground 是一个图形化的，交互式的浏览器内 GraphQL IDE，默认
 ### Async 配置
 
 
+通常, 您可能希望异步传递模块选项, 而不是预先传递它们。在这种情况下, 使用 `forRootAsync()` 方法, 它提供了处理异步数据的几种不同方法。
+
+第一种可能的方法是使用工厂功能:
+
+```
+GraphQLModule.forRootAsync({
+  useFactory: () => ({
+    typePaths: ['./**/*.graphql'],
+  }),
+})
+```
+显然, 我们的 factory 的行为和其他人一样 (可能是异步的, 并且能够通过 `inject` 注入依赖关系)。
+
+```
+GraphQLModule.forRootAsync({
+  imports: [ConfigModule],
+  useFactory: async (configService: ConfigService) => ({
+    typePaths: configService.getString('GRAPHQL_TYPE_PATHS'),
+  }),
+  inject: [ConfigService],
+})
+```
+
+或者, 您可以使用类而不是 factory。
+
+```
+GraphQLModule.forRootAsync({
+  useClass: GqlConfigService,
+})
+```
+上面的构造将实例化 `GqlConfigService` 内部 `GraphQLModule`, 并将利用它来创建选项对象。`GqlConfigService` 必须实现 `GqlOptionsFactory` 接口。
+
+```
+@Injectable()
+class GqlConfigService implements GqlOptionsFactory {
+  createGqlOptions(): GqlModuleOptions {
+    return {
+      typePaths: ['./**/*.graphql'],
+    };
+  }
+}
+```
+
+为了防止 `GqlConfigService`内部创建 `GraphQLModule` 并使用从不同模块导入的提供程序，您可以使用 `useExisting` 语法。
+
+
+```
+GraphQLModule.forRootAsync({
+  imports: [ConfigModule],
+  useExisting: ConfigService,
+})
+```
+
+它的工作原理与 `useClass` 有一个关键的区别—— `GraphQLModule` 将查找导入的模块重用已经创建的 `ConfigService`, 而不是单独实例化它。
+
+## 例子
+
+[这里](https://github.com/nestjs/nest/tree/master/sample/12-graphql-apollo)这里提供完整的案例。
+
+
+
+
+
+
 
 ### Apollo 中间件
 

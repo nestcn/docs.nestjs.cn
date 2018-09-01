@@ -24,7 +24,7 @@ https://github.com/coopnd/fastify-apollo
 
 > app.module.ts
 
-```
+```typescript
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 
@@ -42,7 +42,7 @@ export class ApplicationModule {}
 
 > app.module.ts
 
-```
+```typescript
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 
@@ -73,7 +73,7 @@ Playground 是一个图形化的，交互式的浏览器内 GraphQL IDE，默认
 
 第一种可能的方法是使用工厂功能:
 
-```
+```typescript
 GraphQLModule.forRootAsync({
   useFactory: () => ({
     typePaths: ['./**/*.graphql'],
@@ -82,7 +82,7 @@ GraphQLModule.forRootAsync({
 ```
 显然, 我们的 factory 的行为和其他人一样 (可能是异步的, 并且能够通过 `inject` 注入依赖关系)。
 
-```
+```typescript
 GraphQLModule.forRootAsync({
   imports: [ConfigModule],
   useFactory: async (configService: ConfigService) => ({
@@ -94,14 +94,14 @@ GraphQLModule.forRootAsync({
 
 或者, 您可以使用类而不是 factory。
 
-```
+```typescript
 GraphQLModule.forRootAsync({
   useClass: GqlConfigService,
 })
 ```
 上面的构造将实例化 `GqlConfigService` 内部 `GraphQLModule`, 并将利用它来创建选项对象。`GqlConfigService` 必须实现 `GqlOptionsFactory` 接口。
 
-```
+```typescript
 @Injectable()
 class GqlConfigService implements GqlOptionsFactory {
   createGqlOptions(): GqlModuleOptions {
@@ -115,7 +115,7 @@ class GqlConfigService implements GqlOptionsFactory {
 为了防止 `GqlConfigService`内部创建 `GraphQLModule` 并使用从不同模块导入的提供程序，您可以使用 `useExisting` 语法。
 
 
-```
+```typescript
 GraphQLModule.forRootAsync({
   imports: [ConfigModule],
   useExisting: ConfigService,
@@ -133,7 +133,7 @@ GraphQLModule.forRootAsync({
 
 如果您正在使用 graphql-tools，则必须手动创建解析图。以下示例从 [Apollo文档](https://www.apollographql.com/docs/graphql-tools/generate-schema.html) 中复制，您可以在其中阅读有关它的更多信息：
 
-```
+```typescript
 import { find, filter } from 'lodash';
 
 // example data
@@ -163,7 +163,7 @@ const resolverMap = {
 
 使用 `@nestjs/graphql` 包，解析器映射将使用装饰器提供的元数据自动生成。让我们用等同的 Nest 代码重写上面的例子。
 
-```
+```typescript
 import { Query, Resolver, ResolveProperty, Args, Parent } from '@nestjs/graphql';
 import { find, filter } from 'lodash';
 
@@ -197,7 +197,7 @@ export class AuthorResolver {
 
 通常, 我们会使用像 `getAuthor()` 或 `getPosts()` 之类的方法来命名。我们可以很容易地做到这一点, 以及移动命名之间的装饰器的括号。
 
-```
+```typescript
 import { Query, Resolver, ResolveProperty, Parent, Args } from '@nestjs/graphql';
 import { find, filter } from 'lodash';
 
@@ -240,7 +240,7 @@ export class AuthorResolver {
 
 上面代码背后的思想是展示 Apollo 和 Nest-way 之间的区别，从而允许您的代码进行简单的转换。现在，我们要做一个小重构来利用 Nest 体系结构的优势，让它成为一个真实的例子。
 
-```
+```typescript
 @Resolver('Author')
 export class AuthorResolver {
   constructor(
@@ -262,7 +262,7 @@ export class AuthorResolver {
 ```
 基本上，我们去掉了本地定义的模拟数据。相反，我们同时使用 `AuthorsService` 和 `PostsService` 从我们的数据存储中检索实体。在这里完成之后，我们必须在某个地方注册 `AuthorResolver`，例如在新创建的 `AuthorsModule` 中。
 
-```
+```typescript
 @Module({
   imports: [PostsModule],
   providers: [AuthorsService, AuthorResolver],
@@ -278,7 +278,7 @@ export class AuthorsModule {}
 
 > author-types.graphql
 
-```
+```typescript
 type Author {
   id: Int!
   firstName: String
@@ -305,7 +305,6 @@ type Query {
 
 在 GraphQL 中，为了修改服务器端数据，我们使用了变更（Mutations）。[了解更多](http://graphql.cn/learn/queries/#mutations)
 
-
 [Apollo](https://www.apollographql.com/docs/graphql-tools/generate-schema.html) 官方文献中有一个 `upvotePost ()` 变更的例子。这种变更允许增加后 `votes` 属性值。
 
 ```typescript
@@ -324,31 +323,28 @@ Mutation: {
 为了在 Nest-way 中创建等价的变更，我们将使用  `@Mutation()` 装饰器。让我们扩展在上一节 (解析器映射) 中使用的 `AuthorResolver`。
 
 ```typescript
-import { Query, Mutation, Resolver, ResolveProperty } from '@nestjs/graphql';
+import { Query, Mutation, Resolver, ResolveProperty, Parent, Args } from '@nestjs/graphql';
 import { find, filter } from 'lodash';
 
 // example data
 const authors = [
   { id: 1, firstName: 'Tom', lastName: 'Coleman' },
   { id: 2, firstName: 'Sashko', lastName: 'Stubailo' },
-  { id: 3, firstName: 'Mikhail', lastName: 'Novikov' },
 ];
 const posts = [
   { id: 1, authorId: 1, title: 'Introduction to GraphQL', votes: 2 },
   { id: 2, authorId: 2, title: 'Welcome to Meteor', votes: 3 },
-  { id: 3, authorId: 2, title: 'Advanced GraphQL', votes: 1 },
-  { id: 4, authorId: 3, title: 'Launchpad is Cool', votes: 7 },
 ];
 
 @Resolver('Author')
 export class AuthorResolver {
   @Query('author')
-  getAuthor(obj, args, context, info) {
-    return find(authors, { id: args.id });
+  getAuthor(@Args('id') id: number) {
+    return find(authors, { id: id });
   }
 
   @Mutation()
-  upvotePost(_, { postId }) {
+  upvotePost(@Args('postId') postId: number) {
     const post = find(posts, { id: postId });
     if (!post) {
       throw new Error(`Couldn't find post with id ${postId}`);
@@ -358,7 +354,7 @@ export class AuthorResolver {
   }
 
   @ResolveProperty('posts')
-  getPosts(author) {
+  getPosts(@Parent() author) {
     return filter(posts, { authorId: author.id });
   }
 }
@@ -377,19 +373,17 @@ export class AuthorResolver {
   ) {}
 
   @Query('author')
-  async getAuthor(obj, args, context, info) {
-    const { id } = args;
+  async getAuthor(@Args('id') id: number) {
     return await this.authorsService.findOneById(id);
   }
 
   @Mutation()
-  async upvotePost(_, { postId }) {
+  async upvotePost(@Args('postId') postId: number) {
     return await this.postsService.upvoteById({ id: postId });
   }
 
   @ResolveProperty('posts')
-  async getPosts(author) {
-    const { id } = author;
+  async getPosts(@Parent() { id }) {
     return await this.postsService.findAll({ authorId: id });
   }
 }
@@ -450,7 +444,7 @@ Subscription: {
 为了以Nest方式创建等效订阅，我们将使用 `@Subscription()` 装饰器。让我们扩展 `AuthorResolver` 在解析器映射部分中的使用。
 
 ```typescript
-import { Query, Resolver, Subscription, ResolveProperty } from '@nestjs/graphql';
+import { Query, Resolver, Subscription, ResolveProperty, Parent, Args } from '@nestjs/graphql';
 import { find, filter } from 'lodash';
 import { PubSub } from 'graphql-subscriptions';
 
@@ -458,13 +452,10 @@ import { PubSub } from 'graphql-subscriptions';
 const authors = [
   { id: 1, firstName: 'Tom', lastName: 'Coleman' },
   { id: 2, firstName: 'Sashko', lastName: 'Stubailo' },
-  { id: 3, firstName: 'Mikhail', lastName: 'Novikov' },
 ];
 const posts = [
   { id: 1, authorId: 1, title: 'Introduction to GraphQL', votes: 2 },
   { id: 2, authorId: 2, title: 'Welcome to Meteor', votes: 3 },
-  { id: 3, authorId: 2, title: 'Advanced GraphQL', votes: 1 },
-  { id: 4, authorId: 3, title: 'Launchpad is Cool', votes: 7 },
 ];
 
 // example pubsub
@@ -473,8 +464,8 @@ const pubSub = new PubSub();
 @Resolver('Author')
 export class AuthorResolver {
   @Query('author')
-  getAuthor(obj, args, context, info) {
-    return find(authors, { id: args.id });
+  getAuthor(@Args('id') id: number) {
+    return find(authors, { id });
   }
 
   @Subscription()
@@ -485,7 +476,7 @@ export class AuthorResolver {
   }
 
   @ResolveProperty('posts')
-  getPosts(author) {
+  getPosts(@Parent() author) {
     return filter(posts, { authorId: author.id });
   }
 }
@@ -539,15 +530,21 @@ type Subscription {
 $ npm i --save graphql-type-json
 ```
 
-然后，我们必须将自定义解析器传递给 `createSchema()` 函数：
+然后，我们必须将自定义解析器传递给 `forRoot()` 函数：
 
 ```typescript
-const resolvers = { JSON: GraphQLJSON };
-const schema = this.graphQLFactory.createSchema({ typeDefs, resolvers });
+import * as GraphQLJSON from 'graphql-type-json';
+
+@Module({
+  imports: [
+    GraphQLModule.forRoot({
+      typePaths: ['./**/*.graphql'],
+      resolvers: { JSON: GraphQLJSON },
+    }),
+  ],
+})
+export class ApplicationModule {}
 ```
-
-?> `GraphQLJSON` 是从 `graphql-type-json` 包中导入的
-
 现在, 我们可以在类型定义中使用 `JSON` 标量:
 
 ```typescript
@@ -558,142 +555,98 @@ type Foo {
 }
 ```
 
-## 看守器和拦截器
+### 类
 
-在 GraphQL 中, 许多文章抱怨如何处理诸如身份验证或操作的副作用之类的问题。我们应该把它放在业务逻辑里面吗？我们是否应该使用高阶函数来增强查询和变更, 例如使用授权逻辑？没有单一的答案。
+定义标量类型的另一种形式是创建一个简单的类。假设我们想用 `Date`类型增强我们的模式。
 
-Nest 生态系统正试图利用现有的功能, 如看守器和拦截器来帮助解决这个问题。其背后的想法是减少冗余, 并为您提供工具，帮助创建结构良好，可读性强且一致的应用程序。
+```typescript
+import { Scalar } from '@nestjs/graphql';
+import { Kind } from 'graphql';
 
-### 使用
+@Scalar('Date')
+export class DateScalar {
+  description = 'Date custom scalar type';
 
-您可以像在简单的 REST 应用程序中一样使用看守器和拦截器。它们的行为等同于在 `graphqlExpress` 中间件中作为 `rootValue` 传递请求。让我们看一下下面的代码:
+  parseValue(value) {
+    return new Date(value); // value from the client
+  }
+
+  serialize(value) {
+    return value.getTime(); // value sent to the client
+  }
+
+  parseLiteral(ast) {
+    if (ast.kind === Kind.INT) {
+      return parseInt(ast.value, 10); // ast value is always in string format
+    }
+    return null;
+  }
+}
+```
+之后，我们需要注册 `DateScalar` 为提供者。
+
+```
+@Module({
+  providers: [DateScalar],
+})
+export class CommonModule {}
+```
+现在我们可以在 `Date` 类型定义中使用标量。
+
+
+## 工具
+
+在GraphQL世界中，很多文章抱怨如何处理诸如身份验证或操作的副作用之类的东西。我们应该把它放在业务逻辑中吗？我们是否应该使用更高阶的函数来增强查询和变更，例如，使用授权逻辑？或者也许使用模式指令。无论如何，没有一个答案。
+
+Nest生态系统正试图利用看守器和拦截器等现有功能帮助解决这个问题。它们背后的想法是减少冗余，并为您提供有助于创建结构良好，可读且一致的应用程序的工具。
+
+### 概述
+
+您可以以与简单的REST应用程序相同的方式使用看守器、拦截器和管道。此外，您还可以通过利用自定义 decorator 特性轻松地创建自己的 decorator。他们都一样。让我们看看下面的代码:
 
 ```typescript
 @Query('author')
 @UseGuards(AuthGuard)
-async getAuthor(obj, args, context, info) {
-  const { id } = args;
+async getAuthor(@Args('id', ParseIntPipe) id: number) {
   return await this.authorsService.findOneById(id);
 }
 ```
 
-由于这一点，您可以将您的身份验证逻辑移至看守器(guard)，甚至可以复用与 REST 应用程序中相同的看守器(guard)类。拦截器的工作方式完全相同：
+正如您所看到的，GraphQL在看守器和管道方面都能很好地工作。因此，您可以将身份验证逻辑移至看守器，甚至可以复用与 REST 应用程序相同的看守器类。拦截器的工作方式完全相同：
 
 ```typescript
 @Mutation()
 @UseInterceptors(EventsInterceptor)
-async upvotePost(_, { postId }) {
+async upvotePost(@Args('postId') postId: number) {
   return await this.postsService.upvoteById({ id: postId });
 }
 ```
+### 执行上下文
 
-写一次，随处使用:)
-
-## Schema 拼接
-
-Schema 拼接功能允许从多个底层GraphQL API创建单个GraphQL模式。你可以在[这里](https://www.apollographql.com/docs/graphql-tools/schema-stitching.html)阅读更多。
-
-### 代理（Proxying）
-
-要在模式之间添加代理字段的功能，您需要在它们之间创建额外的解析器。我们来看看 [Apollo](https://www.apollographql.com/docs/graphql-tools/schema-stitching.html#adding-resolvers) 文档中的例子：
+但是，ExecutionContext 看守器和拦截器所接收的情况有所不同。GraphQL 解析器有一个单独的参数集，分别为 root，args，context，和 info。因此，我们需要将 ExecutionContext 转换为 GqlExecutionContext，这非常简单。
 
 ```typescript
-mergeInfo => ({
-  User: {
-    chirps: {
-      fragment: `fragment UserFragment on User { id }`,
-      resolve(parent, args, context, info) {
-        const authorId = parent.id;
-        return mergeInfo.delegate(
-          'query',
-          'chirpsByAuthorId',
-          {
-            authorId,
-          },
-          context,
-          info,
-        );
-      },
-    },
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { GqlExecutionContext } from '@nestjs/graphql';
+
+@Injectable()
+export class AuthGuard implements CanActivate {
+  canActivate(context: ExecutionContext): boolean {
+    const ctx = GqlExecutionContext.create(context);
+    return true;
   }
-})
-```
-
-在这里，我们将 `User` 的 `chirps` 属性委托给另一个 GraphQL API。为了在 Nest-way 中实现相同的结果，我们使用 `@DelegateProperty()` 装饰器。
-
-```typescript
-
-@Resolver('User')
-@DelegateProperty('chirps')
-findChirpsByUserId() {
-  return (mergeInfo: MergeInfo) => ({
-    fragment: `fragment UserFragment on User { id }`,
-    resolve(parent, args, context, info) {
-      const authorId = parent.id;
-      return mergeInfo.delegate(
-        'query',
-        'chirpsByAuthorId',
-        {
-          authorId,
-        },
-        context,
-        info,
-      );
-    },
-  });
 }
 ```
 
-?> `@Resolver()` 装饰器在这里用于方法级, 但也可以在顶级 (class) 级别使用它。
+GqlExecutionContext 为每个参数公开相应的方法，比如 getArgs()，getContext()等等。现在，我们可以毫不费力地获取特定于当前处理的请求的每个参数。
 
-然后, 让我们再回到 `graphqlExpress` 中间件。我们需要合并我们的架构并在它们之间添加委托。要创建委托, 我们使用 `GraphQLFactory` 类的 `createDelegates ()` 方法。
 
-> app.module.ts
+### 自定义装饰器
 
-```typescript
-configure(consumer) {
-  const typeDefs = this.graphQLFactory.mergeTypesByPaths('./**/*.graphql');
-  const localSchema = this.graphQLFactory.createSchema({ typeDefs });
-  const delegates = this.graphQLFactory.createDelegates();
-  const schema = mergeSchemas({
-    schemas: [localSchema, chirpSchema, linkTypeDefs],
-    resolvers: delegates,
-  });
+如前所述，自定义装饰器功能也可以像 GraphQL 解析器一样工作。但是，Factory 函数采用一组参数而不是 request 对象。
 
-  consumer
-    .apply(graphqlExpress(req => ({ schema, rootValue: req })))
-    .forRoutes('/graphql');
-}
 ```
-
-为了合并 schema ，我们使用了 `mergeSchemas()` 函数（[阅读更多](https://www.apollographql.com/docs/graphql-tools/schema-stitching.html#mergeSchemas)）。此外，您可能会注意到 `chirpsSchema` 和 `linkTypeDefs` 变量。他们是直接从 [Apollo](https://www.apollographql.com/docs/graphql-tools/schema-stitching.html) 文档复制和粘贴的。
-
-```typescript
-import { makeExecutableSchema } from 'graphql-tools';
-    
-const chirpSchema = makeExecutableSchema({
-  typeDefs: `
-    type Chirp {
-      id: ID!
-      text: String
-      authorId: ID!
-    }
-
-    type Query {
-      chirpById(id: ID!): Chirp
-      chirpsByAuthorId(authorId: ID!): [Chirp]
-    }
-  `
-});
-const linkTypeDefs = `
-  extend type User {
-    chirps: [Chirp]
-  }
-
-  extend type Chirp {
-    author: User
-  }
-`;
+export const User = createParamDecorator(
+  (data, [root, args, ctx, info]) => ctx.user,
+);
 ```
-
-就这样。

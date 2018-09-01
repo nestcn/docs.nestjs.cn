@@ -69,7 +69,7 @@ Playground 是一个图形化的，交互式的浏览器内 GraphQL IDE，默认
 ### Async 配置
 
 
-通常, 您可能希望异步传递模块选项, 而不是预先传递它们。在这种情况下, 使用 `forRootAsync()` 方法, 它提供了处理异步数据的几种不同方法。
+通常, 您可能希望异步传递模块选项, 而不是预先传递它们。在这种情况下, 使用 `forRootAsync()` 函数, 它提供了处理异步数据的几种不同方法。
 
 第一种可能的方法是使用工厂功能:
 
@@ -195,7 +195,7 @@ export class AuthorResolver {
 ?> 如果使用 @Resolver() 装饰器, 则不必将类标记为 `@Injectable()`, 否则必须这么做。
 
 
-通常, 我们会使用像 `getAuthor()` 或 `getPosts()` 之类的方法来命名。我们可以很容易地做到这一点, 以及移动命名之间的装饰器的括号。
+通常, 我们会使用像 `getAuthor()` 或 `getPosts()` 之类的函数来命名。我们可以很容易地做到这一点, 以及移动命名之间的装饰器的括号。
 
 ```typescript
 import { Query, Resolver, ResolveProperty, Parent, Args } from '@nestjs/graphql';
@@ -225,7 +225,7 @@ export class AuthorResolver {
 }
 ```
 
-?> 这个 @Resolver()装饰器可以在方法级别被使用。
+?> 这个 @Resolver()装饰器可以在函数级别被使用。
 
 在上面的示例中，您可能会注意到我们使用专用装饰器来引用以下参数。下面是提供的装饰器和它们代表的普通Apollo参数的比较。
 
@@ -638,7 +638,7 @@ export class AuthGuard implements CanActivate {
 }
 ```
 
-GqlExecutionContext 为每个参数公开相应的方法，比如 getArgs()，getContext()等等。现在，我们可以毫不费力地获取特定于当前处理的请求的每个参数。
+GqlExecutionContext 为每个参数公开相应的函数，比如 getArgs()，getContext()等等。现在，我们可以毫不费力地获取特定于当前处理的请求的每个参数。
 
 
 ### 自定义装饰器

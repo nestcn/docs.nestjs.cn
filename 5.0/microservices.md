@@ -128,20 +128,20 @@ async onModuleInit() {
   await this.client.connect();
 }
 ```
+如果无法创建连接，则该 `connect()` 方法将拒绝相应的错误对象。
 
-`ClientProxy` 公开了一个 `send()` 方法。此方法旨在调用微服务并将其响应返回给 `Observable`，这意味着，我们可以轻松订阅发送的值。
+该 `ClientProxy` 公开了一个 `send()` 方法。此方法旨在调用微服务并返回 `Observable` 其响应，这意味着，我们可以轻松地订阅发出的值。
 
 ```typescript
 @Get()
 call(): Observable<number> {
   const pattern = { cmd: 'sum' };
-  const data = [1, 2, 3, 4, 5];
-
-  return this.client.send<number>(pattern, data);
+  const payload = [1, 2, 3];
+  return this.client.send<number>(pattern, payload);
 }
 ```
+send() 函数接受两个参数，pattern 和 payload。模式必须等于 @MessagePattern() 修饰符中定义的这个模式，而 payload 是我们想要传输到另一个微服务的消息
 
-`send()` 方法接受两个参数，`pattern` 和 `data`。`pattern` 必须与 `@MessagePattern()` 装饰器中定义的模式相同，而 `data` 是要传输到另一个微服务的消息。
 
 ## Redis
 

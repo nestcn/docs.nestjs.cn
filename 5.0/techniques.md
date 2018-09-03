@@ -451,6 +451,8 @@ export class PhotoModule {}
 
 ## Mongo
 
+【欢迎提交翻译】
+
 ## 文件上传
 
 为了处理文件上传，Nest使用了[multer](https://github.com/expressjs/multer)中间件。这个中间件是完全可配置的，您可以根据您的应用需求调整其行为。
@@ -566,8 +568,23 @@ await app.listen(3000);
 
 此解决方案的唯一缺点是您的第一个初始化消息将不会由您的 logger 实例处理，但它并不重要。
 
+## 验证
 
-## CORS
+【待翻译】
+
+## 缓存
+
+【待翻译】
+
+## 序列化
+
+【待翻译】
+
+## 日志
+
+## 安全
+
+【需更新】
 
 跨源资源共享（CORS）是一种允许从另一个域请求资源的机制。在引擎盖下，Nest 使用了 [cors](https://github.com/expressjs/cors) 软件包，该软件包提供了一些选项，您可以根据自己的要求进行自定义。为了启用CORS，你必须调用 `enableCors()` 方法。
 
@@ -772,6 +789,10 @@ export class AppService {
   }
 }
 ```
+
+## 压缩
+
+【待翻译】
 
 ## HTTP模块
 

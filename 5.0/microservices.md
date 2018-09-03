@@ -330,6 +330,36 @@ findOne(data: HeroById, metadata: any): Hero {
 
 此外，`FindOne` 这里实际上是多余的。如果没有传递第二个参数 `@GrpcMethod()`，Nest 将自动使用带有大写首字母的方法名称，例如 findOne-> FindOne 。
 
+> hero.controller.ts
+
+```typescript
+@GrpcMethod('HeroService')
+findOne(data: HeroById, metadata: any): Hero {
+  const items = [
+    { id: 1, name: 'John' },
+    { id: 2, name: 'Doe' },
+  ];
+  return items.find(({ id }) => id === data.id);
+}
+```
+
+同样，您可能不会传递任何参数。在这种情况下，Nest将使用类名。
+
+> hero.controller.ts
+
+```typescript
+@Controller()
+export class HeroService {
+  @GrpcMethod()
+  findOne(data: HeroById, metadata: any): Hero {
+    const items = [
+      { id: 1, name: 'John' },
+      { id: 2, name: 'Doe' },
+    ];
+    return items.find(({ id }) => id === data.id);
+  }
+}
+```
 
 ### 客户端
 
@@ -381,7 +411,11 @@ call(): Observable<any> {
 
 ## 异常过滤器 (Exception filters)
 
-HTTP异常过滤器层和相应的微服务层之间的唯一区别在于，不要抛出 `HttpException`，而应该使用 `RpcException`。
+HTTP异常过滤器层和相应的微服务层之间的唯一区别在于，不要使用 `HttpException`，而应该使用 `RpcException`。
+
+```typescript
+throw new RpcException('Invalid credentials.');
+```
 
 ?> `RpcException` 类是从 `@nestjs/microservices` 包导入的。
 
@@ -406,7 +440,7 @@ import { Observable, throwError } from 'rxjs';
 import { RpcException } from '@nestjs/microservices';
 
 @Catch(RpcException)
-export class ExceptionFilter implements RpcExceptionFilter {
+export class ExceptionFilter implements RpcExceptionFilter<RpcException> {
   catch(exception: RpcException, host: ArgumentsHost): Observable<any> {
     return throwError(exception.getError());
   }
@@ -424,6 +458,27 @@ sum(data: number[]): number {
   return (data || []).reduce((a, b) => a + b);
 }
 ```
+
+### 继承
+
+通常，您将创建完全自定义的异常过滤器，以满足您的应用程序要求。虽然您希望重用已经实现的核心异常过滤器并根据某些因素覆盖行为，但可能存在用例。
+
+为了将异常处理委托给基本过滤器，您需要扩展 `BaseExceptionFilter` 并调用继承的 `catch()` 函数。此外，`HttpServer` 必须注入并传递给 `super()` 调用。
+
+```typescript
+import { Catch, ArgumentsHost } from '@nestjs/common';
+import { BaseRpcExceptionFilter } from '@nestjs/microservices';
+
+@Catch()
+export class AllExceptionsFilter extends BaseRpcExceptionFilter {
+  catch(exception: any, host: ArgumentsHost) {
+    return super.catch(exception, host);
+  }
+}
+```
+
+显然，您应该使用您量身定制的业务逻辑（例如添加各种条件）来增强上述实现。
+
 
 ## 管道 (Pipes)
 

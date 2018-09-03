@@ -2,9 +2,9 @@
 
 ## 基本
 
-Nest 微服务是一种使用与HTTP不同的传输层的应用程序。
+Nest 微服务是一种使用与 HTTP 不同的传输层的应用程序。
 
-![](https://docs.nestjs.com/v5/assets/Microservices_1.png)
+![](https://docs.nestjs.com/assets/Microservices_1.png)
 
 ### 安装
 
@@ -55,7 +55,7 @@ bootstrap();
 
 ### 模式（patterns）
 
-微服务通过 **模式** 识别消息。模式是一个普通值，例如对象、字符串或甚至数字。为了创建模式处理程序，我们使用从 `@nestjs/microservices` 包导入的 `@MessagePattern()` 装饰器。
+微服务通过 **模式** 识别消息。模式是一个普通值，例如对象、字符串或甚至数字。为了创建模式处理程序，我们使用从 `@nestjs/microservices` 包的 `@MessagePattern()` 装饰器。
 
 >  math.controller.ts
 
@@ -87,7 +87,7 @@ async sum(data: number[]): Promise<number> {
 }
 ```
 
-此外，我们能够返回 [RxJS](https://github.com/reactivex/rxjs) `Observable`，因此这些值将被发出，直到流完成。
+此外，我们能够返回 [Rx](https://github.com/reactivex/rxjs) `Observable`，因此这些值将被发出，直到流完成。
 
 > math.controller.ts
 
@@ -110,6 +110,24 @@ client: ClientProxy;
 ```
 
 !> `@Client()` 和 `ClientProxy` 需要引入 `@nestjs/microservices` 。
+
+另一种解决方案是 ClientProxy 使用 ClientProxyFactory（从 @nestjs/microservices 包中导出）手动创建实例。
+
+```typescript
+constructor() {
+  this.client = ClientProxyFactory.create({
+    transport: Transport.TCP
+  });
+}
+```
+
+ClientProxy 是惰性的。它不会立即启动连接。相反，它将在第一次微服务请求之前建立，然后在每次后续请求中重复使用。但是，如果要延迟应用程序的引导过程并手动初始化连接，则可以在 OnModuleInit 生命周期钩子中使用函数 connect()。
+
+```typescript
+async onModuleInit() {
+  await this.client.connect();
+}
+```
 
 `ClientProxy` 公开了一个 `send()` 方法。此方法旨在调用微服务并将其响应返回给 `Observable`，这意味着，我们可以轻松订阅发送的值。
 

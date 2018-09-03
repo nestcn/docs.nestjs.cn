@@ -484,7 +484,7 @@ export class AllExceptionsFilter extends BaseRpcExceptionFilter {
 
 微服务管道和普通管道没有区别。唯一需要注意的是，不要抛出 `HttpException` ，而应该使用 `RpcException`。
 
-?> `RpcException` 类是从 `@nestjs/microservices` 包导入的。
+?> `RpcException` 类是从 `@nestjs/microservices` 包引入的。
 
 下面是一个使用手动实例化 **方法作用域** 管道(也可以使用类作用域)的示例:
 
@@ -500,7 +500,7 @@ sum(data: number[]): number {
 
 微服看守器和普通看守器没有区别。唯一需要注意的是，不要抛出 `HttpException` ，而应该使用 `RpcException`。
 
-?> `RpcException` 类是从 `@nestjs/microservices` 包导入的。
+?> `RpcException` 类是从 `@nestjs/microservices` 包引入的。
 
 下面是一个使用 **方法作用域** 看守器(也可以使用类作用域)的示例:
 

@@ -147,7 +147,7 @@ send() 函数接受两个参数，pattern 和 payload。模式必须等于 @Mess
 
 第二个内置传输器基于 [Redis](https://redis.io/) 数据库。此传输器利用发布/订阅功能。
 
-![](https://docs.nestjs.com/v5/assets/Redis_1.png)
+![](https://docs.nestjs.com/assets/Redis_1.png)
 
 ### 安装
 
@@ -181,6 +181,37 @@ const app = await NestFactory.createMicroservice(ApplicationModule, {
 | `url`                  | 连接网址                     |
 | `retryAttempts`        | 连接尝试的总数                |
 | `retryDelay`           | 连接重试延迟（ms）            |
+
+## MQTT
+
+[MQTT](http://mqtt.org/)是一个轻量级消息协议，用于高延迟优化。（译者注：MQTT 协议在智能家居等硬件通信领域十分广泛，是首选协议）
+
+### 安装
+
+在我们开始之前，我们必须安装所需的包：
+
+```
+npm i --save mqtt
+```
+### 概览
+
+为了切换到 `MQTT` 传输协议，我们需要修改传递给该 `createMicroservice()` 函数的选项对象。
+
+> main.ts
+
+```typescript
+const app = await NestFactory.createMicroservice(ApplicationModule, {
+  transport: Transport.MQTT,
+  options: {
+    host: 'localhost',
+    port: 1883,
+  },
+});
+```
+### 选项
+
+有很多可用的选项可以决定传输器的行为。更多描述请[查看](https://github.com/mqttjs/MQTT.js)。
+
 
 ## NATS
 

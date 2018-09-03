@@ -526,6 +526,46 @@ const app = await NestFactory.create(ApplicationModule, {
 });
 await app.listen(3000);
 ```
+### 扩展内置 logger
+
+很多用例需要创建自己的 logger。你不必完全重新发明轮子。只需扩展内置 logger 类来覆盖默认实现，并使用 super 将调用委托给父类。
+
+```typescript
+import { Logger } from '@nestjs/common';
+
+export class MyLogger extends Logger {
+  error(message: string, trace: string) {
+    // add your custom business logic
+    super.error(message, trace);
+  }
+}
+```
+### 依赖注入
+
+如果要在 logger 中启用依赖项注入，则必须使 MyLogger 类成为实际应用程序的一部分。例如，您可以创建一个 LoggerModule 。
+
+```typescript
+import { Module } from '@nestjs/common';
+import { MyLogger } from './my-logger.service.ts';
+
+@Module({
+  providers: [MyLogger],
+  exports: [MyLogger],
+})
+export class LoggerModule {};
+```
+一旦LoggerModule 在任何地方 import，框架将负责创建 logger 的实例。现在，要在整个应用程序中使用相同的 logger 实例，包括引导和错误处理的东西，请使用以下构造：
+
+```typescript
+const app = await NestFactory.create(ApplicationModule, {
+  logger: false,
+});
+app.useLogger(app.get(MyLogger));
+await app.listen(3000);
+```
+
+此解决方案的唯一缺点是您的第一个初始化消息将不会由您的 logger 实例处理，但它并不重要。
+
 
 ## CORS
 

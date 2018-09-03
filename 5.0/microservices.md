@@ -253,7 +253,7 @@ const app = await NestFactory.createMicroservice(ApplicationModule, {
 在开始之前，我们必须安装所需的软件包:
 
 ```
-$ npm i --save grpc
+$ npm i --save grpc @grpc/proto-loader
 ```
 
 ### 传输器
@@ -267,7 +267,7 @@ const app = await NestFactory.createMicroservice(ApplicationModule, {
   transport: Transport.GRPC,
   options: {
     package: 'hero',
-    protoPath: join(__dirname, './hero/hero.proto'),
+    protoPath: join(__dirname, 'hero/hero.proto'),
   },
 });
 ```
@@ -279,7 +279,8 @@ const app = await NestFactory.createMicroservice(ApplicationModule, {
 |                |                         |
 | :------------- | :---------------------- |
 | `url`          | 连接网址               |
-| `protoPath`    | `.proto` 文件的绝对路径 |
+| `protoPath`    | 绝对（或相对于根目录） `.proto` 文件的路径 |
+|`loader` | @grpc/proto-loader 选项。[了解更多](https://github.com/grpc/grpc-node/tree/master/packages/grpc-protobufjs#usage) |
 | `package`      | `protobuf` 包名       |
 | `credentials`  | 服务器证书([阅读更多](https://grpc.io/grpc/node/grpc.ServerCredentials.html))
 
@@ -313,9 +314,12 @@ message Hero {
 > hero.controller.ts
 
 ```typescript
-@GrpcRoute('HeroService', 'FindOne')
+@GrpcMethod('HeroService', 'FindOne')
 findOne(data: HeroById, metadata: any): Hero {
-  const items = [{ id: 1, name: 'John' }, { id: 2, name: 'Doe' }];
+  const items = [
+    { id: 1, name: 'John' },
+    { id: 2, name: 'Doe' },
+  ];
   return items.find(({ id }) => id === data.id);
 }
 ```
@@ -323,6 +327,9 @@ findOne(data: HeroById, metadata: any): Hero {
 !> `@GrpcRoute()` 需要引入 `@nestjs/microservices` 。
 
 `HeroService` 是服务的名称，而 `FindOne` 指向 `FindOne()` gRPC处理程序。对应的 `findOne()` 方法接受两个参数，即从调用方传递的 `data` 和存储gRPC请求元数据的 `metadata`。
+
+此外，`FindOne` 这里实际上是多余的。如果没有传递第二个参数 `@GrpcMethod()`，Nest 将自动使用带有大写首字母的方法名称，例如 findOne-> FindOne 。
+
 
 ### 客户端
 

@@ -32,3 +32,10 @@ const tasksController = app.select(TasksModule).get(TasksController, { strict: t
 | `select()`    | 浏览模块树，例如，从所选模块中提取特定实例（与启用严格模式一起使用）。   |
 
 ?> 默认情况下，根模块处于选中状态。要选择任何其他模块，您需要遍历整个模块树(逐步)。
+
+ ### 译者署名
+
+| 用户名 | 头像 | 职能 | 签名 |
+|---|---|---|---|
+| [@zuohuadong](https://github.com/zuohuadong)  | <img class="avatar-66 rm-style" src="https://wx3.sinaimg.cn/large/006fVPCvly1fmpnlt8sefj302d02s742.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
+| [@Drixn](https://drixn.com/)  | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">  |  翻译  | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/) |

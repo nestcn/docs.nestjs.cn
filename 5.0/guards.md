@@ -227,3 +227,9 @@ const roles = this.reflector.get<string[]>('roles', context.getClass());
 
 实际上，返回 `false` 的守护器强制 `Nest` 抛出一个 `HttpException` 异常。如果您想要向最终用户返回不同的错误响应，则应该引发异常.这个异常可以被异常过滤器捕获。
 
+ ### 译者署名
+
+| 用户名 | 头像 | 职能 | 签名 |
+|---|---|---|---|
+| [@zuohuadong](https://github.com/zuohuadong)  | <img class="avatar-66 rm-style" src="https://wx3.sinaimg.cn/large/006fVPCvly1fmpnlt8sefj302d02s742.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
+| [@Drixn](https://drixn.com/)  | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">  |  翻译  | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/) |

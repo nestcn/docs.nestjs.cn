@@ -451,9 +451,8 @@ export class PhotoModule {}
 
 ## Mongo
 
-有两种方法可以操作 MongoDB 数据库。您可以使用最受欢迎的 [MongoDB](https://www.mongodb.org/) 对象建模工具 [Mongoose](http://mongoosejs.com/)。选择这个的话，你可以按照以前的步骤使用 mongoose 。否则请使用我们 Nest 专用包: @nestjs/mongoose
+有两种方法可以操作 MongoDB 数据库。既使用[ORM](https://github.com/typeorm/typeorm) 提供的 MongoDB 支撑或对象建模工具 [Mongoose](http://mongoosejs.com/)。选择 ORM 的话你可以按照以前的步骤使用 typeorm 。否则请使用我们 Nest 专用包: @nestjs/mongoose
 
-> 译者注: github 目前提供的 mongoose 库只有 [https://github.com/Automattic/mongoose](https://github.com/Automattic/mongoose)
 
 首先，我们需要安装所有必需的依赖项：
 

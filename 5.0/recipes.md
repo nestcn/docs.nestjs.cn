@@ -369,3 +369,7 @@ export class HeroesGameModule implements OnModuleInit {
 `CommandBus` 和 `EventBus` 都是 **Observables** 。这意味着您可以轻松地订阅整个「流」, 并通过  **Event Sourcing** 丰富您的应用程序。
 
 完整的源代码在 [这里](https://github.com/kamilmysliwiec/nest-cqrs-example) 可用。
+
+## OpenAPI (Swagger)
+
+【待翻译】

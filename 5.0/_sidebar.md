@@ -6,7 +6,7 @@
   - [中间件](5.0/middlewares)
   - [异常过滤器](5.0/exceptionfilters)  
   - [管道](5.0/pipes)
-  - [看守器](5.0/guards)
+  - [守卫](5.0/guards)
   - [拦截器](5.0/interceptors)
   - [自定义装饰器](5.0/customdecorators)
   - [关于翻译](5.0/about)

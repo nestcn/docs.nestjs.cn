@@ -11,7 +11,7 @@
   - [自定义装饰器](5.0/customdecorators)
   - [关于翻译](5.0/about)
 
-- [基础](5.0/fundamentals)
+- [基本原理](5.0/fundamentals)
 
 - [技术](5.0/techniques)
 

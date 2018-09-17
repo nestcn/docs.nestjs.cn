@@ -1,8 +1,8 @@
 # 提供者
 
-几乎所有的东西都可以被认为是提供者 - service, repository, factory, helper 等等。他们都可以注入依赖关系 `constructor`，也就是说，他们可以创建各种关系。但事实上，提供者不过是一个用`@Injectable()` 装饰器注解的简单类。
+几乎所有的东西都可以被认为是提供者 - service, repository, factory, helper 等等。他们都可以通过 `constructor` 注入依赖关系，也就是说，他们可以创建各种关系。但事实上，提供者不过是一个用`@Injectable()` 装饰器注解的简单类。
 
-![](http://localhost:4200/assets/Components_1.png)
+![](https://docs.nestjs.com/assets/Components_1.png)
 
 控制器应处理 HTTP 请求并将更复杂的任务委托给服务。提供者是纯粹的 JavaScript 类，其 `@Injectable()` 上有装饰器。
 

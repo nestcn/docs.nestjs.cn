@@ -73,9 +73,9 @@ export class ApplicationModule {}
 
 在这种情况下，即使任何类依赖于`ConfigService`，Nest也会注入提供的类的实例（`DevelopmentConfigService`或`ProductionConfigService`）。
 
-### 使用工厂
+### 使用工厂(use factory)
 
-`useFactory`是一种**动态**创建提供程序的方式。实际提供者将等于工厂函数的返回值。工厂功能可以依靠几个不同的提供商或保持完全独立。这意味着工厂可以接受参数，Nest将在实例化过程中解析并传递参数。另外，这个函数可以**异步**返回值。这里点击 [更多](5.0/fundamentals?id=异步提供者)详解。当你的提供者不得不被动态的计算或者为了解决异步操作时可以使用它。
+`useFactory`是**动态**创建provider的一种方式。工厂函数的返回实际的provider。工厂函数可以依赖几个不同的provider或保持完全独立。这意味着工厂可以接受不通的参数，Nest将在实例化过程中解析并传递参数。此外，工程函数也可以是**异步**的. [更多](5.0/fundamentals?id=异步提供者)详解。当你的provider必须被动态计算或者在异步过程中被resolve时, 可以使用异步工长函数。
 
 ```typescript
 const connectionFactory = {
@@ -92,10 +92,11 @@ const connectionFactory = {
 })
 export class ApplicationModule {}
 ```
-?> 如果您的工厂需要其他提供者，则必须将其标记传入`inject`数组中。 Nest会以相同顺序将实例作为函数的参数传递。
-### 导出自定义提供者
+?> 如果您的工厂函数需要其他provider，则必须将其他token传入`inject`数组中。 Nest会以相同顺序将实例作为函数的参数传递。
 
-为了导出自定义提供者，我们可以使用令牌或整个对象。以下示例显示了一个标记案例：
+### 导出自定义provider(export customer provider)
+
+为了导出自定义provider，我们可以使用token或整个对象。以下示例显示了使用token的例子：
 
 ```typescript
 const connectionFactory = {
@@ -113,6 +114,7 @@ const connectionFactory = {
 })
 export class ApplicationModule {}
 ```
+
 但是你也可以使用整个对象：
 ```typescript
 const connectionFactory = {

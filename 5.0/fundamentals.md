@@ -136,8 +136,8 @@ export class ApplicationModule {}
 
 Nest是一个MIT许可的开源项目。它可以发展得益于这些令人敬畏的人们的支持。如果你想加入他们，请阅读 [更多](5.0/fundamentals?id=用户提供商)。
 
-## 异步提供者
-例如，在完成一些异步任务之前，应用程序启动必须被延迟，直到与数据库的连接建立，您应该考虑使用异步提供程序。为了创建一个`异步`提供者，我们使用`useFactory`。工厂必须返回`Promise`（因此`异步`函数也适合）。
+## 异步提供者 (Asynchronous providers)
+在完成一些异步任务之前，应用程序必须等待启动状态, 例如，必须先等待与数据库的建立连接才能启动应用。 在这种情况下你应该考虑使用异步provider。为了创建一个`异步`提供者，我们使用`useFactory`。工厂必须返回`Promise`（因此`async`也适用）。
 ```typescript
 {
   provide: 'AsyncDbConnection',
@@ -147,18 +147,20 @@ Nest是一个MIT许可的开源项目。它可以发展得益于这些令人敬�
   },
 },
 ```
-?> 在这里了解 [更多](5.0/fundamentals?id=用户提供商)关于定制提供商的语法。
+?> 在这里了解 [更多](5.0/fundamentals?id=用户提供商)自定义provider的相关方法。
 
+### 注入(Injection)
 
-异步提供者可以通过它们的标记（在上述情况下，通过`AsyncDbConnection`标记）简单地注入其他组件。一旦异步提供程序已解析，每个依赖于异步提供程序的类都**将被实例化**。
+异步provider可以通过它们的token（在上述例子中，通过`AsyncDbConnection`是token）简单地注入其他组件。一旦异步provider被resolve，每个依赖于异步provider的类都**将被实例化**。
 
+以上示例用于演示目的。如果你正在寻找更详细的例子，请看 [这里](5.0/recipes?id=sql-类型)。
 
-以上示例用于演示目的。如果你正在寻找更详细的，请看 [这里](5.0/recipes?id=sql-类型)。
 ## 循环依赖
-例如，当A类需要B类，而B类也需要A类时，就会产生**循环依赖**。 Nest允许在提供者和模块之间创建循环依赖关系，但我们建议您尽可能避免。有时候避免这种关系真的很难，这就是为什么我们提供了一些方法来解决这个问题。
+例如，当A类需要B类，而B类也需要A类时，就会产生**循环依赖**。 Nest允许在提供者(provider)和模块(module)之间创建循环依赖关系，但我们建议您尽可能避免。但是有时候难以避免，所以我们提供了一些方法来解决这个问题。
 
-### 正向引用
-**正向引用**允许Nest引用目前尚未被定义的参考。当`CatsService`和`CommonService`相互依赖时，关系的两端需要使用`@Inject()`和`forwardRef()`实用工具，否则Nest不会实例化它们，因为所有基本元数据都不可用。让我们看看下面的代码片段：
+### 正向引用(Forward reference)
+
+**正向引用**允许Nest引用目前尚未被定义的引用。当`CatsService`和`CommonService`相互依赖时，两边都需要使用`@Inject()`和`forwardRef()`，否则Nest不会实例化它们，因为所有基本元数据都不可用。让我们看看下面的代码片段：
 > cats.service.ts
 ```typescript
 @Injectable()
@@ -169,9 +171,9 @@ export class CatsService {
   ) {}
 }
 ```
-?> `forwardRef()`函数是从`@nestjs/common`包中导入的。
+?> `forwardRef()`从`@nestjs/common`包中导入的。
 
-这是第一层的关系。现在让我们对`CommonService`进行相同的操作：
+这是一侧的关系。现在让我们对`CommonService`进行相同的操作：
 > common.service.ts
 ```typescript
 @Injectable()
@@ -182,9 +184,9 @@ export class CommonService {
   ) {}
 }
 ```
-!> 你不能保证哪个构造函数会被首先调用。
+!> 你不能保证哪个构造函数会被先调用。
 
-为了在模块之间创建循环依赖关系，必须在模块关联的两个部分上使用相同的`forwardRef()`实用程序：
+为了在模块(module)之间创建循环依赖，必须在模块关联的两个部分上使用相同的`forwardRef()`：
 
 >common.module.ts
 ```typescript
@@ -193,7 +195,8 @@ export class CommonService {
 })
 export class CommonModule {}
 ```
-### 模块参考
+
+### 模块引用
 
 Nest提供了可以简单地注入到任何组件中的`ModuleRef`类。
 > cats.service.ts
@@ -209,20 +212,27 @@ export class CatsService implements OnModuleInit {
   }
 }
 ```
-?> `ModuleRef`类是从`@nestjs/core`包中导入的。
+?> `ModuleRef`类从`@nestjs/core`包中导入。
 
 
-模块引用有一个`get()`方法，它允许检索当前模块中可用的任何组件。
-## 平台不可知论
+模块引用有一个`get()`方法，它允许检索当前模块中可用的任何组件。另外, 你可以使用非严格模式(non-strict mode), 保证你可以在整个应用中的任何地方获得该provider.
 
-Nest的整个观点是作为一个平台不可知的框架。平台独立性使得**创建可重用的逻辑部分**成为可能，人们可以利用多种不同类型的应用程序。框架的架构专注于适用于任何类型的服务器端解决方案。
+```typescript
+this.moduleRef.get(Service, { strict: false });
 
-**概述**类别主要指HTTP服务器(REST APIs)。但是，所有这些构建模块都可以轻松用于不同的传输层(`microservices`或`websockets`包)。此外，Nest还配备了专用的 [GraphQL](5.0/graphql?id=快速开始)模块。最后但并非最不重要的一点是,执行上下文功能有助于创建在Nest顶部的Node.js上运行的所有内容。
+```
 
-Nest鼓励成为一个完整的平台，为您的应用带来更高级别的可重用性。建造一次，随处使用！
+## 跨平台(Platform agnosticism)
+
+Nest的作为一个跨平台的框架。平台独立性使得**创建可重用的逻辑部分**成为可能，人们可以利用多种不同类型的应用程序。框架的架构专注于适用于任何类型的服务器端解决方案。
+
+### 一次编译, 各处运行(Build once, use everywhere)
+
+主要指HTTP服务器(REST APIs)。但是，所有这些构建的模块都可以轻松用于不同的传输层(`microservices`或`websockets`)。此外，Nest还配备了专用的 [GraphQL](5.0/graphql?id=快速开始)模块。最后但并非最不重要的一点是, 执行上下文功能有助于通过Nest创建在Node.js上运行的所有应用。
+
+Nest鼓励成为一个完整的平台，为您的应用带来更高级别的可重用性。一次编译, 各处运行！
 
 ## 测试
-
 
 自动测试是**全功能软件产品**的重要组成部分。这对于至少覆盖系统中最敏感的部分非常重要。为了实现这个目标，我们产生了一系列不同的测试，例如集成测试，单元测试，e2e测试等等。 Nest提供了一系列改进测试体验的测试实用程序。
 

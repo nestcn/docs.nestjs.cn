@@ -22,7 +22,7 @@ const connectionProvider = {
 })
 export class ApplicationModule {}
 ```
-为了注入自定义用户提供，我们使用`@Inject（）`装饰器。这个装饰器接受一个参数 - 令牌。
+为了注入自定义用户提供，我们使用`@Inject（）`装饰器。这个装饰器可以接受一个参数作为指定的token。(如果没有参数, 可能把类名作为token: 译者个人猜测)
 
 ```typescript
 @Injectable()
@@ -32,7 +32,7 @@ class CatsRepository {
 ```
 !> `@Inject（）`装饰器从`@nestjs/common`包中导入。
 
-当您想要覆盖默认提供者的值时，比方说，您想强制Nest使用模拟`CatsService`以进行测试，您可以简单地使用现有类作为标记。
+当您想要覆盖的默认Provider的值时，比方说，您想强制Nest使用模拟的`CatsService`以进行测试，您可以简单地使用现有类作为标记。
 
 ```typescript
 import { CatsService } from './cats.service';
@@ -50,11 +50,11 @@ const catsServiceProvider = {
 export class ApplicationModule {}
 ```
 
-在上面的例子中，`CatsService`将被传递的`mockCatsService`模拟对象覆盖。这意味着，Nest不是手动创建`CatsService`实例，而是将此提供者视为已解决，并使用`mockCatsService`作为其代表值。
+在上面的例子中，`CatsService`将被传入的`mockCatsService`覆盖。这意味着，Nest不再是手动创建`CatsService`实例，而是直接使用`mockCatsService`。
 
 ### 使用类
 
-`useClass`语法允许您对每个选定的因素使用不同的类。例如，我们有一个抽象的（或默认的）`ConfigService`类。根据当前环境，Nest应该使用不同的配置服务实现。
+`useClass`语法允许您对每个选定的因素使用不同的类。例如，我们有一个抽象的（或默认的）`ConfigService`类。根据当前环境，Nest应该使用不同的配置服务。
 
 ```typescript
 const configServiceProvider = {
@@ -69,7 +69,7 @@ const configServiceProvider = {
 })
 export class ApplicationModule {}
 ```
-!>我们使用了`ConfigService`类，而不是自定义标记，因此我们已经覆盖了默认的实现。
+!>我们使用了`ConfigService`类，而不是自定义token，因此我们已经覆盖了默认的实现。
 
 在这种情况下，即使任何类依赖于`ConfigService`，Nest也会注入提供的类的实例（`DevelopmentConfigService`或`ProductionConfigService`）。
 

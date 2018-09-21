@@ -93,7 +93,7 @@
 
 - Gateways 网关 &
 - Guide 指南
-- Guard 看守器 &
+- Guard 守卫
 
 ### H
 

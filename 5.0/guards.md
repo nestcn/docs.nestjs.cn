@@ -1,6 +1,6 @@
 # 守卫
 
-守卫是一个使用 `@Injectable()` 装饰器的类。 守卫需要实现 `CanActivate` 接口。
+守卫是一个使用 `@Injectable()` 装饰器的类。 守卫应该实现 `CanActivate` 接口。
 
 ![](https://docs.nestjs.com/assets/Guards_1.png)
 

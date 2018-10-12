@@ -75,7 +75,7 @@ export class ApplicationModule {}
 
 ### 使用工厂(use factory)
 
-`useFactory`是**动态**创建provider的一种方式。工厂函数的返回实际的provider。工厂函数可以依赖几个不同的provider或保持完全独立。这意味着工厂可以接受不通的参数，Nest将在实例化过程中解析并传递参数。此外，工程函数也可以是**异步**的. [更多](5.0/fundamentals?id=异步提供者)详解。当你的provider必须被动态计算或者在异步过程中被resolve时, 可以使用异步工长函数。
+`useFactory`是**动态**创建provider的一种方式。工厂函数的返回实际的provider。工厂函数可以依赖几个不同的provider或保持完全独立。这意味着工厂可以接受不同的参数，Nest将在实例化过程中解析并传递参数。此外，工程函数也可以是**异步**的. [更多](5.0/fundamentals?id=异步提供者)详解。当你的provider必须被动态计算或者在异步过程中被resolve时, 可以使用异步工长函数。
 
 ```typescript
 const connectionFactory = {

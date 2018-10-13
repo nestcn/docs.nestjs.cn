@@ -72,6 +72,10 @@ $ npm run start
 
  此命令在 `src` 目录中的 `main.ts` 文件中定义的端口上启动 HTTP 服务器。在应用程序运行时, 打开浏览器并访问 `http://localhost:3000/`。 你应该看到 `Hello world!` 信息。
  
+ ### 支持我们
+ 
+ [搬瓦工-bandwagonhost](https://bwh1.net/aff.php?aff=34437&gid=1)
+ 
  ### 译者署名
 
 | 用户名 | 头像 | 职能 | 签名 |

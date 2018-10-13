@@ -69,7 +69,7 @@ src
 
 # 共享模块
 
-在 Nest 中，默认情况下，模块是单例，因此您可以毫不费力地在 2..* 模块之间共享同一个组件实例。
+在 Nest 中，默认情况下，模块是单例，因此您可以轻松地在多个模块之间共享同一个提供者实例。
 
 
 <center>![图1](https://docs.nestjs.com/assets/Shared_Module_1.png)</center>

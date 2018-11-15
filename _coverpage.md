@@ -12,3 +12,6 @@
 
 [GitHub](https://github.com/nestjs/nest)
 [5.0](/5.0/firststeps.md)
+
+
+Nest.js 技术交流QQ群：489719517

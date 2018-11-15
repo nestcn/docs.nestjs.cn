@@ -9,9 +9,7 @@
 - 支持 typeorm
 - Node.js 版的 spring
 - 构建微服务应用
+- Nest.js 技术交流QQ群：489719517
 
 [GitHub](https://github.com/nestjs/nest)
 [5.0](/5.0/firststeps.md)
-
-
-Nest.js 技术交流QQ群：489719517

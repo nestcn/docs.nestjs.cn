@@ -221,9 +221,9 @@ export class ApplicationModule {}
 !> 我们将元数据附加到 module 类，所以现在 Nest 可以很容易地反映出哪些控制器必须被安装。
 
 
-## 特定库 方式
+## 类库特有 方式
 
-到目前为止，我们已经讨论了 Nest 操作响应的标准方式。操作响应的第二种方法是使用特定于库的响应对象。为了注入响应对象，我们需要使用 `@Res()` 装饰器。为了对比差异，我们重写 CatsController：
+到目前为止，我们已经讨论了 Nest 操作响应的标准方式。操作响应的第二种方法是使用类库特有的[响应对象(Response)](http://expressjs.com/en/api.html#res)。为了注入响应对象，我们需要使用 `@Res()` 装饰器。为了对比差异，我们重写 CatsController：
 
 
 ```typescript

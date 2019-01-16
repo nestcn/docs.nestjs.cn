@@ -56,6 +56,7 @@
 - Context 情境 &
 - Controller 控制器 &
 - Controller Action 控制器行为
+- Consumer 消费者
 - Constructor 构造函数
 - Cookie (不翻)
 - Credentials 凭证
@@ -121,6 +122,7 @@
 - Lerna （开源项目，不翻）&
 - Listener 监听器
 - Library 类库
+- Library-Specific  类库特有的
 
 
 ### M

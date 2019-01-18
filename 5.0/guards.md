@@ -6,7 +6,7 @@
 
 守卫有一个单独的责任。它们确定请求是否应该由路由处理程序处理。到目前为止, 访问限制逻辑大多在中间件内。这样很好, 因为诸如 token 验证或将req对象附加属性与特定路由没有强关联。
 
-但中间件是非常笨的。它不知道调用 next() 函数后应该执行哪个处理程序。另一方面, 守卫可以访问 ExecutionContext 对象, 所以我们确切知道将要评估什么。
+但中间件是非常笨的。它不知道调用 next() 函数后会执行哪个处理程序。另一方面, 守卫可以访问 ExecutionContext 对象, 所以我们确切知道将要执行什么。
 
 ?> 守卫在每个中间件之后执行的, 但在管道之前。
 
@@ -46,9 +46,16 @@ export interface ArgumentsHost {
   switchToWs(): WsArgumentsHost;
 }
 ```
-ArgumentsHost 为我们提供了一套有用的方法, 帮助从基础数组中选取正确的参数。换言之, ArgumentsHost 只是一个参数数组而已。例如, 当在 HTTP 应用程序上下文中使用该保护程序时, ArgumentsHost 将在内部包含 [request, response] 数组。但是, 当当前上下文是 web 套接字应用程序时, 此数组将等于 [client, data]]。通过此设计, 您可以访问最终传递给相应处理程序的任何参数。
+ArgumentsHost 为我们提供了一套有用的方法, 帮助从基础数组中选取正确的参数。换言之, ArgumentsHost 只是一个参数数组而已。例如, 当在 HTTP 应用程序上下文中使用该保护程序时, ArgumentsHost 将在内部包含 [request, response] 数组。但是, 当当前上下文是 web 套接字应用程序时, 此数组将等于 [client, data]。通过此设计, 您可以访问最终传递给相应处理程序的任何参数。
 
 ExecutionContext 提供多一点。它扩展了 ArgumentsHost, 而且还提供了有关当前执行过程的更多细节。
+
+```typescript
+export interface ExecutionContext extends ArgumentsHost {
+  getClass<T = any>(): Type<T>;
+  getHandler(): Function;
+}
+```
 
 getHandler() 返回对当前处理的处理程序的引用, 而 getClass() 返回此特定处理程序所属的控制器类的类型。换句话说, 如果用户指向在 CatsController 中定义和注册的 `create()` 方法, 则 getHandler() 将返回对 `create()` 方法和 `getClass（）`  的引用, 在这种情况下, 将只返回一个 CatsController 类型 (不是实例)。
 
@@ -73,7 +80,7 @@ export class RolesGuard implements CanActivate {
 ```
 
 
-守卫可以是控制器范围的，方法范围的和全局范围的。为了建立守卫，我们使用 `@UseGuards()` 装饰器。这个装饰器可以带来无数的参数。也就是说，你可以传递几个守卫并用逗号分隔它们。
+守卫可以是控制器范围的，方法范围的和全局范围的。为了建立守卫，我们使用 `@UseGuards()` 装饰器。这个装饰器可以有无数的参数。也就是说，你可以传递几个守卫并用逗号分隔它们。
 
 > cats.controller.ts
 
@@ -135,7 +142,7 @@ import { UserGuard } from '../guard';
 export class ServiceModule {}
 ```
 
-？> 另一种选择是使用执行上下文功能, 虽然它可能会过于臃肿, 且消耗资源。另外，useClass并不是处理自定义提供商注册的唯一方法。在[这里](/5.0/fundamentalsid=dependencyinjection)了解更多
+?> 另一种选择是使用执行上下文功能, 虽然它可能会过于臃肿, 且消耗资源。另外，useClass并不是处理自定义提供者注册的唯一方法。在[这里](/5.0/fundamentalsid=dependencyinjection)了解更多
 
 
 
@@ -210,7 +217,7 @@ export class RolesGuard implements CanActivate {
 
 ?> 在 `node.js` 世界中，将授权用户附加到 `request` 对象是一种常见的做法。 这就是为什么我们假定 `request.user` 包含用户对象。
 
-反射器允许我们通过指定的键很容易地反映元数据。 在上面的例子中，我们反映了处理程序，因为它是对路由处理函数的引用。 如果我们也添加控制器反射部分，我们可以使这个警卫更通用。 为了提取控制器元数据，我们只是使用 `context.getClass()` 而不是 `getHandler()`函数。
+反射器 `Reflector` 允许我们很容易地通过指定的键反射元数据。 在上面的例子中，为了反射元数据, 我们使用 `getHandler()`，因为它是对路由处理函数的引用。 如果我们也添加控制器反射部分，我们可以使这个守卫更通用。 为了提取控制器元数据，我们只是使用 `context.getClass()` 而不是 `getHandler()`函数。
 
 ```typescript
 const roles = this.reflector.get<string[]>('roles', context.getClass());
@@ -233,3 +240,4 @@ const roles = this.reflector.get<string[]>('roles', context.getClass());
 |---|---|---|---|
 | [@zuohuadong](https://github.com/zuohuadong)  | <img class="avatar-66 rm-style" src="https://wx3.sinaimg.cn/large/006fVPCvly1fmpnlt8sefj302d02s742.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
 | [@Drixn](https://drixn.com/)  | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">  |  翻译  | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/) |
+| [@havef](https://havef.github.io)  | <img class="avatar-66 rm-style" height="70" src="https://avatars1.githubusercontent.com/u/54462?s=460&v=4">  |  校正  | 数据分析、机器学习、TS/JS技术栈 [@havef](https://havef.github.io) |

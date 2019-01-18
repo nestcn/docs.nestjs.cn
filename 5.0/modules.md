@@ -16,7 +16,7 @@
 |imports|导入模块的列表，这些模块导出了此模块中所需提供者|
 |exports|由本模块提供并应在其他模块中可用的提供者的子集。|
 
-默认情况下, 模块**封装**提供者。这意味着如果提供者如果不是当前模块的直接部分、不能从导入的模块导出，则无法注入。
+默认情况下, 模块**封装**提供者。这意味着如果提供者如果不是当前模块的一部分, 也不是从另外已导入的模块导出的，那么它就是无法注入的。
 
 # 功能模块
 
@@ -109,7 +109,7 @@ export class CoreModule {}
 
 # 依赖注入
 
-模块类也可以注入提供者（例如，用于配置目的）：
+提供者也可以注入到模块(类)中（例如，用于配置目的）：
 
 > cats.module.ts
 
@@ -214,3 +214,4 @@ export class ApplicationModule {}
 | [@zuohuadong](https://github.com/zuohuadong)  | <img class="avatar-66 rm-style" src="https://wx3.sinaimg.cn/large/006fVPCvly1fmpnlt8sefj302d02s742.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
 | [@Drixn](https://drixn.com/)  | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">  |  翻译  | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/) |
 | [@tangkai](https://github.com/tangkai123456)  | <img class="avatar-66 rm-style" height="70" src="https://avatars1.githubusercontent.com/u/22436910">  |  翻译  | 专注于 React，[@tangkai](https://github.com/tangkai123456) |
+| [@havef](https://havef.github.io)  | <img class="avatar-66 rm-style" height="70" src="https://avatars1.githubusercontent.com/u/54462?s=460&v=4">  |  校正  | 数据分析、机器学习、TS/JS技术栈 [@havef](https://havef.github.io) |

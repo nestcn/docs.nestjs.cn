@@ -1,4 +1,4 @@
-#网关
+# 网关
 
 网关是用`@WebSocketGateway（)`装饰器注解的类。默认情况下，网关使用 [socket.io](https://github.com/socketio/socket.io)包，但也提供了与广泛的其他库的兼容性，包括本地web套接字实现（[阅读更多](https://docs.nestjs.com/v5/websockets/adapter)）。
 
@@ -6,7 +6,7 @@
 
 ?> `提示`网关的行为与简单的`提供者`相同，因此它可以毫不费力地通过构造函数注入依赖关系。另外，网关也可以由其他类（提供者和控制器）注入。
 
-###安装
+### 安装
 
 首先，我们需要安装所需的软件包：
 
@@ -14,7 +14,7 @@
 $ npm i --save @nestjs/websockets
 ```
 
-###基本
+### 基本
 
 一般来说，除非你的应用程序不是Web应用程序，或者您已手动更改端口，否则每个网关都会在**HTTP服务器**运行时监听相同的端口。我们可以通过将参数传递给`@WebSocketGateway（81）`装饰器来改变这种行为，其中`81`是一个选定的端口号。另外，您可以使用以下构造来设置此网关使用的[命名空间](https://socket.io/docs/rooms-and-namespaces/)：
 
@@ -52,7 +52,7 @@ socket.emit('events', { name: 'Nest' });
 socket.on('events', (data) => console.log(data));
 ```
 
-###异步响应
+### 异步响应
 
 每个消息处理程序可以是同步的或异步的（`异步`），因此您可以返回`Promise`。此外，你可以返回[RxJS](https://github.com/reactivex/rxjs) `Observable`，这意味着你可以返回多个值（它们将被发射，直到流完成）。
 
@@ -71,7 +71,7 @@ onEvent(client, data: any: Observable<WsResponse<number>> {
 ```
 上面的消息处理程序将响应3次（从`响应`数组中的每个项目按顺序）。
 
-###生命周期挂钩
+### 生命周期挂钩
 
 有3个有用的生命周期挂钩。它们都有相应的接口，并在下表中进行描述：
 
@@ -83,7 +83,7 @@ onEvent(client, data: any: Observable<WsResponse<number>> {
 
 ?>提示每个生命周期接口都来自`@ nestjs / websockets`包。
 
-###特定库的服务器实例
+### 特定库的服务器实例
 
 偶尔，您可能希望直接访问本地`特定库`的服务器实例。此对象的引用作为参数传递给`afterInit（）`方法（`OnGatewayInit`接口）。第二种方法是使用`@WebSocketServer（）`装饰器。
 
@@ -98,7 +98,7 @@ onEvent(client, data: any: Observable<WsResponse<number>> {
 
 [这里](https://github.com/nestjs/nest/tree/master/sample/02-gateways)有一个可用的例子
 
-##异常过滤器
+## 异常过滤器
 
 websockets的**异常处理层**工作原理与[prime](https://docs.nestjs.com/exception-filters)层完全相同。唯一的区别是不要抛出`HttpException`，你应该抛出`WsException`。
 
@@ -118,7 +118,7 @@ Nest会处理这个异常并用下列数据发出异常消息：
 }
 ```
 
-###异常过滤器
+### 异常过滤器
 
 **异常过滤器**也是非常类似的，并且工作方式与主过滤器完全相同。
 
@@ -141,23 +141,23 @@ export class ExceptionFilter implements WsExceptionFilter {
 
 !>注意全局设置websockets异常过滤器是不可能的。
 
-##管道
+## 管道
 
 websockets**管道**和[普通管道](https://docs.nestjs.com/pipes)没有区别。唯一应该注意的是，不要抛出`HttpException`，而应该使用`WsException`。
 
 !>提示`WsException`类在`@socketjs / websockets`包中可用。
 
-##看守器
+## 看守器
 
 [常规看守器](https://docs.nestjs.com/guards)和websockets**看守器**之间有一个区别。websockets guard将从客户端传递的`数据`而不是expressjs请求对象作为`canActivate（）`函数的参数。此外，当警卫返回`false`时，它会抛出`WsException`（而不是`HttpException`）。
 
 !>提示`WsException`类在`@socketjs / websockets`包中可用。
 
-##拦截器
+## 拦截器
 
 [常规拦截器](https://docs.nestjs.com/interceptors)和websockets**拦截器**之间有一个区别。 Websockets拦截器将从客户端传递的`数据`而不是expressjs请求对象作为`intercept（）`函数的参数。
 
-##适配器
+## 适配器
 
 Nest websockets模块基于[socket.io](https://github.com/socketio/socket.io)，但您可以使用`WebSocketAdapter`接口来引入自己的库。该界面强制实施下表中描述的几种方法：
 

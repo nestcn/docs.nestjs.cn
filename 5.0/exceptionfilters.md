@@ -5,7 +5,7 @@
 
 ![](https://docs.nestjs.com/assets/Filter_1.png)
 
-每个异常都由全局异常过滤器处理, 当**无法识别**时 (既不是 `HttpException` 也不是继承的类 `HttpException` ) , 用户将收到以下 JSON 响应:
+每个异常都由全局异常过滤器处理, 当这个异常**无法识别**时 (既不是 `HttpException` 也不是继承的类 `HttpException` ) , 用户将收到以下 JSON 响应:
 
 ```
 {
@@ -173,7 +173,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 ?> `@UseFilters()` 装饰器从 `@nestjs/common` 包导入。
 
-我们在 `@UseFilters()` 这里使用了装饰器。与 `@Catch()` 相同，它需要无限的参数。
+我们在 `@UseFilters()` 这里使用了装饰器。与 `@Catch()` 相同，它可以有无限的参数。
 
 这个实例  `HttpExceptionFilter` 已经被直接创建了。另一种可用的方式是传递类（不是实例），让框架实例化责任并启用依赖注入。
 
@@ -309,3 +309,4 @@ bootstrap();
 | [@zuohuadong](https://github.com/zuohuadong)  | <img class="avatar-66 rm-style" src="https://wx3.sinaimg.cn/large/006fVPCvly1fmpnlt8sefj302d02s742.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
 | [@Drixn](https://drixn.com/)  | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">  |  翻译  | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/) |
 | [@tangkai](https://github.com/tangkai123456)  | <img class="avatar-66 rm-style" height="70" src="https://avatars1.githubusercontent.com/u/22436910">  |  翻译  | 专注于 React，[@tangkai](https://github.com/tangkai123456) |
+| [@havef](https://havef.github.io)  | <img class="avatar-66 rm-style" height="70" src="https://avatars1.githubusercontent.com/u/54462?s=460&v=4">  |  校正  | 数据分析、机器学习、TS/JS技术栈 [@havef](https://havef.github.io) |

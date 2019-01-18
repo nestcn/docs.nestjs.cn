@@ -34,9 +34,9 @@ export interface ExecutionContext extends ArgumentsHost {
   getHandler(): Function;
 }
 ```
-所述 getHandler() 返回一个参考当前处理的处理程序，而 getClass() 返回的类型的 Controller 此特定处理程序属于类别。使用换句话说，如果用户指向 create() 方法被定义和内注册 CatsController时，getHandler() 将返回一个 create() 参考方法和 getClass()，在这种情况下，将简单地返回一个 CatsController 类型（未实例）。
+所述 getHandler() 返回一个参考当前处理的处理程序，而 getClass() 返回的类型的 Controller 此特定处理程序属于类别。使用换句话说，如果用户指向 create() 方法被定义和内注册 CatsController时，getHandler() 将返回一个 create() 参考方法和 getClass()，在这种情况下，将简单地返回一个 CatsController 类型（非实例）。
 
-第二个参数是一个 `call$` ，一个 Observable 流。如果你不返回这个流，主处理程序将不会被评估。这是什么意思？基本上，这 `call$` 是一个推迟最终处理程序执行的流。比方说，有人提出了 POST `/cats` 请求。这个请求指向在 create() 里面定义的处理程序 CatsController 。如果 `call$` 一直拦截不会返回流，create() 则不会计算该方法。只有当 `call$` 流返回时，最终的方法才会被触发。为什么？因为 Nest 订阅到返回的流，并使用此流生成的值为最终用户创建单个响应或多个响应。此外，正如前面提到的，`call$` 是一个 Observable，也就是说，它为我们提供了一组非常强大的操作符，可以帮助处理例如响应操作。
+第二个参数是一个 `call$` ，一个 Observable 流。如果你不返回这个流，主处理程序将不会被执行。这是什么意思？基本上，这 `call$` 是一个推迟最终处理程序执行的流。比方说，有人提出了 POST `/cats` 请求。这个请求指向在 create() 里面定义的处理程序 CatsController 。如果 `call$` 一直拦截不会返回流，create() 则不会计算该方法。只有当 `call$` 流返回时，最终的方法才会被触发。为什么？因为 Nest 订阅到返回的流，并使用此流生成的值为最终用户创建单个响应或多个响应。此外，正如前面提到的，`call$` 是一个 Observable，也就是说，它为我们提供了一组非常强大的操作符，可以帮助处理例如响应操作。
 
 ## 截取之前/之后
 
@@ -201,9 +201,8 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { HttpException } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { _throw } from 'rxjs/observable/throw';
 
 @Injectable()
 export class ErrorsInterceptor implements NestInterceptor {
@@ -213,7 +212,7 @@ export class ErrorsInterceptor implements NestInterceptor {
   ): Observable<any> {
     return call$.pipe(
       catchError(err =>
-        _throw(new HttpException('Message', HttpStatus.BAD_GATEWAY)),
+        throwError(new HttpException('Message', HttpStatus.BAD_GATEWAY)),
       ),
     );
   }
@@ -247,7 +246,7 @@ export class CacheInterceptor implements NestInterceptor {
 ```
 
 
-这里有一个 CacheInterceptor 与硬编码的 isCached 变量和硬编码的 `response[]` 。我们在这里通过运算符创建返回了一个新的流, 因此路由处理程序根本不会被调用。当有人调用使用 CacheInterceptor 的端点时, 响应 (硬编码的空数组) 将返回 immedietely。为了创建通用解决方案, 您可以利用反射器并创建自定义修饰符。该反射器是很好地描述在看守器章。
+这里有一个 CacheInterceptor 与硬编码的 isCached 变量和硬编码的 `response[]` 。我们在这里通过运算符创建返回了一个新的流, 因此路由处理程序根本不会被调用。当有人调用使用 CacheInterceptor 的端点时, 响应 (硬编码的空数组) 将返回 immedietely。为了创建通用解决方案, 您可以利用反射器并创建自定义修饰符。反射器 `Reflector` 在守卫章节描述的很好, 可以去那看看。
 
 返回流给了我们许多可能性。让我们考虑另一个常见的用例。假设您想处理 timeout 。当端点在一段时间后没有返回任何内容时, 我们希望得到错误响应。
 
@@ -277,3 +276,4 @@ export class TimeoutInterceptor implements NestInterceptor {
 |---|---|---|---|
 | [@zuohuadong](https://github.com/zuohuadong)  | <img class="avatar-66 rm-style" src="https://wx3.sinaimg.cn/large/006fVPCvly1fmpnlt8sefj302d02s742.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
 | [@Drixn](https://drixn.com/)  | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">  |  翻译  | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/) |
+| [@havef](https://havef.github.io)  | <img class="avatar-66 rm-style" height="70" src="https://avatars1.githubusercontent.com/u/54462?s=460&v=4">  |  校正  | 数据分析、机器学习、TS/JS技术栈 [@havef](https://havef.github.io) |

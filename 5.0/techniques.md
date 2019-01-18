@@ -652,87 +652,6 @@ uploadFile(@UploadedFiles() files) {
 
 ?> `FilesInterceptor()` 和 `@UploadedFiles()` 装饰都是 `@nestjs/common` 包提供的。
 
-## 日志记录（Logger）
-
-Nest附带了一个默认的内部 `Logger` 实现，它在实例化过程中使用，并且在几个不同的情况下使用，例如 occurred exception 等。但有时，您可能希望完全禁用日志记录，或者提供自定义实现并自行处理消息。为了关闭 logger，我们使用 Nest 的 options 对象。
-
-
-```typescript
-const app = await NestFactory.create(ApplicationModule, {
-  logger: false,
-});
-await app.listen(3000);
-```
-
-不过, 我们可能希望在底层使用不同的 logger, 而不是禁用整个日志机制。为了达到这个目的, 我们必须传递一个满足 `LoggerService` 接口的对象。例如, 可以是内置的 `console`。
-
-```typescript
-const app = await NestFactory.create(ApplicationModule, {
-  logger: console,
-});
-await app.listen(3000);
-```
-
-但这不是个好主意。但是，我们可以轻松创建自己的记录器。
-
-```typescript
-import { LoggerService } from '@nestjs/common';
-
-export class MyLogger implements LoggerService {
-  log(message: string) {}
-  error(message: string, trace: string) {}
-  warn(message: string) {}
-}
-```
-
-然后，我们可以直接应用 `MyLogger` 实例:
-
-```typescript
-const app = await NestFactory.create(ApplicationModule, {
-  logger: new MyLogger(),
-});
-await app.listen(3000);
-```
-### 扩展内置 logger
-
-很多用例需要创建自己的 logger。你不必完全重新发明轮子。只需扩展内置 logger 类来覆盖默认实现，并使用 super 将调用委托给父类。
-
-```typescript
-import { Logger } from '@nestjs/common';
-
-export class MyLogger extends Logger {
-  error(message: string, trace: string) {
-    // add your custom business logic
-    super.error(message, trace);
-  }
-}
-```
-### 依赖注入
-
-如果要在 logger 中启用依赖项注入，则必须使 MyLogger 类成为实际应用程序的一部分。例如，您可以创建一个 LoggerModule 。
-
-```typescript
-import { Module } from '@nestjs/common';
-import { MyLogger } from './my-logger.service.ts';
-
-@Module({
-  providers: [MyLogger],
-  exports: [MyLogger],
-})
-export class LoggerModule {};
-```
-一旦LoggerModule 在任何地方 import，框架将负责创建 logger 的实例。现在，要在整个应用程序中使用相同的 logger 实例，包括引导和错误处理的东西，请使用以下构造：
-
-```typescript
-const app = await NestFactory.create(ApplicationModule, {
-  logger: false,
-});
-app.useLogger(app.get(MyLogger));
-await app.listen(3000);
-```
-
-此解决方案的唯一缺点是您的第一个初始化消息将不会由您的 logger 实例处理，但它并不重要。
-
 ## 验证
 
 ### 验证
@@ -1198,22 +1117,79 @@ await app.listen(3000);
 
 ## 安全
 
-跨源资源共享（CORS）是一种允许从另一个域请求资源的机制。在引擎盖下，Nest 使用了 [cors](https://github.com/expressjs/cors) 软件包，该软件包提供了一些选项，您可以根据自己的要求进行自定义。为了启用CORS，你必须调用 `enableCors()` 方法。
+在本章中，您将学习一些可以提高应用程序安全性的技术。
 
-```typescript
+### Helmet
+通过适当地设置 HTTP 头，[Helmet](https://github.com/helmetjs/helmet) 可以帮助保护您的应用免受一些众所周知的 Web 漏洞的影响。通常，Helmet 只是12个较小的中间件函数的集合，它们设置与安全相关的 HTTP 头（[阅读更多](https://github.com/helmetjs/helmet#how-it-works)）。首先，安装所需的包：
+
+```
+$ npm i --save helmet
+```
+
+安装完成后，将其应用为全局中间件。
+
+```
+import * as helmet from 'helmet';
+// somewhere in your initialization file
+app.use(helmet());
+```
+
+### CORS
+
+跨源资源共享（CORS）是一种允许从另一个域请求资源的机制。在引擎盖下，Nest 使用了 [cors](https://github.com/expressjs/cors) 包，它提供了一系列选项，您可以根据自己的要求进行自定义。为了启用 CORS，您必须调用 enableCors() 方法。
+
+```
 const app = await NestFactory.create(ApplicationModule);
 app.enableCors();
 await app.listen(3000);
 ```
 
-而且，你可以传递一个配置对象作为这个函数的参数。可用的属性在官方的 [cors](https://github.com/expressjs/cors) 仓库中详细描述。另一种方法是使用Nest选项对象：
+此外，您可以将配置对象作为此函数的参数传递。可用的属性在官方 [cors](https://github.com/expressjs/cors) 存储库中详尽描述。另一种方法是使用 Nest 选项对象：
 
-```typescript
+```
 const app = await NestFactory.create(ApplicationModule, { cors: true });
 await app.listen(3000);
 ```
 
-您也可以使用cors配置对象，而不是传递布尔值。
+您也可以使用 cors 配置对象（[更多信息](https://github.com/expressjs/cors#configuration-options)），而不是传递布尔值。
+
+### CSRF
+
+跨站点请求伪造（称为 CSRF 或 XSRF）是一种恶意利用网站，其中未经授权的命令从Web应用程序信任的用户传输。要减轻此类攻击，您可以使用 [csurf](https://github.com/expressjs/csurf) 软件包。首先，安装所需的包：
+
+```
+$ npm i --save csurf
+```
+
+安装完成后，将其应用为全局中间件。
+
+```
+import * as csurf from 'csurf';
+// somewhere in your initialization file
+app.use(csurf());
+```
+
+
+### 限速
+
+为了保护您的应用程序免受暴力攻击，您必须实现某种速率限制。幸运的是，NPM 上已经有很多各种中间件可用。其中之一是[express-rate-limit](https://github.com/nfriedly/express-rate-limit)。
+
+```
+$ npm i --save express-rate-limit
+```
+
+安装完成后，将其应用为全局中间件。
+
+```typescript
+import * as rateLimit from 'express-rate-limit';
+// somewhere in your initialization file
+app.use(rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100 // limit each IP to 100 requests per windowMs
+}));
+```
+
+> 提示: 如果您在 FastifyAdapter 下开发，请考虑使用 [fastify-rate-limit](https://github.com/fastify/fastify-rate-limit)。
 
 ## Configuration
 
@@ -1401,82 +1377,6 @@ export class AppService {
   }
 }
 ```
-
---- 更新
-
-在本章中，您将学习一些可以提高应用程序安全性的技术。
-
-### Helmet
-通过适当地设置 HTTP 头，[Helmet](https://github.com/helmetjs/helmet) 可以帮助保护您的应用免受一些众所周知的 Web 漏洞的影响。通常，Helmet 只是12个较小的中间件函数的集合，它们设置与安全相关的 HTTP 头（[阅读更多](https://github.com/helmetjs/helmet#how-it-works)）。首先，安装所需的包：
-
-```
-$ npm i --save helmet
-```
-
-安装完成后，将其应用为全局中间件。
-
-```
-import * as helmet from 'helmet';
-// somewhere in your initialization file
-app.use(helmet());
-```
-
-### CORS
-
-跨源资源共享（CORS）是一种允许从另一个域请求资源的机制。在引擎盖下，Nest 使用了 [cors](https://github.com/expressjs/cors) 包，它提供了一系列选项，您可以根据自己的要求进行自定义。为了启用 CORS，您必须调用 enableCors() 方法。
-
-```
-const app = await NestFactory.create(ApplicationModule);
-app.enableCors();
-await app.listen(3000);
-```
-
-此外，您可以将配置对象作为此函数的参数传递。可用的属性在官方 [cors](https://github.com/expressjs/cors) 存储库中详尽描述。另一种方法是使用 Nest 选项对象：
-
-```
-const app = await NestFactory.create(ApplicationModule, { cors: true });
-await app.listen(3000);
-```
-
-您也可以使用 cors 配置对象（[更多信息](https://github.com/expressjs/cors#configuration-options)），而不是传递布尔值。
-
-### CSRF
-
-跨站点请求伪造（称为 CSRF 或 XSRF）是一种恶意利用网站，其中未经授权的命令从Web应用程序信任的用户传输。要减轻此类攻击，您可以使用 [csurf](https://github.com/expressjs/csurf) 软件包。首先，安装所需的包：
-
-```
-$ npm i --save csurf
-```
-
-安装完成后，将其应用为全局中间件。
-
-```
-import * as csurf from 'csurf';
-// somewhere in your initialization file
-app.use(csurf());
-```
-
-
-### 限速
-
-为了保护您的应用程序免受暴力攻击，您必须实现某种速率限制。幸运的是，NPM 上已经有很多各种中间件可用。其中之一是[express-rate-limit](https://github.com/nfriedly/express-rate-limit)。
-
-```
-$ npm i --save express-rate-limit
-```
-
-安装完成后，将其应用为全局中间件。
-
-```typescript
-import * as rateLimit from 'express-rate-limit';
-// somewhere in your initialization file
-app.use(rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
-}));
-```
-
-> 提示: 如果您在 FastifyAdapter 下开发，请考虑使用 [fastify-rate-limit](https://github.com/fastify/fastify-rate-limit)。
 
 ## 压缩
 
@@ -1798,4 +1698,5 @@ $ npm run start
 |---|---|---|---|
 | [@zuohuadong](https://github.com/zuohuadong)  | <img class="avatar-66 rm-style" src="https://wx3.sinaimg.cn/large/006fVPCvly1fmpnlt8sefj302d02s742.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
 | [@Drixn](https://drixn.com/)  | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">  |  翻译  | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/) |
-| [@Erchoc](https://github.com/erchoc)  | <img class="avatar-66 rm-style" src="https://avatars1.githubusercontent.com/u/19908809?s=400&u=e935620bf39d85bfb749a4ce4b3758b086a57de5&v=4">  |  翻译  | 学习更优雅的架构方式，做更贴切用户的产品。[@Erchoc](https://github/erchoc) at Github |
+| [@Erchoc](https://github.com/erchoc)  | <img class="avatar-66 rm-style" height="70" src="https://avatars1.githubusercontent.com/u/19908809?s=400&u=e935620bf39d85bfb749a4ce4b3758b086a57de5&v=4">  |  翻译  | 学习更优雅的架构方式，做更贴切用户的产品。[@Erchoc](https://github/erchoc) at Github |
+| [@havef](https://havef.github.io)  | <img class="avatar-66 rm-style" height="70" src="https://avatars1.githubusercontent.com/u/54462?s=460&v=4">  |  校正  | 数据分析、机器学习、TS/JS技术栈 [@havef](https://havef.github.io) |

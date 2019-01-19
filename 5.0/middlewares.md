@@ -36,7 +36,7 @@ export class LoggerMiddleware implements NestMiddleware {
 
 ## 依赖注入
 
-说到中间件, 也不例外。与提供者和控制器相同, 它们能够**注入**属于统一模块的依赖项（通过 `constructor` ）。
+说到中间件, 也不例外。与提供者和控制器相同, 它们能够**注入**属于同一模块的依赖项（通过 `constructor` ）。
 
 
 ## 应用中间件
@@ -145,7 +145,7 @@ export class ApplicationModule implements NestModule {
 }
 ```
 
-因此，`LoggerMiddleware` 将限制在 `CatsController` 中定义的所有路由，除了这两个传递给 `exclude()` 函数的。 请注意，`exclude()` 方法**不适用**于函数式中间件。 此外，此功能不排除来自更通用路由（例如通配符）的路径。 在这种情况下，您应该将路径限制逻辑直接放在中间件中，例如，比较请求的URL。
+因此，除了传递给 `exclude()` 的两个路由之外, `LoggerMiddleware` 将绑定在 `CatsController` 中其余的路由上。 请注意，`exclude()` 方法**不适用**于函数式中间件。 此外，此功能不排除来自更通用路由（例如通配符）的路径。 在这种情况下，您应该将路径限制逻辑直接放在中间件中，例如，比较请求的URL这种逻辑就应该放在中间件中。
 
 ## 可配置中间件
 
@@ -285,4 +285,4 @@ await app.listen(3000);
 | [@zuohuadong](https://github.com/zuohuadong)  | <img class="avatar-66 rm-style" src="https://wx3.sinaimg.cn/large/006fVPCvly1fmpnlt8sefj302d02s742.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
 | [@Drixn](https://drixn.com/)  | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">  |  翻译  | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/) |
 | [@tangkai](https://github.com/tangkai123456)  | <img class="avatar-66 rm-style" height="70" src="https://avatars1.githubusercontent.com/u/22436910">  |  翻译  | 专注于 React，[@tangkai](https://github.com/tangkai123456) |
-
+| [@havef](https://havef.github.io)  | <img class="avatar-66 rm-style" height="70" src="https://avatars1.githubusercontent.com/u/54462?s=460&v=4">  |  校正  | 数据分析、机器学习、TS/JS技术栈 [@havef](https://havef.github.io) |

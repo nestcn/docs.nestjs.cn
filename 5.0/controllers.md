@@ -38,7 +38,7 @@ export class CatsController {
 | |此外, 响应状态代码在默认情况下总是 200, 除了 POST 请求外，此时它是 201。我们可以通过在处理程序层添加 `@HttpCode（...)` 装饰器来轻松地更改此行为。|
 | 类库特有的 |   我们可以在函数签名通过 `@Res()` 注入类库特定的[响应对象](http://expressjs.com/en/api.html#res)。（例如 `findAll(@Res() response)`）。    |
 
-!> 注意！ 禁止同时使用这两种方法。 Nest 检测处理程序是否正在使用 `@Res()`或 `@Next()`，如果是这样,此单个路由的「标准」方式将被禁用。
+!> 注意！ 禁止同时使用这两种方法。 Nest 检测处理程序是否正在使用 `@Res()`或 `@Next()`，如果两个方法都用了的话, 那么在这里的标准方式就是自动禁用此路由, 你将不会得到你想要的结果。
 
 ## Request 对象
 
@@ -189,7 +189,7 @@ findAll(): Observable<any[]> {
 }
 ```
 
- 没有推荐的方法。 你可以使用任何你想要的。
+ 上面的方法都可以, 你可以选择你喜欢的方式。
 
 ## 请求负载
 
@@ -282,7 +282,7 @@ import { CatsController } from './cats/cats.controller';
 export class ApplicationModule {}
 ```
 
-!> 我们将元数据附加到 module 类，所以现在 Nest 可以很容易地反映出哪些控制器必须被安装。
+!> 我们将元数据附加到 module 类，所以现在 Nest 可以很容易地通过反射挂载必须的控制器。
 
 
 ## 类库特有 方式
@@ -308,7 +308,7 @@ export class CatsController {
 }
 ```
 
-从我的角度来看，这种方式是非常不清晰。 我当然更喜欢第一种方法，但为了使 Nest **向下兼容**以前的版本，这种方法仍然可用。 而且，**响应对象**提供了更大的灵活性 - 您可以完全控制响应。
+从我的角度来看，这种方式是非常不清晰。 我当然更喜欢第一种方法，但为了使 Nest **向下兼容**以前的版本，这种方法仍然可用。 另外，**响应对象**提供了更大的灵活性 - 我们可以完全控制 response 对象(比如操作 header 等等)。
 
 
  ### 译者署名
@@ -318,3 +318,4 @@ export class CatsController {
 | [@zuohuadong](https://github.com/zuohuadong)  | <img class="avatar-66 rm-style" src="https://wx3.sinaimg.cn/large/006fVPCvly1fmpnlt8sefj302d02s742.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
 | [@Drixn](https://drixn.com/)  | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">  |  翻译  | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/) |
 | [@tangkai](https://github.com/tangkai123456)  | <img class="avatar-66 rm-style" height="70" src="https://avatars1.githubusercontent.com/u/22436910">  |  翻译  | 专注于 React，[@tangkai](https://github.com/tangkai123456) |
+| [@havef](https://havef.github.io)  | <img class="avatar-66 rm-style" height="70" src="https://avatars1.githubusercontent.com/u/54462?s=460&v=4">  |  校正  | 数据分析、机器学习、TS/JS技术栈 [@havef](https://havef.github.io) |

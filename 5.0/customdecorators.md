@@ -12,9 +12,9 @@ Nest 提供了一组有用的参数装饰器，可以和 HTTP 路由处理器（
 | @Response()                               | res                                          |
 | @Next()                                   | next                                         |
 | @Session()                                | req.session                                  |
-| Param(param?: string)                     | req.params / req.params[param]               |
+| @Param(param?: string)                     | req.params / req.params[param]               |
 | @Body(param?: string)                     | req.body / req.body[param]                   |
-| @@Query(param?: string)                   | req.query / req.query[param]                 |
+| @Query(param?: string)                   | req.query / req.query[param]                 |
 | @Headers(param?: string)　　　　　　　   　　| req.headers / req.headers[param]　　　　　　　 |
 
 另外，你还可以创建你自己的自定义装饰器。为什么它很有用呢？

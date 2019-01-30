@@ -229,7 +229,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 > cats.controller.ts
 
 ```typescript
-import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Query, Post, Body, Put, Param, Delete } from '@nestjs/common';
 
 @Controller('cats')
 export class CatsController {

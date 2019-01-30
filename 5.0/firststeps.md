@@ -73,7 +73,7 @@ $ npm run start
  
  ### 支持我们
  
- [搬瓦工-bandwagonhost](https://bwh1.net/aff.php?aff=34437&gid=1)
+  [当前网站托管在：vultr-日本](https://www.vultr.com/?ref=7815855-4F)
  
  ### 译者署名
 

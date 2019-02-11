@@ -535,7 +535,7 @@ export class CommonModule {}
 
 ## 工具
 
-在GraphQL世界中，很多文章抱怨如何处理诸如身份验证或操作的副作用之类的东西。我们应该把它放在业务逻辑中吗？我们是否应该使用更高阶的函数来增强查询和变更，例如，使用授权逻辑？或者也许使用模式指令。无论如何，没有一个答案。
+在GraphQL世界中，很多文章抱怨如何处理诸如身份验证或操作的副作用之类的东西。我们应该把它放在业务逻辑中吗？我们是否应该使用更高阶的函数来增强查询和变更，例如，使用授权逻辑？或者也许使用[模式指令](https://www.apollographql.com/docs/apollo-server/v2/features/directives.html)。无论如何，没有一个答案。
 
 Nest生态系统正试图利用看守器和拦截器等现有功能帮助解决这个问题。它们背后的想法是减少冗余，并为您提供有助于创建结构良好，可读且一致的应用程序的工具。
 
@@ -589,6 +589,17 @@ export const User = createParamDecorator(
   (data, [root, args, ctx, info]) => ctx.user,
 );
 ```
+
+然后：
+
+```typescript
+@Mutation()
+async upvotePost(
+  @User() user: UserEntity,
+  @Args('postId') postId: number,
+) {}
+```
+
  ### 译者署名
 
 | 用户名 | 头像 | 职能 | 签名 |

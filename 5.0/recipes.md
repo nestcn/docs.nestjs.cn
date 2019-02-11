@@ -399,6 +399,7 @@ npm install --save prisma-binding
 如果您发现自己遇到麻烦，请跳转到[「快速入门」](https://www.prisma.io/docs/quickstart/) 部分以获取更多详细信息。最终，您应该在项目目录中看到两个新文件。
 
 > prisma.yaml
+
 ```yaml
 endpoint: https://us1.prisma.sh/nest-f6ec12/prisma/dev
 datamodel: datamodel.graphql
@@ -406,6 +407,7 @@ datamodel: datamodel.graphql
 并自动创建数据模型。
 
 > datamodel.graphql
+
 ```yaml
 type User {
   id: ID! @unique

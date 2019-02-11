@@ -366,7 +366,7 @@ type Mutation {
 
 ## 订阅（Subscriptions）
 
-订阅只是查询和变更等另一种 GraphQL 操作类型。它允许通过双向传输层创建实时订阅，主要通过 websockets 实现。[阅读更多](https://www.apollographql.com/docs/graphql-subscriptions/)的订阅。
+订阅只是查询和变更的另一种 GraphQL 操作类型。它允许通过双向传输层创建实时订阅，主要通过 websockets 实现。[阅读更多]（https://www.apollographql.com/docs/graphql-subscriptions）(https://www.apollographql.com/docs/graphql-subscriptions/) 。
 
 以下是 `commentAdded` 订阅示例，可直接从官方 [Apollo](https://www.apollographql.com/docs/graphql-subscriptions/subscriptions-to-schema.html) 文档复制和粘贴：
 
@@ -383,28 +383,24 @@ Subscription: {
 为了以Nest方式创建等效订阅，我们将使用 `@Subscription()` 装饰器。让我们扩展 `AuthorResolver` 在解析器映射部分中的使用。
 
 ```typescript
-import { Query, Resolver, Subscription, ResolveProperty, Parent, Args } from '@nestjs/graphql';
-import { find, filter } from 'lodash';
-import { PubSub } from 'graphql-subscriptions';
-
-// example data
-const authors = [
-  { id: 1, firstName: 'Tom', lastName: 'Coleman' },
-  { id: 2, firstName: 'Sashko', lastName: 'Stubailo' },
-];
-const posts = [
-  { id: 1, authorId: 1, title: 'Introduction to GraphQL', votes: 2 },
-  { id: 2, authorId: 2, title: 'Welcome to Meteor', votes: 3 },
-];
-
-// example pubsub
 const pubSub = new PubSub();
 
 @Resolver('Author')
 export class AuthorResolver {
+  constructor(
+    private readonly authorsService: AuthorsService,
+    private readonly postsService: PostsService,
+  ) {}
+
   @Query('author')
-  getAuthor(@Args('id') id: number) {
-    return find(authors, { id });
+  async getAuthor(@Args('id') id: number) {
+    return await this.authorsService.findOneById(id);
+  }
+
+  @ResolveProperty('posts')
+  async getPosts(@Parent() author) {
+    const { id } = author;
+    return await this.postsService.findAll({ authorId: id });
   }
 
   @Subscription()
@@ -413,23 +409,27 @@ export class AuthorResolver {
       subscribe: () => pubSub.asyncIterator('commentAdded'),
     };
   }
-
-  @ResolveProperty('posts')
-  getPosts(@Parent() author) {
-    return filter(posts, { authorId: author.id });
-  }
 }
 ```
 
-### 重构
+我们在这里使用了一个本地 `PubSub` 实例。相反, 我们应该将 `PubSub` 定义为一个组件, 通过构造函数 (使用 `@Inject ()` 装饰器) 注入它, 并在整个应用程序中重用它。[您可以在此了解有关嵌套自定义组件的更多信息](/5.0/fundamentals?id=自定义providercustomer-provider)。
 
-我们在这里使用了一个本地 `PubSub` 实例。相反, 我们应该将 `PubSub` 定义为一个组件, 通过构造函数 (使用 `@Inject ()` 装饰器) 注入它, 并在整个应用程序中重用它。[您可以在此了解有关嵌套自定义组件的更多信息](https://docs.nestjs.com/v5/fundamentals/custom-providers)。
+### Module
+
+为了启用订阅，我们必须将 `installSubscriptionHandlers` 属性设置为 `true` 。
+
+```typescript
+GraphQLModule.forRoot({
+  typePaths: ['./**/*.graphql'],
+  installSubscriptionHandlers: true,
+})
+```
+
+要自定义订阅服务器（例如，更改端口），您可以使用 `subscriptions` 属性（阅读[更多](https://www.apollographql.com/docs/apollo-server/v2/api/apollo-server.html#constructor-options-lt-ApolloServer-gt)）。
 
 ### 类型定义
 
-最后一步是更新类型定义（[阅读更多](http://graphql.cn/learn/schema/#type-language)）文件。
-
-> author-types.graphql
+最后一步是更新类型定义文件。
 
 ```typescript
 type Author {
@@ -459,7 +459,7 @@ type Subscription {
 }
 ```
 
-就这样。我们创建了一个 `commentAdded(repoFullName: String!): Comment` 订阅。另外，我们应该创建一个发送和订阅事件的 Web sockets 服务器，但为了保持这个示例尽可能简单，我们省略了这部分。尽管如此，你可以在[这里](https://github.com/nestjs/nest/tree/master/sample/12-graphql-apollo)找到完整的示例实现。
+做得好。我们创建了一个commentAdded(repoFullName: String!): Comment订阅。您可以在[此处](https://github.com/nestjs/nest/blob/master/sample/12-graphql-apollo)找到完整的示例实现。
 
 ## 标量
 

@@ -243,7 +243,7 @@ export class AuthorsModule {}
 
 ?> 提示：在[此处](http://graphql.cn/learn/queries/)了解有关 GraphQL 查询的更多信息。
 
-### 分型
+### 类型
 
 单独创建 GraphQL 类型和相应的 TypeScript 定义会产生不必要的冗余。最终，我们最终没有这样做，SDL 内部的每个变化都会迫使我们修改接口。因此，该`@nestjs/graphql` 包提供了另一个有趣的功能，即使用抽象语法树（AST）自动生成 TS 定义。要启用它，只需自定义 definitions 属性即可。
 
@@ -303,134 +303,9 @@ export class CreatePostInput {
 !> 注意： 要启用输入（和参数）的自动验证，必须使用ValidationPipe。[了解更多有关验证](/5.0/techniques?id=验证)或者更具体的[管道](/5.0/pipes)。
 
 
+## 变更（Mutations）
 
-### 重构
-
-上面代码背后的思想是展示 Apollo 和 Nest-way 之间的区别，从而允许您的代码进行简单的转换。现在，我们要做一个小重构来利用 Nest 体系结构的优势，让它成为一个真实的例子。
-
-```typescript
-@Resolver('Author')
-export class AuthorResolver {
-  constructor(
-    private readonly authorsService: AuthorsService,
-    private readonly postsService: PostsService,
-  ) {}
-
-  @Query('author')
-  async getAuthor(@Args('id') id: number) {
-    return await this.authorsService.findOneById(id);
-  }
-
-  @ResolveProperty('posts')
-  async getPosts(@Parent() author) {
-    const { id } = author;
-    return await this.postsService.findAll({ authorId: id });
-  }
-}
-```
-基本上，我们去掉了本地定义的模拟数据。相反，我们同时使用 `AuthorsService` 和 `PostsService` 从我们的数据存储中检索实体。在这里完成之后，我们必须在某个地方注册 `AuthorResolver`，例如在新创建的 `AuthorsModule` 中。
-
-```typescript
-@Module({
-  imports: [PostsModule],
-  providers: [AuthorsService, AuthorResolver],
-})
-export class AuthorsModule {}
-```
-
-`GraphQLModule` 将自动反应元数据并将类转换为正确的解析器映射。唯一需要注意的是，您需要在某个地方导入这个模块，这样 Nest 就知道 `AuthorsModule`   确实存在了。
-
-### 类型定义
-
-最后一个缺失的部分是类型定义（[更多](http://graphql.org/learn/schema/#type-language)）文件。让我们在解析器类附近创建它。
-
-> author-types.graphql
-
-```typescript
-type Author {
-  id: Int!
-  firstName: String
-  lastName: String
-  posts: [Post]
-}
-
-type Post {
-  id: Int!
-  title: String
-  votes: Int
-}
-
-type Query {
-  author(id: Int!): Author
-}
-```
-就这样。我们创建了一个`author(id: Int!)` 查询。
-
-?> 在[此处](http://graphql.org/learn/queries/) 了解有关 GraphQL 查询的更多信息。
-
-
-##  变更（Mutations）
-
-在 GraphQL 中，为了修改服务器端数据，我们使用了变更（Mutations）。[了解更多](http://graphql.cn/learn/queries/#mutations)
-
-[Apollo](https://www.apollographql.com/docs/graphql-tools/generate-schema.html) 官方文献中有一个 `upvotePost ()` 变更的例子。这种变更允许增加后 `votes` 属性值。
-
-```typescript
-Mutation: {
-  upvotePost: (_, { postId }) => {
-    const post = find(posts, { id: postId });
-    if (!post) {
-      throw new Error(`Couldn't find post with id ${postId}`);
-    }
-    post.votes += 1;
-    return post;
-  },
-}
-```
-
-为了在 Nest-way 中创建等价的变更，我们将使用  `@Mutation()` 装饰器。让我们扩展在上一节 (解析器映射) 中使用的 `AuthorResolver`。
-
-```typescript
-import { Query, Mutation, Resolver, ResolveProperty, Parent, Args } from '@nestjs/graphql';
-import { find, filter } from 'lodash';
-
-// example data
-const authors = [
-  { id: 1, firstName: 'Tom', lastName: 'Coleman' },
-  { id: 2, firstName: 'Sashko', lastName: 'Stubailo' },
-];
-const posts = [
-  { id: 1, authorId: 1, title: 'Introduction to GraphQL', votes: 2 },
-  { id: 2, authorId: 2, title: 'Welcome to Meteor', votes: 3 },
-];
-
-@Resolver('Author')
-export class AuthorResolver {
-  @Query('author')
-  getAuthor(@Args('id') id: number) {
-    return find(authors, { id: id });
-  }
-
-  @Mutation()
-  upvotePost(@Args('postId') postId: number) {
-    const post = find(posts, { id: postId });
-    if (!post) {
-      throw new Error(`Couldn't find post with id ${postId}`);
-    }
-    post.votes += 1;
-    return post;
-  }
-
-  @ResolveProperty('posts')
-  getPosts(@Parent() author) {
-    return filter(posts, { authorId: author.id });
-  }
-}
-```
-
-### 重构
-
-我们要做一个小的重构来利用Nest架构的优势，将其变为一个 真实的例子.
+在 GraphQL 中，为了修改服务器端数据，我们使用了变更（[在这里阅读更多](http://graphql.cn/learn/queries/#mutations)） 。官方 Apollo 文档共享一个 upvotePost() 变更示例。该变更允许增加 votes 属性值。为了在 Nest 中创建等效变更，我们将使用 @Mutation() 装饰器。让我们 AuthorResolver 在上一节中扩展我们的用法（参见[解析图](/5.0/graphql?id=解析图)）。
 
 ```typescript
 @Resolver('Author')
@@ -456,18 +331,14 @@ export class AuthorResolver {
   }
 }
 ```
-
-就这样。业务逻辑被转移到了 `PostsService` 。
+ 请注意，我们假设业务逻辑已移至 PostsService（分别查询 post 和 incrementing votes 属性）。
 
 ### 类型定义
 
 最后一步是将我们的变更添加到现有的类型定义中。
 
 
-> author-types.graphql
-
 ```typescript
-
 type Author {
   id: Int!
   firstName: String
@@ -490,7 +361,7 @@ type Mutation {
 }
 ```
 
-该 `upvotePost(postId: Int!): Post` 变更后现在可用！
+该 `upvotePost(postId: Int!): Post` 变更现在可用！
 
 
 ## 订阅（Subscriptions）

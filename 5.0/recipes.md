@@ -374,6 +374,167 @@ export class HeroesGameModule implements OnModuleInit {
 
 【待翻译】
 
+## Prisma
+
+Prisma 将您的数据库转换为 GraphQL API，并允许将 GraphQL 用作所有数据库的通用查询语言(译者注：替代 orm )。您可以直接使用 GraphQL 查询数据库，而不是编写 SQL 或使用 NoSQL API。在本章中，我们不会详细介绍 Prisma，因此请访问他们的网站，了解可用的[功能](https://www.prisma.io/features/)。
+
+!> 注意： 在本文中，您将学习如何集成 Prisma 到 Nest 框架中。我们假设您已经熟悉 GraphQL 概念和 @nestjs/graphql 模块。
+
+### 依赖
+
+首先，我们需要安装所需的包：
+
+```bash
+npm install --save prisma-binding
+```
+
+### 设置 Prisma
+
+在使用 Prisma 时，您可以使用自己的实例或使用 [Prisma Cloud](https://www.prisma.io/cloud/) 。在本简介中，我们将使用 Prisma 提供的演示服务器。
+
+1. 安装 Prisma CLI `npm install -g prisma`
+2. 创建新服务 `prisma init` , 选择演示服务器并按照说明操作。
+3. 部署您的服务 `prisma deploy` 
+
+如果您发现自己遇到麻烦，请跳转到[「快速入门」](https://www.prisma.io/docs/quickstart/) 部分以获取更多详细信息。最终，您应该在项目目录中看到两个新文件。
+
+> prisma.yaml
+```yaml
+endpoint: https://us1.prisma.sh/nest-f6ec12/prisma/dev
+datamodel: datamodel.graphql
+```
+并自动创建数据模型。
+
+> datamodel.graphql
+```yaml
+type User {
+  id: ID! @unique
+  name: String!
+}
+```
+
+!> 注意： 在实际应用程序中，您将创建更复杂的数据模型。有关Prisma中数据建模的更多信息，请单击[此处](https://www.prisma.io/features/data-modeling/)。
+
+输入： `prisma playground` 您可以打开 Prisma GraphQL API 控制台。随意发送查询。
+
+### 创建客户端
+
+有几种方法可以集成 GraphQL API。这里我们将使用 [GraphQL CLI](https://www.npmjs.com/package/graphql-cli)，这是一个用于常见 GraphQL 开发工作流的命令行工具。要安装 GraphQL CLI，请使用以下命令：
+
+```bash
+npm install -g graphql-cli
+```
+
+接下来，在 Nest 应用程序的根目录中创建 `.graphqlconfig` ：
+
+```bash
+touch .graphqlconfig.yml
+```
+将以下内容放入其中：
+
+```yaml
+projects:
+  database:
+    schemaPath: src/prisma/prisma-types.graphql
+    extensions:
+      endpoints:
+        default: https://us1.prisma.sh/nest-f6ec12/prisma/dev
+      codegen:
+        - generator: prisma-binding
+          language: typescript
+          output:
+            binding: src/prisma/prisma.binding.ts
+ ```
+ 
+ 要下载 Prisma GraphQL 文件 `src/prisma/prisma-types.graphql` 并在其下创建 Prisma 客户端 `src/prisma/prisma.binding.graphql` ，请在终端中运行以下命令：
+ 
+ ```bash
+graphql get-schema --project database
+graphql codegen --project database
+```
+
+### 积分
+
+快要完成了。现在，让我们为 Prisma 创建一个模块。
+
+> prisma.service
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import { Prisma } from './prisma.binding';
+
+@Injectable()
+export class PrismaService extends Prisma {
+  constructor() {
+    super({
+      endpoint: 'https://us1.prisma.sh/nest-f6ec12/prisma/dev',
+      debug: false,
+    });
+  }
+}
+```
+
+一旦 `PrismaService` 准备就绪，我们需要创建一个对应模块。
+
+> prisma.module
+
+```typescript
+import { Module } from '@nestjs/common';
+import { PrismaService } from './prisma.service';
+
+@Module({
+  providers: [PrismaService],
+  exports: [PrismaService],
+})
+export class PrismaModule {}
+```
+
+?> 提示： 要立即创建新模块和服务，我们可以使用 [Nest CLI](5.0/cli)。创建 `PrismaModule` 类型 `nest g module prisma` 和服务 `nest g service prisma/prisma`
+
+### 用法
+
+若要使用新的服务，我们要 import `PrismaModule`，并注入 `PrismaService` 到 `UsersResolver`。
+
+> src/users/users.module
+
+```typescript
+import { Module } from '@nestjs/common';
+import { UsersResolver } from './users.resolver';
+import { PrismaModule } from '../prisma/prisma.module';
+
+@Module({
+  imports: [PrismaModule],
+  providers: [UsersResolver],
+})
+export class UsersModule {}
+```
+
+import `PrismaModule` 使 export `PrismaService` 在 `UsersModule` 上下文中可用。
+
+> src/users/users.resolver
+
+```typescript
+import { Query, Resolver, Args, Info } from '@nestjs/graphql';
+import { PrismaService } from '../prisma/prisma.service';
+import { User } from '../graphql.schema';
+
+@Resolver()
+export class UsersResolver {
+  constructor(private readonly prisma: PrismaService) {}
+
+  @Query('users')
+  async getUsers(@Args() args, @Info() info): Promise<User[]> {
+    return await this.prisma.query.users(args, info);
+  }
+}
+```
+
+### 例子
+
+
+官方示例请看[这里](https://github.com/nestjs/nest/tree/master/sample/22-graphql-prisma)
+
+
 
  ### 译者署名
 

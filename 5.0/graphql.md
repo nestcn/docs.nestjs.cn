@@ -243,6 +243,67 @@ export class AuthorsModule {}
 
 ?> 提示：在[此处](http://graphql.cn/learn/queries/)了解有关 GraphQL 查询的更多信息。
 
+### 分型
+
+单独创建 GraphQL 类型和相应的 TypeScript 定义会产生不必要的冗余。最终，我们最终没有这样做，SDL 内部的每个变化都会迫使我们修改接口。因此，该`@nestjs/graphql` 包提供了另一个有趣的功能，即使用抽象语法树（AST）自动生成 TS 定义。要启用它，只需自定义 definitions 属性即可。
+
+```typescript
+GraphQLModule.forRoot({
+  typePaths: ['./**/*.graphql'],
+  definitions: {
+    path: join(process.cwd(), 'src/graphql.ts'),
+  },
+})
+```
+该 `src/graphql.ts` 指示在何处保存 typescript 输出。默认情况下，所有类型都转换为接口。但是，您可以通过将 outputAs 属性更改为 class。
+
+```typescript
+GraphQLModule.forRoot({
+  typePaths: ['./**/*.graphql'],
+  definitions: {
+    path: join(process.cwd(), 'src/graphql.ts'),
+    outputAs: 'class',
+  },
+})
+```
+
+因此，它将生成以下文件：
+
+```typescript
+export class Author {
+  id: number;
+  firstName?: string;
+  lastName?: string;
+  posts?: Post[];
+}
+
+export class Post {
+  id: number;
+  title?: string;
+  votes?: number;
+}
+
+export abstract class IQuery {
+  abstract author(id: number): Author | Promise<Author>;
+}
+```
+
+类允许您使用装饰器，这使得它们在验证方面非常有用（阅读[更多](/5.0/techniques?id=验证)）。例如：
+
+```typescript
+import { MinLength, MaxLength } from 'class-validator';
+
+export class CreatePostInput {
+  @MinLength(3)
+  @MaxLength(50)
+  title: string;
+}
+```
+
+!> 注意： 要启用输入（和参数）的自动验证，必须使用ValidationPipe。[了解更多有关验证](/5.0/techniques?id=验证)或者更具体的[管道](/5.0/pipes)。
+
+
+
 ### 重构
 
 上面代码背后的思想是展示 Apollo 和 Nest-way 之间的区别，从而允许您的代码进行简单的转换。现在，我们要做一个小重构来利用 Nest 体系结构的优势，让它成为一个真实的例子。

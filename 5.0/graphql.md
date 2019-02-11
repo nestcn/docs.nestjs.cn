@@ -2,7 +2,7 @@
 
 ## 快速开始
 
-GraphQL 是一种用于 API 的查询语言。这是 GraphQL 和 REST 之间一个很好的[比较](https://dev-blog.apollodata.com/graphql-vs-rest-5d425123e34b) 。在这组文章中, 我们不会解释什么是 GraphQL, 而是演示如何使用 `@nestjs/GraphQL` 模块。
+GraphQL 是一种用于 API 的查询语言，是使用现有数据来完成这些查询的运行时。这是一种优雅的方法，可以解决我们在典型REST apis 中遇到的许多问题 。这里是 GraphQL 和 REST 之间一个很好的[比较](https://dev-blog.apollodata.com/graphql-vs-rest-5d425123e34b) 。在这组文章中, 我们不会解释什么是 GraphQL, 而是演示如何使用 `@nestjs/GraphQL` 模块。
 
 GraphQLModule 只不过是 [Apollo](https://www.apollographql.com) 服务器的包装器。我们没有造轮子, 而是提供一个现成的模块, 这让 GraphQL 和 Nest 有了比较简洁的融合方式。
 
@@ -65,6 +65,16 @@ export class ApplicationModule {}
 Playground 是一个图形化的，交互式的浏览器内 GraphQL IDE，默认情况下可与 GraphQL 服务器本身 URL 相同。当您的应用程序在后台运行时，打开 Web 浏览器并访问： http://localhost:3000/graphql （主机和端口可能因您的配置而异）。
 
 ![](https://docs.nestjs.com/assets/playground.png)
+
+### 多个端点
+
+该模块的另一个有用功能是能够同时为多个端点提供服务。多亏了这一点，您可以决定哪个模块应该包含在哪个端点中。默认情况下，`GraphQL` 在整个应用程序中搜索解析器。要仅限制模块的子集，可以使用该 `include` 属性。
+
+```typescript
+GraphQLModule.forRoot({
+  include: [CatsModule],
+})
+```
 
 ### Async 配置
 

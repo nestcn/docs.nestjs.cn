@@ -11,13 +11,7 @@
 $ npm install -g @nestjs/cli
 ```
 
-使用 **Docker Hub** 安装CLI：
-
-```
-$ docker pull nestjs/cli:[version]
-```
-
-更多详细信息可在 [Docker Hub](https://hub.docker.com/r/nestjs/cli/) 中找到。
+您可以[参与](https://github.com/nestjs/nest-cli)并促进项目改进。
 
 ## 使用
 

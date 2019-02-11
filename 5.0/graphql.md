@@ -141,101 +141,83 @@ GraphQLModule.forRootAsync({
 ## 解析图
 
 
-如果您正在使用 graphql-tools，则必须手动创建解析图。以下示例从 [Apollo文档](https://www.apollographql.com/docs/graphql-tools/generate-schema.html) 中复制，您可以在其中阅读有关它的更多信息：
+通常，您必须手动创建解析图。 `@nestjs/graphql` 包也产生解析器映射，可以自动使用由装饰器提供的元数据。
+为了学习库基础知识，我们将创建一个简单的用户 API。首先，让我们在 SDL 中定义我们的类型（阅读[更多](http://graphql.org/learn/schema/#type-language)）：
 
-```typescript
-import { find, filter } from 'lodash';
 
-// example data
-const authors = [
-  { id: 1, firstName: 'Tom', lastName: 'Coleman' },
-  { id: 2, firstName: 'Sashko', lastName: 'Stubailo' },
-];
-const posts = [
-  { id: 1, authorId: 1, title: 'Introduction to GraphQL', votes: 2 },
-  { id: 2, authorId: 2, title: 'Welcome to Meteor', votes: 3 },
-];
+```graphql
+type Author {
+  id: Int!
+  firstName: String
+  lastName: String
+  posts: [Post]
+}
 
-const resolverMap = {
-  Query: {
-    author(obj, args, context, info) {
-      return find(authors, { id: args.id });
-    },
-  },
-  Author: {
-    posts(author, args, context, info) {
-      return filter(posts, { authorId: author.id });
-    },
-  },
-};
+type Post {
+  id: Int!
+  title: String
+  votes: Int
+}
+
+type Query {
+  author(id: Int!): Author
+}
 ```
 
+我们的 GraphQL 架构包含公开的单个查询 `author(id: Int!): Author` 。现在，让我们创建一个 `AuthorResolver` 。
 
-使用 `@nestjs/graphql` 包，解析器映射将使用装饰器提供的元数据自动生成。让我们用等同的 Nest 代码重写上面的例子。
-
-```typescript
-import { Query, Resolver, ResolveProperty, Args, Parent } from '@nestjs/graphql';
-import { find, filter } from 'lodash';
-
-// example data
-const authors = [
-  { id: 1, firstName: 'Tom', lastName: 'Coleman' },
-  { id: 2, firstName: 'Sashko', lastName: 'Stubailo' },
-];
-const posts = [
-  { id: 1, authorId: 1, title: 'Introduction to GraphQL', votes: 2 },
-  { id: 2, authorId: 2, title: 'Welcome to Meteor', votes: 3 },
-];
-
+```graphql
 @Resolver('Author')
 export class AuthorResolver {
+  constructor(
+    private readonly authorsService: AuthorsService,
+    private readonly postsService: PostsService,
+  ) {}
+
   @Query()
-  author(@Args('id') id: number) {
-    return find(authors, { id });
+  async author(@Args('id') id: number) {
+    return await this.authorsService.findOneById(id);
   }
 
   @ResolveProperty()
-  posts(@Parent() author) {
-    return filter(posts, { authorId: author.id });
+  async posts(@Parent() author) {
+    const { id } = author;
+    return await this.postsService.findAll({ authorId: id });
   }
 }
 ```
+
+?> 提示：如果使用 `@Resolver()` 装饰器，则不必将类标记为 `@Injectable()` ，否则必须这么做。
+
+
 `@Resolver()` 装饰器不影响查询和对象变动 (`@Query()` 和 `@Mutation()` 装饰器)。这只会通知 Nest, 每个 `@ResolveProperty()` 有一个父节点, `Author` 在这种情况下是父节点。
-
-?> 如果使用 @Resolver() 装饰器, 则不必将类标记为 `@Injectable()`, 否则必须这么做。
-
 
 通常, 我们会使用像 `getAuthor()` 或 `getPosts()` 之类的函数来命名。我们可以很容易地做到这一点, 以及移动命名之间的装饰器的括号。
 
 ```typescript
-import { Query, Resolver, ResolveProperty, Parent, Args } from '@nestjs/graphql';
-import { find, filter } from 'lodash';
-
-// example data
-const authors = [
-  { id: 1, firstName: 'Tom', lastName: 'Coleman' },
-  { id: 2, firstName: 'Sashko', lastName: 'Stubailo' },
-];
-const posts = [
-  { id: 1, authorId: 1, title: 'Introduction to GraphQL', votes: 2 },
-  { id: 2, authorId: 2, title: 'Welcome to Meteor', votes: 3 },
-];
-
 @Resolver('Author')
 export class AuthorResolver {
+  constructor(
+    private readonly authorsService: AuthorsService,
+    private readonly postsService: PostsService,
+  ) {}
+
   @Query('author')
-  getAuthor(@Args('id') id: number) {
-    return find(authors, { id });
+  async getAuthor(@Args('id') id: number) {
+    return await this.authorsService.findOneById(id);
   }
 
   @ResolveProperty('posts')
-  getPosts(@Parent() author) {
-    return filter(posts, { authorId: author.id });
+  async getPosts(@Parent() author) {
+    const { id } = author;
+    return await this.postsService.findAll({ authorId: id });
   }
 }
 ```
 
-?> 这个 @Resolver()装饰器可以在函数级别被使用。
+?> 这个 `@Resolver()` 装饰器可以在函数级别被使用。
+
+### 装饰
 
 在上面的示例中，您可能会注意到我们使用专用装饰器来引用以下参数。下面是提供的装饰器和它们代表的普通Apollo参数的比较。
 
@@ -245,6 +227,21 @@ export class AuthorResolver {
 | @Context(param?:string)	| context/context[param] |
 | @Info(param?:string)	| info/info[param] |
 | @Args(param?:string)	| args/args[param] |
+
+### Module
+
+一旦我们在这里完成，我们必须在 `AuthorResolver` 的某处注册，例如在新创建的 `AuthorsModule` 内部注册。
+
+```typescript
+@Module({
+  imports: [PostsModule],
+  providers: [AuthorsService, AuthorResolver],
+})
+export class AuthorsModule {}
+```
+该 `GraphQLModule` 会考虑反映了元数据和转化类到正确的解析器的自动映射。您应该注意的是您需要在某处 import 此模块，因此 Nest 将知道 `AuthorsModule` 确实存在。
+
+?> 提示：在[此处](http://graphql.cn/learn/queries/)了解有关 GraphQL 查询的更多信息。
 
 ### 重构
 

@@ -37,14 +37,22 @@ export class UsersService implements OnModuleInit, OnModuleDestroy {
 }
 ```
 
+为了推迟应用程序的初始化，您可以使用 `await` 关键字或返回 `Promise`。
+
+```typescript
+async onModuleInit(): Promise<any> {
+  await this.fetch();
+}
+```
+
 ## 混合应用
 
-混合应用程序的应用程序与连接的 microservice/s。可以将 INestApplication 与 INestMicroservice 实例的无限计数结合起来。
+混合应用程序的应用程序与连接的微服务。可以通过实例 `connectMicroservice()` 函数将 INestApplication 与 INestMicroservice 实例的无限计数结合起来。
 
 ```typescript
 const app = await NestFactory.create(ApplicationModule);
 const microservice = app.connectMicroservice({
-    transport: Transport.TCP,
+  transport: Transport.TCP,
 });
 
 await app.startAllMicroservicesAsync();
@@ -53,12 +61,24 @@ await app.listen(3001);
 
 ## HTTPS 和多服务器
 
-由于您可以完全控制 express 实例生命周期，因此创建几个同时运行的多个服务器（例如，HTT P和 HTTPS）并不难。
+为了创建使用HTTPS协议的应用程序，我们必须传递一个 options 对象：
 
 ```typescript
 const httpsOptions = {
-  key: fs.readFileSync("./secrets/private-key.pem"),
-  cert: fs.readFileSync("./secrets/public-certificate.pem")
+  key: fs.readFileSync('./secrets/private-key.pem'),
+  cert: fs.readFileSync('./secrets/public-certificate.pem')
+};
+const app = await NestFactory.create(ApplicationModule, {
+  httpsOptions,
+});
+await app.listen(3000);
+```
+对 express 实例的完全控制提供了一种简单的方法来创建多个同时侦听不同端口的服务器。
+
+```typescript
+const httpsOptions = {
+  key: fs.readFileSync('./secrets/private-key.pem'),
+  cert: fs.readFileSync('./secrets/public-certificate.pem')
 };
 
 const server = express();
@@ -66,7 +86,7 @@ const app = await NestFactory.create(ApplicationModule, server);
 await app.init();
 
 http.createServer(server).listen(3000);
-https.createServer(httpsOptions, server).listen(443)
+https.createServer(httpsOptions, server).listen(443);
 ```
 
 ## 样例

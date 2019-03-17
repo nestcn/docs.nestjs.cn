@@ -492,7 +492,7 @@ export const CatSchema = new mongoose.Schema({
 });
 ```
 
-CatsSchema 属于 cats 目录。这个目录代表了 CatsModule 。当然这是由您决定是否保留这样的文件目录结构。从我们的角度来看，在相应的模块目录中，最好的方法是将它们保存在一致的吗目录中。
+CatsSchema 属于 cats 目录。这个目录代表了 CatsModule 。当然这是由您决定是否保留这样的文件目录结构。从我们的角度来看，在相应的模块目录中，最好的方法是将它们保存在一致的目录中。
 
 我们来看看 CatsModule：
 

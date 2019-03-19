@@ -49,7 +49,7 @@ import { CatsModule } from './cats/cats.module';
 @Module({
   imports: [CatsModule],
 })
-export class ApplicationModule {
+export class ApplicationModule {}
 ```
 
 现在 Nest 知道除了 `ApplicationModule` 之外，注册 `CatsModule` 也是非常重要的。 这就是我们现在的目录结构:

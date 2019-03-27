@@ -14,4 +14,4 @@
 - 交流QQ群：489719517
 
 [GitHub](https://github.com/nestjs/nest)
-[5.0](/5.0/firststeps.md)
+[6.x](/6/firststeps.md)

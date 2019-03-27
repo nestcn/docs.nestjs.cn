@@ -11,6 +11,6 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
 ## [查看 5.0 文档](/5.0/)
 
 
-本站托管在： [vultr   （帮助我们，并且免费获得50美金【10个月】）](https://www.vultr.com/?ref=7786172-4F)
+本站托管在： [vultr   （帮助我们，并且获得50美金【10个月】）](https://www.vultr.com/?ref=7786172-4F)
 
 [![vultr](https://www.vultr.com/media/banner_1.png)](https://www.vultr.com/?ref=7815855-4F)

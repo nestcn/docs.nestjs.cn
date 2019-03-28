@@ -4,7 +4,7 @@
 
 ## 语言
 
- 我们爱上了 [TypeScript](https://www.tslang.cn)，但最重要的是，我们喜欢 [Node.js](http://nodejs.cn/)。 这就是为什么 Nest 兼容 TypeScript 和**纯 JavaScript**。 Nest 正利用最新的语言功能，所以要使用简单的 JavaScript 框架，我们需要一个 [Babel](https://babeljs.cn) 编译器。
+ 我们爱上了 [TypeScript](https://www.tslang.cn)，但最重要的是，我们喜欢 [Node.js](http://nodejs.cn/)。 这就是为什么 Nest 兼容 TypeScript 和**纯 JavaScript**。 Nest 正利用最新的语言功能，所以要使用原生的 JavaScript 框架，我们需要一个 [Babel](https://babeljs.cn) 编译器。
 
  在文章中，我们主要使用 TypeScript ，但是当它包含一些 Typescript 特定的表达式时，您总是可以将代码片段**切换**到 JavaScript 版本。
 
@@ -16,16 +16,16 @@
 
 ## 建立
 
- 使用 [Nest CLI](/5.0/cli?id=overview) 建立新项目非常简单。 只要确保你已经安装了 npm，然后在你的 OS 终端中使用以下命令：
+ 使用 [Nest CLI](/6/cli?id=overview) 建立新项目非常简单。 只要确保你已经安装了 npm，然后在你的 OS 终端中使用以下命令：
 
 
 ```
 $ npm i -g @nestjs/cli
-$ nest new project
+$ nest new project-name
 ```
 
+ 将创建 `project` 目录， 安装node模块和一些其他样板文件，并将创建一个 `src` 目录，目录中包含几个核心文件。
 
- `project` 目录将在 `src` 目录中包含几个核心文件。
 
 ```
 src
@@ -34,13 +34,15 @@ src
 └── main.ts
 ```
 
-按照约定，新创建的模块应该有一个专用目录。
+以下是这些核心文件的简要概述：
+
 
 |      |           |   
 | ------------- |:-------------:| 
-| main.ts     | 应用程序入口文件。它使用  `NestFactory` 用来创建 Nest 应用实例。 | 
-| app.module.ts      | 定义 `AppModule` 应用程序的根模块。      |   
 | app.controller.ts | 带有单个路由的基本控制器示例。     |   
+| app.module.ts      | 应用程序的根模块。      |   
+| main.ts     | 应用程序入口文件。它使用  `NestFactory` 用来创建 Nest 应用实例。 | 
+
 
 
  `main.ts` 包含一个异步函数，它负责**引导**我们的应用程序：
@@ -58,12 +60,33 @@ bootstrap();
 ```
 
 
-要创建一个 Nest 应用实例，我们使用了 `NestFactory` 。`NestFactory` 是最重要的基础类之一，它暴露了一些静态方法用于创建应用实例。 `create()` 方法返回一个实现 `INestApplication` 接口的对象, 并提供一组可用的方法, 在后面的章节中将对此进行详细描述。
+要创建一个 Nest 应用实例，我们使用了 `NestFactory` 核心类。`NestFactory` 暴露了一些静态方法用于创建应用实例。 `create()` 方法返回一个实现 `INestApplication` 接口的对象, 并提供一组可用的方法, 在后面的章节中将对此进行详细描述。 在上面的main.ts示例中，我们只是启动 HTTP 服务器，它允许应用程序等待入站 HTTP 请求。
+
+请注意，使用 Nest CLI 搭建的项目会创建一个初始项目结构，我们鼓励开发人员将每个模块保存在自己的专用目录中。
+
+## 平台
+
+Nest 旨在成为一个与平台无关的框架。 通过平台，可以创建可重用的逻辑部件，开发人员可以利用这些部件来跨越多种不同类型的应用程序。 从技术上讲，Nest 可以在创建适配器后使用任何 Node HTTP 框架。 有两个支持开箱即用的 HTTP 平台：express 和 fastify。 您可以选择最适合您需求的产品。
+
+|      |           |   
+| ------------- |:-------------:| 
+|platform-express|Express 是一个众所周知的 node.js 简约 Web 框架。 这是一个经过实战考验，适用于生产的库，拥有大量社区资源。 默认情况下使用 `@nestjs/platform-express` 包。 许多用户都可以使用 Express ，并且无需采取任何操作即可启用它。|
+|platform-fastify| Fastify 是一个高性能，低开销的框架，专注于提供最高的效率和速度。 在[这里](6/techniques?id=性能（fastify）)阅读如何使用它。|
+
+
+无论使用哪种平台，它都会暴露自己的应用程序界面。 它们分别被视为 NestExpressApplication 和 NestFastifyApplication。
+
+将类型传递给 NestFactory.create() 方法时，如下例所示，app 对象将具有专用于该特定平台的方法。 但是，请注意，除非您确实要访问底层平台API，否则无需指定类型。
+
+```typescript
+const app = await NestFactory.create<NestExpressApplication>(ApplicationModule);
+```
+
 
 
 ## 运行应用程序
 
-安装过程完成后，您可以运行以下命令启动 HTTP 服务器:
+安装过程完成后，您可以在系统命令提示符下运行以下命令，以启动应用程序监听入站 HTTP 请求：
 
 ```
 $ npm run start

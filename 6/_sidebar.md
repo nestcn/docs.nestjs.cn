@@ -1,33 +1,37 @@
+- [介绍](6/introduction)
+
 - 概述
-  - [第一步](5.0/firststeps)
-  - [控制器](5.0/controllers)
-  - [提供者](5.0/providers)
-  - [模块](5.0/modules)
-  - [中间件](5.0/middlewares)
-  - [异常过滤器](5.0/exceptionfilters)  
-  - [管道](5.0/pipes)
-  - [守卫](5.0/guards)
-  - [拦截器](5.0/interceptors)
-  - [自定义装饰器](5.0/customdecorators)
-  - [关于翻译](5.0/about)
+  - [第一步](6/firststeps)
+  - [控制器](6/controllers)
+  - [提供者](6/providers)
+  - [模块](6/modules)
+  - [中间件](6/middlewares)
+  - [异常过滤器](6/exceptionfilters)  
+  - [管道](6/pipes)
+  - [守卫](6/guards)
+  - [拦截器](6/interceptors)
+  - [自定义装饰器](6/customdecorators)
+  - [关于翻译](6/about)
 
-- [基本原理](5.0/fundamentals)
+- [基本原理](6/fundamentals)
 
-- [技术](5.0/techniques)
+- [技术](6/techniques)
 
-- [GraphQL](5.0/graphql)
+- [GraphQL](6/graphql)
 
-- [WEBSOCKETS](5.0/websockets)
+- [WEBSOCKETS](6/websockets)
 
-- [微服务](5.0/microservices)
+- [微服务](6/microservices)
 
-- [执行上下文](5.0/executioncontext)
+- [应用上下文](6/applicationcontext)
 
-- [秘籍](5.0/recipes)
+- [秘籍](6/recipes)
 
-- [CLI](5.0/cli)
+- [CLI](6/cli)
 
-- [FAQ](5.0/faq)
+- [FAQ](6/faq)
 
-- [迁移指南](5.0/migrationguide)
+- [迁移指南](6/migrationguide)
+
+- [谁在使用 Nest](6/discover)
 

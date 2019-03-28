@@ -2,7 +2,7 @@
 
 控制器层负责处理传入的**请求**, 并返回对客户端的**响应**。
 
-![img](https://docs.nestjs.com/assets/Controllers_1.png)
+![img](https://docs.nestjs.com/assets/Controllers_1.png "控制器")
 
 控制器的目的是接收应用的特定请求。**路由**机制控制哪个控制器接收哪些请求。通常，每个控制器有多个路由，不同的路由可以执行不同的操作。
 

@@ -16,8 +16,4 @@
 
 [6.x](/6/firststeps.md)
 [GitHub](https://github.com/nestjs/nest)
-<<<<<<< HEAD
-[6.x](/6/firststeps.md)
-=======
 [加入QQ群](https://jq.qq.com/?_wv=1027&k=5uaXPHc)
->>>>>>> 2af996f21c57f9344fd7d51316796e9dbf8211a2

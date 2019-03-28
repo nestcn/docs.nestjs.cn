@@ -8,11 +8,11 @@
 
 但中间件是非常笨的。它不知道调用 next() 函数后会执行哪个处理程序。另一方面, 守卫可以访问 ExecutionContext 对象, 所以我们确切知道将要执行什么。
 
-?> 守卫在每个中间件之后执行的, 但在管道之前。
+?> 守卫在每个中间件之后执行的, 但在拦截器和管道之前。
 
 ## 授权看守卫
 
-最好的用例之一就是认证逻辑，因为只有当调用者具有足够的权限（例如管理员角色）时才能使用特定的路由。我们有一个计划要创建的 AuthGuard 将依次提取和验证在请求标头中发送的 token。
+最好的守卫用例之一就是授权逻辑，因为只有当调用者具有足够的权限时才能使用特定的路由。我们计划创建的AuthGuard将按顺序提取并验证请求标头中发送的token。
 
 > auth.guard.ts
 
@@ -30,12 +30,25 @@ export class AuthGuard implements CanActivate {
   }
 }
 ```
-不管 validateRequest() 函数背后的逻辑是什么, 主要的一点是要展示如何简单地利用守卫。每个守卫都提供一个 canActivate() 功能。守卫可能通过 (Promise 或 Observable) 同步地或异步地返回它的布尔答复。返回的值控制 Nest 行为:
+不管 validateRequest() 函数背后的逻辑是什么, 重点是展示使用守卫是多么简单。每个守卫都提供一个 canActivate() 方法。守卫可能通过 (Promise 或 Observable) 同步地或异步地返回它的布尔答复。返回的值控制 Nest 行为:
 
 - 如果返回 true, 将处理用户调用。
 - 如果返回 false, 则 Nest 将忽略当前处理的请求。
 
-canActivate() 函数采用单参数 ExecutionContext 实例。ExecutionContext 从 ArgumentsHost 继承 ([这里](/5.0/exceptionfilters)首先提到)。ArgumentsHost 是围绕已传递给原始处理程序的参数的包装, 它包含基于应用程序类型的引擎下的不同参数数组。
+canActivate() 函数采用单参数 ExecutionContext 实例。ExecutionContext 继承自 ArgumentsHost 。ArgumentsHost是传递给原始处理程序的参数的包装器, 它包含基于应用程序类型的引擎下的不同参数数组。你可以在[这里](/6.0/exceptionfilters)了解到更多(在异常过滤器章节)。
+
+### Execution context
+
+ExecutionContext提供了更多功能,它扩展了ArgumentsHost,但是也提供了有关当前执行过程的更多详细信息。
+
+```typescript
+export interface ExecutionContext extends ArgumentsHost {
+  getClass<T = any>(): Type<T>;
+  getHandler(): Function;
+}
+```
+
+getHandler()方法返回对当前处理的处理程序的引用,而getClass()返回此特定处理程序所属的Controller类的类型。用另外的话来说,如果用户指向在CatsController中定义和注册的create()方法,getHandler()将返回对create()方法的引用,在这种情况下,getClass()将只返回一个CatsController的类型（不是实例）。
 
 ```typescript
 export interface ArgumentsHost {

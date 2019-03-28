@@ -1,7 +1,7 @@
 
 
 
- <embed src="_media/icon.svg" width="330" height="88" type="image/svg+xml" />
+![logo](_media/icon.svg ':size=250x60')
 
 > 用于构建高效且可伸缩的服务端应用程序的渐进式 Node.js 框架。
 

@@ -2,8 +2,6 @@
 
 
 
- ![logo](_media/icon.svg)
- 
  <object data="_media/icon.svg" width="200" height="50" type="image/svg+xml" />
 
 > 用于构建高效且可伸缩Web应用程序的渐进式 Node.js 框架。

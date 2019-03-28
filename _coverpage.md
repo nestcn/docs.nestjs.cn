@@ -13,5 +13,6 @@
 - 交流QQ群：336289049
 - 交流QQ群：489719517
 
-[GitHub](https://github.com/nestjs/nest)
 [6.x](/6/firststeps.md)
+[GitHub](https://github.com/nestjs/nest)
+[加入QQ群](https://jq.qq.com/?_wv=1027&k=5uaXPHc)

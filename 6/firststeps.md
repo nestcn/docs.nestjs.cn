@@ -19,10 +19,25 @@
  使用 [Nest CLI](/6/cli?id=overview) 建立新项目非常简单。 只要确保你已经安装了 npm，然后在你的 OS 终端中使用以下命令：
 
 
+<!-- tabs:start -->
+
+#### ** npm **
+
 ```
 $ npm i -g @nestjs/cli
 $ nest new project-name
 ```
+
+#### ** yarn **
+
+```
+$ yarn global add @nestjs/cli
+$ nest new project-name
+```
+
+<!-- tabs:end -->
+
+
 
  将创建 `project` 目录， 安装node模块和一些其他样板文件，并将创建一个 `src` 目录，目录中包含几个核心文件。
 

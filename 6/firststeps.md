@@ -48,7 +48,7 @@ v10.15.1
 6.4
 ```
 
-#### ** Ubuntu/Debian **
+#### ** Debian系 **
 
 （支持ARM及X86平台)
 ```
@@ -64,7 +64,7 @@ $ npm -v
 6.4
 ```
 
-#### ** Centos/Redhat/Fedora **
+#### ** Redhat系 **
 
  （支持X86平台）
  ```

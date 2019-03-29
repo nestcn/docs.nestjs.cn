@@ -20,12 +20,8 @@
 
 #### ** windows **
 
-```
-$ npm i -g @nestjs/cli
-$ nest new project-name
-```
-
 1. [点击下载 Node.js](hhttps://npm.taobao.org/mirrors/node/latest-v10.x/node-v10.15.3-x64.msi)
+
 2. 安装Node.js
 
 Powershell/CMD 可以打印出这个说明安装成功。（部分系统需要重启后环境变量才生效）
@@ -40,6 +36,7 @@ v10.15.3
 #### ** MacOS **
 
 1. [点击下载 Node.js](https://npm.taobao.org/mirrors/node/v10.15.1/node-v10.15.1.pkg)
+
 2. 安装Node.js
 
 打印出这个说明安装成功。（部分系统需要重启后环境变量才生效）
@@ -53,7 +50,6 @@ v10.15.1
 #### ** Ubuntu/Debian **
 
 （支持ARM及X86平台)
-
 ```
 curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
 sudo apt-get install -y nodejs
@@ -108,10 +104,8 @@ $ npm -v
 #### ** Snap **
 
 （支持 所有 Linux ）
-
 ```
 sudo snap install node --classic --channel=10
-
 ```
 （如果提示 snap 不存在，请先安装 snapd）
 终端可以打出以下信息说明安装成功：

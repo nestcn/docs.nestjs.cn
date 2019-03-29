@@ -14,7 +14,8 @@
 
  请确保您的操作系统上安装了 [Node.js](http://nodejs.cn/download/)**（> = 8.9.0）**。
  
- **一分钟安装 node.js**
+ **一分钟安装 node.js** 
+ （支持X86 ARM MIPS 等架构，需要版本管理或者系统为 Raspbian 请直接看 NVM）
  
  <!-- tabs:start -->
 
@@ -80,7 +81,7 @@ $ npm -v
 
 #### ** NVM **
 
-（支持 所有 Linux 及 Raspbian ，支持多版本管理）
+（支持 所有 Linux 及 Raspbian ，支持多版本管理，[windows 点击进入](https://github.com/coreybutler/nvm-windows/releases)）
  ```
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
 

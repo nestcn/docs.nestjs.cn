@@ -122,7 +122,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 本节仅适用于 `TypeScript`。
 
-Nest 与 [class-validator](https://github.com/pleerock/class-validator) 配合得很好。这个优秀的库允许您使用基于装饰器的验证。由于我们可以访问处理过的属性的元类型，所以基于装饰器的验证对于管道功能是非常强大的。让我们安装所需的软件包。
+Nest 与 [class-validator](https://github.com/pleerock/class-validator) 配合得很好。这个优秀的库允许您使用基于装饰器的验证。基于装饰器的验证对于管道功能非常强大，因为我们可以访问已处理属性的 `metatype`。在我们开始之前，我们需要安装所需的软件包。
 
 ```
 $ npm i --save class-validator class-transformer
@@ -147,7 +147,7 @@ export class CreateCatDto {
 }
 ```
 
-现在是完成 `ValidationPipe` 类的时候了。
+完成后，我们可以创建一个 `ValidationPipe` 类。
 
 > validation.pipe.ts
 
@@ -207,7 +207,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 !> `@UsePipes()` 修饰器是从 `@nestjs/common` 包中导入的。
 
-`ValidationPipe` 的实例已立即创建。另一种可用的方法是直接传入类（而不是实例），让框架承担实例化责任，并启用**依赖注入**。
+`ValidationPipe` 的实例已就地立即创建。另一种可用的方法是直接传入类（而不是实例），让框架承担实例化责任，并启用**依赖注入**。
 
 > cats.controler.ts
 
@@ -252,12 +252,13 @@ import { APP_PIPE } from '@nestjs/core';
 })
 export class ApplicationModule {}
 ```
+!> 译者注: 上述6.0官方的示例代码目前是错误的，我们使用了5.0的示例代码。
 
-?> 另一种选择是使用[执行上下文](5.0/executioncontext)功能。另外，useClass 并不是处理自定义提供者注册的唯一方法。在[这里](5.0/fundamentals?id=custom-providers)了解更多。
+!> 另一种选择是使用[执行上下文](5.0/executioncontext)功能。另外，useClass 并不是处理自定义提供者注册的唯一方法。在[这里](5.0/fundamentals?id=custom-providers)了解更多。
 
 ## 转换管道
 
-验证不是唯一的用例。在本章的开始部分，我已经提到管道也可以将输入数据**转换**为所需的输出。这是真的，因为从 `transform` 函数返回的值完全覆盖了参数的前一个值。有时从客户端传来的数据需要经过一些修改。此外，有些部分可能会丢失，所以我们必须应用默认值。**转换管道**填补了客户端和请求处理程序的请求之间的空白。
+验证不是唯一的用例。在本章的开始部分，我已经提到管道也可以将输入数据**转换**为所需的输出。这是真的，因为从 `transform` 函数返回的值完全覆盖了参数先前的值。有时从客户端传来的数据需要经过一些修改。此外，有些部分可能会丢失，所以我们必须应用默认值。**转换管道**填补了客户端请求和请求处理程序之间的空白。
 
 > parse-int.pipe.ts
 
@@ -285,7 +286,7 @@ async findOne(@Param('id', new ParseIntPipe()) id) {
 }
 ```
 
-由于上面的形式，`ParseIntpipe` 将在请求触发相应的处理程序之前执行。
+由于上述结构，`ParseIntpipe` 将在请求触发相应的处理程序之前执行。
 
 另一个有用的例子是按 ID 从数据库中选择一个现有的**用户实体**。
 
@@ -300,7 +301,9 @@ findOne(@Param('id', UserByIdPipe) userEntity: UserEntity) {
 
 幸运的是，由于 `ValidationPipe` 和 `ParseIntPipe` 是内置管道，因此您不必自己构建这些管道（请记住， `ValidationPipe` 需要同时安装 `class-validator` 和 `class-transformer` 包）。
 
-内置的 `ValidationPipe` 提供了比本章描述的更多的选项，为了简单和减少学习曲线，这些选项一直保持基本。如果您查看控制器函数中的 `createCatDto`，您会发现它不是实际的 `CreateCatDto` 实例。这是因为此管道只验证是否正确，而不将其转换为预期类型。但是，如果希望管道改变有效负载，可以通过传递适当的选项来配置它：
+内置的 `ValidationPipe` 提供了比本章描述的更多的选项，为了简单和减少学习曲线，这些选项一直保持基本。你可以在[这里](https://docs.nestjs.com/techniques/validation)查看很多例子。
+
+如果您查看控制器函数中的 `createCatDto`，您会发现它不是实际的 `CreateCatDto` 实例。这是因为此管道仅验证有效负载，而不将其转换为预期类型。但是，如果希望管道改变有效负载，可以通过传递适当的选项来配置它：
 
 > cats.controller.ts
 
@@ -311,12 +314,15 @@ async create(@Body() createCatDto: CreateCatDto) {
   this.catsService.create(createCatDto);
 }
 ```
+!> `ValidationPipe` 是从 `@nestjs/common` 包中导入的。
 
 因为这个管道是基于 `class-validator` 和 `class-transformer` 库的，所以有更多选项。看看构造函数的可选选项。
 
 ```typescript
 export interface ValidationPipeOptions extends ValidatorOptions {
   transform?: boolean;
+  disableErrorMessages?: boolean;
+  exceptionFactory?: (errors: ValidationError[]) => any;
 }
 ```
 
@@ -334,7 +340,7 @@ export interface ValidationPipeOptions extends ValidatorOptions {
 |`validationError.target`|`boolean`| 目标是否应在 `ValidationError` 中展示|
 |`validationError.value`|`boolean`| 验证值是否应在 `ValidationError` 中展示。|
 
-!> 您可以在[这里](https://github.com/typestack/class-validator)中找到关于 `class-validator` 包的更多信息。。
+!> 您可以在他的[库](https://github.com/typestack/class-validator)中找到关于 `class-validator` 包的更多信息。。
 
  ### 译者署名
 
@@ -343,3 +349,4 @@ export interface ValidationPipeOptions extends ValidatorOptions {
 | [@zuohuadong](https://github.com/zuohuadong)  | <img class="avatar-66 rm-style" src="https://wx3.sinaimg.cn/large/006fVPCvly1fmpnlt8sefj302d02s742.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
 | [@Drixn](https://drixn.com/)  | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">  |  翻译  | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/) |
 | [@tangkai](https://github.com/tangkai123456)  | <img class="avatar-66 rm-style" height="70" src="https://avatars1.githubusercontent.com/u/22436910">  |  翻译  | 专注于 React，[@tangkai](https://github.com/tangkai123456) |
+| [@franken133](https://github.com/franken133)  | <img class="avatar rounded-2" src="https://avatars0.githubusercontent.com/u/17498284?s=400&amp;u=aa9742236b57cbf62add804dc3315caeede888e1&amp;v=4" height="70">  |  翻译  | 专注于 java 和 nest，[@franken133](https://github.com/franken133)|

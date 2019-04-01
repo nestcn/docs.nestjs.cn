@@ -6,7 +6,7 @@
 
 管道将输入数据**转换**为所需的输出。另外，它可以处理**验证**，因为当数据不正确时可能会抛出异常。
 
-?> 管道在异常区域内运行。这意味着当抛出异常时，它们由核心异常处理程序和应用于当前上下文的[异常过滤器](/5.0/exceptionfilters)处理。
+?> 管道在异常区域内运行。这意味着当抛出异常时，它们由核心异常处理程序和应用于当前上下文的[异常过滤器](exceptionfilters.md)处理。
 
 ## 内置管道
 
@@ -49,7 +49,7 @@ export interface ArgumentMetadata {
 
 |参数    |   描述|
 |-----|-----|
-|type|告诉我们该属性是一个 body `@Body()`，query `@Query()`，param `@Param()` 还是自定义参数 [在这里阅读更多](https://docs.nestjs.cn/custom-decorators)。|
+|type|告诉我们该属性是一个 body `@Body()`，query `@Query()`，param `@Param()` 还是自定义参数 [在这里阅读更多](customdecorators.md)。|
 |metatype|属性的元类型，例如 `String`。 如果在函数签名中省略类型声明，或者使用原生JavaScript，则为 `undefined`。|
 |data|传递给装饰器的字符串，例如 `@Body('string')`。 如果您将括号留空，则为 `undefined`。|
 
@@ -178,11 +178,11 @@ export class ValidationPipe implements PipeTransform<any> {
 }
 ```
 
-!> 我已经使用了 [class-transformer](https://github.com/pleerock/class-transformer) 库。它和 [class-validator](https://github.com/pleerock/class-validator) 库由同一个作者开发，所以他们配合的很好。
+?> 我们已经使用了 [class-transformer](https://github.com/pleerock/class-transformer) 库。它和 [class-validator](https://github.com/pleerock/class-validator) 库由同一个作者开发，所以他们配合的很好。
 
 我们来看看这个代码。首先，请注意 `transform()` 函数是 `异步` 的。这是可能的，因为Nest支持同步和**异步**管道。另外，还有一个辅助函数 `toValidate()`。由于性能原因，它负责从验证过程中排除原生 `JavaScript` 类型。最后一个重要的是我们必须返回相同的价值。这个管道是一个特定于验证的管道，所以我们需要返回完全相同的属性以避免**重写**（如前所述，管道将输入转换为所需的输出）。
 
-最后一步是设置 `ValidationPipe` 。管道，与[异常过滤器](/5.0/exceptionfilters)相同，它们可以是方法范围的、控制器范围的和全局范围的。另外，管道可以是参数范围的。我们可以直接将管道实例绑定到路由参数装饰器，例如`@Body()`。让我们来看看下面的例子：
+最后一步是设置 `ValidationPipe` 。管道，与[异常过滤器](exceptionfilters.md)相同，它们可以是方法范围的、控制器范围的和全局范围的。另外，管道可以是参数范围的。我们可以直接将管道实例绑定到路由参数装饰器，例如`@Body()`。让我们来看看下面的例子：
 
 > cats.controler.ts
 
@@ -205,7 +205,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 }
 ```
 
-!> `@UsePipes()` 修饰器是从 `@nestjs/common` 包中导入的。
+?> `@UsePipes()` 修饰器是从 `@nestjs/common` 包中导入的。
 
 `ValidationPipe` 的实例已就地立即创建。另一种可用的方法是直接传入类（而不是实例），让框架承担实例化责任，并启用**依赖注入**。
 
@@ -232,7 +232,7 @@ async function bootstrap() {
 bootstrap();
 ```
 
-!> `useGlobalPipes()` 方法不会为网关和微服务设置管道。
+!> `useGlobalPipes()` 方法不会为网关和微服务设置管道（正在使用混合应用程序功能）。
 
 全局管道用于整个应用程序、每个控制器和每个路由处理程序。就依赖注入而言，从任何模块外部注册的全局管道（如上例所示）无法注入依赖，因为它们不属于任何模块。为了解决这个问题，可以使用以下构造直接为任何模块设置管道：
 
@@ -252,9 +252,9 @@ import { APP_PIPE } from '@nestjs/core';
 })
 export class ApplicationModule {}
 ```
-!> 译者注: 上述6.0官方的示例代码目前是错误的，我们使用了5.0的示例代码。
+?> 译者注: 上述6.0官方的示例代码目前是错误的，我们使用了5.0的示例代码。
 
-!> 另一种选择是使用[执行上下文](5.0/executioncontext)功能。另外，useClass 并不是处理自定义提供者注册的唯一方法。在[这里](5.0/fundamentals?id=custom-providers)了解更多。
+?> 另一种选择是使用[执行上下文](5.0/executioncontext)功能。另外，useClass 并不是处理自定义提供者注册的唯一方法。在[这里](5.0/fundamentals?id=custom-providers)了解更多。
 
 ## 转换管道
 
@@ -314,7 +314,7 @@ async create(@Body() createCatDto: CreateCatDto) {
   this.catsService.create(createCatDto);
 }
 ```
-!> `ValidationPipe` 是从 `@nestjs/common` 包中导入的。
+?> `ValidationPipe` 是从 `@nestjs/common` 包中导入的。
 
 因为这个管道是基于 `class-validator` 和 `class-transformer` 库的，所以有更多选项。看看构造函数的可选选项。
 
@@ -340,7 +340,7 @@ export interface ValidationPipeOptions extends ValidatorOptions {
 |`validationError.target`|`boolean`| 目标是否应在 `ValidationError` 中展示|
 |`validationError.value`|`boolean`| 验证值是否应在 `ValidationError` 中展示。|
 
-!> 您可以在他的[库](https://github.com/typestack/class-validator)中找到关于 `class-validator` 包的更多信息。。
+?> 您可以在他的[库](https://github.com/typestack/class-validator)中找到关于 `class-validator` 包的更多信息。。
 
  ### 译者署名
 

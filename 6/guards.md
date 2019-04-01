@@ -35,7 +35,7 @@ export class AuthGuard implements CanActivate {
 - 如果返回 true, 将处理用户调用。
 - 如果返回 false, 则 Nest 将忽略当前处理的请求。
 
-`canActivate()` 函数采用单参数 `ExecutionContext` 实例。`ExecutionContext` 继承自 `ArgumentsHost` 。`ArgumentsHost` 是传递给原始处理程序的参数的包装器，它包含基于应用程序类型的引擎下的不同参数数组。你可以在[这里](/6.0/exceptionfilters)了解到更多(在异常过滤器章节)。
+`canActivate()` 函数采用单参数 `ExecutionContext` 实例。`ExecutionContext` 继承自 `ArgumentsHost` 。`ArgumentsHost` 是传递给原始处理程序的参数的包装器，它包含基于应用程序类型的引擎下的不同参数数组。你可以在[这里](exceptionfilters.md)了解到更多(在异常过滤器章节)。
 
 ## Execution context
 
@@ -73,7 +73,6 @@ export class RolesGuard implements CanActivate {
 
 ## 绑定守卫
 
-
 守卫可以是控制器范围的，方法范围的和全局范围的。为了建立守卫，我们使用 `@UseGuards()` 装饰器。这个装饰器可以有无数的参数，也就是说，你可以传递几个守卫并用逗号分隔它们。
 
 >
@@ -95,6 +94,7 @@ export class CatsController {}
 @UseGuards(new RolesGuard())
 export class CatsController {}
 ```
+
 上面的构造将守卫附加到此控制器声明的每个处理程序。如果我们决定只限制其中一个, 我们只需要在方法级别设置守卫。为了绑定全局守卫, 我们使用 Nest 应用程序实例的 `useGlobalGuards()` 方法:
 
 ```typescript
@@ -123,7 +123,7 @@ import { APP_GUARD } from '@nestjs/core';
 export class ApplicationModule {}
 ```
 
-?> 替代选项是使用应用程序上下文功能。此外，useClass不是处理自定义 `providers` 注册的唯一方法。在[这里](https://docs.nestjs.com/fundamentals/custom-providers)了解更多。
+?> 替代选项是使用应用程序上下文功能。此外，useClass不是处理自定义 `providers` 注册的唯一方法。在[这里](fundamentals?id=custom-providers)了解更多。
 
 
 还有, 控制器里的守卫, 在依赖注入方面, 可以类似地看成普通的可注入类来注入。例如:
@@ -140,7 +140,7 @@ import { UserGuard } from '../guard';
 export class ServiceModule {}
 ```
 
-?> 另一种选择是使用执行上下文功能, 虽然它可能会过于臃肿, 且消耗资源。另外，useClass并不是处理自定义提供者注册的唯一方法。在[这里](/5.0/fundamentalsid=dependencyinjection)了解更多
+?> 另一种选择是使用执行上下文功能, 虽然它可能会过于臃肿, 且消耗资源。另外，useClass并不是处理自定义提供者注册的唯一方法。在[这里](fundamentals?#注入injection)了解更多
 
 ## 反射器
 

@@ -123,7 +123,7 @@ import { APP_GUARD } from '@nestjs/core';
 export class ApplicationModule {}
 ```
 
-?> 替代选项是使用应用程序上下文功能。此外，useClass不是处理自定义 `providers` 注册的唯一方法。在[这里](fundamentals?id=custom-providers)了解更多。
+?> 替代选项是使用应用程序上下文功能。此外，useClass不是处理自定义 `providers` 注册的唯一方法。在[这里](/6/fundamentals.md?id=自定义providercustomer-provider)了解更多。
 
 
 还有, 控制器里的守卫, 在依赖注入方面, 可以类似地看成普通的可注入类来注入。例如:
@@ -140,7 +140,7 @@ import { UserGuard } from '../guard';
 export class ServiceModule {}
 ```
 
-?> 另一种选择是使用执行上下文功能, 虽然它可能会过于臃肿, 且消耗资源。另外，useClass并不是处理自定义提供者注册的唯一方法。在[这里](fundamentals?#注入injection)了解更多
+?> 另一种选择是使用执行上下文功能, 虽然它可能会过于臃肿, 且消耗资源。另外，useClass并不是处理自定义提供者注册的唯一方法。在[这里](fundamentals.md?id=注入injection)了解更多
 
 ## 反射器
 

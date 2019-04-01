@@ -158,7 +158,7 @@ export interface ArgumentsHost {
 }
 ```
 
-`ArgumentsHost` 为我们提供了一组有用的方法，有助于从底层数组中选择正确的参数。换句话说，  `ArgumentsHost` 只不过是一个参数数组。例如，当过滤器在 HTTP 应用程序上下文中使用时，`ArgumentsHost` 将包含 `[request, response]` 数组。但是，当前上下文是一个 Web sockets 应用程序时，该数组将等于  [client, data]。此设计决策使您能够访问最终将传递给相应处理程序的任何参数。
+`ArgumentsHost` 为我们提供了一组有用的方法，有助于从底层数组中选择正确的参数。换句话说，  `ArgumentsHost` 只不过是一个参数数组。例如，当过滤器在 HTTP 应用程序上下文中使用时，`ArgumentsHost` 将包含 `[request, response]` 数组。但是，当前上下文是一个 Web sockets 应用程序时，该数组将等于  `[client, data]` 。此设计决策使您能够访问最终将传递给相应处理程序的任何参数。
 
 ## 绑定过滤器
 
@@ -233,7 +233,7 @@ import { APP_FILTER } from '@nestjs/core';
 export class ApplicationModule {}
 ```
 
-?> 另一种选择是使用 [执行上下文](executioncontext.md)功能。另外，useClass 并不是处理自定义提供者注册的唯一方法。在[这里](fundamentals.md?id=custom-providers)了解更多。
+?> 另一种选择是使用 [执行上下文](/6/executioncontext.md)功能。另外，useClass 并不是处理自定义提供者注册的唯一方法。在[这里](/6/fundamentals.md?id=定制提供者)了解更多。
 
 ## 捕获一切
 

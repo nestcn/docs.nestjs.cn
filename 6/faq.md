@@ -1,12 +1,49 @@
 # FAQ
 
-## Express 实例
+## HTTP 适配器
 
-有时, 您可能希望完全控制 express 实例生命周期。这很容易, 因为 NestFactory.create() 方法将 express 实例作为第二个参数。
+有时，您可能希望在 Nest 应用程序上下文中或从外部访问底层 HTTP 服务器。
+
+基本上，每个本机（特定于平台的）HTTP 服务器/库实例都包含在适配器中。适配器注册为全局可用的提供程序，可以从应用程序上下文中提取，也可以轻松地注入其他提供程序。
+
+### 外部策略
+
+为了 `HttpAdapter` 从应用程序上下文中获取，您可以调用 `getHttpAdapter()` 方法。
 
 ```typescript
-const server = express();
-const app = await NestFactory.create(ApplicationModule, server);
+const app = await NestFactory.create(ApplicationModule);
+const httpAdapter = app.getHttpAdapter();
+```
+
+
+### 上下文策略
+
+为了 `HttpAdapterHost` 从应用程序上下文中获取，您可以以与任何其他现有提供程序相同的方式注入它（比方说，通过 `constructor`）。
+
+```typescript
+export class CatsService {
+  constructor(private readonly adapterHost: HttpAdapterHost) {}
+}
+```
+
+!> HttpAdapterHost 需要 import @nestjs/core 包。
+
+### 适配器主机
+
+到目前为止，我们已经学会了如何获得 `HttpAdapterHost` 。但是，它仍然不是真实的 `HttpAdapter` 。为了获得 `HttpAdapter` ，只需访问该 `httpAdapter` 属性。
+
+```typescript
+const adapterHost = app.get(HttpAdapterHost);
+const httpAdapter = adapterHost.httpAdapter;
+```
+
+这 httpAdapter 是下面的框架使用的 HTTP 适配器的真实实例。它可以是 ExpressAdapter 或 FastifyAdapter（两个类都扩展 AbstractHttpAdapter）。
+
+每个适配器都公开了几种与 HTTP 服务器交互的有用方法。但是，如果要直接访问库引用，请调用 getInstance() 方法。
+
+
+```typescript
+const instance = httpAdapter.getInstance();
 ```
 
 ## 全局路由前缀
@@ -18,36 +55,11 @@ const app = await NestFactory.create(ApplicationModule);
 app.setGlobalPrefix('v1');
 ```
 
-## 生命周期事件
-
-有2个模块生命周期事件, OnModuleInit 和 OnModuleDestroy。将它们用于所有初始化的东西并避免将任何东西直接放入构造函数是一种很好的做法。构造函数只能用于初始化类成员并注入所需的依赖项。
-
-```typescript
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-
-@Injectable()
-export class UsersService implements OnModuleInit, OnModuleDestroy {
-  onModuleInit() {
-    console.log(`Initialization...`);
-  }
-  
-  onModuleDestroy() {
-    console.log(`Cleanup...`);
-  }
-}
-```
-
-为了推迟应用程序的初始化，您可以使用 `await` 关键字或返回 `Promise`。
-
-```typescript
-async onModuleInit(): Promise<any> {
-  await this.fetch();
-}
-```
 
 ## 混合应用
 
-混合应用程序的应用程序与连接的微服务。可以通过实例 `connectMicroservice()` 函数将 INestApplication 与 INestMicroservice 实例的无限计数结合起来。
+
+混合应用程序是一个应用程序，它监听HTTP请求，可以通过实例 `connectMicroservice()` 函数将 INestApplication 与 INestMicroservice 实例的无限计数结合起来。
 
 ```typescript
 const app = await NestFactory.create(ApplicationModule);
@@ -59,30 +71,38 @@ await app.startAllMicroservicesAsync();
 await app.listen(3001);
 ```
 
+
 ## HTTPS 和多服务器
+
+### HTTPS
 
 为了创建使用HTTPS协议的应用程序，我们必须传递一个 options 对象：
 
 ```typescript
 const httpsOptions = {
   key: fs.readFileSync('./secrets/private-key.pem'),
-  cert: fs.readFileSync('./secrets/public-certificate.pem')
+  cert: fs.readFileSync('./secrets/public-certificate.pem'),
 };
 const app = await NestFactory.create(ApplicationModule, {
   httpsOptions,
 });
 await app.listen(3000);
 ```
-对 express 实例的完全控制提供了一种简单的方法来创建多个同时侦听不同端口的服务器。
+
+### 多个同步服务器
+对库实例的完全控制提供了一种简单的方法来创建多个同时侦听不同端口的服务器。
 
 ```typescript
 const httpsOptions = {
   key: fs.readFileSync('./secrets/private-key.pem'),
-  cert: fs.readFileSync('./secrets/public-certificate.pem')
+  cert: fs.readFileSync('./secrets/public-certificate.pem'),
 };
 
 const server = express();
-const app = await NestFactory.create(ApplicationModule, server);
+const app = await NestFactory.create(
+  ApplicationModule,
+  new ExpressAdapter(server),
+);
 await app.init();
 
 http.createServer(server).listen(3000);
@@ -92,6 +112,7 @@ https.createServer(httpsOptions, server).listen(443);
 ## 样例
 
 [更多例子参考](https://github.com/nestjs/nest/tree/master/examples)
+
 
 
  ### 译者署名

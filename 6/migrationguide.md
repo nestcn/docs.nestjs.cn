@@ -93,7 +93,7 @@ $ npm i @nestjs/platform-express @nestjs/platform-socket.io
 订阅机制已更改。检查[此章](/6/subscriptions)的说明。此外，`@nestjs/graphql` 软件包严重依赖 `@ReflectMetadata()`（已被弃用），因此也需要更新软件包本身。
 
 ### Express实例
-我们不再支持将 express 实例作为方法的第二个参数传递 `NestFactory.create()` 。为了获取底层 HTTP 适配器，请使用[此处](/6/faq)描述的技术。此外，您可以传递 `ExpressAdapter`（只需将您的 `express` 实例作为构造函数参数传递 `new ExpressAdapter(express)`）。
+我们不再支持将 express 实例作为方法的第二个参数传递 `NestFactory.create()` 。为了获取底层 HTTP 适配器，请使用[此处](/6/faq?id=http-适配器)描述的技术。此外，您可以传递 `ExpressAdapter`（只需将您的 `express` 实例作为构造函数参数传递 `new ExpressAdapter(express)`）。
 
 ```typescript
 // Before (no longer supported)

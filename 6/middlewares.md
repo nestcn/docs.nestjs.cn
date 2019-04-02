@@ -2,7 +2,7 @@
 
 中间件是一个在路由处理器**之前**被调用的函数。 中间件函数可以访问请求和响应对象，以及应用程序请求响应周期中的**下一个**中间件函数。**下一个**中间件函数通常由名为 `next` 的变量表示。
 
-<center>![图1](https://docs.nestjs.com/assets/Middlewares_1.png)</center>
+![图1](https://docs.nestjs.com/assets/Middlewares_1.png)
 
 Nest 中间件实际上等价于 [express](http://www.expressjs.com.cn/guide/using-middleware.html) 中间件。 下面是Express官方文档中所述的中间件功能：
 

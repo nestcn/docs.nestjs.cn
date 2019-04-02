@@ -508,9 +508,6 @@ class AuthorArgs {
 <!-- tabs:end -->
 
 
-
-
-
 ### 装饰
 
 在上面的示例中，您可能会注意到我们使用专用装饰器来引用以下参数。下面是提供的装饰器和它们代表的普通 Apollo 参数的比较。
@@ -538,71 +535,16 @@ export class AuthorsModule {}
 ?> 提示：在[此处](http://graphql.cn/learn/queries/)了解有关 GraphQL 查询的更多信息。
 
 
-
-
-### 类型
-
-单独创建 GraphQL 类型和相应的 TypeScript 定义会产生不必要的冗余。最终，我们最终没有这样做，SDL 内部的每个变化都会迫使我们修改接口。因此，该`@nestjs/graphql` 包提供了另一个有趣的功能，即使用抽象语法树（AST）自动生成 TS 定义。要启用它，只需自定义 definitions 属性即可。
-
-```typescript
-GraphQLModule.forRoot({
-  typePaths: ['./**/*.graphql'],
-  definitions: {
-    path: join(process.cwd(), 'src/graphql.ts'),
-  },
-})
-```
-该 `src/graphql.ts` 指示在何处保存 typescript 输出。默认情况下，所有类型都转换为接口。但是，您可以通过将 outputAs 属性更改为 class。
-
-```typescript
-GraphQLModule.forRoot({
-  typePaths: ['./**/*.graphql'],
-  definitions: {
-    path: join(process.cwd(), 'src/graphql.ts'),
-    outputAs: 'class',
-  },
-})
-```
-
-因此，它将生成以下文件：
-
-```typescript
-export class Author {
-  id: number;
-  firstName?: string;
-  lastName?: string;
-  posts?: Post[];
-}
-
-export class Post {
-  id: number;
-  title?: string;
-  votes?: number;
-}
-
-export abstract class IQuery {
-  abstract author(id: number): Author | Promise<Author>;
-}
-```
-
-类允许您使用装饰器，这使得它们在验证方面非常有用（阅读[更多](/5.0/techniques?id=验证)）。例如：
-
-```typescript
-import { MinLength, MaxLength } from 'class-validator';
-
-export class CreatePostInput {
-  @MinLength(3)
-  @MaxLength(50)
-  title: string;
-}
-```
-
-!> 注意： 要启用输入（和参数）的自动验证，必须使用ValidationPipe。[了解更多有关验证](/5.0/techniques?id=验证)或者更具体的[管道](/5.0/pipes)。
-
-
 ## 变更（Mutations）
 
-在 GraphQL 中，为了修改服务器端数据，我们使用了变更（[在这里阅读更多](http://graphql.cn/learn/queries/#mutations)） 。官方 Apollo 文档共享一个 upvotePost() 变更示例。该变更允许增加 votes 属性值。为了在 Nest 中创建等效变更，我们将使用 @Mutation() 装饰器。让我们 AuthorResolver 在上一节中扩展我们的用法（参见[解析图](/5.0/graphql?id=解析图)）。
+
+在 GraphQL 中，为了修改服务器端数据，我们使用了变更（[在这里阅读更多](http://graphql.cn/learn/queries/#mutations)） 。官方 Apollo 文档共享一个 upvotePost() 变更示例。该变更允许增加 votes 属性值。为了在 Nest 中创建等效变更，我们将使用 @Mutation() 装饰器。
+
+ <!-- tabs:start -->
+
+#### ** Graphql SDL **
+
+让我们AuthorResolver 在上一节中扩展我们的用法（见[解析图](/6/graphql?id=解析图)）。
 
 ```typescript
 @Resolver('Author')
@@ -628,7 +570,8 @@ export class AuthorResolver {
   }
 }
 ```
- 请注意，我们假设业务逻辑已移至 PostsService（分别查询 post 和 incrementing votes 属性）。
+
+请注意，我们假设业务逻辑已移至 PostsService（分别查询 post 和 incrementing votes 属性）。
 
 ### 类型定义
 
@@ -659,6 +602,63 @@ type Mutation {
 ```
 
 该 `upvotePost(postId: Int!): Post` 变更现在可用！
+
+
+
+#### ** 使用 Typescript **
+
+让我们 AuthorResolver 在上一节中使用另一种方法（参见[解析图](/6/graphql?id=解析图)）。
+
+```typescript
+@Resolver(of => Author)
+export class AuthorResolver {
+  constructor(
+    private readonly authorsService: AuthorsService,
+    private readonly postsService: PostsService,
+  ) {}
+
+  @Query(returns => Author, { name: 'author' })
+  async getAuthor(@Args({ name: 'id', type: () => Int }) id: number) {
+    return await this.authorsService.findOneById(id);
+  }
+
+  @Mutation(returns => Post)
+  async upvotePost(@Args({ name: 'postId', type: () => Int }) postId: number) {
+    return await this.postsService.upvoteById({ id: postId });
+  }
+
+  @ResolveProperty('posts')
+  async getPosts(@Parent() author) {
+    const { id } = author;
+    return await this.postsService.findAll({ authorId: id });
+  }
+}
+```
+
+
+upvotePost() 取 postId（Int）作为输入参数，并返回更新的 Post 实体。出于与解析器部分相同的原因，我们必须明确设置预期类型。
+
+如果变异必须将对象作为参数，我们可以创建一个输入类型。
+
+```typescript
+@InputType()
+export class UpvotePostInput {
+  @Field() postId: number;
+}
+```
+!>  @InputType() 和 @Field() 需要 import type-graphql 包。
+ 
+然后在解析图类中使用它：
+
+```typescript
+@Mutation(returns => Post)
+async upvotePost(
+  @Args('upvotePostData') upvotePostData: UpvotePostInput,
+) {}
+```
+
+
+<!-- tabs:end -->
 
 
 ## 订阅（Subscriptions）

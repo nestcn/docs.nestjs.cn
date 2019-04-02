@@ -64,7 +64,7 @@ export class CatsController {
 }
 ```
 
-!> 为了在 express 中使用 Typescript （如 request: Request 上面的参数示例所示），请安装 @types/express 。
+?> 为了在 express 中使用 Typescript （如 request: Request 上面的参数示例所示），请安装 @types/express 。
 
 「Request」对象表示 HTTP 请求，并具有「Request」查询字符串，参数，HTTP 标头 和 正文的属性（在[这里](http://www.expressjs.com.cn/4x/api.html##req)阅读更多），但在大多数情况下, 不必手动获取它们。 我们可以使用**专用**的装饰器，比如开箱即用的 `@Body()` 或 `@Query()` 。 下面是装饰器和 普通表达对象的比较。
 
@@ -200,7 +200,7 @@ export class CatsController {
 
 我们喜欢现代 JavaScript，而且我们知道数据读取大多是**异步**的。 这就是为什么 Nest 支持 `async` 并且与他们一起工作得非常好。
 
-!> 了解更多关于 `Async / await` 请点击[这里](https://kamilmysliwiec.com/typescript-2-1-introduction-async-await){:target="_blank"}！
+?> 了解更多关于 `Async / await` 请点击[这里](https://kamilmysliwiec.com/typescript-2-1-introduction-async-await){:target="_blank"}！
 
 每个异步函数都必须返回 `Promise`。这意味着您可以返回延迟值, 而 Nest 将自行解析它。让我们看看下面的例子:
 
@@ -322,7 +322,7 @@ import { CatsController } from './cats/cats.controller';
 export class ApplicationModule {}
 ```
 
-!> 我们使用 @module 装饰器将元数据添加到模块类，所以现在 Nest 可以很容易地通过反射挂载必须的控制器。
+?> 我们使用 @module 装饰器将元数据添加到模块类，所以现在 Nest 可以很容易地通过反射挂载必须的控制器。
 
 
 ## 类库特有 方式

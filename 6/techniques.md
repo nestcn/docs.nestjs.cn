@@ -1,5 +1,7 @@
 ## 认证（Authentication）
 
+{待更新}
+
 身份验证是大多数现有应用程序的重要组成部分。有许多不同的方法、策略和方法来处理用户授权。我们最终决定使用什么取决于特定的应用程序要求，并且与它们的需求密切相关。
 
 passport 是目前最流行的 node.js 认证库，为社区所熟知，并相继应用于许多生产应用中。将此工具与 Nest 框架集成起来非常简单。为了演示，我们将设置 passport-http-bearer 和 passport-jwt 策略。
@@ -565,6 +567,8 @@ TypeOrmModule.forRootAsync({
 
 ## Mongo
 
+｛待更新｝
+
 有两种方法可以操作 MongoDB 数据库。既使用[ORM](https://github.com/typeorm/typeorm) 提供的 MongoDB 支撑或对象建模工具 [Mongoose](http://mongoosejs.com/)。选择 ORM 的话你可以按照以前的步骤使用 typeorm 。否则请使用我们 Nest 专用包: @nestjs/mongoose
 
 
@@ -734,6 +738,8 @@ MongooseModule.forRootAsync({
 
 ## 文件上传
 
+｛待更新｝
+
 为了处理文件上传，Nest使用了[multer](https://github.com/expressjs/multer)中间件。这个中间件是完全可配置的，您可以根据您的应用需求调整其行为。
 
 ### 基本实例
@@ -767,6 +773,8 @@ uploadFile(@UploadedFiles() files) {
 ?> `FilesInterceptor()` 和 `@UploadedFiles()` 装饰都是 `@nestjs/common` 包提供的。
 
 ## 验证
+
+｛待更新｝
 
 ### 验证
 验证是任何现有Web应用程序的基本功能。为了自动验证传入请求，我们利用了内置使用底层的 [class-validator](https://github.com/typestack/class-validator) 包 `ValidationPipe`。它`ValidationPipe` 提供了一种方便的方法，可以使用各种强大的验证规则验证传入的客户端有效负载。
@@ -887,6 +895,8 @@ app.useGlobalPipes(new ValidationPipe({
 要阅读有关自定义验证器，错误消息和可用装饰器的更多信息，请访问[此页面](https://github.com/typestack/class-validator)。
 
 ## 高速缓存（Caching）
+
+｛待更新｝
 
 ### 内存缓存
 缓存是一种非常简单的技术，有助于提高应用程序的性能。它充当临时数据存储，访问速度非常快。
@@ -1057,6 +1067,8 @@ CacheModule.forRootAsync({
 
 ## 序列化（Serialization）
 
+｛待更新｝
+
 在发送实际响应之前， Serializers 为数据操作提供了干净的抽象层。例如，应始终从最终响应中排除敏感数据（如用户密码）。此外，某些属性可能需要额外的转换，比方说，我们不想发送整个数据库实体。相反，我们只想选择 id 和 name 。其余部分应自动剥离。不幸的是，手动映射所有实体可能会带来很多麻烦。
 > 译者注: Serialization 实现可类比 composer 库中 fractal ，响应给用户的数据不仅仅要剔除设计安全的属性，还需要剔除一些无用字段如 create_time, delete_time, update_time 和其他属性。在JAVA的实体类中定义N个属性的话就会返回N个字段，解决方法可以使用范型编程，否则操作实体类回影响数据库映射字段。
 
@@ -1148,6 +1160,8 @@ findOne(): UserEntity {
 
 ## 日志
 
+｛待更新｝
+
  Nest 在对象实例化后的几种情况下，内部实现了 Logger 日志记录，例如发生异常时候。但有时，您可能希望完全禁用日志记录，或者实现自定义日志模块并自行处理日志消息。想要关闭记录器，我们得使用 Nest 的选项对象。
 
 ```
@@ -1231,6 +1245,8 @@ await app.listen(3000);
 
 ## 安全
 
+｛待更新｝
+
 在本章中，您将学习一些可以提高应用程序安全性的技术。
 
 ### Helmet
@@ -1306,6 +1322,8 @@ app.use(rateLimit({
 > 提示: 如果您在 FastifyAdapter 下开发，请考虑使用 [fastify-rate-limit](https://github.com/fastify/fastify-rate-limit)。
 
 ## Configuration
+
+｛待更新｝
 
 用于在不同的环境中运行的应用程序。根据环境的不同，应该使用各种配置变量。例如，很可能本地环境会针对特定数据库凭证进行中继，仅对本地数据库实例有效。为了解决这个问题，我们过去利用了 `.env` 包含键值对的文件，每个键代表一个特定的值，因为这种方法非常方便。
 
@@ -1494,6 +1512,8 @@ export class AppService {
 
 ## 压缩
 
+｛待更新｝
+
 压缩可以大大减小响应主体的大小，从而提高 Web 应用程序的速度。使用[压缩中间件](https://github.com/expressjs/compression)启用 gzip 压缩。
 
 ### 安装
@@ -1517,6 +1537,8 @@ app.use(compression());
 对于生产中的高流量网站，实施压缩的最佳方法是在反向代理级别实施。在这种情况下，您不需要使用压缩中间件。
 
 ## HTTP模块
+
+｛待更新｝
 
 [Axios](https://github.com/axios/axios) 是丰富功能的 HTTP 客户端, 广泛应用于许多应用程序中。这就是为什么Nest包装这个包, 并公开它默认为内置 `HttpModule`。`HttpModule` 导出 `HttpService`, 它只是公开了基于 axios 的方法来执行 HTTP 请求, 而且还将返回类型转换为 `Observables`。
 
@@ -1546,6 +1568,8 @@ export class CatsService {
 ```
 
 ## MVC
+
+｛待更新｝
 
 Nest 默认使用 Express 库，因此有关 Express 中的 MVC（模型 - 视图 - 控制器）模式的每个教程都与 Nest 相关。首先，让我们使用CLI工具搭建一个简单的Nest应用程序：
 
@@ -1679,6 +1703,7 @@ export class AppController {
 [这里](https://github.com/nestjs/nest/tree/master/sample/17-mvc-fastify)有 一个可用的例子。
 
 ## 性能（Fastify）
+｛待更新｝
 
 在底层，Nest使用了[Express](https://expressjs.com/)，但如前所述，它提供了与各种其他库的兼容性，例如 [Fastify](https://github.com/fastify/fastify)。它是怎么工作的？事实上，Nest需要使用您最喜欢的库，它是一个兼容的适配器，它主要将相应的处理程序代理到适当的库特定的方法。此外，您的库必须至少提供与express类似的请求-响应周期管理。
 

@@ -981,17 +981,15 @@ export class CommonModule {}
 creationDate: Date;
 ```
 
-
-
 ## 工具
 
 在GraphQL世界中，很多文章抱怨如何处理诸如身份验证或操作的副作用之类的东西。我们应该把它放在业务逻辑中吗？我们是否应该使用更高阶的函数来增强查询和变更，例如，使用授权逻辑？或者也许使用[模式指令](https://www.apollographql.com/docs/apollo-server/v2/features/directives.html)。无论如何，没有一个答案。
 
-Nest生态系统正试图利用看守器和拦截器等现有功能帮助解决这个问题。它们背后的想法是减少冗余，并为您提供有助于创建结构良好，可读且一致的应用程序的工具。
+Nest生态系统正试图利用[守卫](/6/guards)和[拦截器](/6/interceptors)等现有功能帮助解决这个问题。它们背后的想法是减少冗余，并为您提供有助于创建结构良好，可读且一致的应用程序的工具。
 
 ### 概述
 
-您可以以与简单的REST应用程序相同的方式使用看守器、拦截器和管道。此外，您还可以通过利用自定义 decorator 特性轻松地创建自己的 decorator。他们都一样。让我们看看下面的代码:
+您可以以与简单的 REST 应用程序相同的方式使用[守卫](/6/guards)、[拦截器](/6/interceptors)、[过滤器](/6/exceptionfilters)或[管道](/6/pipes)。此外，您还可以通过利用自定义 decorator 特性轻松地创建自己的 decorator。他们都一样。让我们看看下面的代码:
 
 ```typescript
 @Query('author')
@@ -1001,7 +999,7 @@ async getAuthor(@Args('id', ParseIntPipe) id: number) {
 }
 ```
 
-正如您所看到的，GraphQL在看守器和管道方面都能很好地工作。因此，您可以将身份验证逻辑移至看守器，甚至可以复用与 REST 应用程序相同的看守器类。拦截器的工作方式完全相同：
+正如您所看到的，GraphQL在看守器和管道方面都能很好地工作。因此，您可以将身份验证逻辑移至守卫，甚至可以复用与 REST 应用程序相同的守卫。拦截器的工作方式完全相同：
 
 ```typescript
 @Mutation()
@@ -1030,6 +1028,25 @@ export class AuthGuard implements CanActivate {
 GqlExecutionContext 为每个参数公开相应的函数，比如 getArgs()，getContext()等等。现在，我们可以毫不费力地获取特定于当前处理的请求的每个参数。
 
 
+### 异常过滤器
+
+该[异常过滤器](h/6/exceptionfilters)与 GraphQL 应用程序兼容。
+
+```typescript
+@Catch(HttpException)
+export class HttpExceptionFilter implements GqlExceptionFilter {
+  catch(exception: HttpException, host: ArgumentsHost) {
+    const gqlHost = GqlArgumentsHost.create(host);
+    return exception;
+  }
+}
+```
+
+!> GqlExceptionFilter 和 GqlArgumentsHost 需要import @nestjs/graphql 包。
+
+但是，response 在这种情况下，您无法访问本机对象（如在HTTP应用程序中）。
+
+
 ### 自定义装饰器
 
 如前所述，自定义装饰器功能也可以像 GraphQL 解析器一样工作。但是，Factory 函数采用一组参数而不是 request 对象。
@@ -1049,6 +1066,8 @@ async upvotePost(
   @Args('postId') postId: number,
 ) {}
 ```
+
+?> 在上面的示例中，我们假设您的user对象已分配给GraphQL应用程序的上下文。
 
  ### 译者署名
 

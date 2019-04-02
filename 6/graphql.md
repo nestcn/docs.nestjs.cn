@@ -189,7 +189,7 @@ GraphQLModule.forRootAsync({
   useFactory: () => ({
     typePaths: ['./**/*.graphql'],
   }),
-})
+}),
 ```
 显然, 我们的 factory 的行为和其他人一样 (可能是异步的, 并且能够通过 `inject` 注入依赖关系)。
 
@@ -200,7 +200,7 @@ GraphQLModule.forRootAsync({
     typePaths: configService.getString('GRAPHQL_TYPE_PATHS'),
   }),
   inject: [ConfigService],
-})
+}),
 ```
 
 或者, 您可以使用类而不是 factory。
@@ -208,7 +208,7 @@ GraphQLModule.forRootAsync({
 ```typescript
 GraphQLModule.forRootAsync({
   useClass: GqlConfigService,
-})
+}),
 ```
 上面的构造将实例化 `GqlConfigService` 内部 `GraphQLModule`, 并将利用它来创建选项对象。`GqlConfigService` 必须实现 `GqlOptionsFactory` 接口。
 
@@ -230,7 +230,7 @@ class GqlConfigService implements GqlOptionsFactory {
 GraphQLModule.forRootAsync({
   imports: [ConfigModule],
   useExisting: ConfigService,
-})
+}),
 ```
 
 它的工作原理与 `useClass` 有一个关键的区别—— `GraphQLModule` 将查找导入的模块重用已经创建的 `ConfigService`, 而不是单独实例化它。

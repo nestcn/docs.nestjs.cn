@@ -272,13 +272,14 @@ const app = await NestFactory.createMicroservice(ApplicationModule, {
 });
 ```
 
-!> `join()`函数是从 `path` 包导入的。
+!> 该 join() 功能使用import path 封装，而 Transport枚举是从 @nestjs/microservices 而来。
 
 ### 选项
 
 |                |                         |
 | :------------- | :---------------------- |
 | `url`          | 连接网址               |
+|`protoLoader`| NPM包名称（如果要使用其他原型加载器） |
 | `protoPath`    | 绝对（或相对于根目录） `.proto` 文件的路径 |
 |`loader` | @grpc/proto-loader 选项。[了解更多](https://github.com/grpc/grpc-node/tree/master/packages/grpc-protobufjs#usage) |
 | `package`      | `protobuf` 包名       |
@@ -309,7 +310,7 @@ message Hero {
 }
 ```
 
-在上面的示例中，我们定义了一个 `HeroService`，它暴露了一个 `FindOne()` gRPC处理程序，该处理程序期望 `HeroById` 作为输入并返回一个 `Hero` 消息。为了定义一个能够实现这个protobuf定义的处理程序，我们必须使用 `@GrpcRoute()` 装饰器。之前的 `@MessagePattern()` 将不再有用。
+在上面的示例中，我们定义了一个 `HeroService`，它暴露了一个 `FindOne()` gRPC处理程序，该处理程序期望 `HeroById` 作为输入并返回一个 `Hero` 消息。为了定义一个能够实现这个 protobuf 定义的处理程序，我们必须使用 `@GrpcRoute()` 装饰器。之前的 `@MessagePattern()` 将不再有用。
 
 > hero.controller.ts
 
@@ -333,13 +334,16 @@ findOne(data: HeroById, metadata: any): Hero {
 > hero.controller.ts
 
 ```typescript
-@GrpcMethod('HeroService')
-findOne(data: HeroById, metadata: any): Hero {
-  const items = [
-    { id: 1, name: 'John' },
-    { id: 2, name: 'Doe' },
-  ];
-  return items.find(({ id }) => id === data.id);
+@Controller()
+export class HeroService {
+  @GrpcMethod()
+  findOne(data: HeroById, metadata: any): Hero {
+    const items = [
+      { id: 1, name: 'John' },
+      { id: 2, name: 'Doe' },
+    ];
+    return items.find(({ id }) => id === data.id);
+  }
 }
 ```
 
@@ -372,10 +376,10 @@ export class HeroService {
   transport: Transport.GRPC,
   options: {
     package: 'hero',
-    protoPath: join(__dirname, './hero/hero.proto'),
+    protoPath: join(__dirname, 'hero/hero.proto'),
   },
 })
-private readonly client: ClientGrpc;
+client: ClientGrpc;
 ```
 
 与前面的例子相比有一点差别。我们使用提供 `getService()` 方法的 `ClientGrpc`，而不是 `ClientProxy` 类。`getService()` 泛型方法将服务的名称作为参数，并返回其实例(如果可用)。

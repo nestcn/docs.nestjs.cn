@@ -138,7 +138,7 @@ definitionsFactory.generate({
 ts-node generate-typings
 ```
 
-!> 您也可以预先编译脚本并使用 node 可执行文件。
+?> 您也可以预先编译脚本并使用 node 可执行文件。
 
 要切换到文件监听模式（在任何 .graphql 文件更改时自动生成 Typescript），请将 watch 选项传递给 generate() 函数。
 
@@ -373,7 +373,7 @@ export class CreatePostInput {
 }
 ```
 
-!> 要启用输入（和参数）的自动验证，必须使用 ValidationPipe 。了解更多有关[验证](/6/techniques?id=验证)或者[更具体](/6/pipes)。
+?> 要启用输入（和参数）的自动验证，必须使用 ValidationPipe 。了解更多有关[验证](/6/techniques?id=验证)或者[更具体](/6/pipes)。
 
 尽管如此，如果将装饰器直接添加到自动生成的文件中，它们将在每次连续更改时被丢弃。因此，您应该创建一个单独的文件，并简单地扩展生成的类。
 
@@ -500,7 +500,7 @@ class AuthorArgs {
 }
 ```
 
-!> @Field() 和 @ArgsType() 装饰器都是从 type-graphql 包中导入的，而 @Min() 来自 class-validator。
+?> @Field() 和 @ArgsType() 装饰器都是从 type-graphql 包中导入的，而 @Min() 来自 class-validator。
 
 您可能还会注意到这些类与 ValidationPipe（[更多内容](/6/techniques?id=验证)）相关。
 
@@ -646,7 +646,7 @@ export class UpvotePostInput {
   @Field() postId: number;
 }
 ```
-!>  @InputType() 和 @Field() 需要 import type-graphql 包。
+?>  @InputType() 和 @Field() 需要 import type-graphql 包。
  
 然后在解析图类中使用它：
 
@@ -1042,7 +1042,7 @@ export class HttpExceptionFilter implements GqlExceptionFilter {
 }
 ```
 
-!> GqlExceptionFilter 和 GqlArgumentsHost 需要import @nestjs/graphql 包。
+?> GqlExceptionFilter 和 GqlArgumentsHost 需要import @nestjs/graphql 包。
 
 但是，response 在这种情况下，您无法访问本机对象（如在HTTP应用程序中）。
 

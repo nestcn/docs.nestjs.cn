@@ -1,6 +1,6 @@
 # 中间件
 
-中间件是一个在路由处理器**之前**被调用的函数。 中间件函数可以访问请求和响应对象，以及应用程序请求响应周期中的下一个中间件函数。**下一个**中间件函数通常由名为 `next` 的变量表示。
+中间件是一个在路由处理器**之前**被调用的函数。 中间件函数可以访问请求和响应对象，以及应用程序请求响应周期中的**下一个**中间件函数。**下一个**中间件函数通常由名为 `next` 的变量表示。
 
 <center>![图1](https://docs.nestjs.com/assets/Middlewares_1.png)</center>
 
@@ -14,7 +14,7 @@ Nest 中间件实际上等价于 [express](http://www.expressjs.com.cn/guide/usi
 - 调用堆栈中的下一个中间件函数。
 - 如果当前的中间件函数没有结束请求-响应周期, 它必须调用 `next()` 将控制传递给下一个中间件函数。否则, 请求将被挂起。
 
-Nest 中间件可以是一个函数，也可以是一个带有 `@Injectable()` 装饰器的类。 这个类应该实现 `NestMiddleware` 接口。 我们来创建一个例子，`LoggerMiddleware` 类:
+Nest 中间件可以是一个函数，也可以是一个带有 `@Injectable()` 装饰器的类。 这个类应该实现 `NestMiddleware` 接口,  而函数没有任何特殊的要求。 我们来创建一个例子，`LoggerMiddleware` 类:
 
 > logger.middleware.ts
 
@@ -36,7 +36,7 @@ export class LoggerMiddleware implements NestMiddleware {
 
 ## 依赖注入
 
-说到中间件, 也不例外。与提供者和控制器相同, 它们能够**注入**属于同一模块的依赖项（通过 `constructor` ）。
+中间件也不例外。与提供者和控制器相同, 它们能够**注入**属于同一模块的依赖项（通过 `constructor` ）。
 
 
 ## 应用中间件
@@ -62,7 +62,7 @@ export class ApplicationModule implements NestModule {
 }
 ```
 
-在上面的例子中, 我们给之前在`CatsController`中定义的 `/cats` 路由处理程序设置了 `LoggerMiddleware` 。此外，我们可能会将中间件限制为特定的请求方法。
+在上面的例子中, 我们给之前在`CatsController`中定义的 `/cats` 路由处理程序定义了 `LoggerMiddleware` 。此外，我们可以将中间件限制为特定的请求方法。
 
 > app.module.ts
 
@@ -97,7 +97,7 @@ forRoutes({ path: 'ab*cd', method: RequestMethod.ALL })
 
 ## 中间件消费者
 
-`MiddlewareConsumer` 是一个帮助类。它提供了几种使用中间件的方法。他们都可以简单地**链接**。在 `forRoutes()` 可采取一个字符串、多个字符串、`RouteInfo` 对象、控制器类甚至多个控制器类。在大多数情况下，你可能只是通过**控制器**，并用逗号分隔。以下是单个控制器的示例
+`MiddlewareConsumer` 是一个帮助类。它提供了几种内置方法来管理中间件。他们都可以被简单地**链接**起来。在`forRoutes()` 可接受一个字符串、多个字符串、`RouteInfo` 对象、一个控制器类甚至多个控制器类。在大多数情况下，你可能只是传递**控制器**，并用逗号分隔。以下是单个控制器的示例
 
 > app.module.ts
 
@@ -118,7 +118,7 @@ export class ApplicationModule implements NestModule {
 }
 ```
 
-?> 该 `apply()` 方法可以采用单个中间件或**一组中间件**。
+?> 该 `apply()` 方法可以采用单个中间件也可以使用多个参数来指定**多个中间件**。
 
 在使用该类时，我们可能需要**排除**某些路径，由于使用了 `exclude()` 方法，这将是非常直观的。 
 
@@ -145,7 +145,7 @@ export class ApplicationModule implements NestModule {
 }
 ```
 
-因此，除了传递给 `exclude()` 的两个路由之外, `LoggerMiddleware` 将绑定在 `CatsController` 中其余的路由上。 请注意，`exclude()` 方法**不适用**于函数式中间件。 此外，此功能不排除来自更通用路由（例如通配符）的路径。 在这种情况下，您应该将路径限制逻辑直接放在中间件中，例如，比较请求的URL这种逻辑就应该放在中间件中。
+因此，除了传递给 `exclude()` 的两个路由之外, `LoggerMiddleware` 将被绑定在 `CatsController` 中所有的路由上。 请注意，`exclude()` 方法**不适用**于函数式中间件。 此外，此功能不排除来自更通用路由（例如通配符）的路径。 在这种情况下，您应该将路径限制逻辑直接放在中间件中，例如，比较请求的URL这种逻辑就应该放在中间件中。
 
 ## 可配置中间件
 
@@ -286,3 +286,4 @@ await app.listen(3000);
 | [@Drixn](https://drixn.com/)  | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">  |  翻译  | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/) |
 | [@tangkai](https://github.com/tangkai123456)  | <img class="avatar-66 rm-style" height="70" src="https://avatars1.githubusercontent.com/u/22436910">  |  翻译  | 专注于 React，[@tangkai](https://github.com/tangkai123456) |
 | [@havef](https://havef.github.io)  | <img class="avatar-66 rm-style" height="70" src="https://avatars1.githubusercontent.com/u/54462?s=460&v=4">  |  校正  | 数据分析、机器学习、TS/JS技术栈 [@havef](https://havef.github.io) |
+| [@gaoyangy](<https://github.com/gaoyangy>) | ![img](https://avatars0.githubusercontent.com/u/23468113?s=460&v=4) | 校正 | 专注于Vue，TS/JS |

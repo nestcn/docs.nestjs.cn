@@ -243,7 +243,14 @@ GraphQLModule.forRootAsync({
 
 
 通常，您必须手动创建解析图。 `@nestjs/graphql` 包也产生解析器映射，可以自动使用由装饰器提供的元数据。
-为了学习库基础知识，我们将创建一个简单的用户 API。首先，让我们在 SDL 中定义我们的类型（阅读[更多](http://graphql.org/learn/schema/#type-language)）：
+为了学习库基础知识，我们将创建一个简单的用户 API。
+
+
+ <!-- tabs:start -->
+
+#### ** Graphql SDL **
+
+正如提到[以前的章节](/6/graphql?id=快速开始)，让我们在 SDL 中定义我们的类型（阅读[更多](http://graphql.cn/learn/schema/#type-language)）：
 
 
 ```graphql
@@ -256,7 +263,7 @@ type Author {
 
 type Post {
   id: Int!
-  title: String
+  title: String!
   votes: Int
 }
 
@@ -291,7 +298,18 @@ export class AuthorResolver {
 ?> 提示：如果使用 `@Resolver()` 装饰器，则不必将类标记为 `@Injectable()` ，否则必须这么做。
 
 
-`@Resolver()` 装饰器不影响查询和对象变动 (`@Query()` 和 `@Mutation()` 装饰器)。这只会通知 Nest, 每个 `@ResolveProperty()` 有一个父节点, `Author` 在这种情况下是父节点。
+`@Resolver()` 装饰器不影响查询和对象变动 (`@Query()` 和 `@Mutation()` 装饰器)。这只会通知 Nest, 每个 `@ResolveProperty()` 有一个父节点, `Author` 在这种情况下是父节点， Author在这种情况下是一个类型（Author.posts 关系）。基本上，不是设置 @Resolver() 在类的顶部，而是可以接近函数：
+
+```typescript
+@Resolver('Author')
+@ResolveProperty()
+async posts(@Parent() author) {
+  const { id } = author;
+  return await this.postsService.findAll({ authorId: id });
+}
+```
+
+但是，如果 @ResolveProperty() 在一个类中有多个，则必须添加 @Resolver() 到所有这些类中，这不一定是一个好习惯（额外的开销）。
 
 通常, 我们会使用像 `getAuthor()` 或 `getPosts()` 之类的函数来命名。我们可以很容易地做到这一点, 以及移动命名之间的装饰器的括号。
 
@@ -318,9 +336,182 @@ export class AuthorResolver {
 
 ?> 这个 `@Resolver()` 装饰器可以在函数级别被使用。
 
+### Typings
+
+假设我们已经启用了分型生成功能（带outputAs: 'class'）在[前面的](/6/graphql?id=快速开始)章节，一旦你运行应用程序，应该生成以下文件：
+
+```typescript
+export class Author {
+  id: number;
+  firstName?: string;
+  lastName?: string;
+  posts?: Post[];
+}
+
+export class Post {
+  id: number;
+  title: string;
+  votes?: number;
+}
+
+export abstract class IQuery {
+  abstract author(id: number): Author | Promise<Author>;
+}
+```
+
+类允许您使用装饰器，这使得它们在验证方面非常有用（[阅读更多](/6/techniques?id=验证)）。例如：
+
+```typescript
+import { MinLength, MaxLength } from 'class-validator';
+
+export class CreatePostInput {
+  @MinLength(3)
+  @MaxLength(50)
+  title: string;
+}
+```
+
+!> 要启用输入（和参数）的自动验证，必须使用 ValidationPipe 。了解更多有关[验证](/6/techniques?id=验证)或者[更具体](/6/pipes)。
+
+尽管如此，如果将装饰器直接添加到自动生成的文件中，它们将在每次连续更改时被丢弃。因此，您应该创建一个单独的文件，并简单地扩展生成的类。
+
+```typescript
+import { MinLength, MaxLength } from 'class-validator';
+import { Post } from '../../graphql.ts';
+
+export class CreatePostInput extends Post {
+  @MinLength(3)
+  @MaxLength(50)
+  title: string;
+}
+```
+### ** 使用 Typescript**
+
+在代码优先方法中，我们不必手动编写SDL。相反，我们只会使用装饰器。
+
+```typescript
+import { Field, Int, ObjectType } from 'type-graphql';
+import { Post } from './post';
+
+@ObjectType()
+export class Author {
+  @Field(type => Int)
+  id: number;
+
+  @Field({ nullable: true })
+  firstName?: string;
+
+  @Field({ nullable: true })
+  lastName?: string;
+
+  @Field(type => [Post])
+  posts: Post[];
+}
+```
+Author 模型已创建。现在，让我们创建缺少的 Post 类。
+
+```typescript
+import { Field, Int, ObjectType } from 'type-graphql';
+
+@ObjectType()
+export class Post {
+  @Field(type => Int)
+  id: number;
+
+  @Field()
+  title: string;
+
+  @Field(type => Int, { nullable: true })
+  votes?: number;
+}
+```
+
+由于我们的模型准备就绪，我们可以转到解析器类。
+
+```typescript
+@Resolver(of => Author)
+export class AuthorResolver {
+  constructor(
+    private readonly authorsService: AuthorsService,
+    private readonly postsService: PostsService,
+  ) {}
+
+  @Query(returns => Author)
+  async author(@Args({ name: 'id', type: () => Int }) id: number) {
+    return await this.authorsService.findOneById(id);
+  }
+
+  @ResolveProperty()
+  async posts(@Parent() author) {
+    const { id } = author;
+    return await this.postsService.findAll({ authorId: id });
+  }
+}
+```
+
+通常，我们会使用类似 getAuthor() 或 getPosts() 函数名称。我们可以通过将真实名称移动到装饰器来轻松完成此操作。
+
+```typescript
+@Resolver(of => Author)
+export class AuthorResolver {
+  constructor(
+    private readonly authorsService: AuthorsService,
+    private readonly postsService: PostsService,
+  ) {}
+
+  @Query(returns => Author, { name: 'author' })
+  async getAuthor(@Args({ name: 'id', type: () => Int }) id: number) {
+    return await this.authorsService.findOneById(id);
+  }
+
+  @ResolveProperty('posts')
+  async getPosts(@Parent() author) {
+    const { id } = author;
+    return await this.postsService.findAll({ authorId: id });
+  }
+}
+```
+
+通常，您不必将此类对象传递给 @Args() 装饰器。例如，如果您的标识符的类型是字符串，则以下结构就足够了：
+
+```typescript
+@Args('id') id: string
+```
+
+但是，该 number 类型没有提供 type-graphql 有关预期的 GraphQL 表示（Intvs Float）的足够信息，因此，我们必须显式传递类型引用。
+
+而且，您可以创建一个专用 AuthorArgs 类：
+
+```typescript
+@Args() id: AuthorArgs
+```
+
+有以下机构：
+
+```typescript
+
+@ArgsType()
+class AuthorArgs {
+  @Field(type => Int)
+  @Min(1)
+  id: number;
+}
+```
+
+!> @Field() 和 @ArgsType() 装饰器都是从 type-graphql 包中导入的，而 @Min() 来自 class-validator。
+
+您可能还会注意到这些类与 ValidationPipe（[更多内容](/6/techniques?id=验证)）相关。
+
+
+<!-- tabs:end -->
+
+
+
+
+
 ### 装饰
 
-在上面的示例中，您可能会注意到我们使用专用装饰器来引用以下参数。下面是提供的装饰器和它们代表的普通Apollo参数的比较。
+在上面的示例中，您可能会注意到我们使用专用装饰器来引用以下参数。下面是提供的装饰器和它们代表的普通 Apollo 参数的比较。
 
 |||
 |---|---|
@@ -343,6 +534,9 @@ export class AuthorsModule {}
 该 `GraphQLModule` 会考虑反映了元数据和转化类到正确的解析器的自动映射。您应该注意的是您需要在某处 import 此模块，因此 Nest 将知道 `AuthorsModule` 确实存在。
 
 ?> 提示：在[此处](http://graphql.cn/learn/queries/)了解有关 GraphQL 查询的更多信息。
+
+
+
 
 ### 类型
 

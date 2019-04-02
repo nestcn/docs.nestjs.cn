@@ -198,7 +198,7 @@ findAll() {
 $ npm install --save @nestjs/typeorm typeorm mysql
 ```
 
-?> 在本章中，我们将使用MySQL数据库，但TypeORM提供了许多不同的支持，如PostgreSQL，SQLite甚至MongoDB（NoSQL）。
+?> 在本章中，我们将使用 MySQL 数据库，但 TypeORM 提供了许多不同的支持，如 PostgreSQL【推荐】，SQLite 甚至MongoDB（NoSQL）。
 
 一旦安装完成，我们可以将其 TypeOrmModule 导入到根目录中 ApplicationModule 。
 
@@ -217,7 +217,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       username: 'root',
       password: 'root',
       database: 'test',
-      entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
   ],
@@ -225,7 +225,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 export class ApplicationModule {}
 ```
 
-`forRoot()` 方法接受与 [TypeORM](https://github.com/typeorm/typeorm) 包中的 `createConnection()` 相同的配置对象。此外, 我们可以在项目根目录中创建一个 `ormconfig.json` 文件, 而不是将任何内容传递给它。
+`forRoot()` 函数接受与 [TypeORM](https://github.com/typeorm/typeorm) 包中的 `createConnection()` 相同的配置对象。此外, 我们可以在项目根目录中创建一个 `ormconfig.json` 文件, 而不是将任何内容传递给它。
 
 > ormconfig.json
 
@@ -237,7 +237,7 @@ export class ApplicationModule {}
   "username": "root",
   "password": "root",
   "database": "test",
-  "entities": ["src/**/**.entity{.ts,.js}"],
+  "entities": ["src/**/*.entity{.ts,.js}"],
   "synchronize": true
 }
 ```
@@ -254,7 +254,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   imports: [TypeOrmModule.forRoot()],
 })
 export class ApplicationModule {}
-```
 
 之后，`Connection` 和 `EntityManager` 将可用于注入整个项目（无需导入任何其他模块），例如以这种方式：
 
@@ -273,7 +272,7 @@ export class ApplicationModule {
 
 ### 存储库模式
 
-该TypeORM支持库的设计模式，使每个实体都有自己的仓库。这些存储库可以从数据库连接中获取。
+该 TypeORM 支持库的设计模式，使每个实体都有自己的仓库。这些存储库可以从数据库连接中获取。
 
 首先，我们至少需要一个实体。我们将重用 `Photo` 官方文档中的实体。
 
@@ -332,7 +331,7 @@ export class PhotoModule {}
 > photo/photo.service.ts
 
 ```typescript
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Photo } from './photo.entity';
@@ -359,41 +358,35 @@ export class PhotoService {
 假设你有一个 `Person` 实体和一个 `Album` 实体，每个实体都存储在他们自己的数据库中。
 
 ```typescript
+const defaultOptions = {
+  type: 'postgres',
+  port: 5432,
+  username: 'user',
+  password: 'password',
+  database: 'db',
+  synchronize: true,
+};
+
 @Module({
   imports: [
     TypeOrmModule.forRoot({
-      type: 'postgres',
-      host:  'photo_db_host',
-      port: 5432,
-      username: 'user',
-      password: 'password',
-      database: 'db',
+      ...defaultOptions,
+      host: 'photo_db_host',
       entities: [Photo],
-      synchronize: true
     }),
     TypeOrmModule.forRoot({
-      type: 'postgres',
+      ...defaultOptions,
       name: 'personsConnection',
-      host:  'person_db_host',
-      port: 5432,
-      username: 'user',
-      password: 'password',
-      database: 'db',
+      host: 'person_db_host',
       entities: [Person],
-      synchronize: true
     }),
     TypeOrmModule.forRoot({
-      type: 'postgres',
+      ...defaultOptions,
       name: 'albumsConnection',
-      host:  'album_db_host',
-      port: 5432,
-      username: 'user',
-      password: 'password',
-      database: 'db',
+      host: 'album_db_host',
       entities: [Album],
-      synchronize: true
-    })
-  ]
+    }),
+  ],
 })
 export class ApplicationModule {}
 ```
@@ -404,11 +397,12 @@ export class ApplicationModule {}
 
 ```typescript
 @Module({
-  // ...
-  TypeOrmModule.forFeature([Photo]),
-  TypeOrmModule.forFeature([Person], 'personsConnection'),
-  TypeOrmModule.forFeature([Album], 'albumsConnection')
-})    
+  imports: [
+    TypeOrmModule.forFeature([Photo]),
+    TypeOrmModule.forFeature([Person], 'personsConnection'),
+    TypeOrmModule.forFeature([Album], 'albumsConnection'),
+  ],
+})
 export class ApplicationModule {}
 ```
 
@@ -421,7 +415,7 @@ export class PersonService {
     @InjectConnection('personsConnection')
     private readonly connection: Connection,
     @InjectEntityManager('personsConnection')
-    private readonly entityManager: EntityManager
+    private readonly entityManager: EntityManager,
   ) {}
 }
 ```
@@ -447,7 +441,127 @@ export class PhotoModule {}
 
 现在, 将使用硬编码 `mockRepository` 作为 `PhotoRepository`。每当任何提供程序使用 `@InjectRepository()` 修饰器请求 `PhotoRepository` 时, Nest 会使用注册的 `mockRepository` 对象。
 
+
+
+### 定制存储库
+
+TypeORM 提供称为自定义存储库的功能。要了解有关它的更多信息，请访问此页面。基本上，自定义存储库允许您扩展基本存储库类，并使用几种特殊方法对其进行丰富。
+
+要创建自定义存储库，请使用 @EntityRepository() 装饰器和扩展 Repository 类。
+
+```typescript
+@EntityRepository(Author)
+export class AuthorRepository extends Repository<Author> {}
+```
+
+
+?>  @EntityRepository() 和 Repository 来自 typeorm 包。
+
+创建类后，下一步是将实例化责任移交给 Nest。为此，我们必须将 AuthorRepository 类传递给 TypeOrm.forFeature() 函数。
+
+```typescript
+@Module({
+  imports: [TypeOrmModule.forFeature([AuthorRepository])],
+  controller: [AuthorController],
+  providers: [AuthorService],
+})
+export class AuthorModule {}
+```
+
+之后，只需使用以下构造注入存储库：
+
+```typescript
+@Injectable()
+export class AuthorService {
+  constructor(private readonly authorRepository: AuthorRepository) {}
+}
+
+```
+
+### 异步配置
+
+通常，您可能希望异步传递模块选项，而不是事先传递它们。在这种情况下，使用 forRootAsync() 函数，提供了几种处理异步数据的方法。
+
+第一种可能的方法是使用工厂功能：
+
+```typescript
+TypeOrmModule.forRootAsync({
+  useFactory: () => ({
+    type: 'mysql',
+    host: 'localhost',
+    port: 3306,
+    username: 'root',
+    password: 'root',
+    database: 'test',
+    entities: [__dirname + '/**/*.entity{.ts,.js}'],
+    synchronize: true,
+  }),
+});
+```
+
+显然，我们的工厂表现得与其他工厂一样（可能 async 并且能够通过注入依赖关系 inject）。
+
+```typescript
+TypeOrmModule.forRootAsync({
+  imports: [ConfigModule],
+  useFactory: async (configService: ConfigService) => ({
+    type: 'mysql',
+    host: configService.getString('HOST'),
+    port: configService.getString('PORT'),
+    username: configService.getString('USERNAME'),
+    password: configService.getString('PASSWORD'),
+    database: configService.getString('DATABASE'),
+    entities: [__dirname + '/**/*.entity{.ts,.js}'],
+    synchronize: true,
+  }),
+  inject: [ConfigService],
+});
+```
+
+或者，您可以使用类而不是工厂。
+
+```typescript
+TypeOrmModule.forRootAsync({
+  useClass: TypeOrmConfigService,
+});
+```
+
+上面的构造将 TypeOrmConfigService 在内部进行实例化 TypeOrmModule，并将利用它来创建选项对象。在 TypeOrmConfigService 必须实现 TypeOrmOptionsFactory 的接口。
+
+```typescript
+@Injectable()
+class TypeOrmConfigService implements TypeOrmOptionsFactory {
+  createTypeOrmOptions(): TypeOrmModuleOptions {
+    return {
+      type: 'mysql',
+      host: 'localhost',
+      port: 3306,
+      username: 'root',
+      password: 'root',
+      database: 'test',
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      synchronize: true,
+    };
+  }
+}
+```
+
+为了防止创建 TypeOrmConfigService 内部 TypeOrmModule 并使用从不同模块导入的提供程序，您可以使用 useExisting 语法。
+
+```typescript
+TypeOrmModule.forRootAsync({
+  imports: [ConfigModule],
+  useExisting: ConfigService,
+});
+```
+
+它的工作原理 useClass 与一个关键区别相同 - TypeOrmModule 将查找导入的模块以重新创建已经创建的模块 ConfigService，而不是单独实例化它。
+
+### 示例
+
 [这儿](https://github.com/nestjs/nest/tree/master/sample/05-sql-typeorm)有一个可用的例子。
+
+
 
 ## Mongo
 

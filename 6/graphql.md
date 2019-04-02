@@ -18,9 +18,19 @@ $ npm i --save @nestjs/graphql apollo-server-express graphql-tools graphql
 译者注： fastify 请参考：
 https://github.com/coopnd/fastify-apollo
 
+### 概述
+
+Nest 提供了两种构建 GraphQL 应用程序的方法，首先是模式，然后是代码。
+
+在模式第一种方法中，真实的来源是 GraphQL SDL（模式定义语言）。它是一种与语言无关的方式，它基本上允许您在不同平台之间共享模式文件。此外，Nest 将根据GraphQL 模式（使用类或接口）自动生成 TypeScript 定义，以减少冗余。
+
+另一方面，在代码优先的方法中，您将仅使用装饰器和 TypeScript 类来生成相应的 GraphQL 架构。如果您更喜欢使用 TypeScript 来工作并避免语言语法之间的上下文切换，那么它变得非常方便。
+
+
+
 ### 入门
 
-一旦安装了软件包，我们就可以注册`GraphQlModule`
+一旦安装了软件包，我们就可以注册 `GraphQlModule`
 
 > app.module.ts
 
@@ -30,17 +40,14 @@ import { GraphQLModule } from '@nestjs/graphql';
 
 @Module({
   imports: [
-    GraphQLModule.forRoot({
-      typePaths: ['./**/*.graphql'],
-    }),
+    GraphQLModule.forRoot({}),
   ],
 })
 export class ApplicationModule {}
 ```
 
-`typePaths` 属性指示 `GraphQLModule` 应在何处查找 GraphQL 文件。此外, 所有选项都将传递到基础的 Apollo 实例 (在[这里](https://www.apollographql.com/docs/apollo-server/v2/api/apollo-server.html#constructor-options-lt-ApolloServer-gt)阅读更多的可用设置)。例如, 如果要禁用 `playground` 并关闭 `debug` 模式, 只需通过以下选项:
 
-> app.module.ts
+该  `.forRoot()` 函数将选项对象作为参数。这些选项将传递给底层的 Apollo 实例（请在[此处](https://www.apollographql.com/docs/apollo-server/v2/api/apollo-server.html#constructor-options-lt-ApolloServer-gt)阅读有关可用设置的更多信息）。例如，如果要禁用 playground 并关闭 debug模式，只需传递以下选项：
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -49,7 +56,6 @@ import { GraphQLModule } from '@nestjs/graphql';
 @Module({
   imports: [
     GraphQLModule.forRoot({
-      typePaths: ['./**/*.graphql'],
       debug: false,
       playground: false,
     }),
@@ -58,7 +64,8 @@ import { GraphQLModule } from '@nestjs/graphql';
 export class ApplicationModule {}
 ```
 
-如上所述, 所有这些设置都将转发到 ApolloServer 构造函数。
+如上所述，所有这些设置都将传递给 ApolloServer 构造函数。
+
 
 ### Playground
 
@@ -73,8 +80,102 @@ Playground 是一个图形化的，交互式的浏览器内 GraphQL IDE，默认
 ```typescript
 GraphQLModule.forRoot({
   include: [CatsModule],
-})
+}),
 ```
+
+### Grpahql SDL
+
+要以第一种方式开始使用模式，只需 typePaths 在选项对象中添加数组即可。
+
+```typescript
+GraphQLModule.forRoot({
+  typePaths: ['./**/*.graphql'],
+}),
+```
+该 typePaths 属性指示 GraphQLModule 应该查找 GraphQL 文件的位置。所有这些文件最终将合并到内存中，这意味着您可以将模式拆分为多个文件并将它们放在靠近解析器的位置。
+
+单独创建 GraphQL 类型和相应的 TypeScript 定义会产生不必要的冗余。最终，我们最终没有单一的事实来源，SDL 内部的每个变化都迫使我们调整接口。因此，该@nestjs/graphql 包提供了另一个有趣的功能，即使用抽象语法树（AST）自动生成TS定义。要启用它，只需添加 definitions 属性即可。
+
+```typescript
+GraphQLModule.forRoot({
+  typePaths: ['./**/*.graphql'],
+  definitions: {
+    path: join(process.cwd(), 'src/graphql.ts'),
+  },
+}),
+```
+
+该 `src/graphql.ts` 指示在何处保存 Typescript 输出。默认情况下，所有类型都转换为接口。但是，您可以通过将 outputAs 属性改为切换到 `class`。
+
+```typescript
+GraphQLModule.forRoot({
+  typePaths: ['./**/*.graphql'],
+  definitions: {
+    path: join(process.cwd(), 'src/graphql.ts'),
+    outputAs: 'class',
+  },
+}),
+```
+
+但是，可能不需要在每个应用程序启动时生成类型定义。相反，我们可能更喜欢完全控制，只有在执行专用命令时才产生打字。在这种情况下，我们可以创建自己的脚本，比如说 generate-typings.ts: 
+
+```typescript
+import { GraphQLDefinitionsFactory } from '@nestjs/graphql';
+import { join } from 'path';
+
+const definitionsFactory = new GraphQLDefinitionsFactory();
+definitionsFactory.generate({
+  typePaths: ['./src/**/*.graphql'],
+  path: join(process.cwd(), 'src/graphql.ts'),
+  outputAs: 'class',
+});
+```
+
+然后，只需运行您的文件：
+
+```bash
+ts-node generate-typings
+```
+
+!> 您也可以预先编译脚本并使用 node 可执行文件。
+
+要切换到文件监听模式（在任何 .graphql 文件更改时自动生成 Typescript），请将 watch 选项传递给 generate() 函数。
+
+```typescript
+definitionsFactory.generate({
+  typePaths: ['./src/**/*.graphql'],
+  path: join(process.cwd(), 'src/graphql.ts'),
+  outputAs: 'class',
+  watch: true,
+});
+```
+
+[这里](https://github.com/nestjs/nest/tree/master/sample/12-graphql-apollo){:target="_blank"} 提供完整的例子。
+
+### 使用代码
+
+在代码优先方法中，您将只使用装饰器和 TypeScript 类来生成相应的 GraphQL 架构。
+
+Nest 正在使用一个惊人的类型 -graphql 库，以提供此功能。因此，在我们继续之前，您必须安装此软件包。
+
+```typescript
+$ npm i type-graphql
+```
+
+安装过程完成后，我们可以使用 autoSchemaFile 向 options 对象添加属性。
+
+```typescript
+GraphQLModule.forRoot({
+  typePaths: ['./**/*.graphql'],
+  autoSchemaFile: 'schema.gql',
+}),
+```
+
+该 autoSchemaFile 代表您自动生成的模式将被创建的路径。此外，您可以传递 buildSchemaOptions 属性 - 一个将传递给 buildSchema() 函数的选项对象（从type-graphql包中）。
+
+[这里](https://github.com/nestjs/nest/tree/master/sample/23-type-graphql){:target="_blank"} 提供完整的例子。
+
+
 
 ### Async 配置
 

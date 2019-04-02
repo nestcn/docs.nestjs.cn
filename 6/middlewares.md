@@ -2,7 +2,7 @@
 
 中间件是一个在路由处理器**之前**被调用的函数。 中间件函数可以访问请求和响应对象，以及应用程序请求响应周期中的**下一个**中间件函数。**下一个**中间件函数通常由名为 `next` 的变量表示。
 
-![图1](https://docs.nestjs.com/assets/Middlewares_1.png)
+<center>![图1](https://docs.nestjs.com/assets/Middlewares_1.png)</center>
 
 Nest 中间件实际上等价于 [express](http://www.expressjs.com.cn/guide/using-middleware.html) 中间件。 下面是Express官方文档中所述的中间件功能：
 
@@ -286,3 +286,4 @@ await app.listen(3000);
 | [@Drixn](https://drixn.com/)  | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">  |  翻译  | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/) |
 | [@tangkai](https://github.com/tangkai123456)  | <img class="avatar-66 rm-style" height="70" src="https://avatars1.githubusercontent.com/u/22436910">  |  翻译  | 专注于 React，[@tangkai](https://github.com/tangkai123456) |
 | [@havef](https://havef.github.io)  | <img class="avatar-66 rm-style" height="70" src="https://avatars1.githubusercontent.com/u/54462?s=460&v=4">  |  校正  | 数据分析、机器学习、TS/JS技术栈 [@havef](https://havef.github.io) |
+| [@gaoyangy](<https://github.com/gaoyangy>) | ![img](https://avatars0.githubusercontent.com/u/23468113?s=460&v=4) | 校正 | 专注于Vue，TS/JS |

@@ -670,14 +670,19 @@ async upvotePost(
 ```typescript
 Subscription: {
   commentAdded: {
-    subscribe: () => pubSub.asyncIterator('commentAdded')
+    subscribe: () => pubSub.asyncIterator('commentAdded');
   }
 }
 ```
 
-?> `pubsub` 是一个 `PubSub` 类的实例。在[这里](https://www.apollographql.com/docs/graphql-subscriptions/setup.html)阅读更多
+?> `pubsub` 是一个 `PubSub` 类的实例。在[这里](https://www.apollographql.com/docs/graphql-subscriptions/setup.html)阅读更多。
 
-为了以Nest方式创建等效订阅，我们将使用 `@Subscription()` 装饰器。让我们扩展 `AuthorResolver` 在解析器映射部分中的使用。
+
+<!-- tabs:start -->
+
+#### ** Graphql SDL **
+
+为了以 Nest 方式创建等效订阅，我们将使用 `@Subscription()` 装饰器。
 
 ```typescript
 const pubSub = new PubSub();
@@ -702,27 +707,33 @@ export class AuthorResolver {
 
   @Subscription()
   commentAdded() {
-    return {
-      subscribe: () => pubSub.asyncIterator('commentAdded'),
-    };
+    return pubSub.asyncIterator('commentAdded');
   }
 }
 ```
 
-我们在这里使用了一个本地 `PubSub` 实例。相反, 我们应该将 `PubSub` 定义为一个组件, 通过构造函数 (使用 `@Inject ()` 装饰器) 注入它, 并在整个应用程序中重用它。[您可以在此了解有关嵌套自定义组件的更多信息](/5.0/fundamentals?id=自定义providercustomer-provider)。
-
-### Module
-
-为了启用订阅，我们必须将 `installSubscriptionHandlers` 属性设置为 `true` 。
+为了根据上下文和参数过滤掉特定事件，我们可以设置一个 filter 属性。
 
 ```typescript
-GraphQLModule.forRoot({
-  typePaths: ['./**/*.graphql'],
-  installSubscriptionHandlers: true,
+@Subscription('commentAdded', {
+  filter: (payload, variables) =>
+    payload.commentAdded.repositoryName === variables.repoFullName,
 })
+commentAdded() {
+  return pubSub.asyncIterator('commentAdded');
+}
 ```
 
-要自定义订阅服务器（例如，更改端口），您可以使用 `subscriptions` 属性（阅读[更多](https://www.apollographql.com/docs/apollo-server/v2/api/apollo-server.html#constructor-options-lt-ApolloServer-gt)）。
+为了改变已发布的有效负载，我们可以使用 resolve 函数。
+
+```typescript
+@Subscription('commentAdded', {
+  resolve: value => value,
+})
+commentAdded() {
+  return pubSub.asyncIterator('commentAdded');
+}
+```
 
 ### 类型定义
 
@@ -755,10 +766,103 @@ type Subscription {
   commentAdded(repoFullName: String!): Comment
 }
 ```
+做得好。我们创建了一个 commentAdded(repoFullName: String!): Comment 订阅。您可以在[此处](https://github.com/nestjs/nest/blob/master/sample/12-graphql-apollo)找到完整的示例实现。
 
-做得好。我们创建了一个commentAdded(repoFullName: String!): Comment订阅。您可以在[此处](https://github.com/nestjs/nest/blob/master/sample/12-graphql-apollo)找到完整的示例实现。
+
+#### ** 使用 Typescript **
+
+要使用 class-first 方法创建订阅，我们将使用 @Subscription() 装饰器。
+
+```typescript
+const pubSub = new PubSub();
+
+@Resolver('Author')
+export class AuthorResolver {
+  constructor(
+    private readonly authorsService: AuthorsService,
+    private readonly postsService: PostsService,
+  ) {}
+
+  @Query(returns => Author, { name: 'author' })
+  async getAuthor(@Args({ name: 'id', type: () => Int }) id: number) {
+    return await this.authorsService.findOneById(id);
+  }
+
+  @ResolveProperty('posts')
+  async getPosts(@Parent() author) {
+    const { id } = author;
+    return await this.postsService.findAll({ authorId: id });
+  }
+
+  @Subscription(returns => Comment)
+  commentAdded() {
+    return pubSub.asyncIterator('commentAdded');
+  }
+}
+```
+
+为了根据上下文和参数过滤掉特定事件，我们可以设置 filter 属性。
+
+```typescript
+@Subscription(returns => Comment, {
+  filter: (payload, variables) =>
+    payload.commentAdded.repositoryName === variables.repoFullName,
+})
+commentAdded() {
+  return pubSub.asyncIterator('commentAdded');
+}
+```
+
+为了改变已发布的有效负载，我们可以使用 resolve 函数。
+
+```typescript
+
+@Subscription(returns => Comment, {
+  resolve: value => value,
+})
+commentAdded() {
+  return pubSub.asyncIterator('commentAdded');
+}
+
+```
+
+
+<!-- tabs:end -->
+
+### Pubsub
+
+我们在这里使用了一个本地 `PubSub` 实例。相反, 我们应该将 `PubSub` 定义为一个组件, 通过构造函数 (使用 `@Inject ()` 装饰器) 注入它, 并在整个应用程序中重用它。[您可以在此了解有关嵌套自定义组件的更多信息](/6/fundamentals?id=自定义providercustomer-provider)。
+
+```typescript
+{
+  provide: 'PUB_SUB',
+  useValue: new PubSub(),
+}
+
+```
+
+### Module
+
+为了启用订阅，我们必须将 `installSubscriptionHandlers` 属性设置为 `true` 。
+
+```typescript
+GraphQLModule.forRoot({
+  typePaths: ['./**/*.graphql'],
+  installSubscriptionHandlers: true,
+}),
+```
+
+要自定义订阅服务器（例如，更改端口），您可以使用 `subscriptions` 属性（阅读[更多](https://www.apollographql.com/docs/apollo-server/v2/api/apollo-server.html#constructor-options-lt-ApolloServer-gt)）。
 
 ## 标量
+
+
+该GraphQL包括以下默认类型：Int，Float，String，Boolean 和 ID。但是，有时您可能需要支持自定义原子数据类型（例如 Date ）。
+
+<!-- tabs:start -->
+
+#### ** Graphql SDL **
+
 
 为了定义一个自定义标量（在[这里](http://graphql.cn/learn/schema/#scalar-types)阅读更多关于标量的信息），我们必须创建一个类型定义和一个专用的解析器。在这里（如在官方文档中），我们将采取 `graphql-type-json` 包用于演示目的。这个npm包定义了一个`JSON`GraphQL标量类型。首先，让我们安装包：
 
@@ -791,29 +895,27 @@ type Foo {
 }
 ```
 
-### 类
-
-定义标量类型的另一种形式是创建一个简单的类。假设我们想用 `Date`类型增强我们的模式。
+定义标量类型的另一种形式是创建一个简单的类。假设我们想用 `Date` 类型增强我们的模式。
 
 ```typescript
-import { Scalar } from '@nestjs/graphql';
-import { Kind } from 'graphql';
+import { Scalar, CustomScalar } from '@nestjs/graphql';
+import { Kind, ValueNode } from 'graphql';
 
 @Scalar('Date')
-export class DateScalar {
+export class DateScalar implements CustomScalar<number, Date> {
   description = 'Date custom scalar type';
 
-  parseValue(value) {
+  parseValue(value: number): Date {
     return new Date(value); // value from the client
   }
 
-  serialize(value) {
+  serialize(value: Date): number {
     return value.getTime(); // value sent to the client
   }
 
-  parseLiteral(ast) {
+  parseLiteral(ast: ValueNode): Date {
     if (ast.kind === Kind.INT) {
-      return parseInt(ast.value, 10); // ast value is always in string format
+      return new Date(ast.value);
     }
     return null;
   }
@@ -828,6 +930,57 @@ export class DateScalar {
 export class CommonModule {}
 ```
 现在我们可以在 `Date` 类型定义中使用标量。
+
+```typescript
+scalar Date
+
+```
+
+#### ** 使用 Typescript **
+
+要创建 Date 标量，只需创建一个新类。
+
+```typescript
+import { Scalar, CustomScalar } from '@nestjs/graphql';
+import { Kind, ValueNode } from 'graphql';
+
+@Scalar('Date', type => Date)
+export class DateScalar implements CustomScalar<number, Date> {
+  description = 'Date custom scalar type';
+
+  parseValue(value: number): Date {
+    return new Date(value); // value from the client
+  }
+
+  serialize(value: Date): number {
+    return value.getTime(); // value sent to the client
+  }
+
+  parseLiteral(ast: ValueNode): Date {
+    if (ast.kind === Kind.INT) {
+      return new Date(ast.value);
+    }
+    return null;
+  }
+}
+```
+
+准备好后，注册 DateScalar 为提供商。
+
+```typescript
+@Module({
+  providers: [DateScalar],
+})
+export class CommonModule {}
+```
+
+现在可以在类中使用  Date 类型。
+
+```typescript
+@Field()
+creationDate: Date;
+```
+
 
 
 ## 工具

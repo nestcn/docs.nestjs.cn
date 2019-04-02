@@ -82,8 +82,9 @@ GraphQLModule.forRoot({
   include: [CatsModule],
 }),
 ```
+ <!-- tabs:start -->
 
-### Grpahql SDL
+#### ** Graphql SDL **
 
 要以第一种方式开始使用模式，只需 typePaths 在选项对象中添加数组即可。
 
@@ -152,7 +153,7 @@ definitionsFactory.generate({
 
 [这里](https://github.com/nestjs/nest/tree/master/sample/12-graphql-apollo){:target="_blank"} 提供完整的例子。
 
-### 使用代码
+#### ** 使用 Typescript **
 
 在代码优先方法中，您将只使用装饰器和 TypeScript 类来生成相应的 GraphQL 架构。
 
@@ -176,6 +177,7 @@ GraphQLModule.forRoot({
 [这里](https://github.com/nestjs/nest/tree/master/sample/23-type-graphql){:target="_blank"} 提供完整的例子。
 
 
+<!-- tabs:end -->
 
 ### Async 配置
 

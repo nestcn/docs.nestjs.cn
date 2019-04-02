@@ -12,6 +12,8 @@
 
 在下面的例子中，我们使用了定义基本控制器所需的 `@Controller('cats')` 装饰器。我们将可选前缀设置为 `cats`。使用前缀可以避免在所有路由共享通用前缀时出现冲突的情况。
 
+在下面的示例中，我们将使用 @Controller() 装饰器，这是定义基本控制器所必需的。我们将指定一个路径前缀(可选) cats。在 @Controller() 装饰器中使用路径前缀，它允许我们轻松对一组相关路由进行分组，并减少重复代码。例如，我们可以选择管理该路由下的客户实体的交互的这部分进行分组 /customers ，这样, 我们可以在 @Controller() 装饰器中指定路径前缀, 这样我们就不必为文件中的每个路由重新定义前缀。
+
 > cats.controller.ts
 
 ```typescript
@@ -20,7 +22,7 @@ import { Controller, Get } from '@nestjs/common';
 @Controller('cats')
 export class CatsController {
   @Get()
-  findAll() {
+  findAll(): string {
     return 'This action returns all cats';
   }
 }
@@ -28,15 +30,18 @@ export class CatsController {
 
 ?> 要使用 CLI 创建控制器，只需执行 `$nest g controller cats` 命令。
 
-`findAll()` 方法前的 `@Get()` 修饰符告诉 Nest 创建此路由路径的端点，并将每个相应的请求映射到此处理程序。由于我们为每个路由（`cats`）声明了前缀，所以 Nest 会在这里映射每个 `/cats` 的 **GET** 请求。
 
-当客户端调用此端点时, Nest 将返回 200 状态码和解析的 JSON, 在本例中只是个字符串。这怎么可能？有`两种`可能的方法来处理响应：
+
+在 @Get() 该前 HTTP 请求方法的装饰 findAll() 方法让 Nest 创造一个处理程序 HTTP 请求特定端点。端点对应于 HTTP 请求方法（在本例中为 GET）和路由。什么是路由 ？处理程序的路由是通过连接为控制器声明的（可选）前缀和请求装饰器中指定的任何路由来确定的。由于我们已经为每个 route（cats） 声明了一个前缀，并且没有在装饰器中添加任何路由信息，因此 Nest会将 GET /cats 请求映射到此处理程序。如上所述，该路由包括可选的控制器路由前缀和请求方法装饰器中声明的任何路由。例如，customers 与装饰器组合的路由前缀 @Get('profile') 会为请求生成路由映射 GET /customers/profile。
+
+在上面的示例中，当对此端点发出 GET 请求时，Nest 会将请求路由到我们的用户定义 findAll() 方法。请注意，我们在此处选择的函数名称完全是任意的。我们显然必须声明一个绑定路由的函数，但 Nest 不会对所选的函数名称附加任何意义。此函数将返回 200 状态代码和相关的响应，在这种情况下只返回了一个字符串。为什么会这样？ 我们将首先介绍 Nest 使用两种不同的操作响应选项的概念：
+
 
 |         |    |
 | -------------   | :----: |
-| 标准（推荐）|   我们对处理程序的处理方式与普通函数相同。当我们返回 JavaScript 对象或数组时, 它会**自动**转换为 JSON。当我们返回字符串, Nest 将只发送一个字符串而不尝试解析它。|
-| |此外, 响应状态代码在默认情况下总是 200, 除了 POST 请求外，此时它是 201。我们可以通过在处理程序层添加 `@HttpCode（...)` 装饰器来轻松地更改此行为。|
-| 类库特有的 |   我们可以在函数签名通过 `@Res()` 注入类库特定的[响应对象](http://expressjs.com/en/api.html#res)。（例如 `findAll(@Res() response)`）。    |
+| 标准（推荐）|   使用此内置方法，当请求处理程序返回 JavaScript 对象或数组时，它将自动序列化为 JSON。但是，当它返回一个字符串时，Nest 将只发送一个字符串而不是序列化它。这使响应处理变得简单：只需要返回值，Nest 负责其余部分。|
+| |此外, 响应状态代码在默认情况下总是 200, 除了 POST 请求外，此时它是 201。我们可以通过在处理程序层添加 `@HttpCode（...)` 装饰器来轻松地更改此行为。 （[状态代码](/6/controllers?id=状态码)）|
+| 类库特有的 |  我们可以在函数签名通过 `@Res()` 注入类库特定的 响应对象（例如，Express），使用此函数，您具有使用该对象的响应处理函数。例如，使用 Express，您可以使用类似代码构建响应 response.status(200).send()     |
 
 !> 注意！ 禁止同时使用这两种方法。 Nest 检测处理程序是否正在使用 `@Res()`或 `@Next()`，如果两个方法都用了的话, 那么在这里的标准方式就是自动禁用此路由, 你将不会得到你想要的结果。
 
@@ -48,15 +53,18 @@ export class CatsController {
 
 ```typescript
 import { Controller, Get, Req } from '@nestjs/common';
+import { Request } from 'express';
 
 @Controller('cats')
 export class CatsController {
   @Get()
-  findAll(@Req() request) {
+  findAll(@Req() request: Request): string {
     return 'This action returns all cats';
   }
 }
 ```
+
+!> 为了在 express 中使用 Typescript （如 request: Request 上面的参数示例所示），请安装 @types/express 。
 
 「Request」对象表示 HTTP 请求，并具有「Request」查询字符串，参数，HTTP 标头 和 正文的属性（在[这里](http://www.expressjs.com.cn/4x/api.html##req)阅读更多），但在大多数情况下, 不必手动获取它们。 我们可以使用**专用**的装饰器，比如开箱即用的 `@Body()` 或 `@Query()` 。 下面是装饰器和 普通表达对象的比较。
 
@@ -67,12 +75,12 @@ export class CatsController {
 |`@Response()`	|`res`|
 |`@Next()`	|`next`|
 |`@Session()`	|`req.session`|
-|`@Param(param?: string)`	|`req.params` / `req.params[param]`       |
-|`@Body(param?: string)`	|`req.body` / `req.body[param]`|
-|`@Query(param?: string)`	|`req.query` / `req.query[param]`|
-|`@Headers(param?: string)`	|`req.headers` / `req.headers[param]`|
+|`@Param(key?: string)`	|`req.params` / `req.params[key]`       |
+|`@@Body(key?: string)`	|`req.body` / `req.body[key]`|
+|`@Query(key?: string)`	|`req.query` / `req.query[key]`|
+|`@Headers(name?: string)`	|`req.headers` / `req.headers[name]`|
 
-?> 想要了解如何创建自定义的装饰器，阅读[这一章](/5.0/customdecorators)。
+?> 想要了解如何创建自定义的装饰器，阅读[这一章](/6/customdecorators)。
 
 ## 资源
 
@@ -86,12 +94,12 @@ import { Controller, Get, Post } from '@nestjs/common';
 @Controller('cats')
 export class CatsController {
   @Post()
-  create() {
+  create(): string {
     return 'This action adds a new cat';
   }
 
   @Get()
-  findAll() {
+  findAll(): string {
     return 'This action returns all cats';
   }
 }
@@ -128,7 +136,7 @@ create() {
 
 ## Headers
 
-要指定自定义响应头，可以使用 `@header()` 修饰器或类库特有的响应对象
+要指定自定义响应头，可以使用 `@header()` 修饰器或类库特有的响应对象,（使用 并res.header()直接调用）。
 
 ```typescript
 @Post()
@@ -140,30 +148,59 @@ create() {
 
 ## 路由参数
 
-当需要将**动态数据**作为 URL 的一部分接受时, 使用静态路径的路由无法提供帮助。要使用路由参数定义路由，只需在路由的路径中指定路由参数，如下所示。
+当您需要接受**动态数据**作为请求的一部分时，具有静态路径的路由将不起作用（例如，GET /cats/1)获取具有id的cat 1）。为了定义带参数的路由，我们可以在路由中添加路由参数**标记**，以捕获请求 URL 中该位置的动态值。@Get() 下面的装饰器示例中的路由参数标记演示了此用法。可以使用 @Param() 装饰器访问以这种方式声明的路由参数，该装饰器应添加到函数签名中。
 
 ```typescript
 @Get(':id')
-findOne(@Param() params) {
+findOne(@Param() params): string {
   console.log(params.id);
   return `This action returns a #${params.id} cat`;
 }
 ```
 
-为了获取特定的参数，只需在括号中传入其参数名。
+@Param() 用于装饰函数的参数（params 在上面的示例中），并使路径参数可用作函数体内的装饰方法参数的属性。如上面的代码所示，我们可以id 通过引用来访问参数 params.id。您还可以将特定参数标记传递给装饰器，然后直接通过函数主体中的名称引用路由参数。
+
 
 ```typescript
 @Get(':id')
-findOne(@Param('id') id) {
+findOne(@Param('id') id): string {
   return `This action returns a #${id} cat`;
 }
 ```
 
+## 路由注册顺序
+
+请注意，路由注册顺序（每个路由的函数在类中出现的顺序）很重要。假设您有一个通过 identifier（cats/:id）返回 cat 的路由。如果在类定义中注册另一个端点，它会立即返回所有 cat（cats），则 GET /cats 请求不会命中第二个处理程序，因为所有路由参数都是可选的。请参阅以下示例：
+
+```typescript
+@Controller('cats')
+export class CatsController {
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return `This action returns a #${id} cat`;
+  }
+
+  @Get()
+  findAll() {
+    // This endpoint will never get called
+    // because the "/cats" request is going
+    // to be captured by the "/cats/:id" route handler
+  }
+}
+```
+为了避免这种副作用，只需移动上面的 findAll() 声明（包括其装饰器）即可 findOne()。
+
+### 范围
+对于来自不同编程语言背景的人来说，了解在 Nest 中几乎所有内容都可以在传入的请求之间共享，这让人意外。比如我们有一个数据库连接池，具有全局状态的单例服务等。请记住，Node.js 不遵循请求/响应多线程无状态模型，每个请求都由主线程处理。因此，使用单例实例对我们的应用程序来说是完全安全的。
+
+但是，存在基于请求的控制器生命周期可能是期望行为的边缘情况，例如 GraphQL 应用程序中的请求缓存，比如请求跟踪或多租户。在[这里](/6/fundamentals/id=注入范围)学习如何控制范围。
+
+
 ## Async / await
 
-我们喜欢现代 JavaScript，而且我们知道数据读取大多是**异步**的。 这就是为什么 Nest 支持 `async` 函数，并且与他们一起工作得非常好。
+我们喜欢现代 JavaScript，而且我们知道数据读取大多是**异步**的。 这就是为什么 Nest 支持 `async` 并且与他们一起工作得非常好。
 
-!> 了解更多关于 `Async / await` 请点击[这里](https://kamilmysliwiec.com/typescript-2-1-introduction-async-await)！
+!> 了解更多关于 `Async / await` 请点击[这里](https://kamilmysliwiec.com/typescript-2-1-introduction-async-await){:target="_blank"}！
 
 每个异步函数都必须返回 `Promise`。这意味着您可以返回延迟值, 而 Nest 将自行解析它。让我们看看下面的例子:
 
@@ -172,20 +209,20 @@ findOne(@Param('id') id) {
 
 ```typescript
 @Get()
-async findAll(): Promise<any[]> {
-  return [];
+findAll(): Observable<any[]> {
+  return of([]);
 }
 ```
 
 
-这是完全有效的。此外, Nest 路由处理程序更强大。它可以返回一个 [Rxjs observable 流](http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html)，Nest 将自动订阅下面的源并获取最后发出的值（在流完成后）。
+这是完全有效的。此外,通过返回 RxJS [observable 流](http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html) Nest 路由处理程序更强大。Nest 将自动订阅下面的源并获取最后发出的值（在流完成后）。
 
 > cats.controller.ts
 
 ```typescript
 @Get()
-findAll(): Observable<any[]> {
-  return of([]);
+async findAll(): Promise<any[]> {
+  return [];
 }
 ```
 
@@ -222,47 +259,50 @@ async create(@Body() createCatDto: CreateCatDto) {
 }
 ```
 
+## 处理错误
+
+有一个关于处理错误（即有例外的工作），[在这里](/6/exceptionfilters)。
+
+
 ## 完整示例
 
-下面是一个使用一些可用的装饰器来创建基本控制器的示例。该控制器暴露了一些访问和操作内部数据的方法。
+下面是一个使用一些可用的装饰器来创建基本控制器的示例。该控制器暴露了一些访问和操作内部数据的函数。
 
 > cats.controller.ts
 
 ```typescript
 import { Controller, Get, Query, Post, Body, Put, Param, Delete } from '@nestjs/common';
+import { CreateCatDto, UpdateCatDto, ListAllEntities } from './dto';
 
 @Controller('cats')
 export class CatsController {
   @Post()
-  create(@Body() createCatDto) {
+  create(@Body() createCatDto: CreateCatDto) {
     return 'This action adds a new cat';
   }
 
   @Get()
-  findAll(@Query() query) {
+  findAll(@Query() query: ListAllEntities) {
     return `This action returns all cats (limit: ${query.limit} items)`;
   }
 
   @Get(':id')
-  findOne(@Param('id') id) {
+  findOne(@Param('id') id: string) {
     return `This action returns a #${id} cat`;
   }
 
   @Put(':id')
-  update(@Param('id') id, @Body() updateCatDto) {
+  update(@Param('id') id: string, @Body() updateCatDto: UpdateCatDto) {
     return `This action updates a #${id} cat`;
   }
 
   @Delete(':id')
-  remove(@Param('id') id) {
+  remove(@Param('id') id: string) {
     return `This action removes a #${id} cat`;
   }
 }
+
 ```
-
-## 处理 errors
-
-这里有一个关于处理异常的独立[章节](5.0/exceptionfilters.md)。
 
 ## 最后一步
 
@@ -282,7 +322,7 @@ import { CatsController } from './cats/cats.controller';
 export class ApplicationModule {}
 ```
 
-!> 我们将元数据附加到 module 类，所以现在 Nest 可以很容易地通过反射挂载必须的控制器。
+!> 我们使用 @module 装饰器将元数据添加到模块类，所以现在 Nest 可以很容易地通过反射挂载必须的控制器。
 
 
 ## 类库特有 方式
@@ -291,24 +331,26 @@ export class ApplicationModule {}
 
 
 ```typescript
-import { Controller, Get, Post, Res, Body, HttpStatus } from '@nestjs/common';
-import { CreateCatDto } from './dto/create-cat.dto';
+import { Controller, Get, Post, Res, HttpStatus } from '@nestjs/common';
+import { Response } from 'express';
 
 @Controller('cats')
 export class CatsController {
   @Post()
-  create(@Res() res, @Body() createCatDto: CreateCatDto) {
+  create(@Res() res: Response) {
     res.status(HttpStatus.CREATED).send();
   }
 
   @Get()
-  findAll(@Res() res) {
+  findAll(@Res() res: Response) {
      res.status(HttpStatus.OK).json([]);
   }
 }
 ```
 
-从我的角度来看，这种方式是非常不清晰。 我当然更喜欢第一种方法，但为了使 Nest **向下兼容**以前的版本，这种方法仍然可用。 另外，**响应对象**提供了更大的灵活性 - 我们可以完全控制 response 对象(比如操作 header 等等)。
+虽然这种方法有效，并且事实上通过提供响应对象的完全控制（标题操作，库特定的功能等）在某些方面允许更多的灵活性，但应谨慎使用。这种方式非常不清晰，并且有一些缺点。 主要是失去了与依赖于 Nest 标准响应处理的 Nest 功能的兼容性，例如拦截器和 @HttpCode() 装饰器。此外，您的代码可能变得依赖于平台（因为底层库可能在响应对象上有不同的 API），并且更难测试（您必须模拟响应对象等）。
+
+因此，在可能的情况下，应始终首选 Nest 标准方法。
 
 
  ### 译者署名

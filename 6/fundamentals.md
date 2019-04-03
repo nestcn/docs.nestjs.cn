@@ -1,6 +1,8 @@
-## 自定义Provider
 
-有很多场景, 你想**直接**绑定某些值到nest的IoC容器。例如，常量，基于当前环境创建的可配置对象，引入的外部库或预先计算的值（取决于其他几个定义的提供程序）。此外，您可以覆盖默认实现，例如在替身测试(test doubles)的时候需要使用不同的类（用于测试目的）。
+## 自定义Provider(Customer Provider)
+有很多场景, 你想**直接**绑定某些值到nest的IoC容器。例如，任何常量值，基于当前环境创建的可配置对象，引入的外部库或预先计算的值（取决于其他几个定义的提供程序）。此外，您可以覆盖默认实现，例如在需要时使用不同的替身测试(test doubles)或需要使用不同的类（用于测试目的）。
+
+
 
 你应该始终牢记的一件重要事情就是Nest使用**tokens**(口令)来标识依赖关系。通常，用类名自动生成标记。如果你想创建一个自定义提供者，你需要选择一个令牌。大多数情况下，自定义令牌都由纯字符串表示。最佳实践是您应该在一个单独的文件中保存令牌，例如，在`constants.ts`中。
 
@@ -8,7 +10,7 @@
 
 ### 使用值
 
-`useValue`语法在定义常量值，在三种情境下非常有用, 1. 定义常量, 2. 在Nest容器中引入外部库, 3. 用模拟对象替换实际实现。
+`useValue`语法在定义常量值，在三种情境下非常有用1. 定义常量, 2. 在Nest容器中引入外部库, 3. 用模拟对象替换实际实现。
 
 ```typescript
 import { connection } from './connection';
@@ -51,7 +53,7 @@ const catsServiceProvider = {
 export class ApplicationModule {}
 ```
 
-在上面的例子中，`CatsService`将被传入的`mockCatsService`覆盖。这意味着，Nest不再是手动创建`CatsService`实例，而是直接使用`mockCatsService`。
+在上面的例子中，`CatsService`将被传入的`mockCatsService`覆盖。这意味着，Nest不再是手动创建`CatsService`实例，而是将该提供者视为已解析的，并直接使用`mockCatsService`。
 
 ### 使用类
 
@@ -161,7 +163,8 @@ Nest是一个MIT许可的开源项目。它可以发展得益于这些令人敬�
 
 ### 正向引用
 
-**正向引用**允许Nest引用目前尚未被定义的引用。当`CatsService`和`CommonService`相互依赖时，两边都需要使用`@Inject()`和`forwardRef()`，否则Nest不会实例化它们，因为所有基本元数据都不可用。让我们看看下面的代码片段：
+**正向引用**允许Nest引用目前尚未被定义的引用。当`CatsService`和`CommonService`相互依赖时，关系的双方都需要使用`@Inject()`和`forwardRef()`，否则Nest不会实例化它们，因为所有基本元数据都不可用。让我们看看下面的代码片段：
+
 > cats.service.ts
 ```typescript
 @Injectable()
@@ -223,19 +226,177 @@ this.moduleRef.get(Service, { strict: false });
 
 ```
 
-## 跨平台
 
-Nest的作为一个跨平台的框架。平台独立性使得**创建可重用的逻辑部分**成为可能，人们可以利用多种不同类型的应用程序。框架的架构专注于适用于任何类型的服务器端解决方案。
+## **注入作用域(Injection scopes)**
+
+对于使用不同语言的人来说，在Nest中几乎所有内容都在传入请求之间共享，这可能会很尴尬。我们有到数据库的连接池，全局状态的单例服务等等。通常，Node.js不遵循 request/response 多线程无状态模型，其中每个请求都由单独的线程处理。因此，对于我们的应用程序来说，使用单例实例是完全**安全**的。
+
+#### 作用域（Scopes）
+
+基本上，每个提供者都可以作为一个单例，被请求范围限定，并切换到瞬态模式。请参见下表，以熟悉它们之间的区别。
+
+| 单例 | 每个提供者可以跨多个类共享。提供者生命周期严格绑定到应用程序生命周期。一旦应用程序启动，所有提供程序都已实例化。默认情况下使用单例范围。 |
+| ---- | ------------------------------------------------------------ |
+| 请求 | 在请求处理完成后，将为每个传入请求和垃圾收集专门创建提供者的新实例 |
+| 瞬态 | 临时提供者不能在提供者之间共享。每当其他提供者向Nest容器请求特定的临时提供者时，该容器将创建一个新的专用实例 |
+
+?> 使用单例范围始终是推荐的方法。请求之间共享提供者可以降低内存消耗，从而提高应用程序的性能(不需要每次实例化类)。
+
+### 使用(Usage)
+
+为了切换到另一个注入范围，您必须向`@Injectable()`装饰器传递一个参数
+
+```typescript
+import { Injectable, Scope } from '@nestjs/common';
+
+@Injectable({ scope: Scope.REQUEST })
+export class CatsService {}
+```
+
+在自定义提供者的情况下，您必须设置一个额外的范围属性
+
+```typescript
+{
+  provide: 'CACHE_MANAGER',
+  useClass: CacheManager,
+  scope: Scope.TRANSIENT,
+}
+```
+
+当涉及到控制器时，传递ControllerOptions对象
+
+```typescript
+@Controller({
+  path: 'cats',
+  scope: Scope.REQUEST,
+})
+export class CatsController {}
+```
+
+>网关永远不应该依赖于请求范围的提供者，因为它们充当单例。一个网关封装了一个真正的套接字，不能多次被实例化
+
+### **所有请求注入**(Per-request injection)
+
+必须非常谨慎地使用请求范围的提供者。请记住，`scope`实际上是在注入链中冒泡的。如果您的控制器依赖于一个请求范围的提供者，这意味着您的控制器实际上也是请求范围。
+
+想象一下下面的链:`CatsController <- CatsService <- CatsRepository`。如果您的`CatsService`是请求范围的(从理论上讲，其余的都是单例)，那么`CatsController`也将成为请求范围的(因为必须将请求范围的实例注入到新创建的控制器中)，而`CatsRepository`仍然是单例的。
+
+>在这种情况下，循环依赖关系将导致非常蛋疼的副作用，因此，您当然应该避免创建它们
+
+### **请求提供者**(Request provider)
+
+在`HTTP`应用程序中，使用请求范围的提供者使您能够注入原始请求引用
+
+```typescript
+import { Injectable, Scope, Inject } from '@nestjs/common';
+import { REQUEST } from '@nestjs/core';
+import { Request } from 'express';
+
+@Injectable({ scope: Scope.REQUEST })
+export class CatsService {
+  constructor(@Inject(REQUEST) private readonly request: Request) {}
+}
+```
+
+但是，该功能既不能用于微服务，也不能用于`GraphQL`应用程序。在`GraphQL`应用程序中，可以注入`CONTEXT`。
+
+```typescript
+import { Injectable, Scope, Inject } from '@nestjs/common';
+import { CONTEXT } from '@nestjs/graphql';
+
+@Injectable({ scope: Scope.REQUEST })
+export class CatsService {
+  constructor(@Inject(CONTEXT) private readonly context) {}
+}
+```
+
+然后，您可以配置您的上下文值(在`GraphQLModule`中)，以包含请求作为其属性
+
+### 性能(Performance)
+
+使用请求范围的提供者将明显影响应用程序性能。即使Nest试图缓存尽可能多的元数据，它仍然必须为每个请求创建类的实例。因此，它将降低您的平均响应时间和总体基准测试结果。如果您的提供者不一定需要请求范围，那么您应该坚持使用单例范围
+
+## 生命周期(Lifecycle Events)
+
+所有应用程序元素都有一个由Nest管理的生命周期。Nest提供了**生命周期钩子**，提供了对关键生命时刻的可见性，以及在关键时刻发生时采取行动的能力。
+
+#### 生命周期序列(Lifecycle sequence)
+
+通过调用构造函数创建注入/控制器后，Nest在特定时刻按如下顺序调用生命周期钩子方法。
+
+| `OnModuleInit`           | 初始化主模块后调用                              |
+| ------------------------ | ----------------------------------------------- |
+| `OnApplicationBootstrap` | 在应用程序完全启动并引导后调用                  |
+| `OnModuleDestroy`        | 在Nest销毁主模块(`app.close()`方法之前进行清理) |
+| `OnApplicationShutdown`  | 响应系统信号(当应用程序关闭时，例如`SIGTERM`)   |
+
+### 使用(Usage)
+
+所有应用周期的钩子都有接口表示，接口在技术上是可选的，因为它们在`TypeScript`编译之后就不存在了。尽管如此，为了从强类型和编辑器工具中获益，使用它们是一个很好的实践。
+
+```typescript
+import { Injectable, OnModuleInit } from '@nestjs/common';
+
+@Injectable()
+export class UsersService implements OnModuleInit {
+  onModuleInit() {
+    console.log(`The module has been initialized.`);
+  }
+}
+```
+
+此外，`OnModuleInit`和`OnApplicationBootstrap`钩子都允许您延迟应用程序初始化过程(返回一个`Promise`或将方法标记为`async`)。
+
+```typescript
+async onModuleInit(): Promise<void> {
+  await this.fetch();
+}
+```
+
+#### OnApplicationShutdown
+
+`OnApplicationShutdown`响应系统信号(当应用程序通过`SIGTERM`等方式关闭时)。使用此钩子可以优雅地关闭`Nest`应用程序。这一功能通常用于`Kubernetes`、`Heroku`或类似的服务。
+
+要使用此钩子，必须激活侦听器，侦听关闭信号。
+
+```typescript
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  // Starts listening to shutdown hooks
+  app.enableShutdownHooks();
+  await app.listen(3000);
+}
+bootstrap();
+```
+
+如果应用程序接收到一个信号，它将调用`onApplicationShutdown`函数，并将相应的信号作为第一个参数`Injectable`。如果函数确实返回了一个`promise`，那么在`promise`被解析或拒绝之前，它不会关闭Nest应用程序。
+
+```typescript
+@Injectable()
+class UsersService implements OnApplicationShutdown {
+  onApplicationShutdown(signal: string) {
+    console.log(signal); // e.g. "SIGINT"
+  }
+}
+```
+
+## 跨平台(Platform agnosticism)
+
+
+Nest的作为一个跨平台的框架。平台独立性使得**创建可重用的逻辑部分**成为可能，人们可以利用这种逻辑部件跨多种不同类型的应用程序。框架的架构专注于适用于任何类型的服务器端解决方案。
 
 ### 一次编译, 各处运行
 
-主要指HTTP服务器(REST APIs)。但是，所有这些构建的模块都可以轻松用于不同的传输层(`microservices`或`websockets`)。此外，Nest还配备了专用的 [GraphQL](5.0/graphql?id=快速开始)模块。最后但并非最不重要的一点是, 执行上下文功能有助于通过Nest创建在Node.js上运行的所有应用。
+**概览**主要涉及HTTP服务器(REST APIs)。但是，所有这些构建的模块都可以轻松用于不同的传输层(`microservices`或`websockets`)。此外，Nest还配备了专用的 [GraphQL](5.0/graphql?id=快速开始)模块。最后但并非最不重要的一点是, 执行上下文功能有助于通过Nest创建在Node.js上运行的所有应用。
 
 Nest鼓励成为一个完整的平台，为您的应用带来更高级别的可重用性。一次编译, 各处运行！
 
 ## 测试
 
-自动测试是**软件**的重要组成部分。测试必须覆盖系统中关键的部分。为了实现这个目标，我们产生了一系列不同的测试首单，例如集成测试，单元测试，e2e测试等。 Nest提供了一系列改进测试体验的测试实用程序。
+自动化测试是成熟**软件产品**的重要组成部分。对于覆盖系统中关键的部分是极其重要的。为了实现这个目标，我们产生了一系列不同的测试首单，例如集成测试，单元测试，e2e测试等。 Nest提供了一系列改进测试体验的测试实用程序。
 
 通常，您可以使用您喜欢的任何**测试框架**，选择任何适合您要求的工具。Nest应用程序启动程序与Jest框架集成在一起，以减少开始编写测试时的样板代码，但你仍然可以删除它, 使用任何其他测试框架。
 
@@ -247,7 +408,7 @@ $ npm i --save-dev @nestjs/testing
 ```
 ###  单元测试
 
- 在下面的例子中，我们有两个不同的类，分别是`CatsController`和`CatsService`。如前所述，Jest被用作一个完整的测试框架。该框架是test runner, 并提供断言函数和提升测试实用工具，以帮助mock，spy等。一旦被调用, 我们已经手动强制执行`catsService.findAll()`方法来返回结果，。由此，我们可以测试`catsController.findAll()`是否返回预期的结果。
+ 在下面的例子中，我们有两个不同的类，分别是`CatsController`和`CatsService`。如前所述，Jest被用作一个完整的测试框架。该框架是test runner, 并提供断言函数和提升测试实用工具，以帮助mock，spy等。一旦被调用, 我们已经手动强制执行`catsService.findAll()`方法来返回结果。由此，我们可以测试`catsController.findAll()`是否返回预期的结果。
 
  > cats.controller.spec.ts
 
@@ -273,7 +434,7 @@ describe('CatsController', () => {
     });
   });
 });
-```
+ ```
 ?> 保持你的测试文件测试类附近。测试文件必须以`.spec`或`.test`结尾
 
 到目前为止，我们没有使用任何现有的Nest测试工具。由于我们手动处理实例化测试类，因此上面的测试套件与Nest无关。这种类型的测试称为**隔离测试**。
@@ -307,7 +468,7 @@ describe('CatsController', () => {
     it('should return an array of cats', async () => {
       const result = ['test'];
       jest.spyOn(catsService, 'findAll').mockImplementation(() => result);
-
+      
       expect(await catsController.findAll()).toBe(result);
     });
   });
@@ -383,3 +544,4 @@ describe('Cats', () => {
 |---|---|---|---|
 | [@zuohuadong](https://github.com/zuohuadong)  | <img class="avatar-66 rm-style" src="https://wx3.sinaimg.cn/large/006fVPCvly1fmpnlt8sefj302d02s742.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
 | [@Drixn](https://drixn.com/)  | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">  |  翻译  | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/) |
+| [@gaoyangy](<https://github.com/gaoyangy>) | <img class="avatar-66 rm-style" src="https://avatars0.githubusercontent.com/u/23468113?s=460&v=4"> | 校正 | 专注于Vue，TS/JS |

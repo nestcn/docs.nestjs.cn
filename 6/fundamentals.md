@@ -539,4 +539,4 @@ describe('Cats', () => {
 |---|---|---|---|
 | [@zuohuadong](https://github.com/zuohuadong)  | <img class="avatar-66 rm-style" src="https://wx3.sinaimg.cn/large/006fVPCvly1fmpnlt8sefj302d02s742.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
 | [@Drixn](https://drixn.com/)  | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">  |  翻译  | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/) |
-| [@gaoyangy](<https://github.com/gaoyangy>) | ![img](https://avatars0.githubusercontent.com/u/23468113?s=460&v=4) | 校正 | 专注于Vue，TS/JS |
+| [@gaoyangy](<https://github.com/gaoyangy>) | <img class="avatar-66 rm-style" src="https://avatars0.githubusercontent.com/u/23468113?s=460&v=4"> | 校正 | 专注于Vue，TS/JS |

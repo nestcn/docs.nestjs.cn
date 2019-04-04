@@ -151,7 +151,7 @@ definitionsFactory.generate({
 });
 ```
 
-[这里](https://github.com/nestjs/nest/tree/master/sample/12-graphql-apollo){:target="_blank"} 提供完整的例子。
+[这里](https://github.com/nestjs/nest/tree/master/sample/12-graphql-apollo) 提供完整的例子。
 
 #### ** 使用 Typescript **
 
@@ -174,7 +174,7 @@ GraphQLModule.forRoot({
 
 该 autoSchemaFile 代表您自动生成的模式将被创建的路径。此外，您可以传递 buildSchemaOptions 属性 - 一个将传递给 buildSchema() 函数的选项对象（从type-graphql包中）。
 
-[这里](https://github.com/nestjs/nest/tree/master/sample/23-type-graphql){:target="_blank"} 提供完整的例子。
+[这里](https://github.com/nestjs/nest/tree/master/sample/23-type-graphql) 提供完整的例子。
 
 
 <!-- tabs:end -->
@@ -239,7 +239,7 @@ GraphQLModule.forRootAsync({
 
 ### 例子
 
-[这里](https://github.com/nestjs/nest/tree/master/sample/12-graphql-apollo){:target="_blank"} 提供完整的案例。
+[这里](https://github.com/nestjs/nest/tree/master/sample/12-graphql-apollo) 提供完整的案例。
 
 ## 解析图
 

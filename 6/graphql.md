@@ -239,7 +239,7 @@ GraphQLModule.forRootAsync({
 
 ### 例子
 
-[这里](https://github.com/nestjs/nest/tree/master/sample/12-graphql-apollo)这里提供完整的案例。
+[这里](https://github.com/nestjs/nest/tree/master/sample/12-graphql-apollo){:target="_blank"} 提供完整的案例。
 
 ## 解析图
 

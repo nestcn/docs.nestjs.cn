@@ -913,19 +913,15 @@ npm install --save prisma-binding
 2. 创建新服务 `prisma init` , 选择演示服务器并按照说明操作。
 3. 部署您的服务 `prisma deploy` 
 
-如果您发现自己遇到麻烦，请跳转到[「快速入门」](https://www.prisma.io/docs/quickstart/) 部分以获取更多详细信息。最终，您应该在项目目录中看到两个新文件。
-
-> prisma.yaml
+如果您发现自己遇到麻烦，请跳转到[「快速入门」](https://www.prisma.io/docs/quickstart/) 部分以获取更多详细信息。最终，您应该在项目目录中看到两个新文件， `prisma.yaml` 配置文件：
 
 ```yaml
 endpoint: https://us1.prisma.sh/nest-f6ec12/prisma/dev
 datamodel: datamodel.graphql
 ```
-并自动创建数据模型。
+并自动创建数据模型， `datamodel.graphql` 。
 
-> datamodel.graphql
-
-```yaml
+```graphql
 type User {
   id: ID! @unique
   name: String!
@@ -934,7 +930,7 @@ type User {
 
 !> 注意： 在实际应用程序中，您将创建更复杂的数据模型。有关Prisma中数据建模的更多信息，请单击[此处](https://www.prisma.io/features/data-modeling/)。
 
-输入： `prisma playground` 您可以打开 Prisma GraphQL API 控制台。随意发送查询。
+输入： `prisma playground` 您可以打开 Prisma GraphQL API 控制台。
 
 ### 创建客户端
 
@@ -949,6 +945,7 @@ npm install -g graphql-cli
 ```bash
 touch .graphqlconfig.yml
 ```
+
 将以下内容放入其中：
 
 ```yaml
@@ -965,16 +962,16 @@ projects:
             binding: src/prisma/prisma.binding.ts
  ```
  
- 要下载 Prisma GraphQL 文件 `src/prisma/prisma-types.graphql` 并在其下创建 Prisma 客户端 `src/prisma/prisma.binding.graphql` ，请在终端中运行以下命令：
+ 要将Prisma GraphQL架构下载到 `prisma / prisma-types.graphql` 并在 `prisma / prisma.binding.graphql` 下创建Prisma客户端，请在终端中运行以下命令：
  
  ```bash
 graphql get-schema --project database
 graphql codegen --project database
 ```
 
-### 积分
+### 集成（Integration）
 
-快要完成了。现在，让我们为 Prisma 创建一个模块。
+几乎完成了。 现在，让我们为Prisma集成创建一个模块。
 
 > prisma.service
 
@@ -1008,7 +1005,7 @@ import { PrismaService } from './prisma.service';
 export class PrismaModule {}
 ```
 
-?> 提示： 要立即创建新模块和服务，我们可以使用 [Nest CLI](5.0/cli)。创建 `PrismaModule` 类型 `nest g module prisma` 和服务 `nest g service prisma/prisma`
+?> 提示： 要立即创建新模块和服务，我们可以使用 [Nest CLI](/6/cli.md)。创建 `PrismaModule` 类型 `nest g module prisma` 和服务 `nest g service prisma/prisma`
 
 ### 用法
 
@@ -1028,7 +1025,7 @@ import { PrismaModule } from '../prisma/prisma.module';
 export class UsersModule {}
 ```
 
-import `PrismaModule` 使 export `PrismaService` 在 `UsersModule` 上下文中可用。
+导入 `PrismaModule` 可以在 `UsersModule` 上下文中使用导出的 `PrismaService` 。
 
 > src/users/users.resolver
 
@@ -1050,9 +1047,7 @@ export class UsersResolver {
 
 ### 例子
 
-
-官方示例请看[这里](https://github.com/nestjs/nest/tree/master/sample/22-graphql-prisma)
-
+一个略微修改的示例在[这里](https://github.com/nestjs/nest/tree/master/sample/22-graphql-prisma)
 
 
  ### 译者署名

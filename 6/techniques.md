@@ -1,6 +1,5 @@
 ## 认证（Authentication）
 
-{待更新}
 
 身份验证是大多数现有应用程序的重要组成部分。有许多不同的方法、策略和方法来处理用户授权。我们最终决定使用什么取决于特定的应用程序要求，并且与它们的需求密切相关。
 
@@ -8,13 +7,19 @@ passport 是目前最流行的 node.js 认证库，为社区所熟知，并相�
 
 ### 安装
 
+我们必须安装一些基本的包才能开始使用。此外，我们将首先实施承载策略，因此我们需要安装 passport-http-bearer 包。
+
+
+
 ```bash
-$ npm install --save @nestjs/passport passport passport-jwt passport-http-bearer jsonwebtoken
+$ npm install --save @nestjs/passport passport passport-http-bearer
 ```
 
 ### 承载
 
-首先，我们将实现 passport-http-bearer 库。让我们从创建 `AuthService` 类开始，它将公开一个方法 `validateUser()`， 该方法的责任是通过提供的承载令牌查询用户。
+首先，我们将实施 passport-http-bearer 。让我们从创建 `AuthService` 类开始，承载令牌通常用于保护 API 接口，通常使用 OAuth 2.0 。HTTP 承载认证策略使用承载令牌对用户进行认证。
+
+它将公开一个函数 `validateUser()`， 该函数的责任是通过提供的承载令牌查询用户。
 
 > auth.service.ts
 
@@ -27,35 +32,37 @@ export class AuthService {
   constructor(private readonly usersService: UsersService) {}
 
   async validateUser(token: string): Promise<any> {
+    // Validate if token passed along with HTTP request
+    // is associated with any registered account in the database
     return await this.usersService.findOneByToken(token);
   }
 }
 ```
 
-`validateUser()` 方法将 `token` 作为参数。此 token 是从与HTTP请求一起传递的授权标头中提取的。`findOneByToken()` 方法的职责是验证传递的 token 是否确实存在，并与数据库中的所有注册帐户关联。
+`validateUser()` 函数将 `token` 作为参数。此 token 是从  HTTP 请求中的 `Authorization` 提取的。`findOneByToken()` 函数的职责是验证传递的 token 是否确实存在，并与数据库中的所有注册帐户关联。
 
 完成 `AuthService` 后，我们必须创建相应的策略，passport 将使用该策略来验证请求。
 
 > http.strategy.ts
 
 ```typescript
-import { BearerStrategy } from 'passport-http-bearer';
+import { Strategy } from 'passport-http-bearer';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 
 @Injectable()
-export class HttpStrategy extends PassportStrategy(BearerStrategy) {
+export class HttpStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly authService: AuthService) {
     super();
   }
 
-  async validate(token: any, done: Function) {
+  async validate(token: string) {
     const user = await this.authService.validateUser(token);
     if (!user) {
-      return done(new UnauthorizedException(), false);
+      throw new UnauthorizedException();
     }
-    done(null, user);
+    return user;
   }
 }
 ```
@@ -92,9 +99,26 @@ findAll() {
 }
 ```
 
-?> `AuthGuard` 是 `@nestjs/passport` 包中提供的。
+ `AuthGuard` 是 `@nestjs/passport` 包中提供的。`bearer` 是 passport 将使用的策略的名称。让我们检查接口是否有效保护。为了确保一切正常，我们将在users 不设置有效令牌的情况下对资源执行 GET 请求。
+``` bash
+$ curl localhost:3000/users
+```
 
-`bearer` 是 passport 将使用的策略的名称。此外，`AuthGuard` 还接受第二个参数，`options` 对象，您可以通过该对象来确定 passport 行为。
+应用程序应响应 401 Unauthorized 状态代码和以下响应正文：
+
+```
+"statusCode": 401,
+"error": "Unauthorized"
+```
+如果您事先创建了有效令牌并将其与 HTTP 请求一起传递，则应用程序将分别标识用户，将其对象附加到请求，并允许进一步的请求处理。
+
+
+
+ 
+ 
+ 
+ 
+ 此外，`AuthGuard` 还接受第二个参数，`options` 对象，您可以通过该对象来确定 passport 行为。
 
 ### JWT
 

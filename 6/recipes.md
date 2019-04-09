@@ -1049,6 +1049,222 @@ export class UsersResolver {
 
 一个略微修改的示例在[这里](https://github.com/nestjs/nest/tree/master/sample/22-graphql-prisma)
 
+## 健康检查（Health checks (Terminus)）
+
+[terminus](https://github.com/godaddy/terminus)提供了对正常关闭做出反应的钩子，并支持您为任何HTTP应用程序创建适当的[Kubernetes](https://kubernetes.io/)准备/活跃度检查。 模块 `@nestjs/terminus` 将**terminus**库与Nest生态系统集成在一起。
+
+### 入门
+
+要开始使用 `@nestjs/terminus` ，我们需要安装所需的依赖项。
+
+```bash
+$ npm install --save @nestjs/terminus @godaddy/terminus
+```
+
+### 建立一个健康检查
+
+健康检查表示健康指标的摘要。健康指示器执行服务检查，无论是否处于健康状态。 如果所有分配的健康指示符都已启动并正在运行，则运行状况检查为正。由于许多应用程序需要类似的健康指标，因此 `@nestjs/terminus` 提供了一组预定义的健康指标，例如：
+
+- `DNSHealthIndicator`
+- `TypeOrmHealthIndicator`
+- `MongooseHealthIndicator`
+- `MicroserviceHealthIndicator`
+
+### DNS 健康检查
+
+开始我们的第一次健康检查的第一步是设置一个将健康指示器与端点相关联的服务。
+
+> terminus-options.service.ts
+
+```typescript
+import {
+  TerminusEndpoint,
+  TerminusOptionsFactory,
+  DNSHealthIndicator,
+  TerminusModuleOptions
+} from '@nestjs/terminus';
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
+export class TerminusOptionsService implements TerminusOptionsFactory {
+  constructor(
+    private readonly dns: DNSHealthIndicator,
+  ) {}
+
+  createTerminusOptions(): TerminusModuleOptions {
+    const healthEndpoint: TerminusEndpoint = {
+      url: '/health',
+      healthIndicators: [
+        async () => this.dns.pingCheck('google', 'https://google.com'),
+      ],
+    };
+    return {
+      endpoints: [healthEndpoint],
+    };
+  }
+}
+```
+
+一旦我们设置了 `TerminusOptionsService` ，我们就可以将 `TerminusModule` 导入到根 `ApplicationModule` 中。`TerminusOptionsService` 将提供设置，而 `TerminusModule` 将使用这些设置。
+
+>app.module.ts
+
+```typescript
+import { Module } from '@nestjs/common';
+import { TerminusModule } from '@nestjs/terminus';
+import { TerminusOptionsService } from './terminus-options.service';
+
+@Module({
+  imports: [
+    TerminusModule.forRootAsync({
+      useClass: TerminusOptionsService,
+    }),
+  ],
+})
+export class ApplicationModule { }
+```
+
+?> 如果正确完成，Nest将公开定义的运行状况检查，这些检查可通过GET请求到达定义的路由。 例如 `curl -X GET'http://localhost:3000/health'`
+
+### 定制健康指标
+
+在某些情况下，`@nestjs/terminus` 提供的预定义健康指标不会涵盖您的所有健康检查要求。 在这种情况下，您可以根据需要设置自定义运行状况指示器。
+
+让我们开始创建一个代表我们自定义健康指标的服务。为了基本了解健康指标的结构，我们将创建一个示例 `DogHealthIndicator` 。如果每个 `Dog` 对象都具有 `goodboy` 类型，则此健康指示器应具有“up”状态，否则将抛出错误，然后健康指示器将被视为“down”。
+
+> dog.health.ts
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import { HealthCheckError } from '@godaddy/terminus';
+import { HealthIndicatorResult } from '@nestjs/terminus';
+
+export interface Dog {
+  name: string;
+  type: string;
+}
+
+@Injectable()
+export class DogHealthIndicator extends HealthIndicator {
+  private readonly dogs: Dog[] = [
+    { name: 'Fido', type: 'goodboy' },
+    { name: 'Rex', type: 'badboy' },
+  ];
+
+  async isHealthy(key: string): Promise<HealthIndicatorResult> {
+    const badboys = this.dogs.filter(dog => dog.type === 'badboy');
+    const isHealthy = badboys.length > 0;
+    const result = this.getStatus(key, isHealthy, { badboys: badboys.length });
+
+    if (isHealthy) {
+      return result;
+    }
+    throw new HealthCheckError('Dogcheck failed', result);
+  }
+}
+```
+
+我们需要做的下一件事是将健康指标注册为提供者。
+
+> app.module.ts
+
+```typescript
+import { Module } from '@nestjs/common';
+import { TerminusModule } from '@nestjs/terminus';
+import { TerminusOptions } from './terminus-options.service';
+import { DogHealthIndicator } from './dog.health.ts';
+
+@Module({
+  imports: [
+    TerminusModule.forRootAsync({
+      imports: [ApplicationModule],
+      useClass: TerminusOptionsService,
+    }),
+  ],
+  providers: [DogHealthIndicator],
+  exports: [DogHealthIndicator],
+})
+export class ApplicationModule { }
+```
+
+?> 在现实世界的应用程序中，`DogHealthIndicator` 应该在一个单独的模块中提供，例如 `DogsModule` ，然后由 `ApplicationModule` 导入。 但请记住将`DogHealthIndicator` 添加到 `DogModule` 的 `exports` 数组中，并在 `TerminusModule.forRootAsync()` 参数对象的 `imports` 数组中添加 `DogModule` 。
+
+最后需要做的是在所需的运行状况检查端点中添加现在可用的运行状况指示器。 为此，我们返回到 `TerminusOptionsService` 并将其实现到 `/health` 端点。
+
+> terminus-options.service.ts
+
+```typescript
+import {
+  TerminusEndpoint,
+  TerminusOptionsFactory,
+  DNSHealthIndicator,
+  TerminusModuleOptions
+} from '@nestjs/terminus';
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
+export class TerminusOptionsService implements TerminusOptionsFactory {
+  constructor(
+    private readonly dogHealthIndicator: DogHealthIndicator
+  ) {}
+
+  createTerminusOptions(): TerminusModuleOptions {
+    const healthEndpoint: TerminusEndpoint = {
+      url: '/health',
+      healthIndicators: [
+        async () => this.dogHealthIndicator.isHealthy('dog'),
+      ],
+    };
+    return {
+      endpoints: [healthEndpoint],
+    };
+  }
+}
+```
+
+如果一切都已正确完成，`/health` 端点应响应 `503` 响应代码和以下数据。
+
+```json
+{
+  "status": "error",
+  "error": {
+    "dog": {
+      "status": "down",
+      "badboys": 1
+    }
+  }
+}
+```
+
+您可以在 `@nestjs/terminus` [repository](https://github.com/nestjs/terminus/tree/master/sample)中查看示例。
+
+## 文档（Documentation）
+
+**Compodoc**是Angular应用程序的文档工具。 Nest和Angular看起来非常相似，因此，**Compodoc**也支持Nest应用程序。
+
+### 建立（Setup）
+
+在现有的Nest项目中设置Compodoc非常简单。 安装[npm](https://www.npmjs.com/)后，只需在OS终端中使用以下命令添加dev-dependency：
+
+```bash
+$ npm i -D @compodoc/compodoc
+```
+
+### 生成（Generation）
+
+跟随[官方文档](https://compodoc.app/guides/usage.html)，您可以使用以下命令生成文档（需要npm 6）：
+
+```bash
+$ npx compodoc -p tsconfig.json -s
+```
+
+打开浏览器并导航到 `http://localhost:8080` 。 您应该看到一个初始的Nest CLI项目：
+
+<center>![图9](https://docs.nestjs.com/assets/documentation-compodoc-1.jpg)</center>
+
+### 贡献（Contribute）
+
+您可以[在此](https://github.com/compodoc/compodoc)参与Compodoc项目并为其做出贡献。
 
  ### 译者署名
 

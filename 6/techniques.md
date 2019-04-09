@@ -203,7 +203,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
 ### JWT
 
-第二种描述的方法是使用 JSON web token (JWT) 对端点进行身份验证，我们需要安装所需的包。
+第二种描述的方法是使用 JSON web token (JWT) 对接口进行身份验证，我们需要安装所需的包。
 
 ```bash
 $ npm install --save @nestjs/jwt passport-jwt

@@ -112,33 +112,126 @@ $ curl localhost:3000/users
 ```
 如果您事先创建了有效令牌并将其与 HTTP 请求一起传递，则应用程序将分别标识用户，将其对象附加到请求，并允许进一步的请求处理。
 
+```bash
+$ curl localhost:3000/users -H "Authorization: Bearer TOKEN"
+```
+
+### 默认策略
+
+要确定默认策略行为，您可以注册 PassportModule。
+
+> auth.module.ts
+
+```typescript
+import { Module } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { HttpStrategy } from './http.strategy';
+import { UsersModule } from '../users/users.module';
+import { PassportModule } from '@nestjs/passport';
+
+@Module({
+  imports: [
+    PassportModule.register({ defaultStrategy: 'bearer' }),
+    UsersModule,
+  ],
+  providers: [AuthService, HttpStrategy],
+  exports: [PassportModule, AuthService]
+})
+export class AuthModule {}
+```
+
+`defaultStrategy` 设置完成后，您不再需要在 `@AuthGuard()` 装饰器中手动传递策略名称。
+
+```typescript
+@Get('users')
+@UseGuards(AuthGuard())
+findAll() {
+  return [];
+}
+```
+
+?> 请记住，每个使用该模块的模块 PassportModule 或 AuthModule 必须导入 AuthGuard。
 
 
+### 用户对象
+
+当正确验证请求时，用户实体将附加到请求对象并可通过 user 属性访问（例如req.user）。要更改属性名称，请设置 property 选项对象。
+
+```typescript
+PassportModule.register({ property: 'profile' });
+```
+
+### 自定义护照
  
- 
- 
- 
- 此外，`AuthGuard` 还接受第二个参数，`options` 对象，您可以通过该对象来确定 passport 行为。
+根据所使用的策略，护照会采用一系列影响库行为的属性。使用 register() 方法将选项对象直接传递给护照实例。
+
+```typescript
+PassportModule.register({ session: true });
+```
+
+### 继承
+
+在大多数情况下，AuthGuard 就足够了。但是，为了调整默认错误处理或身份验证逻辑，您可以在子类中扩展类和覆盖方法。
+
+```typescript
+import {
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+
+@Injectable()
+export class JwtAuthGuard extends AuthGuard('jwt') {
+  canActivate(context: ExecutionContext) {
+    // Add your custom authentication logic here
+    // for example, call super.logIn(request) to establish a session.
+    return super.canActivate(context);
+  }
+
+  handleRequest(err, user, info) {
+    if (err || !user) {
+      throw err || new UnauthorizedException();
+    }
+    return user;
+  }
+}
+
+```
+
+
 
 ### JWT
 
-第二种描述的方法是使用 JSON web token (JWT) 对端点进行身份验证。首先，让我们关注 AuthService 类。我们需要从token验证切换到基于负载的验证逻辑, 并提供一种方法来为特定用户创建 JWT 令牌, 然后可用于对传入请求进行身份验证。
+第二种描述的方法是使用 JSON web token (JWT) 对端点进行身份验证，我们需要安装所需的包。
+
+```bash
+$ npm install --save @nestjs/jwt passport-jwt
+```
+
+
+让我们关注 AuthService 类。我们需要从token 验证切换到基于负载的验证逻辑, 并提供一种方法来为特定用户创建 JWT 令牌, 然后可用于对传入请求进行身份验证。
 
 > auth.service.ts
 
 ```typescript
-import * as jwt from 'jsonwebtoken';
+import { JwtService } from '@nestjs/jwt';
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+  ) {}
 
-  async createToken() {
+  async signIn(): Promise<string> {
+    // In the real-world app you shouldn't expose this method publicly
+    // instead, return a token once you verify user credentials
     const user: JwtPayload = { email: 'user@email.com' };
-    return jwt.sign(user, 'secretKey', { expiresIn: 3600 });
+    return this.jwtService.sign(user);
   }
 
   async validateUser(payload: JwtPayload): Promise<any> {
@@ -147,9 +240,9 @@ export class AuthService {
 }
 ```
 
-?> 在最佳情况下，`jwt` package 和 token configuration (密钥和到期时间)应注册为 [custom providers]()。
+?> JwtPayloa d是一个具有单个属性的接口 email，表示已解码的 JWT 令牌。
 
-为了简化一个示例，我们创建了一个假用户。此外，到期时间和 `secretKey` 是硬编码的(在实际应用中，您应该考虑使用环境变量)。第二步是创建相应的 `JwtStrategy`。
+为了简化示例，我们创建了一个假用户。第二步是创建一个对应的 `JwtStrategy`。
 
 > jwt.strategy.ts
 
@@ -169,15 +262,17 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: JwtPayload, done: Function) {
+  async validate(payload: JwtPayload) {
     const user = await this.authService.validateUser(payload);
     if (!user) {
-      return done(new UnauthorizedException(), false);
+      throw new UnauthorizedException();
     }
-    done(null, user);
+    return user;
   }
 }
 ```
+
+
 
 `JwtStrategy` 使用 `AuthService` 来验证解码的有效负载。有效负载有效(用户存在)时，passport允许进一步处理请求。否则, 用户将收到 `401 (Unauthorized)` 响应
 
@@ -187,32 +282,106 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
 ```typescript
 import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
 import { UsersModule } from '../users/users.module';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
-  imports: [UsersModule],
+  imports: [
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+    JwtModule.register({
+      secretOrPrivateKey: 'secretKey',
+      signOptions: {
+        expiresIn: 3600,
+      },
+    }),
+    UsersModule,
+  ],
   providers: [AuthService, JwtStrategy],
+  exports: [PassportModule, AuthService],
 })
 export class AuthModule {}
 ```
 
-?> 为了使用 `UsersService`, `AuthModule` 导入了 `UsersModule`。内部实现在这里并不重要。
+?> 为了使用 `UsersService`, `AuthModule` 导入了 `UsersModule`。内部实现在这里并不重要。此外，JwtModule 已经静态注册。要切换到异步配置，请在[此处](https://github.com/nestjs/passport)阅读更多内容。
+
+
+此外，到期时间和 secretKey 是硬编码的(在实际应用中，您应该考虑使用环境变量)。
+
 
 然后，您可以在想要启用身份验证的任何位置使用 `AuthGuard`。
 
 ```typescript
 @Get('users')
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard())
 findAll() {
   return [];
 }
 ```
 
-?> `AuthGuard` 是 `@nestjs/passport` 包中提供的。
 
-`jwt` 是 passport 将使用的策略的名称。此外，`AuthGuard` 还接受第二个参数，`options` 对象，您可以通过该对象来确定 passport 行为。[这里](https://github.com/nestjs/nest/tree/master/sample/19-auth)提供了一个完整的工作示例。
+让我们检查端点是否有效保护。为了确保一切正常，我们将在 users 不设置有效令牌的情况下对资源执行 GET 请求。
+
+```bash
+$ curl localhost:3000/users
+```
+
+
+应用程序应响应 `401 Unauthorized` 状态代码和以下响应正文：
+
+```
+"statusCode": 401,
+"error": "Unauthorized"
+```
+
+如果您事先创建了有效令牌并将其与 HTTP 请求一起传递，则应用程序将分别标识用户，将其对象附加到请求，并允许进一步的请求处理。
+
+```bash
+$ curl localhost:3000/users -H "Authorization: Bearer TOKEN
+```
+
+### 示例
+
+一个完整的工作示例，请[点击这里](https://github.com/nestjs/nest/tree/master/sample/19-auth)。
+
+
+
+### 多种策略
+
+
+通常，您最终会在整个应用程序中重复使用单一策略。但是，有时您可能希望针对不同的范围使用不同的策略。在多个策略的情况下，将第二个参数传递给PassportStrategy 函数。通常，此参数是策略的名称。
+
+```typescript
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt')
+```
+
+在上面的例子中，jwt 变成了 JwtStrategy。之后，您可以用 @AuthGuard('jwt') 像以前一样使用。
+
+### GraphQL
+
+为了将 AuthGuard 与 GraphQ L一起使用，您必须扩展内置 AuthGuard 类和覆盖 getRequest() 函数。
+
+```typescript
+@Injectable()
+export class GqlAuthGuard extends AuthGuard('jwt') {
+  getRequest(context: ExecutionContext) {
+    const ctx = GqlExecutionContext.create(context);
+    return ctx.getContext().req;
+  }
+}
+```
+
+我们假设 req（请求）已作为上下文值的一部分传递。我们必须在模块设置中设置此行为。
+
+```typescript
+GraphQLModule.forRoot({
+  context: ({ req }) => ({ req }),
+});
+```
+而现在，上下文价值将具有 req 属性。
+
 
 ## 数据库（TypeORM）
 

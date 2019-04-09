@@ -585,7 +585,7 @@ $ npm run start
 
 应用程序运行时，打开浏览器并导航到http://localhost:3000/api。 你应该看到一个如下类似的页面：
 
-<center>![图1](https://docs.nestjs.com/assets/swagger1.png)</center>
+![img](https://docs.nestjs.com/assets/swagger1.png)
 
 SwaggerModule自动反映所有端点。 在后台，它使用swagger-ui-express并创建一个实时文档。
 
@@ -608,7 +608,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 基于 `CreateCatDto` ，将创建模块定义：
 
-<center>![图2](https://docs.nestjs.com/assets/swagger-dto.png)</center>
+![img](https://docs.nestjs.com/assets/swagger-dto.png)
 
 如您所见，虽然该类具有一些声明的属性，但定义为空。 为了使 `SwaggerModule` 可以访问类属性，我们必须用 `@ApiModelProperty()` 装饰器标记所有这些属性：
 
@@ -630,7 +630,7 @@ export class CreateCatDto {
 
 让我们打开浏览器并验证生成的 `CreateCatDto` 模型：
 
-<center>![图3](https://docs.nestjs.com/assets/swagger-dto2.png)</center>
+![img](https://docs.nestjs.com/assets/swagger-dto2.png)
 
 `@ApiModelProperty()` 装饰器接受选项对象：
 
@@ -730,11 +730,11 @@ $ npm run start
 
 导航到 `http://localhost:3000/api/cats` 以查看您的 `cats` 的SwaggerUI：
 
-<center>![图4](https://docs.nestjs.com/assets/swagger-cats.png)</center>
+![img](https://docs.nestjs.com/assets/swagger-cats.png)
 
 `http://localhost:3000/api/dogs` 会为你的dogs暴露一个SwaggerUI：
 
-<center>![图5](https://docs.nestjs.com/assets/swagger-dogs.png)</center>
+![img](https://docs.nestjs.com/assets/swagger-dogs.png)
 
 !> 您必须使用 `DocumentBuilder` 构造 **SwaggerOptions** ，对新构造的 `options` 运行 `createDocument()` ，然后立即使用 `setup()` “服务”它，然后才能开始为第二个Swagger规范开发第二个 **SwaggerOptions** 。 此特定顺序是为了防止Swagger配置被不同选项覆盖。
 
@@ -768,13 +768,13 @@ async filterByRole(@Query('role') role: UserRole = UserRole.User) {
 }
 ```
 
-<center>![图6](https://docs.nestjs.com/assets/enum_query.gif)</center>
+![img](https://docs.nestjs.com/assets/enum_query.gif)
 
 ?> `enum` 和 `isArray` 也可以在 `@ApiImplicitQuery()` 中组合使用
 
 将 `isArray` 设置为 **true** ，`enum` 可以多选：
 
-<center>![图7](https://docs.nestjs.com/assets/enum_query_array.gif)</center>
+![img](https://docs.nestjs.com/assets/enum_query_array.gif)
 
 ### 使用数组（Working with arrays）
 
@@ -856,7 +856,7 @@ export class CatsController {}
 
 这就是OpenAPI文档现在的样子：
 
-<center>![图8](https://docs.nestjs.com/assets/swagger-auth.gif)</center>
+![img](https://docs.nestjs.com/assets/swagger-auth.gif)
 
 ### 文件上传（File upload）
 
@@ -1260,7 +1260,7 @@ $ npx compodoc -p tsconfig.json -s
 
 打开浏览器并导航到 `http://localhost:8080` 。 您应该看到一个初始的Nest CLI项目：
 
-<center>![图9](https://docs.nestjs.com/assets/documentation-compodoc-1.jpg)</center>
+![img](https://docs.nestjs.com/assets/documentation-compodoc-1.jpg)
 
 ### 贡献（Contribute）
 

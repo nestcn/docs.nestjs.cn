@@ -931,9 +931,13 @@ MongooseModule.forRootAsync({
 
 ## 文件上传
 
-｛待更新｝
+
 
 为了处理文件上传，Nest使用了[multer](https://github.com/expressjs/multer)中间件。这个中间件是完全可配置的，您可以根据您的应用需求调整其行为。
+
+Multer 是用于处理 `multipart/form-data` 的中间件 ，主要用于上传文件。
+
+!> Multer 不会处理任何不是 multipart（multipart/form-data）的表单。此外，这个包不适用于 FastifyAdapter。
 
 ### 基本实例
 
@@ -951,9 +955,10 @@ uploadFile(@UploadedFile() file) {
 
 `FileInterceptor()` 接收两个参数, 一个 `fieldName` (指向包含文件的 HTML 表单的字段) 和可选 `options` 对象。这些 `MulterOptions` 等效于传入 multer 构造函数 ([此处](https://github.com/expressjs/multer#multeropts)有更多详细信息)
 
-### 多个文件
 
-为了同时上传多个文件，我们使用 `FilesInterceptor()`。这个拦截器需要三个参数。`fieldName`(保持不变)、可同时上载的最大文件数 `maxCount` 以及可选的 `MulterOptions` 对象。此外，要从 `request` 对象中选择文件，我们使用 `@UploadedFiles()` 装饰器
+### 文件数组
+
+为了上传文件数组，我们使用 FilesInterceptor()。这个拦截器有三个参数。 A fieldName（保持不变）， maxCount 即可以同时上载的最大文件数，以及可选MulterOptions 对象。另外，要从 request 对象中选择文件，我们使用 @UploadedFiles() 装饰器。
 
 ```typescript
 @Post('upload')
@@ -963,7 +968,91 @@ uploadFile(@UploadedFiles() files) {
 }
 ```
 
-?> `FilesInterceptor()` 和 `@UploadedFiles()` 装饰都是 `@nestjs/common` 包提供的。
+?> FilesInterceptor() 装饰器需要导入 @nestjs/platform-express ，而 @UploadedFiles() 导入 @nestjs/common。
+
+
+### 多个文件
+
+要上传多个文件（全部使用不同的键），我们使用 FileFieldsInterceptor() 装饰器。
+
+```typescript
+@Post('upload')
+@UseInterceptors(FileFieldsInterceptor([
+  { name: 'avatar', maxCount: 1 },
+  { name: 'background', maxCount: 1 },
+]))
+uploadFile(@UploadedFiles() files) {
+  console.log(files);
+}
+```
+
+### 默认选项
+
+要自定义 multer 行为，您可以注册 MulterModule。我们支持[此处](https://github.com/expressjs/multer#multeropts)列出的所有选项。
+
+```typescript
+MulterModule.register({
+  dest: '/upload',
+});
+```
+
+### 异步配置
+
+通常，您可能希望异步传递模块选项，而不是事先传递它们。在这种情况下，使用 registerAsync() 方法，提供了几种处理异步数据的方法。
+
+第一种可能的方法是使用工厂功能：
+
+```typescript
+MulterModule.registerAsync({
+  useFactory: () => ({
+    dest: '/upload',
+  }),
+});
+```
+
+显然，我们的工厂表现得与其他工厂一样（并且 async并 够通过 inject 注入依赖关系）。
+
+```typescript
+MulterModule.registerAsync({
+  imports: [ConfigModule],
+  useFactory: async (configService: ConfigService) => ({
+    dest: configService.getString('MULTER_DEST'),
+  }),
+  inject: [ConfigService],
+});
+```
+或者，您可以使用类而不是工厂。
+
+```typescript
+MulterModule.registerAsync({
+  useClass: MulterConfigService,
+});
+```
+
+上面的构造将 MulterConfigService 在内部实例化 MulterModule，并将利用它来创建选项对象。在 MulterConfigService 必须实现 MulterOptionsFactory 的接口。
+
+```typescript
+@Injectable()
+class MulterConfigService implements MulterOptionsFactory {
+  createMulterOptions(): MulterModuleOptions {
+    return {
+      dest: '/upload',
+    };
+  }
+}
+````
+
+为了防止创建 MulterConfigService 内部 MulterModule 并使用从不同模块导入的提供程序，您可以使用 useExisting 语法。
+
+```typescript
+MulterModule.registerAsync({
+  imports: [ConfigModule],
+  useExisting: ConfigService,
+});
+```
+
+它的工作原理与使用 Class 相同，但与 MulterModule 有本质区别。MulterModule 将查找导入的模块来重用已创建的配置服务, 而不是自行实例化它。
+
 
 ## 验证
 

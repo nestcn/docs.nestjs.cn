@@ -1056,18 +1056,18 @@ MulterModule.registerAsync({
 
 ## 验证
 
-｛待更新｝
 
-### 验证
 验证是任何现有Web应用程序的基本功能。为了自动验证传入请求，我们利用了内置使用底层的 [class-validator](https://github.com/typestack/class-validator) 包 `ValidationPipe`。它`ValidationPipe` 提供了一种方便的方法，可以使用各种强大的验证规则验证传入的客户端有效负载。
 
 ### 概览
 在 [Pipes](https://docs.nestjs.com/pipes) 一章中，我们完成了构建简化验证管道的过程。为了更好地了解我们在幕后所做的工作，我们强烈建议您阅读本文。在这里，我们将主要关注真实的用例。
 
 ### 自动验证
-为了本教程的目的，我们将绑定 `ValidationPipe` 到整个应用程序，因此，将自动保护所有端点免受不正确的数据的影响。
 
-```
+为了本教程的目的，我们将绑定 `ValidationPipe` 到整个应用程序，因此，将自动保护所有接口免受不正确的数据的影响。
+
+
+```typescript
 async function bootstrap() {
   const app = await NestFactory.create(ApplicationModule);
   app.useGlobalPipes(new ValidationPipe());
@@ -1076,16 +1076,18 @@ async function bootstrap() {
 bootstrap();
 ```
 
-要测试我们的管道，让我们创建一个基本端点。
+要测试我们的管道，让我们创建一个基本接口。
 
 ```
 @Post()
 create(@Body() createUserDto: CreateUserDto) {
   return 'This action adds a new user';
 }
-然后，在我们的中添加一些验证规则CreateCatDto。
+```
 
+然后，在我们的中添加一些验证规则 CreateCatDto。
 
+```typescript
 import { IsEmail, IsNotEmpty } from 'class-validator';
 
 export class CreateUserDto {
@@ -1097,37 +1099,37 @@ export class CreateUserDto {
 }
 ```
 
-现在，当某人使用无效执行对我们的端点的请求时，假设 email 应用程序将响应 `400 Bad Request` 代码并跟随响应主体。
+现在，当某人使用无效 email 执行对我们的接口的请求时，应用程序将响应 `400 Bad Request` 代码并跟随响应主体。
 
 ```
 {
   "statusCode": 400,
   "error": "Bad Request",
   "message": [
-      {
-          "target": {},
-          "property": "email",
-          "children": [],
-          "constraints": {
-              "isEmail": "email must be an email"
-          }
+    {
+      "target": {},
+      "property": "email",
+      "children": [],
+      "constraints": {
+        "isEmail": "email must be an email"
       }
+    }
   ]
 }
 ```
 
 显然，响应机构不是唯一的用例 `ValidationPipe`。想象一下，我们希望 `:id` 在端点路径中接受。但是只有数字才有效。这也很简单。
 
-```
-@Get('id')
+```typescript
+@Get(':id')
 findOne(@Param() params: FindOneParams) {
   return 'This action returns a user';
 }
 ```
 
-而 `FindOneParams` 看起来像下面。
+而 `FindOneParams` 看起来像下面这样。
 
-```
+```typescript
 import { IsNumberString } from 'class-validator';
 
 export class FindOneParams {
@@ -1138,12 +1140,14 @@ export class FindOneParams {
 
 ### 禁用详细错误
 
-错误消息有很多帮助，以便理解通过网络发送的数据有什么问题。但是，在某些生产环境中，您可能希望禁用详细错误。
+错误消息有很多帮助，以便理解通过网络发送的数据有什么问题。但是，在生产环境中，您可能希望禁用详细错误。
 
-```
-app.useGlobalPipes(new ValidationPipe({
-  disableErrorMessages: true,
-}));
+```typescript
+app.useGlobalPipes(
+  new ValidationPipe({
+    disableErrorMessages: true,
+  }),
+);
 ```
 
 现在，不会将错误消息返回给最终用户。
@@ -1153,9 +1157,11 @@ app.useGlobalPipes(new ValidationPipe({
 很多时候，我们希望只传递预定义（列入白名单）的属性。例如，如果我们期望 `email` 和 `password`属性，当有人发送时 age ，该属性应该被剥离并且在 DTO 中不可用。要启用此类行为，请设置 `whitelist` 为 true。
 
 ```
-app.useGlobalPipes(new ValidationPipe({
-  whitelist: true,
-}));
+app.useGlobalPipes(
+  new ValidationPipe({
+    whitelist: true,
+  }),
+);
 ```
 
 此设置将启用自动剥离非白名单（不包含任何装饰器）属性。但是，如果要完全停止请求处理，并向用户返回错误响应，请使用 `forbidNonWhitelisted`。
@@ -1164,24 +1170,35 @@ app.useGlobalPipes(new ValidationPipe({
 
 该 `ValidationPipe` 不会自动将您的有效载荷到相应的 DTO 类。如果您查看控制器方法中的任何一个 `createCatDto` 或 `findOneParams` 在控制器方法中，您会注意到它们不是这些类的实际实例。要启用自动转换，请设置 `transform` 为 true。
 
-```
-app.useGlobalPipes(new ValidationPipe({
-  transform: true,
-}));
+```typescript
+app.useGlobalPipes(
+  new ValidationPipe({
+    transform: true,
+  }),
+);
+
 ```
 
 ### Websockets和微服务
-无论使用何种传输方法，所有这些指南都包括WebSockets和微服务。
+无论使用何种传输方法，所有这些指南都包括 WebSockets 和微服务。
 
 ### 学到更多
 要阅读有关自定义验证器，错误消息和可用装饰器的更多信息，请访问[此页面](https://github.com/typestack/class-validator)。
 
 ## 高速缓存（Caching）
 
-｛待更新｝
+缓存是一种非常简单的技术，有助于提高应用程序的性能。它充当临时数据存储，访问非常高效。
+
+
+### 安装
+
+我们首先需要安装所需的包：
+
+```bash
+$ npm install --save cache-manager
+```
 
 ### 内存缓存
-缓存是一种非常简单的技术，有助于提高应用程序的性能。它充当临时数据存储，访问速度非常快。
 
 Nest 为各种缓存存储提供统一的 API。内置的是内存中的数据存储。但是，您可以轻松切换到更全面的解决方案，例如Redis。为了启用缓存，首先导入 CacheModule 并调用其 register() 方法。
 
@@ -1195,7 +1212,9 @@ import { AppController } from './app.controller';
 })
 export class ApplicationModule {}
 ```
+
 然后挂载 CacheInterceptor 到某个实体（译者注: 向某个实体注入单例缓存对象）:
+
 ```typescript
 @Controller()
 @UseInterceptors(CacheInterceptor)
@@ -1210,6 +1229,7 @@ export class AppController {
 > 警告: 只有使用 @Get() 方式声明的节点会被缓存。
 
 ### 全局缓存
+
 为了减少重复代码量，可以一次绑定 CacheInterceptor 到每个现有节点:
 
 ```typescript
@@ -1231,6 +1251,7 @@ export class ApplicationModule {}
 ```
 
 ### WebSockets和微服务
+
 显然，您可以毫不费力地使用 CacheInterceptor WebSocket 订阅者模式以及 Microservice 的模式（无论使用何种服务间的传输方法）。
 > 译者注: 微服务架构中服务之间的调用需要依赖某种通讯协议介质，在 nest 中不限制你是用消息队列中间价，RPC/gRPC 协议或者对外公开 API 的 HTTP 协议。
 
@@ -1238,7 +1259,7 @@ export class ApplicationModule {}
 @CacheKey('events')
 @UseInterceptors(CacheInterceptor)
 @SubscribeMessage('events')
-onEvent(client, data): Observable<string[]> {
+handleEvent(client: Client, data: string[]): Observable<string[]> {
   return [];
 }
 ```
@@ -1247,16 +1268,18 @@ onEvent(client, data): Observable<string[]> {
 但是， @CacheKey() 需要附加装饰器以指定用于随后存储和检索缓存数据的密钥。此外，请注意，开发者不应该缓存所有内容。缓存数据是用来执行某些业务操作，而一些简单数据查询是不应该被缓存的。
 
 ### 自定义缓存
+
 所有缓存数据都有自己的到期时间（TTL）。要自定义默认值，请将配置选项填写在 register() 方法中。
 
 ```typescript
 CacheModule.register({
   ttl: 5, // seconds
-  max: 10, // seconds
-})
+  max: 10, // maximum number of items in cache
+});
 ```
 
 ### 不同的缓存库
+
 我们充分利用了[缓存管理器](https://github.com/BryanDonovan/node-cache-manager)。该软件包支持各种实用的商店，例如[Redis商店](https://github.com/dabroek/node-cache-manager-redis-store)（此处列出[完整列表](https://github.com/BryanDonovan/node-cache-manager#store-engines)）。要设置 Redis 存储，只需将包与 correspoding 选项一起传递给 register() 方法即可。
 
 > 译者注: 缓存方案库目前可选的有 redis, fs, mongodb, memcached等。 
@@ -1267,17 +1290,20 @@ import { CacheModule, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 
 @Module({
-  imports: [CacheModule.register({
-    store: redisStore,
-    host: 'localhost',
-    port: 6379,
-  })],
+  imports: [
+    CacheModule.register({
+      store: redisStore,
+      host: 'localhost',
+      port: 6379,
+    }),
+  ],
   controllers: [AppController],
 })
 export class ApplicationModule {}
 ```
 
 ### 调整跟踪
+
 默认情况下， Nest 通过 @CacheKey() 装饰器设置的请求路径（在 HTTP 应用程序中）或缓存中的 key（在 websockets 和微服务中）来缓存记录与您的节点数据相关联。然而有时您可能希望根据不同因素设置跟踪，例如，使用 HTTP 头部字段（例如 Authorization 字段关联身份鉴别节点服务）。
 
 > 本文中节点可以理解为服务，也就是一个一个被调用的方法。
@@ -1292,27 +1318,29 @@ class HttpCacheInterceptor extends CacheInterceptor {
   }
 }
 ```
-### 同步配置
-通常，您可能希望同步传递模块选项，而不是事先传递它们。在这种情况下，使用 registerAsync() 方法，提供了几种处理异步数据的方法。
+### 异步配置
+
+通常，您可能希望异步传递模块选项，而不是事先传递它们。在这种情况下，使用 registerAsync() 方法，提供了几种处理异步数据的方法。
 
 第一种可能的方法是使用工厂功能：
+
 ```typescript
 CacheModule.forRootAsync({
   useFactory: () => ({
     ttl: 5,
   }),
-})
+});
 ```
 显然，我们的工厂要看起来能让每一个调用用使用。（可以变成顺序执行的同步代码，并且能够通过注入依赖使用）。
 
 ```typescript
-CacheModule.forRootAsync({
+acheModule.forRootAsync({
   imports: [ConfigModule],
   useFactory: async (configService: ConfigService) => ({
     ttl: configService.getString('CACHE_TTL'),
   }),
   inject: [ConfigService],
-})
+});
 ```
 
 或者，您可以使用类而不是工厂:
@@ -1320,7 +1348,7 @@ CacheModule.forRootAsync({
 ```typescript
 CacheModule.forRootAsync({
   useClass: CacheConfigService,
-})
+});
 ```
 
 上面的构造将 CacheConfigService 在内部实例化为 CacheModule ，并将利用它来创建选项对象。在 CacheConfigService 中必须实现 CacheOptionsFactory 的接口。
@@ -1342,7 +1370,7 @@ class CacheConfigService implements CacheOptionsFactory {
 CacheModule.forRootAsync({
   imports: [ConfigModule],
   useExisting: ConfigService,
-})
+});
 ```
 它和 useClass 的用法有一个关键的相同点: CacheModule 将查找导入的模块以重新使用已创建的 ConfigService 实例，而不是重复实例化。
 

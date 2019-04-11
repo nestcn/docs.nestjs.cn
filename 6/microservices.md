@@ -472,10 +472,10 @@ throw new RpcException('Invalid credentials.');
 
 Nest将处理引发的异常，并因此返回具有以下结构的 `error` 对象:
 
-```
+```json
 {
-  status: 'error',
-  message: 'Invalid credentials.'
+  "status": "error",
+  "message": "Invalid credentials."
 }
 ```
 
@@ -498,14 +498,14 @@ export class ExceptionFilter implements RpcExceptionFilter<RpcException> {
 }
 ```
 
-!> 不能设置全局的微服务异常过滤器。
+!> 在使用混合应用程序功能时，不能设置全局的微服务异常过滤器。
 
 下面是一个使用手动实例化 **方法作用域** 过滤器(也可以使用类作用域)的示例:
 
 ```typescript
 @UseFilters(new ExceptionFilter())
 @MessagePattern({ cmd: 'sum' })
-sum(data: number[]): number {
+accumulate(data: number[]): number {
   return (data || []).reduce((a, b) => a + b);
 }
 ```
@@ -542,14 +542,14 @@ export class AllExceptionsFilter extends BaseRpcExceptionFilter {
 ```typescript
 @UsePipes(new ValidationPipe())
 @MessagePattern({ cmd: 'sum' })
-sum(data: number[]): number {
+accumulate(data: number[]): number {
   return (data || []).reduce((a, b) => a + b);
 }
 ```
 
-## 看守器 (Guards)
+## 守卫(Guards)
 
-微服看守器和普通看守器没有区别。唯一需要注意的是，不要抛出 `HttpException` ，而应该使用 `RpcException`。
+微服守卫和普通守卫没有区别。唯一需要注意的是，不要使用 `HttpException` ，而应该使用 `RpcException`。
 
 ?> `RpcException` 类是从 `@nestjs/microservices` 包引入的。
 
@@ -558,7 +558,7 @@ sum(data: number[]): number {
 ```typescript
 @UseGuards(AuthGuard)
 @MessagePattern({ cmd: 'sum' })
-sum(data: number[]): number {
+accumulate(data: number[]): number {
   return (data || []).reduce((a, b) => a + b);
 }
 ```
@@ -570,7 +570,7 @@ sum(data: number[]): number {
 ```typescript
 @UseInterceptors(new TransformInterceptor())
 @MessagePattern({ cmd: 'sum' })
-sum(data: number[]): number {
+accumulate(data: number[]): number {
   return (data || []).reduce((a, b) => a + b);
 }
 ```

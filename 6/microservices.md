@@ -18,7 +18,7 @@ $ npm i --save @nestjs/microservices
 
 通常，Nest支持一系列内置的传输器。它们基于 **请求-响应** 范式，整个通信逻辑隐藏在抽象层之后。多亏了这一点，您可以轻松地在传输器之间切换，而无需更改任何代码行。我们不支持具有基于日志的持久性的流平台，例如 [Kafka](https://docs.confluent.io/3.0.0/streams/)或 [NATS](https://github.com/nats-io/node-nats-streaming)流，因为它们是为解决不同范围的问题而创建的。但是，您仍然可以通过使用执行上下文功能将它们与Nest一起使用。
 
-为了创建微服务，我们使用 `NestFactory` 类的 `createMicroservice()` 方法。默认情况下，微服务通过 **TCP协议** 监听消息。
+为了创建微服务，我们使用 `NestFactory` 类的 `createMicroservice()` 方法。
 
 > main.ts
 
@@ -36,7 +36,9 @@ async function bootstrap() {
 bootstrap();
 ```
 
-`createMicroservice ()` 方法的第二个参数是options对象。此对象可能有两个成员:
+?> 默认情况下，微服务通过 **TCP协议** 监听消息。
+
+`createMicroservice ()` 方法的第二个参数是 options 对象。此对象可能有两个成员:
 
 |                      |                                  |
 | :------------------- | :------------------------------- |
@@ -55,7 +57,16 @@ bootstrap();
 
 ### 模式（patterns）
 
-微服务通过 **模式** 识别消息。模式是一个普通值，例如对象、字符串或甚至数字。为了创建模式处理程序，我们使用从 `@nestjs/microservices` 包的 `@MessagePattern()` 装饰器。
+微服务通过 **模式** 识别消息。模式是一个普通值，例如对象、字符串或甚至数字。为了创建模式处理程序，最终，每个模式都被序列化，因此可以通过网络与数据一起发送。因此，接收器可以容易地将传入消息与相应的处理器相关联。
+
+### 请求-响应
+
+
+当您必须在各种外部服务之间交换消息时，请求 - 响应 通信机制非常有用。此外，使用此范例，您可以确保该服务实际上已收到该消息。
+
+为了使服务能够通过网络交换数据，Nest 创建了两个通道，其中一个负责传输数据，而另一个负责监听传入的响应。然而，并非总是如此。例如，作为 NATS 的平台提供了开箱即用的功能，因此我们不必自己完成。
+
+基本上，要创建一个消息处理程序（基于请求 - 响应范例），我们使用 @MessagePattern() ，需要 import @nestjs/microservices 包。
 
 >  math.controller.ts
 
@@ -66,13 +77,13 @@ import { MessagePattern } from '@nestjs/microservices';
 @Controller()
 export class MathController {
   @MessagePattern({ cmd: 'sum' })
-  sum(data: number[]): number {
+  accumulate(data: number[]): number {
     return (data || []).reduce((a, b) => a + b);
   }
 }
 ```
 
-`sum ()` 处理程序正在监听符合 `cmd :'sum'` 模式的消息。模式处理程序采用单个参数，即从客户端传递的 `data` 。在这种情况下，数据是必须累加的数字数组。
+`accumulate()` 处理程序正在监听符合 `cmd :'sum'` 模式的消息。模式处理程序采用单个参数，即从客户端传递的 `data` 。在这种情况下，数据是必须累加的数字数组。
 
 ### 异步响应
 
@@ -82,7 +93,7 @@ export class MathController {
 
 ```typescript
 @MessagePattern({ cmd: 'sum' })
-async sum(data: number[]): Promise<number> {
+async accumulate(data: number[]): Promise<number> {
   return (data || []).reduce((a, b) => a + b);
 }
 ```
@@ -93,33 +104,82 @@ async sum(data: number[]): Promise<number> {
 
 ```typescript
 @MessagePattern({ cmd: 'sum' })
-sum(data: number[]): Observable<number> {
+accumulate(data: number[]): Observable<number> {
   return from([1, 2, 3]);
 }
 ```
 
 以上消息处理程序将响应3次(对数组中的每个项)。
 
+### 基于事件
+
+虽然当您必须不断地在服务之间交换消息时，请求 - 响应方法很棒，但是当您只想发布事件（无需等待响应）时，它会带来太多不必要的开销，而这些开销是完全无用的。例如，您希望简单地通知另一个服务系统的这一部分发生了某种情况。因此，我们也为基于事件的通信提供支持。
+
+为了创建事件处理程序，我们使用 @EventPattern()， 需要import @nestjs/microservices 包。
+
+```typescript
+@EventPattern('user_created')
+async handleUserCreated(data: Record<string, unknown>) {
+  // business logic
+}
+```
+
+该 handleUserCreated() 方法正在侦听 user_created 事件。事件处理程序接受一个参数，data 从客户端传递（在本例中，是一个通过网络发送的事件有效负载）。
+
+
 ### 客户端
 
-为了连接 Nest 的微服务，我们使用 `ClientProxy` 类，该类实例通过 `@Client()` 装饰器分配给属性。这个装饰器只需要一个参数。即与 Nest 微服务选项对象相同的对象。
+
+ 为了交换消息或将事件发布到 Nest 微服务，我们使用 ClientProxy 类, 它可以通过几种方式创建实例。首先，我们可以 import  ClientsModule 暴露的静态register() 方法的内容。此方法将数组作为参数，其中每个元素都具有 name（这是一种微服务标识符）以及特定于微服务的选项（它与传入 createMicroservice()方法的对象相同）。
+
+```typescript
+ClientsModule.register([
+  { name: 'MATH_SERVICE', transport: Transport.TCP },
+]),
+```
+
+?> `ClientsModule` 需要 import  `@nestjs/microservices` 。
+
+导入模块后，我们可以在 MATH_SERVICE 使用 @Inject() 装饰器进行注入。
+
+```typescript
+constructor(
+  constructor(
+    @Inject('MATH_SERVICE') private readonly client: ClientProxy,
+  ) {}
+)
+```
+
+?> `ClientProxy` 需要 import  `@nestjs/microservices` 。
+
+尽管如此，这种方法不允许我们异步获取微服务配置。在这种情况下，我们可以直接使用 ClientProxyFactory 注册自定义提供程序（它是一个客户端实例）：
+
+```typescript
+{
+  provide: 'MATH_SERVICE',
+  useFactory: (configService: ConfigService) => {
+    const mathSvcOptions = configService.getMathSvcOptions();
+    return ClientProxyFactory.create(mathSvcOptions);
+  },
+  inject: [ConfigService],
+}
+```
+
+?> `ClientProxyFactory` 需要 import  `@nestjs/microservices` 。
+
+
+最后一个可行的解决方案是使用 @Client() 属性装饰器。
+
 
 ```typescript
 @Client({ transport: Transport.TCP })
 client: ClientProxy;
 ```
 
-!> `@Client()` 和 `ClientProxy` 需要引入 `@nestjs/microservices` 。
+?> `@Client()` 需要 import  `@nestjs/microservices` 。
 
-另一种解决方案是 ClientProxy 使用 ClientProxyFactory（从 @nestjs/microservices 包中导出）手动创建实例。
+但是，使用装饰器不是推荐的方法（难以测试，难以共享客户端实例）。
 
-```typescript
-constructor() {
-  this.client = ClientProxyFactory.create({
-    transport: Transport.TCP
-  });
-}
-```
 
 ClientProxy 是惰性的。它不会立即启动连接。相反，它将在第一次微服务请求之前建立，然后在每次后续请求中重复使用。但是，如果要延迟应用程序的引导过程并手动初始化连接，则可以在 OnModuleInit 生命周期钩子中使用函数 connect()。
 
@@ -133,14 +193,26 @@ async onModuleInit() {
 该 `ClientProxy` 公开了一个 `send()` 方法。此方法旨在调用微服务并返回 `Observable` 其响应，这意味着，我们可以轻松地订阅发出的值。
 
 ```typescript
-@Get()
-call(): Observable<number> {
+accumulate(): Observable<number> {
   const pattern = { cmd: 'sum' };
   const payload = [1, 2, 3];
   return this.client.send<number>(pattern, payload);
 }
 ```
-send() 函数接受两个参数，pattern 和 payload。模式必须等于 @MessagePattern() 修饰符中定义的这个模式，而 payload 是我们想要传输到另一个微服务的消息
+send() 函数接受两个参数，pattern 和 payload。pattern 具有 @MessagePattern() 修饰符中定义的这个模式，而 payload 是我们想要传输到另一个微服务的消息。
+
+### 发布活动
+
+另一种可行的方法是 emit()。此方法的职责是将事件发布到消息代理。
+
+```typescript
+async publish() {
+  this.client.emit<number>('user_created', new UserCreatedEvent());
+}
+```
+
+该 emit() 方法有两个参数，pattern 和 payload。该 pattern 具有等同于在定义的 @EventPattern() ，同时 payload 是我们要传递到另一个微服务的事件负载。
+
 
 
 ## Redis
@@ -208,9 +280,13 @@ const app = await NestFactory.createMicroservice(ApplicationModule, {
   },
 });
 ```
-### 选项
 
-有很多可用的选项可以决定传输器的行为。更多描述请[查看](https://github.com/mqttjs/MQTT.js)。
+?> Transport 枚举需要import  @nestjs/microservices 包。
+
+
+### 属性
+
+有很多可用的属性可以决定传输器的行为。更多描述请[查看](https://github.com/mqttjs/MQTT.js)。
 
 
 ## NATS
@@ -227,7 +303,7 @@ $ npm i --save nats
 
 ### 概述
 
-为了切换到 **NATS** 传输器，我们需要修改传递到 `createMicroservice()` 方法的选项对象。
+为了切换到 **NATS** 传输器，我们需要修改传递到 `createMicroservice()` 方法的属性对象。
 
 > main.ts
 
@@ -239,6 +315,9 @@ const app = await NestFactory.createMicroservice(ApplicationModule, {
   },
 });
 ```
+
+?> Transport 枚举需要import  @nestjs/microservices 包。
+
 
 ### 选项
 

@@ -1974,9 +1974,8 @@ HttpModule.forRootAsync({
 
 ## MVC
 
-｛待更新｝
 
-Nest 默认使用 Express 库，因此有关 Express 中的 MVC（模型 - 视图 - 控制器）模式的每个教程都与 Nest 相关。首先，让我们使用CLI工具搭建一个简单的Nest应用程序：
+Nest 默认使用 Express 库，因此有关 Express 中的 MVC（模型 - 视图 - 控制器）模式的每个教程都与 Nest 相关。首先，让我们使用 CLI 工具搭建一个简单的Nest 应用程序：
 
 ```bash
 $ npm i -g @nestjs/cli
@@ -1989,19 +1988,23 @@ $ nest new project
 $ npm install --save hbs
 ```
 
-我们决定使用 `hbs` 引擎，但您可以使用任何符合您要求的内容。安装过程完成后，我们需要使用以下代码配置快速实例：
+我们决定使用 `hbs` 引擎，但您可以使用任何符合您要求的内容。安装过程完成后，我们需要使用以下代码配置 express 实例：
 
 > main.ts
 
 ``` typescript
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 import { ApplicationModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(ApplicationModule);
+  const app = await NestFactory.create<NestExpressApplication>(
+    ApplicationModule,
+  );
 
-  app.useStaticAssets(__dirname + '/public');
-  app.setBaseViewsDir(__dirname + '/views');
+  app.useStaticAssets(join(__dirname, '..', 'public'));
+  app.setBaseViewsDir(join(__dirname, '..', 'views'));
   app.setViewEngine('hbs');
 
   await app.listen(3000);
@@ -2009,7 +2012,7 @@ async function bootstrap() {
 bootstrap();
 ```
 
-我们告诉express，该 `public` 目录将用于存储静态文件，  `views` 将包含模板，并且 `hbs` 应使用模板引擎来呈现 HTML 输出。
+我们告诉 express，该 `public` 目录将用于存储静态文件，  `views` 将包含模板，并且 `hbs` 应使用模板引擎来呈现 HTML 输出。
 
 现在，让我们在该文件夹内创建一个 `views` 目录和一个 `index.hbs` 模板。在模板内部，我们将打印从控制器传递的 `message`：
 
@@ -2018,13 +2021,13 @@ bootstrap();
 ```html
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>App</title>
-</head>
-<body>
-  {{ message }}
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <title>App</title>
+  </head>
+  <body>
+    {{ message }}
+  </body>
 </html>
 ```
 
@@ -2049,47 +2052,48 @@ export class AppController {
 
 在应用程序运行时，打开浏览器访问 `http://localhost:3000/` 你应该看到这个 Hello world! 消息。
 
-[这里](https://github.com/nestjs/nest/tree/master/sample/15-mvc)有一个可用的例子
+[这里](https://github.com/nestjs/nest/tree/master/sample/15-mvc)有一个可用的例子。
 
-### Fastify
+### 做法
 
+如本章所述，我们可以将任何兼容的 HTTP 提供程序与 Nest 一起使用。比如  [Fastify](https://github.com/fastify/fastify) 。为了创建具有 fastify 的 MVC 应用程序，我们必须安装以下包：
 
-
-
-如[本章](https://docs.nestjs.com/v5/)所述，我们可以将任何兼容的HTTP提供程序与Nest一起使用。其中一个是[fastify](https://github.com/fastify/fastify)库。为了创建一个具有fastify的MVC应用程序，我们必须安装以下软件包:
 
 ```bash
 $ npm i --save fastify point-of-view handlebars
 ```
 
-接下来的步骤几乎涵盖了与express库相同的内容(差别很小)。安装过程完成后，我们需要打开 `main.ts` 文件并更新其内容:
+接下来的步骤几乎涵盖了与 express 库相同的内容(差别很小)。安装过程完成后，我们需要打开 `main.ts` 文件并更新其内容:
 
 > main.ts
 
 ```typescript
 import { NestFactory } from '@nestjs/core';
+import { NestFastifyApplication, FastifyAdapter } from '@nestjs/platform-fastify';
 import { ApplicationModule } from './app.module';
-import { FastifyAdapter } from '@nestjs/core/adapters/fastify-adapter';
 import { join } from 'path';
 
 async function bootstrap() {
-  const app = await NestFactory.create(ApplicationModule, new FastifyAdapter());
+  const app = await NestFactory.create<NestFastifyApplication>(
+    ApplicationModule,
+    new FastifyAdapter(),
+  );
   app.useStaticAssets({
-    root: join(__dirname, 'public'),
+    root: join(__dirname, '..', 'public'),
     prefix: '/public/',
   });
   app.setViewEngine({
     engine: {
       handlebars: require('handlebars'),
     },
-    templates: join(__dirname, 'views'),
+    templates: join(__dirname, '..', 'views'),
   });
   await app.listen(3000);
 }
 bootstrap();
 ```
 
-API略有不同，但这些方法调用背后的想法保持不变。此外，我们还必须确保传递到 `@Render()` 装饰器中的模板名称包含文件扩展名。
+API 略有不同，但这些方法调用背后的想法保持不变。此外，我们还必须确保传递到 `@Render()` 装饰器中的模板名称包含文件扩展名。
 
 > app.controller.ts
 
@@ -2106,7 +2110,7 @@ export class AppController {
 }
 ```
 
-在应用程序运行时，打开浏览器并导航至`http://localhost:3000/`。你应该看到这个Hello world!消息。
+在应用程序运行时，打开浏览器并导航至`http://localhost:3000/`。你应该看到这个 Hello world! 消息。
 
 [这里](https://github.com/nestjs/nest/tree/master/sample/17-mvc-fastify)有 一个可用的例子。
 

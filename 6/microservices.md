@@ -244,6 +244,53 @@ const app = await NestFactory.createMicroservice(ApplicationModule, {
 
 有许多可用的选项可以确定传输器的行为。它们在 [这里](https://github.com/nats-io/node-nats#connect-options) 有很好的描述。
 
+## RabbitMQ
+
+[RabbitMQ](https://www.rabbitmq.com/) 是部署最广泛的开源消息代理。
+
+### 安装
+
+在开始之前，我们必须安装所需的包：
+
+```bash
+$ npm i --save amqplib amqp-connection-manager
+```
+
+### 传输器
+
+为了切换到 RabbitMQ 传输器，我们需要修改传递给该 createMicroservice() 方法的属性对象。
+
+> main.ts
+
+```typescript
+const app = await NestFactory.createMicroservice(ApplicationModule, {
+  transport: Transport.RMQ,
+  options: {
+    urls: [`amqp://localhost:5672`],
+    queue: 'cats_queue',
+    queueOptions: { durable: false },
+  },
+});
+```
+
+?> Transport 枚举 需要import  @nestjs/microservices 包。
+
+### 属性
+
+
+有许多可用属性可确定传输器行为。
+
+|  |  | 
+| :--- | ----: | 
+| urls |	连接地址 |
+| queue |	您的服务器将监听的队列名称 |
+| prefetchCount |	设置通道的预取计数 |
+| isGlobalPrefetchCount	 | 启用每个通道预取|
+| queueOptions |	其他队列选项。它们在[这里](https://www.squaremobius.net/amqp.node/channel_api.html#assertQueue)有很好的描述 |
+| socketOptions	 | 其他套接字选项。它们在[这里](https://www.squaremobius.net/amqp.node/channel_api.html#socket-options)有很好的描述 |
+
+
+
 ## gRPC
 
 [gRPC](https://github.com/grpc/grpc-node) 是一个高性能、开源的通用RPC框架。

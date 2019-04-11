@@ -2053,6 +2053,9 @@ export class AppController {
 
 ### Fastify
 
+
+
+
 如[本章](https://docs.nestjs.com/v5/)所述，我们可以将任何兼容的HTTP提供程序与Nest一起使用。其中一个是[fastify](https://github.com/fastify/fastify)库。为了创建一个具有fastify的MVC应用程序，我们必须安装以下软件包:
 
 ```bash
@@ -2108,20 +2111,20 @@ export class AppController {
 [这里](https://github.com/nestjs/nest/tree/master/sample/17-mvc-fastify)有 一个可用的例子。
 
 ## 性能（Fastify）
-｛待更新｝
 
-在底层，Nest使用了[Express](https://expressjs.com/)，但如前所述，它提供了与各种其他库的兼容性，例如 [Fastify](https://github.com/fastify/fastify)。它是怎么工作的？事实上，Nest需要使用您最喜欢的库，它是一个兼容的适配器，它主要将相应的处理程序代理到适当的库特定的方法。此外，您的库必须至少提供与express类似的请求-响应周期管理。
 
-Fastify非常适合这里，因为它以与express类似的方式解决设计问题。然而，fastify的速度要快得多，达到了几乎两倍的基准测试结果。问题是，为什么Nest仍然使用express作为默认的HTTP提供程序？因为express是应用广泛、广为人知的，而且拥有一套庞大的兼容中间件。
+在底层，Nest 使用了[Express](https://expressjs.com/)，但如前所述，它提供了与各种其他库的兼容性，例如 [Fastify](https://github.com/fastify/fastify)。它是怎么工作的？事实上，Nest需要使用您最喜欢的库，它是一个兼容的适配器，它主要将相应的处理程序代理到适当的库特定的方法。此外，您的库必须至少提供与 express 类似的请求-响应周期管理。
 
-但我们并没有将人们锁定在单一的模式中。我们让他们使用任何他们需要的东西。如果您关心真正出色的性能，Fastify是一个更好的选择，这就是为什么我们提供内置 `FastifyAdapter` 有助于将此库与Nest整合在一起的原因。
+Fastify 非常适合这里，因为它以与 express 类似的方式解决设计问题。然而，fastify 的速度要快得多，达到了几乎两倍的基准测试结果。问题是，为什么Nest仍然使用express作为默认的HTTP提供程序？因为express是应用广泛、广为人知的，而且拥有一套庞大的兼容中间件。
+
+但我们并没有将人们锁定在单一的模式中。我们让他们使用任何他们需要的东西。如果您关心真正出色的性能，Fastify 是一个更好的选择，这就是为什么我们提供内置 `FastifyAdapter` 有助于将此库与 Nest 整合在一起的原因。
 
 ### 安装
 
 首先，我们需要安装所需的软件包：
 
 ```bash
-$ npm i --save fastify fastify-formbody
+$ npm i --save @nestjs/platform-fastify
 ```
 
 ### 适配器（Adapter）
@@ -2130,17 +2133,30 @@ $ npm i --save fastify fastify-formbody
 
 ```typescript
 import { NestFactory } from '@nestjs/core';
-import { FastifyAdapter } from '@nestjs/core/adapters';
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
 import { ApplicationModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(ApplicationModule, new FastifyAdapter());
+  const app = await NestFactory.create<NestFastifyApplication>(
+    ApplicationModule,
+    new FastifyAdapter(),
+  );
   await app.listen(3000);
 }
 bootstrap();
 ```
 
-就这样。此外，您还可以通过 `FastifyAdapter` 构造函数将选项传递到fastify构造函数中。请记住，Nest现在使用fastify作为HTTP提供程序，这意味着在express上转发的每个配方都将不再起作用。您应该使用fastify等效软件包。
+如果您在 docker 容器中运行 Nest 实例，则需要指定主机，如下所示：
+
+```typescript
+await app.listen(3000, '0.0.0.0');
+```
+
+
+就这样。此外，您还可以通过 `FastifyAdapter` 构造函数将选项传递到 fastify 构造函数中。请记住，Nest现在使用 fastify 作为 HTTP 提供程序，这意味着在express 上转发的每个配置都将不再起作用。您应该使用 fastify 等效软件包。
 
 ## 热重载（Webpack）
 
@@ -2151,7 +2167,7 @@ bootstrap();
 首先，我们安装所需的软件包：
 
 ```bash
-$ npm i --save-dev webpack webpack-cli webpack-node-externals
+$ npm i --save-dev webpack webpack-cli webpack-node-externals ts-loader
 ```
 
 ### 配置（Configuration）

@@ -7,7 +7,7 @@
 ```typescript
 async function bootstrap() {
   const app = await NestFactory.createApplicationContext(ApplicationModule);
-  // logic...
+  // application logic...
 }
 bootstrap();
 ```
@@ -16,14 +16,14 @@ bootstrap();
 
 ```typescript
 const app = await NestFactory.create(ApplicationModule);
-const tasksController = app.get(TasksController);
+const tasksService = app.get(TasksService);
 ```
 
 就是这样。要获取 `TasksController` 实例，我们必须使用 `get()` 方法。我们不必遍历整个模块树，`get()` 方法就像 **查询** 一样，自动在每个注册模块中搜索实例。但是，如果您更喜欢严格的上下文检查，则可以使用 `strict: true` 选项对象作为 `get()` 方法的第二个参数传递给它。然后，您必须通过所有模块从选定的上下文中选取特定的实例。
 
 ```typescript
 const app = await NestFactory.create(ApplicationModule);
-const tasksController = app.select(TasksModule).get(TasksController, { strict: true });
+const tasksService = app.select(TasksModule).get(TasksService, { strict: true });
 ```
 
 |               |                                                              |

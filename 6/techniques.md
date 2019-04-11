@@ -1383,7 +1383,7 @@ CacheModule.forRootAsync({
 > 译者注: Serialization 实现可类比 composer 库中 fractal ，响应给用户的数据不仅仅要剔除设计安全的属性，还需要剔除一些无用字段如 create_time, delete_time, update_time 和其他属性。在JAVA的实体类中定义N个属性的话就会返回N个字段，解决方法可以使用范型编程，否则操作实体类回影响数据库映射字段。
 
 ### 概要
-为了提供一种直接的方式来执行这些操作， Nest 附带了这个 ClassSerializerInterceptor 类。它使用类转换器来提供转换对象的声明性和可扩展方式。基于此类基础下，可以从类转换器 ClassSerializerInterceptor 中获取方法和调用 classToPlain() 函数返回的值。
+为了提供一种直接的方式来执行这些操作， Nest 附带了这个 ClassSerializerInterceptor 类。它使用[类转换器](https://github.com/typestack/class-transformer)来提供转换对象的声明性和可扩展方式。基于此类基础下，可以从类转换器 ClassSerializerInterceptor 中获取方法和调用 classToPlain() 函数返回的值。
 
 ### 排除属性
 
@@ -1479,7 +1479,7 @@ findOne(): UserEntity {
 
 Nest 在对象实例化后的几种情况下，内部实现了 Logger 日志记录，例如发生异常时候。但有时，您可能希望完全禁用日志记录，或者实现自定义日志模块并自行处理日志消息。想要关闭记录器，我们得使用 Nest 的选项对象。
 
-```
+```typescript
 const app = await NestFactory.create(ApplicationModule, {
   logger: false,
 });
@@ -1488,7 +1488,7 @@ await app.listen(3000);
 
 尽管如此，我们可能希望在 hook 下使用不同的记录器，而不是禁用整个日志记录机制。为了做到这一点，我们必须传递一个实现 LoggerService 接口的对象。比如说可以是内置的 console。
 
-```
+```typescript
 const app = await NestFactory.create(ApplicationModule, {
   logger: console,
 });
@@ -1497,19 +1497,21 @@ await app.listen(3000);
 
 但这不是一个最好的办法，我们也可以选择创建自定义的记录器：
 
-```
+```typescript
 import { LoggerService } from '@nestjs/common';
 
 export class MyLogger implements LoggerService {
   log(message: string) {}
   error(message: string, trace: string) {}
   warn(message: string) {}
+  debug(message: string) {}
+  verbose(message: string) {}
 }
 ```
 
 然后，我们可以 MyLogger 直接应用实例：
 
-```
+```typescript
 const app = await NestFactory.create(ApplicationModule, {
   logger: new MyLogger(),
 });
@@ -1520,12 +1522,12 @@ await app.listen(3000);
 
 很多实例操作需要创建自己的日志。你不必完全重新发明轮子。只需扩展内置 Logger 类以部分覆盖默认实现，并使用 super 将调用委托给父类。
 
-```
+```typescript
 import { Logger } from '@nestjs/common';
 
 export class MyLogger extends Logger {
   error(message: string, trace: string) {
-    // add your custom business logic
+    // add your tailored logic here
     super.error(message, trace);
   }
 }
@@ -1535,7 +1537,7 @@ export class MyLogger extends Logger {
 
 如果要在 Logger 类中启用依赖项注入，则必须使 MyLogger 该类成为实际应用程序的一部分。例如，您可以创建一个 LoggerModule:
 
-```
+```typescript
 import { Module } from '@nestjs/common';
 import { MyLogger } from './my-logger.service.ts';
 
@@ -1543,12 +1545,12 @@ import { MyLogger } from './my-logger.service.ts';
   providers: [MyLogger],
   exports: [MyLogger],
 })
-export class LoggerModule {};
+export class LoggerModule {}
 ```
 
 一旦 LoggerModule 在其他地方导入，框架将负责创建 Logger 类的实例。现在，要在整个应用程序中使用相同的 Logger 实例，包括引导和错误处理的东西，请使用以下方式：
 
-```
+```typescript
 const app = await NestFactory.create(ApplicationModule, {
   logger: false,
 });
@@ -1559,8 +1561,6 @@ await app.listen(3000);
 此解决方案的唯一缺点是您的第一个初始化消息将不会由您的 Logger 实例处理，但此时这点并不重要。
 
 ## 安全
-
-｛待更新｝
 
 在本章中，您将学习一些可以提高应用程序安全性的技术。
 
@@ -1573,7 +1573,7 @@ $ npm i --save helmet
 
 安装完成后，将其应用为全局中间件。
 
-```
+```typescript
 import * as helmet from 'helmet';
 // somewhere in your initialization file
 app.use(helmet());
@@ -1583,7 +1583,7 @@ app.use(helmet());
 
 跨源资源共享（CORS）是一种允许从另一个域请求资源的机制。在引擎盖下，Nest 使用了 [cors](https://github.com/expressjs/cors) 包，它提供了一系列选项，您可以根据自己的要求进行自定义。为了启用 CORS，您必须调用 enableCors() 方法。
 
-```
+```typescript
 const app = await NestFactory.create(ApplicationModule);
 app.enableCors();
 await app.listen(3000);
@@ -1591,7 +1591,7 @@ await app.listen(3000);
 
 此外，您可以将配置对象作为此函数的参数传递。可用的属性在官方 [cors](https://github.com/expressjs/cors) 存储库中详尽描述。另一种方法是使用 Nest 选项对象：
 
-```
+```typescript
 const app = await NestFactory.create(ApplicationModule, { cors: true });
 await app.listen(3000);
 ```
@@ -1602,13 +1602,13 @@ await app.listen(3000);
 
 跨站点请求伪造（称为 CSRF 或 XSRF）是一种恶意利用网站，其中未经授权的命令从Web应用程序信任的用户传输。要减轻此类攻击，您可以使用 [csurf](https://github.com/expressjs/csurf) 软件包。首先，安装所需的包：
 
-```
+```bash
 $ npm i --save csurf
 ```
 
 安装完成后，将其应用为全局中间件。
 
-```
+```typescript
 import * as csurf from 'csurf';
 // somewhere in your initialization file
 app.use(csurf());
@@ -1628,23 +1628,28 @@ $ npm i --save express-rate-limit
 ```typescript
 import * as rateLimit from 'express-rate-limit';
 // somewhere in your initialization file
-app.use(rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
-}));
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+  }),
+);
 ```
 
 > 提示: 如果您在 FastifyAdapter 下开发，请考虑使用 [fastify-rate-limit](https://github.com/fastify/fastify-rate-limit)。
 
 ## Configuration
 
-｛待更新｝
+
 
 用于在不同的环境中运行的应用程序。根据环境的不同，应该使用各种配置变量。例如，很可能本地环境会针对特定数据库凭证进行中继，仅对本地数据库实例有效。为了解决这个问题，我们过去利用了 `.env` 包含键值对的文件，每个键代表一个特定的值，因为这种方法非常方便。
 
+
+但是, 当我们使用进程全局对象时, 很难保持我们的测试不被污染, 因为测试类可能会直接使用它。另一种方法是创建一个抽象层, 即一个 ConfigModule, 它公开了一个 ConfigService, 其中包含加载的配置变量。
+
 ### 安装
 
-为了解析我们的环境文件，我们将使用一个 [dotenv](https://github.com/motdotla/dotenv) 软件包。
+某些平台会自动将我们的环境变量附加到 process.env 全局。但是，在本地环境中，我们必须手动处理它。为了解析我们的环境文件，我们将使用一个 [dotenv](https://github.com/motdotla/dotenv) 软件包。
 
 ```bash
 $ npm i --save dotenv
@@ -1659,7 +1664,7 @@ import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 
 export class ConfigService {
-  private readonly envConfig: { [prop: string]: string };
+  private readonly envConfig: { [key: string]: string };
 
   constructor(filePath: string) {
     this.envConfig = dotenv.parse(fs.readFileSync(filePath))
@@ -1696,8 +1701,8 @@ export class ConfigModule {}
 > development.env
 
 ```
-DATABASE_USER=test
-DATABASE_PASSWORD=test
+DATABASE_USER = test;
+DATABASE_PASSWORD = test;
 ```
 
 ### 使用ConfigService
@@ -1730,7 +1735,7 @@ export class AppService {
 
 您也可以将 `ConfigModule` 声明为全局模块，而不是在所有模块中重复导入 `ConfigModule`。
 
-### 高级配置（可选）
+### 高级配置
 
 我们刚刚实现了一个基础 `ConfigService`。但是，这种方法有几个缺点，我们现在将解决这些缺点:
 
@@ -1754,11 +1759,12 @@ $ npm install --save-dev @types/joi
 > config.service.ts
 
 ```typescript
+import * as dotenv from 'dotenv';
 import * as Joi from 'joi';
 import * as fs from 'fs';
 
 export interface EnvConfig {
-  [prop: string]: string;
+  [key: string]: string;
 }
 
 export class ConfigService {
@@ -1770,7 +1776,7 @@ export class ConfigService {
   }
 
   /**
-   * Ensures all needed variables are set, and returns the validated JavaScript object 
+   * Ensures all needed variables are set, and returns the validated JavaScript object
    * including the applied default values.
    */
   private validateInput(envConfig: EnvConfig): EnvConfig {
@@ -1827,7 +1833,6 @@ export class AppService {
 
 ## 压缩
 
-｛待更新｝
 
 压缩可以大大减小响应主体的大小，从而提高 Web 应用程序的速度。使用[压缩中间件](https://github.com/expressjs/compression)启用 gzip 压缩。
 
@@ -1841,7 +1846,7 @@ $ npm i --save compression
 
 安装完成后，将其应用为全局中间件。
 
-```
+```typescript
 import * as compression from 'compression';
 // somewhere in your initialization file
 app.use(compression());
@@ -1853,7 +1858,6 @@ app.use(compression());
 
 ## HTTP模块
 
-｛待更新｝
 
 [Axios](https://github.com/axios/axios) 是丰富功能的 HTTP 客户端, 广泛应用于许多应用程序中。这就是为什么Nest包装这个包, 并公开它默认为内置 `HttpModule`。`HttpModule` 导出 `HttpService`, 它只是公开了基于 axios 的方法来执行 HTTP 请求, 而且还将返回类型转换为 `Observables`。
 
@@ -1867,20 +1871,106 @@ app.use(compression());
 export class CatsModule {}
 ```
 
-？> `HttpModule` 是 `@nestjs/common` 包提供的
+?> `HttpModule` 是 `@nestjs/common` 包提供的
 
 然后，你可以注入 `HttpService`。这个类可以从` @nestjs/common` 包中获取。
 
 ```typescript
 @Injectable()
 export class CatsService {
-  constructor(private readonly httpService: HttpService) {} 
-  
+  constructor(private readonly httpService: HttpService) {}
+
   findAll(): Observable<AxiosResponse<Cat[]>> {
     return this.httpService.get('http://localhost:3000/cats');
   }
 }
 ```
+所有方法都返回 AxiosResponse, 并使用 Observable 对象包装。
+
+
+### 配置
+
+Axios 提供了许多选项，您可以利用这些选项来增加您的 HttpService 功能。[在这里](https://github.com/axios/axios#request-config)阅读更多相关信息。要配置底层库实例，请使用 register() 方法的 HttpModule。
+
+```typescript
+@Module({
+  imports: [
+    HttpModule.register({
+      timeout: 5000,
+      maxRedirects: 5,
+    }),
+  ],
+  providers: [CatsService],
+})
+export class CatsModule {}
+```
+
+所有这些属性都将传递给 axios 构造函数。
+
+### 异步配置
+
+通常，您可能希望异步传递模块属性，而不是事先传递它们。在这种情况下，使用 registerAsync() 方法，提供了几种处理异步数据的方法。
+
+第一种可能的方法是使用工厂功能：
+
+```typescript
+HttpModule.forRootAsync({
+  useFactory: () => ({
+    timeout: 5000,
+    maxRedirects: 5,
+  }),
+});
+```
+
+显然，我们的工厂表现得与其他工厂一样（ async 能够通过 inject 注入依赖关系）。
+
+
+```typescript
+HttpModule.forRootAsync({
+  imports: [ConfigModule],
+  useFactory: async (configService: ConfigService) => ({
+    timeout: configService.getString('HTTP_TIMEOUT'),
+    maxRedirects: configService.getString('HTTP_MAX_REDIRECTS'),
+  }),
+  inject: [ConfigService],
+});
+```
+
+或者，您可以使用类而不是工厂。
+
+
+```typescript
+HttpModule.forRootAsync({
+  useClass: HttpConfigService,
+});
+```
+
+
+以上构造将在 HttpModule 中实例化 Httpconcisservice, 并将利用它来创建选项对象。在 HttpConfigService 必须实现 HttpOptionsFactory厂接口。
+
+```typescript
+@Injectable()
+class HttpConfigService implements HttpOptionsFactory {
+  createHttpOptions(): HttpModuleOptions {
+    return {
+      timeout: 5000,
+      maxRedirects: 5,
+    };
+  }
+}
+```
+
+为了防止在 HttpModule 中创建 Httpconcecunservice, 并使用从不同模块导入的提供程序, 可以使用现有语法。
+
+```typescript
+HttpModule.forRootAsync({
+  imports: [ConfigModule],
+  useExisting: ConfigService,
+});
+```
+它的工作原理与使用类具有一个本质区别  HttpModule 将查找导入的模块来重用已创建的配置服务, 而不是自行实例化它。
+
+
 
 ## MVC
 

@@ -2054,7 +2054,7 @@ export class AppController {
 
 [这里](https://github.com/nestjs/nest/tree/master/sample/15-mvc)有一个可用的例子。
 
-### 做法
+### MVC（fastify）
 
 如本章所述，我们可以将任何兼容的 HTTP 提供程序与 Nest 一起使用。比如  [Fastify](https://github.com/fastify/fastify) 。为了创建具有 fastify 的 MVC 应用程序，我们必须安装以下包：
 

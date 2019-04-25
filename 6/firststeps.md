@@ -86,6 +86,10 @@ $ npm -v
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
 
 ```
+使用淘宝加速下载（可选）
+```
+export NVM_NODEJS_ORG_MIRROR=https://npm.taobao.org/mirrors/node
+```
 如果没 curl ，可以使用 wget 安装
 ```
 wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash

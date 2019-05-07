@@ -774,6 +774,8 @@ app.useGlobalPipes(new ValidationPipe({
 
 ## 高速缓存（Caching）
 
+**[译者注：查看相关使用方法](https://www.jianshu.com/p/e7b0f3eb3aed)**
+
 ### 内存缓存
 缓存是一种非常简单的技术，有助于提高应用程序的性能。它充当临时数据存储，访问速度非常快。
 

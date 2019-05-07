@@ -1200,6 +1200,8 @@ $ npm install --save cache-manager
 
 ### 内存缓存
 
+**[译者注：查看相关使用方法](https://www.jianshu.com/p/e7b0f3eb3aed)**
+
 Nest 为各种缓存存储提供统一的 API。内置的是内存中的数据存储。但是，您可以轻松切换到更全面的解决方案，例如Redis。为了启用缓存，首先导入 CacheModule 并调用其 register() 方法。
 
 ```typescript

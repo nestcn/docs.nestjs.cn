@@ -124,6 +124,7 @@ import { CatsService } from './cats.service';
 })
 export class CatsModule {
   constructor(private readonly catsService: CatsService) {}
+}
 ```
 
 但是，由于[循环依赖](/6/fundamentals?id=circular-dependency)性，模块类不能注入到提供者中。

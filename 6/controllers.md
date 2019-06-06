@@ -188,7 +188,7 @@ export class CatsController {
   }
 }
 ```
-为了避免这种副作用，只需移动上面的 findAll() 声明（包括其装饰器）即可 findOne()。
+为了避免这种副作用，只需将 findAll() 声明（包括其装饰器）移动到 findOne()上面即可。
 
 ### 范围
 对于来自不同编程语言背景的人来说，了解在 Nest 中几乎所有内容都可以在传入的请求之间共享，这让人意外。比如我们有一个数据库连接池，具有全局状态的单例服务等。请记住，Node.js 不遵循请求/响应多线程无状态模型，每个请求都由主线程处理。因此，使用单例实例对我们的应用程序来说是完全安全的。
@@ -200,22 +200,10 @@ export class CatsController {
 
 我们喜欢现代 JavaScript，而且我们知道数据读取大多是**异步**的。 这就是为什么 Nest 支持 `async` 并且与他们一起工作得非常好。
 
-?> 了解更多关于 `Async / await` 请点击[这里](https://kamilmysliwiec.com/typescript-2-1-introduction-async-await){:target="_blank"}！
+?> 了解更多关于 `Async / await` 请点击<a href="https://kamilmysliwiec.com/typescript-2-1-introduction-async-await" target="_blank">这里</a>！
 
 每个异步函数都必须返回 `Promise`。这意味着您可以返回延迟值, 而 Nest 将自行解析它。让我们看看下面的例子:
 
-
-> cats.controller.ts
-
-```typescript
-@Get()
-findAll(): Observable<any[]> {
-  return of([]);
-}
-```
-
-
-这是完全有效的。此外,通过返回 RxJS [observable 流](http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html) Nest 路由处理程序更强大。Nest 将自动订阅下面的源并获取最后发出的值（在流完成后）。
 
 > cats.controller.ts
 
@@ -226,7 +214,18 @@ async findAll(): Promise<any[]> {
 }
 ```
 
- 上面的方法都可以, 你可以选择你喜欢的方式。
+这是完全有效的。此外,通过返回 RxJS [observable 流](http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html) Nest 路由处理程序更强大。Nest 将自动订阅下面的源并获取最后发出的值（在流完成后）。
+
+> cats.controller.ts
+
+```typescript
+@Get()
+findAll(): Observable<any[]> {
+  return of([]);
+}
+```
+
+上面的方法都可以, 你可以选择你喜欢的方式。
 
 ## 请求负载
 
@@ -261,7 +260,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 ## 处理错误
 
-有一个关于处理错误（即有例外的工作），[在这里](/6/exceptionfilters)。
+关于处理错误[这里](/6/exceptionfilters)有一章单独的内容（即异常处理）。
 
 
 ## 完整示例
@@ -306,7 +305,7 @@ export class CatsController {
 
 ## 最后一步
 
-控制器已经准备就绪，可以使用，但是 Nest 不知道 `CatsController` 是否存在，所以它不会创建这个类的一个实例。
+控制器已经准备就绪，可以使用，但是 Nest 不知道 `CatsController` 的存在，所以它不会创建这个类的一个实例。
 
 控制器总是属于模块，这就是为什么我们将 `controllers ` 数组保存在 `@module()` 装饰器中。 由于除了根 `ApplicationModule`，我们没有其他模块，所以我们将使用它来介绍 `CatsController`：
 
@@ -322,7 +321,7 @@ import { CatsController } from './cats/cats.controller';
 export class ApplicationModule {}
 ```
 
-?> 我们使用 @module 装饰器将元数据添加到模块类，所以现在 Nest 可以很容易地通过反射挂载必须的控制器。
+?> 我们使用 @module 装饰器将元数据添加到模块类，所以现在 Nest 可以很容易反映出需要挂载的控制器
 
 
 ## 类库特有 方式

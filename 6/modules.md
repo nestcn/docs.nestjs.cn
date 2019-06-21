@@ -175,7 +175,7 @@ export class DatabaseModule {
 }
 ```
 
-?> `forRoot()` 可以同步或异步（`Primise`）返回动态模块。
+?> `forRoot()` 可以同步或异步（`Promise`）返回动态模块。
 
 此模块默认定义了 `Connection` 提供者，但另外 - 根据传递的 `options` 和 `entities` - 创建一个提供者集合，例如存储库。实际上，动态模块扩展了模块元数据。当您需要动态注册组件时，这个实质特性非常有用。然后你可以通过以下方式导入 `DatabaseModule`：
 

@@ -951,7 +951,7 @@ uploadFile(@UploadedFile() file) {
 }
 ```
 
-?> `FileInterceptor()` 和 `@UploadedFile()` 装饰都是 `@nestjs/common` 包提供的。
+?> `FileInterceptor()`装饰是`@nestjs/platform-express`包提供的， `@UploadedFile()` 装饰是 `@nestjs/common` 包提供的。
 
 `FileInterceptor()` 接收两个参数, 一个 `fieldName` (指向包含文件的 HTML 表单的字段) 和可选 `options` 对象。这些 `MulterOptions` 等效于传入 multer 构造函数 ([此处](https://github.com/expressjs/multer#multeropts)有更多详细信息)
 

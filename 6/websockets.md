@@ -42,7 +42,7 @@ handleEvent(client: Client, data: string): string {
 }
 ```
 
-?> `@SubscribeMessage（）`装饰器从`@ nestjs/common`包中导入。
+?> `@SubscribeMessage（）`装饰器从`@nestjs/websockets`包中导入。
 
 该 handleEvent() 函数有两个参数。第一个是特定于平台的套接字实例，第二个是从客户端接收的数据。收到消息后，我们会发送一个确认信息，其中包含某人通过网络发送的相同数据。此外，可以使用特定于库的方法发出消息，例如，通过使用 client.emit() 方法。但是，在这种情况下，您无法使用拦截器。如果您不想回复用户，则不要返回任何内容（或明确返回“falsy”值，例如 undefined ）。
 

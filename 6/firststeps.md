@@ -10,6 +10,7 @@
 
  【译者注：由于 nest.js 对 ts 特性支持更好，中文文档只翻译 Typescript】 
 
+
 ## 先决条件
 
  请确保您的操作系统上安装了 [Node.js](http://nodejs.cn/download/)**（> = 8.9.0）**。
@@ -220,6 +221,11 @@ $ npm run start
 
  此命令在 `src` 目录中的 `main.ts` 文件中定义的端口上启动 HTTP 服务器。在应用程序运行时, 打开浏览器并访问 `http://localhost:3000/`。 你应该看到 `Hello world!` 信息。
  
+ ### 学习资料
+ 
+[Nestjs 框架教程](https://wtdf.io/83)
+[Nestjs 学习教程](https://github.com/dzzzzzy/Nestjs-Learning)
+
  ### 支持我们
  
   [当前网站托管在：vultr-日本](https://www.vultr.com/?ref=7815855-4F)    

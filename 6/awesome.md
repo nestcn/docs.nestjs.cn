@@ -16,7 +16,7 @@
   - [Telegram (社区维护)](https://t.me/nestjs)
   - [Telegram (俄罗斯社区)](https://t.me/nest_ru)
   - [Slack (韩语社区)](https://nestjs.slack.com)
-  - [QQ 群](https://jq.qq.com/?_wv=1027&k=5DnXWGR)
+  - [QQ 群 (中文社区)](https://jq.qq.com/?_wv=1027&k=5DnXWGR)
   - [Reddit (社区维护)](https://www.reddit.com/r/Nestjs_framework)
 
 - 中文教程

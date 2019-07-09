@@ -1,4 +1,5 @@
 # 相关资料
+
 ### 相关资源
 
 - 官方资源
@@ -89,6 +90,8 @@
   - [nestjs bull](https://github.com/fwoelffel/nest-bull)   - Nestjs 分布式消息队列
 - 状态管理
   - [Ngrx Nest](https://github.com/derekkite/ngrx-nest) - 在 Nest 上使用  ngrx/store 和 ngrx/effects.
+- 微信开发
+  - [TNW](https://github.com/Javen205/TNW) WeChat 微信公众号开发脚手架，支持集成到任何基于 Node.js 的服务端框架
 - 代码风格
   - [StyleGuide and Coding Conventions](https://github.com/basarat/typescript-book/blob/master/docs/styleguide/styleguide.md) - 非官方的 TypeScript StyleGuide
 - WebSockets
@@ -120,9 +123,11 @@
 ### 集成
 
 - Auth
+  - [node-casbin](https://github.com/casbin/node-casbin) - 支持 ACL, RBAC, ABAC 权限管理的 Nodejs 库
   - [Nestjs + Auth0](https://github.com/cdiaz/nestjs-auth0) - 使用 Auth0 的 NestJS Framework Web 应用程序。
 - 数据库
   - [Typeorm](https://github.com/nestjs/typeorm) - 用于 Nest 框架的 TypeORM 模块 [[Tutorial](http://docs.nestjs.com/recipes/sql-typeorm)].
+  - [Magnus](https://github.com/notadd/magnus) 自动生成 grpc 及 graphql 的库。
   - [Nest Mongoose](https://github.com/nestjs/mongoose) - 用于 Nest 框架的 Mongoose 模块
   - [Nest Sequelize JWT](https://github.com/adrien2p/nest-js-sequelize-jwt) - 入门套件 Nest + Sequelize + jwt。
   - [Nest sequelize-typescript](https://github.com/kentloog/nestjs-sequelize-typescript) - Nest + sequelize-typescript + JWT + Jest + Swagger

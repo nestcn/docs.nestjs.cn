@@ -227,9 +227,24 @@ $ npm run start
 [Nestjs 学习教程](https://github.com/dzzzzzy/Nestjs-Learning)    
 [让我们用Nestjs来重写一个CNode](https://github.com/jiayisheji/blog/issues/18)
 
+### 学习例子
+
+[官方示例](https://github.com/nestjs/nest/tree/master/sample)    
+[nodepress-blog](https://github.com/surmon-china/nodepress)    
+[nestjs+angular cnode](https://github.com/jiayisheji/AngularNest-Fullstack-CNode)    
+[nestjs-typeorm](https://github.com/lujakob/nestjs-realworld-example-app)    
+[nestjs-graphql-angular](https://github.com/bojidaryovchev/nest-angular)
+
+### 例子
+
 [Notadd 微服务项目](https://github.com/notadd)    
 [nestjsx 项目](https://github.com/nestjsx)    
-[nest-clooud 微服务](https://github.com/nest-cloud/nestcloud)
+[nest-clooud 微服务](https://github.com/nest-cloud/nestcloud)    
+[nestjs 定时任务](https://github.com/miaowing/nest-schedule)
+[nestjs 分布式消息](https://github.com/fwoelffel/nest-bull)
+[nestjs 中间件](https://github.com/wbhob/nest-middlewares)
+
+更多... [nestjs-awesome](https://github.com/juliandavidmr/awesome-nestjs) 
 
  ### 支持我们
  

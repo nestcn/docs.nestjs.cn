@@ -224,8 +224,12 @@ $ npm run start
  ### 学习资料
  
 [Nestjs 框架教程](https://keelii.com/2019/07/03/nestjs-framework-tutorial-1/)      
-[Nestjs 学习教程](https://github.com/dzzzzzy/Nestjs-Learning)
+[Nestjs 学习教程](https://github.com/dzzzzzy/Nestjs-Learning)    
 [让我们用Nestjs来重写一个CNode](https://github.com/jiayisheji/blog/issues/18)
+
+[Notadd 微服务项目](https://github.com/notadd)    
+[nestjsx 项目](https://github.com/nestjsx)    
+[nest-clooud 微服务](https://github.com/nest-cloud/nestcloud)
 
  ### 支持我们
  

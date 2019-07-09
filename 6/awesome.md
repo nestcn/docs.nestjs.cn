@@ -143,6 +143,7 @@
   - [Nestjs AMQP](https://github.com/nestjsx/nestjs-amqp) - amqp 连接管理器
 - 支付网关
   - [Nestjs Braintree](https://github.com/nestjsx/nestjs-braintree) - 一个用于 webhooks 交易的模块。
+  - [Notadd pay](https://github.com/notadd/nt-addon-pay) - 支持微信和支付宝支付。
 - Consul
   - [Nest Consul](https://github.com/nest-cloud/nestcloud) - 基于 Consul 的 NodeJS 微服务解决方案，由Typescript 语言和 NestJS 框架编写
 - Cache

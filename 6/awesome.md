@@ -94,6 +94,8 @@
   - [TNW](https://github.com/Javen205/TNW) WeChat 微信公众号开发脚手架，支持集成到任何基于 Node.js 的服务端框架
 - 代码风格
   - [StyleGuide and Coding Conventions](https://github.com/basarat/typescript-book/blob/master/docs/styleguide/styleguide.md) - 非官方的 TypeScript StyleGuide
+- 工作流
+  - [workflow-es](https://github.com/danielgerlag/workflow-es) 基于 Typescript 的工作流
 - WebSockets
   - [官方](https://docs.nestjs.cn/6/websockets)
 - 邮件

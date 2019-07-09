@@ -11,6 +11,7 @@
   - [守卫](6/guards)
   - [拦截器](6/interceptors)
   - [自定义装饰器](6/customdecorators)
+  - [相关资料](6/awesome)
   - [关于翻译](6/about)
 
 - [基本原理](6/fundamentals)

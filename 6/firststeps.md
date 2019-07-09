@@ -239,9 +239,9 @@ $ npm run start
 
 [Notadd 微服务项目](https://github.com/notadd)    
 [nestjsx 项目](https://github.com/nestjsx)    
-[nest-clooud 微服务](https://github.com/nest-cloud/nestcloud)    
-[nestjs 定时任务](https://github.com/miaowing/nest-schedule)
-[nestjs 分布式消息](https://github.com/fwoelffel/nest-bull)
+[nest-clooud 微服务](https://github.com/nest-cloud/nestcloud)     
+[nestjs 定时任务](https://github.com/miaowing/nest-schedule)    
+[nestjs 分布式消息](https://github.com/fwoelffel/nest-bull)    
 [nestjs 中间件](https://github.com/wbhob/nest-middlewares)
 
 更多... [nestjs-awesome](https://github.com/juliandavidmr/awesome-nestjs) 

@@ -12,13 +12,13 @@ GraphQLModule 只不过是 [Apollo](https://www.apollographql.com) 服务器的�
 如果您使用的是 `express` HTTP引擎，请安装以下软件包：
 
 ```bash
-$ npm i --save @ nestjs / graphql apollo-server-express graphql
+$ npm i --save @nestjs/graphql apollo-server-express graphql
 ```
 
 如果是 `fastify` ，您应该安装`apollo-server-fastify`
 
 ```bash
-$ npm i --save @ nestjs / graphql apollo-server-fastify graphql
+$ npm i --save @nestjs/graphql apollo-server-fastify graphql
 ```
 
 ### 概述

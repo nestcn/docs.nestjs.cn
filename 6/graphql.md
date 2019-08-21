@@ -666,7 +666,7 @@ async upvotePost(
 
 ## 订阅（Subscriptions）
 
-订阅只是查询和变更的另一种 GraphQL 操作类型。它允许通过双向传输层创建实时订阅，主要通过 websockets 实现。[阅读更多]（https://www.apollographql.com/docs/graphql-subscriptions）(https://www.apollographql.com/docs/graphql-subscriptions/) 。
+订阅只是查询和变更的另一种 GraphQL 操作类型。它允许通过双向传输层创建实时订阅，主要通过 websockets 实现。在[这里](https://www.apollographql.com/docs/graphql-subscriptions/)阅读更多关于订阅的内容。
 
 以下是 `commentAdded` 订阅示例，可直接从官方 [Apollo](https://www.apollographql.com/docs/graphql-subscriptions/subscriptions-to-schema.html) 文档复制和粘贴：
 

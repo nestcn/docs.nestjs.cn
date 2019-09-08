@@ -240,7 +240,7 @@ export class AuthService {
 }
 ```
 
-?> JwtPayloa d是一个具有单个属性的接口 email，表示已解码的 JWT 令牌。
+?> JwtPayload 是只有 email 一个属性的接口，表示已解码的 JWT 令牌。
 
 为了简化示例，我们创建了一个假用户。第二步是创建一个对应的 `JwtStrategy`。
 

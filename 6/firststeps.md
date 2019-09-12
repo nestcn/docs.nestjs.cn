@@ -22,69 +22,24 @@
 
 #### ** windows **
 
-1. [点击下载 Node.js](hhttps://npm.taobao.org/mirrors/node/latest-v10.x/node-v10.15.3-x64.msi)
+1. [点击下载 Node.js](https://npm.taobao.org/mirrors/node/v12.10.0/node-v12.10.0-x64.msi)
 
 2. 安装Node.js
 
 Powershell/CMD 可以打印出这个说明安装成功。（部分系统需要重启后环境变量才生效）
 
 ```
->> node -v
-v10.15.3
->> npm -v
-6.4
-```
-
-#### ** MacOS **
-
-1. [点击下载 Node.js](https://npm.taobao.org/mirrors/node/v10.15.1/node-v10.15.1.pkg)
-
-2. 安装Node.js
-
-打印出这个说明安装成功。（部分系统需要重启后环境变量才生效）
-```
->> node -v
-v10.15.1
->> npm -v
-6.4
-```
-
-#### ** Debian系 **
-
-（支持ARM及X86平台)
-```
-curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
-sudo apt-get install -y nodejs
-```
-（如果安装缓慢，可以使用[国内镜像源](http://mirrors.ustc.edu.cn/help/nodesource.html)）
-终端可以打出以下信息说明安装成功：
-```
-$ node -v
-v10.15.1
+$node -v
+v12.10.0
 $ npm -v
-6.4
+6.10.3
 ```
 
-#### ** Redhat系 **
+#### ** linux（建议） **
 
- （支持X86平台）
+（NVM 支持 所有 Linux 及 Raspbian ，支持多版本管理，[windows 点击进入](https://github.com/coreybutler/nvm-windows/releases)）
  ```
-curl -sL https://rpm.nodesource.com/setup_10.x | bash -
-```
-（如果安装缓慢，可以使用[国内镜像源](http://mirrors.ustc.edu.cn/help/nodesource.html)）
-终端可以打出以下信息说明安装成功：
-```
-$ node -v
-v10.15.1
-$ npm -v
-6.4
-```
-
-#### ** NVM **
-
-（支持 所有 Linux 及 Raspbian ，支持多版本管理，[windows 点击进入](https://github.com/coreybutler/nvm-windows/releases)）
- ```
-curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
 
 ```
 如果没 curl ，可以使用 wget 安装
@@ -102,25 +57,72 @@ nvm install --lts
 ```
 终端可以打出以下信息说明安装成功：
 ```
-$ node -v
-v10.15.1
+$node -v
+v12.10.0
 $ npm -v
-6.4
+6.10.3
 ```
+
+#### ** MacOS **
+
+1. [点击下载 Node.js](https://npm.taobao.org/mirrors/node/v12.10.0/node-v12.10.0.pkg)
+
+2. 安装Node.js
+
+打印出这个说明安装成功。（部分系统需要重启后环境变量才生效）
+```
+$node -v
+v12.10.0
+$ npm -v
+6.10.3
+```
+
+#### ** Debian系 **
+
+（支持ARM及X86平台)
+```
+curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+（如果安装缓慢，可以使用[国内镜像源](http://mirrors.ustc.edu.cn/help/nodesource.html)）
+终端可以打出以下信息说明安装成功：
+```
+$node -v
+v12.10.0
+$ npm -v
+6.10.3
+```
+
+#### ** Redhat系 **
+
+ （支持X86平台）
+ ```
+curl -sL https://rpm.nodesource.com/setup_12.x | bash -
+```
+（如果安装缓慢，可以使用[国内镜像源](http://mirrors.ustc.edu.cn/help/nodesource.html)）
+终端可以打出以下信息说明安装成功：
+```
+$node -v
+v12.10.0
+$ npm -v
+6.10.3
+```
+
+
 
 #### ** Snap **
 
 （支持 所有 Linux ）
 ```
-sudo snap install node --classic --channel=10
+sudo snap install node --classic --channel=12
 ```
 （如果提示 snap 不存在，请先安装 snapd）
 终端可以打出以下信息说明安装成功：
 ```
-$ node -v
-v10.15.1
+$node -v
+v12.10.0
 $ npm -v
-6.4
+6.10.3
 ```
 <!-- tabs:end -->
 

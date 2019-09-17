@@ -32,9 +32,9 @@ const user = req.user;
 > user.decorator.ts
 
 ```typescript
-import { createRouteParamDecorator } from '@nestjs/common';
+import { createParamDecorator } from '@nestjs/common';
 
-export const User = createRouteParamDecorator((data, req) => {
+export const User = createParamDecorator((data, req) => {
   return req.user;
 });
 ```

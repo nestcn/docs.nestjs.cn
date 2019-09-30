@@ -4,22 +4,29 @@
 
 ![](https://docs.nestjs.com/assets/Pipe_1.png)
 
+管道有两个类型:
+
+- **转换**: 管道将输入数据转换为所需的输出
+- **验证**: 对输入数据进行验证, 如果验证成功继续传递; 验证失败则抛出异常;常
+
 管道将输入数据**转换**为所需的输出。另外，它可以处理**验证**，因为当数据不正确时可能会抛出异常。
 
-?> 管道在异常区域内运行。这意味着当抛出异常时，它们由核心异常处理程序和应用于当前上下文的[异常过滤器](exceptionfilters.md)处理。
+在这两种情况下，管道都对由控制器路由处理程序处理的参数进行操作。 Nest 会在调用方法之前插入一个管道，并且管道会接收指定给该方法的参数。那时将进行任何转换或验证操作，然后使用任何（可能）转换后的参数调用路由处理程序。
+
+在这两种情况下, 管道会对<a href="controllers#route-parameters">控制器(controllers)路由方法</a> 的 `参数(arguments)` 进行处理. Nest 会在调用这个方法之前插入一个管道, 管道会先拦截方法的调用参数,进行转换或是验证处理, 然后用转换好或是验证好的参数调用原方法.
+
+?> 管道在异常区域内运行。这意味着当抛出异常时，它们由核心异常处理程序和应用于当前上下文的[异常过滤器](exceptionfilters.md)处理。当在 Pipe 中发生异常, controller 不会继续执行任何方法.
 
 ## 内置管道
 
-`Nest` 自带两个开箱即用的管道，即 `ValidationPipe` 和 `ParseIntPipe`。他们从 `@nestjs/common` 包中导出。为了更好地理解它们是如何工作的，我们将从头开始构建它们。
+`Nest` 自带三个开箱即用的管道，即 `ValidationPipe`,`ParseIntPipe` 和 `ParseUUIDPipe`。他们从 `@nestjs/common` 包中导出。为了更好地理解它们是如何工作的，我们将从头开始构建它们。
 
-## 它是什么样子的？
-
-我们从 `ValidationPipe` 开始。 首先它只接受一个值并立即返回相同的值，其行为类似于一个标识函数。
+我们从 `ValidationPipe`. 开始。 首先它只接受一个值并立即返回相同的值，其行为类似于一个标识函数。
 
 > validation.pipe.ts
 
 ```typescript
-import { PipeTransform, Injectable, ArgumentMetadata } from '@nestjs/common';
+import { PipeTransform, Injectable, ArgumentMetadata } from "@nestjs/common";
 
 @Injectable()
 export class ValidationPipe implements PipeTransform {
@@ -32,30 +39,31 @@ export class ValidationPipe implements PipeTransform {
 ?> `PipeTransform<T, R>` 是一个通用接口，其中 `T` 表示 `value` 的类型，`R` 表示 `transform()` 方法的返回类型。
 
 每个管道必须提供 `transform()` 方法。 这个方法有两个参数：
-* `value`
-* `metadata`
+
+- `value`
+- `metadata`
 
 `value` 是当前处理的参数，而 `metadata` 是其元数据。元数据对象包含一些属性：
 
 ```typescript
 export interface ArgumentMetadata {
-    type: 'body' | 'query' | 'param' | 'custom';
-    metatype?: new (...args) => any;
-    data?: string;
+  readonly type: "body" | "query" | "param" | "custom";
+  readonly metatype?: Type<any>;
+  readonly data?: string;
 }
 ```
 
 这里有一些属性描述参数：
 
-|参数    |   描述|
-|-----|-----|
-|type|告诉我们该属性是一个 body `@Body()`，query `@Query()`，param `@Param()` 还是自定义参数 [在这里阅读更多](customdecorators.md)。|
-|metatype|属性的元类型，例如 `String`。 如果在函数签名中省略类型声明，或者使用原生JavaScript，则为 `undefined`。|
-|data|传递给装饰器的字符串，例如 `@Body('string')`。 如果您将括号留空，则为 `undefined`。|
+| 参数     | 描述                                                                                                                           |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| type     | 告诉我们该属性是一个 body `@Body()`，query `@Query()`，param `@Param()` 还是自定义参数 [在这里阅读更多](customdecorators.md)。 |
+| metatype | 属性的元类型，例如 `String`。 如果在函数签名中省略类型声明，或者使用原生 JavaScript，则为 `undefined`。                        |
+| data     | 传递给装饰器的字符串，例如 `@Body('string')`。 如果您将括号留空，则为 `undefined`。                                            |
 
-!> `TypeScript `接口在编译期间消失，所以如果你使用接口而不是类，那么 `metatype` 的值将是一个 `Object`。
- 
-## 重点是什么？
+!> `TypeScript`接口在编译期间消失，所以如果你使用接口而不是类，那么 `metatype` 的值将是一个 `Object`。
+
+## 测试用例
 
 我们来关注一下 `CatsController` 的 `create()` 方法：
 
@@ -68,7 +76,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 }
 ```
 
-下面是 `CreateCatDto` 参数
+下面是 `CreateCatDto` 参数. 类型为 CreateCatDto:
 
 > create-cat.dto.ts
 
@@ -80,26 +88,42 @@ export class CreateCatDto {
 }
 ```
 
-这个对象必须是正确的，所以我们必须验证这三个成员。我们可以在路由处理程序方法中做到这一点，但是我们会打破单个责任原则（SRP）。第二个想法是创建一个验证器类并在那里委托任务，但是每次在方法开始的时候我们都必须使用这个验证器。那么验证中间件呢？ 这是一个好主意，但不可能创建一个通用的中间件，可以在整个应用程序中使用。
+我们要确保`create`方法能正确执行, 所以必须验证参数类型 `CreateCatDto` 里的三个成员。我们可以在路由处理程序方法中做到这一点，但是我们会打破单个责任原则（SRP）。另一种方法是创建一个验证器类并在那里委托任务，但是不得不每次在方法开始的时候我们都必须使用这个验证器。那么验证中间件呢？ 这可能是一个好主意，但我们不可能创建一个整个应用程序通用的中间件(因为中间件不知道 `execution context`执行环境,也不知道要调用的函数和它的参数)。
 
-这是第一个用例，你应该考虑使用**管道**。
+在这种情况下，你应该考虑使用**管道**。
 
-## 对象结构验证
+## 对象结构验证(Object schema validation)
 
-常用方法之一是使用**基于结构**的验证。[Joi](https://github.com/hapijs/joi)库是一个工具，它允许您使用一个可读的API以非常简单的方式创建结构。为了创建一个使用对象结构的管道，我们需要创建一个简单的类，该类将结构作为 `constructor` 参数。
+有几种方法可以实现. 一种常见的方式是使用**基于结构**的验证。[Joi](https://github.com/hapijs/joi)库是一个工具，它允许您使用一个可读的 API 以非常简单的方式创建结构。让我们俩试一下 Joi 的管道.
+
+首先安装依赖:
+
+```bash
+$ npm install --save @hapi/joi
+$ npm install --save-dev @types/hapi__joi
+```
+
+在下面的代码中, 我们先创建一个简单的 class, 在构造函数中传递 schema 参数. 然后我们使用 `schema.validate()` 方法, 该方法根据设置的 schema 验证传递的值.
+
+就像是前面说过的, `验证类型的管道` 要么返回该值,要么抛出一个错误.
+在下一节中,你将看到我们如何使用 `@UsePipes()` 修饰器给指定的控制器方法提供需要的 schema.
 
 ```typescript
-import * as Joi from 'joi';
-import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException } from '@nestjs/common';
+import {
+  PipeTransform,
+  Injectable,
+  ArgumentMetadata,
+  BadRequestException
+} from "@nestjs/common";
 
 @Injectable()
 export class JoiValidationPipe implements PipeTransform {
-  constructor(private readonly schema) {}
+  constructor(private readonly schema: Object) {}
 
   transform(value: any, metadata: ArgumentMetadata) {
-    const { error } = Joi.validate(value, this.schema);
+    const { error } = this.schema.validate(value);
     if (error) {
-      throw new BadRequestException('Validation failed');
+      throw new BadRequestException("Validation failed");
     }
     return value;
   }
@@ -107,8 +131,6 @@ export class JoiValidationPipe implements PipeTransform {
 ```
 
 ## 绑定管道
-
-管道绑定非常简单-我们需要使用 `@UsePipes()` 修饰器并使用有效的Joi结构创建管道实例。
 
 ```typescript
 @Post()
@@ -120,7 +142,9 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 ## 类验证器（Class validator）
 
-本节仅适用于 `TypeScript`。
+!> 本节仅适用于 `TypeScript`
+
+让我们看一下验证的另外一种实现方式
 
 Nest 与 [class-validator](https://github.com/pleerock/class-validator) 配合得很好。这个优秀的库允许您使用基于装饰器的验证。基于装饰器的验证对于管道功能非常强大，因为我们可以访问已处理属性的 `metatype`。在我们开始之前，我们需要安装所需的软件包。
 
@@ -133,7 +157,7 @@ $ npm i --save class-validator class-transformer
 > create-cat.dto.ts
 
 ```typescript
-import { IsString, IsInt } from 'class-validator';
+import { IsString, IsInt } from "class-validator";
 
 export class CreateCatDto {
   @IsString()
@@ -147,40 +171,46 @@ export class CreateCatDto {
 }
 ```
 
+?> 有关 class-validator decorators [在这里阅读更多](6.0/typestack/class-validator#usage)
+
 完成后，我们可以创建一个 `ValidationPipe` 类。
 
 > validation.pipe.ts
 
 ```typescript
-import { PipeTransform, Pipe, ArgumentMetadata, BadRequestException } from '@nestjs/common';
-import { validate } from 'class-validator';
-import { plainToClass } from 'class-transformer';
+import {
+  PipeTransform,
+  Injectable,
+  ArgumentMetadata,
+  BadRequestException
+} from "@nestjs/common";
+import { validate } from "class-validator";
+import { plainToClass } from "class-transformer";
 
 @Injectable()
 export class ValidationPipe implements PipeTransform<any> {
-    async transform(value, metadata: ArgumentMetadata) {
-      const { metatype } = metadata;
-      if (!metatype || !this.toValidate(metatype)) {
-          return value;
-      }
-      const object = plainToClass(metatype, value);
-      const errors = await validate(object);
-      if (errors.length > 0) {
-          throw new BadRequestException('Validation failed');
-      }
+  async transform(value: any, { metatype }: ArgumentMetadata) {
+    if (!metatype || !this.toValidate(metatype)) {
       return value;
     }
-
-    private toValidate(metatype): boolean {
-      const types = [String, Boolean, Number, Array, Object];
-      return !types.find((type) => metatype === type);
+    const object = plainToClass(metatype, value);
+    const errors = await validate(object);
+    if (errors.length > 0) {
+      throw new BadRequestException("Validation failed");
     }
+    return value;
+  }
+
+  private toValidate(metatype: Function): boolean {
+    const types: Function[] = [String, Boolean, Number, Array, Object];
+    return !types.includes(metatype);
+  }
 }
 ```
 
-?> 我们已经使用了 [class-transformer](https://github.com/pleerock/class-transformer) 库。它和 [class-validator](https://github.com/pleerock/class-validator) 库由同一个作者开发，所以他们配合的很好。
+?> 我们已经使用了[class-transformer](https://github.com/pleerock/class-transformer) 库。它和 [class-validator](https://github.com/pleerock/class-validator) 库由同一个作者开发，所以他们配合的很好。
 
-我们来看看这个代码。首先，请注意 `transform()` 函数是 `异步` 的。这是可能的，因为Nest支持同步和**异步**管道。另外，还有一个辅助函数 `toValidate()`。由于性能原因，它负责从验证过程中排除原生 `JavaScript` 类型。最后一个重要的是我们必须返回相同的价值。这个管道是一个特定于验证的管道，所以我们需要返回完全相同的属性以避免**重写**（如前所述，管道将输入转换为所需的输出）。
+我们来看看这个代码。首先，请注意 `transform()` 函数是 `异步` 的。这是可能的，因为 Nest 支持**同步**和**异步**管道。我们这样做的原因是因为有些 `class-validator` 的验证是[可以异步的](typestack/class-validator#custom-validation-classes)(Promise)
 
 最后一步是设置 `ValidationPipe` 。管道，与[异常过滤器](exceptionfilters.md)相同，它们可以是方法范围的、控制器范围的和全局范围的。另外，管道可以是参数范围的。我们可以直接将管道实例绑定到路由参数装饰器，例如`@Body()`。让我们来看看下面的例子：
 
@@ -239,20 +269,21 @@ bootstrap();
 > app.module.ts
 
 ```typescript
-import { Module } from '@nestjs/common';
-import { APP_PIPE } from '@nestjs/core';
+import { Module } from "@nestjs/common";
+import { APP_PIPE } from "@nestjs/core";
 
 @Module({
   providers: [
     {
       provide: APP_PIPE,
-      useClass: CustomGlobalPipe,
-    },
-  ],
+      useClass: CustomGlobalPipe
+    }
+  ]
 })
 export class ApplicationModule {}
 ```
-?> 译者注: 上述6.0官方的示例代码目前是错误的，我们使用了5.0的示例代码。
+
+?> 译者注: 上述 6.0 官方的示例代码目前是错误的，我们使用了 5.0 的示例代码。
 
 ?> 另一种选择是使用[执行上下文](5.0/executioncontext)功能。另外，useClass 并不是处理自定义提供者注册的唯一方法。在[这里](5.0/fundamentals?id=custom-providers)了解更多。
 
@@ -263,14 +294,20 @@ export class ApplicationModule {}
 > parse-int.pipe.ts
 
 ```typescript
-import { PipeTransform, Pipe, ArgumentMetadata, HttpStatus, BadRequestException } from '@nestjs/common';
+import {
+  PipeTransform,
+  Pipe,
+  ArgumentMetadata,
+  HttpStatus,
+  BadRequestException
+} from "@nestjs/common";
 
 @Injectable()
 export class ParseIntPipe implements PipeTransform<string> {
   async transform(value: string, metadata: ArgumentMetadata) {
     const val = parseInt(value, 10);
     if (isNaN(val)) {
-      throw new BadRequestException('Validation failed');
+      throw new BadRequestException("Validation failed");
     }
     return val;
   }
@@ -314,6 +351,7 @@ async create(@Body() createCatDto: CreateCatDto) {
   this.catsService.create(createCatDto);
 }
 ```
+
 ?> `ValidationPipe` 是从 `@nestjs/common` 包中导入的。
 
 因为这个管道是基于 `class-validator` 和 `class-transformer` 库的，所以有更多选项。看看构造函数的可选选项。
@@ -328,25 +366,25 @@ export interface ValidationPipeOptions extends ValidatorOptions {
 
 下面是 `transform` 属性和所有 `class-validator` 选项（从 `ValidatorOptions` 接口继承）：
 
-|参数|类型|描述|
-|-----|-----|-----|
-|`skipMissingProperties`|`boolean`| 如果设置为 true，则验证程序将跳过验证对象中缺少的属性的验证。|
-|`whitelist`|`boolean`| 如果设置为 true，则验证程序将除去未使用任何装饰器的属性的已验证对象。|
-|`forbidNonWhitelisted`|`boolean`| 如果设置为 true，则验证程序将引发异常，而不是取消非白名单属性。|
-|`forbidUnknownValues`|`boolean`| 如果设置为 true，未知对象的验证将立即失败。|
-|`disableErrorMessages`|`boolean`| 如果设置为 true，验证错误将不会转发到客户端。|
-|`groups`|`string[]`| 验证对象期间要使用的组。|
-|`dismissDefaultMessages`|`boolean`| 如果设置为 true，验证将不使用默认消息。如果错误消息未显式设置，则为 `undefined` 的。|
-|`validationError.target`|`boolean`| 目标是否应在 `ValidationError` 中展示|
-|`validationError.value`|`boolean`| 验证值是否应在 `ValidationError` 中展示。|
+| 参数                     | 类型       | 描述                                                                                 |
+| ------------------------ | ---------- | ------------------------------------------------------------------------------------ |
+| `skipMissingProperties`  | `boolean`  | 如果设置为 true，则验证程序将跳过验证对象中缺少的属性的验证。                        |
+| `whitelist`              | `boolean`  | 如果设置为 true，则验证程序将除去未使用任何装饰器的属性的已验证对象。                |
+| `forbidNonWhitelisted`   | `boolean`  | 如果设置为 true，则验证程序将引发异常，而不是取消非白名单属性。                      |
+| `forbidUnknownValues`    | `boolean`  | 如果设置为 true，未知对象的验证将立即失败。                                          |
+| `disableErrorMessages`   | `boolean`  | 如果设置为 true，验证错误将不会转发到客户端。                                        |
+| `groups`                 | `string[]` | 验证对象期间要使用的组。                                                             |
+| `dismissDefaultMessages` | `boolean`  | 如果设置为 true，验证将不使用默认消息。如果错误消息未显式设置，则为 `undefined` 的。 |
+| `validationError.target` | `boolean`  | 目标是否应在 `ValidationError` 中展示                                                |
+| `validationError.value`  | `boolean`  | 验证值是否应在 `ValidationError` 中展示。                                            |
 
 ?> 您可以在他的[库](https://github.com/typestack/class-validator)中找到关于 `class-validator` 包的更多信息。。
 
- ### 译者署名
+### 译者署名
 
-| 用户名 | 头像 | 职能 | 签名 |
-|---|---|---|---|
-| [@zuohuadong](https://github.com/zuohuadong)  | <img class="avatar-66 rm-style" src="https://wx3.sinaimg.cn/large/006fVPCvly1fmpnlt8sefj302d02s742.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
-| [@Drixn](https://drixn.com/)  | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">  |  翻译  | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/) |
-| [@tangkai](https://github.com/tangkai123456)  | <img class="avatar-66 rm-style" height="70" src="https://avatars1.githubusercontent.com/u/22436910">  |  翻译  | 专注于 React，[@tangkai](https://github.com/tangkai123456) |
-| [@franken133](https://github.com/franken133)  | <img class="avatar rounded-2" src="https://avatars0.githubusercontent.com/u/17498284?s=400&amp;u=aa9742236b57cbf62add804dc3315caeede888e1&amp;v=4" height="70">  |  翻译  | 专注于 java 和 nest，[@franken133](https://github.com/franken133)|
+| 用户名                                       | 头像                                                                                                                                                            | 职能 | 签名                                                                          |
+| -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------- |
+| [@zuohuadong](https://github.com/zuohuadong) | <img class="avatar-66 rm-style" src="https://wx3.sinaimg.cn/large/006fVPCvly1fmpnlt8sefj302d02s742.jpg">                                                        | 翻译 | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github |
+| [@Drixn](https://drixn.com/)                 | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">                                                                                | 翻译 | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/)                             |
+| [@tangkai](https://github.com/tangkai123456) | <img class="avatar-66 rm-style" height="70" src="https://avatars1.githubusercontent.com/u/22436910">                                                            | 翻译 | 专注于 React，[@tangkai](https://github.com/tangkai123456)                    |
+| [@franken133](https://github.com/franken133) | <img class="avatar rounded-2" src="https://avatars0.githubusercontent.com/u/17498284?s=400&amp;u=aa9742236b57cbf62add804dc3315caeede888e1&amp;v=4" height="70"> | 翻译 | 专注于 java 和 nest，[@franken133](https://github.com/franken133)             |

@@ -37,6 +37,7 @@ export class LoggerMiddleware implements NestMiddleware {
 拦截器API也已简化。此外，由于社区报告[此问题](https://github.com/nestjs/nest/issues/1016)，因此需要进行更改。
 
 ```typescript
+
 // Before
 @Injectable()
 export class TransformInterceptor implements NestInterceptor {
@@ -98,6 +99,7 @@ $ npm i @nestjs/platform-express @nestjs/platform-socket.io
 我们不再支持将 `express` 实例作为方法的第二个参数传递 `NestFactory.create()` 。为了获取底层 HTTP 适配器，请使用[此处](/6/faq?id=http-适配器)描述的技术。此外，您可以传递 `ExpressAdapter`（只需将您的 `express` 实例作为构造函数参数传递 `new ExpressAdapter(express)`）。
 
 ```typescript
+
 // Before (no longer supported)
 const server = express();
 const app = await NestFactory.create(ApplicationModule, server);

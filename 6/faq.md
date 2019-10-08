@@ -11,6 +11,7 @@
 为了 `HttpAdapter` 从应用程序上下文中获取，您可以调用 `getHttpAdapter()` 方法。
 
 ```typescript
+
 const app = await NestFactory.create(ApplicationModule);
 const httpAdapter = app.getHttpAdapter();
 ```
@@ -22,6 +23,7 @@ const httpAdapter = app.getHttpAdapter();
 为了 `HttpAdapterHost` 从应用程序上下文中获取，您可以采用与任何其他现有提供程序相同的方式注入它（例如，通过 `constructor`）。
 
 ```typescript
+
 export class CatsService {
   constructor(private readonly adapterHost: HttpAdapterHost) {}
 }
@@ -56,9 +58,7 @@ const app = await NestFactory.create(ApplicationModule);
 app.setGlobalPrefix('v1');
 ```
 
-
 ## 混合应用
-
 
 混合应用程序是一个应用程序，它监听HTTP请求，可以通过实例 `connectMicroservice()` 函数将 `INestApplication` 与 `INestMicroservice` 实例的无限计数结合起来。
 
@@ -71,7 +71,6 @@ const microservice = app.connectMicroservice({
 await app.startAllMicroservicesAsync();
 await app.listen(3001);
 ```
-
 
 ## HTTPS 和多服务器
 
@@ -89,7 +88,6 @@ const app = await NestFactory.create(ApplicationModule, {
 });
 await app.listen(3000);
 ```
-
 如果使用Fastify，则创建 `app` 如下代码：
 
 ```typescript
@@ -98,7 +96,6 @@ const app = await NestFactory.create<NestFastifyApplication>(
   new FastifyAdapter({ https: httpsOptions }),
 );
 ```
-
 ### 多个同步服务器
 对库实例的完全控制提供了一种简单的方法来创建同时监听多个不同端口的服务器。
 

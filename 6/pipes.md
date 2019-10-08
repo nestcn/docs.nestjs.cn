@@ -6,16 +6,12 @@
 
 管道有两个类型:
 
-- **转换**: 管道将输入数据转换为所需的输出
-- **验证**: 对输入数据进行验证, 如果验证成功继续传递; 验证失败则抛出异常;常
+- **转换**：管道将输入数据转换为所需的数据输出
+- **验证**：对输入数据进行验证，如果验证成功继续传递; 验证失败则抛出异常;
 
-管道将输入数据**转换**为所需的输出。另外，它可以处理**验证**，因为当数据不正确时可能会抛出异常。
+在这两种情况下, 管道`参数(arguments)` 会由 [控制器(controllers)的路由处理程序](6/controllers?id=路由参数) 进行处理. Nest 会在调用这个方法之前插入一个管道，管道会先拦截方法的调用参数,进行转换或是验证处理，然后用转换好或是验证好的参数调用原方法。
 
-在这两种情况下，管道都对由控制器路由处理程序处理的参数进行操作。 Nest 会在调用方法之前插入一个管道，并且管道会接收指定给该方法的参数。那时将进行任何转换或验证操作，然后使用任何（可能）转换后的参数调用路由处理程序。
-
-在这两种情况下, 管道会对<a href="controllers#route-parameters">控制器(controllers)路由方法</a> 的 `参数(arguments)` 进行处理. Nest 会在调用这个方法之前插入一个管道, 管道会先拦截方法的调用参数,进行转换或是验证处理, 然后用转换好或是验证好的参数调用原方法.
-
-?> 管道在异常区域内运行。这意味着当抛出异常时，它们由核心异常处理程序和应用于当前上下文的[异常过滤器](exceptionfilters.md)处理。当在 Pipe 中发生异常, controller 不会继续执行任何方法.
+?> 管道在异常区域内运行。这意味着当抛出异常时，它们由核心异常处理程序和应用于当前上下文的[异常过滤器](6/exceptionfilters.md)处理。当在 Pipe 中发生异常, controller 不会继续执行任何方法.
 
 ## 内置管道
 
@@ -94,7 +90,7 @@ export class CreateCatDto {
 
 ## 对象结构验证(Object schema validation)
 
-有几种方法可以实现. 一种常见的方式是使用**基于结构**的验证。[Joi](https://github.com/hapijs/joi)库是一个工具，它允许您使用一个可读的 API 以非常简单的方式创建结构。让我们俩试一下 Joi 的管道.
+有几种方法可以实现，一种常见的方式是使用**基于结构**的验证。[Joi](https://github.com/hapijs/joi)库是一个工具，它允许您使用一个可读的 API 以非常简单的方式创建结构。让我们俩试一下 Joi 的管道.
 
 首先安装依赖:
 
@@ -166,7 +162,7 @@ export class CreateCatDto {
 }
 ```
 
-?> 有关 class-validator decorators [在这里阅读更多](6.0/typestack/class-validator#usage)
+?> 有关 class-validator decorators [在这里阅读更多](https://github.com/typestack/class-validator#usage)
 
 完成后，我们可以创建一个 `ValidationPipe` 类。
 
@@ -285,7 +281,7 @@ export class AppModule {}
 
 ?> When using this approach to perform dependency injection for the pipe, note that regardless of the module where this construction is employed, the pipe is, in fact, global. Where should this be done? Choose the module where the pipe (ValidationPipe in the example above) is defined. Also, useClass is not the only way of dealing with custom provider registration. Learn more here.
 
-?> 另一种选择是使用[执行上下文](5.0/executioncontext)功能。另外，useClass 并不是处理自定义提供者注册的唯一方法。在[这里](5.0/fundamentals?id=custom-providers)了解更多。
+?> 另一种选择是使用[执行上下文](6/applicationcontext)功能。另外，useClass 并不是处理自定义提供者注册的唯一方法。在[这里](6/fundamentals?id=custom-providers)了解更多。
 
 ## 转换管道
 

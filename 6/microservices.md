@@ -2,21 +2,23 @@
 
 ## 基本
 
-Nest 微服务是一种使用与 HTTP 不同的传输层的应用程序。
+除了传统的(有时称为单片)应用程序架构之外，`Nest` 还支持微服务架构风格的开发。本文档中其他地方讨论的大多数概念，如依赖项注入、装饰器、异常过滤器、管道、保护和拦截器，都同样适用于微服务。`Nest` 会尽可能地抽象化实现细节，以便相同的组件可以跨基于 HTTP 的平台，`WebSocket` 和微服务运行。本节特别讨论 `Nest` 的微服务方面。
+在 `Nest` 中，微服务基本上是一个使用与 `HTTP` 不同的传输层的应用程序。
 
 ![](https://docs.nestjs.com/assets/Microservices_1.png)
+
+`Nest` 支持几种内置的传输层实现，称为传输器，负责在不同的微服务实例之间传输消息。大多数传输器本机都支持请求 - 响应和基于事件的消息样式。`Nest` 在规范接口的后面抽象了每个传输器的实现细节，用于请求 - 响应和基于事件的消息传递。这样可以轻松地从一个传输层切换到另一层，例如，利用特定传输层的特定可靠性或性能功能，而不会影响您的应用程序代码。
+
 
 ### 安装
 
 首先，我们需要安装所需的软件包：
 
 ```
-$ npm i --save @nestjs/microservices
+$ $ npm i --save @nestjs/microservices
 ```
 
-### 概述
-
-通常，Nest支持一系列内置的传输器。它们基于 **请求-响应** 范式，整个通信逻辑隐藏在抽象层之后。多亏了这一点，您可以轻松地在传输器之间切换，而无需更改任何代码行。我们不支持具有基于日志的持久性的流平台，例如 [Kafka](https://docs.confluent.io/3.0.0/streams/)或 [NATS](https://github.com/nats-io/node-nats-streaming)流，因为它们是为解决不同范围的问题而创建的。但是，您仍然可以通过使用执行上下文功能将它们与Nest一起使用。
+### 开始
 
 为了创建微服务，我们使用 `NestFactory` 类的 `createMicroservice()` 方法。
 
@@ -46,7 +48,7 @@ bootstrap();
 | `options`            | 确定传输器行为的传输器特定选项对象     |
 
 
-`options` 对象根据所选的传送器而不同。TCP传输器暴露了下面描述的几个属性。
+`options` 对象根据所选的传送器而不同。`TCP` 传输器暴露了下面描述的几个属性。
 
 |                        |                            |
 | :--------------------- | :------------------------- |
@@ -57,16 +59,16 @@ bootstrap();
 
 ### 模式（patterns）
 
-微服务通过 **模式** 识别消息。模式是一个普通值，例如对象、字符串或甚至数字。为了创建模式处理程序，最终，每个模式都被序列化，因此可以通过网络与数据一起发送。因此，接收器可以容易地将传入消息与相应的处理器相关联。
+微服务通过 **模式** 识别消息。模式是一个普通值，例如对象、字符串或甚至数字。模式将自动序列化，并与消息的数据部分一起通过网络发送。因此，接收器可以容易地将传入消息与相应的处理器相关联。
 
 ### 请求-响应
 
 
-当您必须在各种外部服务之间交换消息时，请求 - 响应 通信机制非常有用。此外，使用此范例，您可以确保该服务实际上已收到该消息。
+当您需要在各种外部服务之间交换消息时，请求-响应消息样式非常有用。使用此范例，您可以确定服务确实收到了消息(不需要手动实现消息 `ACK` 协议)。然而，请求-响应范式并不总是最佳选择。例如，使用基于日志的持久性的流传输器(如 `Kafka` 或 `NATS` 流)针对解决不同范围的问题进行了优化，更符合事件消息传递范例(有关更多细节，请参阅下面的基于事件的消息传递)。
 
-为了使服务能够通过网络交换数据，Nest 创建了两个通道，其中一个负责传输数据，而另一个负责监听传入的响应。然而，并非总是如此。例如，作为 NATS 的平台提供了开箱即用的功能，因此我们不必自己完成。
+为了使服务能够通过网络交换数据，`Nest` 创建了两个通道，其中一个负责传输数据，而另一个负责监听传入的响应。对于某些底层传输，比如 `NATS`，这种双通道是支持开箱即用的。对于其他人，`Nest` 通过手动创建单独的渠道进行补偿。 这样做可能会产生开销，因此，如果您不需要请求-响应消息样式，则应考虑使用基于事件的方法。
 
-基本上，要创建一个消息处理程序（基于请求 - 响应范例），我们使用 @MessagePattern() ，需要 import @nestjs/microservices 包。
+基本上，要创建一个消息处理程序（基于请求 - 响应范例），我们使用 `@MessagePattern()` ，需要从 `@nestjs/microservices` 包导入。
 
 >  math.controller.ts
 
@@ -81,9 +83,9 @@ export class MathController {
     return (data || []).reduce((a, b) => a + b);
   }
 }
-```
 
-`accumulate()` 处理程序正在监听符合 `cmd :'sum'` 模式的消息。模式处理程序采用单个参数，即从客户端传递的 `data` 。在这种情况下，数据是必须累加的数字数组。
+```
+在上面的代码中，`accumulate()` 处理程序正在监听符合 `cmd :'sum'` 模式的消息。模式处理程序采用单个参数，即从客户端传递的 `data` 。在这种情况下，数据是必须累加的数字数组。
 
 ### 异步响应
 
@@ -100,8 +102,6 @@ async accumulate(data: number[]): Promise<number> {
 
 此外，我们能够返回 [Rx](https://github.com/reactivex/rxjs) `Observable`，因此这些值将被发出，直到流完成。
 
-> math.controller.ts
-
 ```typescript
 @MessagePattern({ cmd: 'sum' })
 accumulate(data: number[]): Observable<number> {
@@ -113,9 +113,9 @@ accumulate(data: number[]): Observable<number> {
 
 ### 基于事件
 
-虽然当您必须不断地在服务之间交换消息时，请求 - 响应方法很棒，但是当您只想发布事件（无需等待响应）时，它会带来太多不必要的开销，而这些开销是完全无用的。例如，您希望简单地通知另一个服务系统的这一部分发生了某种情况。因此，我们也为基于事件的通信提供支持。
+虽然 `request-response` 方法是在服务之间交换消息的理想方法，但是当您的消息样式是基于事件的时（即您只想发布事件而不等待响应时），它不太适合。它会带来太多不必要的开销，而这些开销是完全无用的。例如，您希望简单地通知另一个服务系统的这一部分发生了某种情况。因此，我们也为基于事件的通信提供支持。
 
-为了创建事件处理程序，我们使用 @EventPattern()， 需要import @nestjs/microservices 包。
+为了创建事件处理程序，我们使用 `@EventPattern()`装饰器， 需要 ` @nestjs/microservices` 包导入。
 
 ```typescript
 @EventPattern('user_created')
@@ -124,13 +124,31 @@ async handleUserCreated(data: Record<string, unknown>) {
 }
 ```
 
-该 handleUserCreated() 方法正在侦听 user_created 事件。事件处理程序接受一个参数，data 从客户端传递（在本例中，是一个通过网络发送的事件有效负载）。
+该 `handleUserCreated()` 方法正在侦听 `user_created` 事件。事件处理程序接受一个参数，`data` 从客户端传递（在本例中，是一个通过网络发送的事件有效负载）。
 
+### 装饰器
+
+在更复杂的场景中，您可能希望访问关于传入请求的更多信息。例如，对于通配符订阅的 `NATS`，您可能希望获得生产者发送消息的原始主题。同样，在 `Kafka` 中，您可能希望访问消息头。为了做到这一点，你可以使用内置的装饰如下:
+
+```typescript
+@MessagePattern('time.us.*')
+getDate(@Payload() data: number[], @Ctx() context: NatsContext) {
+  console.log(`Subject: ${context.getSubject()}`); // e.g. "time.us.east"
+  return new Date().toLocaleTimeString(...);
+}
+```
+
+?> `@Payload()`、`@Ctx()` 和 `NatsContext` 需要从 `@nestjs/microservices` 包导入。
 
 ### 客户端
 
 
- 为了交换消息或将事件发布到 Nest 微服务，我们使用 ClientProxy 类, 它可以通过几种方式创建实例。首先，我们可以 import  ClientsModule 暴露的静态register() 方法的内容。此方法将数组作为参数，其中每个元素都具有 name（这是一种微服务标识符）以及特定于微服务的选项（它与传入 createMicroservice()方法的对象相同）。
+ 为了交换消息或将事件发布到 Nest 微服务，我们使用 ClientProxy 类, 它可以通过几种方式创建实例。此类定义了几个方法，例如`send()`（用于请求-响应消息传递）和`emit()`（用于事件驱动消息传递），这些方法允许您与远程微服务通信。使用下列方法之一获取此类的实例。
+ 
+ 首先，我们可以使用 `ClientsModule` 暴露的静态`register()` 方法。此方法将数组作为参数，其中每个元素都具有 `name`（这是一种微服务标识符）以及特定于微服务的选项（它与传入 `createMicroservice()`  方法的对象相同）。
+
+ `name`属性充当一个 `injection token`，可以在需要时将其用于注入 `ClientProxy` 实例。`name` 属性的值作为注入标记，可以是任意字符串或`JavaScript`符号，如下所述。
+`options` 对象的属性与我们之前在`createmicroservice（）`方法中看到的属性相同。
 
 ```typescript
 ClientsModule.register([
@@ -138,21 +156,18 @@ ClientsModule.register([
 ]),
 ```
 
-?> `ClientsModule` 需要 import  `@nestjs/microservices` 。
-
-导入模块后，我们可以在 MATH_SERVICE 使用 @Inject() 装饰器进行注入。
+导入模块之后，我们可以使用 `@Inject()` 装饰器注入`'MATH_SERVICE'`。
 
 ```typescript
 constructor(
-  constructor(
-    @Inject('MATH_SERVICE') private readonly client: ClientProxy,
-  ) {}
-)
+  @Inject('MATH_SERVICE') private readonly client: ClientProxy,
+) {}
 ```
 
-?> `ClientProxy` 需要 import  `@nestjs/microservices` 。
+?> `ClientsModule`和 `ClientProxy`类需要从 `@nestjs/microservices` 包导入。
 
-尽管如此，这种方法不允许我们异步获取微服务配置。在这种情况下，我们可以直接使用 ClientProxyFactory 注册自定义提供程序（它是一个客户端实例）：
+有时候，我们可能需要从另一个服务(比如 `ConfigService` )获取微服务配置，为此，我们可以使用 `ClientProxyFactory` 类来注册一个自定义提供程序(它提供了一个 `ClientProxy` 实例):
+
 
 ```typescript
 {
@@ -165,32 +180,33 @@ constructor(
 }
 ```
 
-?> `ClientProxyFactory` 需要 import  `@nestjs/microservices` 。
+?> `ClientProxyFactory` 需要从 `@nestjs/microservices` 包导入 。
 
-
-最后一个可行的解决方案是使用 @Client() 属性装饰器。
-
+另一种选择是使用 `@client()`属性装饰器。
 
 ```typescript
 @Client({ transport: Transport.TCP })
 client: ClientProxy;
 ```
 
-?> `@Client()` 需要 import  `@nestjs/microservices` 。
-
-但是，使用装饰器不是推荐的方法（难以测试，难以共享客户端实例）。
+?> `@Client()` 需要从  `@nestjs/microservices` 包导入 。
 
 
-ClientProxy 是惰性的。它不会立即启动连接。相反，它将在第一次微服务请求之前建立，然后在每次后续请求中重复使用。但是，如果要延迟应用程序的引导过程并手动初始化连接，则可以在 OnModuleInit 生命周期钩子中使用函数 connect()。
+但是，使用 `@Client()` 装饰器不是推荐的方法（难以测试，难以共享客户端实例）。
+
+ClientProxy是惰性的。 它不会立即启动连接。 相反，它将在第一个微服务调用之前建立，然后在每个后续调用中重用。 但是，如果您希望将应用程序引导过程延迟到建立连接为止，则可以使用 `OnApplicationBootstrap` 生命周期挂钩内的 `ClientProxy` 对象的 `connect()` 方法手动启动连接。
 
 ```typescript
-async onModuleInit() {
+async onApplicationBootstrap() {
   await this.client.connect();
 }
 ```
+
 如果无法创建连接，则该 `connect()` 方法将拒绝相应的错误对象。
 
-该 `ClientProxy` 公开了一个 `send()` 方法。此方法旨在调用微服务并返回 `Observable` 其响应，这意味着，我们可以轻松地订阅发出的值。
+### 消息传递
+
+该 `ClientProxy` 公开 `send()` 方法。 此方法旨在调用微服务，并返回带有其响应的 `Observable`。 因此，我们可以轻松地订阅发射的值。
 
 ```typescript
 accumulate(): Observable<number> {
@@ -199,11 +215,12 @@ accumulate(): Observable<number> {
   return this.client.send<number>(pattern, payload);
 }
 ```
-send() 函数接受两个参数，pattern 和 payload。pattern 具有 @MessagePattern() 修饰符中定义的这个模式，而 payload 是我们想要传输到另一个微服务的消息。
+
+`send()` 函数接受两个参数，`pattern` 和 `payload`。`pattern` 具有 `@MessagePattern()` 修饰符中定义的这个模式，而 `payload` 是我们想要传输到另一个微服务的消息。该方法返回一个`cold Observable`对象，这意味着您必须在消息发送之前显式地订阅它。
 
 ### 发布活动
 
-另一种可行的方法是 emit()。此方法的职责是将事件发布到消息代理。
+另一种是使用 `ClientProxy` 对象的 `emit()`方法。此方法的职责是将事件发布到消息代理。
 
 ```typescript
 async publish() {
@@ -211,9 +228,35 @@ async publish() {
 }
 ```
 
-该 emit() 方法有两个参数，pattern 和 payload。该 pattern 具有等同于在定义的 @EventPattern() ，同时 payload 是我们要传递到另一个微服务的事件负载。
+该 `emit()`方法有两个参数，`pattern` 和 `payload`。`pattern` 具有 `@MessagePattern()` 修饰符中定义的这个模式，而`payload` 是我们想要传输到另一个微服务的消息。此方法返回一个 `hot Observable`（不同于`send()`方法返回一个 `cold Observable`），这意味着无论您是否显式订阅该 `Observable`，代理都将立即尝试传递事件。
 
+### 作用域
 
+对于不同编程语言背景的人来说，可能会意外地发现，在 `Nest` 中，几乎所有内容都在传入的请求之间共享。例如，我们有一个到数据库的连接池，带有全局状态的单例服务，等等。请记住，`Node.js` 并不遵循`request-response`的多线程无状态模型，在这种模型中，每个请求都由单独的线程处理。因此，对于应用程序来说，使用单例实例是完全安全的。
+
+但是，在某些情况下，当应用程序是基于生命周期的行为时，也存在边界情况，例如 `GraphQL` 应用程序中的每个请求缓存、请求跟踪或多租户。在[这里](/6/fundameentals)学习如何控制范围。
+
+请求作用域的处理程序和提供程序可以使用 `@Inject()` 装饰器结合`CONTEXT` （上下文）令牌注入`RequestContext`:
+
+```typescript
+import { Injectable, Scope, Inject } from '@nestjs/common';
+import { CONTEXT, RequestContext } from '@nestjs/microservices';
+
+@Injectable({ scope: Scope.REQUEST })
+export class CatsService {
+  constructor(@Inject(CONTEXT) private readonly ctx: RequestContext) {}
+}
+```
+
+还提供了对 `RequestContext ` 对象的访问，该对象有两个属性：
+```typescript
+export interface RequestContext<T = any> {
+  pattern: string | Record<string, any>;
+  data: T;
+}
+```
+
+`data`属性是消息生产者发送的消息有效负载。 `pattern` 属性是用于标识适当的处理程序以处理传入消息的模式。
 
 ## Redis
 
@@ -659,3 +702,4 @@ accumulate(data: number[]): number {
 |---|---|---|---|
 | [@zuohuadong](https://github.com/zuohuadong)  | <img class="avatar-66 rm-style" src="https://wx3.sinaimg.cn/large/006fVPCvly1fmpnlt8sefj302d02s742.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
 | [@Drixn](https://drixn.com/)  | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">  |  翻译  | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/) |
+| [@Armor](https://github.com/Armor-cn)  | <img class="avatar-66 rm-style" height="70" src="https://avatars3.githubusercontent.com/u/31821714?s=460&v=4">  |  翻译  | 专注于 Java 和 Nest，[@Armor](https://armor.ac.cn/) | 

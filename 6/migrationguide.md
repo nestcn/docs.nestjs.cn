@@ -1,14 +1,13 @@
 ## 迁移指南
 
 
-本文提供了一套从 v5 迁移到最新 v6 版本的**指导原则**。尽管我们试图减少一些重大变化，但必须在几个地方修改API以简化其使用。
+本文提供了一套从 `v5` 迁移到最新 `v6` 版本的**指导原则**。尽管我们试图减少一些重大变化，但必须在几个地方修改 `API` 以简化其使用。
 
 ### 中间件
 
-基于[此主题](https://github.com/nestjs/nest/issues/1378)，中间件 API 已经更改，以便来自不同 node 库的人员更直接使用，并减少先前 API 产生的混淆。
+基于[此主题](https://github.com/nestjs/nest/issues/1378)，中间件 `API` 已经更改，以便来自不同 `Node` 库的人员更直接使用，并减少先前 `API` 产生的混淆。
 
 ```typescript
-
 // Before
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {
@@ -34,10 +33,9 @@ export class LoggerMiddleware implements NestMiddleware {
 
 ### 拦截器
 
-拦截器API也已简化。此外，由于社区报告[此问题](https://github.com/nestjs/nest/issues/1016)，因此需要进行更改。
+拦截器 `API` 也已简化。此外，由于社区报告[此问题](https://github.com/nestjs/nest/issues/1016)，因此需要进行更改。
 
 ```typescript
-
 // Before
 @Injectable()
 export class TransformInterceptor implements NestInterceptor {
@@ -70,9 +68,9 @@ export class TransformInterceptor implements NestInterceptor {
 
 ### 平台
 
-到目前为止，即使您没有使用 HTTP 服务器，也必须在内部安装 `express` 库（作为 `@nestjs/core` 软件包的依赖项）。自从新的主要版本发布以来，Nest 将不再提供这些软件包。每个平台已经提取到单个包中，分别为 `@nestjs/platform-express`，`@nestjs/platform-fastify`，`@nestjs/platform-ws`，和 `@nestjs/platform-socket.io`。假设您的应用程序同时使用 `express` 和 `socket.io`，则需安装相应的平台：
+到目前为止，即使您没有使用 `HTTP` 服务器，也必须在内部安装 `express` 库（作为 `@nestjs/core` 软件包的依赖项）。自从新的主要版本发布以来，`Nest` 将不再提供这些软件包。每个平台已经提取到单个包中，分别为 `@nestjs/platform-express`，`@nestjs/platform-fastify`，`@nestjs/platform-ws`，和 `@nestjs/platform-socket.io`。假设您的应用程序同时使用 `express` 和 `socket.io`，则需安装相应的平台：
 
-```bash
+```
 $ npm i @nestjs/platform-express @nestjs/platform-socket.io
 ```
 
@@ -96,7 +94,7 @@ $ npm i @nestjs/platform-express @nestjs/platform-socket.io
 
 ### Express实例
 
-我们不再支持将 `express` 实例作为方法的第二个参数传递 `NestFactory.create()` 。为了获取底层 HTTP 适配器，请使用[此处](/6/faq?id=http-适配器)描述的技术。此外，您可以传递 `ExpressAdapter`（只需将您的 `express` 实例作为构造函数参数传递 `new ExpressAdapter(express)`）。
+我们不再支持将 `express` 实例作为方法的第二个参数传递 `NestFactory.create()` 。为了获取底层 `HTTP` 适配器，请使用[此处](/6/faq?id=http-适配器)描述的技术。此外，您可以传递 `ExpressAdapter`（只需将您的 `express` 实例作为构造函数参数传递 `new ExpressAdapter(express)`）。
 
 ```typescript
 
@@ -115,11 +113,11 @@ const app = await NestFactory.create(
 
 ### 弃用
 
-最终删除了所有弃用（从4到5版本）。
+最终删除了所有弃用（从 `4` 到 `5` 版本）。
 
 ### TypeScript
 
-Nest 6 支持 `TypeScript（3.0.0）`的最新主要版本。
+`Nest 6` 支持 `TypeScript（3.0.0）`的最新主要版本。
 
  ### 译者署名
 

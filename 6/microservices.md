@@ -2,7 +2,7 @@
 
 ## 基本
 
-除了传统的(有时称为单片)应用程序架构之外，`Nest` 还支持微服务架构风格的开发。本文档中其他地方讨论的大多数概念，如依赖项注入、装饰器、异常过滤器、管道、保护和拦截器，都同样适用于微服务。`Nest` 会尽可能地抽象化实现细节，以便相同的组件可以跨基于 HTTP 的平台，`WebSocket` 和微服务运行。本节特别讨论 `Nest` 的微服务方面。
+除了传统的(有时称为单片)应用程序架构之外，`Nest` 还支持微服务架构风格的开发。本文档中其他地方讨论的大多数概念，如依赖项注入、装饰器、异常过滤器、管道、保护和拦截器，都同样适用于微服务。`Nest` 会尽可能地抽象化实现细节，以便相同的组件可以跨基于 `HTTP` 的平台，`WebSocket` 和微服务运行。本节特别讨论 `Nest` 的微服务方面。
 在 `Nest` 中，微服务基本上是一个使用与 `HTTP` 不同的传输层的应用程序。
 
 ![](https://docs.nestjs.com/assets/Microservices_1.png)
@@ -40,7 +40,7 @@ bootstrap();
 
 ?> 默认情况下，微服务通过 **TCP协议** 监听消息。
 
-`createMicroservice ()` 方法的第二个参数是 options 对象。此对象可能有两个成员:
+`createMicroservice ()` 方法的第二个参数是 `options` 对象。此对象可能有两个成员:
 
 |                      |                                  |
 | :------------------- | :------------------------------- |
@@ -59,7 +59,7 @@ bootstrap();
 
 ### 模式（patterns）
 
-微服务通过 **模式** 识别消息。模式是一个普通值，例如对象、字符串或甚至数字。模式将自动序列化，并与消息的数据部分一起通过网络发送。因此，接收器可以容易地将传入消息与相应的处理器相关联。
+微服务通过 **模式** 识别消息。模式是一个普通值，例如对象、字符串。模式将自动序列化，并与消息的数据部分一起通过网络发送。因此，接收器可以容易地将传入消息与相应的处理器相关联。
 
 ### 请求-响应
 
@@ -143,7 +143,7 @@ getDate(@Payload() data: number[], @Ctx() context: NatsContext) {
 ### 客户端
 
 
- 为了交换消息或将事件发布到 Nest 微服务，我们使用 ClientProxy 类, 它可以通过几种方式创建实例。此类定义了几个方法，例如`send()`（用于请求-响应消息传递）和`emit()`（用于事件驱动消息传递），这些方法允许您与远程微服务通信。使用下列方法之一获取此类的实例。
+ 为了交换消息或将事件发布到 `Nest` 微服务，我们使用 `ClientProxy` 类, 它可以通过几种方式创建实例。此类定义了几个方法，例如`send()`（用于请求-响应消息传递）和`emit()`（用于事件驱动消息传递），这些方法允许您与远程微服务通信。使用下列方法之一获取此类的实例。
  
  首先，我们可以使用 `ClientsModule` 暴露的静态`register()` 方法。此方法将数组作为参数，其中每个元素都具有 `name`（这是一种微服务标识符）以及特定于微服务的选项（它与传入 `createMicroservice()`  方法的对象相同）。
 
@@ -194,7 +194,7 @@ client: ClientProxy;
 
 但是，使用 `@Client()` 装饰器不是推荐的方法（难以测试，难以共享客户端实例）。
 
-ClientProxy是惰性的。 它不会立即启动连接。 相反，它将在第一个微服务调用之前建立，然后在每个后续调用中重用。 但是，如果您希望将应用程序引导过程延迟到建立连接为止，则可以使用 `OnApplicationBootstrap` 生命周期挂钩内的 `ClientProxy` 对象的 `connect()` 方法手动启动连接。
+`ClientProxy` 是惰性的。 它不会立即启动连接。 相反，它将在第一个微服务调用之前建立，然后在每个后续调用中重用。 但是，如果您希望将应用程序引导过程延迟到建立连接为止，则可以使用 `OnApplicationBootstrap` 生命周期挂钩内的 `ClientProxy` 对象的 `connect()` 方法手动启动连接。
 
 ```typescript
 async onApplicationBootstrap() {
@@ -234,7 +234,7 @@ async publish() {
 
 对于不同编程语言背景的人来说，可能会意外地发现，在 `Nest` 中，几乎所有内容都在传入的请求之间共享。例如，我们有一个到数据库的连接池，带有全局状态的单例服务，等等。请记住，`Node.js` 并不遵循`request-response`的多线程无状态模型，在这种模型中，每个请求都由单独的线程处理。因此，对于应用程序来说，使用单例实例是完全安全的。
 
-但是，在某些情况下，当应用程序是基于生命周期的行为时，也存在边界情况，例如 `GraphQL` 应用程序中的每个请求缓存、请求跟踪或多租户。在[这里](/6/fundameentals)学习如何控制范围。
+但是，在某些情况下，当应用程序是基于生命周期的行为时，也存在边界情况，例如 `GraphQL` 应用程序中的每个请求缓存、请求跟踪或多租户。在[这里](/6/fundamentals?id=作用域)学习如何控制范围。
 
 请求作用域的处理程序和提供程序可以使用 `@Inject()` 装饰器结合`CONTEXT` （上下文）令牌注入`RequestContext`:
 
@@ -249,6 +249,7 @@ export class CatsService {
 ```
 
 还提供了对 `RequestContext ` 对象的访问，该对象有两个属性：
+
 ```typescript
 export interface RequestContext<T = any> {
   pattern: string | Record<string, any>;
@@ -256,17 +257,18 @@ export interface RequestContext<T = any> {
 }
 ```
 
-`data`属性是消息生产者发送的消息有效负载。 `pattern` 属性是用于标识适当的处理程序以处理传入消息的模式。
+`data` 属性是消息生产者发送的消息有效负载。 `pattern` 属性是用于标识适当的处理程序以处理传入消息的模式。
 
 ## Redis
 
-第二个内置传输器基于 [Redis](https://redis.io/) 数据库。此传输器利用发布/订阅功能。
+[Redis](https://redis.io/) 传输器实现了发布/订阅消息传递范例，并利用了 `Redis` 的 `Pub/Sub` 特性。 已发布的消息按渠道分类，不知道哪些订阅者（如果有）最终会收到该消息。 每个微服务可以订阅任意数量的渠道。 此外，一次可以订阅多个频道。这意味着如果发布了一条消息，并且没有订阅者对此消息感兴趣，则该消息将被删除并且无法恢复。 因此，您不能保证消息或事件将至少由一项服务处理。 一条消息可以由多个订户订阅（并接收）。
+
 
 ![](https://docs.nestjs.com/assets/Redis_1.png)
 
 ### 安装
 
-在开始之前，我们必须安装所需的软件包:
+构建基于 `Redis` 的微服务，请首先安装所需的软件包：
 
 ```
 $ npm i --save redis
@@ -274,7 +276,7 @@ $ npm i --save redis
 
 ### 概述
 
-为了从TCP传输策略切换到Redis **pub/sub**，我们需要更改传递给 `createMicroservice()` 方法的选项对象。
+要使用 `Redis` 传输器，请将以下选项对象传递给 `createMicroservice()` 方法:
 
 > main.ts
 
@@ -287,9 +289,37 @@ const app = await NestFactory.createMicroservice(ApplicationModule, {
 });
 ```
 
+?> `Transport` 需要从 `@nestjs/microservices` 包导入。
+
+同样，要创建一个客户端实例，我们需要传递一个 `options` 对象，该对象具有与前面在 `createMicroservice()` 方法具有相同的属性。
+
+```typescript
+ClientsModule.register([
+  {
+    name: 'MATH_SERVICE',
+    transport: Transport.REDIS,
+    options: {
+      url: 'redis://localhost:6379',
+    }
+  },
+]),
+```
+
+也可以使用其他创建客户端的实例（ `ClientProxyFactory` 或 `@Client()` ）。你可以在[这里](/6/introduction.md)读到。
+
+在更复杂的场景中，您可能希望访问关于传入请求的更多信息。在`Redis` 中，您可以访问 `RedisContext`对象。
+
+```typescript
+@MessagePattern('notifications')
+getDate(@Payload() data: number[], @Ctx() context: RedisContext) {
+  console.log(`Channel: ${context.getChannel()}`);
+}
+```
+?> `@Payload()`， `@Ctx()` 和 `RedisContext` 需要从 `@nestjs/microservices` 包导入.
+
 ### 选项
 
-有许多可用的选项可以确定传输器的行为。
+有许多可用的选项可以确定传输器的行为。`Redis` 公开了下面描述的属性。
 
 |                        |                             |
 | :--------------------- | :-------------------------- |
@@ -308,6 +338,7 @@ const app = await NestFactory.createMicroservice(ApplicationModule, {
 ```
 $ npm i --save mqtt
 ```
+
 ### 概览
 
 为了切换到 `MQTT` 传输协议，我们需要修改传递给该 `createMicroservice()` 函数的选项对象。
@@ -324,13 +355,11 @@ const app = await NestFactory.createMicroservice(ApplicationModule, {
 });
 ```
 
-?> Transport 枚举需要import  @nestjs/microservices 包。
-
+?> `Transport` 需要从 `@nestjs/microservices` 包导入。
 
 ### 属性
 
 有很多可用的属性可以决定传输器的行为。更多描述请[查看](https://github.com/mqttjs/MQTT.js)。
-
 
 ## NATS
 
@@ -346,7 +375,7 @@ $ npm i --save nats
 
 ### 概述
 
-为了切换到 **NATS** 传输器，我们需要修改传递到 `createMicroservice()` 方法的属性对象。
+为了切换到 **NATS** 传输器，我们需要修改传递到 `createMicroservice()` 方法的选项对象。
 
 > main.ts
 
@@ -359,12 +388,12 @@ const app = await NestFactory.createMicroservice(ApplicationModule, {
 });
 ```
 
-?> Transport 枚举需要import  @nestjs/microservices 包。
+?> `Transport` 需要从 `@nestjs/microservices` 包导入。
 
 
 ### 选项
 
-有许多可用的选项可以确定传输器的行为。它们在 [这里](https://github.com/nats-io/node-nats#connect-options) 有很好的描述。
+有许多可用的选项可以确定传输器的行为。它们在 [这里](https://github.com/nats-io/nats.js#connect-options) 有很好的描述。此外，还有一个附加的队列属性，允许您指定服务器应订阅的队列的名称（如果不想使用任何特定队列，请保留未定义的名称）。
 
 ## RabbitMQ
 
@@ -380,7 +409,7 @@ $ npm i --save amqplib amqp-connection-manager
 
 ### 传输器
 
-为了切换到 RabbitMQ 传输器，我们需要修改传递给该 createMicroservice() 方法的属性对象。
+为了切换到 `RabbitMQ` 传输器，我们需要修改传递给该 `createMicroservice()` 方法的选项对象。
 
 > main.ts
 
@@ -395,7 +424,7 @@ const app = await NestFactory.createMicroservice(ApplicationModule, {
 });
 ```
 
-?> Transport 枚举 需要import  @nestjs/microservices 包。
+?> `Transport` 需要从 `@nestjs/microservices` 包导入。
 
 ### 属性
 
@@ -409,13 +438,12 @@ const app = await NestFactory.createMicroservice(ApplicationModule, {
 | prefetchCount |	设置通道的预取计数 |
 | isGlobalPrefetchCount	 | 启用每个通道预取|
 | queueOptions |	其他队列选项。它们在[这里](https://www.squaremobius.net/amqp.node/channel_api.html#assertQueue)有很好的描述 |
-| socketOptions	 | 其他套接字选项。它们在[这里](https://www.squaremobius.net/amqp.node/channel_api.html#socket-options)有很好的描述 |
-
+| socketOptions	 | 其他`socket`选项。它们在[这里](https://www.squaremobius.net/amqp.node/channel_api.html#socket-options)有很好的描述 |
 
 
 ## gRPC
 
-[gRPC](https://github.com/grpc/grpc-node) 是一个高性能、开源的通用RPC框架。
+[gRPC](https://github.com/grpc/grpc-node) 是一个高性能、开源的通用 `RPC` 框架。
 
 ### 安装
 
@@ -441,7 +469,7 @@ const app = await NestFactory.createMicroservice(ApplicationModule, {
 });
 ```
 
-!> 该 join() 功能使用import path 封装，而 Transport枚举是从 @nestjs/microservices 而来。
+!> 该 `join()` 方法使用 import `path` 封装，而 `Transport` 需要从 `@nestjs/microservices` 包导入。
 
 ### 选项
 
@@ -449,10 +477,10 @@ const app = await NestFactory.createMicroservice(ApplicationModule, {
 | :------------- | :---------------------- |
 | `url`          | 连接网址               |
 |`protoLoader`| NPM包名称（如果要使用其他原型加载器） |
-| `protoPath`    | 绝对（或相对于根目录） `.proto` 文件的路径 |
-|`loader` | @grpc/proto-loader 选项。[了解更多](https://github.com/grpc/grpc-node/tree/master/packages/grpc-protobufjs#usage) |
+| `protoPath`    | 指向 `.proto` 文件的绝对(或相对于根目录)路径 |
+|`loader` | @grpc/proto-loader 选项。[了解更多](https://github.com/grpc/grpc-node/tree/master/packages/proto-loader) |
 | `package`      | `protobuf` 包名       |
-| `credentials`  | 服务器证书([阅读更多](https://grpc.io/grpc/node/grpc.ServerCredentials.html))
+| `credentials`  | 服务器证书([阅读更多](https://grpc.github.io/grpc/node/grpc.ServerCredentials.html))
 
 ### 概述
 
@@ -479,7 +507,7 @@ message Hero {
 }
 ```
 
-在上面的示例中，我们定义了一个 `HeroService`，它暴露了一个 `FindOne()` gRPC处理程序，该处理程序期望 `HeroById` 作为输入并返回一个 `Hero` 消息。为了定义一个能够实现这个 protobuf 定义的处理程序，我们必须使用 `@GrpcRoute()` 装饰器。之前的 `@MessagePattern()` 将不再有用。
+在上面的示例中，我们定义了一个 `HeroService`，它暴露了一个 `FindOne()` gRPC处理程序，该处理程序期望 `HeroById` 作为输入并返回一个 `Hero` 消息。为了定义一个能够实现这个 `protobuf` 定义的处理程序，我们必须使用 `@GrpcRoute()` 装饰器。之前的 `@MessagePattern()` 将不再有用。
 
 > hero.controller.ts
 
@@ -494,11 +522,11 @@ findOne(data: HeroById, metadata: any): Hero {
 }
 ```
 
-!> `@GrpcRoute()` 需要引入 `@nestjs/microservices` 。
+!> `@GrpcMethod()` 需要从 `@nestjs/microservices` 包导入 。
 
-`HeroService` 是服务的名称，而 `FindOne` 指向 `FindOne()` gRPC处理程序。对应的 `findOne()` 方法接受两个参数，即从调用方传递的 `data` 和存储gRPC请求元数据的 `metadata`。
+`HeroService` 是服务的名称，而 `FindOne` 指向 `FindOne()` `gRPC`处理程序。对应的 `findOne()` 方法接受两个参数，即从调用方传递的 `data` 和存储`gRPC`请求元数据的 `metadata`。
 
-此外，`FindOne` 这里实际上是多余的。如果没有传递第二个参数 `@GrpcMethod()`，Nest 将自动使用带有大写首字母的方法名称，例如 findOne-> FindOne 。
+此外，`FindOne` 这里实际上是多余的。如果没有传递第二个参数 `@GrpcMethod()`，`Nest` 将自动使用带有大写首字母的方法名称，例如 `findOne->` `FindOne` 。
 
 > hero.controller.ts
 
@@ -516,7 +544,7 @@ export class HeroService {
 }
 ```
 
-同样，您可能不会传递任何参数。在这种情况下，Nest将使用类名。
+同样，您可能不会传递任何参数。在这种情况下，`Nest` 将使用类名。
 
 > hero.controller.ts
 
@@ -538,8 +566,6 @@ export class HeroService {
 
 为了创建客户端实例，我们需要使用 `@Client()` 装饰器。
 
-> hero.controller.ts
-
 ```typescript
 @Client({
   transport: Transport.GRPC,
@@ -551,7 +577,7 @@ export class HeroService {
 client: ClientGrpc;
 ```
 
-与前面的例子相比有一点差别。我们使用提供 `getService()` 方法的 `ClientGrpc`，而不是 `ClientProxy` 类。`getService()` 泛型方法将服务的名称作为参数，并返回其实例(如果可用)。
+与前面的例子相比有一点差别。我们没有使用 `ClientProxy` 类，而是使用 `ClientGrpc`。它提供 `getService()` 泛型方法将服务的名称作为参数，并返回其实例(如果可用)。
 
 > hero.controller.ts
 
@@ -561,7 +587,7 @@ onModuleInit() {
 }
 ```
 
-`heroService` 对象暴露了 `.proto` 文件中定义的同一组方法。注意，所有这些都是 **小写** (为了遵循自然惯例)。基本上，我们的gRPC `HeroService` 定义包含 `FindOne()` 函数。这意味着 `heroService` 实例将提供 `findOne()` 方法。
+`heroService` 对象暴露了 `.proto` 文件中定义的同一组方法。注意，所有这些都是 **小写** (为了遵循自然惯例)。基本上，我们的`gRPC` `HeroService` 定义包含 `FindOne()` 函数。这意味着 `heroService` 实例将提供 `findOne()` 方法。
 
 ```typescript
 interface HeroService {
@@ -569,7 +595,7 @@ interface HeroService {
 }
 ```
 
-所有服务的方法都返回 `Observable`。由于 Nest 支持 [RxJS](https://github.com/reactivex/rxjs) 流并且与它们很好地协作，所以我们也可以在HTTP处理程序中返回它们。
+所有服务的方法都返回 `Observable`。由于 `Nest` 支持 [RxJS](https://github.com/reactivex/rxjs) 流并且与它们很好地协作，所以我们也可以在 `HTTP` 处理程序中返回它们。
 
 > hero.controller.ts
 
@@ -582,17 +608,74 @@ call(): Observable<any> {
 
 [这里](https://github.com/nestjs/nest/tree/master/sample/04-grpc) 提供了一个完整的示例。
 
+### gRPC流 (gRPC Streaming)
+
+`GRPC` 本身支持长期的实时连接（称为流）。 对于诸如聊天，观察或块数据传输之类的服务案例，流可以是非常有用的工具。 您可以在官方文档（[此处](https://grpc.io/docs/guides/concepts/)）中找到更多详细信息。
+
+`Nest` 通过两种可能的方式支持 `GRPC`流处理程序：
+- `RxJS Subject + Observable` 处理程序：可用于在`Controller` 内部编写响应或将其传递给 `Subject / Observable`使用者。
+
+- `Pure GRPC` 调用流处理程序:将其传递给某个执行程序非常有用，后者将处理节点标准双工流处理程序的其余分派。
+
+### 主题策略 (Subject strategy)
+
+`@GrpcStreamMethod()` 装饰器将提供功能参数作为 `RxJS Observable`。
+
+```typescript
+// Set decorator with selecting a Service definition from protobuf package
+// the string is matching to: package proto_example.orders.OrdersService
+@GrpcStreamMethod('orders.OrderService')
+handleStream(messages: Observable<any>): Observable<any> {
+  const subject = new Subject();
+  messages.subscribe(message => {
+    console.log(message);
+    subject.next({
+      shipmentType: {
+        carrier: 'test-carrier',
+      },
+    });
+  });
+  return subject.asObservable();
+}
+```
+
+为了支持与 `@GrpcStreamMethod()` 装饰器的全双工交互，需要从`Controller` 方法中返回 `RxJS Observable`。
+
+### Pure GRPC call stream handler
+
+`@GrpcStreamCall()`装饰器将提供函数参数为 `grpc.ServerDuplexStream`，它支持 `.on('data', callback)`、`.write(message)`或 `.cancel()`之类的标准方法，有关可用方法的完整文档可在此处找到。
+
+```typescript
+// Set decorator with selecting a Service definition from protobuf package
+// the string is matching to: package proto_example.orders.OrdersService
+@GrpcStreamCall('orders.OrderService')
+handleStream(stream: any) {
+  stream.on('data', (msg: any) => {
+    console.log(msg);
+    // Answer here or anywhere else using stream reference
+    stream.write({
+      shipmentType: {
+        carrier: 'test-carrier',
+      },
+    });
+  });
+}
+```
+
+此装饰器不需要提供任何特定的返回参数。 可以像对待任何其他标准流类型一样处理流。
+
+
 ## 异常过滤器 (Exception filters)
 
-HTTP异常过滤器层和相应的微服务层之间的唯一区别在于，不要使用 `HttpException`，而应该使用 `RpcException`。
+`HTTP`异常过滤器层和相应的微服务层之间的唯一区别在于，不要使用 `HttpException`，而应该使用 `RpcException`。
 
 ```typescript
 throw new RpcException('Invalid credentials.');
 ```
 
-?> `RpcException` 类是从 `@nestjs/microservices` 包导入的。
+?> `RpcException` 需要从 `@nestjs/microservices` 包导入。
 
-Nest将处理引发的异常，并因此返回具有以下结构的 `error` 对象:
+Nest将处理抛出的异常，并因此返回具有以下结构的 `error` 对象:
 
 ```json
 {
@@ -634,9 +717,9 @@ accumulate(data: number[]): number {
 
 ### 继承
 
-通常，您将创建完全自定义的异常过滤器，以满足您的应用程序要求。虽然您希望重用已经实现的核心异常过滤器并根据某些因素覆盖行为，但可能存在用例。
+通常，您将创建完全定制的异常过滤器，以满足您的应用程序需求。但是，当您希望重用已经实现的核心异常过滤器并基于某些因素覆盖行为时，可能会有一些用例。
 
-为了将异常处理委托给基本过滤器，您需要扩展 `BaseExceptionFilter` 并调用继承的 `catch()` 函数。此外，`HttpServer` 必须注入并传递给 `super()` 调用。
+为了将异常处理委托给基本过滤器，您需要扩展 `BaseExceptionFilter` 并调用继承的 `catch()`方法。此外，必须注入 `HttpServer` 引用并将其传递给 `super()` 调用。
 
 ```typescript
 import { Catch, ArgumentsHost } from '@nestjs/common';
@@ -657,7 +740,7 @@ export class AllExceptionsFilter extends BaseRpcExceptionFilter {
 
 微服务管道和普通管道没有区别。唯一需要注意的是，不要抛出 `HttpException` ，而应该使用 `RpcException`。
 
-?> `RpcException` 类是从 `@nestjs/microservices` 包引入的。
+?> `RpcException` 类需要从 `@nestjs/microservices` 包导入。
 
 下面是一个使用手动实例化 **方法作用域** 管道(也可以使用类作用域)的示例:
 
@@ -671,11 +754,11 @@ accumulate(data: number[]): number {
 
 ## 守卫(Guards)
 
-微服守卫和普通守卫没有区别。唯一需要注意的是，不要使用 `HttpException` ，而应该使用 `RpcException`。
+微服守卫和普通守卫没有区别。唯一需要注意的是，不要抛出 `HttpException` ，而应该使用 `RpcException`。
 
-?> `RpcException` 类是从 `@nestjs/microservices` 包引入的。
+?> `RpcException` 类需要从 `@nestjs/microservices` 包导入。
 
-下面是一个使用 **方法作用域** 看守器(也可以使用类作用域)的示例:
+下面是一个使用 **方法作用域** 作为守卫(也可以使用类作用域)的示例:
 
 ```typescript
 @UseGuards(AuthGuard)

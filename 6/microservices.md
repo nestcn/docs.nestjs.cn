@@ -15,7 +15,7 @@
 首先，我们需要安装所需的软件包：
 
 ```
-$ $ npm i --save @nestjs/microservices
+$ npm i --save @nestjs/microservices
 ```
 
 ### 开始
@@ -306,7 +306,7 @@ const app = await NestFactory.createMicroservice(ApplicationModule, {
 在我们开始之前，我们必须安装所需的包：
 
 ```
-npm i --save mqtt
+$ npm i --save mqtt
 ```
 ### 概览
 

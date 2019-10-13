@@ -674,7 +674,7 @@ Subscription: {
 
 <!-- tabs:start -->
 
-#### ** Graphql SDL **
+#### ** 模式优先 **
 
 为了以 Nest 方式创建等效订阅，我们将使用 `@Subscription()` 装饰器。
 
@@ -851,11 +851,11 @@ GraphQLModule.forRoot({
 ## 标量
 
 
-该GraphQL包括以下默认类型：Int，Float，String，Boolean 和 ID。但是，有时您可能需要支持自定义原子数据类型（例如 Date ）。
+该GraphQL包括以下默认类型：`Int`，`Float`，`String`，`Boolean` 和 `ID`。但是，有时您可能需要支持自定义原子数据类型（例如 `Date` ）。
 
 <!-- tabs:start -->
 
-#### ** Graphql SDL **
+#### ** 模式优先 **
 
 
 为了定义一个自定义标量（在[这里](http://graphql.cn/learn/schema/#scalar-types)阅读更多关于标量的信息），我们必须创建一个类型定义和一个专用的解析器。在这里（如在官方文档中），我们将采取 `graphql-type-json` 包用于演示目的。这个npm包定义了一个`JSON`GraphQL标量类型。首先，让我们安装包：
@@ -959,7 +959,7 @@ export class DateScalar implements CustomScalar<number, Date> {
 }
 ```
 
-准备好后，注册 DateScalar 为提供商。
+准备好后，注册 `DateScalar` 为provider。
 
 ```typescript
 @Module({
@@ -983,7 +983,7 @@ Nest生态系统正试图利用[守卫](/6/guards)和[拦截器](/6/interceptors
 
 ### 概述
 
-您可以以与简单的 REST 应用程序相同的方式使用[守卫](/6/guards)、[拦截器](/6/interceptors)、[过滤器](/6/exceptionfilters)或[管道](/6/pipes)。此外，您还可以通过利用自定义 decorator 特性轻松地创建自己的 decorator。他们都一样。让我们看看下面的代码:
+您可以以与简单的 REST 应用程序相同的方式使用[守卫](/6/guards)、[拦截器](/6/interceptors)、[过滤器](/6/exceptionfilters)或[管道](/6/pipes)。此外，您还可以通过利用[自定义装饰器](/6/customdecorators) 特性轻松地创建自己的 decorator。他们都一样。让我们看看下面的代码:
 
 ```typescript
 @Query('author')
@@ -1024,7 +1024,7 @@ GqlExecutionContext 为每个参数公开相应的函数，比如 getArgs()，ge
 
 ### 异常过滤器
 
-该[异常过滤器](h/6/exceptionfilters)与 GraphQL 应用程序兼容。
+该[异常过滤器](/6/exceptionfilters)与 GraphQL 应用程序兼容。
 
 ```typescript
 @Catch(HttpException)
@@ -1038,12 +1038,12 @@ export class HttpExceptionFilter implements GqlExceptionFilter {
 
 ?> GqlExceptionFilter 和 GqlArgumentsHost 需要import @nestjs/graphql 包。
 
-但是，response 在这种情况下，您无法访问本机对象（如在HTTP应用程序中）。
+但是，`response` 在这种情况下，您无法访问本机对象（如在HTTP应用程序中）。
 
 
 ### 自定义装饰器
 
-如前所述，自定义装饰器功能也可以像 GraphQL 解析器一样工作。但是，Factory 函数采用一组参数而不是 request 对象。
+如前所述，[自定义装饰器](/6/customdecorators)功能也可以像 GraphQL 解析器一样工作。但是，Factory 函数采用一组参数而不是 `request` 对象。
 
 ```
 export const User = createParamDecorator(

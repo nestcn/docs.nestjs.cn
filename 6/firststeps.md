@@ -10,6 +10,7 @@
 
  【译者注：由于 nest.js 对 ts 特性支持更好，中文文档只翻译 Typescript】 
 
+
 ## 先决条件
 
  请确保您的操作系统上安装了 [Node.js](http://nodejs.cn/download/)**（> = 8.9.0）**。
@@ -21,100 +22,107 @@
 
 #### ** windows **
 
-1. [点击下载 Node.js](hhttps://npm.taobao.org/mirrors/node/latest-v10.x/node-v10.15.3-x64.msi)
+1. [点击下载 Node.js](https://npm.taobao.org/mirrors/node/v12.10.0/node-v12.10.0-x64.msi)
 
 2. 安装Node.js
 
 Powershell/CMD 可以打印出这个说明安装成功。（部分系统需要重启后环境变量才生效）
 
 ```
->> node -v
-v10.15.3
->> npm -v
-6.4
-```
-
-#### ** MacOS **
-
-1. [点击下载 Node.js](https://npm.taobao.org/mirrors/node/v10.15.1/node-v10.15.1.pkg)
-
-2. 安装Node.js
-
-打印出这个说明安装成功。（部分系统需要重启后环境变量才生效）
-```
->> node -v
-v10.15.1
->> npm -v
-6.4
-```
-
-#### ** Debian系 **
-
-（支持ARM及X86平台)
-```
-curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
-sudo apt-get install -y nodejs
-```
-（如果安装缓慢，可以使用[国内镜像源](http://mirrors.ustc.edu.cn/help/nodesource.html)）
-终端可以打出以下信息说明安装成功：
-```
-$ node -v
-v10.15.1
+$node -v
+v12.10.0
 $ npm -v
-6.4
+6.10.3
 ```
 
-#### ** Redhat系 **
+#### ** linux（建议） **
 
- （支持X86平台）
+（NVM 支持 所有 Linux 及 Raspbian ，支持多版本管理，[windows 点击进入](https://github.com/coreybutler/nvm-windows/releases)）
  ```
-curl -sL https://rpm.nodesource.com/setup_10.x | bash -
-```
-（如果安装缓慢，可以使用[国内镜像源](http://mirrors.ustc.edu.cn/help/nodesource.html)）
-终端可以打出以下信息说明安装成功：
-```
-$ node -v
-v10.15.1
-$ npm -v
-6.4
-```
-
-#### ** NVM **
-
-（支持 所有 Linux 及 Raspbian ，支持多版本管理，[windows 点击进入](https://github.com/coreybutler/nvm-windows/releases)）
- ```
-curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
 
 ```
 如果没 curl ，可以使用 wget 安装
 ```
 wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
 ```
+使用淘宝加速下载（可选）
+```
+export NVM_NODEJS_ORG_MIRROR=https://npm.taobao.org/mirrors/node
+```
+
 使用 NVM 安装nodejs ：
 ```
 nvm install --lts
 ```
 终端可以打出以下信息说明安装成功：
 ```
-$ node -v
-v10.15.1
+$node -v
+v12.10.0
 $ npm -v
-6.4
+6.10.3
 ```
+
+#### ** MacOS **
+
+1. [点击下载 Node.js](https://npm.taobao.org/mirrors/node/v12.10.0/node-v12.10.0.pkg)
+
+2. 安装Node.js
+
+打印出这个说明安装成功。（部分系统需要重启后环境变量才生效）
+```
+$node -v
+v12.10.0
+$ npm -v
+6.10.3
+```
+
+#### ** Debian系 **
+
+（支持ARM及X86平台)
+```
+curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+（如果安装缓慢，可以使用[国内镜像源](http://mirrors.ustc.edu.cn/help/nodesource.html)）
+终端可以打出以下信息说明安装成功：
+```
+$node -v
+v12.10.0
+$ npm -v
+6.10.3
+```
+
+#### ** Redhat系 **
+
+ （支持X86平台）
+ ```
+curl -sL https://rpm.nodesource.com/setup_12.x | bash -
+```
+（如果安装缓慢，可以使用[国内镜像源](http://mirrors.ustc.edu.cn/help/nodesource.html)）
+终端可以打出以下信息说明安装成功：
+```
+$node -v
+v12.10.0
+$ npm -v
+6.10.3
+```
+
+
 
 #### ** Snap **
 
 （支持 所有 Linux ）
 ```
-sudo snap install node --classic --channel=10
+sudo snap install node --classic --channel=12
 ```
 （如果提示 snap 不存在，请先安装 snapd）
 终端可以打出以下信息说明安装成功：
 ```
-$ node -v
-v10.15.1
+$node -v
+v12.10.0
 $ npm -v
-6.4
+6.10.3
 ```
 <!-- tabs:end -->
 
@@ -215,9 +223,11 @@ $ npm run start
 
  此命令在 `src` 目录中的 `main.ts` 文件中定义的端口上启动 HTTP 服务器。在应用程序运行时, 打开浏览器并访问 `http://localhost:3000/`。 你应该看到 `Hello world!` 信息。
  
+ **[学习资料](https://docs.nestjs.cn/6/awesome?id=%e7%9b%b8%e5%85%b3%e8%b5%84%e6%ba%90)**
+
  ### 支持我们
  
-  [当前网站托管在：vultr-日本](https://www.vultr.com/?ref=7815855-4F)    
+  [当前网站托管在：vultr-洛杉矶](https://www.vultr.com/?ref=7786172-4F)    
   [捐赠](https://gitee.com/notadd/docs.nestjs.cn?donate=true)
  
  ### 译者署名

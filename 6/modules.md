@@ -1,8 +1,8 @@
 # 模块
 
 模块是具有 `@Module()` 装饰器的类。 `@Module()` 装饰器提供了元数据，Nest 用它来组织应用程序结构。
- 
- 
+
+
 ![图1](https://docs.nestjs.com/assets/Modules_1.png)
 
 每个 Nest 应用程序至少有一个模块，即根模块。根模块是 Nest 开始安排应用程序树的地方。事实上，根模块可能是应用程序中唯一的模块，特别是当应用程序很小时，但是对于大型程序来说这是没有意义的。在大多数情况下，您将拥有多个模块，每个模块都有一组紧密相关的**功能**。
@@ -11,12 +11,12 @@
 
 |||
 |:-----:|:-----:|
-|providers| 由 Nest 注入器实例化的提供者，并且可以至少在整个模块中共享|	
+|providers| 由 Nest 注入器实例化的提供者，并且可以至少在整个模块中共享|
 |controllers|必须创建的一组控制器|
 |imports|导入模块的列表，这些模块导出了此模块中所需提供者|
 |exports|由本模块提供并应在其他模块中可用的提供者的子集。|
 
-默认情况下, 模块**封装**提供者。这意味着如果提供者如果不是当前模块的一部分, 也不是从另外已导入的模块导出的，那么它就是无法注入的。
+默认情况下, 模块**封装**提供者。这意味着如果提供者即不是当前模块的一部分, 也不是从另外模块(已导入)导出的，那么它就是无法注入的。
 
 ## 功能模块
 
@@ -124,6 +124,7 @@ import { CatsService } from './cats.service';
 })
 export class CatsModule {
   constructor(private readonly catsService: CatsService) {}
+}
 ```
 
 但是，由于[循环依赖](/6/fundamentals?id=circular-dependency)性，模块类不能注入到提供者中。
@@ -174,7 +175,7 @@ export class DatabaseModule {
 }
 ```
 
-?> `forRoot()` 可以同步或异步（`Primise`）返回动态模块。
+?> `forRoot()` 可以同步或异步（`Promise`）返回动态模块。
 
 此模块默认定义了 `Connection` 提供者，但另外 - 根据传递的 `options` 和 `entities` - 创建一个提供者集合，例如存储库。实际上，动态模块扩展了模块元数据。当您需要动态注册组件时，这个实质特性非常有用。然后你可以通过以下方式导入 `DatabaseModule`：
 

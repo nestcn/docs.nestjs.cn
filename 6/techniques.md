@@ -240,7 +240,7 @@ export class AuthService {
 }
 ```
 
-?> JwtPayloa d是一个具有单个属性的接口 email，表示已解码的 JWT 令牌。
+?> JwtPayload 是只有 email 一个属性的接口，表示已解码的 JWT 令牌。
 
 为了简化示例，我们创建了一个假用户。第二步是创建一个对应的 `JwtStrategy`。
 
@@ -951,7 +951,7 @@ uploadFile(@UploadedFile() file) {
 }
 ```
 
-?> `FileInterceptor()` 和 `@UploadedFile()` 装饰都是 `@nestjs/common` 包提供的。
+?> `FileInterceptor()`装饰是`@nestjs/platform-express`包提供的， `@UploadedFile()` 装饰是 `@nestjs/common` 包提供的。
 
 `FileInterceptor()` 接收两个参数, 一个 `fieldName` (指向包含文件的 HTML 表单的字段) 和可选 `options` 对象。这些 `MulterOptions` 等效于传入 multer 构造函数 ([此处](https://github.com/expressjs/multer#multeropts)有更多详细信息)
 
@@ -1199,6 +1199,8 @@ $ npm install --save cache-manager
 ```
 
 ### 内存缓存
+
+**[译者注：查看相关使用方法](https://www.jianshu.com/p/e7b0f3eb3aed)**
 
 Nest 为各种缓存存储提供统一的 API。内置的是内存中的数据存储。但是，您可以轻松切换到更全面的解决方案，例如Redis。为了启用缓存，首先导入 CacheModule 并调用其 register() 方法。
 

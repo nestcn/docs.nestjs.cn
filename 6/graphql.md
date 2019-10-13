@@ -2,35 +2,32 @@
 
 ## 快速开始
 
-GraphQL 是一种用于 API 的查询语言，是使用现有数据来完成这些查询的运行时。这是一种优雅的方法，可以解决我们在典型REST apis 中遇到的许多问题 。这里是 GraphQL 和 REST 之间一个很好的[比较](https://dev-blog.apollodata.com/graphql-vs-rest-5d425123e34b) 。在这组文章中, 我们不会解释什么是 GraphQL, 而是演示如何使用 `@nestjs/GraphQL` 模块。
+GraphQL 是一种用于 API 的查询语言，是使用现有数据来完成这些查询的运行时。这是一种优雅的方法，可以解决我们在典型REST apis 中遇到的许多问题 。这里是 GraphQL 和 REST 之间一个很好的[比较](https://dev-blog.apollodata.com/graphql-vs-rest-5d425123e34b) 。在这组文章中, 我们将不解释什么是 GraphQL, 而是演示如何使用 `@nestjs/graphql` 模块。本章假定你已经熟练GraphQL。
 
-GraphQLModule 只不过是 [Apollo](https://www.apollographql.com) 服务器的包装器。我们没有造轮子, 而是提供一个现成的模块, 这让 GraphQL 和 Nest 有了比较简洁的融合方式。
+GraphQLModule 仅仅是 [Apollo](https://www.apollographql.com) Server 的包装器。我们没有造轮子, 而是提供一个现成的模块, 这让 GraphQL 和 Nest 有了比较简洁的融合方式。
 
 
 ### 安装
 
-首先，我们需要安装所需的软件包：
+首先，我们需要安装以下依赖包：
 
 ```bash
 $ npm i --save @nestjs/graphql apollo-server-express graphql-tools graphql
 ```
 
-译者注： fastify 请参考：
-https://github.com/coopnd/fastify-apollo
-
 ### 概述
 
-Nest 提供了两种构建 GraphQL 应用程序的方法，首先是模式，然后是代码。
+Nest 提供了两种构建 GraphQL 应用程序的方式，模式优先和代码优先。
 
-在模式第一种方法中，真实的来源是 GraphQL SDL（模式定义语言）。它是一种与语言无关的方式，它基本上允许您在不同平台之间共享模式文件。此外，Nest 将根据GraphQL 模式（使用类或接口）自动生成 TypeScript 定义，以减少冗余。
+**模式优先**的方式，本质是 GraphQL SDL（模式定义语言）。它以一种与语言无关的方式，基本允许您在不同平台之间共享模式文件。此外，Nest 将根据GraphQL 模式（通过类或接口）自动生成 TypeScript 定义，以减少冗余。
 
-另一方面，在代码优先的方法中，您将仅使用装饰器和 TypeScript 类来生成相应的 GraphQL 架构。如果您更喜欢使用 TypeScript 来工作并避免语言语法之间的上下文切换，那么它变得非常方便。
+另一方面，在**代码优先**的方法中，您将仅使用装饰器和 TypeScript 类来生成相应的 GraphQL 架构。如果您更喜欢使用 TypeScript 来工作并避免语言语法之间的上下文切换，那么它变得非常方便。
 
 
 
 ### 入门
 
-一旦安装了软件包，我们就可以注册 `GraphQlModule`
+依赖包安装完成后，我们就可以注册 `GraphQLModule`。
 
 > app.module.ts
 
@@ -47,7 +44,7 @@ export class ApplicationModule {}
 ```
 
 
-该  `.forRoot()` 函数将选项对象作为参数。这些选项将传递给底层的 Apollo 实例（请在[此处](https://www.apollographql.com/docs/apollo-server/v2/api/apollo-server.html#constructor-options-lt-ApolloServer-gt)阅读有关可用设置的更多信息）。例如，如果要禁用 playground 并关闭 debug模式，只需传递以下选项：
+该  `.forRoot()` 函数将选项对象作为参数。这些选项将传递给底层的 Apollo 实例（请在[此处](https://www.apollographql.com/docs/apollo-server/v2/api/apollo-server.html#constructor-options-lt-ApolloServer-gt)阅读有关可用设置的更多信息）。例如，如果要禁用`playground`并关闭`debug`模式，只需传递以下选项：
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -64,7 +61,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 export class ApplicationModule {}
 ```
 
-如上所述，所有这些设置都将传递给 ApolloServer 构造函数。
+如上所述，所有这些设置都将传递给`ApolloServer`构造函数。
 
 
 ### Playground
@@ -84,9 +81,9 @@ GraphQLModule.forRoot({
 ```
  <!-- tabs:start -->
 
-#### ** Graphql SDL **
+#### ** 模式优先 **
 
-要以第一种方式开始使用模式，只需 typePaths 在选项对象中添加数组即可。
+当使用模式优先的方式，最简单的方法是为 typePaths 数组中添加对象即可。
 
 ```typescript
 GraphQLModule.forRoot({
@@ -95,7 +92,7 @@ GraphQLModule.forRoot({
 ```
 该 typePaths 属性指示 GraphQLModule 应该查找 GraphQL 文件的位置。所有这些文件最终将合并到内存中，这意味着您可以将模式拆分为多个文件并将它们放在靠近解析器的位置。
 
-单独创建 GraphQL 类型和相应的 TypeScript 定义会产生不必要的冗余。最终，我们最终没有单一的事实来源，SDL 内部的每个变化都迫使我们调整接口。因此，该@nestjs/graphql 包提供了另一个有趣的功能，即使用抽象语法树（AST）自动生成TS定义。要启用它，只需添加 definitions 属性即可。
+同时创建 GraphQL 类型和相应的 TypeScript 定义会产生不必要的冗余。导致我们没有单一的实体来源，SDL 内部的每个变化都促使我们调整接口。因此，该`@nestjs/graphql` 包提供了另一个有趣的功能，使用抽象语法树（AST）自动生成TS定义。要启用它，只需添加 definitions 属性即可。
 
 ```typescript
 GraphQLModule.forRoot({
@@ -106,7 +103,7 @@ GraphQLModule.forRoot({
 }),
 ```
 
-该 `src/graphql.ts` 指示在何处保存 Typescript 输出。默认情况下，所有类型都转换为接口。但是，您可以通过将 outputAs 属性改为切换到 `class`。
+`src/graphql.ts` 为TypeScript输出文件。默认情况下，所有类型都转换为接口。您也可以通过将 outputAs 属性改为切换到 `class`。
 
 ```typescript
 GraphQLModule.forRoot({
@@ -118,7 +115,7 @@ GraphQLModule.forRoot({
 }),
 ```
 
-但是，可能不需要在每个应用程序启动时生成类型定义。相反，我们可能更喜欢完全控制，只有在执行专用命令时才产生打字。在这种情况下，我们可以创建自己的脚本，比如说 generate-typings.ts: 
+事实上，每个应用程序启动时都生成类型定义并不是必须的。我们可能更喜欢完全控制，只在执行专用命令时才生成类型定义文件。在这种情况下，我们可以通过创建自己的脚本来实现，比如说 generate-typings.ts: 
 
 ```typescript
 import { GraphQLDefinitionsFactory } from '@nestjs/graphql';
@@ -132,7 +129,7 @@ definitionsFactory.generate({
 });
 ```
 
-然后，只需运行您的文件：
+然后，只需运行：
 
 ```bash
 ts-node generate-typings
@@ -140,7 +137,7 @@ ts-node generate-typings
 
 ?> 您也可以预先编译脚本并使用 node 可执行文件。
 
-要切换到文件监听模式（在任何 .graphql 文件更改时自动生成 Typescript），请将 watch 选项传递给 generate() 函数。
+当需要切换到文件监听模式（在任何 .graphql 文件更改时自动生成 Typescript），请将 watch 选项传递给 generate() 函数。
 
 ```typescript
 definitionsFactory.generate({
@@ -153,11 +150,11 @@ definitionsFactory.generate({
 
 [这里](https://github.com/nestjs/nest/tree/master/sample/12-graphql-apollo) 提供完整的例子。
 
-#### ** 使用 Typescript **
+#### ** 代码优先 **
 
 在代码优先方法中，您将只使用装饰器和 TypeScript 类来生成相应的 GraphQL 架构。
 
-Nest 正在使用一个惊人的类型 -graphql 库，以提供此功能。因此，在我们继续之前，您必须安装此软件包。
+Nest 通过使用一个惊艳的type-graphql 库，来提供此功能。为此，在我们继续之前，您必须安装此软件包。
 
 ```typescript
 $ npm i type-graphql
@@ -172,7 +169,7 @@ GraphQLModule.forRoot({
 }),
 ```
 
-该 autoSchemaFile 代表您自动生成的模式将被创建的路径。此外，您可以传递 buildSchemaOptions 属性 - 一个将传递给 buildSchema() 函数的选项对象（从type-graphql包中）。
+这里 autoSchemaFile 是您自动生成的gql文件将被创建的路径。您一样可以传递 buildSchemaOptions 属性 - 用于传递给 buildSchema() 函数的选项（从type-graphql包中）。
 
 [这里](https://github.com/nestjs/nest/tree/master/sample/23-type-graphql) 提供完整的例子。
 
@@ -182,9 +179,9 @@ GraphQLModule.forRoot({
 ### Async 配置
 
 
-通常, 您可能希望异步传递模块选项, 而不是预先传递它们。在这种情况下, 使用 `forRootAsync()` 函数, 它提供了处理异步数据的几种不同方法。
+大多数情况下, 您可能希望异步传递模块选项, 而不是预先传递它们。在这种情况下, 请使用 `forRootAsync()` 函数, 它提供了处理异步数据的几种不同方法。
 
-第一种可能的方法是使用工厂功能:
+第一种方法是使用工厂功能:
 
 ```typescript
 GraphQLModule.forRootAsync({
@@ -193,7 +190,7 @@ GraphQLModule.forRootAsync({
   }),
 }),
 ```
-显然, 我们的 factory 的行为和其他人一样 (可能是异步的, 并且能够通过 `inject` 注入依赖关系)。
+我们的 factory 的行为和其他人一样 (可能是异步的, 并且能够通过 `inject` 注入依赖关系)。
 
 ```typescript
 GraphQLModule.forRootAsync({
@@ -205,7 +202,7 @@ GraphQLModule.forRootAsync({
 }),
 ```
 
-或者, 您可以使用类而不是 factory。
+当然除了factory， 您也可以使用类。
 
 ```typescript
 GraphQLModule.forRootAsync({
@@ -235,7 +232,7 @@ GraphQLModule.forRootAsync({
 }),
 ```
 
-它的工作原理与 `useClass` 有一个关键的区别—— `GraphQLModule` 将查找导入的模块重用已经创建的 `ConfigService`, 而不是单独实例化它。
+它的工作原理与 `useClass` 有一个关键的区别—— `GraphQLModule` 将查找导入的模块可重用的已经创建的 `ConfigService`, 而不是单独实例化它。
 
 ### 例子
 
@@ -250,7 +247,7 @@ GraphQLModule.forRootAsync({
 
  <!-- tabs:start -->
 
-#### ** Graphql SDL **
+#### ** 模式优先 **
 
 正如提到[以前的章节](/6/graphql?id=快速开始)，让我们在 SDL 中定义我们的类型（阅读[更多](http://graphql.cn/learn/schema/#type-language)）：
 
@@ -297,10 +294,9 @@ export class AuthorResolver {
 }
 ```
 
-?> 提示：如果使用 `@Resolver()` 装饰器，则不必将类标记为 `@Injectable()` ，否则必须这么做。
+?> 提示：使用 `@Resolver()` 装饰器则不必将类标记为 `@Injectable()` ，否则必须这么做。
 
-
-`@Resolver()` 装饰器不影响查询和对象变动 (`@Query()` 和 `@Mutation()` 装饰器)。这只会通知 Nest, 每个 `@ResolveProperty()` 有一个父节点, `Author` 在这种情况下是父节点， Author在这种情况下是一个类型（Author.posts 关系）。基本上，不是设置 @Resolver() 在类的顶部，而是可以接近函数：
+`@Resolver()` 装饰器不影响查询和对象变动 (`@Query()` 和 `@Mutation()` 装饰器)。这只会通知 Nest, 每个 `@ResolveProperty()` 有一个父节点, `Author` 在这种情况下是父节点， Author在这种情况下是一个类型（Author.posts 关系）。基本上，不是为类设置 @Resolver() ，而是为函数：
 
 ```typescript
 @Resolver('Author')
@@ -311,9 +307,9 @@ async posts(@Parent() author) {
 }
 ```
 
-但是，如果 @ResolveProperty() 在一个类中有多个，则必须添加 @Resolver() 到所有这些类中，这不一定是一个好习惯（额外的开销）。
+但当 @ResolveProperty() 在一个类中有多个，则必须为所有的都添加 @Resolver()，这不是一个好习惯（额外的开销）。
 
-通常, 我们会使用像 `getAuthor()` 或 `getPosts()` 之类的函数来命名。我们可以很容易地做到这一点, 以及移动命名之间的装饰器的括号。
+通常, 我们会使用像 `getAuthor()` 或 `getPosts()` 之类的函数来命名。通过将真实名称放在装饰器里很容易地做到这一点。
 
 ```typescript
 @Resolver('Author')
@@ -387,9 +383,9 @@ export class CreatePostInput extends Post {
   title: string;
 }
 ```
-### ** 使用 Typescript**
+### ** 代码优先 **
 
-在代码优先方法中，我们不必手动编写SDL。相反，我们只会使用装饰器。
+在代码优先方法中，我们不必手动编写SDL。相反，我们只需使用装饰器。
 
 ```typescript
 import { Field, Int, ObjectType } from 'type-graphql';
@@ -451,7 +447,7 @@ export class AuthorResolver {
 }
 ```
 
-通常，我们会使用类似 getAuthor() 或 getPosts() 函数名称。我们可以通过将真实名称移动到装饰器来轻松完成此操作。
+通常，我们会使用类似 getAuthor() 或 getPosts() 函数名称。我们可以通过将真实名称移动到装饰器里来轻松完成此操作。
 
 ```typescript
 @Resolver(of => Author)
@@ -480,7 +476,7 @@ export class AuthorResolver {
 @Args('id') id: string
 ```
 
-但是，该 number 类型没有提供 type-graphql 有关预期的 GraphQL 表示（Intvs Float）的足够信息，因此，我们必须显式传递类型引用。
+但是，该 `number`.  类型没有提供 type-graphql 有关预期的 GraphQL 表示（ `Int ` vs `Float` ）的足够信息，因此，我们必须显式传递类型引用。
 
 而且，您可以创建一个专用 AuthorArgs 类：
 
@@ -488,7 +484,7 @@ export class AuthorResolver {
 @Args() id: AuthorArgs
 ```
 
-有以下机构：
+用以下结构：
 
 ```typescript
 
@@ -500,10 +496,9 @@ class AuthorArgs {
 }
 ```
 
-?> @Field() 和 @ArgsType() 装饰器都是从 type-graphql 包中导入的，而 @Min() 来自 class-validator。
+?>  `@Field()` 和 `@ArgsType()` 装饰器都是从 `type-graphql` 包中导入的，而 `@Min()` 来自 `class-validator`。
 
-您可能还会注意到这些类与 ValidationPipe（[更多内容](/6/techniques?id=验证)）相关。
-
+您可能还会注意到这些类与 `ValidationPipe` 相关（[更多内容](/6/techniques?id=验证)）。
 
 <!-- tabs:end -->
 
@@ -514,14 +509,14 @@ class AuthorArgs {
 
 |||
 |---|---|
-| @Root() 和 @Parent() |	root/parent |
-| @Context(param?:string)	| context/context[param] |
-| @Info(param?:string)	| info/info[param] |
-| @Args(param?:string)	| args/args[param] |
+| `@Root()` 和 `@Parent()` |	`root`/`parent` |
+| `@Context(param?:string)`	| `context`/`context[param]` |
+| `@Info(param?:string)`	| `info`/`info[param]` |
+| `@Args(param?:string)`	| `args`/`args[param]` |
 
 ### Module
 
-一旦我们在这里完成，我们必须在 `AuthorResolver` 的某处注册，例如在新创建的 `AuthorsModule` 内部注册。
+一旦我们在这里完成，我们必须将 `AuthorResolver` 注册，例如在新创建的 `AuthorsModule` 内部注册。
 
 ```typescript
 @Module({
@@ -530,7 +525,7 @@ class AuthorArgs {
 })
 export class AuthorsModule {}
 ```
-该 `GraphQLModule` 会考虑反映了元数据和转化类到正确的解析器的自动映射。您应该注意的是您需要在某处 import 此模块，因此 Nest 将知道 `AuthorsModule` 确实存在。
+该 `GraphQLModule` 会考虑反映了元数据和转化类到正确的解析器的自动映射。您应该注意的是您需要在某处 import 此模块，Nest 才会知道 `AuthorsModule` 确实存在。
 
 ?> 提示：在[此处](http://graphql.cn/learn/queries/)了解有关 GraphQL 查询的更多信息。
 
@@ -538,13 +533,13 @@ export class AuthorsModule {}
 ## 变更（Mutations）
 
 
-在 GraphQL 中，为了修改服务器端数据，我们使用了变更（[在这里阅读更多](http://graphql.cn/learn/queries/#mutations)） 。官方 Apollo 文档共享一个 upvotePost() 变更示例。该变更允许增加 votes 属性值。为了在 Nest 中创建等效变更，我们将使用 @Mutation() 装饰器。
+在 GraphQL 中，为了变更服务器端数据，我们使用了变更（[在这里阅读更多](http://graphql.cn/learn/queries/#mutations)） 。官方 Apollo 文档共享一个 upvotePost() 变更示例。该变更允许增加 votes 属性值。为了在 Nest 中创建等效变更，我们将使用 @Mutation() 装饰器。
 
  <!-- tabs:start -->
 
-#### ** Graphql SDL **
+#### ** 模式优先 **
 
-让我们AuthorResolver 在上一节中扩展我们的用法（见[解析图](/6/graphql?id=解析图)）。
+让我们扩展我们在上一节中AuthorResolver的用法（见[解析图](/6/graphql?id=解析图)）。
 
 ```typescript
 @Resolver('Author')
@@ -571,7 +566,7 @@ export class AuthorResolver {
 }
 ```
 
-请注意，我们假设业务逻辑已移至 PostsService（分别查询 post 和 incrementing votes 属性）。
+请注意，我们假设业务逻辑已移至 `PostsService`（分别查询 `post` 和 incrementing `votes` 属性）。
 
 ### 类型定义
 
@@ -605,9 +600,9 @@ type Mutation {
 
 
 
-#### ** 使用 Typescript **
+#### ** 代码优先 **
 
-让我们 AuthorResolver 在上一节中使用另一种方法（参见[解析图](/6/graphql?id=解析图)）。
+让我们使用 在上一节中AuthorResolver另一种方法（参见[解析图](/6/graphql?id=解析图)）。
 
 ```typescript
 @Resolver(of => Author)
@@ -635,8 +630,7 @@ export class AuthorResolver {
 }
 ```
 
-
-upvotePost() 取 postId（Int）作为输入参数，并返回更新的 Post 实体。出于与解析器部分相同的原因，我们必须明确设置预期类型。
+`upvotePost()` 取 `postId`（`Int`）作为输入参数，并返回更新的 `Post` 实体。出于与解析器部分相同的原因，我们必须明确设置预期类型。
 
 如果变异必须将对象作为参数，我们可以创建一个输入类型。
 
@@ -646,8 +640,8 @@ export class UpvotePostInput {
   @Field() postId: number;
 }
 ```
-?>  @InputType() 和 @Field() 需要 import type-graphql 包。
- 
+?>  `@InputType()` 和 `@Field()` 需要 import `type-graphql` 包。
+
 然后在解析图类中使用它：
 
 ```typescript
@@ -663,7 +657,7 @@ async upvotePost(
 
 ## 订阅（Subscriptions）
 
-订阅只是查询和变更的另一种 GraphQL 操作类型。它允许通过双向传输层创建实时订阅，主要通过 websockets 实现。[阅读更多]（https://www.apollographql.com/docs/graphql-subscriptions）(https://www.apollographql.com/docs/graphql-subscriptions/) 。
+订阅只是查询和变更的另一种 GraphQL 操作类型。它允许通过双向传输层创建实时订阅，主要通过 websockets 实现。在[这里](https://www.apollographql.com/docs/graphql-subscriptions/)阅读更多关于订阅的内容。
 
 以下是 `commentAdded` 订阅示例，可直接从官方 [Apollo](https://www.apollographql.com/docs/graphql-subscriptions/subscriptions-to-schema.html) 文档复制和粘贴：
 
@@ -680,7 +674,7 @@ Subscription: {
 
 <!-- tabs:start -->
 
-#### ** Graphql SDL **
+#### ** 模式优先 **
 
 为了以 Nest 方式创建等效订阅，我们将使用 `@Subscription()` 装饰器。
 
@@ -857,11 +851,11 @@ GraphQLModule.forRoot({
 ## 标量
 
 
-该GraphQL包括以下默认类型：Int，Float，String，Boolean 和 ID。但是，有时您可能需要支持自定义原子数据类型（例如 Date ）。
+该GraphQL包括以下默认类型：`Int`，`Float`，`String`，`Boolean` 和 `ID`。但是，有时您可能需要支持自定义原子数据类型（例如 `Date` ）。
 
 <!-- tabs:start -->
 
-#### ** Graphql SDL **
+#### ** 模式优先 **
 
 
 为了定义一个自定义标量（在[这里](http://graphql.cn/learn/schema/#scalar-types)阅读更多关于标量的信息），我们必须创建一个类型定义和一个专用的解析器。在这里（如在官方文档中），我们将采取 `graphql-type-json` 包用于演示目的。这个npm包定义了一个`JSON`GraphQL标量类型。首先，让我们安装包：
@@ -965,7 +959,7 @@ export class DateScalar implements CustomScalar<number, Date> {
 }
 ```
 
-准备好后，注册 DateScalar 为提供商。
+准备好后，注册 `DateScalar` 为provider。
 
 ```typescript
 @Module({
@@ -989,7 +983,7 @@ Nest生态系统正试图利用[守卫](/6/guards)和[拦截器](/6/interceptors
 
 ### 概述
 
-您可以以与简单的 REST 应用程序相同的方式使用[守卫](/6/guards)、[拦截器](/6/interceptors)、[过滤器](/6/exceptionfilters)或[管道](/6/pipes)。此外，您还可以通过利用自定义 decorator 特性轻松地创建自己的 decorator。他们都一样。让我们看看下面的代码:
+您可以以与简单的 REST 应用程序相同的方式使用[守卫](/6/guards)、[拦截器](/6/interceptors)、[过滤器](/6/exceptionfilters)或[管道](/6/pipes)。此外，您还可以通过利用[自定义装饰器](/6/customdecorators) 特性轻松地创建自己的 decorator。他们都一样。让我们看看下面的代码:
 
 ```typescript
 @Query('author')
@@ -1030,7 +1024,7 @@ GqlExecutionContext 为每个参数公开相应的函数，比如 getArgs()，ge
 
 ### 异常过滤器
 
-该[异常过滤器](h/6/exceptionfilters)与 GraphQL 应用程序兼容。
+该[异常过滤器](/6/exceptionfilters)与 GraphQL 应用程序兼容。
 
 ```typescript
 @Catch(HttpException)
@@ -1044,12 +1038,12 @@ export class HttpExceptionFilter implements GqlExceptionFilter {
 
 ?> GqlExceptionFilter 和 GqlArgumentsHost 需要import @nestjs/graphql 包。
 
-但是，response 在这种情况下，您无法访问本机对象（如在HTTP应用程序中）。
+但是，`response` 在这种情况下，您无法访问本机对象（如在HTTP应用程序中）。
 
 
 ### 自定义装饰器
 
-如前所述，自定义装饰器功能也可以像 GraphQL 解析器一样工作。但是，Factory 函数采用一组参数而不是 request 对象。
+如前所述，[自定义装饰器](/6/customdecorators)功能也可以像 GraphQL 解析器一样工作。但是，Factory 函数采用一组参数而不是 `request` 对象。
 
 ```
 export const User = createParamDecorator(

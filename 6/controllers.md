@@ -310,7 +310,6 @@ export class CatsController {
     return `This action removes a #${id} cat`;
   }
 }
-
 ```
 
 ## 最后一步

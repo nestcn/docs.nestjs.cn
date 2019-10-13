@@ -4,7 +4,7 @@
 
 GraphQL 是一种用于 API 的查询语言，是使用现有数据来完成这些查询的运行时。这是一种优雅的方法，可以解决我们在典型REST apis 中遇到的许多问题 。这里是 GraphQL 和 REST 之间一个很好的[比较](https://dev-blog.apollodata.com/graphql-vs-rest-5d425123e34b) 。在这组文章中, 我们将不解释什么是 GraphQL, 而是演示如何使用 `@nestjs/graphql` 模块。本章假定你已经熟练GraphQL。
 
-GraphQLModule 仅仅是 [Apollo](https://www.apollographql.com) Server的包装器。我们没有造轮子, 而是提供一个现成的模块, 这让 GraphQL 和 Nest 有了比较简洁的融合方式。
+GraphQLModule 仅仅是 [Apollo](https://www.apollographql.com) Server 的包装器。我们没有造轮子, 而是提供一个现成的模块, 这让 GraphQL 和 Nest 有了比较简洁的融合方式。
 
 
 ### 安装

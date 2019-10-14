@@ -4,15 +4,15 @@
 
 ![](https://docs.nestjs.com/assets/Guards_1.png)
 
-守卫有一个单独的责任。它们确定请求是否应该由路由处理程序处理。到目前为止，访问限制逻辑大多在中间件内。这样很好，因为诸如 token 验证或将 `request` 对象附加属性与特定路由没有强关联。
+守卫有一个单独的责任。它们根据运行时出现的某些条件（例如权限，角色，访问控制列表等）来确定给定的请求是否由路由处理程序处理。 这通常称为授权。在传统的 `Express` 应用程序中，通常由中间件处理授权。中间件是身份验证的良好选择。到目前为止，访问限制逻辑大多在中间件内。这样很好，因为诸如 `token` 验证或将 `request` 对象附加属性与特定路由没有强关联。
 
-但中间件是非常笨的。它不知道调用 `next()` 函数后会执行哪个处理程序。另一方面，守卫可以访问 `ExecutionContext` 对象，所以我们确切知道将要执行什么。
+中间件不知道调用 `next()` 函数后会执行哪个处理程序。另一方面，警卫可以访问 `ExecutionContext` 实例，因此确切地知道接下来要执行什么。它们的设计与异常过滤器、管道和拦截器非常相似，目的是让您在请求/响应周期的正确位置插入处理逻辑，并以声明的方式进行插入。这有助于保持代码的简洁和声明性。
 
-?> 守卫在每个中间件之后执行的，但在拦截器和管道之前。
+?> 守卫在每个中间件之后执行，但在任何拦截器或管道之前执行。
 
-## 授权看守卫
+## 授权守卫
 
-最好的守卫用例之一就是授权逻辑，因为只有当调用者具有足够的权限时才能使用特定的路由。我们计划创建的 `AuthGuard` 将按顺序提取并验证请求标头中发送的 token。
+正如前面提到的，授权是保护的一个很好的用例，因为只有当调用者(通常是经过身份验证的特定用户)具有足够的权限时，特定的路由才可用。我们现在要构建的 `AuthGuard` 假设用户是经过身份验证的(因此，请求头附加了一个`token`)。它将提取和验证`token`，并使用提取的信息来确定请求是否可以继续。
 
 > auth.guard.ts
 
@@ -30,16 +30,19 @@ export class AuthGuard implements CanActivate {
   }
 }
 ```
-不管 `validateRequest()` 函数背后的逻辑是什么，重点是展示使用守卫是多么简单。每个守卫都提供一个 `canActivate()` 方法。守卫可能通过 (`Promise` 或 `Observable`) 同步地或异步地返回它的布尔答复。返回的值控制 Nest 行为:
+`validateRequest()` 函数中的逻辑可以根据需要变得简单或复杂。本例的主要目的是说明保护如何适应请求/响应周期。
 
-- 如果返回 true, 将处理用户调用。
-- 如果返回 false, 则 Nest 将忽略当前处理的请求。
+每个保护必须实现一个canActivate()函数。此函数应该返回一个布尔值，指示是否允许当前请求。它可以同步或异步地返回响应(通过 `Promise` 或 `Observable`)。`Nest`使用返回值来控制下一个行为:
 
-`canActivate()` 函数采用单参数 `ExecutionContext` 实例。`ExecutionContext` 继承自 `ArgumentsHost` 。`ArgumentsHost` 是传递给原始处理程序的参数的包装器，它包含基于应用程序类型的引擎下的不同参数数组。你可以在[这里](exceptionfilters.md)了解到更多(在异常过滤器章节)。
+- 如果返回 `true`, 将处理用户调用。
+- 如果返回 `false`, 则 `Nest` 将忽略当前处理的请求。
 
-## Execution context
+## 执行上下文 (Execution context)
 
-ExecutionContext 提供了更多功能，它扩展了 ArgumentsHost，但是也提供了有关当前执行过程的更多详细信息。
+`canActivate()` 函数接收单个参数 `ExecutionContext` 实例。`ExecutionContext` 继承自 `ArgumentsHost` 。`ArgumentsHost` 是传递给原始处理程序的参数的包装器，在上面的示例中，我们只是使用了之前在 `ArgumentsHost`上定义的帮助器方法来获得对请求对象的引用。有关此主题的更多信息。你可以在[这里](exceptionfilters.md)了解到更多(在异常过滤器章节)。
+
+
+`ExecutionContext` 提供了更多功能，它扩展了 `ArgumentsHost`，但是也提供了有关当前执行过程的更多详细信息。
 
 ```typescript
 export interface ExecutionContext extends ArgumentsHost {
@@ -48,12 +51,12 @@ export interface ExecutionContext extends ArgumentsHost {
 }
 ```
 
-`getHandler()` 方法返回对当前处理的处理程序的引用,而 `getClass()` 返回此特定处理程序所属的 `Controller` 类的类型。用另外的话来说,如果用户指向在 `CatsController` 中定义和注册的 `create()` 方法, `getHandler()` 将返回对 `create()` 方法的引用，在这种情况下, `getClass()` 将只返回一个 `CatsController` 的类型（不是实例）。
+`etHandler()`方法返回对将要调用的处理程序的引用。`getClass()`方法返回这个特定处理程序所属的 `Controller` 类的类型。例如，如果当前处理的请求是 `POST` 请求，目标是 `CatsController`上的 `create()` 方法，那么 `getHandler()` 将返回对 `create()` 方法的引用，而 `getClass()`将返回一个`CatsControllertype`(而不是实例)。
 
 
 ## 基于角色的认证
 
-一个更详细的例子是一个 `RolesGuard` 。这个守卫只允许具有特定角色的用户访问。我们要从一个基本的守卫模板开始：
+一个更详细的例子是一个 `RolesGuard` 。这个守卫只允许具有特定角色的用户访问。我们将从一个基本模板开始，并在接下来的部分中构建它。目前，它允许所有请求继续:
 
 > roles.guard.ts
 
@@ -73,9 +76,7 @@ export class RolesGuard implements CanActivate {
 
 ## 绑定守卫
 
-守卫可以是控制器范围的，方法范围的和全局范围的。为了建立守卫，我们使用 `@UseGuards()` 装饰器。这个装饰器可以有无数的参数，也就是说，你可以传递几个守卫并用逗号分隔它们。
-
->
+与管道和异常过滤器一样，守卫可以是控制范围的、方法范围的或全局范围的。下面，我们使用 `@UseGuards()`装饰器设置了一个控制范围的守卫。这个装饰器可以使用单个参数，也可以使用逗号分隔的参数列表。也就是说，你可以传递几个守卫并用逗号分隔它们。
 
 ```typescript
 @Controller('cats')
@@ -83,11 +84,9 @@ export class RolesGuard implements CanActivate {
 export class CatsController {}
 ```
 
-?> `@UseGuards()` 装饰器是从 `@nestjs/common` 包中导入的。
+?> `@UseGuards()` 装饰器需要从 `@nestjs/common` 包导入。
 
-我们已经通过了 `RolesGuard` 类型而不是实例, 让框架成为实例化责任并启用依赖注入。另一种可用的方法是传递立即创建的实例:
-
->
+上例，我们已经传递了 `RolesGuard` 类型而不是实例, 让框架进行实例化，并启用了依赖项注入。与管道和异常过滤器一样，我们也可以传递一个实例:
 
 ```typescript
 @Controller('cats')
@@ -97,12 +96,14 @@ export class CatsController {}
 
 上面的构造将守卫附加到此控制器声明的每个处理程序。如果我们决定只限制其中一个, 我们只需要在方法级别设置守卫。为了绑定全局守卫, 我们使用 Nest 应用程序实例的 `useGlobalGuards()` 方法:
 
+为了设置一个全局警卫，使用Nest应用程序实例的 `useGlobalGuards()` 方法：
+
 ```typescript
-const app = await NestFactory.create(ApplicationModule);
+const app = await NestFactory.create(AppModule);
 app.useGlobalGuards(new RolesGuard());
 ```
 
-?> 该 `useGlobalGuards()` 方法没有设置网关和微服务的守卫(混合应用程序正在使用的)。
+?> 对于混合应用程序，`useGlobalGuards()` 方法不会为网关和微服务设置守卫。对于“标准”(非混合)微服务应用程序，`useGlobalGuards()`在全局安装守卫。
 
 全局守卫用于整个应用程序, 每个控制器和每个路由处理程序。在依赖注入方面, 从任何模块外部注册的全局守卫 (如上面的示例中所示) 不能插入依赖项, 因为它们不属于任何模块。为了解决此问题, 您可以使用以下构造直接从任何模块设置一个守卫:
 
@@ -120,35 +121,16 @@ import { APP_GUARD } from '@nestjs/core';
     },
   ],
 })
-export class ApplicationModule {}
+export class AppModule {}
 ```
 
-?> 替代选项是使用应用程序上下文功能。此外，useClass不是处理自定义 `providers` 注册的唯一方法。在[这里](/6/fundamentals.md?id=自定义providercustomer-provider)了解更多。
-
-
-还有, 控制器里的守卫, 在依赖注入方面, 可以类似地看成普通的可注入类来注入。例如:
-```typescript
-import { Module } from '@nestjs/common';
-import { UserService } from '../service';
-import { UserGuard } from '../guard';
-
-@Module({
-  providers: [
-    UserService, UserGuard
-  ],
-})
-export class ServiceModule {}
-```
-
-?> 另一种选择是使用执行上下文功能, 虽然它可能会过于臃肿, 且消耗资源。另外，useClass并不是处理自定义提供者注册的唯一方法。在[这里](fundamentals.md?id=注入injection)了解更多
+?> 当使用此方法为守卫程序执行依赖项注入时，请注意，无论使用此构造的模块是什么，守卫程序实际上是全局的。应该在哪里进行?选择定义守卫的模块(上例中的 `RolesGuard`)。此外，`useClass`不是处理自定义 `providers` 注册的唯一方法。在[这里](/6/fundamentals.md?id=自定义providercustomer-provider)了解更多。
 
 ## 反射器
 
-守卫现在在正常工作，但我们仍然没有利用最重要的守卫的特征，即执行上下文。
+守卫现在在正常工作，但还不是很智能。我们仍然没有利用最重要的守卫的特征，即执行上下文。它还不知道角色，或者每个处理程序允许哪些角色。例如，`CatsController` 可以为不同的路由提供不同的权限方案。其中一些可能只对管理用户可用，而另一些则可以对所有人开放。我们如何以灵活和可重用的方式将角色与路由匹配起来?
 
-现在，`RolesGuard` 是不可重用的。 我们如何知道处理程序需要处理哪些角色？ `CatsController` 可以有很多。 有些可能只适用于管理员，一些适用于所有人，虽然他们没有任何权限。
-
-这就是为什么与守卫一起，`Nest` 提供了通过 `@SetMetadata()` 装饰器附加自定义元数据的功能。
+这就是自定义元数据发挥作用的地方。`Nest`提供了通过 `@SetMetadata()` 装饰器将定制元数据附加到路由处理程序的能力。这些元数据提供了我们所缺少的角色数据，而守卫需要这些数据来做出决策。让我们看看使用`@SetMetadata()`:
 
 > cats.controller.ts
 
@@ -160,9 +142,9 @@ async create(@Body() createCatDto: CreateCatDto) {
 }
 ```
 
-?> `@SetMetadata()` 装饰器是从 `@nestjs/common` 包中导入的。
+?> `@SetMetadata()` 装饰器需要从 `@nestjs/common` 包导入。
 
-通过上面的构建，我们将 `roles` 元数据(`roles` 是一个键，而 `['admin']` 是一个特定的值)附加到 `create()` 方法。 直接使用 `@SetMetadata()` 并不是一个好习惯。 相反，你应该总是创建你自己的装饰器。
+通过上面的构建，我们将 `roles` 元数据(`roles` 是一个键，而 `['admin']` 是一个特定的值)附加到 `create()` 方法。 直接使用 `@SetMetadata()` 并不是一个好习惯。 相反，你应该创建你自己的装饰器。
 
 > roles.decorator.ts
 
@@ -172,7 +154,7 @@ import { SetMetadata } from '@nestjs/common';
 export const Roles = (...roles: string[]) => SetMetadata('roles', roles);
 ```
 
-这种方法更清晰，更易读（并且是强类型的）。 由于我们现在有一个 `@Roles()` 装饰器，所以我们可以在 `create()` 方法中使用它。
+这种方法更简洁、更易读，而且是强类型的。现在我们有了一个自定义的 `@Roles()` 装饰器，我们可以使用它来装饰 `create()`方法。
 
 > cats.controller.ts
 
@@ -184,7 +166,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 }
 ```
 
-让我们再次回到 `RolesGuard` 。 现在它立即返回 `true` ，到目前为止允许请求继续。 为了反映元数据，我们将使用在 `@nestjs/core` 中提供的 `Reflector` 帮助类。
+让我们再次回到 `RolesGuard` 。 它只是在所有情况下返回 `true`，到目前为止允许请求继续。我们希望根据分配给当前用户的角色与正在处理的当前路由所需的实际角色之间的比较来设置返回值的条件。 为了访问路由的角色(自定义元数据)，我们将使用在 `@nestjs/core` 中提供的 `Reflector` 帮助类。
 
 > roles.guard.ts
 
@@ -210,9 +192,11 @@ export class RolesGuard implements CanActivate {
 }
 ```
 
-?> 在 `node.js` 世界中，将授权用户附加到 `request` 对象是一种常见的做法。 这就是为什么我们假定 `request.user` 包含用户对象。
+?> 在 `node.js` 世界中，将授权用户附加到 `request` 对象是一种常见的做法。 因此，在上面的示例代码中。我们假设 `request.user` 包含用户实例和允许的角色。 在您的应用中，您可能会在自定义身份验证（或中间件）中建立该关联。
 
-反射器 `Reflector` 允许我们很容易地通过指定的键反射元数据。 在上面的例子中，为了反射元数据, 我们使用 `getHandler()`，因为它是对路由处理函数的引用。 如果我们也添加控制器反射部分，我们可以使这个守卫更通用。 为了提取控制器元数据，我们应该使用 `context.getClass()` 而不是 `getHandler()` 函数。
+键是 `roles`;返回到 `roles.decorator.ts` 文件和在那里进行的 `SetMetadata()` 调用。在上面的示例中，我们传递了 `context.getHandler()`，以便为当前处理的请求方法提取元数据。请记住，`getHandler()`为我们提供了对路由处理程序函数的引用。
+
+反射器 `Reflector` 允许我们很容易地通过指定的键轻松访问元数据。 键是 `roles`;返回到`roles.decorator.ts` 文件和在那里进行的 `SetMetadata()` 调用。在上面的示例中，我们传递了 `context.getHandler()`，以便为当前处理的请求方法提取元数据。请记住，`getHandler()`为我们提供了对路由处理程序函数的引用。
 
 ```typescript
 const roles = this.reflector.get<string[]>('roles', context.getClass());
@@ -220,7 +204,7 @@ const roles = this.reflector.get<string[]>('roles', context.getClass());
 
 现在，当用户尝试在没有足够权限的情况下调用 `/cats` POST端点时，`Nest` 会自动返回以下响应：
 
-```typescript
+```json
 {
   "statusCode": 403,
   "message": "Forbidden resource"
@@ -232,8 +216,7 @@ const roles = this.reflector.get<string[]>('roles', context.getClass());
 ```typescript
 throw new UnauthorizedException();
 ```
-
-之后，异常过滤器可以捕获此异常。
+由守卫引发的任何异常都将由异常层(全局异常过滤器和应用于当前上下文的任何异常过滤器)处理。
 
  ### 译者署名
 
@@ -241,5 +224,6 @@ throw new UnauthorizedException();
 |---|---|---|---|
 | [@zuohuadong](https://github.com/zuohuadong)  | <img class="avatar-66 rm-style" src="https://wx3.sinaimg.cn/large/006fVPCvly1fmpnlt8sefj302d02s742.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
 | [@Drixn](https://drixn.com/)  | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">  |  翻译  | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/) |
+| [@Armor](https://github.com/Armor-cn)  | <img class="avatar-66 rm-style" height="70" src="https://avatars3.githubusercontent.com/u/31821714?s=460&v=4">  |  翻译  | 专注于 Java 和 Nest，[@Armor](https://armor.ac.cn/) |
 | [@havef](https://havef.github.io)  | <img class="avatar-66 rm-style" height="70" src="https://avatars1.githubusercontent.com/u/54462?s=460&v=4">  |  校正  | 数据分析、机器学习、TS/JS技术栈 [@havef](https://havef.github.io) |
 | [@franken133](https://github.com/franken133)  | <img class="avatar rounded-2" src="https://avatars0.githubusercontent.com/u/17498284?s=400&amp;u=aa9742236b57cbf62add804dc3315caeede888e1&amp;v=4" height="70">  |  翻译  | 专注于 java 和 nest，[@franken133](https://github.com/franken133)|

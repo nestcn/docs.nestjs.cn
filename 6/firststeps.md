@@ -229,7 +229,7 @@ $ npm run start
  
   [当前网站托管在：vultr-洛杉矶](https://www.vultr.com/?ref=7786172-4F)  
   [Onevps-不限流量](https://www.onevps.com/portal/aff.php?aff=12238)    
-  [JMS](https://justmysocks1.net/members/aff.php?aff=6423)
+  [JMS](https://justmysocks1.net/members/aff.php?aff=6423)    
   [捐赠](https://gitee.com/notadd/docs.nestjs.cn?donate=true)
  
  ### 译者署名

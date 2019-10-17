@@ -80,7 +80,10 @@
 
 - 开源
   - [EVE Book API](https://github.com/evebook/api) - :milky_way: EVE Book API
+  - [Ever®](https://github.com/ever-co/ever) - 电子商务平台。
   - [LXDhub](https://github.com/Roche/lxdhub) - Linux 容器管理系统（LXC）.
+  - [Notadd](https://github.com/notadd/notadd) - 微服务开发架构。
+  
 
 ### 常用库
 

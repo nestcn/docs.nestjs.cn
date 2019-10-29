@@ -1916,7 +1916,7 @@ export class CatsModule {}
 第一种可能的方法是使用工厂功能：
 
 ```typescript
-HttpModule.forRootAsync({
+HttpModule.registerAsync({
   useFactory: () => ({
     timeout: 5000,
     maxRedirects: 5,
@@ -1928,7 +1928,7 @@ HttpModule.forRootAsync({
 
 
 ```typescript
-HttpModule.forRootAsync({
+HttpModule.registerAsync({
   imports: [ConfigModule],
   useFactory: async (configService: ConfigService) => ({
     timeout: configService.getString('HTTP_TIMEOUT'),
@@ -1942,7 +1942,7 @@ HttpModule.forRootAsync({
 
 
 ```typescript
-HttpModule.forRootAsync({
+HttpModule.registerAsync({
   useClass: HttpConfigService,
 });
 ```
@@ -1965,7 +1965,7 @@ class HttpConfigService implements HttpOptionsFactory {
 为了防止在 HttpModule 中创建 Httpconcecunservice, 并使用从不同模块导入的提供程序, 可以使用现有语法。
 
 ```typescript
-HttpModule.forRootAsync({
+HttpModule.registerAsync({
   imports: [ConfigModule],
   useExisting: ConfigService,
 });

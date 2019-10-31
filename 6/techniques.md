@@ -432,7 +432,7 @@ export class ApplicationModule {}
   "username": "root",
   "password": "root",
   "database": "test",
-  "entities": ["src/**/*.entity{.ts,.js}"],
+  "entities": ["dist/**/*.entity{.ts,.js}"],
   "synchronize": true
 }
 ```

@@ -619,7 +619,8 @@ export class CatsService {
     private readonly commonService: CommonService,
   ) {}
 }
-```
+```    
+
 ?> `forwardRef()` 需要从 `@nestjs/common` 包中导入的。
 
 这只是关系的一方面。现在让我们对 `CommonService` 做同样的事情:

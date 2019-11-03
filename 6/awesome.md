@@ -60,7 +60,10 @@
   - [Lynx](https://github.com/mentos1386/lynx) - 基于 NestJS 和 TypeORM 构建的 Opinionated Framework    
   - [NestJS Ideas API](https://github.com/kelvin-mai/nest-ideas-api) - 使用 NestJS，PostgresQL 和 TypeORM构 建的 REST 和 GraphQL 服务端的实现    
   - [Nestcloud Starter](https://github.com/nest-cloud/nestcloud-starter) - 使用 nestcloud 快速启动微服务应用程序.    
-  - [Nodepress](https://github.com/surmon-china/nodepress) - 使用 Nest 的 Blog/CMS，  RESTful API 服务端应用. 😎    
+  - [Nodepress](https://github.com/surmon-china/nodepress) - 使用 Nest 的 Blog/CMS，  RESTful API 服务端应用. 😎
+  - [Serverless-Lambda-DynamoDB](https://github.com/International-Slackline-Association/Rankings-Backend) - 具有AWS Lambda，DynamoDB，DynamoDB Streams的完全无服务器生产应用程序。
+  - [Passport Email Auth](https://github.com/marcomelilli/nestjs-email-authentication) 入门项目，包括用于通过MongoDB和PassportJs进行用户电子邮件身份验证的API。
+  
 
 - 样例
   - [Nest 入门套件](https://github.com/kentloog/nestjs-sequelize-typescript) - Nest + sequelize-typescript + JWT + Jest + Swagger
@@ -70,12 +73,17 @@
   - [NestJS Boilerplate 💡](https://github.com/Vivify-Ideas/nestjs-boilerplate) - 具有可用身份验证，typeorm，env 配置和 swagger 的 Boilerplate。开始制作伟大事物所需的一切。🚀
   - [Awesome Nest Boilerplate 😍](https://github.com/NarHakobyan/awesome-nest-boilerplate), Typescript 💪，Postgresql 🎉，TypeORM，Swagger for Api文档，角色基本访问控制和最佳应用程序架构。
   - [NestJS Prisma Starter](https://github.com/fivethree-team/nestjs-prisma-client-starter) - NestJS 的入门项目😻 包括带有 Prisma 客户端的 Graphql，Passport-JWT 身份验证，Swagger Api 和 Docker。
+  - [TeanJS](https://github.com/adrien2p/teanjs) - TeanJS是一个入门程序，它为您提供所有方式，以便能够尽快开始编写代码😻
+  
 
 ### 使用 NestJS 的项目
 
 - 开源
   - [EVE Book API](https://github.com/evebook/api) - :milky_way: EVE Book API
+  - [Ever®](https://github.com/ever-co/ever) - 电子商务平台。
   - [LXDhub](https://github.com/Roche/lxdhub) - Linux 容器管理系统（LXC）.
+  - [Notadd](https://github.com/notadd/notadd) - 微服务开发架构。
+  
 
 ### 常用库
 
@@ -117,6 +125,7 @@
 - 日志
   - [Nest Morgan](https://github.com/mentos1386/nest-morgan) - 用于 nestjs 的 Morgan 模块
   - [Nest Winston](https://github.com/gremo/nest-winston) - 用于 nestjs 的 Winston 模块
+  - [Nest Pino](https://github.com/iamolegga/nestjs-pino) - 用于 nestjs 的 Pino 模块 ，😮在任意位置记录请求上下文😍
 - 监控
   - [Nest Status Monitor](https://github.com/GenFirst/nest-status-monitor) - 基于 Socket.io 和 Chart.js 的简单自托管模块，用于报告 Nest.js 的 node.js 服务器的实时状态。
 - 国际化
@@ -131,6 +140,7 @@
   - [Typeorm](https://github.com/nestjs/typeorm) - 用于 Nest 框架的 TypeORM 模块 [[Tutorial](http://docs.nestjs.com/recipes/sql-typeorm)].
   - [Magnus](https://github.com/notadd/magnus) 自动生成 grpc 及 graphql 的库。
   - [Nest Mongoose](https://github.com/nestjs/mongoose) - 用于 Nest 框架的 Mongoose 模块
+  - [Nest Typegoose](https://github.com/kpfromer/nestjs-typegoose) - nest.js 的 [Typegoose](https://github.com/szokodiakos/typegoose) 模块。
   - [Nest Sequelize JWT](https://github.com/adrien2p/nest-js-sequelize-jwt) - 入门套件 Nest + Sequelize + jwt。
   - [Nest sequelize-typescript](https://github.com/kentloog/nestjs-sequelize-typescript) - Nest + sequelize-typescript + JWT + Jest + Swagger
 - GraphQL

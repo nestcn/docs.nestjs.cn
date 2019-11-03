@@ -11,6 +11,9 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
 ## [查看 6.0 文档](/6/)
 
 
-本站托管在： [vultr   （帮助我们，并且获得50美金【10个月】）](https://www.vultr.com/?ref=7786172-4F)
+本站托管在： [vultr   （帮助我们，并且获得50美金【10个月】）](https://www.vultr.com/?ref=7786172-4F)    
+  [【推荐】Onevps-更稳定-不限流量](https://www.onevps.com/portal/aff.php?aff=12238)    
+  [JMS 搬瓦工官方的科学上网工具](https://justmysocks1.net/members/aff.php?aff=6423)    
+  [【捐赠】](https://gitee.com/notadd/docs.nestjs.cn?donate=true)    
 
 [![vultr](https://www.vultr.com/media/banner_1.png)](https://www.vultr.com/?ref=7815855-4F)

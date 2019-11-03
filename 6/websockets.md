@@ -1,8 +1,8 @@
 # 网关
 
-本文档其他部分讨论的大多数概念（如依赖项注入、修饰器、异常筛选器、管道、防护和拦截器）同样适用于网关。Nest 尽可能会抽象实现细节，以便相同的组件可以跨基于 HTTP 、WebSockets 和微服务运行。本节介绍特定于 WebSocket 的方面。
+本文档中其他地方讨论的大多数概念，如依赖注入、装饰器、异常过滤器、管道、守卫和拦截器，都同样适用于网关。只要有可能，Nest将抽象实现细节，以便相同的组件可以跨基于 `http` 的平台、`WebSockets` 和微服务运行。本节将介绍 `WebSockets` 在 `Nest` 中的应用。
 
-网关是用`@WebSocketGateway（)`装饰器注解的类。默认情况下，网关使用 [socket.io](https://github.com/socketio/socket.io)包，但也提供了与广泛的其他库的兼容性，包括本地web套接字实现（[阅读更多](https://docs.nestjs.com/v5/websockets/adapter)）。
+在 `Nest` 中，网关只是一个用 `@WebSocketGateway()` 装饰器注解的类。从技术上讲，网关与平台无关，这使得它们在创建适配器之后就可以与任何 `WebSockets` 库兼容。有两个开箱即用的WS平台:[socket.io](https://github.com/socketio/socket.io)和[ws](https://github.com/websockets/ws)。你可以选择最适合你需要的。另外，您可以按照本指南构建自己的适配器。
 
 ![](https://docs.nestjs.com/assets/Gateways_1.png)
 
@@ -12,28 +12,28 @@
 
 首先，我们需要安装所需的软件包：
 
-```
+```bash
 $ npm i --save @nestjs/websockets @nestjs/platform-socket.io
 $ npm i --save-dev @types/socket.io
 ```
 
-### 概述
+### 基本
 
-一般来说，除非你的应用程序不是 Web 应用程序，或者您已手动更改端口，否则每个网关都会在**HTTP服务器**运行时监听相同的端口。我们可以通过将参数传递给`@WebSocketGateway（80）` 装饰器来改变这种行为，其中 `80` 是一个选定的端口号。另外，您可以使用以下构造来设置此网关使用的[命名空间](https://socket.io/docs/rooms-and-namespaces/)：
+一般来说，除非你的应用程序不是 `Web` 应用程序，或者您已手动更改端口，否则每个网关都会在**HTTP服务器**运行时监听相同的端口。我们可以通过将参数传递给 `@WebSocketGateway(80)` 装饰器来改变这种行为，其中 `8` 是一个选定的端口号。另外，您可以使用以下构造来设置此网关使用的[命名空间](https://socket.io/docs/rooms-and-namespaces/)：
 
-```
+```typescript
 @WebSocketGateway(80, { namespace: 'events' })
 ```
 
-!> `警告`只有将网关放入`providers`数组中，网关才会启动。
+!> 警告只有将网关放入 `providers` 程序数组中，网关才会启动。
 
-`命名空间`不是唯一可用的选项。您可以传递[此处](https://socket.io/docs/server-api/)提及的任何其他东西。在实例化过程中，这些属性将传递给套接字构造函数。
+您可以将任何受支持的选项与第二个参数一起传递给 `@WebSocketGateway()` 装饰器，如下所示:
 
 ```typescript
 @WebSocketGateway(81, { transports: ['websocket'] })
 ```
 
-网关当前正在监听，但我们尚未订阅收到的消息。让我们创建一个处理程序，它将订阅`事件`消息并使用完全相同的数据响应用户。
+现在，网关现在正在监听，但我们目前尚未订阅收到的消息。让我们创建一个处理程序，它将订阅`事件`消息并使用完全相同的数据响应用户。
 
 >events.gateway.ts
 
@@ -44,26 +44,26 @@ handleEvent(@MessageBody() data: string): string {
 }
 ```
 
-?> `@SubscribeMessage()` 和 `@MessageBody()` 装饰器从`@nestjs/websockets`包中导入。
+?> `@SubscribeMessage()` 和 `@MessageBody()` 装饰器是从 `@nestjs/websockets` 包中导入的。
 
-如果你不喜欢使用装饰器，以下代码在功能上效果一致:
+如果你不想使用装饰器，下面的代码在功能上是等价的:
 
 > events.gateway.ts
 
-```javascript
+```typescript
 @SubscribeMessage('events')
 handleEvent(client: Socket, data: string): string {
   return data;
 }
 ```
 
-该 handleEvent() 函数有两个参数。第一个是特定于平台的[套接字实例](https://socket.io/docs/server-api/#socket)，第二个是从客户端接收的数据。但是，不建议使用此方法，因为它需要在每个单元测试中模拟套接字实例。
+该 `handleEvent()` 函数有两个参数。第一个是特定于平台的[socket](https://socket.io/docs/server-api/#socket)实例，第二个是从客户端接收的数据。但是不建议使用此方法，因为它需要在每个单元测试中模拟 `socket` 实例。
 
-收到`event`消息后，我们会发送一个确认信息，其中包含某人通过网络发送的相同数据。此外，可以使用特定于库的方法发出消息，例如，通过使用 `client.emit()`方法。为了访问连接的套接字实例，请使用 `@ConnectedSocket()` 修饰器。
+收到消息后，我们会发送一个确认信息，其中包含某人通过网络发送的相同数据。此外，可以使用特定于库的方法发出消息，例如，通过使用 `client.emit()` 方法。 为了访问连接的 `socket` 实例，请使用 `@ConnectedSocket()` 装饰器。
 
 > events.gateway.ts
 
-```javascript
+```typescript
 @SubscribeMessage('events')
 handleEvent(
   @MessageBody() data: string,
@@ -72,26 +72,25 @@ handleEvent(
   return data;
 }
 ```
+?> `@ConnectedSocket()` 装饰器是从 `@nestjs/websockets` 包中导入的。
 
-?> `提示` `@ConnectedSocket()` 装饰器可以从 `@nestjs/websocket` 中导入。
+但是，在这种情况下，您将无法利用拦截器。如果你不想响应用户，你可以简单地跳过 `return` 语句(或者显式地返回 'falsy' 值，例如 'undefined' )。
 
-但是，在这种情况下，您无法使用拦截器。如果您不想回复用户，则不要 `返回` 任何内容（或明确返回“falsy”值，例如 `undefined` ）。
-
-现在，当客户端以下列方式发出消息时：
+现在，当客户端发出的消息如下:
 
 ```typescript
 socket.emit('events', { name: 'Nest' });
 ```
 
-`onEvent（）`方法将被执行。此外，为了侦听从上述处理程序中发出的消息，客户端必须附加相应的侦听器：
+将执行 `handleEvent()` `法。此外，为了侦听从上述处理程序中发出的消息，客户端必须附加相应的侦听器：
 
 ```typescript
 socket.emit('events', { name: 'Nest' }, data => console.log(data));
 ```
 
-### 多个回复
+### 多个响应
 
-确认仅发送一次。此外，原生 WebSockets 不支持它。要解决此限制，您可以返回包含两个属性的对象。在 event 为所发射的事件的名称 data 具有要被转发到客户端。
+确认仅发送一次。而且，原生 `WebSockets` 不支持它。要解决这个限制，可以返回一个包含两个属性的对象。在 `event` 为所发射的事件的名称 `data` 具有要被转发到客户端。
 
 > events.gateway.ts
 
@@ -102,20 +101,19 @@ handleEvent(@MessageBody() data: unknown): WsResponse<unknown> {
   return { event, data };
 }
 ```
-?> `WsResponse` 接口需要 import @nestjs/websockets 包。
+?> `WsResponse` 接口是从 `@nestjs/websockets` 包中导入的。
 
 为了侦听传入的响应，客户端必须应用另一个事件侦听器。
 
 ```typescript
 socket.on('events', data => console.log(data));
 ```
-
-
+ 
 ### 异步响应
 
-每个消息处理程序可以是同步或异步的. 因此`async` 是支持的，因此您可以返回`Promise`。一个消息 `handler` 也可以返回 `Observable`，这意味着你可以返回多个值（它们将被发射，直到流完成）。
+消息处理程序可以同步或异步响应。因此，支持异步方法。消息处理程序还能够返回一个 `Observable` 对象，在这种情况下，结果值将被发出，直到流完成。
 
->events.gateway.ts
+> events.gateway.ts
 
 ```typescript
 @SubscribeMessage('events')
@@ -132,44 +130,44 @@ onEvent(@MessageBody() data: unknown): Observable<WsResponse<number>> {
 
 ### 生命周期挂钩
 
-有3个有用的生命周期挂钩。它们都有相应的接口，并在下表中进行描述：
+有3个有用的生命周期钩子可用。它们都有相应的接口，如下表所示:
 
 |                      |                                  |
 | :------------------- | :------------------------------- |
-|  `OnGatewayInit`    | 强制执行`afterInit()`方法。将特定于库的服务器实例作为参数 |
-| `OnGatewayConnection`| 强制执行`handleConnection()`方法。将特定于库的客户端套接字实例作为参数。   |
-| `OnGatewayDisconnect`|强制执行`handleDisconnect()`方法。将特定于库的客户端套接字实例作为参数。|
+|  `OnGatewayInit`    | 强制执行`afterInit()`方法。将特定于库的服务器实例作为参数|
+| `OnGatewayConnection`| 强制执行`handleConnection()`方法。将特定于库的客户端 `socket` 实例作为参数。     |
+| `OnGatewayDisconnect`|强制执行`handleDisconnect()`方法。将特定于库的客户端 `socket` 实例作为参数。|
 
-?> 提示每个生命周期接口都来自`@nestjs/websockets`包。
+?> 提示每个生命周期接口都来自 `@nestjs/websockets` 包。
 
-### 特定库的服务器实例
+### 服务
 
-偶尔，您可能希望直接访问原生`特定库`的服务器实例。此对象的引用作为参数传递给`afterInit()`方法（`OnGatewayInit`接口）。第二种方法是使用`@WebSocketServer（）`装饰器。
+有时，您可能希望直接访问本机的、特定于平台的服务器实例。这个对象的引用作为参数传递给 `afterInit()` 方法( `OnGatewayInit` 接口)。另一个选项是使用 `@WebSocketServer()` 装饰器。
+
+偶尔，您可能希望直接访问原生`特定库`的服务器实例。此对象的引用作为参数传递给`afterInit()`方法（`OnGatewayInit`接口）。另一个选项是使用 `@WebSocketServer()` 装饰器。
 
 ```typescript
 @WebSocketServer()
 server: Server;
 ```
 
-?> 注意`@WebSocketServer()` 装饰器是从 `@ nestjs/websockets` 包中导入的。
+?> `@WebSocketServer()` 装饰器是从 `@nestjs/websockets` 包中导入的。
 
-当它准备好使用时，Nest会自动将服务器实例分配给该属性。
-
+当它准备好使用时，`Nest` 会自动将服务器实例分配给该属性。
 
 [这里](https://github.com/nestjs/nest/tree/master/sample/02-gateways)有一个可用的例子
 
 ## 异常过滤器
 
-websockets的**异常过滤器**工作原理与[HTTP异常过滤器](https://docs.nestjs.com/exception-filters)完全相同。唯一的区别是不要抛出`HttpException`，你应该抛出`WsException`。
+`websockets` 的**异常过滤器**工作原理与[HTTP异常过滤器](https://docs.nestjs.com/exception-filters)完全相同。唯一的区别是不要抛出`HttpException`，你应该抛出`WsException`。
 
 ```typescript
 throw new WsException('Invalid credentials.');
 ```
 
-!> 注意`WsException` 类是从`@ nestjs/websockets`包中导入的。
+?> 注意 `WsException` 类是从`@nestjs/websockets`包中导入的。
 
-
-Nest会处理这个异常并用下列数据发出异常消息：
+`Nest` 会处理这个异常并用下列数据发出异常消息：
 
 ```json
 {
@@ -190,13 +188,12 @@ onEvent(client, data: any): WsResponse<any> {
   const event = 'events';
   return { event, data };
 }
-
 ```
 ### 继承
 
 通常，您将创建完全自定义的异常过滤器，以满足您的应用程序要求。虽然您希望重用已经实现的核心异常过滤器并根据某些因素覆盖行为，但可能存在用例。
 
-为了将异常处理委托给基本过滤器，您需要扩展 BaseWsExceptionFilter 并调用继承的 catch() 方法。
+为了将异常处理委托给基本过滤器，您需要扩展 `BaseWsExceptionFilter` 并调用继承的 `catch()` 方法。
 
 ```typescript
 import { Catch, ArgumentsHost } from '@nestjs/common';
@@ -210,14 +207,13 @@ export class AllExceptionsFilter extends BaseWsExceptionFilter {
 }
 ```
 
-显然，您应该使用自己的业务逻辑增强以上实现（例如添加各种条件）。
-
+显然，您应该使用定制的业务逻辑(例如，添加各种条件)来增强上述实现。
 
 ## 管道
 
-websockets**管道**和[普通管道](https://docs.nestjs.com/pipes)没有区别。唯一应该注意的是，不要抛出`HttpException`，而应该使用`WsException`。同时，所有的管道都将应用到 `data` 参数(因为验证或转换客户端实例听起来很笨拙)。
+`websockets` 管道和[普通管道](https://docs.nestjs.com/pipes)没有区别。唯一应该注意的是，不要抛出 `HttpException`，而应该使用 `WsException`。此外，所有管道将仅应用于data参数。
 
-?> 提示`WsException`类在`@socketjs/websockets`包中可用。
+?> 提示`WsException` 类在 `@socketjs/websockets`包中可用。
 
 ### 绑定管道
 
@@ -234,9 +230,9 @@ handleEvent(client: Client, data: unknown): WsResponse<unknown> {
 
 ## 守卫
 
-[常规守卫](https://docs.nestjs.com/guards)和websockets**看守器**之间没有区别，但它会抛出`WsException`（而不是`HttpException`）。
+`websockets` 和[常规守卫](https://docs.nestjs.com/guards)守卫之间没有区别，但它会抛出`WsException`（而不是`HttpException`）。
 
-?> 提示`WsException`类在`@socketjs/websockets`包中可用。
+?> 提示 `WsException` 类在 `@socketjs/websockets` 包中可用。
 
 ### 绑定守卫
 
@@ -253,7 +249,7 @@ handleEvent(client: Client, data: unknown): WsResponse<unknown> {
 
 ## 拦截器
 
-[常规拦截器](https://docs.nestjs.com/interceptors)和websockets**拦截器**之间没有区别。 下面是一个使用手动实例化的方法范围拦截器的示例（类范围的工作）。
+常规[拦截器](https://docs.nestjs.com/interceptors)和 `websockets` **拦截器**之间没有区别。 下面是一个使用手动实例化的方法范围拦截器的示例（类范围的工作）。
 
 ```typescript
 @UseInterceptors(new TransformInterceptor())
@@ -264,10 +260,9 @@ handleEvent(client: Client, data: unknown): WsResponse<unknown> {
 }
 ```
 
-
 ## 适配器
 
-WebSockets模块与平台无关，因此，您可以通过使用 WebSocketAdapter 接口来创建自己的库（甚至是原声实现）。此接口强制实施下表中描述的几种方法：
+`WebSockets` 模块与平台无关，因此，您可以通过使用 `WebSocketAdapter` 接口来创建自己的库（甚至是原生实现）。此接口强制实施下表中描述的几种方法：
 
 |                      |                                  |
 | :------------------- | :------------------------------- |
@@ -279,15 +274,13 @@ WebSockets模块与平台无关，因此，您可以通过使用 WebSocketAdapte
 
 ### 拓展 socket.io
 
+[socket.io](https://github.com/socketio/socket.io) 包封装在一个 `IoAdapter` 类中。如果您想增强适配器的基本功能，该怎么办？例如，您的技术要求需要能够跨 `Web` 服务的多个负载平衡实例广播事件。为此，您可以扩展 `IoAdapter` 和覆盖单个方法，该方法的任务是实例化新的 `socket.io` 服务器。但首先，让我们安装所需的包。
 
-所述 [socket.io](https://github.com/socketio/socket.io) 包被包装在一个 IoAdapter 类中。如果您想增强适配器的基本功能，该怎么办？例如，您的技术要求需要能够跨 Web 服务的多个负载平衡实例广播事件。为此，您可以扩展 IoAdapter 和覆盖单个方法，该方法的任务是实例化新的 socket.io 服务器。但首先，让我们安装所需的包。
-
-```typescript
+```bash
 $ npm i --save socket.io-redis
 ```
 
-安装包后，我们可以创建一个 `RedisIoAdapter`类。
-
+安装包后，我们可以创建一个 `RedisIoAdapter` 类。
 
 ```typescript
 import { IoAdapter } from '@nestjs/platform-socket.io';
@@ -304,7 +297,7 @@ export class RedisIoAdapter extends IoAdapter {
 }
 ```
 
-然后，只需切换到新创建的 Redis 适配器。
+然后，只需切换到新创建的 `Redis` 适配器。
 
 ```typescript
 const app = await NestFactory.create(ApplicationModule);
@@ -313,12 +306,11 @@ app.useWebSocketAdapter(new RedisIoAdapter(app));
 
 ### ws 库
 
-另一个可用的适配器 WsAdapter 反过来充当框架之间的代理，并集成了快速且经过全面测试的 ws 库。此适配器与原生浏览器 WebSockets 完全兼容，并且比socket.io 包快得多。不幸的是，它具有明显更少的开箱即用功能。在某些情况下，您可能不一定需要它们。
+另一个可用的适配器 `WsAdapter` 反过来充当框架之间的代理，并集成了快速且经过全面测试的 `ws` 库。此适配器与原生浏览器 `WebSockets` 完全兼容，并且比 `socket.io` 包快得多。不幸的是，它具有明显更少的开箱即用功能。在某些情况下，您可能不一定需要它们。
 
+为了使用 `ws`，我们首先必须安装所需的包：
 
-为了使用 ws，我们首先必须安装所需的包：
-
-```typescript
+```bash
 $ npm i --save @nestjs/platform-ws
 ```
 
@@ -329,14 +321,11 @@ const app = await NestFactory.create(ApplicationModule);
 app.useWebSocketAdapter(new WsAdapter(app));
 ```
 
-?> WsAdapter 需要 import @nestjs/platform-ws。
+?> `WsAdapter` 是从 `@nestjs/platform-ws` 导入的。
 
 ### 高级（自定义适配器）
 
-
-出于演示目的，我们将手动集成 ws 库。如上所述，此库的适配器已创建，并将 `@nestjs/platform-ws` 作为 `WsAdapter` 类从包中公开。以下是简化实现的可能方式：
-
-
+出于演示目的，我们将手动集成 `ws` 库。如前所述，这个库的适配器已经创建，并从 `@nestjs/platform-ws` 包中作为 `WsAdapter` 类公开。下面是简化后的实现可能的样子:
 
 >ws-adapter.ts
 
@@ -392,9 +381,9 @@ export class WsAdapter implements WebSocketAdapter {
 }
 ```
 
-?> 如果要利用 [ws](https://github.com/websockets/ws) 库，请使用内置 `WsAdapter` 而不是创建自己的。
+?> 如果要利用 `ws` 库，请使用内置` WsAdapter` 而不是创建自己的。
 
-然后，我们可以使用`useWebSocketAdapter()`方法设置适配器：
+然后，我们可以使用 `useWebSocketAdapter()` 方法设置适配器：
 
 >main.ts
 
@@ -405,7 +394,7 @@ app.useWebSocketAdapter(new WsAdapter(app));
 
 ### 示例
 
-[这里](https://github.com/nestjs/nest/tree/master/sample/16-gateways-ws)提供了一个使用 WsAdapter 的工作示例。
+[这里](https://github.com/nestjs/nest/tree/master/sample/16-gateways-ws)提供了一个使用  `WsAdapter` 的工作示例。
 
 
  ### 译者署名
@@ -413,6 +402,5 @@ app.useWebSocketAdapter(new WsAdapter(app));
 | 用户名 | 头像 | 职能 | 签名 |
 |---|---|---|---|
 | [@zuohuadong](https://github.com/zuohuadong)  | <img class="avatar-66 rm-style" src="https://wx3.sinaimg.cn/large/006fVPCvly1fmpnlt8sefj302d02s742.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
+[@Armor](https://github.com/Armor-cn)  | <img class="avatar-66 rm-style" height="70" src="https://avatars3.githubusercontent.com/u/31821714?s=460&v=4">  |  翻译  | 专注于 Java 和 Nest，[@Armor](https://armor.ac.cn/) |
 | [@Drixn](https://drixn.com/)  | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">  |  翻译  | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/) |
-| [@丁酉年十三](https://github.com/warriorsfly) |  | 勘误 | 不专注的关注rust,nest,flutter,prisma2 |
-

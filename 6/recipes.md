@@ -4,20 +4,20 @@
 
 **本章仅适用于TypeScript**
 
-!> 在本文中，您将学习如何使用自定义提供者机制从零开始创建基于 **TypeORM** 包的 `DatabaseModule` 。由于该解决方案包含许多开销，因此您可以使用开箱即用的 `@nestjs/typeorm` 软件包。要了解更多信息，请参阅 [此处](/6/techniques.md?id=数据库（TypeORM）)。
+!> 在本文中，您将学习如何使用自定义提供者机制从零开始创建基于 **TypeORM** 包的 `DatabaseModule` 。由于该解决方案包含许多开销，因此您可以使用开箱即用的 `@nestjs/typeorm` 软件包。要了解更多信息，请参阅 [此处](/6/techniques.md?id=数据库)。
 
 
-[TypeORM](https://github.com/typeorm/typeorm) 无疑是 node.js 世界中最成熟的对象关系映射器（ORM）。由于它是用 TypeScript 编写的，所以它在 Nest 框架下运行得非常好。
+[TypeORM](https://github.com/typeorm/typeorm) 无疑是 `node.js` 世界中最成熟的对象关系映射器（`ORM` ）。由于它是用 `TypeScript` 编写的，所以它在 `Nest` 框架下运行得非常好。
 
 ### 入门
 
 在开始使用这个库前，我们必须安装所有必需的依赖关系
 
-```
+```bash
 $ npm install --save typeorm mysql
 ```
 
-我们需要做的第一步是使用从 `typeorm` 包导入的 `createConnection()` 函数建立与数据库的连接。`createConnection()` 函数返回一个 `Promise`，因此我们必须创建一个[异步提供者](/6/fundamentals.md?id=异步提供者 (Asynchronous providers))。
+我们需要做的第一步是使用从 `typeorm` 包导入的 `createConnection()` 函数建立与数据库的连接。`createConnection()` 函数返回一个 `Promise`，因此我们必须创建一个[异步提供者](/6/fundamentals.md?id=异步提供者 ( `Asynchronous providers` ))。
 
 > database.providers.ts
 
@@ -26,7 +26,7 @@ import { createConnection } from 'typeorm';
 
 export const databaseProviders = [
   {
-    provide: 'DbConnectionToken',
+    provide: 'DATABASE_CONNECTION',
     useFactory: async () => await createConnection({
       type: 'mysql',
       host: 'localhost',
@@ -68,7 +68,7 @@ export class DatabaseModule {}
 
 但首先，我们至少需要一个实体。我们将重用官方文档中的 `Photo` 实体。
 
-> photo/photo.entity.ts
+> photo.entity.ts
 
 ```typescript
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
@@ -105,14 +105,16 @@ import { Photo } from './photo.entity';
 
 export const photoProviders = [
   {
-    provide: 'PhotoRepositoryToken',
+    provide: 'PHOTO_REPOSITORY',
     useFactory: (connection: Connection) => connection.getRepository(Photo),
-    inject: ['DbConnectionToken'],
+    inject: ['DATABASE_CONNECTION'],
   },
 ];
 ```
 
 !> 请注意，在实际应用程序中，您应该避免使用魔术字符串。`PhotoRepositoryToken` 和 `DbConnectionToken` 都应保存在分离的 `constants.ts` 文件中。
+
+在实际应用程序中，应该避免使用魔法字符串。`PHOTO_REPOSITORY` 和 `DATABASE_CONNECTION` 应该保持在单独的 `constants.ts` 文件中。
 
 现在我们可以使用 `@Inject()` 装饰器将 `Repository<Photo>` 注入到 `PhotoService` 中：
 
@@ -136,7 +138,7 @@ export class PhotoService {
 }
 ```
 
-数据库连接是 **异步的**，但 Nest 使最终用户完全看不到这个过程。`PhotoRepository` 正在等待数据库连接时，并且`PhotoService` 会被延迟，直到存储库可以使用。整个应用程序可以在每个类实例化时启动。
+数据库连接是 **异步的**，但 `Nest` 使最终用户完全看不到这个过程。`PhotoRepository` 正在等待数据库连接时，并且`PhotoService` 会被延迟，直到存储库可以使用。整个应用程序可以在每个类实例化时启动。
 
 这是一个最终的 `PhotoModule` ：
 
@@ -160,11 +162,11 @@ export class PhotoModule {}
 
 ?> 不要忘记将 `PhotoModule` 导入到根 `ApplicationModule` 中。
 
-## MongoDB (Mongoose)
+## Mongoose
 
 !> 在本文中，您将学习如何使用自定义提供者机制从零开始创建基于 **Mongoose** 包的 `DatabaseModule`。由于该解决方案包含许多开销，因此您可以使用开箱即用的 `@nestjs/mongoose` 软件包。要了解更多信息，请参阅 [此处](https://docs.nestjs.com/techniques/mongodb)。
 
-Mongoose是最受欢迎的MongoDB对象建模工具。
+[Mongoose](http://mongoosejs.com/)是最受欢迎的[MongoDB](https://www.mongodb.org/)对象建模工具。
 
 ### 入门
 
@@ -275,7 +277,7 @@ export class CatsService {
 }
 ```
 
-在上面的例子中，我们使用了 `Cat` 接口。 此接口扩展了来自mongoose包的 `Document` ：
+在上面的例子中，我们使用了 `Cat` 接口。 此接口扩展了来自 `mongoose` 包的 `Document` ：
 
 ```typescript
 import { Document } from 'mongoose';
@@ -313,22 +315,174 @@ export class CatsModule {}
 
 ?> 不要忘记将 `CatsModule` 导入到根 `ApplicationModule` 中。
 
+
+## Sequelize
+
+### SQL (Sequelize)
+
+本章仅适用于 `TypeScript`
+
+`Sequelize` 是一个用普通 `JavaScript` 编写的流行对象关系映射器( `ORM` )，但是有一个 `Sequelize-TypeScript` 包装器，它为基本 `Sequelize` 提供了一组装饰器和其他附加功能。
+
+### 入门
+
+要开始使用这个库，我们必须安装以下附件:
+
+```bash
+$ npm install --save sequelize sequelize-typescript mysql2
+$ npm install --save-dev @types/sequelize
+```
+
+我们需要做的第一步是创建一个 `Sequelize` 实例，并将一个 `options` 对象传递给构造函数。另外，我们需要添加所有模型（替代方法是使用 `modelPaths` 属性）并同步数据库表。
+
+> database.providers.ts
+
+```typescript
+
+import { Sequelize } from 'sequelize-typescript';
+import { Cat } from '../cats/cat.entity';
+
+export const databaseProviders = [
+  {
+    provide: 'SEQUELIZE',
+    useFactory: async () => {
+      const sequelize = new Sequelize({
+        dialect: 'mysql',
+        host: 'localhost',
+        port: 3306,
+        username: 'root',
+        password: 'password',
+        database: 'nest',
+      });
+      sequelize.addModels([Cat]);
+      await sequelize.sync();
+      return sequelize;
+    },
+  },
+];
+```
+!> 按照最佳实践，我们在分隔的文件中声明了带有 `*.providers.ts` 后缀的自定义提供程序。
+
+然后，我们需要导出这些提供程序，使它们可用于应用程序的其他部分。
+
+```typescript
+import { Module } from '@nestjs/common';
+import { databaseProviders } from './database.providers';
+
+@Module({
+  providers: [...databaseProviders],
+  exports: [...databaseProviders],
+})
+export class DatabaseModule {}
+```
+
+现在我们可以使用 `@Inject()` 装饰器注入 `Sequelize` 对象。 每个将依赖于 `Sequelize` 异步提供程序的类将等待 `Promise` 被解析。
+
+### 模型注入
+
+在 `Sequelize` 中，模型在数据库中定义了一个表。该类的实例表示数据库行。首先，我们至少需要一个实体:
+
+> cat.entity.ts
+
+```typescript
+import { Table, Column, Model } from 'sequelize-typescript';
+
+@Table
+export class Cat extends Model<Cat> {
+  @Column
+  name: string;
+
+  @Column
+  age: number;
+
+  @Column
+  breed: string;
+}
+```
+
+`Cat` 实体属于 `cats` 目录。 此目录代表 `CatsModule` 。 现在是时候创建一个存储库提供程序了：
+
+> cats.providers.ts
+
+```typescript
+
+import { Cat } from './cat.entity';
+
+export const catsProviders = [
+  {
+    provide: 'CATS_REPOSITORY',
+    useValue: Cat,
+  },
+];
+```
+
+?> 在实际应用中，应避免使用魔术字符串。 `CATS_REPOSITORY` 和 `SEQUELIZE` 都应保存在单独的 `constants.ts` 文件中。
+
+在 `Sequelize` 中，我们使用静态方法来操作数据，因此我们在这里创建了一个别名。
+
+现在我们可以使用 `@Inject()` 装饰器将 `CATS_REPOSITORY` 注入到 `CatsService` 中:
+
+> cats.service.ts
+
+```typescript
+import { Injectable, Inject } from '@nestjs/common';
+import { CreateCatDto } from './dto/create-cat.dto';
+import { Cat } from './cat.entity';
+
+@Injectable()
+export class CatsService {
+  constructor(
+    @Inject('CATS_REPOSITORY') private readonly CATS_REPOSITORY: typeof Cat) {}
+
+  async findAll(): Promise<Cat[]> {
+    return await this.CATS_REPOSITORY.findAll<Cat>();
+  }
+}
+```
+`
+数据库连接是异步的，但是 `Nest` 使此过程对于最终用户完全不可见。 `CATS_REPOSITORY` 提供程序正在等待数据库连接，并且 `CatsService` 将延迟，直到准备好使用存储库为止。 实例化每个类时，启动整个应用程序。
+
+这是最终的 `CatsModule`：
+
+> cats.module.ts
+
+```typescript
+import { Module } from '@nestjs/common';
+import { CatsController } from './cats.controller';
+import { CatsService } from './cats.service';
+import { catsProviders } from './cats.providers';
+import { DatabaseModule } from '../database/database.module';
+
+@Module({
+  imports: [DatabaseModule],
+  controllers: [CatsController],
+  providers: [
+    CatsService,
+    ...catsProviders,
+  ],
+})
+export class CatsModule {}
+```
+
+?> 不要忘记将 `CatsModule` 导入到根 `ApplicationModule` 中。
+
 ## CQRS
 
 最简单的 **[CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete)** 应用程序的流程可以使用以下步骤来描述:
 
 1. 控制器层处理**HTTP请求**并将任务委派给服务。
-2. 服务层是执行大部分业务逻辑的地方。
-3. **Services**使用存储库或 DAOs 来更改/保留实体。
-4. 实体充当值的容器，具有setter和getter。
+2. 服务层是处理大部分业务逻辑。
+3. **Services**使用存储库或 `DAOs` 来更改/保留实体。
+4. 实体充当值的容器，具有 `setter` 和 `getter` 。
 
 在大多数情况下，没有理由使中小型应用程序更加复杂。 但是，有时它还不够，当我们的需求变得更加复杂时，我们希望拥有可扩展的系统，并且数据流量非常简单。
 
-这就是为什么 Nest 提供了一个轻量级的 CQRS 模块，其元素如下所述。
+这就是为什么`Nest` 提供了一个轻量级的 [CQRS](https://github.com/nestjs/cqrs) 模块，其元素如下所述。
 
-### Commands
+### 指令
 
 为了使应用程序更易于理解，每个更改都必须以 **Command** 开头。当任何命令被分派时，应用程序必须对其作出反应。命令可以从服务中分派(或直接来自控制器/网关)并在相应的 **Command 处理程序** 中使用。
+
 
 > heroes-game.service.ts
 
@@ -338,7 +492,7 @@ export class HeroesGameService {
   constructor(private readonly commandBus: CommandBus) {}
 
   async killDragon(heroId: string, killDragonDto: KillDragonDto) {
-    return await this.commandBus.execute(
+    return this.commandBus.execute(
       new KillDragonCommand(heroId, killDragonDto.dragonId)
     );
   }
@@ -350,7 +504,7 @@ export class HeroesGameService {
 > kill-dragon.command.ts
 
 ```typescript
-export class KillDragonCommand implements ICommand {
+export class KillDragonCommand {
   constructor(
     public readonly heroId: string,
     public readonly dragonId: string,
@@ -377,7 +531,7 @@ export class KillDragonHandler implements ICommandHandler<KillDragonCommand> {
 }
 ```
 
-现在，每个应用程序状态更改都是 **Command** 发生的结果。逻辑被封装在处理程序中。我们可以简单地在这里添加日志，甚至我们可以在数据库中保留我们的命令 (例如，用于诊断目的)。
+现在，每个应用程序状态更改都是**Command**发生的结果。 逻辑封装在处理程序中。 如果需要，我们可以简单地在此处添加日志，甚至更多，我们可以将命令保留在数据库中（例如用于诊断目的）。
 
 ### 事件（Events）
 
@@ -434,14 +588,14 @@ export class KillDragonHandler implements ICommandHandler<KillDragonCommand> {
 }
 ```
 
-现在，一切都按我们预期的方式工作。注意，我们需要 commit() 事件，因为他们不会立即被发布。显然，对象不必预先存在。我们也可以轻松地合并类型上下文:
+现在，一切都按我们预期的方式工作。注意，我们需要 `commit()` 事件，因为他们不会立即被发布。显然，对象不必预先存在。我们也可以轻松地合并类型上下文:
 
 ```typescript
 const HeroModel = this.publisher.mergeContext(Hero);
 new HeroModel('id');
 ```
 
-就是这样。模型现在能够发布事件。我们得处理他们。此外，我们可以使用EventBus手动发出事件。
+就是这样。模型现在能够发布事件。我们得处理他们。此外，我们可以使用 `EventBus` 手动发出事件。
 
 ```typescript
 this.eventBus.publish(new HeroKilledDragonEvent());
@@ -470,7 +624,7 @@ export class HeroKilledDragonHandler implements IEventHandler<HeroKilledDragonEv
 
 这种类型的 **事件驱动架构** 可以提高应用程序的 **反应性** 和 **可伸缩性** 。现在, 当我们有了事件, 我们可以简单地以各种方式对他们作出反应。**Sagas**是建筑学观点的最后一个组成部分。
 
-sagas 是一个非常强大的功能。单saga可以监听 1..* 事件。它可以组合，合并，过滤事件流。[RxJS](https://github.com/ReactiveX/rxjs) 库是魔术的来源地。简单地说, 每个 sagas 都必须返回一个包含命令的Observable。此命令是 **异步** 调用的。
+`sagas` 是一个非常强大的功能。单 `saga` 可以监听 1..* 事件。它可以组合，合并，过滤事件流。[RxJS](https://github.com/ReactiveX/rxjs) 库是`sagas`的来源地。简单地说, 每个 `sagas` 都必须返回一个包含命令的Observable。此命令是 **异步** 调用的。
 
 > heroes-game.saga.ts
 
@@ -489,11 +643,12 @@ export class HeroesGameSagas {
 
 ?> `ofType` 运算符从 `@nestjs/cqrs` 包导出。
 
-我们宣布一个规则 - 当任何英雄杀死龙时，古代物品就会掉落。 之后，DropAncientItemCommand将由适当的处理程序调度和处理。
+我们宣布一个规则 - 当任何英雄杀死龙时，古代物品就会掉落。 之后，`DropAncientItemCommand` 将由适当的处理程序调度和处理。
 
-### Queries
+### 查询
 
 `CqrsModule` 对于查询处理可能也很方便。 `QueryBus` 与 `CommandsBus` 的工作方式相同。 此外，查询处理程序应实现 `IQueryHandler` 接口并使用 `@QueryHandler()` 装饰器进行标记。
+
 
 ### 建立（Setup）
 
@@ -529,9 +684,9 @@ export class HeroesGameModule {}
 
 **本章仅适用于TypeScript**
 
-[OpenAPI](https://swagger.io/specification/)(Swagger)规范是一种用于描述RESTful API的强大定义格式。 Nest提供了一个专用[模块](https://github.com/nestjs/swagger)来使用它。
+[OpenAPI](https://swagger.io/specification/)(Swagger)规范是一种用于描述 `RESTful API` 的强大定义格式。 `Nest` 提供了一个专用[模块](https://github.com/nestjs/swagger)来使用它。
 
-### 安装（Installation）
+### 安装
 
 首先，您必须安装所需的包：
 
@@ -539,7 +694,7 @@ export class HeroesGameModule {}
 $ npm install --save @nestjs/swagger swagger-ui-express
 ```
 
-如果你正在使用fastify，你必须安装 `fastify-swagger` 而不是 `swagger-ui-express` ：
+如果你正在使用 `fastify` ，你必须安装 `fastify-swagger` 而不是 `swagger-ui-express` ：
 
 ```bash
 $ npm install --save @nestjs/swagger fastify-swagger
@@ -566,7 +721,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(3001);
+  await app.listen(3000);
 }
 bootstrap();
 ```
@@ -575,21 +730,21 @@ bootstrap();
 
 为了创建一个完整的文档（使用已定义的HTTP路由），我们使用 `SwaggerModule` 类的 `createDocument()` 方法。 此方法接收两个参数，即应用程序实例和基本Swagger选项。
 
-最后一步是调用 `setup()` 。 它顺序的接收（1）安装Swagger的路径，（2）应用程序实例，以及（3）描述Nest应用程序的文档。
+最后一步是调用 `setup()` 。 它顺序的接收（1）安装 `Swagger` 的路径，（2）应用程序实例，以及（3）描述 `Nest` 应用程序的文档。
 
-现在，您可以运行以下命令来启动HTTP服务器：
+现在，您可以运行以下命令来启动 `HTTP` 服务器：
 
 ```bash
 $ npm run start
 ```
 
-应用程序运行时，打开浏览器并导航到http://localhost:3000/api。 你应该看到一个如下类似的页面：
+应用程序运行时，打开浏览器并导航到 `http://localhost:3000/api` 。 你应该看到一个如下类似的页面：
 
 ![img](https://docs.nestjs.com/assets/swagger1.png)
 
-SwaggerModule自动反映所有端点。 在后台，它使用swagger-ui-express并创建一个实时文档。
+`SwaggerModule` 自动反映所有端点。 在后台，它使用 `swagger-ui-express` 并创建一个实时文档。
 
-?> 如果要下载相应的Swagger JSON文件，只需在浏览器中调用 `http://localhost:3000/api-json` （如果您的Swagger文档发布在 `http://localhost:3000/api` 下）。
+?> 如果要下载相应的 `Swagger JSON` 文件，只需在浏览器中调用 `http://localhost:3000/api-json` （如果您的 `Swagger` 文档发布在 `http://localhost:3000/api` 下）。
 
 ### Body, query, path parameters
 
@@ -613,7 +768,6 @@ async create(@Body() createCatDto: CreateCatDto) {
 如您所见，虽然该类具有一些声明的属性，但定义为空。 为了使 `SwaggerModule` 可以访问类属性，我们必须用 `@ApiModelProperty()` 装饰器标记所有这些属性：
 
 ```typescript
-@Post()
 import { ApiModelProperty } from '@nestjs/swagger';
 
 export class CreateCatDto {
@@ -663,7 +817,7 @@ export const ApiModelProperty: (metadata?: {
 }) => PropertyDecorator;
 ```
 
-?> 有一个 `@ApiModelPropertyOptional()` 快捷方式装饰器有助于避免连续输入 `@ApiModelProperty(&#123 required：false&#125)` 。
+?> 有一个 `@ApiModelPropertyOptional()` 快捷方式修饰符，可以避免连续输入 `@ApiModelProperty({required：false})`。
 
 因此我们可以简单地设置默认值，确定属性是否是必需的或者显式设置类型。
 
@@ -717,7 +871,7 @@ async function bootstrap() {
   });
   SwaggerModule.setup('api/dogs', app, dogDocument);
 
-  await app.listen(3001);
+  await app.listen(3000);
 }
 bootstrap();
 ```
@@ -728,15 +882,15 @@ bootstrap();
 $ npm run start
 ```
 
-导航到 `http://localhost:3000/api/cats` 以查看您的 `cats` 的SwaggerUI：
+导航到 `http://localhost:3000/api/cats` 以查看您的 `cats` 的 `SwaggerUI` ：
 
 ![img](https://docs.nestjs.com/assets/swagger-cats.png)
 
-`http://localhost:3000/api/dogs` 会为你的dogs暴露一个SwaggerUI：
+`http://localhost:3000/api/dogs` 会为你的 `dogs` 暴露一个 `SwaggerUI` ：
 
 ![img](https://docs.nestjs.com/assets/swagger-dogs.png)
 
-!> 您必须使用 `DocumentBuilder` 构造 **SwaggerOptions** ，对新构造的 `options` 运行 `createDocument()` ，然后立即使用 `setup()` “服务”它，然后才能开始为第二个Swagger规范开发第二个 **SwaggerOptions** 。 此特定顺序是为了防止Swagger配置被不同选项覆盖。
+!> 您必须使用 `DocumentBuilder` 构造 **SwaggerOptions** ，对新构造的 `options` 运行 `createDocument()` ，然后立即使用 `setup()` “服务”它，然后才能开始为第二个 `Swagger` 规范开发第二个 **SwaggerOptions** 。 此特定顺序是为了防止 `Swagger` 配置被不同选项覆盖。
 
 ### 使用枚举（Working with enums）
 
@@ -776,7 +930,7 @@ async filterByRole(@Query('role') role: UserRole = UserRole.User) {
 
 ![img](https://docs.nestjs.com/assets/enum_query_array.gif)
 
-### 使用数组（Working with arrays）
+### 使用数组
 
 当属性实际上是一个数组时，我们必须手动指定一个类型：
 
@@ -797,9 +951,9 @@ readonly names: string[];
 export class CatsController {}
 ```
 
-### 响应（Responses）
+### 响应
 
-要定义自定义HTTP响应，我们使用 `@ApiResponse()` 装饰器。
+要定义自定义 `HTTP` 响应，我们使用 `@ApiResponse()` 装饰器。
 
 ```typescript
 @Post()
@@ -810,7 +964,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 }
 ```
 
-与异常过滤器部分中定义的常见HTTP异常相同，Nest还提供了一组可重用的 **API响应** ，这些响应继承自核心 `@ApiResponse` 装饰器：
+与异常过滤器部分中定义的常见 `HTTP` 异常相同，Nest还提供了一组可重用的 **API响应** ，这些响应继承自核心 `@ApiResponse` 装饰器：
 
 - `@ApiOkResponse()`
 - `@ApiCreatedResponse()`
@@ -832,7 +986,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 - `@ApiServiceUnavailableResponse()`
 - `@ApiGatewayTimeoutResponse()`
 
-除了可用的HTTP异常之外，Nest还提供了以下的简写装饰器：`HttpStatus.OK` ，`HttpStatus.CREATED` 和 `HttpStatus.METHOD_NOT_ALLOWED`
+除了可用的 `HTTP` 异常之外，Nest还提供了以下的简写装饰器：`HttpStatus.OK` ，`HttpStatus.CREATED` 和 `HttpStatus.METHOD_NOT_ALLOWED`
 
 ```typescript
 @Post()
@@ -842,6 +996,39 @@ async create(@Body() createCatDto: CreateCatDto) {
   this.catsService.create(createCatDto);
 }
 ```
+
+要为请求指定返回模型，必须创建一个类并使用 `@ApiModelProperty()` 装饰器注释所有属性。
+
+```typescript
+export class Cat {
+  @ApiModelProperty()
+  name: string;
+
+  @ApiModelProperty()
+  age: number;
+
+  @ApiModelProperty()
+  breed: string;
+}
+```
+
+之后，必须将 `Cat` 模型与响应修饰符的 `type` 属性结合使用。
+
+```typescript
+@ApiUseTags('cats')
+@Controller('cats')
+export class CatsController {
+  @Post()
+  @ApiCreatedResponse({ description: 'The record has been successfully created.', type: Cat })
+  async create(@Body() createCatDto: CreateCatDto): Promise<Cat> {
+    return this.catsService.create(createCatDto);
+  }
+}
+```
+
+打开浏览器，验证生成的 `Cat` 模型:
+
+![img](https://docs.nestjs.com/assets/swagger-response-type.png)
 
 ### 认证（Authentication）
 
@@ -854,11 +1041,11 @@ async create(@Body() createCatDto: CreateCatDto) {
 export class CatsController {}
 ```
 
-这就是OpenAPI文档现在的样子：
+这就是 `OpenAPI` 文档现在的样子：
 
 ![img](https://docs.nestjs.com/assets/swagger-auth.gif)
 
-### 文件上传（File upload）
+### 文件上传
 
 您可以使用 `@ApiImplicitFile` 装饰器和 `@ApiConsumes()` 为特定方法启用文件上载。 这里是使用[文件上传](/6/techniques.md?id=文件上传)技术的完整示例：
 
@@ -869,9 +1056,9 @@ export class CatsController {}
 uploadFile(@UploadedFile() file) {}
 ```
 
-### 装饰器（Decorators）
+### 装饰器
 
-所有可用的OpenAPI装饰器都有一个Api前缀，可以清楚地区分核心装饰器。 下面是具有已定义使用级别的导出装饰器的完整列表（可能应用的位置）。
+所有可用的 `OpenAPI` 装饰器都有一个 `Api` 前缀，可以清楚地区分核心装饰器。 下面是具有已定义使用级别的导出装饰器的完整列表（可能应用的位置）。
 
 |   `@ApiOperation()`               |      `Method`           |
 | :---------------------: | :-------------------------: |
@@ -893,21 +1080,21 @@ uploadFile(@UploadedFile() file) {}
 
 ## Prisma
 
-Prisma 将您的数据库转换为 GraphQL API，并允许将 GraphQL 用作所有数据库的通用查询语言(译者注：替代 orm )。您可以直接使用 GraphQL 查询数据库，而不是编写 SQL 或使用 NoSQL API。在本章中，我们不会详细介绍 Prisma，因此请访问他们的网站，了解可用的[功能](https://www.prisma.io/features/)。
+`Prisma` 将您的数据库转换为 `GraphQL API`，并允许将 `GraphQL` 用作所有数据库的通用查询语言(译者注：替代 orm )。您可以直接使用 `GraphQL` 查询数据库，而不是编写 `SQL` 或使用 `NoSQL API`。在本章中，我们不会详细介绍 `Prisma`，因此请访问他们的网站，了解可用的[功能](https://www.prisma.io/features/)。
 
-!> 注意： 在本文中，您将学习如何集成 Prisma 到 Nest 框架中。我们假设您已经熟悉 GraphQL 概念和 @nestjs/graphql 模块。
+!> 注意： 在本文中，您将学习如何集成 `Prisma` 到 `Nest` 框架中。我们假设您已经熟悉  `GraphQL` 概念和 `@nestjs/graphql` 模块。
 
 ### 依赖
 
 首先，我们需要安装所需的包：
 
 ```bash
-npm install --save prisma-binding
+$ npm install --save prisma-binding
 ```
 
 ### 设置 Prisma
 
-在使用 Prisma 时，您可以使用自己的实例或使用 [Prisma Cloud](https://www.prisma.io/cloud/) 。在本简介中，我们将使用 Prisma 提供的演示服务器。
+在使用 `Prisma` 时，您可以使用自己的实例或使用 [Prisma Cloud](https://www.prisma.io/cloud/) 。在本简介中，我们将使用 `Prisma` 提供的演示服务器。
 
 1. 安装 Prisma CLI `npm install -g prisma`
 2. 创建新服务 `prisma init` , 选择演示服务器并按照说明操作。
@@ -930,17 +1117,17 @@ type User {
 
 !> 注意： 在实际应用程序中，您将创建更复杂的数据模型。有关Prisma中数据建模的更多信息，请单击[此处](https://www.prisma.io/features/data-modeling/)。
 
-输入： `prisma playground` 您可以打开 Prisma GraphQL API 控制台。
+输入： `prisma playground` 您可以打开 `Prisma GraphQL API` 控制台。
 
 ### 创建客户端
 
-有几种方法可以集成 GraphQL API。这里我们将使用 [GraphQL CLI](https://www.npmjs.com/package/graphql-cli)，这是一个用于常见 GraphQL 开发工作流的命令行工具。要安装 GraphQL CLI，请使用以下命令：
+有几种方法可以集成 `GraphQL API`。这里我们将使用 [GraphQL CLI](https://www.npmjs.com/package/graphql-cli)，这是一个用于常见 `GraphQL` 开发工作流的命令行工具。要安装 `GraphQL CLI`，请使用以下命令：
 
 ```bash
-npm install -g graphql-cli
+$ npm install -g graphql-cli
 ```
 
-接下来，在 Nest 应用程序的根目录中创建 `.graphqlconfig` ：
+接下来，在 `Nest` 应用程序的根目录中创建 `.graphqlconfig` ：
 
 ```bash
 touch .graphqlconfig.yml
@@ -962,18 +1149,18 @@ projects:
             binding: src/prisma/prisma.binding.ts
  ```
  
- 要将Prisma GraphQL架构下载到 `prisma / prisma-types.graphql` 并在 `prisma / prisma.binding.graphql` 下创建Prisma客户端，请在终端中运行以下命令：
+ 要将 `Prisma GraphQL` 架构下载到 `prisma/prisma-types.graphql` 并在 `prisma/prisma.binding.graphql` 下创建 `Prisma` 客户端，请在终端中运行以下命令：
  
  ```bash
-graphql get-schema --project database
-graphql codegen --project database
+$ graphql get-schema --project database
+$ graphql codegen --project database
 ```
 
-### 集成（Integration）
+### 集成
 
-几乎完成了。 现在，让我们为Prisma集成创建一个模块。
+现在，让我们为 `Prisma` 集成创建一个模块。
 
-> prisma.service
+> prisma.service.ts
 
 ```typescript
 import { Injectable } from '@nestjs/common';
@@ -1011,7 +1198,7 @@ export class PrismaModule {}
 
 若要使用新的服务，我们要 import `PrismaModule`，并注入 `PrismaService` 到 `UsersResolver`。
 
-> src/users/users.module
+> users.module.ts
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -1027,7 +1214,7 @@ export class UsersModule {}
 
 导入 `PrismaModule` 可以在 `UsersModule` 上下文中使用导出的 `PrismaService` 。
 
-> src/users/users.resolver
+> users.resolver.ts
 
 ```typescript
 import { Query, Resolver, Args, Info } from '@nestjs/graphql';
@@ -1047,11 +1234,11 @@ export class UsersResolver {
 
 ### 例子
 
-一个略微修改的示例在[这里](https://github.com/nestjs/nest/tree/master/sample/22-graphql-prisma)
+[这里](https://github.com/nestjs/nest/tree/master/sample/22-graphql-prisma)有一个稍微修改过的示例。
 
 ## 健康检查（Health checks (Terminus)）
 
-[terminus](https://github.com/godaddy/terminus)提供了对正常关闭做出反应的钩子，并支持您为任何HTTP应用程序创建适当的[Kubernetes](https://kubernetes.io/)准备/活跃度检查。 模块 `@nestjs/terminus` 将**terminus**库与Nest生态系统集成在一起。
+[terminus](https://github.com/godaddy/terminus)提供了对正常关闭做出反应的钩子，并支持您为任何HTTP应用程序创建适当的[Kubernetes](https://kubernetes.io/)准备/活跃度检查。 模块 `@nestjs/terminus` 将**terminus**库与 `Nest` 生态系统集成在一起。
 
 ### 入门
 
@@ -1069,6 +1256,8 @@ $ npm install --save @nestjs/terminus @godaddy/terminus
 - `TypeOrmHealthIndicator`
 - `MongooseHealthIndicator`
 - `MicroserviceHealthIndicator`
+- `MemoryHealthIndicator`
+- `DiskHealthIndicator`
 
 ### DNS 健康检查
 
@@ -1107,7 +1296,7 @@ export class TerminusOptionsService implements TerminusOptionsFactory {
 
 一旦我们设置了 `TerminusOptionsService` ，我们就可以将 `TerminusModule` 导入到根 `ApplicationModule` 中。`TerminusOptionsService` 将提供设置，而 `TerminusModule` 将使用这些设置。
 
->app.module.ts
+> app.module.ts
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -1124,20 +1313,20 @@ import { TerminusOptionsService } from './terminus-options.service';
 export class ApplicationModule { }
 ```
 
-?> 如果正确完成，Nest将公开定义的运行状况检查，这些检查可通过GET请求到达定义的路由。 例如 `curl -X GET'http://localhost:3000/health'`
+?> 如果正确完成，`Nest` 将公开定义的运行状况检查，这些检查可通过 `GET` 请求到达定义的路由。 例如 `curl -X GET'http://localhost:3000/health'`
 
-### 定制健康指标
+### 自定义健康指标
 
 在某些情况下，`@nestjs/terminus` 提供的预定义健康指标不会涵盖您的所有健康检查要求。 在这种情况下，您可以根据需要设置自定义运行状况指示器。
 
-让我们开始创建一个代表我们自定义健康指标的服务。为了基本了解健康指标的结构，我们将创建一个示例 `DogHealthIndicator` 。如果每个 `Dog` 对象都具有 `goodboy` 类型，则此健康指示器应具有“up”状态，否则将抛出错误，然后健康指示器将被视为“down”。
+让我们开始创建一个代表我们自定义健康指标的服务。为了基本了解健康指标的结构，我们将创建一个示例 `DogHealthIndicator` 。如果每个 `Dog` 对象都具有 `goodboy` 类型，则此健康指示器应具有 `'up'` 状态，否则将抛出错误，然后健康指示器将被视为 `'down'` 。
 
 > dog.health.ts
 
 ```typescript
 import { Injectable } from '@nestjs/common';
 import { HealthCheckError } from '@godaddy/terminus';
-import { HealthIndicatorResult } from '@nestjs/terminus';
+import { HealthIndicator, HealthIndicatorResult } from '@nestjs/terminus';
 
 export interface Dog {
   name: string;
@@ -1153,7 +1342,7 @@ export class DogHealthIndicator extends HealthIndicator {
 
   async isHealthy(key: string): Promise<HealthIndicatorResult> {
     const badboys = this.dogs.filter(dog => dog.type === 'badboy');
-    const isHealthy = badboys.length > 0;
+    const isHealthy = badboys.length === 0;
     const result = this.getStatus(key, isHealthy, { badboys: badboys.length });
 
     if (isHealthy) {
@@ -1171,8 +1360,8 @@ export class DogHealthIndicator extends HealthIndicator {
 ```typescript
 import { Module } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
-import { TerminusOptions } from './terminus-options.service';
-import { DogHealthIndicator } from './dog.health.ts';
+import { TerminusOptionsService } from './terminus-options.service';
+import { DogHealthIndicator } from './dog.health';
 
 @Module({
   imports: [
@@ -1187,7 +1376,7 @@ import { DogHealthIndicator } from './dog.health.ts';
 export class ApplicationModule { }
 ```
 
-?> 在现实世界的应用程序中，`DogHealthIndicator` 应该在一个单独的模块中提供，例如 `DogsModule` ，然后由 `ApplicationModule` 导入。 但请记住将`DogHealthIndicator` 添加到 `DogModule` 的 `exports` 数组中，并在 `TerminusModule.forRootAsync()` 参数对象的 `imports` 数组中添加 `DogModule` 。
+?> 在应用程序中，`DogHealthIndicator` 应该在一个单独的模块中提供，例如 `DogsModule` ，然后由 `ApplicationModule` 导入。 但请记住将 `DogHealthIndicator` 添加到 `DogModule` 的 `exports` 数组中，并在 `TerminusModule.forRootAsync()` 参数对象的 `imports` 数组中添加 `DogModule` 。
 
 最后需要做的是在所需的运行状况检查端点中添加现在可用的运行状况指示器。 为此，我们返回到 `TerminusOptionsService` 并将其实现到 `/health` 端点。
 
@@ -1201,6 +1390,7 @@ import {
   TerminusModuleOptions
 } from '@nestjs/terminus';
 import { Injectable } from '@nestjs/common';
+import { DogHealthIndicator } from './dog.health';
 
 @Injectable()
 export class TerminusOptionsService implements TerminusOptionsFactory {
@@ -1238,38 +1428,389 @@ export class TerminusOptionsService implements TerminusOptionsFactory {
 
 您可以在 `@nestjs/terminus` [repository](https://github.com/nestjs/terminus/tree/master/sample)中查看示例。
 
-## 文档（Documentation）
+### 自定义日志
 
-**Compodoc**是Angular应用程序的文档工具。 Nest和Angular看起来非常相似，因此，**Compodoc**也支持Nest应用程序。
+在健康检查请求期间，`Terminus` 模块自动记录每个错误。默认情况下，它将使用全局定义的 `Nest` 日志记录器。您可以在 `logger` 一章中了解更多关于全局记录器的信息。在某些情况下，需要显式地处理终端的日志。在本例中，是 `TerminusModule.forRoot[Async]` 函数为自定义日志程序提供了一个选项。
 
-### 建立（Setup）
+```typescript
+TerminusModule.forRootAsync({
+  logger: (message: string, error: Error) => console.error(message, error),
+  endpoints: [
+    ...
+  ]
+})
+```
 
-在现有的Nest项目中设置Compodoc非常简单。 安装[npm](https://www.npmjs.com/)后，只需在OS终端中使用以下命令添加dev-dependency：
+还可以通过将 `logger` 选项设置为 `null` 来禁用 `logger`。
+
+```typescript
+TerminusModule.forRootAsync({
+  logger: null,
+  endpoints: [
+    ...
+  ]
+})
+```
+
+## 文档
+
+**Compodoc**是 `Angular` 应用程序的文档工具。 `Nest` 和 `Angular` 看起来非常相似，因此，**Compodoc**也支持 `Nest` 应用程序。
+
+### 建立
+
+在现有的 `Nest` 项目中设置 `Compodoc` 非常简单。 安装[npm](https://www.npmjs.com/)后，只需在 `OS` 终端中使用以下命令添加 `dev-dependency` ：
 
 ```bash
 $ npm i -D @compodoc/compodoc
 ```
 
-### 生成（Generation）
-
-跟随[官方文档](https://compodoc.app/guides/usage.html)，您可以使用以下命令生成文档（需要npm 6）：
+### 生成
+在[官方文档](https://compodoc.app/guides/usage.html)之后，您可以使用以下命令( `npm 6` )生成文档:
 
 ```bash
 $ npx compodoc -p tsconfig.json -s
 ```
 
-打开浏览器并导航到 `http://localhost:8080` 。 您应该看到一个初始的Nest CLI项目：
+打开浏览器并导航到 `http://localhost:8080` 。 您应该看到一个初始的 `Nest CLI` 项目：
 
 ![img](https://docs.nestjs.com/assets/documentation-compodoc-1.jpg)
 
+![img](https://docs.nestjs.com/assets/documentation-compodoc-2.jpg)
+
 ### 贡献（Contribute）
 
-您可以[在此](https://github.com/compodoc/compodoc)参与Compodoc项目并为其做出贡献。
+您可以[在此](https://github.com/compodoc/compodoc)参与 `Compodoc` 项目并为其做出贡献。
+
+
+## CRUD
+
+**本章仅适用于 `TypeScript`**
+
+`CRUD` 包( `@nestjsx/CRUD` )帮助您轻松创建 `CRUD` 控制器和服务，并为您的 `RESTful API` 提供了一些开箱即用的特性:
+
+- 与数据库无关的可扩展 `CRUD` 控制器
+- 查询字符串解析与过滤，分页，排序，关系，嵌套关系，缓存等。
+- 与框架无关的包与查询生成器用于前端使用
+- 查询、路径参数和 `DTO` 验证
+- 轻松地重写控制器方法
+- 微小但功能强大的配置(包括全局配置)
+- 额外的辅助修饰符
+- `Swagger` 文档
+
+?> 到目前为止，`@nestjsx/crud` 只支持 `TypeORM`，但是在不久的将来会包括 `Sequelize` 和 `Mongoose` 等其他 `orm` 。因此，在本文中，您将学习如何使用 `TypeORM` 创建 `CRUD` 控制器和服务。我们假设您已经成功安装并设置了 `@nestjs/typeorm` 包。想了解更多，请看[这里](/6/techniques/database)。
+
+### 开始
+
+要开始创建 `CRUD` 功能，我们必须安装所有必要的依赖:
+
+```bash
+npm i --save @nestjsx/crud @nestjsx/crud-typeorm class-transformer class-validator
+```
+
+假设你已经有一些实体在你的项目:
+
+> hero.entity.ts
+
+```typescript
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+@Entity()
+export class Hero {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  name: string;
+
+  @Column({ type: 'number' })
+  power: number;
+}
+```
+
+我们需要做的第一步是创建一个服务:
+
+> heroes.service.ts
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
+import { Hero } from './hero.entity';
+
+@Injectable()
+export class HeroesService extends TypeOrmCrudService<Hero> {
+  constructor(@InjectRepository(Hero) repo) {
+    super(repo);
+  }
+}
+```
+
+我们完成了服务，所以让我们创建一个控制器:
+
+> heroes.controller.ts
+
+```typescript
+import { Controller } from '@nestjs/common';
+import { Crud } from '@nestjsx/crud';
+import { Hero } from './hero.entity';
+import { HeroesService } from './heroes.service';
+
+@Crud({
+  model: {
+    type: Hero,
+  },
+})
+@Controller('heroes')
+export class HeroesController {
+  constructor(public service: HeroesService) {}
+}
+```
+
+最后，我们需要连接我们模块中的所有内容:
+
+> heroes.module.ts
+
+```typescript
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+import { Hero } from './hero.entity';
+import { HeroesService } from './heroes.service';
+import { HeroesController } from './heroes.controller';
+
+@Module({
+  imports: [TypeOrmModule.forFeature([Hero])],
+  providers: [HeroesService],
+  controllers: [HeroesController],
+})
+export class HeroesModule {}
+```
+
+?> 不要忘记将 `HeroesModule` 导入根应用程序模块。
+
+之后，您的 `Nest` 应用程序将拥有这些新创建的端点:
+
+- `GET /heroes` - 获得许多英雄。
+- `GET /heroes/id` - 一名英雄。
+- `POST /heroes/bulk` - 创建许多英雄。
+- `POST /heroes` - 创建一位英雄。
+- `PATCH /heroes/:id` - 更新一位英雄。
+- `PUT /heroes/id` - 替换一位英雄。
+- `DELETE /heroes/:id` - 删除一位英雄。
+
+### 过滤和分页
+
+`CRUD` 提供了丰富的过滤和分页工具。示例请求:
+
+?> `GET /heroes?select=name&filter=power||gt||90&sort=name,ASC&page=1&limit=3`
+
+在本例中，我们只请求 `heroes` 列表和选择的 `name` 属性，其中英雄的能力大于 `90` ，并在第 `1` 页中将结果限制为 `3` ，并按 `ASC` 顺序按名称排序。
+
+响应对象将类似于这个:
+
+```json
+{
+  "data": [
+    {
+      "id": 2,
+      "name": "Batman"
+    },
+    {
+      "id": 4,
+      "name": "Flash"
+    },
+    {
+      "id": 3,
+      "name": "Superman"
+    }
+  ],
+  "count": 3,
+  "total": 14,
+  "page": 1,
+  "pageCount": 5
+}
+```
+
+无论是否请求，主列都保存在资源响应对象中。在我们的例子中，它是一个 `id` 列。
+
+查询参数和筛选操作符的完整列表可以在项目的 [Wiki](https://github.com/nestjsx/crud/wiki/Requests) 中找到。
+
+### 关系 (Relations)
+
+另一个值得一提的特性是 "关系"。在您的 `CRUD` 控制器中，您可以指定允许在您的 `API` 调用中获取的实体关系列表:
+
+```typescript
+@Crud({
+  model: {
+    type: Hero,
+  },
+  join: {
+    profile: {
+      exclude: ['secret'],
+    },
+    faction: {
+      eager: true,
+      only: ['name'],
+    },
+  },
+})
+@Controller('heroes')
+export class HeroesController {
+  constructor(public service: HeroesService) {}
+}
+```
+
+在 `@Crud()` 装饰器选项中指定允许的关系后，可以发出以下请求:
+
+?> `GET /heroes/25?join=profile||address,bio`
+
+响应将包含一个 `hero` 对象，该对象具有一个已连接的配置文件，其中将选择 `address` 和 `bio` 列。
+
+此外，响应将包含一个名称列被选中的派系对象，因为它被设置为 `eager: true` ，因此在每个响应中持久存在。
+
+您可以在项目的[WiKi](https://github.com/nestjsx/crud/wiki/Controllers#join)中找到更多关于关系的信息。
+
+### 路径参数验证
+
+默认情况下，`CRUD` 将创建一个名称为 `id` 的段并将其验证为数字。
+
+但是有可能改变这种行为。 假设您的实体有一个主列 `_id` -一个 `UUID` 字符串-您需要将其用作端点的标记。 使用这些选项，很容易做到：
+
+```typescript
+@Crud({
+  model: {
+    type: Hero,
+  },
+  params: {
+    _id: {
+      field: '_id',
+      type: 'uuid',
+      primary: true,
+    },
+  },
+})
+@Controller('heroes')
+export class HeroesController {
+  constructor(public service: HeroesService) {}
+}
+```
+
+有关更多参数选项，请参阅项目的[Wiki](https://github.com/nestjsx/crud/wiki/Controllers#params)。
+
+
+### 请求主体验证
+
+通过在每个 `POST`、`PUT` 和 `PATCH` 请求上应用 `Nest ValidationPipe` ，可以开箱即用地执行请求体验证。我们使用 `model.type` 将 `@Crud()` 装饰器选项作为描述验证规则的 `DTO` 输入。
+
+为了做到这一点，我们使用[验证组](https://github.com/typestack/class-validator#validation-groups):
+
+> hero.entity.ts
+
+```typescript
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { IsOptional, IsDefined, IsString, IsNumber } from 'class-validator';
+import { CrudValidationGroups } from '@nestjsx/crud';
+
+const { CREATE, UPDATE } = CrudValidationGroups;
+
+@Entity()
+export class Hero {
+  @IsOptional({ always: true })
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @IsOptional({ groups: [UPDATE] })
+  @IsDefined({ groups: [CREATE] })
+  @IsString({ always: true })
+  @Column()
+  name: string;
+
+  @IsOptional({ groups: [UPDATE] })
+  @IsDefined({ groups: [CREATE] })
+  @IsNumber({}, { always: true })
+  @Column({ type: 'number' })
+  power: number;
+}
+```
+
+完全支持用于创建和更新操作的单独 `DTO` 类是下一个 `CRUD` 版本的主要优先事项之一。
+
+### 路由选项
+
+您可以禁用或仅启用通过应用 `@Crud()` 装饰器生成的某些特定路由： 
+
+```typescript
+@Crud({
+  model: {
+    type: Hero,
+  },
+  routes: {
+    only: ['getManyBase'],
+    getManyBase: {
+      decorators: [
+        UseGuards(HeroAuthGuard)
+      ]
+    }
+  }
+})
+@Controller('heroes')
+export class HeroesController {
+  constructor(public service: HeroesService) {}
+}
+```
+
+此外，您还可以通过将任何方法装饰器传递给特定的路由装饰器数组来应用它们。当您希望添加一些装饰器而不覆盖基本方法时，这很方便。
+
+### 文档
+
+本章中的示例仅涉及 [CRUD](https://github.com/nestjsx/crud) 的一些特性。您可以在项目的 [Wiki](https://github.com/nestjsx/crud/wiki/Home) 页面上找到更多使用问题的答案。
+
+## 静态服务 
+
+为了像单页应用程序（ `SPA` ）一样提供静态内容，我们可以使用 `@nestjs/serve-static` 包中的`ServeStaticModule`。
+
+### 安装
+
+首先我们需要安装所需的软件包:
+
+```bash
+$ npm install --save @nestjs/serve-static
+```
+
+### bootstrap
+
+安装过程完成后，我们可以将 `ServeStaticModule` 导入根 `AppModule`，并通过将配置对象传递给 `forRoot()` 方法来配置它。
+
+```typescript
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+
+@Module({
+  imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'client'),
+    }),
+  ],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
+```
+
+有了这些之后，构建静态网站并将其内容放置在 `rootPath` 属性指定的位置。
+
+### 总结
+
+这里有一个工作[示例](https://github.com/nestjs/nest/tree/master/sample/24-serve-static)。
+
 
  ### 译者署名
 
 | 用户名 | 头像 | 职能 | 签名 |
 |---|---|---|---|
 | [@zuohuadong](https://github.com/zuohuadong)  | <img class="avatar-66 rm-style" src="https://wx3.sinaimg.cn/large/006fVPCvly1fmpnlt8sefj302d02s742.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
+[@Armor](https://github.com/Armor-cn)  | <img class="avatar-66 rm-style" height="70" src="https://avatars3.githubusercontent.com/u/31821714?s=460&v=4">  |  翻译  | 专注于 Java 和 Nest，[@Armor](https://armor.ac.cn/) 
 | [@Drixn](https://drixn.com/)  | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">  |  翻译  | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/) |
 | [@franken133](https://github.com/franken133)  | <img class="avatar rounded-2" src="https://avatars0.githubusercontent.com/u/17498284?s=400&amp;u=aa9742236b57cbf62add804dc3315caeede888e1&amp;v=4" height="70">  |  翻译  | 专注于 java 和 nest，[@franken133](https://github.com/franken133)|

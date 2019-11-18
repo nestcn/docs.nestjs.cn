@@ -166,18 +166,18 @@ export class PhotoModule {}
 
 !> 在本文中，您将学习如何使用自定义提供者机制从零开始创建基于 **Mongoose** 包的 `DatabaseModule`。由于该解决方案包含许多开销，因此您可以使用开箱即用的 `@nestjs/mongoose` 软件包。要了解更多信息，请参阅 [此处](https://docs.nestjs.com/techniques/mongodb)。
 
-[Mongoose](http://mongoosejs.com/)是最受欢迎的[MongoDB](https://www.mongodb.org/)对象建模工具。
+[Mongoose](http://mongoosejs.com/) 是最受欢迎的[MongoDB](https://www.mongodb.org/) 对象建模工具。
 
 ### 入门
 
 在开始使用这个库前，我们必须安装所有必需的依赖关系
 
-```
+```bash
 $ npm install --save mongoose
 $ npm install --save-dev @types/mongoose
 ```
 
-我们需要做的第一步是使用 `connect()` 函数建立与数据库的连接。`connect()` 函数返回一个 `Promise`，因此我们必须创建一个[异步提供者](/6/fundamentals.md?id=异步提供者 (Asynchronous providers))。
+我们需要做的第一步是使用 `connect()` 函数建立与数据库的连接。`connect()` 函数返回一个 `Promise`，因此我们必须创建一个 [异步提供者](/6/fundamentals.md?id=异步提供者 (Asynchronous providers))。
 
 > database.providers.ts
 
@@ -289,7 +289,7 @@ export interface Cat extends Document {
 }
 ```
 
-数据库连接是 **异步的**，但 Nest 使最终用户完全看不到这个过程。`CatModel` 正在等待数据库连接时，并且`CatsService` 会被延迟，直到存储库可以使用。整个应用程序可以在每个类实例化时启动。
+数据库连接是 **异步的**，但 `Nest` 使最终用户完全看不到这个过程。`CatModel` 正在等待数据库连接时，并且`CatsService` 会被延迟，直到存储库可以使用。整个应用程序可以在每个类实例化时启动。
 
 这是一个最终的 `CatsModule` ：
 
@@ -439,7 +439,7 @@ export class CatsService {
   }
 }
 ```
-`
+
 数据库连接是异步的，但是 `Nest` 使此过程对于最终用户完全不可见。 `CATS_REPOSITORY` 提供程序正在等待数据库连接，并且 `CatsService` 将延迟，直到准备好使用存储库为止。 实例化每个类时，启动整个应用程序。
 
 这是最终的 `CatsModule`：
@@ -650,9 +650,9 @@ export class HeroesGameSagas {
 `CqrsModule` 对于查询处理可能也很方便。 `QueryBus` 与 `CommandsBus` 的工作方式相同。 此外，查询处理程序应实现 `IQueryHandler` 接口并使用 `@QueryHandler()` 装饰器进行标记。
 
 
-### 建立（Setup）
+### 建立
 
-我们要处理的最后一件事是建立整个机制。。
+我们要处理的最后一件事是建立整个机制。
 
 > heroes-game.module.ts
 
@@ -821,7 +821,7 @@ export const ApiModelProperty: (metadata?: {
 
 因此我们可以简单地设置默认值，确定属性是否是必需的或者显式设置类型。
 
-### 多种规格（Multiple specifications）
+### 多种规格
 
 Swagger模块还提供了一种支持多种规格的方法。 换句话说，您可以在不同的端点上使用不同的 `SwaggerUI` 提供不同的文档。
 
@@ -892,7 +892,7 @@ $ npm run start
 
 !> 您必须使用 `DocumentBuilder` 构造 **SwaggerOptions** ，对新构造的 `options` 运行 `createDocument()` ，然后立即使用 `setup()` “服务”它，然后才能开始为第二个 `Swagger` 规范开发第二个 **SwaggerOptions** 。 此特定顺序是为了防止 `Swagger` 配置被不同选项覆盖。
 
-### 使用枚举（Working with enums）
+### 使用枚举
 
 为了使 `SwaggerModule` 能够识别 `Enum` ，我们必须使用数组值在 `@ApiModelProperty` 上手动设置 `enum` 属性。
 
@@ -1030,7 +1030,7 @@ export class CatsController {
 
 ![img](https://docs.nestjs.com/assets/swagger-response-type.png)
 
-### 认证（Authentication）
+### 认证
 
 您可以使用 `DocumentBuilder` 类的 `addBearerAuth()` 方法启用承载授权。 然后要限制所选路径或整个控制器，请使用 `@ApiBearerAuth()` 装饰器。
 
@@ -1236,9 +1236,9 @@ export class UsersResolver {
 
 [这里](https://github.com/nestjs/nest/tree/master/sample/22-graphql-prisma)有一个稍微修改过的示例。
 
-## 健康检查（Health checks (Terminus)）
+## 健康检查 
 
-[terminus](https://github.com/godaddy/terminus)提供了对正常关闭做出反应的钩子，并支持您为任何HTTP应用程序创建适当的[Kubernetes](https://kubernetes.io/)准备/活跃度检查。 模块 `@nestjs/terminus` 将**terminus**库与 `Nest` 生态系统集成在一起。
+[terminus](https://github.com/godaddy/terminus) 提供了对正常关闭做出反应的钩子，并支持您为任何HTTP应用程序创建适当的 [Kubernetes](https://kubernetes.io/) 准备/活跃度检查。 模块 `@nestjs/terminus` 将**terminus**库与 `Nest` 生态系统集成在一起。
 
 ### 入门
 
@@ -1477,7 +1477,7 @@ $ npx compodoc -p tsconfig.json -s
 
 ![img](https://docs.nestjs.com/assets/documentation-compodoc-2.jpg)
 
-### 贡献（Contribute）
+### 贡献
 
 您可以[在此](https://github.com/compodoc/compodoc)参与 `Compodoc` 项目并为其做出贡献。
 
@@ -1634,7 +1634,7 @@ export class HeroesModule {}
 
 查询参数和筛选操作符的完整列表可以在项目的 [Wiki](https://github.com/nestjsx/crud/wiki/Requests) 中找到。
 
-### 关系 (Relations)
+### Relations
 
 另一个值得一提的特性是 "关系"。在您的 `CRUD` 控制器中，您可以指定允许在您的 `API` 调用中获取的实体关系列表:
 

@@ -255,7 +255,7 @@ $ curl -X POST http://localhost:3000/auth/login -d '{"username": "john", "passwo
 $ # result -> {"userId":1,"username":"john"}
 ```
 
-### JWT功能
+### JWT 功能
 
 我们已经准备好进入JWT部分的认证系统。让我们回顾并完善我们的需求:
 
@@ -391,7 +391,7 @@ $ # result -> {"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."}
 $ # Note: above JWT truncated
 ```
 
-### Implementing Passport JWT
+### 实施 Passport JWT
 
 我们现在可以处理我们的最终需求:通过要求在请求时提供有效的 `JWT` 来保护端点。护照对我们也有帮助。它提供了用于用 `JSON Web` 标记保护 `RESTful` 端点的 `passport-jwt` 策略。在 `auth` 文件夹中 `jwt.strategy.ts`，并添加以下代码:
 
@@ -549,7 +549,7 @@ import { JwtStrategy } from './jwt.strategy';
 export class AuthModule {}
 ```
 
-### 自定义护照
+### 自定义 Passport
  
 根据所使用的策略，护照会采用一系列影响库行为的属性。使用  `register()` 方法将选项对象直接传递给护照实例。
 
@@ -1129,7 +1129,7 @@ export class CatsService {
 }
 ```
 
-### 测试'
+### 测试
 
 在单元测试我们的应用程序时，我们通常希望避免任何数据库连接，使我们的测试套件独立并尽可能快地执行它们。但是我们的类可能依赖于从连接实例中提取的模型。
 
@@ -1478,7 +1478,7 @@ app.useGlobalPipes(
 );
 ```
 
-### Websockets和微服务
+### Websockets和 微服务
 
 尽管本章展示了使用 `HTTP` 风格的应用程序的例子(例如，`Express`或 `Fastify` )，  `ValidationPipe` 对于 `WebSockets` 和微服务是一样的，不管使用什么传输方法。
 
@@ -1553,7 +1553,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 export class ApplicationModule {}
 ```
 
-### WebSockets和微服务
+### WebSockets 和 微服务
 
 显然，您可以毫不费力地使用 `CacheInterceptor WebSocket` 订阅者模式以及 `Microservice` 的模式（无论使用何种服务间的传输方法）。
 
@@ -1774,7 +1774,7 @@ findOne(): UserEntity {
 
 通过 `@SerializeOptions()` 传递的选项作为底层 `classToPlain()` 函数的第二个参数传递。在本例中，我们自动排除了所有以_前缀开头的属性。
 
-### Websockets 和微服务
+### Websockets 和 微服务
 
 虽然本章展示了使用 `HTTP` 风格的应用程序的例子(例如，`Express` 或 `Fastify` )，但是 `ClassSerializerInterceptor`对于 `WebSockets` 和微服务的工作方式是一样的，不管使用的是哪种传输方法。
 
@@ -2525,7 +2525,7 @@ index(@Res() res) {
   res.status(302).redirect('/login');
 }
 ```
-### Fastify选项
+### Fastify 选项
 
 您可以通过构造函数将选项传递给 `Fastify`的构造 `FastifyAdapter` 函数。例如：
 

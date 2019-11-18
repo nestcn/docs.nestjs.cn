@@ -350,8 +350,6 @@ findOne(@Param('id', UserByIdPipe) userEntity: UserEntity) {
 
 内置的 `ValidationPipe` 提供了比本章描述的更多的选项，为了简单和减少学习曲线，这些选项一直保持基本。你可以在[这里](https://docs.nestjs.com/techniques/validation)查看很多例子。
 
-One such option is transform. Recall the earlier discussion about deserialized body objects being vanilla JavaScript objects (i.e., not having our DTO type). So far, we've used the pipe to validate our payload. You may recall that in the process, we used class-transform to temporarily convert our plain object into a typed object so that we could do the validation. The built-in ValidationPipe can also, optionally, return this converted object. We enable this behavior by passing in a configuration object to the pipe. For this option, pass a config object with the field transform with a value true as shown below:
-
 另一个选项是**转换**，回想一下前面提到过的反序列化 body 数据没有验证类型（DTO 定义）。到目前为止我们已经使用管道来验证数据，你可能还记得在这个过程中，我们用`class-transform`把普通对象转换为 DTO 可验证对象来进行验证。内置的 `ValidationPipe` 也可以返回转换后的对象，该对象 **transform** 的值为 **true**，如下所示：
 
 > cats.controller.ts
@@ -399,6 +397,7 @@ export interface ValidationPipeOptions extends ValidatorOptions {
 | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------- |
 | [@zuohuadong](https://github.com/zuohuadong) | <img class="avatar-66 rm-style" src="https://wx3.sinaimg.cn/large/006fVPCvly1fmpnlt8sefj302d02s742.jpg">                                                        | 翻译 | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github |
 | [@Drixn](https://drixn.com/)                 | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">                                                                                | 翻译 | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/)                             |
+[@Armor](https://github.com/Armor-cn)  | <img class="avatar-66 rm-style" height="70" src="https://avatars3.githubusercontent.com/u/31821714?s=460&v=4">  |  翻译  | 专注于 Java 和 Nest，[@Armor](https://armor.ac.cn/) |
 | [@tangkai](https://github.com/tangkai123456) | <img class="avatar-66 rm-style" height="70" src="https://avatars1.githubusercontent.com/u/22436910">                                                            | 翻译 | 专注于 React，[@tangkai](https://github.com/tangkai123456)                    |
 | [@franken133](https://github.com/franken133) | <img class="avatar rounded-2" src="https://avatars0.githubusercontent.com/u/17498284?s=400&amp;u=aa9742236b57cbf62add804dc3315caeede888e1&amp;v=4" height="70"> | 翻译 | 专注于 java 和 nest，[@franken133](https://github.com/franken133)             |
 | [@Jimmy](https://github.com/Jimmysh)         | <img class="avatar rounded-2" src="https://avatars3.githubusercontent.com/u/230652?s=460&v=4" height="70">                                                      | 翻译 | 专注于 angular, nest，Ionic，[@Jimmy](https://github.com/Jimmysh)             |

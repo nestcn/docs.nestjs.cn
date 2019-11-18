@@ -14,7 +14,7 @@
 
 首先，我们需要安装所需的软件包：
 
-```
+```bash
 $ npm i --save @nestjs/microservices
 ```
 
@@ -608,7 +608,7 @@ call(): Observable<any> {
 
 [这里](https://github.com/nestjs/nest/tree/master/sample/04-grpc) 提供了一个完整的示例。
 
-### gRPC流 (gRPC Streaming)
+### gRPC流
 
 `GRPC` 本身支持长期的实时连接（称为流）。 对于诸如聊天，观察或块数据传输之类的服务案例，流可以是非常有用的工具。 您可以在官方文档（[此处](https://grpc.io/docs/guides/concepts/)）中找到更多详细信息。
 
@@ -617,7 +617,7 @@ call(): Observable<any> {
 
 - `Pure GRPC` 调用流处理程序:将其传递给某个执行程序非常有用，后者将处理节点标准双工流处理程序的其余分派。
 
-### 主题策略 (Subject strategy)
+### 主题策略
 
 `@GrpcStreamMethod()` 装饰器将提供功能参数作为 `RxJS Observable`。
 
@@ -641,7 +641,7 @@ handleStream(messages: Observable<any>): Observable<any> {
 
 为了支持与 `@GrpcStreamMethod()` 装饰器的全双工交互，需要从`Controller` 方法中返回 `RxJS Observable`。
 
-### Pure GRPC call stream handler
+### 纯GRPC调用流处理程序
 
 `@GrpcStreamCall()`装饰器将提供函数参数为 `grpc.ServerDuplexStream`，它支持 `.on('data', callback)`、`.write(message)`或 `.cancel()`之类的标准方法，有关可用方法的完整文档可在此处找到。
 
@@ -665,7 +665,7 @@ handleStream(stream: any) {
 此装饰器不需要提供任何特定的返回参数。 可以像对待任何其他标准流类型一样处理流。
 
 
-## 异常过滤器 (Exception filters)
+## 异常过滤器
 
 `HTTP`异常过滤器层和相应的微服务层之间的唯一区别在于，不要使用 `HttpException`，而应该使用 `RpcException`。
 
@@ -736,7 +736,7 @@ export class AllExceptionsFilter extends BaseRpcExceptionFilter {
 显然，您应该使用您量身定制的业务逻辑（例如添加各种条件）来增强上述实现。
 
 
-## 管道 (Pipes)
+## 管道
 
 微服务管道和普通管道没有区别。唯一需要注意的是，不要抛出 `HttpException` ，而应该使用 `RpcException`。
 
@@ -752,7 +752,7 @@ accumulate(data: number[]): number {
 }
 ```
 
-## 守卫(Guards)
+## 守卫
 
 微服守卫和普通守卫没有区别。唯一需要注意的是，不要抛出 `HttpException` ，而应该使用 `RpcException`。
 
@@ -768,7 +768,7 @@ accumulate(data: number[]): number {
 }
 ```
 
-## 拦截器 (Interceptors)
+## 拦截器
 
 常规拦截器和微服务拦截器之间没有区别。下面是一个使用手动实例化 **方法作用域** 拦截器(也可以使用类作用域)的示例:
 

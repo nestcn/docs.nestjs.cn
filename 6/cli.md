@@ -49,7 +49,7 @@ $ npm run start:dev
 您可以使用任何一种模式来管理多个项目。这里是一个快速的差异总结:
 
 
-|功能 | 标准模式 | `Monorepo` 模式
+|功能 | 标准模式 | `Monorepo` 模式|
 |---|---|---|---|
 |多个项目| 独立文件系统结构 | 单文件系统结构 |
 | `node_modules` 和 `package.json` | 单独的实例 | 跨 `monorepo`共享 |
@@ -89,7 +89,7 @@ $ nest n my-nest-project -d
 
 有关每个命令的详细描述，请参见用法。
 
-|命令 | 别名 | 描述
+|命令 | 别名 | 描述|
 |---|---|---|---|
 | `new` | `n` | 搭建一个新的标准模式应用程序，包含所有需要运行的样板文件。|
 | `generate` | `g` | 根据原理图生成或修改文件。 |
@@ -134,6 +134,7 @@ nest new my-project
 ```
 
 我们已经构建了一个标准模式结构，其文件夹结构如下:
+
 ```bash
 src
 |_ app.controller.ts
@@ -519,9 +520,9 @@ common version : 6.0.0
 core version : 6.0.0
 ```
 
-## 脚本
+## scripts
 
-### Nest CLI和 脚本
+### Nest CLI和 scripts
 
 本节提供有关 `nest`命令如何与编译器和脚本交互以帮助 `DevOps` 人员管理开发环境的其他背景。
 

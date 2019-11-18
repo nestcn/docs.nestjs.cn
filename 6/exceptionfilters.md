@@ -14,7 +14,8 @@
 }
 ```
 
-## 基础异常类（Base exceptions）
+## 基础异常类
+
 `Nest`提供了一个内置的 `HttpException` 类，它从 `@nestjs/common` 包中导入。对于典型的基于`HTTP` `REST/GraphQL` `API`的应用程序，最佳实践是在发生某些错误情况时发送标准HTTP响应对象。
 
 在 `CatsController`，我们有一个 `findAll()` 方法（`GET` 路由）。假设此路由处理程序由于某种原因引发异常。 为了说明这一点，我们将对其进行如下硬编码：
@@ -80,7 +81,7 @@ async findAll() {
 }
 ```
 
-## 自定义异常（Custom exceptions）
+## 自定义异常
 
 在许多情况下，您无需编写自定义异常，而可以使用内置的 `Nest HTTP`异常，如下一节所述。 如果确实需要创建自定义的异常，则最好创建自己的**异常层次结构**，其中自定义异常从基 `HttpException` 类继承。 使用这种方法，`Nest`可以识别您的异常，并自动处理错误响应。 让我们实现这样一个自定义异常：
 
@@ -105,7 +106,7 @@ async findAll() {
 }
 ```
 
-## 内置HTTP异常（Built-in HTTP exceptions）
+## 内置HTTP异常
 
 为了减少样板代码，Nest 提供了一系列继承自核心异常 `HttpException` 的可用异常。所有这些都可以在 `@nestjs/common`包中找到：
 
@@ -126,7 +127,7 @@ async findAll() {
 - `ServiceUnavailableException`
 - `GatewayTimeoutException`
 
-## 异常过滤器（Exception Filters）
+## 异常过滤器
 
 虽然基本（内置）异常过滤器可以为您自动处理许多情况，但有时您可能希望对异常层拥有**完全控制权**，例如，您可能要添加日志记录或基于一些动态因素使用其他 `JSON`模式。 **异常过滤器**正是为此目的而设计的。 它们使您可以控制精确的控制流以及将响应的内容发送回客户端。
 
@@ -161,7 +162,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
  `@Catch()` 装饰器绑定所需的元数据到异常过滤器上。它告诉 `Nest`这个特定的过滤器正在寻找 `HttpException` 而不是其他的。在实践中，`@Catch()` 可以传递多个参数，所以你可以通过逗号分隔来为多个类型的异常设置过滤器。
 
- ## Arguments host
+ ## 参数主机
 
  让我们看看 `catch()`方法的参数。`exception`参数是当前正在处理的异常对象。`host` 参数是一个 `ArgumentsHost` 对象。ArgumentsHost 是传递给原始处理程序的参数的一个包装 ，我们将在其他章节中进一步讨论它。在这个上下文中，它的主要目的是为我们提供一个 `Request` 和 `Response` 对象的引用，这些对象被传递给原始请求处理程序(在产生异常的控制器中)。在本文中，我们使用了 `ArgumentsHost`上的一些帮助方法来获得所需的`Request` 和 `Response` 对象。
 
@@ -252,7 +253,7 @@ export class AppModule {}
 
 您可以根据需要添加任意数量的过滤器;只需将每个组件添加到 `providers`（提供者）数组。
 
-## 捕获一切
+## 捕获异常
 
 为了捕获每一个未处理的异常(不管异常类型如何)，将 `@Catch()` 装饰器的参数列表设为空，例如 `@Catch()`。
 

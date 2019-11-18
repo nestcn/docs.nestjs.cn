@@ -43,7 +43,7 @@ export class CatsController {
 
 !> 注意！ 禁止同时使用这两种方法。 `Nest` 检测处理程序是否正在使用 `@Res()`或 `@Next()`，如果两个方法都用了的话, 那么在这里的标准方式就是自动禁用此路由, 你将不会得到你想要的结果。
 
-## Request 对象
+## Request
 
 许多端点需要访问客户端的**请求**细节。实际上，`Nest` 正使用类库特有(默认是`express`)的[请求对象](http://expressjs.com/en/api.html#req)。因此，我们可以强制 `Nest` 使用 `@Req()` 装饰器将请求对象注入处理程序。
 
@@ -150,7 +150,7 @@ create() {
 
 ?> `Header` 需要从 `@nestjs/common` 包导入。
 
-## Redirection (重定向)
+## 重定向
 
 要将响应重定向到特定的 `URL`，可以使用 `@Redirect()`装饰器或特定于库的响应对象(并直接调用 `res.redirect()`)。
 
@@ -204,7 +204,7 @@ findOne(@Param('id') id): string {
 }
 ```
 
-## 范围 (Scopes)
+## 范围
 
 对于来自不同编程语言背景的人来说，了解在 `Nest` 中几乎所有内容都可以在传入的请求之间共享，这让人意外。比如我们有一个数据库连接池，具有全局状态的单例服务等。请记住，`Node.js` 不遵循请求/响应多线程无状态模型，每个请求都由主线程处理。因此，使用单例实例对我们的应用程序来说是完全安全的。
 
@@ -214,7 +214,7 @@ findOne(@Param('id') id): string {
 
 我们喜欢现代 `JavaScript`，而且我们知道数据读取大多是**异步**的。 这就是为什么 `Nest` 支持 `async` 并且与他们一起工作得非常好。
 
-?> 了解更多关于 `Async / await` 请点击[这里](https://kamilmysliwiec.com/typescript-2-1-introduction-async-await){:target="_blank"}！
+?> 了解更多关于 `Async / await` 请点击[这里](https://kamilmysliwiec.com/typescript-2-1-introduction-async-await)
 
 每个异步函数都必须返回 `Promise`。这意味着您可以返回延迟值, 而 `Nest` 将自行解析它。让我们看看下面的例子:
 

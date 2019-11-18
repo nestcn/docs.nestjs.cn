@@ -37,7 +37,7 @@ export class AuthGuard implements CanActivate {
 - 如果返回 `true`, 将处理用户调用。
 - 如果返回 `false`, 则 `Nest` 将忽略当前处理的请求。
 
-## 执行上下文 (Execution context)
+## 执行上下文
 
 `canActivate()` 函数接收单个参数 `ExecutionContext` 实例。`ExecutionContext` 继承自 `ArgumentsHost` 。`ArgumentsHost` 是传递给原始处理程序的参数的包装器，在上面的示例中，我们只是使用了之前在 `ArgumentsHost`上定义的帮助器方法来获得对请求对象的引用。有关此主题的更多信息。你可以在[这里](exceptionfilters.md)了解到更多(在异常过滤器章节)。
 
@@ -54,7 +54,7 @@ export interface ExecutionContext extends ArgumentsHost {
 `etHandler()`方法返回对将要调用的处理程序的引用。`getClass()`方法返回这个特定处理程序所属的 `Controller` 类的类型。例如，如果当前处理的请求是 `POST` 请求，目标是 `CatsController`上的 `create()` 方法，那么 `getHandler()` 将返回对 `create()` 方法的引用，而 `getClass()`将返回一个`CatsControllertype`(而不是实例)。
 
 
-## 基于角色的认证
+## 基于角色认证
 
 一个更详细的例子是一个 `RolesGuard` 。这个守卫只允许具有特定角色的用户访问。我们将从一个基本模板开始，并在接下来的部分中构建它。目前，它允许所有请求继续:
 

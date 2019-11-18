@@ -6,7 +6,8 @@
 
 Nest 中间件实际上等价于 [express](http://expressjs.com/en/guide/using-middleware.html) 中间件。 下面是Express官方文档中所述的中间件功能：
 
-> 中间件函数可以执行以下任务:
+中间件函数可以执行以下任务:
+
 - 执行任何代码。
 - 对请求和响应对象进行更改。
 - 结束请求-响应周期。
@@ -185,4 +186,4 @@ await app.listen(3000);
 [@Armor](https://github.com/Armor-cn)  | <img class="avatar-66 rm-style" height="70" src="https://avatars3.githubusercontent.com/u/31821714?s=460&v=4">  |  翻译  | 专注于 Java 和 Nest，[@Armor](https://armor.ac.cn/) 
 | [@tangkai](https://github.com/tangkai123456)  | <img class="avatar-66 rm-style" height="70" src="https://avatars1.githubusercontent.com/u/22436910">  |  翻译  | 专注于 React，[@tangkai](https://github.com/tangkai123456) |
 | [@havef](https://havef.github.io)  | <img class="avatar-66 rm-style" height="70" src="https://avatars1.githubusercontent.com/u/54462?s=460&v=4">  |  校正  | 数据分析、机器学习、TS/JS技术栈 [@havef](https://havef.github.io) |
-| [@gaoyangy](<https://github.com/gaoyangy>) | ![img](https://avatars0.githubusercontent.com/u/23468113?s=460&v=4) | 校正 | 专注于Vue，TS/JS |
+| [@gaoyangy](<https://github.com/gaoyangy>) | <img class="avatar-66 rm-style" height="70" src="https://avatars0.githubusercontent.com/u/23468113?s=460&v=4"> | 校正 | 专注于Vue，TS/JS |

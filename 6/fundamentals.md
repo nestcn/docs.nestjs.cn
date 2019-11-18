@@ -46,6 +46,7 @@ export class CatsController {
 最后，我们在 `Nest IoC` 容器中注册提供程序
 
 ?> app.module.ts
+
 ```typescript
 import { Module } from '@nestjs/common';
 import { CatsController } from './cats/cats.controller';
@@ -107,7 +108,7 @@ providers: [
 
 `Nest` 可让您定义自定义提供程序来处理这些情况。它提供了几种定义自定义提供程序的方法。让我们来看看它们。
 
-### 值提供者: useValue
+### 值提供者 (useValue)
 
 `useValue` 语法对于注入常量值、将外部库放入 `Nest` 容器或使用模拟对象替换实际实现非常有用。假设您希望强制 `Nest` 使用模拟 `CatsService` 进行测试。
 
@@ -134,7 +135,6 @@ export class AppModule {}
 
 在本例中，`CatsService` 令牌将解析为 `mockCatsService` 模拟对象。`useValue` 需要一个值——在本例中是一个文字对象，它与要替换的 `CatsService` 类具有相同的接口。由于 `TypeScript` 的结构类型化，您可以使用任何具有兼容接口的对象，包括文本对象或用 `new` 实例化的类实例。
 
-### Non-class-based provider tokens
 
 到目前为止，我们已经使用了类名作为我们的提供者标记（ `providers` 数组中列出的提供者中的 `Provide` 属性的值）。 这与基于构造函数的注入所使用的标准模式相匹配，其中令牌也是类名。 （如果此概念尚不完全清楚，请参阅[DI](fundamentals.md#依赖注入)基础知识，以重新学习令牌）。 有时，我们可能希望灵活使用字符串或符号作为 `DI` 令牌。 例如：
 
@@ -169,7 +169,7 @@ export class CatsRepository {
 
 虽然我们在上面的例子中直接使用字符串 `'CONNECTION'` 来进行说明，但是为了清晰的代码组织，最佳实践是在单独的文件（例如 `constants.ts` ）中定义标记。 对待它们就像对待在其自己的文件中定义并在需要时导入的符号或枚举一样。
 
-### 类提供者: useClass
+### 类提供者 (useClass)
 
 `useClass`语法允许您动态确定令牌应解析为的类。 例如，假设我们有一个抽象（或默认）的 `ConfigService` 类。 根据当前环境，我们希望 `Nest 提供配置服务的不同实现。 以下代码实现了这种策略。
 
@@ -192,7 +192,7 @@ export class AppModule {}
 
 另外，我们使用 `ConfigService` 类名称作为令牌。 对于任何依赖 `ConfigService` 的类，`Nest` 都会注入提供的类的实例（ `DevelopmentConfigService` 或 `ProductionConfigService`），该实例将覆盖在其他地方已声明的任何默认实现（例如，使用 `@Injectable()` 装饰器声明的 `ConfigService`）。
 
-### 工厂提供者:useFactory
+### 工厂提供者 (useFactory)
 
 `useFactory` 语法允许动态创建提供程序。实工厂函数的返回实际的 `provider` 。工厂功能可以根据需要简单或复杂。一个简单的工厂可能不依赖于任何其他的提供者。更复杂的工厂可以自己注入它需要的其他提供者来计算结果。对于后一种情况，工厂提供程序语法有一对相关的机制:
 
@@ -218,7 +218,7 @@ const connectionFactory = {
 export class AppModule {}
 ```
 
-### 别名提供者: useExisting
+### 别名提供者 (useExisting)
 
 `useExisting` 语法允许您为现有的提供程序创建别名。这将创建两种访问同一提供者的方法。在下面的示例中，(基于`string`)令牌 `'AliasedLoggerService'` 是(基于类的)令牌 `LoggerService` 的别名。假设我们有两个不同的依赖项，一个用于 `'AlilasedLoggerService'` ，另一个用于 `LoggerService` 。如果两个依赖项都用单例作用域指定，它们将解析为同一个实例。
 
@@ -240,7 +240,7 @@ export class AppModule {}
 
 ```
 
-### Non-service based providers
+### 非服务提供者
 
 虽然提供者经常提供服务，但他们并不限于这种用途。提供者可以提供任何值。例如，提供程序可以根据当前环境提供配置对象数组，如下所示:
 
@@ -492,7 +492,6 @@ export class ConfigModule {
 
 然而，我们的动态模块还不是很有趣，因为我们还没有引入任何我们想要配置它的功能。让我们接下来解决这个问题。
 
-
 ### 模块配置
 
 定制 `ConfigModule` 行为的显而易见的解决方案是在静态 `register()` 方法中向其传递一个 `options` 对象，如我们上面所猜测的。让我们再次看一下消费模块的 `imports` 属性：
@@ -689,14 +688,15 @@ this.moduleRef.get(Service, { strict: false });
 
 基本上，每个提供者都可以作为一个单例，被请求范围限定，并切换到瞬态模式。请参见下表，以熟悉它们之间的区别。
 
+|||
+|---|----|
 | `SINGLETON` | 每个提供者可以跨多个类共享。提供者生命周期严格绑定到应用程序生命周期。一旦应用程序启动，所有提供程序都已实例化。默认情况下使用单例范围。 |
-| ---- | ------------------------------------------------------------ |
 | `REQUEST` | 在请求处理完成后，将为每个传入请求和垃圾收集专门创建提供者的新实例 |
 | `TRANSIENT` | 临时提供者不能在提供者之间共享。每当其他提供者向 `Nest` 容器请求特定的临时提供者时，该容器将创建一个新的专用实例 |
 
 ?> 使用单例范围始终是推荐的方法。请求之间共享提供者可以降低内存消耗，从而提高应用程序的性能(不需要每次实例化类)。
 
-### 使用(Usage)
+### 使用 (Usage)
 
 为了切换到另一个注入范围，您必须向 `@Injectable()` 装饰器传递一个参数
 
@@ -991,12 +991,11 @@ describe('Cats', () => {
 编译好的模块有几种在下表中详细描述的方法：
 
 |||
-|------------|-------------|
-|`createNestInstance()`|基于给定模块创建一个Nest实例（返回`INestApplication`）,请注意，必须使用`init()`方法手动初始化应用程序|
-|`createNestMicroservice()`|基于给定模块创建Nest微服务实例（返回`INestMicroservice）`|
-|`get()`|检索应用程序上下文中可用的控制器或提供程序（包括警卫，过滤器等）的实例|
-|`select()`|例如，浏览模块树，从所选模块中提取特定实例（与启用严格模式一起使用)|
-|||
+|----|---|
+| `createNestInstance()`|基于给定模块创建一个Nest实例（返回`INestApplication`）,请注意，必须使用`init()`方法手动初始化应用程序|
+| `createNestMicroservice()`|基于给定模块创建Nest微服务实例（返回`INestMicroservice）`|
+| `get()`|检索应用程序上下文中可用的控制器或提供程序（包括警卫，过滤器等）的实例|
+| `select()`|例如，浏览模块树，从所选模块中提取特定实例（与启用严格模式一起使用)|
 
  ### 译者署名
 

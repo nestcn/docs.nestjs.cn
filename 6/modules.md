@@ -153,7 +153,7 @@ export class CatsModule {}
 
 ## 动态模块
 
-Nest 模块系统带有一个称为动态模块的功能。 它使您能够毫不费力地创建可定制的模块。 让我们来看看 `DatabaseModule`：
+`Nest` 模块系统带有一个称为动态模块的功能。 它使您能够毫不费力地创建可定制的模块。 让我们来看看 `DatabaseModule`：
 
 ```typescript
 import { Module, DynamicModule } from '@nestjs/common';

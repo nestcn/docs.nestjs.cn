@@ -50,7 +50,7 @@ $ npm run start:dev
 
 
 |功能 | 标准模式 | `Monorepo` 模式|
-|---|---|---|---|
+|---|---|---|
 |多个项目| 独立文件系统结构 | 单文件系统结构 |
 | `node_modules` 和 `package.json` | 单独的实例 | 跨 `monorepo`共享 |
 | 默认的编译器 | `tsc` | `webpack` |

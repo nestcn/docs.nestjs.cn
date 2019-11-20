@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/nestcn/docs#readme",
   "devDependencies": {
-    "docsify-cli": "4.3.0"
+    "docsify-cli": "4.4.0"
   }
 }

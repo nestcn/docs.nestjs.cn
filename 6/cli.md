@@ -49,7 +49,7 @@ $ npm run start:dev
 您可以使用任何一种模式来管理多个项目。这里是一个快速的差异总结:
 
 
-|功能 | 标准模式 | `Monorepo` 模式|
+| 功能 | 标准模式 | `Monorepo` 模式|
 |---|---|---|
 |多个项目| 独立文件系统结构 | 单文件系统结构 |
 | `node_modules` 和 `package.json` | 单独的实例 | 跨 `monorepo`共享 |

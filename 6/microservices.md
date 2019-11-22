@@ -42,16 +42,16 @@ bootstrap();
 
 `createMicroservice ()` 方法的第二个参数是 `options` 对象。此对象可能有两个成员:
 
-|                      |                                  |
-| :------------------- | :------------------------------- |
+|||
+|---|---|
 | `transport`          | 指定传输器                         |
 | `options`            | 确定传输器行为的传输器特定选项对象     |
 
 
 `options` 对象根据所选的传送器而不同。`TCP` 传输器暴露了下面描述的几个属性。
 
-|                        |                            |
-| :--------------------- | :------------------------- |
+|||
+|---|---|
 | `host`                 | 连接主机名                   |
 | `port`                 | 连接端口                     |
 | `retryAttempts`        | 连接尝试的总数                |
@@ -142,7 +142,6 @@ getDate(@Payload() data: number[], @Ctx() context: NatsContext) {
 
 ### 客户端
 
-
  为了交换消息或将事件发布到 `Nest` 微服务，我们使用 `ClientProxy` 类, 它可以通过几种方式创建实例。此类定义了几个方法，例如`send()`（用于请求-响应消息传递）和`emit()`（用于事件驱动消息传递），这些方法允许您与远程微服务通信。使用下列方法之一获取此类的实例。
  
  首先，我们可以使用 `ClientsModule` 暴露的静态`register()` 方法。此方法将数组作为参数，其中每个元素都具有 `name`（这是一种微服务标识符）以及特定于微服务的选项（它与传入 `createMicroservice()`  方法的对象相同）。
@@ -167,7 +166,6 @@ constructor(
 ?> `ClientsModule`和 `ClientProxy`类需要从 `@nestjs/microservices` 包导入。
 
 有时候，我们可能需要从另一个服务(比如 `ConfigService` )获取微服务配置，为此，我们可以使用 `ClientProxyFactory` 类来注册一个自定义提供程序(它提供了一个 `ClientProxy` 实例):
-
 
 ```typescript
 {
@@ -432,13 +430,13 @@ const app = await NestFactory.createMicroservice(ApplicationModule, {
 有许多可用属性可确定传输器行为。
 
 |  |  | 
-| :--- | ----: | 
-| urls |	连接地址 |
-| queue |	您的服务器将监听的队列名称 |
-| prefetchCount |	设置通道的预取计数 |
-| isGlobalPrefetchCount	 | 启用每个通道预取|
-| queueOptions |	其他队列选项。它们在[这里](https://www.squaremobius.net/amqp.node/channel_api.html#assertQueue)有很好的描述 |
-| socketOptions	 | 其他`socket`选项。它们在[这里](https://www.squaremobius.net/amqp.node/channel_api.html#socket-options)有很好的描述 |
+|---| ----| 
+| `urls` | 连接地址 |
+| `queue` |	您的服务器将监听的队列名称 |
+| `prefetchCount` |	设置通道的预取计数 |
+| `isGlobalPrefetchCount`	 | 启用每个通道预取|
+| `queueOptions` |	其他队列选项。它们在[这里](https://www.squaremobius.net/amqp.node/channel_api.html#assertQueue)有很好的描述 |
+| `socketOptions`	 | 其他`socket`选项。它们在[这里](https://www.squaremobius.net/amqp.node/channel_api.html#socket-options)有很好的描述 |
 
 
 ## gRPC
@@ -473,8 +471,8 @@ const app = await NestFactory.createMicroservice(ApplicationModule, {
 
 ### 选项
 
-|                |                         |
-| :------------- | :---------------------- |
+|||
+|---|---|
 | `url`          | 连接网址               |
 |`protoLoader`| NPM包名称（如果要使用其他原型加载器） |
 | `protoPath`    | 指向 `.proto` 文件的绝对(或相对于根目录)路径 |

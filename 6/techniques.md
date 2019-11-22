@@ -747,8 +747,6 @@ export class Photo {
 > app.module.ts
 
 ```typescript
-app.module.tsJS
-
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Photo } from './photo/photo.entity';
@@ -1214,7 +1212,7 @@ MongooseModule.forRootAsync({
 
 ### 基本实例
 
-当我们要上传单个文件时, 我们只需将 `FileInterceptor ()` 与处理程序绑定在一起, 然后使用 `@UploadedFile ()` 装饰器从 `request` 中取出 `file`。
+当我们要上传单个文件时, 我们只需将 `FileInterceptor()` 与处理程序绑定在一起, 然后使用 `@UploadedFile()` 装饰器从 `request` 中取出 `file`。
 
 ```typescript
 @Post('upload')
@@ -1529,7 +1527,7 @@ export class AppController {
 }
 ```
 
-?> 警告: 只有使用 @Get() 方式声明的节点会被缓存。此外，注入本机响应对象( `@Res()` )的 `HTTP` 服务器路由不能使用缓存拦截器。有关详细信息，请参见响应映射。
+?> 警告: 只有使用 `@Get()` 方式声明的节点会被缓存。此外，注入本机响应对象( `@Res()` )的 `HTTP` 服务器路由不能使用缓存拦截器。有关详细信息，请参见响应映射。
 
 ### 全局缓存
 
@@ -1680,17 +1678,17 @@ CacheModule.registerAsync({
 ## 序列化（Serialization）
 
 
-在发送实际响应之前， `Serializers` 为数据操作提供了干净的抽象层。例如，应始终从最终响应中排除敏感数据（如用户密码）。此外，某些属性可能需要额外的转换，比方说，我们不想发送整个数据库实体。相反，我们只想选择 id 和 name 。其余部分应自动剥离。不幸的是，手动映射所有实体可能会带来很多麻烦。
+在发送实际响应之前， `Serializers` 为数据操作提供了干净的抽象层。例如，应始终从最终响应中排除敏感数据（如用户密码）。此外，某些属性可能需要额外的转换，比方说，我们不想发送整个数据库实体。相反，我们只想选择 `id` 和 `name` 。其余部分应自动剥离。不幸的是，手动映射所有实体可能会带来很多麻烦。
 
-?> 译者注: `Serialization` 实现可类比 `composer` 库中 `fractal` ，响应给用户的数据不仅仅要剔除设计安全的属性，还需要剔除一些无用字段如 `create_time`,  `delete_time`,` update_time` 和其他属性。在 `JAVA` 的实体类中定义`N` 个属性的话就会返回 `N` 个字段，解决方法可以使用范型编程，否则操作实体类回影响数据库映射字段。
+?> 译者注: `Serialization` 实现可类比 `composer` 库中 `fractal` ，响应给用户的数据不仅仅要剔除设计安全的属性，还需要剔除一些无用字段如 `create_time`,  `delete_time`,` update_time` 和其他属性。在 `JAVA` 的实体类中定义 `N` 个属性的话就会返回 `N` 个字段，解决方法可以使用范型编程，否则操作实体类回影响数据库映射字段。
 
 ### 概要
 
-为了提供一种直接的方式来执行这些操作， Nest 附带了这个  `ClassSerializerInterceptor` 类。它使用[类转换器](https://github.com/typestack/class-transformer)来提供转换对象的声明性和可扩展方式。基于此类基础下，可以从类转换器 `ClassSerializerInterceptor` 中获取方法和调用  `classToPlain()` 函数返回的值。
+为了提供一种直接的方式来执行这些操作， `Nest` 附带了这个  `ClassSerializerInterceptor` 类。它使用[类转换器](https://github.com/typestack/class-transformer)来提供转换对象的声明性和可扩展方式。基于此类基础下，可以从类转换器 `ClassSerializerInterceptor` 中获取方法和调用  `classToPlain()` 函数返回的值。
 
 ### 排除属性
 
-让我们假设一下，如何从一个含有多属性的实体中剔除 `password` 属性？
+让我们假设一下，如何从一个含有多属性的实体中剔除 `password` 属性 ？
 
 ```typescript
 import { Exclude } from 'class-transformer';
@@ -1785,7 +1783,7 @@ findOne(): UserEntity {
 ## 日志
 
 
- `Nest`附带一个默认的内部日志记录器实现，它在实例化过程中以及在一些不同的情况下使用，比如发生异常等等。但是，有时您可能希望完全禁用日志记录，或者提供自定义实现并自己处理消息。为了关闭记录器，我们使用 `Nes` t应用程序选项对象。
+ `Nest`附带一个默认的内部日志记录器实现，它在实例化过程中以及在一些不同的情况下使用，比如发生异常等等。但是，有时您可能希望完全禁用日志记录，或者提供自定义实现并自己处理消息。为了关闭记录器，我们使用 `Nest` 应用程序选项对象。
 
 ```typescript
 const app = await NestFactory.create(ApplicationModule, {
@@ -1969,7 +1967,7 @@ app.use(
 
 ### 安装
 
-为了解析我们的环境文件，我们将使用dotenv包。
+为了解析我们的环境文件，我们将使用 `dotenv` 包。
 
 ```bash
 $ npm i --save dotenv
@@ -2068,11 +2066,11 @@ export class AppService {
 
 * 缺少环境变量的名称和类型（无智能感知）
 * 缺少提供对 `.env` 文件的验证
-* env文件将布尔值作为string ('`true`'),提供，因此每次都必须将它们转换为 `boolean`
+* env文件将布尔值作为string (`'true'`),提供，因此每次都必须将它们转换为 `boolean`
 
 ### 验证
 
-我们将从验证提供的环境变量开始。如果未提供所需的环境变量或者它们不符合您的预定义要求，则可以抛出错误。为此，我们将使用 `npm` 包 [Joi](https://github.com/hapijs/joi)。通过 `Joi`，您可以定义一个对象模式（schema）并根据它来验证  `JavaScript` 对象。
+我们将从验证提供的环境变量开始。如果未提供所需的环境变量或者它们不符合您的预定义要求，则可以抛出错误。为此，我们将使用 `npm` 包 [Joi](https://github.com/hapijs/joi)。通过 `Joi`，您可以定义一个对象模式（ `schema` ）并根据它来验证  `JavaScript` 对象。
 
 安装 `Joi` 和它的类型（用于 `TypeScript` 用户）：
 
@@ -2539,7 +2537,7 @@ new FastifyAdapter({ logger: true })
 
 ## 热重载（Webpack）
 
-对应用程序的引导过程影响最大的是 `TypeScript` 编译。但问题是，每次发生变化时，我们是否必须重新编译整个项目？一点也不。这就是为什么 [webpack](https://github.com/webpack/webpack) HMR（Hot-Module Replacement）大大减少了实例化您的应用程序所需的时间。
+对应用程序的引导过程影响最大的是 `TypeScript` 编译。但问题是，每次发生变化时，我们是否必须重新编译整个项目？一点也不。这就是为什么 [webpack](https://github.com/webpack/webpack) `HMR`（Hot-Module Replacement）大大减少了实例化您的应用程序所需的时间。
 
 
 ?> 请注意，`webpack`这不会自动将（例如 `graphql` 文件）复制到 `dist` 文件夹中。类似地，`webpack` 与全局静态路径（例如中的 `entities` 属性 `TypeOrmModule` ）不兼容。
@@ -2547,7 +2545,6 @@ new FastifyAdapter({ logger: true })
 ### CLI
 
 如果使用的是 `Nest CLI`，则配置过程非常简单。`CLI` 包装 `webpack`，允许使用 `HotModuleReplacementPlugin`。
-
 
 ### 安装
 

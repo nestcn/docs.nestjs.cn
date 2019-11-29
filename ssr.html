@@ -13,6 +13,27 @@
   <!--inject-app-->
   <!--inject-config-->
 </body>
+<script>
+    window.$docsify = {
+      name: 'Nest',
+      repo: 'https://github.com/nestjs/nest',
+      coverpage: true,
+      loadNavbar: true,
+      onlyCover: true,
+      loadSidebar: true,
+      subMaxLevel: 3,
+      routerMode: 'history',
+      auto2top: true,
+      tabs: {
+        theme: 'material'
+      },
+      plugins: [
+        window.EditOnGithubPlugin.create(
+          'https://github.com/nestcn/docs/tree/master/'
+        )
+      ]
+    }
+  </script>
 <script src="//unpkg.com/docsify/lib/docsify.min.js"></script>
 <script src="//unpkg.com/docsify/lib/plugins/search.min.js"></script>
 </html>

@@ -20,6 +20,13 @@
   "files": [
     "./"
   ],
+  "now": {
+    "alias": "docsify",
+    "env": {
+      "NODE_ENV": "production",
+      "DEBUG": "docsify"
+    }
+  },
   "docsify": {
     "config": {
       "basePath": "https://docs.nestjs.cn/",
@@ -30,6 +37,7 @@
     }
   },
   "devDependencies": {
-    "docsify-cli": "4.4.0"
+    "docsify-cli": "^4.4.0",
+    "now": "^16.6.0"
   }
 }

@@ -28,6 +28,7 @@
     }
   },
   "docsify": {
+    "template": "./ssr.html",
     "config": {
       "basePath": "https://docs.nestjs.cn/",
       "loadSidebar": true,

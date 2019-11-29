@@ -28,7 +28,7 @@
       "coverpage": true,
       "name": "nest.js 中文文档"
     }
-  }
+  },
   "devDependencies": {
     "docsify-cli": "4.4.0"
   }

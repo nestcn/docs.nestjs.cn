@@ -1721,7 +1721,7 @@ findOne(): UserEntity {
 }
 ```
 
-?> 提示: `@SerializeOptions()` 装饰器来源于 `@nestjs/common` 包。
+?> 提示: `@ClassSerializerInterceptor()` 装饰器来源于 `@nestjs/common` 包。
 
 现在当你调用此服务时，将收到以下响应结果：
 

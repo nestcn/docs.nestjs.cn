@@ -138,6 +138,9 @@
   - [Nestjs + Auth0](https://github.com/cdiaz/nestjs-auth0) - 使用 Auth0 的 NestJS Framework Web 应用程序。
 - 数据库
   - [Typeorm](https://github.com/nestjs/typeorm) - 用于 Nest 框架的 TypeORM 模块 [[Tutorial](http://docs.nestjs.com/recipes/sql-typeorm)].
+  - [hasura](https://hasura.io/) -Hasura 连接到您的数据库和微服务，并提供可用于生产的GraphQL API。
+  - [prisma](https://www.prisma.io/) -Prisma 取代了传统的ORM。
+  - [sequelize](https://github.com/sequelize/sequelize) -传统 Node.js ORM
   - [Magnus](https://github.com/notadd/magnus) 自动生成 grpc 及 graphql 的库。
   - [Nest Mongoose](https://github.com/nestjs/mongoose) - 用于 Nest 框架的 Mongoose 模块
   - [Nest Typegoose](https://github.com/kpfromer/nestjs-typegoose) - nest.js 的 [Typegoose](https://github.com/szokodiakos/typegoose) 模块。

@@ -682,7 +682,7 @@ export class HeroesGameModule {}
 
 ## OpenAPI (Swagger)
 
-**本章仅适用于TypeScript**
+!> 本小节的技术需要使用 TypeScript，不适用纯 JavaScript 的应用。
 
 [OpenAPI](https://swagger.io/specification/)(Swagger)规范是一种用于描述 `RESTful API` 的强大定义格式。 `Nest` 提供了一个专用[模块](https://github.com/nestjs/swagger)来使用它。
 
@@ -702,7 +702,7 @@ $ npm install --save @nestjs/swagger fastify-swagger
 
 ### 引导（Bootstrap）
 
-安装过程完成后，打开引导文件（主要是 `main.ts` ）并使用 `SwaggerModule` 类初始化Swagger：
+安装过程完成后，打开引导文件（主要是 `main.ts` ）并使用 `SwaggerModule` 类初始化 Swagger：
 
 ```typescript
 import { NestFactory } from '@nestjs/core';
@@ -726,11 +726,13 @@ async function bootstrap() {
 bootstrap();
 ```
 
-`DocumentBuilder` 是一个帮助类，可帮助构建 `SwaggerModule` 的基本文档。 它包含几个允许设置标题，描述，版本等属性的方法。
+`DocumentBuilder` 有助于构建符合 OpenAPI 规范的基础文档。它提供了几种允许设置诸如标题，描述，版本等属性的方法。为了创建一个完整的文档（使用已定义的 HTTP 路由），我们使用 `SwaggerModule` 类的 `createDocument()` 方法。 此方法接收两个参数，即应用程序实例和 Swagger 选项对象。
 
-为了创建一个完整的文档（使用已定义的HTTP路由），我们使用 `SwaggerModule` 类的 `createDocument()` 方法。 此方法接收两个参数，即应用程序实例和基本Swagger选项。
+一旦创建完文档，我们就可以调用 `setup()` 方法。 它接收：
 
-最后一步是调用 `setup()` 。 它顺序的接收（1）安装 `Swagger` 的路径，（2）应用程序实例，以及（3）描述 `Nest` 应用程序的文档。
+1. Swagger UI 的挂载路径
+2. 应用程序实例
+3. 上面已经实例化的文档对象
 
 现在，您可以运行以下命令来启动 `HTTP` 服务器：
 
@@ -738,19 +740,17 @@ bootstrap();
 $ npm run start
 ```
 
-应用程序运行时，打开浏览器并导航到 `http://localhost:3000/api` 。 你应该看到一个如下类似的页面：
+应用程序运行时，打开浏览器并导航到 `http://localhost:3000/api` 。 你应该可以看到 Swagger UI
 
 ![img](https://docs.nestjs.com/assets/swagger1.png)
 
-`SwaggerModule` 自动反映所有端点。 在后台，它使用 `swagger-ui-express` 并创建一个实时文档。
+`SwaggerModule` 自动反映所有端点。同时，为了展现 Swagger UI，`@nestjs/swagger`依据平台使用 `swagger-ui-express` 或 `fastify-swagger`。
 
-?> 如果要下载相应的 `Swagger JSON` 文件，只需在浏览器中调用 `http://localhost:3000/api-json` （如果您的 `Swagger` 文档发布在 `http://localhost:3000/api` 下）。
+?> 生成并下载 Swagger JSON 文件，只需在浏览器中导航到 `http://localhost:3000/api-json` （如果您的 Swagger 文档是在 `http://localhost:3000/api` 下）。
 
-### Body, query, path parameters
+### 路由参数
 
-在检查定义的控制器期间，`SwaggerModule` 在路由处理程序中查找所有使用的 `@Body()` ， `@Query()` 和 `@Param()` 装饰器。 因此，可以创建有效文档。
-
-此外，该模块利用反射创建模型定义。 看看下面的代码：
+`SwaggerModule` 在路由处理程序中查找所有使用的 `@Body()` ， `@Query()` 和 `@Param()` 装饰器来生成 API 文档。该模块利用反射创建相应的模型定义。 看看下面的代码：
 
 ```typescript
 @Post()
@@ -759,73 +759,200 @@ async create(@Body() createCatDto: CreateCatDto) {
 }
 ```
 
-!> 要隐式设置主体定义，可以使用 `@ApiImplicitBody()` 装饰器（ `@nestjs/swagger` 包）。
+!> 要显式地设置主体定义，可以使用 `@ApiBody()` 装饰器（ `@nestjs/swagger` 包）。
 
 基于 `CreateCatDto` ，将创建模块定义：
 
 ![img](https://docs.nestjs.com/assets/swagger-dto.png)
 
-如您所见，虽然该类具有一些声明的属性，但定义为空。 为了使 `SwaggerModule` 可以访问类属性，我们必须用 `@ApiModelProperty()` 装饰器标记所有这些属性：
+如您所见，虽然该类具有一些声明的属性，但定义为空。 为了使类属性对 `SwaggerModule` 可见，我们必须用 `@ApiProperty()` 装饰器对其进行注释或者使用 CLI 插件自动完成（更多请阅读**插件**小节）：
 
 ```typescript
-import { ApiModelProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateCatDto {
-  @ApiModelProperty()
+  @ApiProperty()
   readonly name: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   readonly age: number;
 
-  @ApiModelProperty()
+  @ApiProperty()
   readonly breed: string;
 }
 ```
+
+?> 考虑使用 Swagger 插件（请阅读**插件**小节），它会自动帮你完成。
 
 让我们打开浏览器并验证生成的 `CreateCatDto` 模型：
 
 ![img](https://docs.nestjs.com/assets/swagger-dto2.png)
 
-`@ApiModelProperty()` 装饰器接受选项对象：
+另外，`@ApiProperty()` 装饰器允许设计不同[模式对象](https://swagger.io/specification/#schemaObject) 属性:
 
 ```typescript
-export const ApiModelProperty: (metadata?: {
-  description?: string;
-  required?: boolean;
-  type?: any;
-  isArray?: boolean;
-  collectionFormat?: string;
-  default?: any;
-  enum?: SwaggerEnumType;
-  format?: string;
-  multipleOf?: number;
-  maximum?: number;
-  exclusiveMaximum?: number;
-  minimum?: number;
-  exclusiveMinimum?: number;
-  maxLength?: number;
-  minLength?: number;
-  pattern?: string;
-  maxItems?: number;
-  minItems?: number;
-  uniqueItems?: boolean;
-  maxProperties?: number;
-  minProperties?: number;
-  readOnly?: boolean;
-  xml?: any;
-  example?: any;
-}) => PropertyDecorator;
+@ApiProperty({
+  description: 'The age of a cat',
+  min: 1,
+  default: 1,
+})
+age: number;
 ```
 
-?> 有一个 `@ApiModelPropertyOptional()` 快捷方式修饰符，可以避免连续输入 `@ApiModelProperty({required：false})`。
+?> 避免显式地输入 `{{"@ApiProperty({ required: false })"}}`，你可以使用 `@ApiPropertyOptional()` 短手装饰器。
+
+为了显式地设置属性的类型，使用`type`键
+
+```typescript
+@ApiProperty({
+  type: Number,
+})
+age: number;
+```
 
 因此我们可以简单地设置默认值，确定属性是否是必需的或者显式设置类型。
 
+### 枚举
+
+为了定义一个 `enum`，我们必须手动在 `@ApiProperty` 上设置 `enum` 属性为数值数组。
+
+```typescript
+@ApiProperty({ enum: ['Admin', 'Moderator', 'User']})
+role: UserRole;
+```
+
+或者，如下定义实际的 TypeScript 枚举：
+
+```typescript
+export enum UserRole {
+  Admin = 'Admin',
+  Moderator = 'Moderator',
+  User = 'User'
+}
+```
+
+你可以直接将枚举在 `@Query()` 参数装饰器里使用，并结合 `@ApiQuery()` 装饰器。
+
+```typescript
+@ApiQuery({ name: 'role', enum: UserRole })
+async filterByRole(@Query('role') role: UserRole = UserRole.User) {}
+```
+
+![img](https://docs.nestjs.com/assets/enum_query.gif)
+
+将 `isArray` 设置为 **true** ，`enum` 可以**多选**：
+
+![img](https://docs.nestjs.com/assets/enum_query_array.gif)
+
+### 数组
+
+当属性实际上是一个数组时，我们必须手动指定一个类型：
+
+```typescript
+@ApiProperty({ type: [String] })
+names: string[];
+```
+
+只需将您的类型作为数组的第一个元素（如上所示）或将 `isArray` 属性设置为 `true` 。
+
+### 循环依赖
+
+当类之间具有循环依赖关系时，请使用惰性函数为 `SwaggerModule` 提供类型信息：
+
+```typescript
+@ApiProperty({ type: () => Node })
+node: Node;
+```
+
+### 泛型和接口
+
+由于 TypeScript 不会存储有关泛型或接口的元数据，因此当您在 DTO 中使用它们时，`SwaggerModule` 可能无法在运行时正确生成模型定义。例如，以下代码将不会被 Swagger 模块正确检查：
+
+```typescript
+createBulk(@Body() usersDto: CreateUserDto[])
+```
+
+为了克服此限制，可以显式设置类型：
+
+```typescript
+@ApiBody({ type: [CreateUserDto] })
+createBulk(@Body() usersDto: CreateUserDto[])
+```
+
+### 原生定义
+
+在某些特定情况下（例如，深度嵌套的数组，矩阵），您可能需要手动描述类型。
+
+```typescript
+@ApiProperty({
+  type: 'array',
+  items: {
+    type: 'array',
+    items: {
+      type: 'number',
+    },
+  },
+})
+coords: number[][];
+```
+
+同样，为了在控制器类中手动定义输入/输出内容，请使用 `schema` 属性：
+
+```typescript
+@ApiBody({
+  schema: {
+    type: 'array',
+    items: {
+      type: 'array',
+      items: {
+        type: 'number',
+      },
+    },
+  },
+})
+async create(@Body() coords: number[][]) {}
+```
+
+### 额外模型
+
+为了定义其他应由 Swagger 模块检查的模型，请使用 `@ApiExtraModels()` 装饰器：
+
+```typescript
+@ApiExtraModels(ExtraModel)
+export class CreateCatDto {}
+```
+
+然后，您可以使用 `getSchemaPath(ExtraModel)` 获取对模型的引用(`$ref`)：
+
+```typescript
+'application/vnd.api+json': {
+   schema: { $ref: getSchemaPath(ExtraModel) },
+},
+```
+
+#### oneOf, anyOf, allOf
+
+为了合并模式（schemas），您可以使用 `oneOf`，`anyOf` 或 `allOf` 关键字 ([阅读更多](https://swagger.io/docs/specification/data-models/oneof-anyof-allof-not/)).
+
+```typescript
+@ApiProperty({
+  oneOf: [
+    { $ref: getSchemaPath(Cat) },
+    { $ref: getSchemaPath(Dog) },
+  ],
+})
+pet: Cat | Dog;
+```
+
+?> `getSchemaPath()` 函数是从 `@nestjs/swagger`进行导入的
+
+必须使用 `@ApiExtraModels()` 装饰器（在类级别）将 `Cat` 和 `Dog` 都定义为额外模型。
+
 ### 多种规格
 
-Swagger模块还提供了一种支持多种规格的方法。 换句话说，您可以在不同的端点上使用不同的 `SwaggerUI` 提供不同的文档。
+Swagger 模块还提供了一种支持多种规格的方法。 换句话说，您可以在不同的端点上使用不同的 UI 提供不同的文档。
 
-为了允许 `SwaggerModule` 支持多规范，您的应用程序必须使用模块化方法编写。 `createDocument()` 方法接受的第三个参数：`extraOptions` ，它是一个对象，其中的属性 `include` 是一个模块数组。
+为了支持多规格，您的应用程序必须使用模块化方法编写。 `createDocument()` 方法接受的第三个参数：`extraOptions` ，它是一个包含 `include` 属性的对象。`include` 属性的值是一个模块数组。
 
 您可以设置多个规格支持，如下所示：
 
@@ -855,7 +982,7 @@ async function bootstrap() {
     .build();
 
   const catDocument = SwaggerModule.createDocument(app, options, {
-    include: [CatsModule],
+    include: [CatsModule]
   });
   SwaggerModule.setup('api/cats', app, catDocument);
 
@@ -867,7 +994,7 @@ async function bootstrap() {
     .build();
 
   const dogDocument = SwaggerModule.createDocument(app, secondOptions, {
-    include: [DogsModule],
+    include: [DogsModule]
   });
   SwaggerModule.setup('api/dogs', app, dogDocument);
 
@@ -882,71 +1009,33 @@ bootstrap();
 $ npm run start
 ```
 
-导航到 `http://localhost:3000/api/cats` 以查看您的 `cats` 的 `SwaggerUI` ：
+导航到 `http://localhost:3000/api/cats` 查看 Swagger UI 里的 cats：
 
 ![img](https://docs.nestjs.com/assets/swagger-cats.png)
 
-`http://localhost:3000/api/dogs` 会为你的 `dogs` 暴露一个 `SwaggerUI` ：
+`http://localhost:3000/api/dogs` 查看 Swagger UI 里的 dogs：
 
 ![img](https://docs.nestjs.com/assets/swagger-dogs.png)
 
-!> 您必须使用 `DocumentBuilder` 构造 **SwaggerOptions** ，对新构造的 `options` 运行 `createDocument()` ，然后立即使用 `setup()` “服务”它，然后才能开始为第二个 `Swagger` 规范开发第二个 **SwaggerOptions** 。 此特定顺序是为了防止 `Swagger` 配置被不同选项覆盖。
-
-### 使用枚举
-
-为了使 `SwaggerModule` 能够识别 `Enum` ，我们必须使用数组值在 `@ApiModelProperty` 上手动设置 `enum` 属性。
-
-```typescript
-@ApiModelProperty({ enum: ['Admin', 'Moderator', 'User']})
-role: UserRole;
-```
-
-`UserRole` 枚举定义如下：
-
-```typescript
-export enum UserRole {
-  Admin = 'Admin',
-  Moderator = 'Moderator',
-  User = 'User',
-}
-```
-
-!> 上述用法只能作为 **模型定义** 的一部分应用于 **属性** 。
-
-枚举可以单独使用 `@Query()` 参数装饰器和 `@ApiImplicitQuery()` 装饰器。
-
-```typescript
-@ApiImplicitQuery({ name: 'role', enum: ['Admin', 'Moderator', 'User'] })
-async filterByRole(@Query('role') role: UserRole = UserRole.User) {
-  // role returns: UserRole.Admin, UserRole.Moderator OR UserRole.User
-}
-```
-
-![img](https://docs.nestjs.com/assets/enum_query.gif)
-
-?> `enum` 和 `isArray` 也可以在 `@ApiImplicitQuery()` 中组合使用
-
-将 `isArray` 设置为 **true** ，`enum` 可以多选：
-
-![img](https://docs.nestjs.com/assets/enum_query_array.gif)
-
-### 使用数组
-
-当属性实际上是一个数组时，我们必须手动指定一个类型：
-
-```typescript
-@ApiModelProperty({ type: [String] })
-readonly names: string[];
-```
-
-只需将您的类型作为数组的第一个元素（如上所示）或将 `isArray` 属性设置为 `true` 。
-
 ### 标签（Tags）
 
-最初，我们创建了一个 `cats` 标签（通过使用 `DocumentBuilder` ）。 为了将控制器附加到指定的标记，我们需要使用 `@ApiUseTags(... tags)` 装饰器。
+要将控制器附加到特定标签，请使用 `@ApiTags(...tags)` 装饰器。
 
 ```typescript
 @ApiUseTags('cats')
+@Controller('cats')
+export class CatsController {}
+```
+
+### HTTP 头字段
+
+要定义自定义 HTTP 标头作为请求一部分，请使用 `@ApiHeader()` 。
+
+```typescript
+@ApiHeader({
+  name: 'Authorization',
+  description: 'Auth token'
+})
 @Controller('cats')
 export class CatsController {}
 ```
@@ -964,7 +1053,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 }
 ```
 
-与异常过滤器部分中定义的常见 `HTTP` 异常相同，Nest还提供了一组可重用的 **API响应** ，这些响应继承自核心 `@ApiResponse` 装饰器：
+与异常过滤器部分中定义的常见 `HTTP` 异常相同，Nest 还提供了一组可重用的 **API 响应** ，这些响应继承自核心 `@ApiResponse` 装饰器：
 
 - `@ApiOkResponse()`
 - `@ApiCreatedResponse()`
@@ -985,8 +1074,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 - `@ApiBadGatewayResponse()`
 - `@ApiServiceUnavailableResponse()`
 - `@ApiGatewayTimeoutResponse()`
-
-除了可用的 `HTTP` 异常之外，Nest还提供了以下的简写装饰器：`HttpStatus.OK` ，`HttpStatus.CREATED` 和 `HttpStatus.METHOD_NOT_ALLOWED`
+- `@ApiDefaultResponse()`
 
 ```typescript
 @Post()
@@ -997,29 +1085,35 @@ async create(@Body() createCatDto: CreateCatDto) {
 }
 ```
 
-要为请求指定返回模型，必须创建一个类并使用 `@ApiModelProperty()` 装饰器注释所有属性。
+要为请求指定返回模型，必须创建一个类并使用 `@ApiProperty()` 装饰器注释所有属性。
 
 ```typescript
 export class Cat {
-  @ApiModelProperty()
+  @ApiProperty()
+  id: number;
+
+  @ApiProperty()
   name: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   age: number;
 
-  @ApiModelProperty()
+  @ApiProperty()
   breed: string;
 }
 ```
 
-之后，必须将 `Cat` 模型与响应修饰符的 `type` 属性结合使用。
+之后，必须将 `Cat` 模型与响应装饰器的 `type` 属性结合使用。
 
 ```typescript
-@ApiUseTags('cats')
+@ApiTags('cats')
 @Controller('cats')
 export class CatsController {
   @Post()
-  @ApiCreatedResponse({ description: 'The record has been successfully created.', type: Cat })
+  @ApiCreatedResponse({
+    description: 'The record has been successfully created.',
+    type: Cat
+  })
   async create(@Body() createCatDto: CreateCatDto): Promise<Cat> {
     return this.catsService.create(createCatDto);
   }
@@ -1030,53 +1124,286 @@ export class CatsController {
 
 ![img](https://docs.nestjs.com/assets/swagger-response-type.png)
 
-### 认证
+### 全局前缀
 
-您可以使用 `DocumentBuilder` 类的 `addBearerAuth()` 方法启用承载授权。 然后要限制所选路径或整个控制器，请使用 `@ApiBearerAuth()` 装饰器。
+要忽略通过 `setGlobalPrefix()` 设置的路由的全局前缀，请使用 `ignoreGlobalPrefix`:
 
 ```typescript
-@ApiUseTags('cats')
+const document = SwaggerModule.createDocument(app, options, {
+  ignoreGlobalPrefix: true
+});
+```
+
+### 安全
+
+要定义针对特定操作应使用的安全性机制，请使用 `@ApiSecurity()` 装饰器。
+
+```typescript
+@ApiSecurity('basic')
+@Controller('cats')
+export class CatsController {}
+```
+
+在运行应用程序之前，请记住使用 `DocumentBuilder` 将安全性定义添加到您的基本文档中：
+
+```typescript
+const options = new DocumentBuilder().addSecurity('basic', {
+  type: 'http',
+  scheme: 'basic'
+});
+```
+
+一些最流行的身份验证技术是预定义的（例如 `basic` 和 `bearer`），因此，您不必如上所述手动定义安全性机制。
+
+### 基础认证
+
+为了使用基础认证，使用 `@ApiBasicAuth()`。
+
+```typescript
+@ApiBasicAuth()
+@Controller('cats')
+export class CatsController {}
+```
+
+在运行应用程序之前，请记住使用 `DocumentBuilder` 将安全性定义添加到基本文档中：
+
+```typescript
+const options = new DocumentBuilder().addBasicAuth();
+```
+
+### Bearer 认证
+
+为了使用 bearer 认证， 使用 `@ApiBearerAuth()`。
+
+```typescript
 @ApiBearerAuth()
 @Controller('cats')
 export class CatsController {}
 ```
 
-这就是 `OpenAPI` 文档现在的样子：
+在运行应用程序之前，请记住使用 `DocumentBuilder` 将安全性定义添加到基本文档中：
 
-![img](https://docs.nestjs.com/assets/swagger-auth.gif)
+```typescript
+const options = new DocumentBuilder().addBearerAuth();
+```
+
+### OAuth2 认证
+
+为了使用 OAuth2 认证，使用 `@ApiOAuth2()`。
+
+```typescript
+@ApiOAuth2(['pets:write'])
+@Controller('cats')
+export class CatsController {}
+```
+
+在运行应用程序之前，请记住使用 `DocumentBuilder` 将安全性定义添加到基本文档中：
+
+```typescript
+const options = new DocumentBuilder().addOAuth2();
+```
 
 ### 文件上传
 
-您可以使用 `@ApiImplicitFile` 装饰器和 `@ApiConsumes()` 为特定方法启用文件上载。 这里是使用[文件上传](/6/techniques.md?id=文件上传)技术的完整示例：
+您可以使用 `@ApiBody` 装饰器和 `@ApiConsumes()` 为特定方法启用文件上载。 这里是使用[文件上传](https://docs.nestjs.com/techniques/file-upload)技术的完整示例：
 
 ```typescript
 @UseInterceptors(FileInterceptor('file'))
 @ApiConsumes('multipart/form-data')
-@ApiImplicitFile({ name: 'file', required: true, description: 'List of cats' })
+@ApiBody({
+  description: 'List of cats',
+  type: FileUploadDto,
+})
 uploadFile(@UploadedFile() file) {}
+```
+
+`FileUploadDto` 如下所定义：
+
+```typescript
+class FileUploadDto {
+  @ApiProperty({ type: 'string', format: 'binary' })
+  file: any;
+}
 ```
 
 ### 装饰器
 
-所有可用的 `OpenAPI` 装饰器都有一个 `Api` 前缀，可以清楚地区分核心装饰器。 下面是具有已定义使用级别的导出装饰器的完整列表（可能应用的位置）。
+所有可用的 OpenAPI 装饰器都有一个 `Api` 前缀，可以清楚地区分核心装饰器。 以下是导出的装饰器的完整列表，以及可以应用装饰器的级别的名称。
 
-|   `@ApiOperation()`               |      `Method`           |
-| :---------------------: | :-------------------------: |
-|   `@ApiResponse()`               |      `Method/Controller`           |
-|   `@ApiProduces()`               |      `Method/Controller`           |
-|   `@ApiConsumes()`               |      `Method/Controller`           |
-|   `@ApiOAuth2Auth()`               |      `Method/Controller`           |
-|   `@ApiImplicitBody()`               |      `Method`           |
-|   `@ApiImplicitParam()`               |      `Method`           |
-|   `@ApiImplicitQuery()`               |      `Method`           |
-|   `@ApiImplicitHeader()`               |      `Method`           |
-|   `@ApiImplicitFile()`               |      `Method`           |
-|   `@ApiExcludeEndpoint()`               |      `Method`           |
-|   `@ApiUseTags()`               |      `Method/Controller`           |
-|   `@ApiModelProperty()`               |      `Method`           |
-|   `@ApiModelPropertyOptional()`               |      `Model`           |
+|                          |                     |
+| :----------------------: | :-----------------: |
+|    `@ApiOperation()`     |       Method        |
+|     `@ApiResponse()`     | Method / Controller |
+|     `@ApiProduces()`     | Method / Controller |
+|     `@ApiConsumes()`     | Method / Controller |
+|    `@ApiBearerAuth()`    | Method / Controller |
+|      `@ApiOAuth2()`      | Method / Controller |
+|    `@ApiBasicAuth()`     | Method / Controller |
+|     `@ApiSecurity()`     | Method / Controller |
+|   `@ApiExtraModels()`    | Method / Controller |
+|       `@ApiBody()`       |       Method        |
+|      `@ApiParam()`       |       Method        |
+|      `@ApiQuery()`       |       Method        |
+|      `@ApiHeader()`      | Method / Controller |
+| `@ApiExcludeEndpoint()`  |       Method        |
+|       `@ApiTags()`       | Method / Controller |
+|     `@ApiProperty()`     |        Model        |
+| `@ApiPropertyOptional()` |        Model        |
+|   `@ApiHideProperty()`   |        Model        |
+
+### 插件
+
+TypeScript 的元数据反射系统具有几个限制，这些限制使得例如无法确定类包含哪些属性或无法识别给定属性是可选属性还是必需属性。但是，其中一些限制可以在编译时解决。 Nest 提供了一个插件，可以增强 TypeScript 编译过程，以减少所需的样板代码量。
+
+?> 该插件是**选择性**的。可以手动声明所有装饰器，也可以只声明需要的特定装饰器。
+
+Swagger 插件会自动：
+
+- 除非使用 `@ApiHideProperty`，否则用 `@ApiProperty` 注释所有 DTO 属性
+- 根据问号标记设置 `required` 属性（例如，`name?: string` 将设置 `required: false`）
+- 根据类型设置 `type` 或 `enum` 属性（也支持数组）
+- 根据分配的默认值设置 `default` 属性
+- 根据 `class-validator` 装饰器设置多个验证规则（如果 `classValidatorShim` 设置为 `true`）
+- 向具有正确状态和 `type`（响应模型）的每个端点添加响应装饰器
+
+以前，如果您想通过 Swagger UI 提供交互式体验，您必须重复很多代码，以使程序包知道应如何在规范中声明您的模型/组件。例如，您可以定义一个简单的 `CreateUserDto` 类，如下所示：
+
+```typescript
+export class CreateUserDto {
+  @ApiProperty()
+  email: string;
+
+  @ApiProperty()
+  password: string;
+
+  @ApiProperty({ enum: RoleEnum, default: [], isArray: true })
+  roles: RoleEnum[] = [];
+
+  @ApiProperty({ required: false, default: true })
+  isEnabled?: boolean = true;
+}
+```
+
+尽管对于中型项目而言这并不是什么大问题，但是一旦您拥有大量的类，它就会变得冗长而笨拙。
+
+现在，在启用 Swagger 插件的情况下，可以简单地声明上述类定义：
+
+```typescript
+export class CreateUserDto {
+  email: string;
+  password: string;
+  roles: RoleEnum[] = [];
+  isEnabled?: boolean = true;
+}
+```
+
+该插件会基于**抽象语法树**动态添加适当的装饰器。因此，您不必再为分散在整个项目中的 `@ApiProperty` 装饰器而苦恼。
+
+?> 该插件将自动生成所有缺少的 swagger 属性，但是如果您需要覆盖它们，则只需通过 `@ApiProperty()` 显式设置它们即可。
+
+为了启用该插件，只需打开 `nest-cli.json`（如果使用[Nest CLI](/cli/overview)) 并添加以下`plugins`配置：
+
+```javascript
+{
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "src",
+  "compilerOptions": {
+    "plugins": ["@nestjs/swagger/plugin"]
+  }
+}
+```
+
+您可以使用 `options` 属性来自定义插件的行为。
+
+```javascript
+"plugins": [
+  {
+    "name": "@nestjs/swagger/plugin",
+    "options": {
+      "classValidatorShim": false
+    }
+  }
+]
+```
+
+`options` 属性必须满足以下接口：
+
+```typescript
+export interface PluginOptions {
+  dtoFileNameSuffix?: string[];
+  controllerFileNameSuffix?: string[];
+  classValidatorShim?: boolean;
+}
+```
+
+<table>
+  <tr>
+    <th>选项(Option)</th>
+    <th>默认(Default)</th>
+    <th>描述(Description)</th>
+  </tr>
+  <tr>
+    <td><code>dtoFileNameSuffix</code></td>
+    <td><code>['.dto.ts', '.entity.ts']</code></td>
+    <td>DTO（数据传输对象）文件后缀</td>
+  </tr>
+  <tr>
+    <td><code>controllerFileNameSuffix</code></td>
+    <td><code>.controller.ts</code></td>
+    <td>控制器文件后缀</td>
+  </tr>
+  <tr>
+    <td><code>classValidatorShim</code></td>
+    <td><code>true</code></td>
+    <td>如果设置为true，则模块将重用 <code>class-validator</code> 验证装饰器 (例如 <code>@Max(10)</code> 会将 <code>max: 10</code> 添加到 schema 定义中) </td>
+  </tr>
+</table>
+
+如果您不使用 CLI，而是使用自定义的 `webpack` 配置，则可以将此插件与 `ts-loader` 结合使用：
+
+```javascript
+getCustomTransformers: (program: any) => ({
+  before: [require('@nestjs/swagger/plugin').before({}, program)]
+}),
+```
+
+### 移植到 4.0
+
+如果你现在正在使用 `@nestjs/swagger@3.*`，请注意版本 4.0 中的以下重大更改/ API 更改。
+
+以下装饰器已经被更改/重命名：
+
+- `@ApiModelProperty` 现在是 `@ApiProperty`
+- `@ApiModelPropertyOptional` 现在是 `@ApiPropertyOptional`
+- `@ApiResponseModelProperty` 现在是 `@ApiResponseProperty`
+- `@ApiImplicitQuery` 现在是 `@ApiQuery`
+- `@ApiImplicitParam` 现在是 `@ApiParam`
+- `@ApiImplicitBody` 现在是 `@ApiBody`
+- `@ApiImplicitHeader` 现在是 `@ApiHeader`
+- `@ApiOperation({{ '{' }} title: 'test' {{ '}' }})` 现在是 `@ApiOperation({{ '{' }} summary: 'test' {{ '}' }})`
+- `@ApiUseTags` 现在是 `@ApiTags`
+
+`DocumentBuilder` 重大更改（更新的方法签名）:
+
+- `addTag`
+- `addBearerAuth`
+- `addOAuth2`
+- `setContactEmail` 现在是 `setContact`
+- `setHost` 已经被移除
+- `setSchemes` 已经被移除
+
+如下方法被添加：
+
+- `addServer`
+- `addApiKey`
+- `addBasicAuth`
+- `addSecurity`
+- `addSecurityRequirements`
+
+### 示例
 
 请参考这里的[示例](https://github.com/nestjs/nest/tree/master/sample/11-swagger)。
+
 
 ## Prisma
 

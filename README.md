@@ -14,7 +14,7 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
 
 微信群：（由于超过100人，微信限制，请先添加好友）
 
-![](https://pic2.superbed.cn/item/5dee07c91f8f59f4d6581d0f.jpg)
+![](https://pic2.superbed.cn/item/5dee088d1f8f59f4d6586014.jpg)
 
 赞助商广告：
 

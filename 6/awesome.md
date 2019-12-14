@@ -185,5 +185,6 @@
 
 ### 其他
 
-- [ts-toolbelt](https://github.com/pirix-gh/ts-toolbelt) - ts-toolbelt 是一个类型库，它提供了更新，更改和计算 TypeScript 类型的简单方法。
+- [ts-toolbelt](https://github.com/pirix-gh/ts-toolbelt) - ts-toolbelt 是一个类型库，它提供了更新，更改和计算 TypeScript 类型的简单方法。    
+
 更多... [nestjs-awesome](https://github.com/juliandavidmr/awesome-nestjs)

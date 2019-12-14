@@ -149,6 +149,7 @@
   - [hasura](https://hasura.io/) -Hasura 连接到您的数据库和微服务，并提供可用于生产的GraphQL API。
   - [prisma](https://www.prisma.io/) -Prisma 取代了传统的ORM。
   - [sequelize](https://github.com/sequelize/sequelize) -传统 Node.js ORM
+  - [notadd-cli](https://github.com/notadd/notadd-cli) - Typescript 生成 Graphql 。
   - [Magnus](https://github.com/notadd/magnus) 自动生成 grpc 及 graphql 的库。
   - [Nest Mongoose](https://github.com/nestjs/mongoose) - 用于 Nest 框架的 Mongoose 模块
   - [Nest Typegoose](https://github.com/kpfromer/nestjs-typegoose) - nest.js 的 [Typegoose](https://github.com/szokodiakos/typegoose) 模块。
@@ -166,6 +167,7 @@
   - [Nestjs AMQP](https://github.com/nestjsx/nestjs-amqp) - amqp 连接管理器
 - 支付网关
   - [Nestjs Braintree](https://github.com/nestjsx/nestjs-braintree) - 一个用于 webhooks 交易的模块。
+  - [Nestjs Stripe](https://github.com/dhaspden/nestjs-stripe) - 将已配置的 Stripe 客户端注入服务的模块。
   - [Notadd pay](https://github.com/notadd/nt-addon-pay) - 支持微信和支付宝支付。
 - Consul
   - [Nest Consul](https://github.com/nest-cloud/nestcloud) - 基于 Consul 的 NodeJS 微服务解决方案，由Typescript 语言和 NestJS 框架编写

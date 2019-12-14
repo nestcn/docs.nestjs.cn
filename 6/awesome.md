@@ -93,6 +93,7 @@
   - [Nest Consul Config](https://github.com/nest-cloud/nest-consul-config) - 从 consul kv 获取配置的模块
   - [Nest Consul Service](https://github.com/nest-cloud/nestcloud) - 基于 Consul 的 NodeJS 微服务解决方案，由 Typescript 语言和 NestJS 框架编写
   - [Nest Consul Loadbalance](https://github.com/nest-cloud/nest-consul-loadbalance) -  用于 Rest 的软件负载均衡器
+  - [Nest Schedule(官方)](https://github.com/miaowing/nest-schedule) - 装饰器实现的定时任务。
   - [Nest Schedule](https://github.com/miaowing/nest-schedule) - 装饰器实现的定时任务。
   - [Nest Queue](https://github.com/owl1n/nest-queue) - 基于 Redis 的简单队列管理，适用于您的应用程序
   - [nestjs bull](https://github.com/fwoelffel/nest-bull)   - Nestjs 分布式消息队列

@@ -182,4 +182,8 @@
   - [Yeoman Generator](https://github.com/ashinzekene/generator-nestjs-app) -  用于 nestsjs 应用程序的自动生成器。
   - [Nestjs Console](https://github.com/Pop-Code/nestjs-console) - 一个为应用程序提供 cli 的 Nestjs 模块。
 
+
+### 其他
+
+- [ts-toolbelt](https://github.com/pirix-gh/ts-toolbelt) - ts-toolbelt 是一个类型库，它提供了更新，更改和计算 TypeScript 类型的简单方法。
 更多... [nestjs-awesome](https://github.com/juliandavidmr/awesome-nestjs)

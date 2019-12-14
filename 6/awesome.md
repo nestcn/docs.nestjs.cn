@@ -74,7 +74,7 @@
   - [Awesome Nest Boilerplate 😍](https://github.com/NarHakobyan/awesome-nest-boilerplate), Typescript 💪，Postgresql 🎉，TypeORM，Swagger for Api文档，角色基本访问控制和最佳应用程序架构。
   - [NestJS Prisma Starter](https://github.com/fivethree-team/nestjs-prisma-client-starter) - NestJS 的入门项目😻 包括带有 Prisma 客户端的 Graphql，Passport-JWT 身份验证，Swagger Api 和 Docker。
   - [TeanJS](https://github.com/adrien2p/teanjs) - TeanJS是一个入门程序，它为您提供所有方式，以便能够尽快开始编写代码😻
-  
+  - [NestJS DDD Boilerplate](https://github.com/pezzetti/base-app-nestjs) 具有 NestJS，类验证器和 TypeORM 的领域驱动设计基础应用程序。完全可测试。
 
 ### 使用 NestJS 的项目
 
@@ -131,6 +131,7 @@
   - [Nest Pino](https://github.com/iamolegga/nestjs-pino) - 用于 nestjs 的 Pino 模块 ，😮在任意位置记录请求上下文😍
 - 监控
   - [Nest Status Monitor](https://github.com/GenFirst/nest-status-monitor) - 基于 Socket.io 和 Chart.js 的简单自托管模块，用于报告 Nest.js 的 node.js 服务器的实时状态。
+  - [Nest Terminus](https://github.com/nestjs/terminus) - 综合健康检查, 基于 [Terminus](https://github.com/godaddy/terminus) .
 - 国际化
   - [Nest i18n](https://github.com/ToonvanStrijp/nestjs-i18n) - 在您的服务器上轻松添加 i18n 支持，内置丰富的格式化 api 。    
 - 事件

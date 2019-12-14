@@ -92,10 +92,12 @@
   - [Nestjs Config](https://github.com/nestjsx/nestjs-config) -  处理项目配置的一个很棒的模块
   - [Nest Consul Config](https://github.com/nest-cloud/nest-consul-config) - 从 consul kv 获取配置的模块
   - [Nest Consul Service](https://github.com/nest-cloud/nestcloud) - 基于 Consul 的 NodeJS 微服务解决方案，由 Typescript 语言和 NestJS 框架编写
+  - [Nestjs Easy Config](https://github.com/rubiin/nestjs-easyconfig) - 一个用于管理配置的 nestjs模块，提供了一些现代的功能。
   - [Nest Consul Loadbalance](https://github.com/nest-cloud/nest-consul-loadbalance) -  用于 Rest 的软件负载均衡器
   - [Nest Schedule(官方)](https://github.com/miaowing/nest-schedule) - 装饰器实现的定时任务。
   - [Nest Schedule](https://github.com/miaowing/nest-schedule) - 装饰器实现的定时任务。
-  - [Nest Queue](https://github.com/owl1n/nest-queue) - 基于 Redis 的简单队列管理，适用于您的应用程序
+  - [Nest Queue](https://github.com/owl1n/nest-queue) - 基于 Redis 的简单队列管理，适用于您的应用程序。
+  - [Nest AutoMapper](https://github.com/nestjsx/automapper) - NestJS 的 AutoMapper 模块。    
   - [nestjs bull](https://github.com/fwoelffel/nest-bull)   - Nestjs 分布式消息队列
 - 状态管理
   - [Ngrx Nest](https://github.com/derekkite/ngrx-nest) - 在 Nest 上使用  ngrx/store 和 ngrx/effects.
@@ -130,7 +132,11 @@
 - 监控
   - [Nest Status Monitor](https://github.com/GenFirst/nest-status-monitor) - 基于 Socket.io 和 Chart.js 的简单自托管模块，用于报告 Nest.js 的 node.js 服务器的实时状态。
 - 国际化
-  - [Nest i18n](https://github.com/ToonvanStrijp/nestjs-i18n) - 在您的服务器上轻松添加 i18n 支持，内置丰富的格式化 api
+  - [Nest i18n](https://github.com/ToonvanStrijp/nestjs-i18n) - 在您的服务器上轻松添加 i18n 支持，内置丰富的格式化 api 。    
+- 事件
+- [Nest Event](https://github.com/yak0/nest-event) - 使用 NestJS 框架的装饰器进行事件处理。
+- Auth
+  - [Nestjs Session](https://github.com/iamolegga/nestjs-session) - NestJS 的 Session 模块, 基于 [express-session](https://npm.im/express-session)
 
 ### 集成
 

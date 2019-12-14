@@ -135,7 +135,7 @@
 - 国际化
   - [Nest i18n](https://github.com/ToonvanStrijp/nestjs-i18n) - 在您的服务器上轻松添加 i18n 支持，内置丰富的格式化 api 。    
 - 事件
-- [Nest Event](https://github.com/yak0/nest-event) - 使用 NestJS 框架的装饰器进行事件处理。
+  - [Nest Event](https://github.com/yak0/nest-event) - 使用 NestJS 框架的装饰器进行事件处理。
 - Auth
   - [Nestjs Session](https://github.com/iamolegga/nestjs-session) - NestJS 的 Session 模块, 基于 [express-session](https://npm.im/express-session)
 

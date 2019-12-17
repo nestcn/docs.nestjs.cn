@@ -2,7 +2,7 @@
 
 控制器层负责处理传入的请求, 并返回对客户端的响应。
 
-<center>![图1](https://docs.nestjs.com/assets/Controllers_1.png)</center>
+<center><img src="https://docs.nestjs.com/assets/Controllers_1.png"  alt="图1" /></center>
 
 
 要创建一个基本的控制器，你必须将 `元数据`（metadata） 附加到类中。Nest 元数据知道如何映射您的控制器到适当的路由。要附加元数据到我们正在使用的装饰器 (在这种情况下 `@Controller('cats')` )。

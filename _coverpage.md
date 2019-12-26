@@ -7,7 +7,8 @@
 
 - 完美支持 Typescript 
 - 面向 AOP 编程 
-- 支持 typeorm
+- 支持 Typeorm
+- 高并发，异步非阻塞 IO
 - Node.js 版的 spring
 - 构建微服务应用
 

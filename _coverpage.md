@@ -13,5 +13,5 @@
 - 构建微服务应用
 
 [6.x 文档](/6/firststeps.md)
-[加入QQ群](https://jq.qq.com/?_wv=1027&k=5uaXPHc)
 [学习资料/库](https://docs.nestjs.cn/6/awesome)
+[加入QQ群](https://jq.qq.com/?_wv=1027&k=5uaXPHc)

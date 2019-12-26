@@ -1203,153 +1203,200 @@ MongooseModule.forRootAsync({
   useExisting: ConfigService,
 });
 ```
+## 配置
 
-## 文件上传
+应用程序通常在不同的环境中运行。根据环境的不同，应该使用不同的配置设置。例如，通常本地环境依赖于特定的数据库凭据，仅对本地DB实例有效。生产环境将使用一组单独的DB凭据。由于配置变量会更改，所以最佳实践是将[配置变量](https://12factor.net/config)存储在环境中。
 
-为了处理文件上传，`Nest` 提供了一个内置的基于[multer](https://github.com/expressjs/multer)中间件包的 `Express`模块。`Multer` 处理以 `multipart/form-data` 格式发送的数据，该格式主要用于通过 `HTTP POST` 请求上传文件。这个模块是完全可配置的，您可以根据您的应用程序需求调整它的行为。
+通过 `process.env` 全局，`xternal` 定义的环境变量在` Node.js` 内部可见。 我们可以尝试通过在每个环境中分别设置环境变量来解决多个环境的问题。 这会很快变得难以处理，尤其是在需要轻松模拟或更改这些值的开发和测试环境中。
 
-!> `Multer`无法处理不是受支持的多部分格式（`multipart/form-data`）的数据。 另外，请注意此程序包与 `FastifyAdapter`不兼容。
+在 `Node.js` 应用程序中，通常使用 `.env` 文件，其中包含键值对，其中每个键代表一个特定的值，以代表每个环境。 在不同的环境中运行应用程序仅是交换正确的`.env` 文件的问题。
 
-### 基本实例
+在 `Nest` 中使用这种技术的一个好方法是创建一个 `ConfigModule` ，它公开一个 `ConfigService` ，根据 `$NODE_ENV` 环境变量加载适当的 `.env` 文件。
 
-当我们要上传单个文件时, 我们只需将 `FileInterceptor()` 与处理程序绑定在一起, 然后使用 `@UploadedFile()` 装饰器从 `request` 中取出 `file`。
+### 安装
 
-```typescript
-@Post('upload')
-@UseInterceptors(FileInterceptor('file'))
-uploadFile(@UploadedFile() file) {
-  console.log(file);
-}
+为了解析我们的环境文件，我们将使用 `dotenv` 包。
+
+```bash
+$ npm i --save dotenv
+$ npm i --save-dev @types/dotenv
 ```
 
-?> `FileInterceptor()` 装饰器是 `@nestjs/platform-express` 包提供的， `@UploadedFile()` 装饰是 `@nestjs/common` 包提供的。
+### 服务
 
-`FileInterceptor()` 接收两个参数：
+首先，我们创建一个 `ConfigService` 类，它将执行必要的 `.env` 文件解析并提供读取配置变量的接口。
 
- - 一个 `fieldName` (指向包含文件的 HTML 表单的字段) 
- 
- - 可选 `options` 对象。这些 `MulterOptions` 等效于传入 `multer` 构造函数 ([此处](https://github.com/expressjs/multer#multeropts)有更多详细信息)
-
-
-### 文件数组
-
-为了上传文件数组，我们使用 `FilesInterceptor()`。请使用 `FilesInterceptor()` 装饰器(注意装饰器名称中的复数文件)。这个装饰器有三个参数:
-
-- `fieldName`:（保持不变）
-
-- `maxCount`:可选的数字，定义要接受的最大文件数
-
-- `options`:可选的 `MulterOptions` 对象 ，如上所述
-
-使用 `FilesInterceptor()` 时，使用 `@UploadedFiles()` 装饰器从请求中提取文件。
+> config/config.service.ts
 
 ```typescript
-@Post('upload')
-@UseInterceptors(FilesInterceptor('files'))
-uploadFile(@UploadedFiles() files) {
-  console.log(files);
-}
-```
+import * as dotenv from 'dotenv';
+import * as fs from 'fs';
 
-?> `FilesInterceptor()` 装饰器需要导入 `@nestjs/platform-express`，而 `@UploadedFiles()` 导入  `@nestjs/common`。
+export class ConfigService {
+  private readonly envConfig: Record<string, string>;
 
-### 多个文件
+  constructor(filePath: string) {
+    this.envConfig = dotenv.parse(fs.readFileSync(filePath))
+  }
 
-要上传多个文件（全部使用不同的键），请使用 `FileFieldsInterceptor()` 装饰器。这个装饰器有两个参数:
-
-- `uploadedFields`:对象数组，其中每个对象指定一个必需的 `name` 属性和一个指定字段名的字符串值(如上所述)，以及一个可选的 `maxCount` 属性(如上所述)
-
-- `options`:可选的 `MulterOptions` 对象，如上所述
-
-使用 `FileFieldsInterceptor()` 时，使用 `@UploadedFiles()` 装饰器从 `request` 中提取文件。
-
-```typescript
-@Post('upload')
-@UseInterceptors(FileFieldsInterceptor([
-  { name: 'avatar', maxCount: 1 },
-  { name: 'background', maxCount: 1 },
-]))
-uploadFile(@UploadedFiles() files) {
-  console.log(files);
-}
-```
-### 任何文件
-
-要使用任意字段名称键上载所有字段，请使用 `AnyFilesInterceptor()` 装饰器。该装饰器可以接受如上所述的可选选项对象。
-
-使用 `FileFieldsInterceptor()` 时，使用 `@UploadedFiles()` 装饰器从 `request` 中提取文件。
-
-```typescript
-@Post('upload')
-@UseInterceptors(AnyFilesInterceptor())
-uploadFile(@UploadedFiles() files) {
-  console.log(files);
-}
-```
-
-### 默认选项
-
-您可以像上面描述的那样在文件拦截器中指定 `multer` 选项。要设置默认选项，可以在导入 `MulterModule` 时调用静态 `register()` 方法，传入受支持的选项。您可以使用[这里](https://github.com/expressjs/multer#multeropts)列出的所有选项。
-
-```typescript
-MulterModule.register({
-  dest: '/upload',
-});
-```
-
-### 异步配置
-
-当需要异步而不是静态地设置 `MulterModule` 选项时，请使用 `registerAsync()` 方法。与大多数动态模块一样，`Nest` 提供了一些处理异步配置的技术。
-
-第一种可能的方法是使用工厂函数：
-
-```typescript
-MulterModule.registerAsync({
-  useFactory: () => ({
-    dest: '/upload',
-  }),
-});
-```
-
-与其他工厂提供程序一样，我们的工厂函数可以是异步的，并且可以通过注入注入依赖。
-
-```typescript
-MulterModule.registerAsync({
-  imports: [ConfigModule],
-  useFactory: async (configService: ConfigService) => ({
-    dest: configService.getString('MULTER_DEST'),
-  }),
-  inject: [ConfigService],
-});
-```
-或者，您可以使用类而不是工厂来配置 `MulterModule`，如下所示:
-
-```typescript
-MulterModule.registerAsync({
-  useClass: MulterConfigService,
-});
-```
-
-上面的构造在 `MulterModule` 中实例化 `MulterConfigService` ，使用它来创建所需的 `options` 对象。注意，在本例中，`MulterConfigService` 必须实现 `MulterOptionsFactory` 接口，如下所示。`MulterModule` 将在提供的类的实例化对象上调用 `createMulterOptions()` 方法。
-
-```typescript
-@Injectable()
-class MulterConfigService implements MulterOptionsFactory {
-  createMulterOptions(): MulterModuleOptions {
-    return {
-      dest: '/upload',
-    };
+  get(key: string): string {
+    return this.envConfig[key];
   }
 }
 ```
 
-为了防止创建 `MulterConfigService` 内部 `MulterModule` 并使用从不同模块导入的提供程序，您可以使用  `useExisting` 语法。
+这个类只有一个参数，`filePath` 是你的 `.env` 文件的路径。提供 `get()` 方法以启用对私有 `envConfig` 对象的访问，该对象包含在环境文件中定义的每个属性。
+
+最后一步是创建一个 `ConfigModule`。
 
 ```typescript
-MulterModule.registerAsync({
+import { Module } from '@nestjs/common';
+import { ConfigService } from './config.service';
+
+@Module({
+  providers: [
+    {
+      provide: ConfigService,
+      useValue: new ConfigService(`${process.env.NODE_ENV || 'development'}.env`),
+    },
+  ],
+  exports: [ConfigService],
+})
+export class ConfigModule {}
+```
+
+`ConfigModule` 注册一个 `ConfigService` ，并将其导出为在其他消费模块中可见。此外，我们使用 `useValue` 语法(参见自定义提供程序)来传递到 `.env` 文件的路径。此路径将根据 `NODE_ENV` 环境变量中包含的实际执行环境而不同(例如，'开发'、'生产'等)。
+
+现在您可以简单地在任何地方注入 `ConfigService` ，并根据传递的密钥检索特定的配置值。
+
+> development.env
+
+```
+DATABASE_USER = test;
+DATABASE_PASSWORD = test;
+```
+
+### 使用 ConfigService
+
+要从 `ConfigService` 访问环境变量，我们需要注入它。因此我们首先需要导入该模块。
+
+> app.module.ts
+
+```typescript
+@Module({
   imports: [ConfigModule],
-  useExisting: ConfigService,
-});
+  ...
+})
+```
+
+然后我们可以使用标准的构造函数注入，并在我们的类中使用它:
+
+> app.service.ts
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from './config/config.service';
+
+@Injectable()
+export class AppService {
+  private isAuthEnabled: boolean;
+  constructor(config: ConfigService) {
+    // Please take note that this check is case sensitive!
+    this.isAuthEnabled = config.get('IS_AUTH_ENABLED') === 'true';
+  }
+```
+
+?> 您可以选择将 `ConfigModule` 声明为全局模块，而不是在每个模块中导入 `ConfigModule`。
+
+### 高级配置
+
+我们刚刚实现了一个基础 `ConfigService`。但是，这种方法有几个缺点，我们现在将解决这些缺点:
+
+* 缺少环境变量的名称和类型（无智能感知）
+* 缺少提供对 `.env` 文件的验证
+* env文件将布尔值作为string (`'true'`),提供，因此每次都必须将它们转换为 `boolean`
+
+### 验证
+
+我们将从验证提供的环境变量开始。如果未提供所需的环境变量或者它们不符合您的预定义要求，则可以抛出错误。为此，我们将使用 `npm` 包 [Joi](https://github.com/hapijs/joi)。通过 `Joi`，您可以定义一个对象模式（ `schema` ）并根据它来验证  `JavaScript` 对象。
+
+安装 `Joi` 和它的类型（用于 `TypeScript` 用户）：
+
+```bash
+$ npm install --save @hapi/joi
+$ npm install --save-dev @types/hapi__joi
+```
+
+安装软件包后，我们就可以转到 `ConfigService`。
+
+> config.service.ts
+
+```typescript
+import * as dotenv from 'dotenv';
+import * as Joi from '@hapi/joi';
+import * as fs from 'fs';
+
+export type EnvConfig = Record<string, string>;
+
+export class ConfigService {
+  private readonly envConfig: EnvConfig;
+
+  constructor(filePath: string) {
+    const config = dotenv.parse(fs.readFileSync(filePath));
+    this.envConfig = this.validateInput(config);
+  }
+
+  /**
+   * Ensures all needed variables are set, and returns the validated JavaScript object
+   * including the applied default values.
+   */
+  private validateInput(envConfig: EnvConfig): EnvConfig {
+    const envVarsSchema: Joi.ObjectSchema = Joi.object({
+      NODE_ENV: Joi.string()
+        .valid('development', 'production', 'test', 'provision')
+        .default('development'),
+      PORT: Joi.number().default(3000),
+      API_AUTH_ENABLED: Joi.boolean().required(),
+    });
+
+    const { error, value: validatedEnvConfig } = envVarsSchema.validate(
+      envConfig,
+    );
+    if (error) {
+      throw new Error(`Config validation error: ${error.message}`);
+    }
+    return validatedEnvConfig;
+  }
+}
+```
+
+由于我们为 `NODE_ENV` 和 `PORT` 设置了默认值，因此如果不在环境文件中提供这些变量，验证将不会失败。然而, 我们需要明确提供 `API_AUTH_ENABLED`。如果我们的 `.env` 文件中的变量不是模式（ `schema` ）的一部分, 则验证也会引发错误。此外，`Joi` 还会尝试将 `env` 字符串转换为正确的类型。
+
+### 类属性
+
+对于每个配置属性，我们必须添加一个getter方法。
+
+> config.service.ts
+
+```typescript
+get isApiAuthEnabled(): boolean {
+  return Boolean(this.envConfig.API_AUTH_ENABLED);
+}
+```
+
+现在我们可以像下面这样使用getter函数:
+
+> app.service.ts
+
+```typescript
+@Injectable()
+export class AppService {
+  constructor(config: ConfigService) {
+    if (config.isApiAuthEnabled) {
+      // Authorization is enabled
+    }
+  }
+}
 ```
 
 ## 验证
@@ -1780,6 +1827,116 @@ findOne(): UserEntity {
 
 想了解有关装饰器选项的更多信息，请访问此[页面](https://github.com/typestack/class-transformer)。
 
+## 定时任务
+
+（更新中）
+
+## 压缩
+
+
+压缩可以大大减小响应主体的大小，从而提高 `Web` 应用程序的速度。使用[压缩中间件](https://github.com/expressjs/compression)启用 `gzip` 压缩。
+
+### 安装
+
+首先，安装所需的包：
+
+```
+$ npm i --save compression
+```
+
+安装完成后，将其应用为全局中间件。
+
+```typescript
+import * as compression from 'compression';
+// somewhere in your initialization file
+app.use(compression());
+```
+
+?> 提示: 如果你在使用的是 `FastifyAdapter`，请考虑使用 [fastify-compress](https://github.com/fastify/fastify-compress) 代替。
+
+对于生产中的高流量网站，实施压缩的最佳方法是在反向代理级别实施。在这种情况下，您不需要使用压缩中间件。
+
+## 安全
+
+在本章中，您将学习一些可以提高应用程序安全性的技术。
+
+### Helmet
+
+通过适当地设置 `HTTP` 头，[Helmet](https://github.com/helmetjs/helmet) 可以帮助保护您的应用免受一些众所周知的 `Web` 漏洞的影响。通常，`Helmet` 只是`12`个较小的中间件函数的集合，它们设置与安全相关的 `HTTP` 头（[阅读更多](https://github.com/helmetjs/helmet#how-it-works)）。首先，安装所需的包：
+
+```bash
+$ npm i --save helmet
+```
+
+安装完成后，将其应用为全局中间件。
+
+```typescript
+import * as helmet from 'helmet';
+// somewhere in your initialization file
+app.use(helmet());
+```
+
+### CORS
+
+跨源资源共享（`CORS`）是一种允许从另一个域请求资源的机制。在引擎盖下，`Nest` 使用了 [cors](https://github.com/expressjs/cors) 包，它提供了一系列选项，您可以根据自己的要求进行自定义。为了启用 `CORS`，您必须调用 `enableCors()` 方法。
+
+```typescript
+const app = await NestFactory.create(ApplicationModule);
+app.enableCors();
+await app.listen(3000);
+```
+
+此外，您可以将配置对象作为此函数的参数传递。可用的属性在官方 [cors](https://github.com/expressjs/cors) 存储库中详尽描述。另一种方法是使用 `Nest` 选项对象：
+
+```typescript
+const app = await NestFactory.create(ApplicationModule, { cors: true });
+await app.listen(3000);
+```
+
+您也可以使用 `cors` 配置对象（[更多信息](https://github.com/expressjs/cors#configuration-options)），而不是传递布尔值。
+
+### CSRF
+
+跨站点请求伪造（称为 `CSRF` 或 `XSRF`）是一种恶意利用网站，其中未经授权的命令从 `Web` 应用程序信任的用户传输。要减轻此类攻击，您可以使用 [csurf](https://github.com/expressjs/csurf) 软件包。首先，安装所需的包：
+
+```bash
+$ npm i --save csurf
+```
+
+?> 正如 `csurf` 中间件页面所解释的，`csurf` 模块需要首先初始化会话中间件或 `cookie` 解析器。有关进一步说明，请参阅该[文档](https://github.com/expressjs/csurf#csurf)。 
+
+安装完成后，将其应用为全局中间件。
+
+```typescript
+import * as csurf from 'csurf';
+// somewhere in your initialization file
+app.use(csurf());
+```
+
+### 限速
+
+为了保护您的应用程序免受暴力攻击，您必须实现某种速率限制。幸运的是，`NPM`上已经有很多各种中间件可用。其中之一是[express-rate-limit](https://github.com/nfriedly/express-rate-limit)。
+
+```bash
+$ npm i --save express-rate-limit
+```
+
+安装完成后，将其应用为全局中间件。
+
+```typescript
+import * as rateLimit from 'express-rate-limit';
+// somewhere in your initialization file
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+  }),
+);
+```
+
+?> 提示: 如果您在 `FastifyAdapter` 下开发，请考虑使用 [fastify-rate-limit](https://github.com/fastify/fastify-rate-limit)。
+
+
 ## 日志
 
 
@@ -1875,306 +2032,155 @@ await app.listen(3000);
 
 此解决方案的唯一缺点是您的第一个初始化消息将不会由您的 `Logger` 实例处理，但此时这点并不重要。
 
-## 安全
 
-在本章中，您将学习一些可以提高应用程序安全性的技术。
+## 文件上传
 
-### Helmet
+为了处理文件上传，`Nest` 提供了一个内置的基于[multer](https://github.com/expressjs/multer)中间件包的 `Express`模块。`Multer` 处理以 `multipart/form-data` 格式发送的数据，该格式主要用于通过 `HTTP POST` 请求上传文件。这个模块是完全可配置的，您可以根据您的应用程序需求调整它的行为。
 
-通过适当地设置 `HTTP` 头，[Helmet](https://github.com/helmetjs/helmet) 可以帮助保护您的应用免受一些众所周知的 `Web` 漏洞的影响。通常，`Helmet` 只是`12`个较小的中间件函数的集合，它们设置与安全相关的 `HTTP` 头（[阅读更多](https://github.com/helmetjs/helmet#how-it-works)）。首先，安装所需的包：
+!> `Multer`无法处理不是受支持的多部分格式（`multipart/form-data`）的数据。 另外，请注意此程序包与 `FastifyAdapter`不兼容。
 
-```bash
-$ npm i --save helmet
-```
+### 基本实例
 
-安装完成后，将其应用为全局中间件。
+当我们要上传单个文件时, 我们只需将 `FileInterceptor()` 与处理程序绑定在一起, 然后使用 `@UploadedFile()` 装饰器从 `request` 中取出 `file`。
 
 ```typescript
-import * as helmet from 'helmet';
-// somewhere in your initialization file
-app.use(helmet());
+@Post('upload')
+@UseInterceptors(FileInterceptor('file'))
+uploadFile(@UploadedFile() file) {
+  console.log(file);
+}
 ```
 
-### CORS
+?> `FileInterceptor()` 装饰器是 `@nestjs/platform-express` 包提供的， `@UploadedFile()` 装饰是 `@nestjs/common` 包提供的。
 
-跨源资源共享（`CORS`）是一种允许从另一个域请求资源的机制。在引擎盖下，`Nest` 使用了 [cors](https://github.com/expressjs/cors) 包，它提供了一系列选项，您可以根据自己的要求进行自定义。为了启用 `CORS`，您必须调用 `enableCors()` 方法。
+`FileInterceptor()` 接收两个参数：
+
+ - 一个 `fieldName` (指向包含文件的 HTML 表单的字段) 
+ 
+ - 可选 `options` 对象。这些 `MulterOptions` 等效于传入 `multer` 构造函数 ([此处](https://github.com/expressjs/multer#multeropts)有更多详细信息)
+
+
+### 文件数组
+
+为了上传文件数组，我们使用 `FilesInterceptor()`。请使用 `FilesInterceptor()` 装饰器(注意装饰器名称中的复数文件)。这个装饰器有三个参数:
+
+- `fieldName`:（保持不变）
+
+- `maxCount`:可选的数字，定义要接受的最大文件数
+
+- `options`:可选的 `MulterOptions` 对象 ，如上所述
+
+使用 `FilesInterceptor()` 时，使用 `@UploadedFiles()` 装饰器从请求中提取文件。
 
 ```typescript
-const app = await NestFactory.create(ApplicationModule);
-app.enableCors();
-await app.listen(3000);
+@Post('upload')
+@UseInterceptors(FilesInterceptor('files'))
+uploadFile(@UploadedFiles() files) {
+  console.log(files);
+}
 ```
 
-此外，您可以将配置对象作为此函数的参数传递。可用的属性在官方 [cors](https://github.com/expressjs/cors) 存储库中详尽描述。另一种方法是使用 `Nest` 选项对象：
+?> `FilesInterceptor()` 装饰器需要导入 `@nestjs/platform-express`，而 `@UploadedFiles()` 导入  `@nestjs/common`。
+
+### 多个文件
+
+要上传多个文件（全部使用不同的键），请使用 `FileFieldsInterceptor()` 装饰器。这个装饰器有两个参数:
+
+- `uploadedFields`:对象数组，其中每个对象指定一个必需的 `name` 属性和一个指定字段名的字符串值(如上所述)，以及一个可选的 `maxCount` 属性(如上所述)
+
+- `options`:可选的 `MulterOptions` 对象，如上所述
+
+使用 `FileFieldsInterceptor()` 时，使用 `@UploadedFiles()` 装饰器从 `request` 中提取文件。
 
 ```typescript
-const app = await NestFactory.create(ApplicationModule, { cors: true });
-await app.listen(3000);
+@Post('upload')
+@UseInterceptors(FileFieldsInterceptor([
+  { name: 'avatar', maxCount: 1 },
+  { name: 'background', maxCount: 1 },
+]))
+uploadFile(@UploadedFiles() files) {
+  console.log(files);
+}
 ```
+### 任何文件
 
-您也可以使用 `cors` 配置对象（[更多信息](https://github.com/expressjs/cors#configuration-options)），而不是传递布尔值。
+要使用任意字段名称键上载所有字段，请使用 `AnyFilesInterceptor()` 装饰器。该装饰器可以接受如上所述的可选选项对象。
 
-### CSRF
-
-跨站点请求伪造（称为 `CSRF` 或 `XSRF`）是一种恶意利用网站，其中未经授权的命令从 `Web` 应用程序信任的用户传输。要减轻此类攻击，您可以使用 [csurf](https://github.com/expressjs/csurf) 软件包。首先，安装所需的包：
-
-```bash
-$ npm i --save csurf
-```
-
-?> 正如 `csurf` 中间件页面所解释的，`csurf` 模块需要首先初始化会话中间件或 `cookie` 解析器。有关进一步说明，请参阅该[文档](https://github.com/expressjs/csurf#csurf)。 
-
-安装完成后，将其应用为全局中间件。
+使用 `FileFieldsInterceptor()` 时，使用 `@UploadedFiles()` 装饰器从 `request` 中提取文件。
 
 ```typescript
-import * as csurf from 'csurf';
-// somewhere in your initialization file
-app.use(csurf());
+@Post('upload')
+@UseInterceptors(AnyFilesInterceptor())
+uploadFile(@UploadedFiles() files) {
+  console.log(files);
+}
 ```
 
-### 限速
+### 默认选项
 
-为了保护您的应用程序免受暴力攻击，您必须实现某种速率限制。幸运的是，`NPM`上已经有很多各种中间件可用。其中之一是[express-rate-limit](https://github.com/nfriedly/express-rate-limit)。
-
-```bash
-$ npm i --save express-rate-limit
-```
-
-安装完成后，将其应用为全局中间件。
+您可以像上面描述的那样在文件拦截器中指定 `multer` 选项。要设置默认选项，可以在导入 `MulterModule` 时调用静态 `register()` 方法，传入受支持的选项。您可以使用[这里](https://github.com/expressjs/multer#multeropts)列出的所有选项。
 
 ```typescript
-import * as rateLimit from 'express-rate-limit';
-// somewhere in your initialization file
-app.use(
-  rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
+MulterModule.register({
+  dest: '/upload',
+});
+```
+
+### 异步配置
+
+当需要异步而不是静态地设置 `MulterModule` 选项时，请使用 `registerAsync()` 方法。与大多数动态模块一样，`Nest` 提供了一些处理异步配置的技术。
+
+第一种可能的方法是使用工厂函数：
+
+```typescript
+MulterModule.registerAsync({
+  useFactory: () => ({
+    dest: '/upload',
   }),
-);
+});
 ```
 
-?> 提示: 如果您在 `FastifyAdapter` 下开发，请考虑使用 [fastify-rate-limit](https://github.com/fastify/fastify-rate-limit)。
-
-## 配置
-
-应用程序通常在不同的环境中运行。根据环境的不同，应该使用不同的配置设置。例如，通常本地环境依赖于特定的数据库凭据，仅对本地DB实例有效。生产环境将使用一组单独的DB凭据。由于配置变量会更改，所以最佳实践是将[配置变量](https://12factor.net/config)存储在环境中。
-
-通过 `process.env` 全局，`xternal` 定义的环境变量在` Node.js` 内部可见。 我们可以尝试通过在每个环境中分别设置环境变量来解决多个环境的问题。 这会很快变得难以处理，尤其是在需要轻松模拟或更改这些值的开发和测试环境中。
-
-在 `Node.js` 应用程序中，通常使用 `.env` 文件，其中包含键值对，其中每个键代表一个特定的值，以代表每个环境。 在不同的环境中运行应用程序仅是交换正确的`.env` 文件的问题。
-
-在 `Nest` 中使用这种技术的一个好方法是创建一个 `ConfigModule` ，它公开一个 `ConfigService` ，根据 `$NODE_ENV` 环境变量加载适当的 `.env` 文件。
-
-### 安装
-
-为了解析我们的环境文件，我们将使用 `dotenv` 包。
-
-```bash
-$ npm i --save dotenv
-$ npm i --save-dev @types/dotenv
-```
-
-### 服务
-
-首先，我们创建一个 `ConfigService` 类，它将执行必要的 `.env` 文件解析并提供读取配置变量的接口。
-
-> config/config.service.ts
+与其他工厂提供程序一样，我们的工厂函数可以是异步的，并且可以通过注入注入依赖。
 
 ```typescript
-import * as dotenv from 'dotenv';
-import * as fs from 'fs';
-
-export class ConfigService {
-  private readonly envConfig: Record<string, string>;
-
-  constructor(filePath: string) {
-    this.envConfig = dotenv.parse(fs.readFileSync(filePath))
-  }
-
-  get(key: string): string {
-    return this.envConfig[key];
-  }
-}
-```
-
-这个类只有一个参数，`filePath` 是你的 `.env` 文件的路径。提供 `get()` 方法以启用对私有 `envConfig` 对象的访问，该对象包含在环境文件中定义的每个属性。
-
-最后一步是创建一个 `ConfigModule`。
-
-```typescript
-import { Module } from '@nestjs/common';
-import { ConfigService } from './config.service';
-
-@Module({
-  providers: [
-    {
-      provide: ConfigService,
-      useValue: new ConfigService(`${process.env.NODE_ENV || 'development'}.env`),
-    },
-  ],
-  exports: [ConfigService],
-})
-export class ConfigModule {}
-```
-
-`ConfigModule` 注册一个 `ConfigService` ，并将其导出为在其他消费模块中可见。此外，我们使用 `useValue` 语法(参见自定义提供程序)来传递到 `.env` 文件的路径。此路径将根据 `NODE_ENV` 环境变量中包含的实际执行环境而不同(例如，'开发'、'生产'等)。
-
-现在您可以简单地在任何地方注入 `ConfigService` ，并根据传递的密钥检索特定的配置值。
-
-> development.env
-
-```
-DATABASE_USER = test;
-DATABASE_PASSWORD = test;
-```
-
-### 使用 ConfigService
-
-要从 `ConfigService` 访问环境变量，我们需要注入它。因此我们首先需要导入该模块。
-
-> app.module.ts
-
-```typescript
-@Module({
+MulterModule.registerAsync({
   imports: [ConfigModule],
-  ...
-})
+  useFactory: async (configService: ConfigService) => ({
+    dest: configService.getString('MULTER_DEST'),
+  }),
+  inject: [ConfigService],
+});
 ```
-
-然后我们可以使用标准的构造函数注入，并在我们的类中使用它:
-
-> app.service.ts
+或者，您可以使用类而不是工厂来配置 `MulterModule`，如下所示:
 
 ```typescript
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from './config/config.service';
-
-@Injectable()
-export class AppService {
-  private isAuthEnabled: boolean;
-  constructor(config: ConfigService) {
-    // Please take note that this check is case sensitive!
-    this.isAuthEnabled = config.get('IS_AUTH_ENABLED') === 'true';
-  }
+MulterModule.registerAsync({
+  useClass: MulterConfigService,
+});
 ```
 
-?> 您可以选择将 `ConfigModule` 声明为全局模块，而不是在每个模块中导入 `ConfigModule`。
-
-### 高级配置
-
-我们刚刚实现了一个基础 `ConfigService`。但是，这种方法有几个缺点，我们现在将解决这些缺点:
-
-* 缺少环境变量的名称和类型（无智能感知）
-* 缺少提供对 `.env` 文件的验证
-* env文件将布尔值作为string (`'true'`),提供，因此每次都必须将它们转换为 `boolean`
-
-### 验证
-
-我们将从验证提供的环境变量开始。如果未提供所需的环境变量或者它们不符合您的预定义要求，则可以抛出错误。为此，我们将使用 `npm` 包 [Joi](https://github.com/hapijs/joi)。通过 `Joi`，您可以定义一个对象模式（ `schema` ）并根据它来验证  `JavaScript` 对象。
-
-安装 `Joi` 和它的类型（用于 `TypeScript` 用户）：
-
-```bash
-$ npm install --save @hapi/joi
-$ npm install --save-dev @types/hapi__joi
-```
-
-安装软件包后，我们就可以转到 `ConfigService`。
-
-> config.service.ts
-
-```typescript
-import * as dotenv from 'dotenv';
-import * as Joi from '@hapi/joi';
-import * as fs from 'fs';
-
-export type EnvConfig = Record<string, string>;
-
-export class ConfigService {
-  private readonly envConfig: EnvConfig;
-
-  constructor(filePath: string) {
-    const config = dotenv.parse(fs.readFileSync(filePath));
-    this.envConfig = this.validateInput(config);
-  }
-
-  /**
-   * Ensures all needed variables are set, and returns the validated JavaScript object
-   * including the applied default values.
-   */
-  private validateInput(envConfig: EnvConfig): EnvConfig {
-    const envVarsSchema: Joi.ObjectSchema = Joi.object({
-      NODE_ENV: Joi.string()
-        .valid('development', 'production', 'test', 'provision')
-        .default('development'),
-      PORT: Joi.number().default(3000),
-      API_AUTH_ENABLED: Joi.boolean().required(),
-    });
-
-    const { error, value: validatedEnvConfig } = envVarsSchema.validate(
-      envConfig,
-    );
-    if (error) {
-      throw new Error(`Config validation error: ${error.message}`);
-    }
-    return validatedEnvConfig;
-  }
-}
-```
-
-由于我们为 `NODE_ENV` 和 `PORT` 设置了默认值，因此如果不在环境文件中提供这些变量，验证将不会失败。然而, 我们需要明确提供 `API_AUTH_ENABLED`。如果我们的 `.env` 文件中的变量不是模式（ `schema` ）的一部分, 则验证也会引发错误。此外，`Joi` 还会尝试将 `env` 字符串转换为正确的类型。
-
-### 类属性
-
-对于每个配置属性，我们必须添加一个getter方法。
-
-> config.service.ts
-
-```typescript
-get isApiAuthEnabled(): boolean {
-  return Boolean(this.envConfig.API_AUTH_ENABLED);
-}
-```
-
-现在我们可以像下面这样使用getter函数:
-
-> app.service.ts
+上面的构造在 `MulterModule` 中实例化 `MulterConfigService` ，使用它来创建所需的 `options` 对象。注意，在本例中，`MulterConfigService` 必须实现 `MulterOptionsFactory` 接口，如下所示。`MulterModule` 将在提供的类的实例化对象上调用 `createMulterOptions()` 方法。
 
 ```typescript
 @Injectable()
-export class AppService {
-  constructor(config: ConfigService) {
-    if (config.isApiAuthEnabled) {
-      // Authorization is enabled
-    }
+class MulterConfigService implements MulterOptionsFactory {
+  createMulterOptions(): MulterModuleOptions {
+    return {
+      dest: '/upload',
+    };
   }
 }
 ```
 
-## 压缩
-
-
-压缩可以大大减小响应主体的大小，从而提高 `Web` 应用程序的速度。使用[压缩中间件](https://github.com/expressjs/compression)启用 `gzip` 压缩。
-
-### 安装
-
-首先，安装所需的包：
-
-```
-$ npm i --save compression
-```
-
-安装完成后，将其应用为全局中间件。
+为了防止创建 `MulterConfigService` 内部 `MulterModule` 并使用从不同模块导入的提供程序，您可以使用  `useExisting` 语法。
 
 ```typescript
-import * as compression from 'compression';
-// somewhere in your initialization file
-app.use(compression());
+MulterModule.registerAsync({
+  imports: [ConfigModule],
+  useExisting: ConfigService,
+});
 ```
 
-?> 提示: 如果你在使用的是 `FastifyAdapter`，请考虑使用 [fastify-compress](https://github.com/fastify/fastify-compress) 代替。
-
-对于生产中的高流量网站，实施压缩的最佳方法是在反向代理级别实施。在这种情况下，您不需要使用压缩中间件。
 
 ## HTTP 模块
 
@@ -2535,179 +2541,10 @@ new FastifyAdapter({ logger: true })
 
 [这里](https://github.com/nestjs/nest/tree/master/sample/10-fastify)有一个工作示例
 
-## 热重载（Webpack）
 
-对应用程序的引导过程影响最大的是 `TypeScript` 编译。但问题是，每次发生变化时，我们是否必须重新编译整个项目？一点也不。这就是为什么 [webpack](https://github.com/webpack/webpack) `HMR`（Hot-Module Replacement）大大减少了实例化您的应用程序所需的时间。
+## 性能（Fastify）
 
-
-?> 请注意，`webpack`这不会自动将（例如 `graphql` 文件）复制到 `dist` 文件夹中。类似地，`webpack` 与全局静态路径（例如中的 `entities` 属性 `TypeOrmModule` ）不兼容。
-
-### CLI
-
-如果使用的是 `Nest CLI`，则配置过程非常简单。`CLI` 包装 `webpack`，允许使用 `HotModuleReplacementPlugin`。
-
-### 安装
-
-首先，我们安装所需的软件包：
-
-```bash
-$ npm i --save-dev webpack-node-externals
-```
-
-### 配置（Configuration）
-
-然后，我们需要创建一个` webpack.config.js`，它是webpack的一个配置文件，并将其放入根目录。
-
-```typescript
-const webpack = require('webpack');
-const nodeExternals = require('webpack-node-externals');
-
-module.exports = function(options) {
-  return {
-    ...options,
-    entry: ['webpack/hot/poll?100', './src/main.ts'],
-    watch: true,
-    externals: [
-      nodeExternals({
-        whitelist: ['webpack/hot/poll?100'],
-      }),
-    ],
-    plugins: [...options.plugins, new webpack.HotModuleReplacementPlugin()],
-  };
-}
-```
-
-此函数获取包含默认 `webpack` 配置的原始对象，并返回一个已修改的对象和一个已应用的 `HotModuleReplacementPlugin` 插件。
-
-### 热模块更换
-
-为了启用 `HMR`，请打开应用程序入口文件（ `main.ts` ）并添加一些与 `Webpack`相关的说明，如下所示：
-
-```typescript
-declare const module: any;
-
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
-
-  if (module.hot) {
-    module.hot.accept();
-    module.hot.dispose(() => app.close());
-  }
-}
-bootstrap();
-```
-
-就这样。为了简化执行过程，请将这两行添加到 `package.json` 文件的脚本中。
-
-```json
-"build": "nest build --watch --webpack"
-"start": "node dist/main",
-```
-
-现在只需打开你的命令行并运行下面的命令：
-
-```bash
-$ npm run build
-```
-
-webpack开始监视文件后，在另一个命令行窗口中运行另一个命令:
-
-```bash
-$ npm run start
-```
-
-### 没有使用 CLI
-
-如果您没有使用 `Nest CLI` ，配置将稍微复杂一些(需要更多的手动步骤)。
-
-### 安装
-
-首先安装所需的软件包：
-
-```bash
-$ npm i --save-dev webpack webpack-cli webpack-node-externals ts-loader
-```
-
-### 配置
-
-然后，我们需要创建一个` webpack.config.js`，它是 `webpack` 的一个配置文件，并将其放入根目录。
-
-```typescript
-const webpack = require('webpack');
-const path = require('path');
-const nodeExternals = require('webpack-node-externals');
-
-module.exports = {
-  entry: ['webpack/hot/poll?100', './src/main.ts'],
-  watch: true,
-  target: 'node',
-  externals: [
-    nodeExternals({
-      whitelist: ['webpack/hot/poll?100'],
-    }),
-  ],
-  module: {
-    rules: [
-      {
-        test: /.tsx?$/,
-        use: 'ts-loader',
-        exclude: /node_modules/,
-      },
-    ],
-  },
-  mode: 'development',
-  resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
-  },
-  plugins: [new webpack.HotModuleReplacementPlugin()],
-  output: {
-    path: path.join(__dirname, 'dist'),
-    filename: 'server.js',
-  },
-};
-```
-
-这个配置告诉 `webpack` 关于我们的应用程序的一些基本信息。入口文件位于何处，应使用哪个目录保存已编译的文件，以及我们要使用哪种装载程序来编译源文件。基本上，您不必担心太多，根本不需要了解该文件的内容。
-
-### 热模块更换
-
-为了启用 `HMR` ，我们必须打开应用程序入口文件（ `main.ts` ），并添加一些与 `Webpack` 相关的说明。
-
-```typescript
-declare const module: any;
-
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
-
-  if (module.hot) {
-    module.hot.accept();
-    module.hot.dispose(() => app.close());
-  }
-}
-bootstrap();
-```
-
-为了简化执行过程，请将两个脚本添加到 `package.json` 文件中。
-
-```bash
-"webpack": "webpack --config webpack.config.js"
-"start": "node dist/server",
-```
-
-现在，只需打开命令行并运行以下命令：
-
-```bash
-$ npm run webpack
-```
-一旦 `webpack` 开始监视文件，请在单独的命令行窗口中运行以下命令：
-
-```bash
-$ npm run start
-```
-
-[这里](https://github.com/nestjs/nest/tree/master/sample/08-webpack)有一个可用的例子
+（更新中）
 
  ### 译者署名
 

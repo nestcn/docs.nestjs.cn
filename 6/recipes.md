@@ -2091,6 +2091,181 @@ export class HeroesController {
 
 本章中的示例仅涉及 [CRUD](https://github.com/nestjsx/crud) 的一些特性。您可以在项目的 [Wiki](https://github.com/nestjsx/crud/wiki/Home) 页面上找到更多使用问题的答案。
 
+
+## 热重载（Webpack）
+
+对应用程序的引导过程影响最大的是 `TypeScript` 编译。但问题是，每次发生变化时，我们是否必须重新编译整个项目？一点也不。这就是为什么 [webpack](https://github.com/webpack/webpack) `HMR`（Hot-Module Replacement）大大减少了实例化您的应用程序所需的时间。
+
+
+?> 请注意，`webpack`这不会自动将（例如 `graphql` 文件）复制到 `dist` 文件夹中。类似地，`webpack` 与全局静态路径（例如中的 `entities` 属性 `TypeOrmModule` ）不兼容。
+
+### CLI
+
+如果使用的是 `Nest CLI`，则配置过程非常简单。`CLI` 包装 `webpack`，允许使用 `HotModuleReplacementPlugin`。
+
+### 安装
+
+首先，我们安装所需的软件包：
+
+```bash
+$ npm i --save-dev webpack-node-externals
+```
+
+### 配置（Configuration）
+
+然后，我们需要创建一个` webpack.config.js`，它是webpack的一个配置文件，并将其放入根目录。
+
+```typescript
+const webpack = require('webpack');
+const nodeExternals = require('webpack-node-externals');
+
+module.exports = function(options) {
+  return {
+    ...options,
+    entry: ['webpack/hot/poll?100', './src/main.ts'],
+    watch: true,
+    externals: [
+      nodeExternals({
+        whitelist: ['webpack/hot/poll?100'],
+      }),
+    ],
+    plugins: [...options.plugins, new webpack.HotModuleReplacementPlugin()],
+  };
+}
+```
+
+此函数获取包含默认 `webpack` 配置的原始对象，并返回一个已修改的对象和一个已应用的 `HotModuleReplacementPlugin` 插件。
+
+### 热模块更换
+
+为了启用 `HMR`，请打开应用程序入口文件（ `main.ts` ）并添加一些与 `Webpack`相关的说明，如下所示：
+
+```typescript
+declare const module: any;
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  await app.listen(3000);
+
+  if (module.hot) {
+    module.hot.accept();
+    module.hot.dispose(() => app.close());
+  }
+}
+bootstrap();
+```
+
+就这样。为了简化执行过程，请将这两行添加到 `package.json` 文件的脚本中。
+
+```json
+"build": "nest build --watch --webpack"
+"start": "node dist/main",
+```
+
+现在只需打开你的命令行并运行下面的命令：
+
+```bash
+$ npm run build
+```
+
+webpack开始监视文件后，在另一个命令行窗口中运行另一个命令:
+
+```bash
+$ npm run start
+```
+
+### 没有使用 CLI
+
+如果您没有使用 `Nest CLI` ，配置将稍微复杂一些(需要更多的手动步骤)。
+
+### 安装
+
+首先安装所需的软件包：
+
+```bash
+$ npm i --save-dev webpack webpack-cli webpack-node-externals ts-loader
+```
+
+### 配置
+
+然后，我们需要创建一个` webpack.config.js`，它是 `webpack` 的一个配置文件，并将其放入根目录。
+
+```typescript
+const webpack = require('webpack');
+const path = require('path');
+const nodeExternals = require('webpack-node-externals');
+
+module.exports = {
+  entry: ['webpack/hot/poll?100', './src/main.ts'],
+  watch: true,
+  target: 'node',
+  externals: [
+    nodeExternals({
+      whitelist: ['webpack/hot/poll?100'],
+    }),
+  ],
+  module: {
+    rules: [
+      {
+        test: /.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
+    ],
+  },
+  mode: 'development',
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js'],
+  },
+  plugins: [new webpack.HotModuleReplacementPlugin()],
+  output: {
+    path: path.join(__dirname, 'dist'),
+    filename: 'server.js',
+  },
+};
+```
+
+这个配置告诉 `webpack` 关于我们的应用程序的一些基本信息。入口文件位于何处，应使用哪个目录保存已编译的文件，以及我们要使用哪种装载程序来编译源文件。基本上，您不必担心太多，根本不需要了解该文件的内容。
+
+### 热模块更换
+
+为了启用 `HMR` ，我们必须打开应用程序入口文件（ `main.ts` ），并添加一些与 `Webpack` 相关的说明。
+
+```typescript
+declare const module: any;
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  await app.listen(3000);
+
+  if (module.hot) {
+    module.hot.accept();
+    module.hot.dispose(() => app.close());
+  }
+}
+bootstrap();
+```
+
+为了简化执行过程，请将两个脚本添加到 `package.json` 文件中。
+
+```bash
+"webpack": "webpack --config webpack.config.js"
+"start": "node dist/server",
+```
+
+现在，只需打开命令行并运行以下命令：
+
+```bash
+$ npm run webpack
+```
+一旦 `webpack` 开始监视文件，请在单独的命令行窗口中运行以下命令：
+
+```bash
+$ npm run start
+```
+
+[这里](https://github.com/nestjs/nest/tree/master/sample/08-webpack)有一个可用的例子
+
 ## 静态服务 
 
 为了像单页应用程序（ `SPA` ）一样提供静态内容，我们可以使用 `@nestjs/serve-static` 包中的`ServeStaticModule`。

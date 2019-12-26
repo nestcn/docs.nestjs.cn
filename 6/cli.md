@@ -99,7 +99,7 @@ $ nest n my-nest-project -d
 | `update`|`u`| 更新包中的 `@nestjs` `package.json `  `dependencies` 列表的 `@latest` 版本。|
 
 
-### 工作空间
+## 工作空间
 
 `Nest` 有两种组织代码的模式:
 
@@ -115,7 +115,7 @@ $ nest n my-nest-project -d
 
 当您运行 `nest new` 时，将使用一个内置的示意图为您创建一个新项目。`Nest` 的做法如下:
 
-## 用法
+### 用法
 
 1. 创建一个新文件夹，与您为 `nest new` 提供的名称参数相对应
 
@@ -215,7 +215,7 @@ $ nest start my-app
 
 然而，该示意图确实生成了特定于项目的 `tsconfig.app.json`。此配置文件自动设置适当的生成选项，包括正确设置编译输出文件夹。该文件扩展了顶级(monorepo) `tsconfig.json` 文件，因此您可以管理单点范围内的全局设置，但是如果需要，可以在项目级别覆盖它们。
 
-### 库
+## 库
 
 如前所述，库类型项目，或简称为“库”，是 `Nest` 组件的程序包，需要将它们组成应用程序才能运行。 您可以使用嵌套生成库来生成库类型的项目。我们在库这章深入讨论库。
 
@@ -520,7 +520,7 @@ common version : 6.0.0
 core version : 6.0.0
 ```
 
-## scripts
+## 脚本
 
 ### Nest CLI和 scripts
 

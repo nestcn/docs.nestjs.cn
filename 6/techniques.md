@@ -2542,7 +2542,6 @@ new FastifyAdapter({ logger: true })
 [这里](https://github.com/nestjs/nest/tree/master/sample/10-fastify)有一个工作示例
 
 
-## 性能（Fastify）
 
 （更新中）
 

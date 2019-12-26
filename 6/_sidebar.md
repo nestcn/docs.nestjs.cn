@@ -26,9 +26,9 @@
 
 - [应用上下文](6/applicationcontext)
 
-- [秘籍](6/recipes)
-
 - [CLI](6/cli)
+
+- [秘籍](6/recipes)
 
 - [FAQ](6/faq)
 

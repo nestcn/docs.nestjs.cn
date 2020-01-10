@@ -676,7 +676,7 @@ export class AppModule {}
 }
 ```
 
-?> 静态全局路径(例如 `dist/**/*.entity{ .ts,.js}` )不适用于webpack。
+?> 静态全局路径(例如 `dist/**/*.entity{ .ts,.js}` )不适用于Webpack热重载。
 
 然后，我们可以调用 `forRoot()` 没有任何选项:
 

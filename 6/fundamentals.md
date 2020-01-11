@@ -136,7 +136,7 @@ export class AppModule {}
 在本例中，`CatsService` 令牌将解析为 `mockCatsService` 模拟对象。`useValue` 需要一个值——在本例中是一个文字对象，它与要替换的 `CatsService` 类具有相同的接口。由于 `TypeScript` 的结构类型化，您可以使用任何具有兼容接口的对象，包括文本对象或用 `new` 实例化的类实例。
 
 
-到目前为止，我们已经使用了类名作为我们的提供者标记（ `providers` 数组中列出的提供者中的 `Provide` 属性的值）。 这与基于构造函数的注入所使用的标准模式相匹配，其中令牌也是类名。 （如果此概念尚不完全清楚，请参阅[DI](fundamentals.md#依赖注入)基础知识，以重新学习令牌）。 有时，我们可能希望灵活使用字符串或符号作为 `DI` 令牌。 例如：
+到目前为止，我们已经使用了类名作为我们的提供者标记（ `providers` 数组中列出的提供者中的 `Provide` 属性的值）。 这与基于构造函数的注入所使用的标准模式相匹配，其中令牌也是类名。 （如果此概念尚不完全清楚，请参阅[DI](/6/fundamentals.md#依赖注入)基础知识，以重新学习令牌）。 有时，我们可能希望灵活使用字符串或符号作为 `DI` 令牌。 例如：
 
 ```typescript
 import { connection } from './connection';
@@ -154,7 +154,7 @@ export class AppModule {}
 
 在本例中，我们将字符串值令牌(`'CONNECTION'`)与从外部文件导入的已存在的连接对象相关联。
 
-!> 除了使用字符串作为令牌之外，还可以使用`JavaScript`符号。
+!> 除了使用字符串作为令牌之外，还可以使用[JavaScript Symbol](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Symbol)。
 
 我们前面已经看到了如何使用基于标准构造函数的注入模式注入提供者。此模式要求用类名声明依赖项。`'CONNECTION'` 自定义提供程序使用字符串值令牌。让我们看看如何注入这样的提供者。为此，我们使用 `@Inject()` 装饰器。这个装饰器只接受一个参数——令牌。
 

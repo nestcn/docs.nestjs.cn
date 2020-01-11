@@ -125,7 +125,7 @@ $ nest n my-nest-project -d
 
 ### Monorepo模式
 
-要启用 `monorepo` 模式，您可以从一个标准模式结构开始，然后添加项目。项目可以是一个完整的应用程序(使用 `nest generate`应用程序将其添加到 `workspace` 中)，也可以是一个库(使用 `nest generate` 库将其添加到 `workspace` 中)。我们将在下面详细讨论这些特定类型的项目组件。现在要注意的关键点是将项目添加到现有的标准模式结构中，然后将其转换为 `monorepo` 模式。让我们看一个例子。
+要启用 `monorepo` 模式，您可以从一个标准模式结构开始，然后添加 `project` 。 `project` 可以是一个完整的应用程序(使用 `nest generate app` 将一个应用程序添加到 `workspace` 中)，也可以是一个库(使用 `nest generate lib` 将一个库添加到 `workspace` 中)。我们将在下面详细讨论这些特定类型的项目组件。现在要注意的关键点是将项目添加到现有的标准模式结构中，然后将其转换为 `monorepo` 模式。让我们看一个例子。
 
 如果我们运行:
 

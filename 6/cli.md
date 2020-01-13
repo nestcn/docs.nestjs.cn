@@ -18,7 +18,7 @@ $ npm install -g @nestjs/cli
 
 ### 基本工作流程
 
-安装过程完成后，您应该能够通过``nest` 可执行文件直接从命令行调用 `CLI` 命令。
+安装过程完成后，您应该能够通过 `nest` 可执行文件直接从命令行调用 `CLI` 命令。
 
 ```bash
 $ nest --help

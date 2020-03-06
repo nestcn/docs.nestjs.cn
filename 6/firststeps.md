@@ -203,7 +203,7 @@ Nest 旨在成为一个与平台无关的框架。 通过平台，可以创建�
 |platform-fastify| Fastify 是一个高性能，低开销的框架，专注于提供最高的效率和速度。 在[这里](6/techniques?id=性能（fastify）)阅读如何使用它。|
 
 
-无论使用哪种平台，它都会暴露自己的应用程序界面。 它们分别被视为 NestExpressApplication 和 NestFastifyApplication。
+无论使用哪种平台，它都会暴露自己的 API。 它们分别是 NestExpressApplication 和 NestFastifyApplication。
 
 将类型传递给 NestFactory.create() 方法时，如下例所示，app 对象将具有专用于该特定平台的方法。 但是，请注意，除非您确实要访问底层平台API，否则无需指定类型。
 

@@ -2,7 +2,7 @@
 
 ## 说明
 
-https://i.loli.net/2020/03/24/37yC4dntIcTHkLO.jpg
+https://i.loli.net/2020/03/24/ed8yXDRGni4paQf.jpg
 
 本版本翻译的完整参与人员列表请见 ：[nest.js 译者](#) 。
 

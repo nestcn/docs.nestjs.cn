@@ -2552,7 +2552,7 @@ new FastifyAdapter({ logger: true })
 
 | 用户名 | 头像 | 职能 | 签名 |
 |---|---|---|---|
-| [@zuohuadong](https://github.com/zuohuadong)  | <img class="avatar-66 rm-style" src="https://wx3.sinaimg.cn/large/006fVPCvly1fmpnlt8sefj302d02s742.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
+| [@zuohuadong](https://github.com/zuohuadong)  | <img class="avatar-66 rm-style" src="https://sm.ms/delete/r7wFUECO8VSI3pcX1ueJ4MPndb">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
 | [@Drixn](https://drixn.com/)  | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">  |  翻译  | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/) |
 [@Armor](https://github.com/Armor-cn)  | <img class="avatar-66 rm-style" height="70" src="https://avatars3.githubusercontent.com/u/31821714?s=460&v=4">  |  翻译  | 专注于 Java 和 Nest，[@Armor](https://armor.ac.cn/) |
 | [@Erchoc](https://github.com/erchoc)  | <img class="avatar-66 rm-style" height="70" src="https://avatars1.githubusercontent.com/u/19908809?s=400&u=e935620bf39d85bfb749a4ce4b3758b086a57de5&v=4">  |  翻译  | 学习更优雅的架构方式，做更贴切用户的产品。[@Erchoc](https://github/erchoc) at Github |

@@ -13,7 +13,7 @@
 
 ## 先决条件
 
- 请确保您的操作系统上安装了 [Node.js](http://nodejs.cn/download/)**（> = 8.9.0）**。
+ 请确保您的操作系统上安装了 [Node.js](http://nodejs.cn/download/)**（> = >= 10.13.0）**。
  
  **一分钟安装 node.js** 
  （支持X86 ARM MIPS 等架构，需要版本管理或者系统为 Raspbian 请直接看 NVM）

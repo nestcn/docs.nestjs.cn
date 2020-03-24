@@ -1,123 +1,139 @@
-## 迁移指南
+### 迁移指南
 
+本文提供了一套从 v6 迁移到最新 v7 版本的指导。
 
-本文提供了一套从 `v5` 迁移到最新 `v6` 版本的**指导原则**。尽管我们试图减少一些重大变化，但必须在几个地方修改 `API` 以简化其使用。
+#### 自定义路由参数装饰器
 
-### 中间件
-
-基于[此主题](https://github.com/nestjs/nest/issues/1378)，中间件 `API` 已经更改，以便来自不同 `Node` 库的人员更直接使用，并减少先前 `API` 产生的混淆。
-
-```typescript
-// Before
-@Injectable()
-export class LoggerMiddleware implements NestMiddleware {
- resolve(...args: any[]): MiddlewareFunction {
-   return (req: Request, res: Response, next: Function) => {
-     console.log('Request...');
-     next();
-   };
- }
-}
-
-// After
-@Injectable()
-export class LoggerMiddleware implements NestMiddleware {
-  use(req: Request, res: Response, next: Function) {
-    console.log('Request...');
-    next();
-  }
-}
-```
-
-因此，该 `with()` 方法 `MiddlewareConsumer` 将不再起作用（完全无用）。如果要将选项传递给中间件类，请使用[自定义提供程序](/6/customdecorators)或[在此处](https://github.com/nestjs/nest/issues/1378)查看更多示例。
-
-### 拦截器
-
-拦截器 `API` 也已简化。此外，由于社区报告[此问题](https://github.com/nestjs/nest/issues/1016)，因此需要进行更改。
+已经对所有类型的应用程序的 [自定义装饰器](/customdecorators) API 做了统一，现在无论您创建的是 `GraphQL` 应用程序还是 `RestAPI` 应用程序，`执行上下文(ExecutionContext)`（[阅读更多](/fundamentals/execution-context)）都会作为第二个参数传递到 `createParamDecorator()` 函数
 
 ```typescript
 // Before
-@Injectable()
-export class TransformInterceptor implements NestInterceptor {
-  intercept(
-    context: ExecutionContext,
-    call$: Observable<T>,
-  ): Observable<Response<T>> {
-    return call$.pipe(map(data => ({ data })));
-  }
-}
+import { createParamDecorator } from '@nestjs/common';
+
+export const User = createParamDecorator((data, req) => {
+  return req.user;
+});
 
 // After
-@Injectable()
-export class TransformInterceptor implements NestInterceptor {
-  intercept(
-    context: ExecutionContext,
-    next: CallHandler,
-  ): Observable<Response<T>> {
-    return next
-      .handle()
-      .pipe(map(data => ({ data })));
-  }
-}
-```
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
-!> 该 `CallHandler` 接口需要从 `@nestjs/common ` 包导入。
-
-请注意，你的拦截器现在将以正确的顺序运行 - 它们将遵循一个简单的请求来处理管道，一旦请求想要命中一个终端处理程序，就从全局执行到具体执行，然后（在响应管道中），它们将是从特定的到全局的（如果你在其中附加一些异步/映射逻辑）执行。
-
-
-### 平台
-
-到目前为止，即使您没有使用 `HTTP` 服务器，也必须在内部安装 `express` 库（作为 `@nestjs/core` 软件包的依赖项）。自从新的主要版本发布以来，`Nest` 将不再提供这些软件包。每个平台已经提取到单个包中，分别为 `@nestjs/platform-express`，`@nestjs/platform-fastify`，`@nestjs/platform-ws`，和 `@nestjs/platform-socket.io`。假设您的应用程序同时使用 `express` 和 `socket.io`，则需安装相应的平台：
-
-```
-$ npm i @nestjs/platform-express @nestjs/platform-socket.io
-```
-
-现在，每个现有的适配器（例如 `FastifyAdapter`）都是从专用平台包提供的。
-
-
-- FastifyAdapter -  @nestjs/platform-fastify
-- ExpressAdapter -  @nestjs/platform-express
-- WsAdapter -  @nestjs/platform-ws
-- IoAdapter -  @nestjs/platform-socket.io
-
-此外，`FileInterceptor`（和其他 `multer` 相关的拦截器）现在从 `@nestjs/platform-express`（因为 `multer` 库不兼容 `fastify`）导出 。
-
-### 元数据相关
-
-该 `@ReflectMetadata()` 装饰已被弃用，并将在下一主要版本中删除（现在它只会显示一个警告）。请改用 `@SetMetadata()` 装饰器。
-
-### GraphQL
-
-订阅机制已更改。检查[此章](/6/subscriptions)的说明。此外，`@nestjs/graphql` 软件包严重依赖 `@ReflectMetadata()`（已被弃用），因此也需要更新软件包本身。
-
-### Express实例
-
-我们不再支持将 `express` 实例作为方法的第二个参数传递 `NestFactory.create()` 。为了获取底层 `HTTP` 适配器，请使用[此处](/6/faq?id=http-适配器)描述的技术。此外，您可以传递 `ExpressAdapter`（只需将您的 `express` 实例作为构造函数参数传递 `new ExpressAdapter(express)`）。
-
-```typescript
-
-// Before (no longer supported)
-const server = express();
-const app = await NestFactory.create(ApplicationModule, server);
-
-// After (potential solution)
-const server = express();
-const app = await NestFactory.create(
-  ApplicationModule,
-  new ExpressAdapter(server),
+export const User = createParamDecorator(
+  (data: unknown, ctx: ExecutionContext) => {
+    const request = ctx.switchToHttp().getRequest();
+    return request.user;
+  },
 );
-
 ```
 
-### 弃用
+#### 微服务
 
-最终删除了所有弃用（从 `4` 到 `5` 版本）。
+为了避免代码重复，`MicroserviceOptions` 接口(Interface)已从 `@nestjs/common` 包中删除。因此，现在在创建微服务（通过 `createMicroservice()` 或 `connectMicroservice()` 方法）时，应该传递泛型类型参数以自动完成代码获取。
 
-### TypeScript
+```typescript
+// Before
+const app = await NestFactory.createMicroservice(AppModule);
 
-`Nest 6` 支持 `TypeScript（3.0.0）`的最新主要版本。
+// After
+const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule);
+```
+
+> 提示：`MicroserviceOptions` 接口(Interface)是从 `@nestjs/microservices` 包导出的。
+
+#### GraphQL
+
+在NestJS第6版的主要版本中，我们引入了 ***代码优先*** 的方法，作为 `type-graphql` 包和 `@nestjs/graphql` 模块之间的兼容层。最终，由于缺乏灵活性，我们的团队决定从头开始重新实现所有功能。为了避免大量断层更改，公开API是向后兼容的，可能类似于 `type-graphql`。
+
+迁移现有的应用程序，只需将所有从 `type-graphql` 导入的改为从 `@nestjs/graphql` 导入即可。
+
+#### HTTP exceptions body
+
+以前，为`HttpException` 类以及从 `HttpException` 派生的其他类生成的响应体不一致（例如，`BadRequestException` 或 `NotFoundException`）。在最新的主要版本中，这些异常响应将采用相同的结构。
+
+
+```typescript
+/*
+ * Sample outputs for "throw new ForbiddenException('Forbidden resource')"
+ */
+
+// Before
+{
+  "statusCode": 403,
+  "message": "Forbidden resource"
+}
+
+// After
+{
+  "statusCode": 403,
+  "message": "Forbidden resource",
+  "error": "Forbidden"
+}
+```
+
+#### Validation errors schema
+
+在过去的版本中，`ValidationPipe` 抛出一个由 `class-validator` 包返回的 `ValidationError` 对象数组。现在，`ValidationPipe` 将错误映射到表示错误消息的纯字符串列表。
+
+```typescript
+// Before
+{
+  "statusCode": 400,
+  "error": "Bad Request",
+  "message": [
+    {
+      "target": {},
+      "property": "email",
+      "children": [],
+      "constraints": {
+        "isEmail": "email must be an email"
+      }
+    }
+  ]
+}
+
+// After
+{
+  "statusCode": 400,
+  "message": ["email must be an email"],
+  "error": "Bad Request"
+}
+```
+
+如果你喜欢以前的方式，你可以通过设置 `exceptionFactory` 函数来还原：
+
+```typescript
+new ValidationPipe({
+  exceptionFactory: errors => new BadRequestException(errors),
+});
+```
+
+#### 类型隐式转换 (`ValidationPipe`)
+
+如果启用了自动转换选项(`transform: true`)，那么`ValidationPipe` 现在将会执行基于元类型的转换。在下面的示例中，`findOne` 方法接受一个表示提取 `id` 路径参数的参数：
+
+```typescript
+@Get(':id')
+findOne(@Param('id') id: number) {
+  console.log(typeof id === 'number'); // true
+  return 'This action returns a user';
+}
+```
+
+默认情况下，每个路径参数和查询参数都是以 `string` 类型在网络传输。在上面的示例中，我们将 `id` 的类型指定为 `number`类型，因此，`ValidationPipe` 会自动尝试将标识符 `id` 的值从 `sting` 类型转为 `number` 类型。
+
+#### 微服务通道（双向通信）
+
+为了启用 `请求-响应` 消息类型， `Nest` 创建了两个逻辑通道 - 一个是负责数据传输，另一个是负责等待传入的响应。对于一些底层传输，例如 `NATS` 这种 `双通道` 是支持的，开箱即用。对于其他的，`Nest` 通过手动创建单独的通道来进行支持。
+
+假设我们有一个消息处理器 `@MessagePattern('getUsers')`。在过去， `Nest` 根据这种模式会创建两个通道：`getUsers_ack` （用于请求）和`getUsers_res` （用于响应）。现在，`Nest 7`中这种命名方案将会更改。将会更改为 `getUsers`（用于请求）和 `getUsers.reply`（用于响应）。同样，对于 `MQTT` 的传输策略，响应通过将会是 `getUsers/reply`（以避免与主题通配符冲突）。
+
+#### 弃用
+
+所有的弃用的（从Nest version 5到version 6）最终都被删除了（例如，弃用了的`@reflectmetada` decorator）。
+
+#### Node.js
+
+这个版本不再对Node v8的支持。我们强烈建议使用最新的LTS版本。
+
 
  ### 译者署名
 

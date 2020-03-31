@@ -106,10 +106,11 @@ $ npm install --save-dev @types/hapi__joi
 
 ```typescript
 import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException } from '@nestjs/common';
+import { ObjectSchema } from '@hapi/joi';
 
 @Injectable()
 export class JoiValidationPipe implements PipeTransform {
-  constructor(private readonly schema: Object) {}
+  constructor(private readonly schema: ObjectSchema) {}
 
   transform(value: any, metadata: ArgumentMetadata) {
     const { error } = this.schema.validate(value);

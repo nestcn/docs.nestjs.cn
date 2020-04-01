@@ -120,6 +120,16 @@ export class JoiValidationPipe implements PipeTransform {
   }
 }
 ```
+`create-cat.schema.ts`
+```typescript
+import Joi = require("@hapi/joi");
+
+export const createCatSchema = Joi.object({
+    name: Joi.string(),
+    age: Joi.number(),
+    breed: Joi.string()
+})
+```
 
 ## 绑定管道
 

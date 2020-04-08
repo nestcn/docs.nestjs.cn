@@ -41,7 +41,6 @@
   - [使用 Nest.js 和 Ably 构建实时 Web 应用程序](https://hackernoon.com/building-real-time-web-applications-using-nest-js-and-ably-d85887e81f06)
   - [视频教程 - 使用 NestJs，Angular 和 Angular Material 构建一个完整的博客](https://www.youtube.com/watch?v=nz6yFTyLbAQ&list=PLq1kZ5GbKd4qyDcK3IHGSi4FDAL6fRZeL)
   - [免费视频课程-完整的 NestJS 开发人员。企业 Node.js 框架](https://www.udemy.com/course/the-complete-nestjs-developer-enterprise-nodejs-framework/)
--例子	-例子
   - [ChatServer](https://github.com/Pinedo11/nestDemo-ChatServer)-使用 Nest 实现的聊天应用的服务器端	  -[ChatServer](https://github.com/Pinedo11/nestDemo-ChatServer)-使用Nest实现的聊天应用的服务器端
   - [Nestjs API.ai](https://github.com/adrien2p/nest-js-api-ai)-与Node.js中的api.ai进行交互	  - [Nestjs API.ai](https://github.com/adrien2p/nest-js-api-ai)-与Node.js中的api.ai进行交互
 

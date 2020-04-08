@@ -83,6 +83,7 @@
   - [NestJS DDD Boilerplate](https://github.com/pezzetti/base-app-nestjs) 具有 NestJS，类验证器和 TypeORM 的领域驱动设计基础应用程序。完全可测试。
   - [Nest Mongo Graphql](https://github.com/benawad/nest-mongo-graphql/) - 带有 NestJS，TypeORM，TypeGrapQL，MongoDB，GraphQL 的 Dockerized API 样板，以及带有 Makefile 的自动化任务。[https://typegraphql.ml/](https://typegraphql.ml/)
   - [Ultimate Backend](https://github.com/juicycleff/ultimate-backend) - 具有 cqrs graphql 微服务架构，Apollo 联盟，事件源和身份验证的企业多租户 SaaS 入门套件
+  - [NestJS GraphQL Boilerplate](https://github.com/fernandohenriques/nestjs-graphql-boilerplate) - 带有 NestJS，TypeORM，TypeGrapQL，MongoDB，GraphQL 的 Dockerized API 样板以及带有 Makefile 的自动化任务。
 
 ### 使用 NestJS 的项目
 
@@ -127,7 +128,8 @@
   - [Nestjs-Query](https://github.com/doug-martin/nestjs-query) - 用于 GraphQL API 的 Nest CRUD 。
   - [Nest Middlewares](https://github.com/wbhob/nest-middlewares) - NestJS 的通用可注入中间件
 - Errors
-  - [Nestjs Flub](https://github.com/shekohex/nestjs-flub) - 漂亮的错误😫 NestJS框架的Stack Viewer .
+  - [Nestjs Flub](https://github.com/shekohex/nestjs-flub) - 漂亮的错误😫 NestJS框架的Stack Viewer 。
+  - [Nestjs Enlighten](https://github.com/ozkanonur/nestjs-enlighten) - NestJS 框架的类似 laravel-ignition 的错误页面。
   - [Nest Raven](https://github.com/mentos1386/nest-raven) - Nest.js 框架的 Sentry Raven 模块
 - Lint
   - [Eslint Plugin Nestjs](https://github.com/unlight/eslint-plugin-nestjs) - 用于 nestjs 框架的 ESLint 规则
@@ -174,7 +176,9 @@
   - VSCode
     - [Nestjs Snippets](https://github.com/ashinzekene/vscode-nestjs-snippets) - Vscode nestjs 代码片段
 - AMQP
-  - [Nestjs AMQP](https://github.com/nestjsx/nestjs-amqp) - amqp 连接管理器
+  - [Nestjs AMQP](https://github.com/nestjsx/nestjs-amqp) - amqp 连接管理器。
+- EventStore
+  - [Nestjs EventStore](https://github.com/juicycleff/nestjs-event-store) - 带有适配器支持的 NestJs CQRS 的 evenstore.org 模块，可持久保留Catchup 订阅的 lastcheckpoint。
 - 支付网关
   - [Nestjs Braintree](https://github.com/nestjsx/nestjs-braintree) - 一个用于 webhooks 交易的模块。
   - [Nestjs Stripe](https://github.com/dhaspden/nestjs-stripe) - 将已配置的 Stripe 客户端注入服务的模块。

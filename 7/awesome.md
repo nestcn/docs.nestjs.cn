@@ -60,12 +60,14 @@
   - [Angular Nestjs Rendering](https://github.com/Innovic-io/angular-nestjs-rendering) - 使用 NestJS 进行 Angular 5+ 服务端渲染    
   - [Angular Contact Manager App](https://github.com/Abdallah-khalil/ContactManagerApp) - 使用 Angular，Nestjs，Mongoose，Passport，JWT的 联系人管理程序    
   - [Books Library API](https://github.com/Abdallah-khalil/Books-Library-API) - 一个带有 nestjs，mongoose，Passport，JWT 的 API    
-  - [Passport Auth Nestjs](https://github.com/Abdallah-khalil/NodeJsWithPassport) -  使用 nestjs 构建的 Passport 策略，集成了 oauth     
+  - [Passport Auth Nestjs](https://github.com/Abdallah-khalil/NodeJsWithPassport) -  使用 nestjs 构建的 Passport 策略，集成了 oauth  
+  - [NestJS Auth0](https://github.com/jajaperson/nestjs-auth0) - 一个 NestJS 应用示例，该应用通过 Passport 使用 Auth0 进行身份验证。
   - [Lynx](https://github.com/mentos1386/lynx) - 基于 NestJS 和 TypeORM 构建的 Opinionated Framework    
   - [NestJS Ideas API](https://github.com/kelvin-mai/nest-ideas-api) - 使用 NestJS，PostgresQL 和 TypeORM构 建的 REST 和 GraphQL 服务端的实现    
   - [Nestcloud Starter](https://github.com/nest-cloud/nestcloud-starter) - 使用 nestcloud 快速启动微服务应用程序.    
   - [Nodepress](https://github.com/surmon-china/nodepress) - 使用 Nest 的 Blog/CMS，  RESTful API 服务端应用. 😎
   - [Serverless-Lambda-DynamoDB](https://github.com/International-Slackline-Association/Rankings-Backend) - 具有AWS Lambda，DynamoDB，DynamoDB Streams的完全无服务器生产应用程序。
+  - [Serverless-nestjs-TypeOrm](https://github.com/kop7/serverless-nestjs-typeorm) - 示例如何通过 TypeORM less 使用无服务器框架来嵌套 js。
   - [Passport Email Auth](https://github.com/marcomelilli/nestjs-email-authentication) 入门项目，包括用于通过MongoDB和PassportJs进行用户电子邮件身份验证的API。
   
 
@@ -105,7 +107,8 @@
   - [Nest Schedule](https://github.com/miaowing/nest-schedule) - 装饰器实现的定时任务。
   - [Nest Queue](https://github.com/owl1n/nest-queue) - 基于 Redis 的简单队列管理，适用于您的应用程序。
   - [Nest AutoMapper](https://github.com/nestjsx/automapper) - NestJS 的 AutoMapper 模块。    
-  - [nestjs bull](https://github.com/fwoelffel/nest-bull)   - Nestjs 分布式消息队列
+  - [nestjs bull](https://github.com/fwoelffel/nest-bull)   - Nestjs 分布式消息队列。
+  - [Nest Multer Extended](https://github.com/jeffminsungkim/nestjs-multer-extended) - 用于NestJS框架的扩展MulterModule，具有灵活的Amazon S3上传功能和有用的功能。
 - 状态管理
   - [Ngrx Nest](https://github.com/derekkite/ngrx-nest) - 在 Nest 上使用  ngrx/store 和 ngrx/effects.
 - 微信开发
@@ -121,7 +124,7 @@
 - API
   - [Swagger](https://github.com/nestjs/swagger) - 这是 Nest 的 OpenAPI（Swagger）模块。. _[教程](https://docs.nestjs.com/recipes/swagger)]_.
   - [Nest CRUD](https://github.com/nestjsx/crud) -  用于 RESTful API 的 Nest CRUD。
-- 中间件
+  - [Nestjs-Query](https://github.com/doug-martin/nestjs-query) - 用于 GraphQL API 的 Nest CRUD 。
   - [Nest Middlewares](https://github.com/wbhob/nest-middlewares) - NestJS 的通用可注入中间件
 - Errors
   - [Nestjs Flub](https://github.com/shekohex/nestjs-flub) - 漂亮的错误😫 NestJS框架的Stack Viewer .

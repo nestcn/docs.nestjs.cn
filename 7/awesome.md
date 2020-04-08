@@ -40,6 +40,10 @@
   - [NestJS Ideas API](https://www.youtube.com/watch?v=NF9Xn4g5MJY&list=PLBeQxJQNprbiJm55q7nTAfhMmzIC8MWxc)
   - [使用 Nest.js 和 Ably 构建实时 Web 应用程序](https://hackernoon.com/building-real-time-web-applications-using-nest-js-and-ably-d85887e81f06)
   - [视频教程 - 使用 NestJs，Angular 和 Angular Material 构建一个完整的博客](https://www.youtube.com/watch?v=nz6yFTyLbAQ&list=PLq1kZ5GbKd4qyDcK3IHGSi4FDAL6fRZeL)
+  - [免费视频课程-完整的 NestJS 开发人员。企业 Node.js 框架](https://www.udemy.com/course/the-complete-nestjs-developer-enterprise-nodejs-framework/)
+-例子	-例子
+  - [ChatServer](https://github.com/Pinedo11/nestDemo-ChatServer)-使用 Nest 实现的聊天应用的服务器端	  -[ChatServer](https://github.com/Pinedo11/nestDemo-ChatServer)-使用Nest实现的聊天应用的服务器端
+  - [Nestjs API.ai](https://github.com/adrien2p/nest-js-api-ai)-与Node.js中的api.ai进行交互	  - [Nestjs API.ai](https://github.com/adrien2p/nest-js-api-ai)-与Node.js中的api.ai进行交互
 
 - 例子
   - [官方示例](https://github.com/nestjs/nest/tree/master/sample)    
@@ -75,12 +79,15 @@
   - [NestJS Prisma Starter](https://github.com/fivethree-team/nestjs-prisma-client-starter) - NestJS 的入门项目😻 包括带有 Prisma 客户端的 Graphql，Passport-JWT 身份验证，Swagger Api 和 Docker。
   - [TeanJS](https://github.com/adrien2p/teanjs) - TeanJS是一个入门程序，它为您提供所有方式，以便能够尽快开始编写代码😻
   - [NestJS DDD Boilerplate](https://github.com/pezzetti/base-app-nestjs) 具有 NestJS，类验证器和 TypeORM 的领域驱动设计基础应用程序。完全可测试。
+  - [Nest Mongo Graphql](https://github.com/benawad/nest-mongo-graphql/) - 带有 NestJS，TypeORM，TypeGrapQL，MongoDB，GraphQL 的 Dockerized API 样板，以及带有 Makefile 的自动化任务。[https://typegraphql.ml/](https://typegraphql.ml/)
+  - [Ultimate Backend](https://github.com/juicycleff/ultimate-backend) - 具有 cqrs graphql 微服务架构，Apollo 联盟，事件源和身份验证的企业多租户 SaaS 入门套件
 
 ### 使用 NestJS 的项目
 
 - 开源
   - [EVE Book API](https://github.com/evebook/api) - :milky_way: EVE Book API
-  - [Ever®](https://github.com/ever-co/ever) - 电子商务平台。
+  - [Ever®](https://github.com/ever-co/ever) - 用于按需经济和数字市场的开源商务平台。
+  - [Gauzy](https://github.com/ever-co/gauzy) - 适用于现代代理商和工作室的开源利润分享平台。
   - [LXDhub](https://github.com/Roche/lxdhub) - Linux 容器管理系统（LXC）.
   - [Notadd](https://github.com/notadd/notadd) - 微服务开发架构。
   

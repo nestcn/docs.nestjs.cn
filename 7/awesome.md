@@ -182,7 +182,14 @@
 - Consul
   - [Nest Consul](https://github.com/nest-cloud/nestcloud) - 基于 Consul 的 NodeJS 微服务解决方案，由Typescript 语言和 NestJS 框架编写
 - Cache
-  - [Nest Memcached](https://github.com/nest-cloud/nest-memcached) - 用于 Nest 框架的 memcached 模块
+  - [Nest Memcached](https://github.com/nest-cloud/nest-memcached) - 用于 Nest 框架的 memcached 模块。
+- 前端
+  - [NestJS CRUD React Admin](https://github.com/FusionWorks/react-admin-nestjsx-crud-dataprovider) - A React Admin data provider for [NextJS CRUD](https://github.com/nestjsx/crud)
+- 定时任务
+  - [Nest Bull](https://github.com/nestjsx/nest-bull) - Nest框架的Bull模块。
+  
+- 自动工作流
+  - [Zeebe microservices](https://github.com/pay-k/nestjs-zeebe)
 
 ### 运行
 

@@ -108,7 +108,6 @@
   - [Nest Schedule](https://github.com/miaowing/nest-schedule) - 装饰器实现的定时任务。
   - [Nest Queue](https://github.com/owl1n/nest-queue) - 基于 Redis 的简单队列管理，适用于您的应用程序。
   - [Nest AutoMapper](https://github.com/nestjsx/automapper) - NestJS 的 AutoMapper 模块。    
-  - [nestjs bull](https://github.com/fwoelffel/nest-bull)   - Nestjs 分布式消息队列。
   - [Nest Multer Extended](https://github.com/jeffminsungkim/nestjs-multer-extended) - 用于NestJS框架的扩展MulterModule，具有灵活的Amazon S3上传功能和有用的功能。
 - 状态管理
   - [Ngrx Nest](https://github.com/derekkite/ngrx-nest) - 在 Nest 上使用  ngrx/store 和 ngrx/effects.

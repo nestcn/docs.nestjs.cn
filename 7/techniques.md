@@ -254,6 +254,25 @@ $ # POST to /auth/login
 $ curl -X POST http://localhost:3000/auth/login -d '{"username": "john", "password": "changeme"}' -H "Content-Type: application/json"
 $ # result -> {"userId":1,"username":"john"}
 ```
+如果上述内容可以正常工作，可以通过直接将策略名称传递给`AuthGuard()`来引入代码库中的魔术字符串。作为替代，我们推荐创建自己的类，如下所示：
+
+> auth/local-auth.guard.ts
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+
+@Injectable()
+export class LocalAuthGuard extends AuthGuard('local') {}
+```
+
+```typescript
+@UseGuards(LocalAuthGuard)
+@Post('auth/login')
+async login(@Request() req) {
+  return req.user;
+}
+```
 
 ### JWT 功能
 
@@ -514,7 +533,7 @@ $ # result -> {"userId":1,"username":"john"}
 
 注意，在 `AuthModule` 中，我们将 `JWT` 配置为 `60` 秒过期。这个过期时间可能太短了，而处理令牌过期和刷新的细节超出了本文的范围。然而，我们选择它来展示`JWT` 的一个重要品质和 `jwt` 护照战略。如果您在验证之后等待 `60` 秒再尝试 `GET /profile` 请求，您将收到 `401` 未授权响应。这是因为 `Passport` 会自动检查 `JWT` 的过期时间，从而省去了在应用程序中这样做的麻烦。
 
-我们现在已经完成了 `JWT` 身份验证实现。`JavaScript` 客户端(如 `Angular/React/Vue` )和其他 `JavaScript` 应用程序现在可以安全地与我们的 `API` 服务器进行身份验证和通信。
+我们现在已经完成了 `JWT` 身份验证实现。`JavaScript` 客户端(如 `Angular/React/Vue` )和其他 `JavaScript` 应用程序现在可以安全地与我们的 `API` 服务器进行身份验证和通信。在[这里](https://github.com/nestjs/nest/tree/master/sample/19-auth-jwt)可以看到本节完整的程序代码。
 
 ### 默认策略
 
@@ -548,10 +567,82 @@ import { JwtStrategy } from './jwt.strategy';
 })
 export class AuthModule {}
 ```
+### 请求范围策略
+
+`passport`API基于将策略注册到库的全局实例。因此策略并没有设计为依赖请求的选项的或者根据每个请求动态生成实例（更多内容见[请求范围提供者](https://docs.nestjs.cn/7/fundamentals?id=%e6%89%80%e6%9c%89%e8%af%b7%e6%b1%82%e6%b3%a8%e5%85%a5)）。当你配置你的策略为请求范围时，`Nest`永远不会将其实例化，因为它并没有和任何特定路径绑定。并没有一个物理方法来决定哪个"请求范围"策略会根据每个请求执行。
+
+然而，在策略中总有办法动态处理请求范围提供者。我们在这里利用[模块参考](https://docs.nestjs.cn/7/fundamentals?id=%e6%a8%a1%e5%9d%97%e5%8f%82%e8%80%83)特性。
+
+首先，打开`local.strategy.ts`文件并且将`ModuleRef`按照正常方法注入其中：
+
+```typescript
+constructor(private moduleRef: ModuleRef){
+  super({
+    passReqToCallback:true;
+  })
+}
+```
+
+!> 注意： `ModuleRef` 类需要从`@nestjs/core`中导入。
+
+要保证`passReqToCallback`属性和上述示例中一样配置为`true`。
+
+在下一步中，请求的实例将被用于获取一个当前上下文标识，而不是生成一个新的（更多关于请求上下文的内容见[这里](https://docs.nestjs.cn/7/fundamentals?id=%e6%a8%a1%e5%9d%97%e5%8f%82%e8%80%83))。
+
+现在，在`LocalStrategy`类的`validate()`方法中，使用`ContextIdFactory`类中的`getByRequest()`方法来创建一个基于请求对向的上下文id，并将其传递给`resolve()`调用：
+
+```typescript
+
+async validate(
+  request: Request,
+  username: string,
+  password: string,
+) {
+  const contextId = ContextIdFactory.getByRequest(request);
+  // "AuthService" is a request-scoped provider
+  const authService = await this.moduleRef.resolve(AuthService, contextId);
+  ...
+}
+```
+
+在上述例子中，`resolve()`方法会异步返回`AuthService`提供者的请求范围实例（我们假设`AuthService`被标示为一个请求范围提供者）。
+
+### 扩展守卫
+
+在大多数情况下，使用一个提供的`AuthGuard`类是有用的。然而，在一些用例中你可能只是希望简单地扩展默认的错误处理或者认证逻辑。在这种情况下，你可以通过一个子类来扩展内置的类并且覆盖其方法。
+
+```typescript
+
+import {
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+
+@Injectable()
+export class JwtAuthGuard extends AuthGuard('jwt') {
+  canActivate(context: ExecutionContext) {
+    // 在这里添加自定义的认证逻辑
+    // 例如调用 super.logIn(request) 来建立一个session
+    return super.canActivate(context);
+  }
+
+  handleRequest(err, user, info) {
+    // 可以抛出一个基于info或者err参数的异常
+    if (err || !user) {
+      throw err || new UnauthorizedException();
+    }
+    return user;
+  }
+}
+
+
+```
 
 ### 自定义 Passport
-
-根据所使用的策略，护照会采用一系列影响库行为的属性。使用  `register()` 方法将选项对象直接传递给护照实例。
+ 
+根据所使用的策略，`Passport`会采用一系列影响库行为的属性。使用  `register()` 方法将选项对象直接传递给`Passport`实例。例如：
 
 ```typescript
 PassportModule.register({ session: true });
@@ -570,7 +661,7 @@ constructor(private readonly authService: AuthService) {
 
 ### 命名策略
 
-在实现策略时，可以通过向 `PassportStrategy` 函数传递第二个参数来为其提供名称。如果你不这样做，每个战略将有一个默认的名称(例如，"jwt"的 `jwt`策略 ):
+在实现策略时，可以通过向 `PassportStrategy` 函数传递第二个参数来为其提供名称。如果你不这样做，每个策略将有一个默认的名称(例如，"jwt"的 `jwt`策略 ):
 
 ```typescript
 export class JwtStrategy extends PassportStrategy(Strategy, 'myjwt')
@@ -599,12 +690,17 @@ GraphQLModule.forRoot({
 });
 ```
 
-要在 `graphql` 解析器中获得当前经过身份验证的用户，可以定义一个用户装饰器:
+要在 `graphql` 解析器中获得当前经过身份验证的用户，可以定义一个`@CurrentUser()`装饰器:
 
 ```typescript
-import { createParamDecorator } from '@nestjs/common';
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { GqlExecutionContext } from '@nestjs/graphql';
+
 export const CurrentUser = createParamDecorator(
-  (data, [root, args, ctx, info]) => ctx.req.user,
+  (data: unknown, context: ExecutionContext) => {
+    const ctx = GqlExecutionContext.create(context);
+    return ctx.getContext().req.user;
+  },
 );
 ```
 
@@ -624,7 +720,7 @@ whoAmI(@CurrentUser() user: User) {
 
 您还可以直接使用任何通用的 `Node.js` 数据库集成库或 `ORM` ，例如 [Sequelize (recipe)](https://www.npmjs.com/package/sequelize)、[knexjs](http://knexjs.org/) (tutorial)`和 [TypeORM](https://github.com/typeorm/typeorm) ，以在更高的抽象级别上进行操作。
 
-为了方便起见，`Nest` 还提供了与现成的 `TypeORM` 与 `@nestjs/typeorm` 的紧密集成，我们将在本章中对此进行介绍，而与 `@nestjs/mongoose` 的紧密集成将在本章中介绍。这些集成提供了附加的特定于 `nestjs` 的特性，比如模型/存储库注入、可测试性和异步配置，从而使访问您选择的数据库更加容易。
+为了方便起见，`Nest` 还提供了与现成的 `TypeORM` 与 `@nestjs/typeorm` 的紧密集成，我们将在本章中对此进行介绍，而与 `@nestjs/mongoose` 的紧密集成将在[这一章](https://docs.nestjs.cn/7/techniques?id=mongo)中介绍。这些集成提供了附加的特定于 `nestjs` 的特性，比如模型/存储库注入、可测试性和异步配置，从而使访问您选择的数据库更加容易。
 
 ### TypeORM 集成
 
@@ -661,7 +757,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 export class AppModule {}
 ```
 
- `forRoot()` 方法接受与来自 `TypeORM`包的 `createConnection()` 相同的配置对象。另外，我们可以创建 `ormconfig.json` ，而不是将配置对象传递给 `forRoot()`。
+ `forRoot()` 方法支持所有`TypeORM`包中`createConnection()`函数暴露出的配置属性。其他一些额外的配置参数描述如下：
+ 
+ |参数|说明|
+ |---|---|
+ |retryAttempts|重试连接数据库的次数（默认：10）|
+ |retryDelay|两次重试连接的间隔(ms)（默认：3000）|
+ |autoLoadEntities|如果为`true`,将自动加载实体(默认：false)|
+ |keepConnectionAlive|如果未`true`，在应用程序关闭后连接不会关闭（默认：false)|
+
+?> 更多连接选项见[这里](https://typeorm.io/#/connection-options)
+
+ 另外，我们可以创建 `ormconfig.json` ，而不是将配置对象传递给 `forRoot()`。
 
 ```bash
 {
@@ -676,9 +783,7 @@ export class AppModule {}
 }
 ```
 
-?> 静态全局路径(例如 `dist/**/*.entity{ .ts,.js}` )不适用于Webpack热重载。
-
-然后，我们可以调用 `forRoot()` 没有任何选项:
+然后，我们可以不带任何选项地调用 `forRoot()` :
 
 > app.module.ts
 
@@ -692,7 +797,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 export class AppModule {}
 ```
 
-一旦完成，`TypeORM` 连接和 `EntityManager` 对象就可以在整个项目中注入(不需要导入任何模块)，例如:
+?> 静态全局路径(例如 `dist/**/*.entity{ .ts,.js}` )不适用于Webpack热重载。
+
+!> 注意，`ormconfig.json` 文件由`typeorm`库载入，因此，任何上述参数之外的属性都不会被应用（例如由`forRoot()`方法内部支持的属性--例如`autoLoadEntities`和`retryDelay()`)
+
+一旦完成，`TypeORM` 的`Connection`和 `EntityManager` 对象就可以在整个项目中注入(不需要导入任何模块)，例如:
 
 > app.module.ts
 
@@ -711,38 +820,33 @@ export class AppModule {
 
 `TypeORM` 支持存储库设计模式，因此每个实体都有自己的存储库。可以从数据库连接获得这些存储库。
 
-为了继续这个示例，我们需要至少一个实体。我们将使用官方TypeORM文档中的 `Photo` 实体。
+为了继续这个示例，我们需要至少一个实体。我们来定义`User` 实体。
 
-> photo/photo.entity.ts
+> user.entity.ts
 
 ```typescript
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class Photo {
+export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 500 })
-  name: string;
-
-  @Column('text')
-  description: string;
+  @Column()
+  firstName: string;
 
   @Column()
-  filename: string;
+  lastName: string;
 
-  @Column('int')
-  views: number;
-
-  @Column()
-  isPublished: boolean;
+  @Column({ default: true })
+  isActive: boolean;
 }
 ```
+?> 关于实体的更多内容见[TypeORM 文档](https://typeorm.io/#/entities)。
 
-该 `Photo` 实体属于该 `photo` 目录。这个目录代表了 `PhotoModule`。这是你决定在哪里保留你的模型文件。从我的观点来看，最好的方法是将它们放在他们的域中, 放在相应的模块目录中。
+该 `User` 实体在 `users` 目录下。这个目录包含了和 `UsersModule`模块有关的所有文件。你可以决定在哪里保存模型文件，但我们推荐在他们的**域**中就近创建，即在相应的模块目录中。
 
-开始使用 `photo` 实体，我们需要让 `TypeORM` 知道它插入实体数组:
+要开始使用 `user` 实体，我们需要在模块的`forRoot()`方法的选项中（除非你使用一个静态的全局路径）将它插入`entities`数组中来让 `TypeORM`知道它的存在。
 
 > app.module.ts
 
@@ -760,7 +864,7 @@ import { Photo } from './photo/photo.entity';
       username: 'root',
       password: 'root',
       database: 'test',
-      entities: [Photo],
+      entities: [User],
       synchronize: true,
     }),
   ],
@@ -768,88 +872,273 @@ import { Photo } from './photo/photo.entity';
 export class AppModule {}
 ```
 
-现在让我们看一下 `PhotoModule`：
+现在让我们看一下 `UsersModule`：
 
-> photo.module.ts
+> user.module.ts
 
 ```typescript
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PhotoService } from './photo.service';
-import { PhotoController } from './photo.controller';
-import { Photo } from './photo.entity';
+import { UsersService } from './users.service';
+import { UsersController } from './users.controller';
+import { User } from './user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Photo])],
-  providers: [PhotoService],
-  controllers: [PhotoController],
+  imports: [TypeOrmModule.forFeature([User])],
+  providers: [UsersService],
+  controllers: [UsersController],
 })
-export class PhotoModule {}
+export class UsersModule {}
 ```
 
-此模块使用 `forFeature()` 方法定义在当前范围中注册哪些存储库。这样，我们就可以使用 `@InjectRepository()`装饰器将 `PhotoRepository` 注入到 `PhotoService` 中:
+此模块使用 `forFeature()` 方法定义在当前范围中注册哪些存储库。这样，我们就可以使用 `@InjectRepository()`装饰器将 `UsersRepository` 注入到 `UsersService` 中:
 
-> photo.service.ts
+> users.service.ts
 
 ```typescript
+
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Photo } from './photo.entity';
+import { User } from './user.entity';
 
 @Injectable()
-export class PhotoService {
+export class UsersService {
   constructor(
-    @InjectRepository(Photo)
-    private readonly photoRepository: Repository<Photo>,
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
   ) {}
 
-  findAll(): Promise<Photo[]> {
-    return this.photoRepository.find();
+  findAll(): Promise<User[]> {
+    return this.usersRepository.find();
+  }
+
+  findOne(id: string): Promise<User> {
+    return this.usersRepository.findOne(id);
+  }
+
+  async remove(id: string): Promise<void> {
+    await this.usersRepository.delete(id);
   }
 }
 ```
 
-?> 不要忘记将 `PhotoModule` 导入根 `ApplicationModule`。
+?> 不要忘记将 `UsersModule` 导入根 `AppModule`。
 
 如果要在导入`TypeOrmModule.forFeature` 的模块之外使用存储库，则需要重新导出由其生成的提供程序。 您可以通过导出整个模块来做到这一点，如下所示：
 
-> photo.module.ts
+> users.module.ts
 
 ```typescript
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Photo } from './photo.entity';
+import { User } from './user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Photo])],
+  imports: [TypeOrmModule.forFeature([User])],
   exports: [TypeOrmModule]
 })
-export class PhotoModule {}
+export class UsersModule {}
 ```
-现在，如果我们在 `PhotoHttpModule` 中导入 `PhotoModule` ，我们可以在后一个模块的提供者中使用 `@InjectRepository(Photo)`。
+现在，如果我们在 `UserHttpModule` 中导入 `UsersModule` ，我们可以在后一个模块的提供者中使用 `@InjectRepository(User)`。
 
-> photo-http.module.ts
+> users-http.module.ts
 
 ```typescript
 import { Module } from '@nestjs/common';
-import { PhotoModule } from './photo.module';
-import { PhotoService } from './photo.service';
-import { PhotoController } from './photo.controller';
+import { UsersModule } from './user.module';
+import { UsersService } from './users.service';
+import { UsersController } from './users.controller';
 
 @Module({
-  imports: [PhotoModule],
-  providers: [PhotoService],
-  controllers: [PhotoController]
+  imports: [UsersModule],
+  providers: [UsersService],
+  controllers: [UsersController]
 })
-export class PhotoHttpModule {}
+export class UserHttpModule {}
+
 ```
+### 关系
+
+关系是指两个或多个表之间的联系。关系基于每个表中的常规字段，通常包含主键和外键。
+
+关系有三种：
+
+|名称|说明|
+|---|---|
+|一对一|主表中的每一行在外部表中有且仅有一个对应行。使用`@OneToOne()`装饰器来定义这种类型的关系|
+|一对多/多对一|主表中的每一行在外部表中有一个或多的对应行。使用`@OneToMany()`和`@ManyToOne()`装饰器来定义这种类型的关系|
+|多对多|主表中的每一行在外部表中有多个对应行，外部表中的每个记录在主表中也有多个行。使用`@ManyToMany()`装饰器来定义这种类型的关系|
+
+使用对应的装饰器来定义实体的关系。例如，要定义每个`User`可以有多个`Photo`，可以使用`@OneToMany()`装饰器。
+
+>user.entity.ts
+
+```typescript
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Photo } from '../photos/photo.entity';
+
+@Entity()
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  firstName: string;
+
+  @Column()
+  lastName: string;
+
+  @Column({ default: true })
+  isActive: boolean;
+
+  @OneToMany(type => Photo, photo => photo.user)
+  photos: Photo[];
+}
+
+```
+?> 要了解TypeORM中关系的内容，可以查看[TypeORM文档](https://typeorm.io/#/relations)。
+
+### 自动载入实体
+
+手动将实体一一添加到连接选项的`entities`数组中的工作会很无聊。此外，在根模块中涉及实体破坏了应用的域边界，并可能将应用的细节泄露给应用的其他部分。针对这一情况，可以使用静态全局路径（例如, dist/**/*.entity{.ts,.js})。
+
+注意，`webpack`不支持全局路径，因此如果你要在单一仓库(Monorepo)中构建应用，可能不能使用全局路径。针对这一问题，有另外一个可选的方案。在配置对象的属性中(传递给`forRoot()`方法的)设置`autoLoadEntities`属性为`true`来自动载入实体，示意如下：
+
+> app.module.ts
+
+```typescript
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+@Module({
+  imports: [
+    TypeOrmModule.forRoot({
+      ...
+      autoLoadEntities: true,
+    }),
+  ],
+})
+export class AppModule {}
+
+```
+通过配置这一选项，每个通过`forFeature()`注册的实体都会自动添加到配置对象的`entities`数组中。
+
+?> 注意，那些没有通过`forFeature()`方法注册，而仅仅是在实体中被引用（通过关系）的实体不能通过`autoLoadEntities`配置被包含。
+
+### 事务
+
+数据库事务代表在数据库管理系统（DBMS）中针对数据库的一组操作，这组操作是有关的、可靠的并且和其他事务相互独立的。一个事务通常可以代表数据库中的任何变更（[了解更多](https://zh.wikipedia.org/wiki/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BA%8B%E5%8A%A1))。
+
+在[TypeORM事务](https://typeorm.io/#/transactions)中有很多不同策略来处理事务，我们推荐使用`QueryRunner`类，因为它对事务是完全可控的。
+
+首先，我们需要将`Connection`对象以正常方式注入：
+
+```typescript
+@Injectable()
+export class UsersService {
+  constructor(private connection: Connection) {}
+}
+```
+?> `Connection`类需要从`typeorm`包中导入
+
+现在，我们可以使用这个对象来创建一个事务。
+
+```typescript
+async createMany(users: User[]) {
+  const queryRunner = this.connection.createQueryRunner();
+
+  await queryRunner.connect();
+  await queryRunner.startTransaction();
+  try {
+    await queryRunner.manager.save(users[0]);
+    await queryRunner.manager.save(users[1]);
+
+    await queryRunner.commitTransaction();
+  } catch (err) {
+    //如果遇到错误，可以回滚事务
+    await queryRunner.rollbackTransaction();
+  } finally {
+    //你需要手动实例化并部署一个queryRunner
+    await queryRunner.release();
+  }
+}
+```
+?> 注意`connection`仅用于创建`QueryRunner`。然而，要测试这个类，就需要模拟整个`Connection`对象（它暴露出来的几个方法），因此，我们推荐采用一个帮助工厂类（也就是`QueryRunnerFactory`)并且定义一个包含仅限于维持事务需要的方法的接口。这一技术让模拟这些方法变得非常直接。
+
+可选地，你可以使用一个`Connection`对象的回调函数风格的`transaction`方法([阅读更多](https://typeorm.io/#/transactions/creating-and-using-transactions))。
+
+```typescript
+async createMany(users: User[]) {
+  await this.connection.transaction(async manager => {
+    await manager.save(users[0]);
+    await manager.save(users[1]);
+  });
+}
+```
+不推荐使用装饰器来控制事务(`@Transaction()`和`@TransactionManager()`)。
+
+### 订阅者
+
+使用TypeORM[订阅者](https://typeorm.io/#/listeners-and-subscribers/what-is-a-subscriber)，你可以监听特定的实体事件。
+
+```typescript
+import {
+  Connection,
+  EntitySubscriberInterface,
+  EventSubscriber,
+  InsertEvent,
+} from 'typeorm';
+import { User } from './user.entity';
+
+@EventSubscriber()
+export class UserSubscriber implements EntitySubscriberInterface<User> {
+  constructor(connection: Connection) {
+    connection.subscribers.push(this);
+  }
+
+  listenTo() {
+    return User;
+  }
+
+  beforeInsert(event: InsertEvent<User>) {
+    console.log(`BEFORE USER INSERTED: `, event.entity);
+  }
+}
+```
+!> 事件订阅者不能是[请求范围](https://docs.nestjs.com/fundamentals/injection-scopes)的。
+
+现在，将`UserSubscriber`类添加到`providers`数组。
+
+```typescript
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './user.entity';
+import { UsersController } from './users.controller';
+import { UsersService } from './users.service';
+import { UserSubscriber } from './user.subscriber';
+
+@Module({
+  imports: [TypeOrmModule.forFeature([User])],
+  providers: [UsersService, UserSubscriber],
+  controllers: [UsersController],
+})
+export class UsersModule {}
+```
+
+?> 更多实体订阅者内容见[这里](https://typeorm.io/#/listeners-and-subscribers/what-is-a-subscriber)。
+
+### 迁移
+
+[迁移](https://typeorm.io/#/migrations)提供了一个在保存数据库中现有数据的同时增量升级数据库使其与应用中的数据模型保持同步的方法。TypeORM提供了一个专用[CLI命令行工具](https://typeorm.io/#/migrations/creating-a-new-migration)用于生成、运行以及回滚迁移。
+
+迁移类和`Nest`应用源码是分开的。他们的生命周期由`TypeORM CLI`管理，因此，你不能在迁移中使用依赖注入和其他`Nest`专有特性。在[TypeORM文档](https://typeorm.io/#/migrations/creating-a-new-migration) 中查看更多关于迁移的内容。
 
 ### 多个数据库
 
-某些项目可能需要多个数据库连接。幸运的是，这也可以通过本模块实现。要使用多个连接，首先要做的是创建这些连接。在这种情况下，连接命名成为必填项。
+某些项目可能需要多个数据库连接。这也可以通过本模块实现。要使用多个连接，首先要做的是创建这些连接。在这种情况下，连接命名成为必填项。
 
-假设你有一个 `Person` 实体和一个 `Album` 实体，每个实体都存储在他们自己的数据库中。
+假设你有一个`Album` 实体存储在他们自己的数据库中。
 
 ```typescript
 const defaultOptions = {
@@ -865,14 +1154,8 @@ const defaultOptions = {
   imports: [
     TypeOrmModule.forRoot({
       ...defaultOptions,
-      host: 'photo_db_host',
-      entities: [Photo],
-    }),
-    TypeOrmModule.forRoot({
-      ...defaultOptions,
-      name: 'personsConnection',
-      host: 'person_db_host',
-      entities: [Person],
+      host: 'user_db_host',
+      entities: [User],
     }),
     TypeOrmModule.forRoot({
       ...defaultOptions,
@@ -887,13 +1170,12 @@ export class AppModule {}
 
 ?> 如果未为连接设置任何 `name` ，则该连接的名称将设置为 `default`。请注意，不应该有多个没有名称或同名的连接，否则它们会被覆盖。
 
-此时，您的 `Photo` 、 `Person` 和 `Album` 实体中的每一个都已在各自的连接中注册。通过此设置，您必须告诉 `TypeOrmModule.forFeature()` 函数和 `@InjectRepository()` 装饰器应该使用哪种连接。如果不传递任何连接名称，则使用 `default` 连接。
+此时，您的`User` 和 `Album` 实体中的每一个都已在各自的连接中注册。通过此设置，您必须告诉 `TypeOrmModule.forFeature()` 方法和 `@InjectRepository()` 装饰器应该使用哪种连接。如果不传递任何连接名称，则使用 `default` 连接。
 
 ```typescript
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Photo]),
-    TypeOrmModule.forFeature([Person], 'personsConnection'),
+    TypeOrmModule.forFeature([User]),
     TypeOrmModule.forFeature([Album], 'albumsConnection'),
   ],
 })
@@ -904,36 +1186,36 @@ export class AppModule {}
 
 ```typescript
 @Injectable()
-export class PersonService {
+export class AlbumsService {
   constructor(
-    @InjectConnection('personsConnection')
-    private readonly connection: Connection,
-    @InjectEntityManager('personsConnection')
-    private readonly entityManager: EntityManager,
+    @InjectConnection('albumsConnection')
+    private connection: Connection,
+    @InjectEntityManager('albumsConnection')
+    private entityManager: EntityManager,
   ) {}
 }
 ```
 
 ### 测试
 
-在单元测试我们的应用程序时，我们通常希望避免任何数据库连接，从而使我们的测试适合于独立，并使它们的执行过程尽可能快。但是我们的类可能依赖于从连接实例中提取的存储库。那是什么？解决方案是创建假存储库。为了实现这一点，我们设置了自定义提供者。事实上，每个注册的存储库都由 `entitynamereposition` 标记表示，其中 `EntityName` 是实体类的名称。
+在单元测试我们的应用程序时，我们通常希望避免任何数据库连接，从而使我们的测试适合于独立，并使它们的执行过程尽可能快。但是我们的类可能依赖于从连接实例中提取的存储库。那是什么？解决方案是创建假存储库。为了实现这一点，我们设置了[自定义提供者]。事实上，每个注册的存储库都由 `entitynamereposition` 标记表示，其中 `EntityName` 是实体类的名称。
 
 `@nestjs/typeorm` 包提供了基于给定实体返回准备好 `token` 的 `getRepositoryToken()` 函数。
 
 ```typescript
 @Module({
   providers: [
-    PhotoService,
+    UsersService,
     {
-      provide: getRepositoryToken(Photo),
+      provide: getRepositoryToken(User),
       useValue: mockRepository,
     },
   ],
 })
-export class PhotoModule {}
+export class UsersModule {}
 ```
 
-现在, 将使用硬编码 `mockRepository` 作为 `PhotoRepository`。每当任何提供程序使用 `@InjectRepository()` 装饰器请求 `PhotoRepository` 时, `Nest` 会使用注册的 `mockRepository` 对象。
+现在, 将使用`mockRepository` 作为 `UsersRepository`。每当任何提供程序使用 `@InjectRepository()` 装饰器请求 `UsersRepository` 时, `Nest` 会使用注册的 `mockRepository` 对象。
 
 ### 定制存储库
 
@@ -989,18 +1271,18 @@ TypeOrmModule.forRootAsync({
 });
 ```
 
-我们的工厂的行为与任何其他异步提供者一样(例如，它可以是异步的，并且它能够通过注入注入依赖)。
+我们的工厂的行为与任何其他异步提供者一样(例如，它可以是异步的，并且它能够通过`inject`注入依赖)。
 
 ```typescript
 TypeOrmModule.forRootAsync({
   imports: [ConfigModule],
-  useFactory: async (configService: ConfigService) => ({
+  useFactory: (configService: ConfigService) => ({
     type: 'mysql',
-    host: configService.getString('HOST'),
-    port: configService.getString('PORT'),
-    username: configService.getString('USERNAME'),
-    password: configService.getString('PASSWORD'),
-    database: configService.getString('DATABASE'),
+    host: configService.get<string>('HOST'),
+    port: configService.get<string>('PORT'),
+    username: configService.get<string>('USERNAME'),
+    password: configService.get<string>('PASSWORD'),
+    database: configService.get<string>('DATABASE'),
     entities: [__dirname + '/**/*.entity{.ts,.js}'],
     synchronize: true,
   }),
@@ -1008,7 +1290,7 @@ TypeOrmModule.forRootAsync({
 });
 ```
 
-或者，您可以使用类而不是工厂。
+或者，您可以使用`useClass`语法。
 
 ```typescript
 TypeOrmModule.forRootAsync({
@@ -1017,6 +1299,8 @@ TypeOrmModule.forRootAsync({
 ```
 
 上面的构造将 `TypeOrmConfigService` 在内部进行实例化 `TypeOrmModule`，并将利用它来创建选项对象。在 `TypeOrmConfigService` 必须实现 `TypeOrmOptionsFactory` 的接口。
+
+上面的构造将在`TypeOrmModule`内部实例化`TypeOrmConfigService`，并通过调用`createTypeOrmOptions()`
 
 ```typescript
 @Injectable()
@@ -1050,17 +1334,496 @@ TypeOrmModule.forRootAsync({
 
 [这儿](https://github.com/nestjs/nest/tree/master/sample/05-sql-typeorm)有一个可用的例子。
 
+### 序列化集成
+
+另一个使用`TypeORM`的选择是使用`@nestjs/sequelize`包中的`Sequelize ROM`。额外地，我们使用`sequelize-typescript`包来提供一系列额外的装饰器以声明实体。
+
+要开始使用它，我们首先安装需要的依赖。在本章中，我们通过流行的`MySQL`关系数据库来进行说明。序列化支持很多种关系数据库，例如`PostgreSQL`,`MySQL`,`Microsoft SQL Server`,`SQLite`以及`MariaDB`。本章中的步骤也适合其他任何序列化支持的数据库。你只要简单地安装所选数据库相应的客户端API库就可以。
+
+```typescript
+$ npm install --save @nestjs/sequelize sequelize sequelize-typescript mysql2
+$ npm install --save-dev @types/sequelize
+```
+
+安装完成后，就可以将`SequelizeModule`导入到根`AppModule`中。
+
+> app.module.ts
+
+```typescript
+import { Module } from '@nestjs/common';
+import { SequelizeModule } from '@nestjs/sequelize';
+
+@Module({
+  imports: [
+    SequelizeModule.forRoot({
+      dialect: 'mysql',
+      host: 'localhost',
+      port: 3306,
+      username: 'root',
+      password: 'root',
+      database: 'test',
+      models: [],
+    }),
+  ],
+})
+export class AppModule {}
+```
+
+`forRoot()`方法支持所有序列化构造器([了解更多](https://sequelize.org/v5/manual/getting-started.html#setting-up-a-connection))暴露的配置属性。下面是一些额外的配置属性。
+
+|名称|说明|
+|---|---|
+|retryAttempts|尝试连接数据库的次数（默认：10）|
+|retryDelay|两次连接之间间隔时间(ms)(默认：3000)|
+|autoLoadModels|如果为`true`，模型将自动载入（默认:false)|
+|keepConnectionAlive|如果为`true`，在应用关闭后连接将不会关闭（默认:false)|
+|synchronize|如果为`true`，自动载入的模型将同步（默认：false）|
+
+一旦这些完成了，`Sequelize`对象就可以注入到整个项目中（不需要在任何模块中再引入），例如：
+
+> app.service.ts
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import { Sequelize } from 'sequelize-typescript';
+
+@Injectable()
+export class AppService {
+  constructor(private sequelize: Sequelize) {}
+}
+```
+### 模型
+
+序列化采用`活动记录(Active Record)`模式，在这一模式下，你可以使用模型类直接和数据库交互。要继续该示例，我们至少需要一个模型，让我们定义这个`User`模型：
+
+>user.model.ts
+
+```typescript
+import { Column, Model, Table } from 'sequelize-typescript';
+
+@Table
+export class User extends Model<User> {
+  @Column
+  firstName: string;
+
+  @Column
+  lastName: string;
+
+  @Column({ defaultValue: true })
+  isActive: boolean;
+}
+```
+?> 查看[更多](https://github.com/RobinBuschmann/sequelize-typescript#column)的可用装饰器。
+
+`User`模型文件在`users`目录下。该目录包含了和`UsersModule`有关的所有文件。你可以决定在哪里保存模型文件，但我们推荐在他们的**域**中就近创建，即在相应的模块目录中。
+
+要开始使用`User`模型，我们需要通过将其插入到`forRoot()`方法选项的`models`数组中来让序列化知道它的存在。
+
+> app.module.ts
+
+```typescript
+import { Module } from '@nestjs/common';
+import { SequelizeModule } from '@nestjs/sequelize';
+import { User } from './users/user.model';
+
+@Module({
+  imports: [
+    SequelizeModule.forRoot({
+      dialect: 'mysql',
+      host: 'localhost',
+      port: 3306,
+      username: 'root',
+      password: 'root',
+      database: 'test',
+      models: [User],
+    }),
+  ],
+})
+export class AppModule {}
+```
+接下来我们看看`UsersModule`：
+
+>users.module.ts
+
+```typescript
+import { Module } from '@nestjs/common';
+import { SequelizeModule } from '@nestjs/sequelize';
+import { User } from './user.model';
+import { UsersController } from './users.controller';
+import { UsersService } from './users.service';
+
+@Module({
+  imports: [SequelizeModule.forFeature([User])],
+  providers: [UsersService],
+  controllers: [UsersController],
+})
+export class UsersModule {}
+```
+
+这个模块使用`forFeature()`方法来定义哪个模型被注册在当前范围中。我们可以使用`@InjectModel()`装饰器来把`UserModel`注入到`UsersService`中。
+
+> users.service.ts
+
+```typescript
+
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/sequelize';
+import { User } from './user.model';
+
+@Injectable()
+export class UsersService {
+  constructor(
+    @InjectModel(User)
+    private userModel: typeof User,
+  ) {}
+
+  async findAll(): Promise<User[]> {
+    return this.userModel.findAll();
+  }
+
+  findOne(id: string): Promise<User> {
+    return this.userModel.findOne({
+      where: {
+        id,
+      },
+    });
+  }
+
+  async remove(id: string): Promise<void> {
+    const user = await this.findOne(id);
+    await user.destroy();
+  }
+}
+
+```
+
+?> 不要忘记在根`AppModule`中导入`UsersModule`。
+
+如果你要在导入`SequelizeModule.forFreature`的模块之外使用存储库，你需要重新导出其生成的提供者。你可以像这样将整个模块导出：
+
+> users.module.ts
+
+```typescript
+import { Module } from '@nestjs/common';
+import { SequelizeModule } from '@nestjs/sequelize';
+import { User } from './user.entity';
+
+@Module({
+  imports: [SequelizeModule.forFeature([User])],
+  exports: [SequelizeModule]
+})
+export class UsersModule {}
+```
+现在如果我们在`UserHttpModule`中引入`UsersModule`，我们可以在后一个模块的提供者中使用`@InjectModel(User)`。
+
+>users-http.module.ts
+
+```typescript
+import { Module } from '@nestjs/common';
+import { UsersModule } from './user.module';
+import { UsersService } from './users.service';
+import { UsersController } from './users.controller';
+
+@Module({
+  imports: [UsersModule],
+  providers: [UsersService],
+  controllers: [UsersController]
+})
+export class UserHttpModule {}
+```
+### 关系
+
+关系是指两个或多个表之间的联系。关系基于每个表中的常规字段，通常包含主键和外键。
+
+关系有三种：
+
+|名称|说明|
+|---|---|
+|一对一|主表中的每一行在外部表中有且仅有一个对应行。使用`@OneToOne()`装饰器来定义这种类型的关系|
+|一对多/多对一|主表中的每一行在外部表中有一个或多的对应行。使用`@OneToMany()`和`@ManyToOne()`装饰器来定义这种类型的关系|
+|多对多|主表中的每一行在外部表中有多个对应行，外部表中的每个记录在主表中也有多个行。使用`@ManyToMany()`装饰器来定义这种类型的关系|
+
+使用对应的装饰器来定义实体的关系。例如，要定义每个`User`可以有多个`Photo`，可以使用`@HasMany()`装饰器。
+
+> user.entity.ts
+
+```typescript
+import { Column, Model, Table, HasMany } from 'sequelize-typescript';
+import { Photo } from '../photos/photo.model';
+
+@Table
+export class User extends Model<User> {
+  @Column
+  firstName: string;
+
+  @Column
+  lastName: string;
+
+  @Column({ defaultValue: true })
+  isActive: boolean;
+
+  @HasMany(() => Photo)
+  photos: Photo[];
+}
+```
+?> 阅读[本章](https://github.com/RobinBuschmann/sequelize-typescript#model-association)了解更多关于序列化的内容。
+
+### 自动载入模型
+
+手动将模型一一添加到连接选项的`models`数组中的工作会很无聊。此外，在根模块中涉及实体破坏了应用的域边界，并可能将应用的细节泄露给应用的其他部分。针对这一情况，在配置对象的属性中(传递给`forRoot()`方法的)设置`autoLoadModels`和`synchronize`属性来自动载入模型，示意如下：
+
+> app.module.ts
+
+```typescript
+import { Module } from '@nestjs/common';
+import { SequelizeModule } from '@nestjs/sequelize';
+
+@Module({
+  imports: [
+    SequelizeModule.forRoot({
+      ...
+      autoLoadModels: true,
+      synchronize: true,
+    }),
+  ],
+})
+export class AppModule {}
+```
+通过配置这一选项，每个通过`forFeature()`注册的实体都会自动添加到配置对象的`models`数组中。
+
+?> 注意，这不包含那些没有通过`forFeature()`方法注册，而仅仅是在实体中被引用（通过关系）的模型。
+
+### 事务
+
+数据库事务代表在数据库管理系统（DBMS）中针对数据库的一组操作，这组操作是有关的、可靠的并且和其他事务相互独立的。一个事务通常可以代表数据库中的任何变更（[了解更多](https://zh.wikipedia.org/wiki/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BA%8B%E5%8A%A1))。
+
+在[序列化事务](https://sequelize.org/v5/manual/transactions.html)中有很多不同策略来处理事务，下面是一个管理事务的示例（自动回调）。
+
+首先，我们需要将`Sequelize`对象以正常方式注入：
+
+```typescript
+@Injectable()
+export class UsersService {
+  constructor(private sequelize: Sequelize) {}
+}
+```
+?> `Sequelize`类需要从`sequelize-typescript`包中导入
+
+现在，我们可以使用这个对象来创建一个事务。
+
+```typescript
+async createMany() {
+  try {
+    await this.sequelize.transaction(async t => {
+      const transactionHost = { transaction: t };
+
+      await this.userModel.create(
+          { firstName: 'Abraham', lastName: 'Lincoln' },
+          transactionHost,
+      );
+      await this.userModel.create(
+          { firstName: 'John', lastName: 'Boothe' },
+          transactionHost,
+      );
+    });
+  } catch (err) {
+    // 一旦发生错误，事务会回滚
+  }
+}
+```
+?> 注意`Sequelize`仅用于开始一个事务。然而，要测试这个类，就需要模拟整个`Sequelize`对象（它暴露出来的几个方法），因此，我们推荐采用一个帮助工厂类（也就是`TransactionRunner`)并且定义一个包含仅限于维持事务需要的方法的接口。这一技术让模拟这些方法变得非常直接。
+
+可选地，你可以使用一个`Connection`对象的回调函数风格的`transaction`方法([阅读更多](https://typeorm.io/#/transactions/creating-and-using-transactions))。
+
+```typescript
+async createMany(users: User[]) {
+  await this.connection.transaction(async manager => {
+    await manager.save(users[0]);
+    await manager.save(users[1]);
+  });
+}
+```
+不推荐使用装饰器来控制事务(`@Transaction()`和`@TransactionManager()`)。
+
+### 迁移
+
+[迁移](https://typeorm.io/#/migrations)提供了一个在保存数据库中现有数据的同时增量升级数据库使其与应用中的数据模型保持同步的方法。序列化提供了一个专用[CLI命令行工具](https://sequelize.org/v5/manual/migrations.html#the-cli)用于生成、运行以及回滚迁移。
+
+迁移类和`Nest`应用源码是分开的。他们的生命周期由`TypeORM CLI`管理，因此，你不能在迁移中使用依赖注入和其他`Nest`专有特性。在[序列化文档](hhttps://sequelize.org/v5/manual/migrations.html#the-cli) 中查看更多关于迁移的内容。
+
+### 多个数据库
+
+某些项目可能需要多个数据库连接。这也可以通过本模块实现。要使用多个连接，首先要做的是创建这些连接。在这种情况下，连接命名成为必填项。
+
+假设你有一个`Album` 实体存储在他们自己的数据库中。
+
+```typescript
+const defaultOptions = {
+  dialect: 'postgres',
+  port: 5432,
+  username: 'user',
+  password: 'password',
+  database: 'db',
+  synchronize: true,
+};
+
+@Module({
+  imports: [
+    SequelizeModule.forRoot({
+      ...defaultOptions,
+      host: 'user_db_host',
+      models: [User],
+    }),
+    SequelizeModule.forRoot({
+      ...defaultOptions,
+      name: 'albumsConnection',
+      host: 'album_db_host',
+      models: [Album],
+    }),
+  ],
+})
+export class AppModule {}
+```
+
+?> 如果未为连接设置任何 `name` ，则该连接的名称将设置为 `default`。请注意，不应该有多个没有名称或同名的连接，否则它们会被覆盖。
+
+此时，您的`User` 和 `Album` 实体中的每一个都已在各自的连接中注册。通过此设置，您必须告诉 `SequelizeModule.forFeature()` 方法和 `@InjectRepository()` 装饰器应该使用哪种连接。如果不传递任何连接名称，则使用 `default` 连接。
+
+```typescript
+@Module({
+  imports: [
+    SequelizeModule.forFeature([User]),
+    SequelizeModule.forFeature([Album], 'albumsConnection'),
+  ],
+})
+export class AppModule {}
+```
+
+您也可以为给定的连接注入 `Sequelize`：
+
+```typescript
+@Injectable()
+export class AlbumsService {
+  constructor(
+    @InjectConnection('albumsConnection')
+    private sequelize: Sequelize,
+  ) {}
+}
+
+```
+
+### 测试
+
+在单元测试我们的应用程序时，我们通常希望避免任何数据库连接，从而使我们的测试适合于独立，并使它们的执行过程尽可能快。但是我们的类可能依赖于从连接实例中提取的存储库。那是什么？解决方案是创建假模型。为了实现这一点，我们设置了[自定义提供者]。事实上，每个注册的模型都由 `<ModelName>Model` 令牌自动表示，其中 `ModelName` 是模型类的名称。
+
+`@nestjs/sequelize` 包提供了基于给定模型返回准备好 `token` 的 `getModelToken()` 函数。
+
+```typescript
+@Module({
+  providers: [
+    UsersService,
+    {
+      provide: getModelToken(User),
+      useValue: mockModel,
+    },
+  ],
+})
+export class UsersModule {}
+```
+
+现在, 将使用`mockModel` 作为 `UsersModel`。每当任何提供程序使用 `@InjectModel()` 装饰器请求 `UserModel` 时, `Nest` 会使用注册的 `mockModel` 对象。
+
+### 异步配置
+
+通常，您可能希望异步传递`SequelizeModule`选项，而不是事先静态传递它们。在这种情况下，使用 `forRootAsync()` 函数，提供了几种处理异步数据的方法。
+
+第一种可能的方法是使用工厂函数：
+
+```typescript
+SequelizeModule.forRootAsync({
+  useFactory: () => ({
+    dialect: 'mysql',
+    host: 'localhost',
+    port: 3306,
+    username: 'root',
+    password: 'root',
+    database: 'test',
+    models: [],
+  }),
+});
+```
+
+我们的工厂的行为与任何其他[异步提供者](https://docs.nestjs.com/fundamentals/async-providers)一样(例如，它可以是异步的，并且它能够通过`inject`注入依赖)。
+
+```typescript
+SequelizeModule.forRootAsync({
+  imports: [ConfigModule],
+  useFactory: (configService: ConfigService) => ({
+    dialect: 'mysql',
+    host: configService.get<string>('HOST'),
+    port: configService.get<string>('PORT'),
+    username: configService.get<string>('USERNAME'),
+    password: configService.get<string>('PASSWORD'),
+    database: configService.get<string>('DATABASE'),
+    models: [],
+  }),
+  inject: [ConfigService],
+});
+```
+
+或者，您可以使用`useClass`语法。
+
+```typescript
+SequelizeModule.forRootAsync({
+  useClass: SequelizeConfigService,
+});
+```
+
+上面的构造将 `SequelizeConfigService` 在`SequelizeModule`内部进行实例化 ,并通过调用`createSequelizeOptions()`来创建一个选项对象。注意，这意味着 `SequelizeConfigService` 必须实现 `SequelizeOptionsFactory` 的接口。如下所示：
+
+```typescript
+@Injectable()
+class SequelizeConfigService implements SequelizeOptionsFactory {
+  createSequelizeOptions(): SequelizeModuleOptions {
+    return {
+      dialect: 'mysql',
+      host: 'localhost',
+      port: 3306,
+      username: 'root',
+      password: 'root',
+      database: 'test',
+      models: [],
+    };
+  }
+}
+```
+
+为了防止在 `SequelizeModule` 中创建 `SequelizeConfigService` 并使用从不同模块导入的提供程序，可以使用 `useExisting` 语法。
+
+```typescript
+SequelizeModule.forRootAsync({
+  imports: [ConfigModule],
+  useExisting: ConfigService,
+});
+```
+这个构造与 `useClass` 的工作原理相同，但有一个关键的区别 — `SequelizeModule` 将查找导入的模块来重用现有的 `ConfigService`，而不是实例化一个新的 `ConfigService`。
+
+### 示例
+
+[这儿](https://github.com/nestjs/nest/tree/master/sample/07-sequelize)有一个可用的例子。
+
 ## Mongo
 
-`Nest`支持两种与 [MongoDB](http://www.mongodb.org/) 数据库集成的方式。既使用[ORM](https://github.com/typeorm/typeorm) 提供的 MongoDB 支撑或对象建模工具 [Mongoose](http://mongoosejs.com/)。选择 `ORM` 的话你可以按照以前的步骤使用 `typeorm`  。否则请使用我们 `Nest` 专用包: `@nestjs/mongoose`。
+`Nest`支持两种与 [MongoDB](http://www.mongodb.org/) 数据库集成的方式。既使用内置的[TypeORM](https://github.com/typeorm/typeorm) 提供的 MongoDB 连接器，或使用最流行的MongoDB对象建模工具 [Mongoose](http://mongoosejs.com/)。在本章后续描述中我们使用专用的`@nestjs/mongoose`包。
 
 首先，我们需要安装所有必需的依赖项：
 
-```
+```bash
 $ npm install --save @nestjs/mongoose mongoose
+$ npm install --save-dev @types/mongoose
 ```
 
-安装过程完成后，我们可以将其 `MongooseModule` 导入到根目录中 `ApplicationModule` 。
+安装过程完成后，我们可以将其 `MongooseModule` 导入到根目录 `AppModule` 中。
 
 > app.module.ts
 
@@ -1074,13 +1837,27 @@ import { MongooseModule } from '@nestjs/mongoose';
 export class AppModule {}
 ```
 
-该 `forRoot()` 和 [mongoose](http://mongoosejs.com/) 包中的 `mongoose.connect()` 一样的参数对象。如下所述。
+该 `forRoot()` 和 [mongoose](http://mongoosejs.com/) 包中的 `mongoose.connect()` 一样的参数对象。[参见](https://mongoosejs.com/docs/connections.html)。
 
 ### 模型注入
 
-`cat.schema.ts` 文件驻在 `cats` 目录中的一个文件夹中，我们还在其中定义了 `CatsModule`。虽然您可以将模式文件存储在您喜欢的任何地方，但是我们建议将它们存储在相关的域对象附近的适当模块目录中。
+在`Mongoose`中，一切都源于`[Scheme](http://mongoosejs.com/docs/guide.html)`，我们先定义`CatSchema`:
 
-让我们来看看:
+> schemas/cat.schema.ts
+
+```typescript
+import * as mongoose from 'mongoose';
+
+export const CatSchema = new mongoose.Schema({
+  name: String,
+  age: Number,
+  breed: String,
+});
+```
+
+该 `cat.schema` 文件在 `cats` 目录下。这个目录包含了和 `CatsModule`模块有关的所有文件。你可以决定在哪里保存`Schema`文件，但我们推荐在他们的**域**中就近创建，即在相应的模块目录中。
+
+我们来看看`CatsModule`：
 
 > cats.module.ts
 
@@ -1099,9 +1876,9 @@ import { CatSchema } from './schemas/cat.schema';
 export class CatsModule {}
 ```
 
-`MongooseModule` 提供了 `forFeature()` 方法来配置模块，包括定义应该在当前范围内注册哪些模型。如果您还想在另一个模块中使用模型，请将 `MongooseModule` 添加到 `CatsModule` 的导出部分，并在另一个模块中导入`CatsModule`。
+`MongooseModule`提供了`forFeature()`方法来配置模块，包括定义哪些模型应该注册在当前范围中。如果你还想在另外的模块中使用这个模型，将`MongooseModule`添加到`CatsModule`的`exports`部分并在其他模块中导入`CatsModule`。
 
-注册模式后，可以使用 `@InjectModel()` 装饰器将 `Cat` 模型注入到 `CatsService` 中:
+注册`Schema`后，可以使用 `@InjectModel()` 装饰器将 `Cat` 模型注入到 `CatsService` 中:
 
 > cats.service.ts
 
@@ -1114,24 +1891,176 @@ import { CreateCatDto } from './dto/create-cat.dto';
 
 @Injectable()
 export class CatsService {
-  constructor(@InjectModel('Cat') private readonly catModel: Model<Cat>) {}
+  constructor(@InjectModel('Cat') private catModel: Model<Cat>) {}
 
   async create(createCatDto: CreateCatDto): Promise<Cat> {
     const createdCat = new this.catModel(createCatDto);
-    return await createdCat.save();
+    return createdCat.save();
   }
 
   async findAll(): Promise<Cat[]> {
-    return await this.catModel.find().exec();
+    return this.catModel.find().exec();
   }
 }
+
+```
+
+### 连接
+
+有时你可能需要连接原生的[Mongoose连接](https://mongoosejs.com/docs/api.html#Connection)对象，你可能在连接对象中想使用某个原生的API。你可以使用如下的`@InjectConnection()`装饰器来注入Mongoose连接。
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import { InjectConnection } from '@nestjs/mongoose';
+import { Connection } from 'mongoose';
+
+@Injectable()
+export class CatsService {
+  constructor(@InjectConnection() private connection: Connection) {}
+}
+
+```
+### 多数据库
+
+有的项目需要多数据库连接，可以在这个模块中实现。要使用多连接，首先要创建连接，在这种情况下，*连接*必须**要有名称。
+
+> app.module.ts
+
+```typescript
+import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+
+@Module({
+  imports: [
+    MongooseModule.forRoot('mongodb://localhost/test', {
+      connectionName: 'cats',
+    }),
+    MongooseModule.forRoot('mongodb://localhost/users', {
+      connectionName: 'users',
+    }),
+  ],
+})
+export class AppModule {}
+```
+?> 你不能在没有名称的情况下使用多连接，也不能对多连接使用同一个名称，否则会被覆盖掉。
+
+在设置中，要告诉`MongooseModule.forFeature()`方法应该使用哪个连接。
+
+```typescript
+@Module({
+  imports: [
+    MongooseModule.forFeature([{ name: 'Cat', schema: CatSchema }], 'cats'),
+  ],
+})
+export class AppModule {}
+```
+
+也可以向一个给定的连接中注入`Connection`。
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import { InjectConnection } from '@nestjs/mongoose';
+import { Connection } from 'mongoose';
+
+@Injectable()
+export class CatsService {
+  constructor(@InjectConnection('cats') private connection: Connection) {}
+}
+```
+### 钩子（中间件）
+
+中间件（也被称作预处理(pre)和后处理（post）钩子）是在执行异步函数时传递控制的函数。中间件是针对`Schema`层级的，在写插件([源码](https://mongoosejs.com/docs/middleware.html))时非常有用。在Mongoose编译完模型后使用`pre()`或`post()`不会起作用。要在模型注册前注册一个钩子，可以在使用一个工厂提供者（例如 `useFactory`）是使用`MongooseModule`中的`forFeatureAsync()`方法。使用这一技术，你可以访问一个Schema对象，然后使用`pre()`或`post()`方法来在那个schema中注册一个钩子。示例如下：
+
+```typescript
+@Module({
+  imports: [
+    MongooseModule.forFeatureAsync([
+      {
+        name: 'Cat',
+        useFactory: () => {
+          const schema = CatsSchema;
+          schema.pre('save', () => console.log('Hello from pre save'));
+          return schema;
+        },
+      },
+    ]),
+  ],
+})
+export class AppModule {}
+```
+和其他[工厂提供者](https://docs.nestjs.com/fundamentals/custom-providers#factory-providers-usefactory)一样，我们的工厂函数是异步的，可以通过`inject`注入依赖。
+
+```typescript
+@Module({
+  imports: [
+    MongooseModule.forFeatureAsync([
+      {
+        name: 'Cat',
+        imports: [ConfigModule],
+        useFactory: (configService: ConfigService) => {
+          const schema = CatsSchema;
+          schema.pre('save', () =>
+            console.log(
+              `${configService.get<string>('APP_NAME')}: Hello from pre save`,
+            ),
+          );
+          return schema;
+        },
+        inject: [ConfigService],
+      },
+    ]),
+  ],
+})
+export class AppModule {}
+
+```
+### 插件
+
+要向给定的schema中注册[插件](https://mongoosejs.com/docs/plugins.html)，可以使用`forFeatureAsync()`方法。
+
+```typescript
+@Module({
+  imports: [
+    MongooseModule.forFeatureAsync([
+      {
+        name: 'Cat',
+        useFactory: () => {
+          const schema = CatsSchema;
+          schema.plugin(require('mongoose-autopopulate'));
+          return schema;
+        },
+      },
+    ]),
+  ],
+})
+export class AppModule {}
+```
+要向所有schema中立即注册一个插件，调用`Connection`对象中的`.plugin()`方法。你可以在所有模型创建前访问连接。使用`connectionFactory`来实现：
+
+> app.module.ts
+
+```typescript
+import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+
+@Module({
+  imports: [
+    MongooseModule.forRoot('mongodb://localhost/test', {
+      connectionFactory: (connection) => {
+        connection.plugin(require('mongoose-autopopulate'));
+        return connection;
+      }
+    }),
+  ],
+})
+export class AppModule {}
 ```
 
 ### 测试
 
-在单元测试我们的应用程序时，我们通常希望避免任何数据库连接，使我们的测试套件独立并尽可能快地执行它们。但是我们的类可能依赖于从连接实例中提取的模型。
+在单元测试我们的应用程序时，我们通常希望避免任何数据库连接，使我们的测试套件独立并尽可能快地执行它们。但是我们的类可能依赖于从连接实例中提取的模型。如何处理这些类呢？解决方案是创建模拟模型。
 
-为了简化这一过程，`@nestjs/mongoose` 包公开了一个 `getModelToken()` 函数，该函数根据一个 `token` 名称返回一个准备好的注入`token`。使用此 `token`，您可以轻松地使用任何标准自定义提供程序技术(包括 `useClass`、`useValue` 和 `useFactory`)提供模拟实现。例如:
+为了简化这一过程，`@nestjs/mongoose` 包公开了一个 `getModelToken()` 函数，该函数根据一个 `token` 名称返回一个准备好的`[注入token](https://docs.nestjs.com/fundamentals/custom-providers#di-fundamentals)`。使用此 `token`，你可以轻松地使用任何标准[自定义提供者](https://docs.nestjs.com/fundamentals/custom-providers)技术，包括 `useClass`、`useValue` 和 `useFactory`。例如:
 
 ```typescript
 @@Module({
@@ -1150,7 +2079,7 @@ export class CatsModule {}
 
 ### 异步配置
 
-通常，您可能希望异步传递模块选项，而不是事先传递它们。在这种情况下，使用 `forRootAsync()` 方法，提供了几种处理异步数据的方法。
+通常，您可能希望异步传递模块选项，而不是事先传递它们。在这种情况下，使用 `forRootAsync()` 方法，`Nest`提供了几种处理异步数据的方法。
 
 第一种可能的方法是使用工厂函数：
 
@@ -1203,32 +2132,37 @@ MongooseModule.forRootAsync({
   useExisting: ConfigService,
 });
 ```
+### 例子
+
+一个可用的示例见[这里](https://github.com/nestjs/nest/tree/master/sample/06-mongoose)。
+
 ## 配置
 
-应用程序通常在不同的**环境**中运行。根据环境的不同，应该使用不同的配置设置。例如，通常本地环境依赖于特定的数据库凭据，仅对本地DB实例有效。生产环境将使用一组单独的DB凭据。由于配置变量会更改，所以最佳实践是将[配置变量](https://12factor.net/config)存储在环境中。
+应用程序通常在不同的环境中运行。根据环境的不同，应该使用不同的配置设置。例如，通常本地环境依赖于特定的数据库凭据，仅对本地DB实例有效。生产环境将使用一组单独的DB凭据。由于配置变量会更改，所以最佳实践是将[配置变量](https://12factor.net/config)存储在环境中。
 
-通过 `process.env` 全局，`xternal` 定义的环境变量在` Node.js` 内部可见。 我们可以尝试通过在每个环境中分别设置环境变量来解决多个环境的问题。 这会很快变得难以处理，尤其是在需要轻松模拟或更改这些值的开发和测试环境中。
+外部定义的环境变量通过 `process.env global` 在` Node.js` 内部可见。 我们可以尝试通过在每个环境中分别设置环境变量来解决多个环境的问题。 这会很快变得难以处理，尤其是在需要轻松模拟或更改这些值的开发和测试环境中。
 
 在 `Node.js` 应用程序中，通常使用 `.env` 文件，其中包含键值对，其中每个键代表一个特定的值，以代表每个环境。 在不同的环境中运行应用程序仅是交换正确的`.env` 文件的问题。
 
-在 `Nest` 中使用这种技术的一个好方法是创建一个 `ConfigModule` ，它暴露一个 `ConfigService` ，根据 `$NODE_ENV` 环境变量加载适当的 `.env` 文件。虽然您可以选择自己编写这样的模块，但为方便起见，Nest提供了开箱即用的`@ nestjs/config`软件包。 我们将在本章中介绍该软件包。
+在 `Nest` 中使用这种技术的一个好方法是创建一个 `ConfigModule` ，它公开一个 `ConfigService` 以加载适当的 `.env` 文件。你可以选择自己写一个这样的模块，方便起见，Nest也提供了一个开箱即用的`@nestjs/config`包，本章中我们将使用这个包。
 
 ### 安装
 
-要开始使用它，我们首先安装所需的依赖项。
+首先安装需要的依赖
 
 ```bash
 $ npm i --save @nestjs/config
 ```
 
-> info **注意**  `@nestjs/config` 内部使用 [dotenv](https://github.com/motdotla/dotenv) 实现.
+?> `@nestjs/config`包内部使用`dotenv`。
 
-### 开始使用
+### 开始
 
-安装完成之后，我们需要导入`ConfigModule`模块。通常，我们在根模块`AppModule`中导入它，并使用`。forRoot()`静态方法导入它的配置。
+一旦安装完成，我们可以导入`ConfigModule`。我们通过`.forRoot()`静态方法在根`AppModule`中引入并控制其行为。在这个过程中，解析并处理环境变量键值对。然后，我们可以通过不同选项将`ConfigModule`的`ConfigService`类引入我们的其他特征模块。
+
+> app.module.ts
 
 ```typescript
-@@filename(app.module)
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
@@ -1237,66 +2171,62 @@ import { ConfigModule } from '@nestjs/config';
 })
 export class AppModule {}
 ```
+上述代码将从默认位置（项目根目录）载入并解析一个`.env`文件，从`.env`文件和`process.env`合并环境变量键值对，并将结果存储到一个可以通过`ConfigService`访问的私有结构。`forRoot()`方法注册了`ConfigService`提供者，后者提供了一个`get()`方法来读取这些解析/合并的配置变量。由于`@nestjs/config`依赖[dotenv](https://github.com/motdotla/dotenv)，它使用该包的规则来处理冲突的环境变量名称。当一个键同时作为环境变量（例如，通过操作系统终端如`export DATABASE_USER=test`导出）存在于运行环境中以及`.env`文件中时，以运行环境变量优先。
 
+一个示例的`.env`文件看起来如下：
 
-
-上面的代码将从默认位置（项目根目录）加载并解析`.env`文件，将.env文件中的键/值对与分配给`process.env`的环境变量合并，并将结果存储在一个私有结构中，该结构 您可以通过`ConfigService`访问。 `forRoot()`方法注册了`ConfigService`提供者，该提供程序提供了一个get（）方法来读取这些解析/合并的配置变量。 由于`@nestjs/config`依赖于`dotenv`，因此它使用该程序包的规则来解决环境变量名称中的冲突。 当密钥在运行时环境中作为环境变量存在时（例如，通过OS shell导出，例如`export DATABASE_USER = test`），并在.env文件中时，运行时环境变量具有优先权。
-
-一个样例`.env`文件看起来像这样:
-
-```json
+```typescript
 DATABASE_USER=test
 DATABASE_PASSWORD=test
 ```
+### 自定义`env`文件路径
 
-#### 自定义 env 文件路径
-
-默认情况下，程序在应用程序的根目录中查找`.env`文件。 要为`.env`文件指定另一个路径，请配置`forRoot()`的配置对象envFilePath属性(可选)，如下所示：
+默认地，该包从应用根目录下查找`.env`文件。要指定`.env`文件的其他路径，设置一个传递给`forRoot()`的参数对象(可选的）的`envFilePath`属性，如下：
 
 ```typescript
 ConfigModule.forRoot({
   envFilePath: '.development.env',
 });
 ```
-
-您还可以像这样为.env文件指定多个路径：
+你也可以为`.env`文件指定多个路径，像这样：
 
 ```typescript
 ConfigModule.forRoot({
-  envFilePath: ['.env.development.local', '.env.development'],
+  envFilePath:['.env.development.local','.env.development'],
 });
 ```
+如果一个变量出现在多个文件中，以第一个出现的优先。
 
-如果在多个文件中发现同一个变量，则第一个变量优先。
+### 禁用`env`变量加载
 
-#### 禁止加载环境变量
-
-如果您不想加载.env文件，而是想简单地从运行时环境访问环境变量（如OS shell导出，例如`export DATABASE_USER = test`），则将`options`对象的`ignoreEnvFile`属性设置为`true`，如下所示 ：
+如果你不想加载`.env`文件，而只想简单地从运行环境中（例如从操作系统终端中导出`export DATABASE_USER=test`）读取变量。设置`ignoreEnvFile`属性为`true`，如下：
 
 ```typescript
 ConfigModule.forRoot({
   ignoreEnvFile: true,
 });
+
 ```
 
-#### 全局使用
+### 全局使用模块
 
-当您想在其他模块中使用`ConfigModule`时，需要将其导入（这是任何Nest模块的标准配置）。 或者，通过将`options`对象的`isGlobal`属性设置为`true`，将其声明为[全局模块](https://docs.nestjs.cn/7/modules?id=全局模块)，如下所示。 在这种情况下，将`ConfigModule`加载到根模块（例如`AppModule`）后，您无需在其他模块中导入它。
+如果你想在其他模块中使用`ConfigModule`，你需要（和其他标准的Nest模块一样）导入它。另一种方法是将`isGlobal`选项设置为`true`来将其设置为`[全局模块](https://docs.nestjs.com/modules#global-modules)`，如下所示。在这种情况下，一旦在根模块（例如 `AppModule`）中载入，就不需要在其他模块中再导入`ConfigModule`模块。
 
 ```typescript
 ConfigModule.forRoot({
-  isGlobal: true,
+  isGlobal:true,
 });
 ```
 
-#### 自定义配置文件
+### 自定义配置文件
 
-对于更复杂的项目，您可以利用自定义配置文件返回嵌套的配置对象。 这使您可以按功能对相关配置设置进行分组（例如，与数据库相关的设置），并将相关设置存储在单个文件中，以帮助独立管理它们
+在更复杂的项目中，你可能需要自定义配置文件来返回嵌套的配置对象。这允许你通过函数（例如，数据库相关设置）将相关的配置文件分组，并将相互关联的设置存储到独立的文件中以便独立管理。
 
-自定义配置文件导出一个工厂函数，该函数返回一个配置对象。配置对象可以是任意嵌套的普通JavaScript对象。`process.env`对象将包含完全解析的环境变量键/值对（具有如上所述的`.env`文件和已解析和合并的外部定义变量）。因为您控制了返回的配置对象，所以您可以添加任何必需的逻辑来将值转换为适当的类型、设置默认值等等。例如:
+一个自定义配置文件导出一个工厂函数并返回一个配置对象。配置对象可以是任意简单嵌套的`JavaScript`对象。`process.env`对象包含完整的处理过的键值对（包括`.env`文件和[上述](https://docs.nestjs.com/techniques/configuration#getting-started)外部定义和合并的变量）。鉴于你可以控制返回的配置对象，你可以按需添加任何逻辑来将值处理为合适的类型，以及设置默认值，例如：
+
+> config/configuration.ts
 
 ```typescript
-@@filename(config/configuration)
 export default () => ({
   port: parseInt(process.env.PORT, 10) || 3000,
   database: {
@@ -1305,8 +2235,7 @@ export default () => ({
   }
 });
 ```
-
-我们使用传递给`ConfigModule.forRoot()`方法的options对象的`load`属性来加载这个文件:
+我们通过传递给`ConfigModule.forRoot()`方法的选项对象的`load`属性来载入文件：
 
 ```typescript
 import configuration from './config/configuration';
@@ -1320,62 +2249,62 @@ import configuration from './config/configuration';
 })
 export class AppModule {}
 ```
+?> 分派给`load`属性的值是个数组，允许你载入多个配置文件（例如,`load: [databaseConfig, authConfig]`)。
 
-> info **注意** 分配给`load`属性的值是一个数组，允许您加载多个配置文件 (e.g. `load: [databaseConfig, authConfig]`)
+### 使用`ConfigService`
 
-### 使用 `ConfigService`
+> feature.module.ts
 
-要从 `ConfigService` 访问环境变量，我们需要注入它。因此我们首先需要导入该模块。与任何提供程序一样，我们需要将其包含模块`ConfigModule`导入到将使用它的模块中（除非您将传递给`ConfigModule.forRoot()`方法的options对象中的`isGlobal`属性设置为`true`）。 如下所示将其导入功能模块。
+要从我们的`ConfigService`读取配置值，首先要注入`ConfigService`。和其他提供者一样，我们首先要导入包含它的模块——`ConfigModule`——到要使用的模块（除非你在传递给`ConfigModule.forRoot()`方法中的`isGlobal`属性设置为`true`）。如下将其导入`feature`模块。
 
 ```typescript
-feature.module.ts
-
 @Module({
   imports: [ConfigModule],
-  ...
+  // ...
 })
 ```
-
-然后我们可以使用标准的构造函数注入:
+然后我们可以用标准构造器注入它：
 
 ```typescript
 constructor(private configService: ConfigService) {}
 ```
 
-并在我们的类中使用它:
+并且在我们的类中使用：
 
 ```typescript
-// get an environment variable
+// 获取一个环境变量
 const dbUser = this.configService.get<string>('DATABASE_USER');
 
-// get a custom configuration value
+// 获取一个自定义配置值
 const dbHost = this.configService.get<string>('database.host');
 ```
 
-如上所示，使用`configService.get()`方法通过传递变量名来获得一个简单的环境变量。您可以通过传递类型来执行TypeScript类型提示，如上所示(例如，`get<string>(…)`)。`get()`方法还可以遍历一个嵌套的自定义配置对象(通过自定义配置文件创建，如上面的第二个示例所示)。`get()`方法还接受一个可选的第二个参数，该参数定义一个默认值，当键不存在时将返回该值，如下所示:
+如上所示，使用`configService.get()`方法来通过传递一个变量名称以获得一个简单的环境变量。你可以如上所示使用`Typescript`类型提示以传递类型（例如get<string>)。`get()`方法可以传递一个嵌套的自定义配置对象（由[自定义配置文件](https://docs.nestjs.com/techniques/configuration#custom-configuration-files)创建，如上示例)。
+
+`get()`方法也可以使用第二个可选参数作为默认值，以在指定键不存在时返回默认值，如：
 
 ```typescript
-// use "localhost" when "database.host" is not defined
+// 当 "database.host" 未定义时使用 "localhost"
 const dbHost = this.configService.get<string>('database.host', 'localhost');
 ```
 
-#### 配置命名空间
+### 配置命名空间
 
-`ConfigModule`模块允许您定义和加载多个自定义配置文件，如上面的自定义配置文件所示。您可以使用嵌套的配置对象来管理复杂的配置对象层次结构，如本节所示。或者，您可以使用`registerAs()`函数返回一个“带名称空间”的配置对象，如下所示:
+`ConfigMogule`允许你定义和载入多个自定义配置文件，如上述自定义配置文件所述。你可以使用本节所示的嵌入配置对象管理复杂的配置对象层次。可选地，你可以使用如下`registerAs()`函数返回一个包含"命名空间“的配置对象。
+
+> config/database.config.ts
 
 ```typescript
-@@filename(config/database.config)
 export default registerAs('database', () => ({
   host: process.env.DATABASE_HOST,
   port: process.env.DATABASE_PORT || 5432
 }));
 ```
+和自定义配置文件一样，在你的`registerAs()`工厂函数中，`process.env`对象包含一个完整的解析过的环境变量键值对（利用.env文件以及上述的解析与合并的外部定义的变量）。
 
-与自定义配置文件一样，在您的`registerAs()`工厂函数内部，`process.env`对象将包含完全解析的环境变量键/值对（带有`.env`文件和已定义并已合并的外部定义变量)
+?> `registerAs()`函数从`@nestjs/config`包中导出。
 
-> info **注意** `registerAs` 函数是从 `@nestjs/config` 包导出的。
-
-使用`forRott()`的`load`方法载入命名空间的配置，和载入自定义配置文件方法相同：
+通过`forRoot()`方法中可选对象的`load`属性来载入一个带命名空间的配置，采用同样的方法可以载入一个自定义的配置文件。
 
 ```typescript
 import databaseConfig from './config/database.config';
@@ -1389,14 +2318,12 @@ import databaseConfig from './config/database.config';
 })
 export class AppModule {}
 ```
-
-现在，要从数据库命名空间获取`host`的值，请使用符号`.`。使用`'database'`作为属性名称的前缀，该属性名称对应于命名空间的名称（作为传递给`registerAs()`函数的第一个参数）
+现在，要从一个`database`命名空间中获取`host`值，使用点号(.)。使用`database`作为属性名称的前缀，以反映名字对应的命名空间（作为`registerAs()`函数的第一个参数传递）。
 
 ```typescript
 const dbHost = this.configService.get<string>('database.host');
 ```
-
-一个合理的替代方案是直接注入`'database'`的命名空间，我们将从强类型中获益：
+一个合理的选项是直接注入到`database`命名空间中。这允许我们利用强类型的好处：
 
 ```typescript
 constructor(
@@ -1404,12 +2331,11 @@ constructor(
   private databaseConfig: ConfigType<typeof databaseConfig>,
 ) {}
 ```
+?> `ConfigType`从`@nestjs/config`中导出。
 
-> info **注意** ` ConfigType` 函数是从 `@nestjs/config` 包导出的。
+### 部分注册
 
-#### 部分注册
-
-到目前为止，我们已经使用`forRoot()`方法在根模块(例如，`AppModule`)中处理了配置文件。也许您有一个更复杂的项目结构，其中特定于功能的配置文件位于多个不同的目录中。与在根模块中加载所有这些文件不同，`@nestjs/config`包提供了一个称为部分注册的功能，它只引用与每个功能模块相关联的配置文件。使用特性模块中的`forFeature()`静态方法来执行部分注册，如下所示:
+到目前为止，我们都是在根模块（例如,`AppModule`)中使用`forRoot()`方法处理配置文件。可能你有一个更复杂的项目结构，包含在不同目录下的特定配置文件。`@nestjs/config`包提供了一个叫做部分注册的功能来代替从根目录中载入所有文件，该功能是指仅包括和每个特征模块相关的配置文件。在一个特征模块中使用`forFeature()`静态方法来实现部分注册，如下：
 
 ```typescript
 import databaseConfig from './config/database.config';
@@ -1419,38 +2345,25 @@ import databaseConfig from './config/database.config';
 })
 export class DatabaseModule {}
 ```
+!> 在某些情况下，你可能需要使用`onModuleInit()`钩子而不是构造器来访问加载的部分注册属性。这是因为`forFeature()`方法在模块初始化时运行，模块的初始化顺序是不确定的。如果你在构造器中访问其他模块中以这种方法载入的配置值，而该配置依赖的模块可能尚未初始化。`onModuleInit()`方法仅在所有依赖的模块初始化之后运行，因此这一技术是安全的。
 
-> info **警告**在某些情况下，您可能需要使用`onModuleInit()`钩子通过部分注册来访问加载的属性，而不是在构造函数中。这是因为` forFeature() `方法是在模块初始化期间运行的，而模块初始化的顺序是不确定的。如果您以这种方式访问由另一个模块在构造函数中加载的值，则配置所依赖的模块可能尚未初始化。`onModuleInit() `方法只在它所依赖的所有模块被初始化之后运行，因此这种技术是安全的
+### `Schema`验证
 
+一个标准实践是如果在应用启动过程中未提供需要的环境变量或它们不满足特定的验证规则时抛出异常。`@nestjs/config`包让我们可以使用[Joi npm包](https://github.com/hapijs/joi)来提供这种类型验证。使用Joi,你可以定义一个对象`Schema`对象并验证对应的`JavaScript`对象。
 
-
-### 高级配置
-
-我们刚刚实现了一个基础 `ConfigService`。但是，这种方法有几个缺点，我们现在将解决这些缺点:
-
-* 缺少环境变量的名称和类型（无智能感知）
-* 缺少提供对 `.env` 文件的验证
-* env文件将布尔值作为string (`'true'`),提供，因此每次都必须将它们转换为 `boolean`
-
-### 验证
-
-我们将从验证提供的环境变量开始。如果未提供所需的环境变量或者它们不符合您的预定义要求，则可以抛出错误。为此，我们将使用 `npm` 包 [Joi](https://github.com/hapijs/joi)。通过 `Joi`，您可以定义一个对象模式（ `schema` ）并根据它来验证  `JavaScript` 对象。
-
-安装 `Joi` 和它的类型（用于 `TypeScript` 用户）：
+安装Joi(以及`TypeScript`用户的类型声明)。
 
 ```bash
 $ npm install --save @hapi/joi
 $ npm install --save-dev @types/hapi__joi
 ```
+?> 最新版的`@hapi/joi`需要运行在Node V12或更高版本上。老版本的Node请安装`V16.1.8`。`V17.0.2`之后的版本在构建时可能报错，请阅读`[他们的文档](https://hapi.dev/family/joi/?v=17.0.2#install)`和`[github issue](https://hapi.dev/family/joi/?v=17.0.2#install)`。
 
-> warning **注意** 最新版本的“@hapi/joi”要求您运行Node v12或更高版本。对于较老版本的node，请安装“v16.1.8”。这主要是在“v17.0.2”发布之后，它会在构建期间导致错误。更多信息请参考[他们的文档](https://hapi.dev/family/joi/?v=17.0.2#install)和[github issue](https://github.com/hapijs/joi/issues/2266#issuecomment-571667769)
+现在我们可以通过`forRoot()`方法的选项对象的`validationSchema`属性来定义一个Joi验证`schema`，如下：
 
-现在，我们可以定义一个Joi验证模式，并通过`forRoot()`方法的`options`对象的`validationSchema`属性传递它，如下所示
+> app.module.ts
 
 ```typescript
-app.module.ts
-
-
 import * as Joi from '@hapi/joi';
 
 @Module({
@@ -1467,15 +2380,13 @@ import * as Joi from '@hapi/joi';
 })
 export class AppModule {}
 ```
+默认情况下，所有`schema`键都是可选的。在这里，如果环境中（`.env`文件或者进程环境）没有提供这些变量的话，我们可以为`NODE_ENV`和`PORT`设置默认值。此外，我们可以使用`required()`验证方法来获取一个必须在环境中定义的值（`.env`文件或者进程环境）。在这种情况下，如果我们没有在环境中提供变量，验证步骤将抛出异常。查看[Joi验证方法](https://hapi.dev/family/joi/?v=17.0.2#example)来了解更多如何构建验证`schema`的内容。
 
-由于我们为 `NODE_ENV` 和 `PORT` 设置了默认值，因此如果不在环境文件中提供这些变量，验证将不会失败。然而, 我们需要明确提供 `API_AUTH_ENABLED`。如果我们的 `.env` 文件中的变量不是模式（ `schema` ）的一部分, 则验证也会引发错误。此外，`Joi` 还会尝试将 `env` 字符串转换为正确的类型。
+默认情况下，允许存在未知的环境变量（在`schema`中没有的环境变量键），这不会触发验证异常。默认情况下，所有验证错误都会汇报。你可以选择在`forRoot()`选项对象中的`validationOptions`键中传递一个选项对象来修改这些行为。这个选项对象可以包含任意由[Joi validation options](https://hapi.dev/family/joi/api/?v=17.0.2#anyvalidvalues---aliases-equal)提供的标准验证选项属性。例如，要倒置两个上述设置，需要传递这样的选项：
 
-默认情况下，允许使用未知的环境变量(其键不在模式中出现的环境变量)，并且不会触发验证异常。默认情况下，将报告所有验证错误。您可以通过通过`forRoot()` options对象的`validationOptions`键传递一个options对象来更改这些行为。此选项对象可以包含由Joi验证选项提供的任何标准验证选项属性。例如，要反转上面的两个设置，像这样传递选项:
+> app.module.ts
 
 ```typescript
-app.module.ts
-
-
 import * as Joi from '@hapi/joi';
 
 @Module({
@@ -1496,17 +2407,15 @@ import * as Joi from '@hapi/joi';
 })
 export class AppModule {}
 ```
+`@nestjs/config`包使用默认设置：
+- `allowUnknown`:控制是否允许环境变量中未知的键。默认为`true`。
+- `abortEarly`:如果为`true`，在遇到第一个错误时就停止验证；如果为`false`，返回所有错误。默认为`false`。
 
-`@nestjs/config`软件包使用默认设置
+注意，一旦你决定传递一个`validationOptions`对象，任何你没有显性传递的设置将按`Joi`标准默认值设置默认（不是`@nestjs/config`默认）。例如，如果在你自定义的`validationOptions`对象中未指定`allowUnknow`，它将被设置为Joi默认值`false`。因此，最安全的方法可能是在你的自定义对象中同时设置这两个设置。
 
-* `allowUnknown`：控制是否允许环境变量中的未知键，默认为`true`
-* `abortEarly`：如果为真，则对第一个错误停止验证;如果为假，返回所有错误，默认为`false`
+### 自定义`getter`函数
 
-注意，一旦您决定传递`validationOptions`对象，您没有显式传递的任何设置都将默认为`Joi`标准默认值(而不是`@nestjs/config`默认值)。例如，如果在自定义`validationOptions`对象中保留`allowUnknowns`未指定，它的`Joi`默认值将为`false`。因此，在自定义对象中指定这两个设置可能是最安全的
-
-#### 自定义 `getter` 函数
-
-`ConfigService`定义了一个通用的`get()`方法来通过键检索配置值。我们还可以添加`getter`函数来启用更自然的编码风格:
+`ConfigService`定义了一个通用的`get()`方法来根据键查找配置值。我们也可能添加一个`getter`函数来使能一些更自然的编码风格：
 
 ```typescript
 @Injectable()
@@ -1517,26 +2426,12 @@ export class ApiConfigService {
     return this.configService.get('AUTH_ENABLED') === 'true';
   }
 }
-@@switch
-@Dependencies(ConfigService)
-@Injectable()
-export class ApiConfigService {
-  constructor(configService) {
-    this.configService = configService;
-  }
-
-  get isAuthEnabled() {
-    return this.configService.get('AUTH_ENABLED') === 'true';
-  }
-}
 ```
+现在我们可以使用如下的`getter`函数：
 
-现在我们可以像下面这样使用`getter`函数:
+> app.service.ts
 
 ```typescript
-app.service.ts
-
-
 @Injectable()
 export class AppService {
   constructor(apiConfigService: ApiConfigService) {
@@ -1546,28 +2441,23 @@ export class AppService {
   }
 }
 ```
+### 可扩充的变量
 
-#### 扩展变量
+`@nestjs/config`包支持环境变量扩展。使用这种技术，你可以创建一个嵌套的环境变量，其中一个变量可以在另一个变量定义内部被引用。例如：
 
-`@nestjs/config`包支持环境变量扩展。使用这种技术，您可以创建嵌套的环境变量，其中一个变量在另一个变量的定义中引用。例如:
-
-```json
+```typescript
 APP_URL=mywebsite.com
 SUPPORT_EMAIL=support@${APP_URL}
 ```
+在这个结构中，变量`SUPPORT_EMAIL`被解析到`support@mywebsite.com`。注意，使用`${...}`语法来触发并解析在`SUPPORT_EMAIL`定义内部的`APP_URL`值。
 
-通过这种构造，变量`SUPPORT_EMAIL`解析为`support@mywebsite.com`。注意${…}语法来触发解析变量`APP_URL`在`SUPPORT_EMAIL`定义中的值。
+?> 在`@nestjs/config`包内部使用[dotenv-expand](https://github.com/motdotla/dotenv-expand)以使用这个特性。
 
+在传递给`ConfigModule`中`forRoot()`方法的选项对象中使用`expandVariables`属性来使能环境变量扩展。如下所示：
 
-
-> info **提示** 对于这个特性，@nestjs/config包内部使用[dotenv-expand](https://github.com/motdotla/dotenv-expand)实现。
-
-使用传递给`ConfigModule`的`forRoot()`方法的options对象中的`expandVariables`属性来启用环境变量展开，如下所示:
+> app.module.ts
 
 ```typescript
-app.module.ts
-
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -1579,33 +2469,67 @@ app.module.ts
 export class AppModule {}
 ```
 
+### 在`main.ts`中使用
 
+当我们的配置存储在服务中时，它仍然可以在`main.ts`文件中使用。采用这种方法，你可以用它存储例如应用端口或者CORS主机等变量。
 
-在`main.ts`中使用
-
-虽然我们的配置是存储在服务中的，但它仍然可以在main.ts文件中使用。通过这种方式，您可以使用它来存储诸如应用程序端口或CORS主机之类的变量。
-
-要访问它，您必须使用`app.get()`方法，然后是服务引用：
+要使用它，你必须使用`app.get()`方法，参考如下服务引用：
 
 ```typescript
 const configService = app.get(ConfigService);
 ```
-
-然后你可以像往常一样使用它，通过调用带有配置键的get方法：
+你可以在配置中使用配置键调用`get`方法来像平时那样使用它。
 
 ```typescript
 const port = configService.get('PORT');
 ```
 
-
-
 ## 验证
+
+验证网络应用中传递的任何数据是一种最佳实践。为了自动验证传入请求，`Nest`提供了几个开箱即用的管道。
+
+- `ValidationPipe`
+- `ParseIntPipe`
+- `ParseBoolPipe`
+- `ParseArrayPipe`
+- `ParseUUIDPipe`
 
 验证是任何现有 `Web` 应用程序的基本功能。为了自动验证传入请求，`Nest` 提供了一个内置的 `ValidationPipe` ，它使用了功能强大的[class-validator](https://github.com/typestack/class-validator)包及其声明性验证装饰器。 `ValidationPipe` 提供了一种对所有传入的客户端有效负载强制执行验证规则的便捷方法，其中在每个模块的本地类/ `DTO` 声明中使用简单的注释声明特定的规则。
 
 ### 概览
 
-在 [Pipes](/6/pipes.md) 一章中，我们完成了构建简化验证管道的过程。为了更好地了解我们在幕后所做的工作，我们强烈建议您阅读本文。在这里，我们将重点讨论 `ValidationPipe` 的各种实际用例，并使用它的一些高级定制特性。
+在 [Pipes](/7/pipes.md) 一章中，我们完成了构建简化验证管道的过程。为了更好地了解我们在幕后所做的工作，我们强烈建议您阅读本文。在这里，我们将重点讨论 `ValidationPipe` 的各种实际用例，并使用它的一些高级定制特性。
+
+### 使用内置的`ValidationPipe`
+
+?> `ValidationPipe`从`@nestjs/common`包导入。
+
+由于此管道使用了`class-validator`和`class-transformer`库，因此有许多可用的选项。通过传递给管道的配置对象来进行配置。依照下列内置的选项：
+
+```typescript
+export interface ValidationPipeOptions extends ValidatorOptions {
+  transform?: boolean;
+  disableErrorMessages?: boolean;
+  exceptionFactory?: (errors: ValidationError[]) => any;
+}
+```
+所有可用的`class-validator`选项（继承自`ValidatorOptions`接口）：
+
+|选项|类型|描述|
+|---|---|---|
+|skipMissingProperties|boolean|如果设置为`true`，验证将跳过对所有验证对象中没有的属性的验证|
+|whitelist|boolean|如果设置为`true`，验证器将去掉没有使用任何验证装饰器的属性的验证（返回的）对象|
+|forbidNonWhitelisted|boolean|如果设置为`true`，验证器不会去掉非白名单的属性，而是会抛出异常|
+|forbidUnknownValues|boolean|如果设置为`true`，尝试验证未知对象会立即失败|
+|disableErrorMessage|boolean|如果设置为`true`,验证错误不会返回给客户端|
+|errorHttpStatusCode|number|这个设置允许你确定在错误时使用哪个异常类型。默认抛出`BadRequestException`|
+|exceptionFactory|Function|接受一个验证错误数组并返回一个要抛出的异常对象|
+|groups|string[]|验证对象时使用的分组|
+|dismissDefaultMessages|boolean|如果设置为`true`，将不会使用默认消息验证，如果不设置，错误消息会始终是`undefined`|
+|validationError.target|boolean|确定目标是否要在`ValidationError`中暴露出来|
+|validationError.value|boolean|确定验证值是否要在`ValidationError`中暴露出来|
+
+?> 更多关于`class-validator`包的内容见项目[仓库](https://github.com/typestack/class-validator)。
 
 ### 自动验证
 
@@ -1628,7 +2552,10 @@ create(@Body() createUserDto: CreateUserDto) {
   return 'This action adds a new user';
 }
 ```
-现在我们可以在 `CreateUserDto` 中添加一些验证规则。我们使用 `class-validator` 包提供的装饰器来实现这一点，这里有详细的描述。以这种方式，任何使用 `CreateUserDto` 的路由都将自动执行这些验证规则。
+
+?> 由于`Typescript`没有保存`泛型或接口`的元数据。当你在你的DTO中使用他们的时候。`ValidationPipe`可能不能正确验证输入数据。出于这种原因，可以考虑在你的DTO中使用具体的类。
+
+现在我们可以在 `CreateUserDto` 中添加一些验证规则。我们使用 `class-validator` 包提供的装饰器来实现这一点，[这里](https://github.com/typestack/class-validator#validation-decorators)有详细的描述。以这种方式，任何使用 `CreateUserDto` 的路由都将自动执行这些验证规则。
 
 ```typescript
 import { IsEmail, IsNotEmpty } from 'class-validator';
@@ -1648,16 +2575,7 @@ export class CreateUserDto {
 {
   "statusCode": 400,
   "error": "Bad Request",
-  "message": [
-    {
-      "target": {},
-      "property": "email",
-      "children": [],
-      "constraints": {
-        "isEmail": "email must be an email"
-      }
-    }
-  ]
+  "message": ["email must be an email"]
 }
 ```
 
@@ -1711,9 +2629,20 @@ app.useGlobalPipes(
 
 或者，您可以在出现非白名单属性时停止处理请求，并向用户返回错误响应。要启用此选项，请将 `forbidNonWhitelisted` 选项属性设置为 `true` ，并将白名单设置为 `true`。 
 
-### 自动有效负载转换
+### 负载对象转换(Transform)
 
-来自网络的有效负载是普通的 `JavaScript` 对象。`ValidationPipe` 可以根据对象的 `DTO` 类自动将有效负载转换为对象类型。若要启用自动转换，请将转换设置为 `true`。
+来自网络的有效负载是普通的 `JavaScript` 对象。`ValidationPipe` 可以根据对象的 `DTO` 类自动将有效负载转换为对象类型。若要启用自动转换，请将`transform`设置为 `true`。这可以在方法级别使用：
+
+> cats.control.ts
+
+```typescript
+@Post()
+@UsePipes(new ValidationPipe({ transform: true }))
+async create(@Body() createCatDto: CreateCatDto) {
+  this.catsService.create(createCatDto);
+}
+```
+要全局使能这一行为，将选项设置到一个全局管道中：
 
 ```typescript
 app.useGlobalPipes(
@@ -1721,6 +2650,78 @@ app.useGlobalPipes(
     transform: true,
   })
 );
+```
+要使能自动转换选项，`ValidationPipe`将执行简单类型转换。在下述示例中，`findOne()`方法调用一个从地址参数中解析出的`id`参数。
+
+```typescript
+@Get(':id')
+findOne(@Param('id') id: number) {
+  console.log(typeof id === 'number'); // true
+  return 'This action returns a user';
+}
+
+```
+
+默认地，每个地址参数和查询参数在网络传输时都是`string`类型。在上述示例中，我们指定`id`参数为`number`（在方法签名中）。因此，`ValidationPipe`会自动将`string`类型转换为`number`。
+
+### 显式转换
+
+在上述部分，我们演示了`ValidationPipe`如何基于期待类型隐式转换查询和路径参数，然而，这一特性需要开启自动转换功能。
+
+可选地（在不开启自动转换功能的情况下），你可以使用`ParseIntPipe`或者`ParseBoolPipe`显式处理值（注意，没有必要使用`ParseStringPipe`，这是因为如前所述的，网络中传输的路径参数和查询参数默认都是`string`类型）。
+
+```typescript
+@Get(':id')
+findOne(
+  @Param('id', ParseIntPipe) id: number,
+  @Query('sort', ParseBoolPipe) sort: boolean,
+) {
+  console.log(typeof id === 'number'); // true
+  console.log(typeof sort === 'boolean'); // true
+  return 'This action returns a user';
+}
+
+```
+?> `ParseIntPipe`和`ParseBoolPipe`从`@nestjs/common`包中导出。
+
+### 转换和验证数组
+
+`TypeScript`不存储泛型或接口的元数据，因此当你在DTO中使用它们的时候，`ValidationPipe`可能不能正确验证输入数据。例如，在下列代码中，`createUserDto`不能正确验证。
+
+```typescript
+@Post()
+createBulk(@Body() createUserDtos: CreateUserDto[]) {
+  return 'This action adds new users';
+}
+```
+要验证数组，创建一个包裹了该数组的专用类，或者使用`ParseArrayPipe`。
+
+```typescript
+@Post()
+createBulk(
+  @Body(new ParseArrayPipe({ items: CreateUserDto }))
+  createUserDtos: CreateUserDto[],
+) {
+  return 'This action adds new users';
+}
+```
+
+此外，`ParseArrayPipe`可能需要手动解析查询参数。让我们考虑一个返回作为查询参数传递的标识的`users`的`findByIds()`方法：
+
+```typescript
+@Get()
+findByIds(
+  @Query('id', new ParseArrayPipe({ items: Number, separator: ',' }))
+  ids: number[],
+) {
+  return 'This action returns users by ids';
+}
+```
+
+这个构造用于验证一个来自如下形式带参数的`GET`请求：
+
+```typescript
+GET /?ids=1,2,3
 ```
 
 ### Websockets和 微服务
@@ -1746,8 +2747,6 @@ $ npm install --save cache-manager
 
 ### 内存缓存
 
-**[译者注：查看相关使用方法](https://www.jianshu.com/p/e7b0f3eb3aed)**
-
  `Nest`为各种缓存存储提供程序提供了统一的 `API`。内置的是内存中的数据存储。但是，您可以轻松地切换到更全面的解决方案，比如 `Redis` 。为了启用缓存，首先导入 `CacheModule` 并调用它的 `register()` 方法。
 
 ```typescript
@@ -1760,6 +2759,7 @@ import { AppController } from './app.controller';
 })
 export class ApplicationModule {}
 ```
+!> 在`[GraphQL](https://docs.nestjs.com/graphql/quick-start)`应用中，拦截器针对每个字段处理器分别运行，因此，`CacheModule`(使用)
 
 然后将 `CacheInterceptor` 绑定到需要缓存数据的地方。
 
@@ -1774,7 +2774,7 @@ export class AppController {
 }
 ```
 
-?> 警告: 只有使用 `@Get()` 方式声明的节点会被缓存。此外，注入本机响应对象( `@Res()` )的 `HTTP` 服务器路由不能使用缓存拦截器。有关详细信息，请参见响应映射。
+!> 警告: 只有使用 `GET` 方式声明的节点会被缓存。此外，注入本机响应对象( `@Res()` )的 `HTTP` 服务器路由不能使用缓存拦截器。有关详细信息，请参见[响应映射](https://docs.nestjs.com/interceptors#response-mapping)。
 
 ### 全局缓存
 
@@ -1797,12 +2797,40 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 })
 export class ApplicationModule {}
 ```
+### 定制缓存
+
+所有缓存的数据有其自己的过期时间(TTL)。要个性化不同值，将选项对象传递给`register()`方法。
+
+```typescript
+CacheModule.register({
+  ttl:5, //秒
+  max:10, //缓存中最大和最小数量
+});
+```
+
+### 全局缓存重载
+
+使能全局缓存后，缓存入口存储在基于路径自动生成的`Cachekey`中。你可能需要基于每个方法重载特定的缓存设置(`@CacheKey()`和`@CacheTTL()`)，允许为独立控制器方法自定义缓存策略。这在使用[不同存储缓存](https://docs.nestjs.com/techniques/caching#different-stores)时是最有意义的。
+
+```typescript
+@Controller()
+export class AppController {
+  @CacheKey('custom_key')
+  @CacheTTL(20)
+  findAll(): string[] {
+    return [];
+  }
+}
+```
+?> `@CacheKey()`和`@CacheTTL()`装饰器从`@nestjs/common`包导入。
+
+`@CacheKey()`装饰器可以有或者没有一个对应的`@CacheTTL()`装饰器，反之亦然。你可以选择仅覆盖`@CacheKey()`或`@CacheTTL()`。没有用装饰器覆盖的设置将使用全局注册的默认值（见[自定义缓存](https://docs.nestjs.com/techniques/caching#customize-caching))。
 
 ### WebSockets 和 微服务
 
 显然，您可以毫不费力地使用 `CacheInterceptor WebSocket` 订阅者模式以及 `Microservice` 的模式（无论使用何种服务间的传输方法）。
 
-?> 译者注: 微服务架构中服务之间的调用需要依赖某种通讯协议介质，在 `nest` 中不限制你是用消息队列中间价，`RPC/gRPC` 协议或者对外公开 `API` 的 `HTTP` 协议。
+?> 译者注: 微服务架构中服务之间的调用需要依赖某种通讯协议介质，在 `nest` 中不限制你是用消息队列中间件，`RPC/gRPC` 协议或者对外公开 `API` 的 `HTTP` 协议。
 
 ```typescript
 @CacheKey('events')
@@ -1812,6 +2840,114 @@ handleEvent(client: Client, data: string[]): Observable<string[]> {
   return [];
 }
 ```
+
+然而，需要一个附加的`@CacheKey()`装饰器来指定一个用于依次存储并获取缓存数据的键。注意，你不应该缓存所有的内容。永远也不要去缓存那些用于实现业务逻辑也不是简单地查询数据的行为。
+
+此外，你可以使用`@CacheTTL()`装饰器来指定一个缓存过期时间(TTL)，用于覆盖全局默认的TTL值。
+
+```typescript
+@CacheTTL(10)
+@UseInterceptors(CacheInterceptor)
+@SubscribeMessage('events')
+handleEvent(client: Client, data: string[]): Observable<string[]> {
+  return [];
+}
+```
+
+?> `@CacheTTL()`装饰器可以`@CacheKey()`装饰器同时或者不同时使用。
+
+### 不同的存储
+
+服务在底层使用[缓存管理器(cache-manager)](https://github.com/BryanDonovan/node-cache-manager)。`cache-manager`包支持一个宽范围的可用存储，例如，[Redis](https://github.com/dabroek/node-cache-manager-redis-store)存储。一个完整的支持存储列表见[这里](https://github.com/BryanDonovan/node-cache-manager#store-engines)。要设置`Redis`存储，简单地将该包和相应的选项传递给`register()`方法。
+
+```typescript
+import * as redisStore from 'cache-manager-redis-store';
+import { CacheModule, Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+
+@Module({
+  imports: [
+    CacheModule.register({
+      store: redisStore,
+      host: 'localhost',
+      port: 6379,
+    }),
+  ],
+  controllers: [AppController],
+})
+export class ApplicationModule {}
+```
+
+### 调整追踪
+
+默认地，`Nest`使用请求URL(在一个`HTTP`app中)或者缓存键（在`websockets`和`microservices`应用中，通过`@CacheKey()`装饰器设置）来联系缓存记录和路径。然而，有时你可能想要根据不同要素设置追踪，例如`HTTP headers`(比如，确定合适`profile`路径的`Authorization`)。
+
+为了达到这个目的，创建一个`CacheInterceptor`的子类并覆盖`trackBy()`方法。
+
+```typescript
+@Injectable()
+class HttpCacheInterceptor extends CacheInterceptor {
+  trackBy(context: ExecutionContext): string | undefined {
+    return 'key';
+  }
+}
+```
+### 异步配置
+
+你可能想异步传递模块选项来代替在编译时静态传递。在这种情况下，可以使用`registerAsync()`方法，它提供了不同的处理异步配置的方法。
+
+一个方法是使用工厂函数：
+
+```typescript
+CacheModule.registerAsync({
+  useFactory: () => ({
+    ttl: 5,
+  }),
+});
+```
+我们的工厂行为和其他异步模块工厂一样（它可以使用`inject`异步注入依赖）。
+
+```typescript
+CacheModule.registerAsync({
+  imports: [ConfigModule],
+  useFactory: async (configService: ConfigService) => ({
+    ttl: configService.getString('CACHE_TTL'),
+  }),
+  inject: [ConfigService],
+});
+```
+此外，你也可以使用`useClass`方法：
+
+```typescript
+CacheModule.registerAsync({
+  useClass: CacheConfigService,
+});
+```
+上述构造器将在`CacheModule`内部实例化`CacheConfigService`并用它来得到选项对象，`CacheConfigService`需要使用`CacheOptionsFactory`接口来提供配置选项：
+
+```typescript
+@Injectable()
+class CacheConfigService implements CacheOptionsFactory {
+  createCacheOptions(): CacheModuleOptions {
+    return {
+      ttl: 5,
+    };
+  }
+}
+```
+如果你希望使用在其他不同模块中导入的现有的配置提供者，使用`useExisting`语法：
+
+```typescript
+CacheModule.registerAsync({
+  imports: [ConfigModule],
+  useExisting: ConfigService,
+});
+```
+
+这和`useClass`工作模式相同，但有一个根本区别——`CacheModule`将查找导入的模块来重用任何已经创建的`ConfigService`，以代替自己创实例化。
+
+
+
 ?> 提示: `@CacheKey()` 装饰器来源于 `@nestjs/common` 包。
 
 但是， `@CacheKey()` 需要附加装饰器以指定用于随后存储和检索缓存数据的密钥。此外，请注意，开发者不应该缓存所有内容。缓存数据是用来执行某些业务操作，而一些简单数据查询是不应该被缓存的。
@@ -1924,18 +3060,17 @@ CacheModule.registerAsync({
 
 ## 序列化（Serialization）
 
-
-在发送实际响应之前， `Serializers` 为数据操作提供了干净的抽象层。例如，应始终从最终响应中排除敏感数据（如用户密码）。此外，某些属性可能需要额外的转换，比方说，我们不想发送整个数据库实体。相反，我们只想选择 `id` 和 `name` 。其余部分应自动剥离。不幸的是，手动映射所有实体可能会带来很多麻烦。
+序列化(`Serialization`)是一个在网络响应中返回对象前的过程。 这是一个适合转换和净化要返回给客户的数据的地方。例如，应始终从最终响应中排除敏感数据（如用户密码）。此外，某些属性可能需要额外的转换，比方说，我们只想发送一个实体的子集。手动完成这些转换既枯燥又容易出错，并且不能确定是否覆盖了所有的情况。
 
 ?> 译者注: `Serialization` 实现可类比 `composer` 库中 `fractal` ，响应给用户的数据不仅仅要剔除设计安全的属性，还需要剔除一些无用字段如 `create_time`,  `delete_time`,` update_time` 和其他属性。在 `JAVA` 的实体类中定义 `N` 个属性的话就会返回 `N` 个字段，解决方法可以使用范型编程，否则操作实体类回影响数据库映射字段。
 
 ### 概要
 
-为了提供一种直接的方式来执行这些操作， `Nest` 附带了这个  `ClassSerializerInterceptor` 类。它使用[类转换器](https://github.com/typestack/class-transformer)来提供转换对象的声明性和可扩展方式。基于此类基础下，可以从类转换器 `ClassSerializerInterceptor` 中获取方法和调用  `classToPlain()` 函数返回的值。
+为了提供一种直接的方式来执行这些操作， `Nest` 附带了这个  `ClassSerializerInterceptor` 类。它使用[类转换器](https://github.com/typestack/class-transformer)来提供转换对象的声明性和可扩展方式。基于此类基础下，可以从类转换器中获取方法和调用  `classToPlain()` 函数返回的值。要这样做，可以将由`class-transformer`装饰器提供的规则应用在实体/DTO类中，如下所示：
 
 ### 排除属性
 
-让我们假设一下，如何从一个含有多属性的实体中剔除 `password` 属性 ？
+我们假设要从一个用户实体中自动排除`password`属性。我们给实体做如下注释：
 
 ```typescript
 import { Exclude } from 'class-transformer';
@@ -1953,7 +3088,7 @@ export class UserEntity {
   }
 }
 ```
-然后，直接在控制器的方法中调用就能获得此类 `UserEntity` 的实例。
+然后，直接在控制器的方法中调用就能获得此类的实例。
 
 ```typescript
 @UseInterceptors(ClassSerializerInterceptor)
@@ -1967,6 +3102,7 @@ findOne(): UserEntity {
   });
 }
 ```
+!> 我们必须返回一个类的实体。如果你返回一个普通的JavaScript对象，例如，`{user: new UserEntity()}`,该对象将不会被正常序列化。
 
 ?> 提示: `@ClassSerializerInterceptor()` 装饰器来源于 `@nestjs/common` 包。
 
@@ -1980,7 +3116,7 @@ findOne(): UserEntity {
 }
 ```
 
-注意，拦截器可以应用于整个应用程序。拦截器和实体类声明的组合确保返回 `UserEntity` 的任何方法都将确保删除 `password` 属性。
+注意，拦截器可以应用于整个应用程序（见[这里](https://docs.nestjs.com/interceptors#binding-interceptors)）。拦截器和实体类声明的组合确保返回 `UserEntity` 的任何方法都将确保删除 `password` 属性。这给你一个业务规则的强制、集中的评估。
 
 ### 公开属性
 
@@ -2001,9 +3137,9 @@ get fullName(): string {
 role: RoleEntity;
 ```
 
-### 通过属性
+### 传递选项
 
-可变选项可能因某些因素而异。要覆盖默认设置，请使用 `@SerializeOptions()` 装饰器。
+你可能想要修改转换函数的默认行为。要覆盖默认设置，请使用 `@SerializeOptions()` 装饰器来将其传递给一个`options`对象。
 
 ```typescript
 @SerializeOptions({
@@ -2029,14 +3165,337 @@ findOne(): UserEntity {
 
 ## 定时任务
 
-（更新中）
+定时任务允许你按照指定的日期/时间、一定时间间隔或者一定时间后单次执行来调度(`scheduling`)任意代码（方法/函数）。在`Linux`世界中，这经常通过操作系统层面的`cron`包等执行。在`Node.js`应用中，有几个不同的包可以模拟cron包的功能。Nest提供了`@nestjs/schedule`包，其集成了流行的Node.js的`node-cron`包，我们将在本章中应用该包。
+
+### 安装
+
+我们首先从安装需要的依赖开始。
+
+```bash
+$ npm install --save @nestjs/schedule
+```
+要激活工作调度,从根`AppModule`中导入`ScheduleModule`并运行`forRoot()`静态方法，如下：
+
+> app.module.ts
+
+```typescript
+import { Module } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
+
+@Module({
+  imports: [
+    ScheduleModule.forRoot()
+  ],
+})
+export class AppModule {}
+```
+`.forRoot()`调用初始化调度器并且注册在你应用中任何声明的`cron jobs`,`timeouts`和`intervals`。注册开始于`onApplicationBootstrap`生命周期钩子发生时，保证所有模块都已经载入，任何计划工作已经声明。
+
+### 声明计时工作(cron job)
+
+一个计时工作调度任何函数（方法调用）以自动运行， 计时工作可以：
+- 单次，在指定日期/时间
+- 重复循环：重复工作可以在指定周期中指定执行（例如，每小时，每周，或者每5分钟）
+
+在包含要运行代码的方法定义前使用`@Cron()`装饰器声明一个计时工作，如下：
+
+```typescript
+import { Injectable, Logger } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
+
+@Injectable()
+export class TasksService {
+  private readonly logger = new Logger(TasksService.name);
+
+  @Cron('45 * * * * *')
+  handleCron() {
+    this.logger.debug('Called when the current second is 45');
+  }
+}
+```
+在这个例子中，`handleCron()`方法将在当前时间为`45秒`时定期执行。换句话说，该方法每分钟执行一次，在第45秒执行。
+
+`@Cron()`装饰器支持标准的[cron patterns](http://crontab.org/):
+- 星号通配符 (也就是 *)
+- 范围（也就是 1-3,5)
+- 步长（也就是 */2)
+
+在上述例子中，我们给装饰器传递了`45 * * * * *`，下列键展示了每个位置的计时模式字符串的意义：
+
+```bash
+* * * * * *
+| | | | | |
+| | | | | day of week
+| | | | month
+| | | day of month
+| | hour
+| minute
+second (optional)
+```
+一些示例的计时模式包括：
+
+|名称|含义|
+|---|---|
+|* * * * * *|每秒|
+|45 * * * * *|每分钟第45秒|
+|* 10 * * * *|每小时，从第10分钟开始|
+|0 */30 9-17 * * *|上午9点到下午5点之间每30分钟|
+|0 30 11 * * 1-5|周一至周五上午11:30|
+
+`@nestjs/schedule`包提供一个方便的枚举
+
+```typescript
+import { Injectable, Logger } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
+
+@Injectable()
+export class TasksService {
+  private readonly logger = new Logger(TasksService.name);
+
+  @Cron(CronExpression.EVERY_45_SECONDS)
+  handleCron() {
+    this.logger.debug('Called every 45 seconds');
+  }
+}
+```
+
+在本例中，`handleCron()`方法每`45`秒执行一次。
+
+可选地，你可以为将一个`JavaScript`的`Date`对象传递给`@Cron()`装饰器。这样做可以让工作在指定日期执行一次。
+
+?> 使用`JavaScript`日期算法来关联当前日期和计划工作。`@Cron(new Date(Date.now()+10*1000))`用于在应用启动10秒后运行。
+
+你可以在声明后访问并控制一个定时任务，或者使用[动态API](https://docs.nestjs.com/techniques/task-scheduling#dynamic-schedule-module-api)动态创建一个定时任务（其定时模式在运行时定义）。要通过API声明定时任务,你必须通过将选项对象中的`name`属性作为可选的第二个参数传递给装饰器，从而将工作和名称联系起来。
+
+```typescript
+@Cron('* * 8 * * *', {
+  name: 'notifications',
+})
+triggerNotifications() {}
+
+```
+### 声明间隔
+
+要声明一个以一定间隔运行的方法，使用`@Interval()`装饰器前缀。以毫秒单位的`number`传递间隔值，如下：
+
+```typescript
+@Interval(10000)
+handleInterval() {
+  this.logger.debug('Called every 10 seconds');
+}
+```
+?> 本机制在底层使用`JavaScript`的`setInterval()`函数。你也可以使用定期调度工作来应用一个定时任务。
+
+如果你希望在声明类之外通过[动态API](https://docs.nestjs.com/techniques/task-scheduling#dynamic-schedule-module-api)控制你声明的时间间隔。使用下列结构将名称与间隔关联起来。
+
+```typescript
+@Interval('notifications', 2500)
+handleInterval() {}
+```
+动态API也支持动态创建时间间隔，间隔属性在运行时定义，可以列出和删除他们。
+
+### 声明延时任务
+
+要声明一个在指定时间后运行（一次）的方法，使用`@Timeout()`装饰器前缀。将从应用启动的相关时间偏移量（毫秒）传递给装饰器，如下：
+
+```typescript
+@Timeout(5000)
+handleTimeout() {
+  this.logger.debug('Called once after 5 seconds');
+}
+```
+?> 本机制在底层使用JavaScript的`setTimeout()`方法
+
+如果你想要在声明类之外通过动态API控制你声明的超时时间，将超时时间和一个名称以如下结构关联：
+
+```typescript
+@Timeout('notifications', 2500)
+handleTimeout() {}
+```
+动态API同时支持创建动态超时时间，超时时间在运行时定义，可以列举和删除他们。
+
+### 动态规划模块API
+
+`@nestjs/schedule`模块提供了一个支持管理声明定时、超时和间隔任务的动态API。该API也支持创建和管理动态定时、超时和间隔，这些属性在运行时定义。
+
+### 动态定时任务
+
+使用`SchedulerRegistry`API从你代码的任何地方获取一个`CronJob`实例的引用。首先，使用标准构造器注入`ScheduleRegistry`。
+
+```typescript
+constructor(private schedulerRegistry: SchedulerRegistry) {}
+```
+
+?> 从`@nestjs/schedule`包导入`SchedulerRegistry`。
+
+使用下列类，假设通过下列定义声明一个定时任务：
+
+```typescript
+@Cron('* * 8 * * *', {
+  name: 'notifications',
+})
+triggerNotifications() {}
+```
+如下获取本工作：
+
+```typescript
+const job = this.schedulerRegistry.getCronJob('notifications');
+
+job.stop();
+console.log(job.lastDate());
+```
+`getCronJob()`方法返回一个命名的定时任务。然后返回一个包含下列方法的`CronJob`对象：
+- stop()-停止一个按调度运行的任务
+- start()-重启一个停止的任务
+- setTime(time:CronTime)-停止一个任务，为它设置一个新的时间，然后再启动它
+- lastDate()-返回一个表示工作最后执行日期的字符串
+- nextDates(count:number)-返回一个`moment`对象的数组（大小`count`)，代表即将执行的任务日期
+
+?> 在`moment`对象中使用`toDate()`来渲染成易读的形式。
+
+使用`SchedulerRegistry.addCronJob()`动态创建一个新的定时任务，如下：
+
+```typescript
+addCronJob(name: string, seconds: string) {
+  const job = new CronJob(`${seconds} * * * * *`, () => {
+    this.logger.warn(`time (${seconds}) for job ${name} to run!`);
+  });
+
+  this.scheduler.addCronJob(name, job);
+  job.start();
+
+  this.logger.warn(
+    `job ${name} added for each minute at ${seconds} seconds!`,
+  );
+}
+```
+在这个代码中，我们使用`cron`包中的`CronJob`对象来创建定时任务。`CronJob`构造器采用一个定时模式（类似`@Cron()`[装饰器](https://docs.nestjs.com/techniques/task-scheduling#declarative-cron-jobs)作为其第一个参数，以及一个将执行的回调函数作为其第二个参数。`SchedulerRegistry.addCronJob()`方法有两个参数：一个`CronJob`名称，以及一个`CronJob`对象自身。
+
+!> 记得在使用前注入`SchedulerRegistry`，从`cron`包中导入 `CronJob`。
+
+使用`SchedulerRegistry.deleteCronJob()`方法删除一个命名的定时任务，如下：
+
+```typescript
+deleteCron(name: string) {
+  this.scheduler.deleteCronJob(name);
+  this.logger.warn(`job ${name} deleted!`);
+}
+```
+使用`SchedulerRegistry.getCronJobs()`方法列出所有定时任务，如下：
+
+```typescript
+getCrons() {
+  const jobs = this.scheduler.getCronJobs();
+  jobs.forEach((value, key, map) => {
+    let next;
+    try {
+      next = value.nextDates().toDate();
+    } catch (e) {
+      next = 'error: next fire date is in the past!';
+    }
+    this.logger.log(`job: ${key} -> next: ${next}`);
+  });
+}
+```
+`getCronJobs()`方法返回一个`map`。在这个代码中，我们遍历该`map`并且尝试获取每个`CronJob`的`nextDates()`方法。在`CronJob`API中，如果一个工作已经执行了并且没有下一次执行的日期，将抛出异常。
+
+### 动态间隔
+
+使用`SchedulerRegistry.getInterval()`方法获取一个时间间隔的引用。如上，使用标准构造注入`SchedulerRegistry`。
+
+```typescript
+constructor(private schedulerRegistry: SchedulerRegistry) {}
+```
+
+如下使用：
+
+```typescript
+const interval = this.schedulerRegistry.getInterval('notifications');
+clearInterval(interval);
+```
+使用`SchedulerRegistry.addInterval() `方法创建一个新的动态间隔，如下：
+
+```typescript
+addInterval(name: string, seconds: string) {
+  const callback = () => {
+    this.logger.warn(`Interval ${name} executing at time (${seconds})!`);
+  };
+
+  const interval = setInterval(callback, seconds);
+  this.scheduler.addInterval(name, interval);
+}
+```
+在该代码中，我们创建了一个标准的JavaScript间隔，然后将其传递给`ScheduleRegistry.addInterval()`方法。该方法包括两个参数：一个时间间隔的名称，和时间间隔本身。
+
+如下使用`SchedulerRegistry.deleteInterval()`删除一个命名的时间间隔：
+```typescript
+deleteInterval(name: string) {
+  this.scheduler.deleteInterval(name);
+  this.logger.warn(`Interval ${name} deleted!`);
+}
+```
+使用`SchedulerRegistry.getIntervals()`方法如下列出所有的时间间隔：
+
+```typescript
+getIntervals() {
+  const intervals = this.scheduler.getIntervals();
+  intervals.forEach(key => this.logger.log(`Interval: ${key}`));
+}
+```
+
+### 动态超时
+
+使用`SchedulerRegistry.getTimeout()`方法获取一个超时引用，如上，使用标准构造注入`SchedulerRegistry`：
+```typescript
+constructor(private schedulerRegistry: SchedulerRegistry) {}
+```
+并如下使用：
+```typescript
+const timeout = this.schedulerRegistry.getTimeout('notifications');
+clearTimeout(timeout);
+```
+使用`SchedulerRegistry.addTimeout()`方法创建一个新的动态超时，如下：
+
+```typescript
+addTimeout(name: string, seconds: string) {
+  const callback = () => {
+    this.logger.warn(`Timeout ${name} executing after (${seconds})!`);
+  });
+
+  const timeout = setTimeout(callback, seconds);
+  this.scheduler.addTimeout(name, timeout);
+}
+```
+在该代码中，我们创建了个一个标准的JavaScript超时任务，然后将其传递给`ScheduleRegistry.addTimeout()`方法，该方法包含两个参数：一个超时的名称，以及超时对象自身。
+
+使用`SchedulerRegistry.deleteTimeout()`方法删除一个命名的超时，如下：
+```typescript
+deleteTimeout(name: string) {
+  this.scheduler.deleteTimeout(name);
+  this.logger.warn(`Timeout ${name} deleted!`);
+}
+```
+使用`SchedulerRegistry.getTimeouts()`方法列出所有超时任务：
+```typescript
+getTimeouts() {
+  const timeouts = this.scheduler.getTimeouts();
+  timeouts.forEach(key => this.logger.log(`Timeout: ${key}`));
+}
+```
+### 示例
+
+一个可用的例子见[这里](https://github.com/nestjs/nest/tree/master/sample/27-scheduling)。
 
 ## 压缩
 
 
-压缩可以大大减小响应主体的大小，从而提高 `Web` 应用程序的速度。使用[压缩中间件](https://github.com/expressjs/compression)启用 `gzip` 压缩。
+压缩可以大大减小响应主体的大小，从而提高 `Web` 应用程序的速度。
 
-### 安装
+在大业务量的生产环境网站中，强烈推荐将压缩功能从应用服务器中卸载——典型做法是使用反向代理（例如Nginx)。在这种情况下，你不应该使用压缩中间件。
+
+### 配合Express使用（默认）
+
+使用[压缩中间件](https://github.com/expressjs/compression)启用 `gzip` 压缩。
 
 首先，安装所需的包：
 
@@ -2051,10 +3510,28 @@ import * as compression from 'compression';
 // somewhere in your initialization file
 app.use(compression());
 ```
+### 配合Fastify使用
 
-?> 提示: 如果你在使用的是 `FastifyAdapter`，请考虑使用 [fastify-compress](https://github.com/fastify/fastify-compress) 代替。
+如果你在使用的是 `FastifyAdapter`，请考虑使用 [fastify-compress](https://github.com/fastify/fastify-compress)。
 
-对于生产中的高流量网站，实施压缩的最佳方法是在反向代理级别实施。在这种情况下，您不需要使用压缩中间件。
+```
+$ npm i --save fastify-compress
+```
+安装完成后，将其应用为全局中间件。
+
+```typescript
+import * as compression from 'fastify-compress';
+// somewhere in your initialization file
+app.register(compression);
+```
+默认地，如果浏览器支持编码，`fastify-compress`使用`Brotli`压缩(`Node>=11.7.0`)。`Brotli`在压缩比方面非常有效，但也非常慢。鉴于此，你可能想告诉`fastify-compress`仅使用`deflate`和`gzip`来压缩相应，你最终会得到一个较大的相应但是可以传输的更快。
+
+要指定编码，向`app.register`提供第二个参数：
+
+```typescript
+app.register(compression, { encodings: ['gzip', 'deflate'] });
+```
+上述内容告诉`fastify-compress`仅使用gzip和deflate编码，如果客户端同时支持两种，则以gzip优先。
 
 ## 安全
 
@@ -2062,7 +3539,7 @@ app.use(compression());
 
 ### Helmet
 
-通过适当地设置 `HTTP` 头，[Helmet](https://github.com/helmetjs/helmet) 可以帮助保护您的应用免受一些众所周知的 `Web` 漏洞的影响。通常，`Helmet` 只是`12`个较小的中间件函数的集合，它们设置与安全相关的 `HTTP` 头（[阅读更多](https://github.com/helmetjs/helmet#how-it-works)）。首先，安装所需的包：
+通过适当地设置 `HTTP` 头，[Helmet](https://github.com/helmetjs/helmet) 可以帮助保护您的应用免受一些众所周知的 `Web` 漏洞的影响。通常，`Helmet` 只是`14`个较小的中间件函数的集合，它们设置与安全相关的 `HTTP` 头（[阅读更多](https://github.com/helmetjs/helmet#how-it-works)）。首先，安装所需的包：
 
 ```bash
 $ npm i --save helmet
@@ -2078,7 +3555,7 @@ app.use(helmet());
 
 ### CORS
 
-跨源资源共享（`CORS`）是一种允许从另一个域请求资源的机制。在引擎盖下，`Nest` 使用了 [cors](https://github.com/expressjs/cors) 包，它提供了一系列选项，您可以根据自己的要求进行自定义。为了启用 `CORS`，您必须调用 `enableCors()` 方法。
+跨源资源共享（`CORS`）是一种允许从另一个域请求资源的机制。在底层，`Nest` 使用了 [cors](https://github.com/expressjs/cors) 包，它提供了一系列选项，您可以根据自己的要求进行自定义。为了启用 `CORS`，您必须调用 `enableCors()` 方法。
 
 ```typescript
 const app = await NestFactory.create(ApplicationModule);
@@ -2086,14 +3563,14 @@ app.enableCors();
 await app.listen(3000);
 ```
 
-此外，您可以将配置对象作为此函数的参数传递。可用的属性在官方 [cors](https://github.com/expressjs/cors) 存储库中详尽描述。另一种方法是使用 `Nest` 选项对象：
+`enableCors()`方法使用一个可选的配置对象参数。该对象的可用属性在其官方[CORS](https://github.com/expressjs/cors#configuration-options)文档中有所描述。
+
+可选地，通过`create()`方法的选项对象使能`CORS`，设置`cors`属性为`true`来使能CORS的默认属性。可选地，传递一个[CORS配置对象](https://github.com/expressjs/cors#configuration-options)作为`cors`属性值来自定义其行为：
 
 ```typescript
 const app = await NestFactory.create(ApplicationModule, { cors: true });
 await app.listen(3000);
 ```
-
-您也可以使用 `cors` 配置对象（[更多信息](https://github.com/expressjs/cors#configuration-options)），而不是传递布尔值。
 
 ### CSRF
 
@@ -2133,17 +3610,367 @@ app.use(
   }),
 );
 ```
+如果在服务器和以太网之间存在负载均衡或者反向代理，Express可能需要配置为信任proxy设置的头文件，从而保证最终用户得到正确的IP地址。要如此，首先使用`NestExpressApplication`平台[接口](https://docs.nestjs.com/first-steps#platform)来创建你的`app`实例，然后配置[trust proxy](https://expressjs.com/en/guide/behind-proxies.html)设置。
 
 ?> 提示: 如果您在 `FastifyAdapter` 下开发，请考虑使用 [fastify-rate-limit](https://github.com/fastify/fastify-rate-limit)。
 
 
 ## 队列
-【待翻译】
+
+队列是一种有用的设计模式，可以帮助你处理一般应用规模和性能的挑战。一些队列可以帮助你处理的问题示例包括：
+
+- 平滑输出峰值。例如，如果用户可以在任何时间创建资源敏感型任务，你可以将其添加到一个消息队列中而不是同步执行。然后你可以通过工作者进程从队列中以一个可控的方式取出进程。在应用规模增大时，你可以轻松添加新的队列消费者来提高后端任务处理能力。
+- 将可能阻塞`Node.js`事件循环的整体任务打碎。例如，如果一个用户请求是CPU敏感型工作，例如音频转码，你可以将其委托给其他进程，从而保证用户接口进程保持响应。
+- 在不同的服务间提供一个可信的通讯通道。例如，你可以将任务（工作）加入一个进程或服务，并由另一个进程或服务来消费他们。你可以在由其他任何进程或服务执行的工作完成、错误或者其他状态变化时得到通知（通过监听状态事件）。当队列生产者或者消费者失败时，他们的状态会被保留，任务将在node重启后自动重启。
+  
+Nest提供了`@nestjs/bull`包，这是[Bull](https://github.com/OptimalBits/bull)包的一个包装器，Bull是一个流行的、支持良好的、高性能的基于Nodejs的消息队列系统应用。该包将Bull队列以Nest友好的方式添加到你的应用中。
+
+Bull使用[Redis](https://redis.io/)持久化工作数据，因此你需要在你的系统中安装Redis。因为他是基于Redis的，你的队列结构可以是完全分布式的并且和平台无关。例如，你可以有一些队列[生产者](https://docs.nestjs.com/techniques/queues#producers)、[消费者](https://docs.nestjs.com/techniques/queues#consumers)和[监听者](https://docs.nestjs.com/techniques/queues#event-listeners)，他们运行在Nest的一个或多个节点上，同时，其他生产者、消费者和监听者在其他Node.js平台或者其他网络节点上。
+
+本章使用`@nestjs/bull`包，我们同时推荐阅读[BUll文档](https://github.com/OptimalBits/bull/blob/master/REFERENCE.md)来获取更多背景和应用细节。
+
+### 安装
+
+要开始使用，我们首先安装需要的依赖：
+
+```typescript
+$ npm install --save @nestjs/bull bull
+$ npm install --save-dev @types/bull
+```
+一旦安装过程完成，我们可以在根`AppModule`中导入`BullModule`。
+
+> app.module.ts
+
+```typescript
+import { Module } from '@nestjs/common';
+import { BullModule } from '@nestjs/bull';
+
+@Module({
+  imports: [
+    BullModule.registerQueue({
+      name: 'audio',
+      redis: {
+        host: 'localhost',
+        port: 6379,
+      },
+    }),
+  ],
+})
+export class AppModule {}
+```
+`registerQueue()`方法用于实例化并/或注册队列。队列在不同的模块和进程之间共享，在底层则通过同样的凭据连接到同样的Redis数据库。每个队列由其`name`属性区分（如下），当共享队列（跨模块/进程）时，第一个`registerQueue()`方法同时实例化该队列并向模块注册它。其他模块（在相同或者不同进程下）则简单地注册队列。队列注册创建一个`injection token`，它可以被用在给定Nest模块中获取队列。
+
+针对每个队列，传递一个包含下列属性的配置对象：
+
+-`name:string`- 一个队列名称，它可以被用作`injection token`(用于将队列注册到控制器/提供者)，也可以作为装饰器参数来将消费者类和监听者与队列联系起来。是必须的。
+-`limiter:RateLimiter`-该选项用于确定消息队列处理速率，查看[RateLimiter](https://github.com/OptimalBits/bull/blob/master/REFERENCE.md#queue)获取更多信息。可选的。
+-`redis:RedisOpts`-该选项用于配置Redis连接，查看[RedisOpts](https://github.com/OptimalBits/bull/blob/master/REFERENCE.md#queue)获取更多信息。可选的。
+-`prefix: string`-队列所有键的前缀。可选的。
+-`defaultJobOptions: JobOpts`-选项用以控制新任务的默认属性。查看[JobOpts](https://github.com/OptimalBits/bull/blob/master/REFERENCE.md#queueadd)获取更多信息。可选的。
+-`settings: AdvancedSettings`-高级队列配置设置。这些通常不需要改变。查看[AdvancedSettings](https://github.com/OptimalBits/bull/blob/master/REFERENCE.md#queue)获取更多信息。可选的。
+
+注意，`name`属性是必须的。其他选项是可选的，为队列行为提供更细节的控制。这些会直接传递给Bull的`Queue`构造器。在[这里](https://github.com/OptimalBits/bull/blob/master/REFERENCE.md#queue)阅读更多选项。当在第二个或者子模块中注册一个队列时，最佳时间是省略配置对象中除`name`属性之外的所有选项。这些选项仅应该在实例化队列的模块中确定。
+
+?> 在`registerQueue()`方法中传递多个逗号分隔的选项对象来创建多个队列。
+
+由于任务在Redis中是持久化的，每次当一个特定名称的队列被实例化时（例如，当一个app启动/重启时），它尝试处理任何可能在前一个旧的任务遗留未完成的`session`。
+
+每个队里可能有一个或很多生产者、消费者以及监听者。消费者从一个特定命令队列中获取任务：FIFO（默认，先进先出），LIFO(后进先出)或者依据优先级。
+
+控制队列处理命令在[这里](https://docs.nestjs.com/techniques/queues#consumers)讨论。
+
+### 生产者
+
+任务生产者添加任务到队列中。生产者是典型的应用服务（Nest [提供者](https://docs.nestjs.com/providers)）。要添加工作到一个队列，首先注册队列到服务中：
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import { Queue } from 'bull';
+import { InjectQueue } from '@nestjs/bull';
+
+@Injectable()
+export class AudioService {
+  constructor(@InjectQueue('audio') private audioQueue: Queue) {}
+}
+```
+
+?> `@InjectQueue()`装饰器由其名称指定队列，像它在`registerQueue()`方法中提供的那样（例如，`audio`）。
+
+现在，通过调用队列的`add()`方法添加一个任务，传递一个用户定义的任务对象。任务表现为序列化的`JavaScript`对象（因为它们被存储在Redis数据库中）。你传递的任务形式是可选的；用它来在语义上表示你任务对象：
+
+```typescript
+const job = await this.audioQueue.add({
+  foo: 'bar',
+});
+```
+### 命名的任务
+
+任务需要独一无二的名字。这允许你创建专用的[消费者](https://docs.nestjs.com/techniques/queues#consumers),这将仅处理给定名称的处理任务。
+
+```typescript
+const job = await this.audioQueue.add('transcode', {
+  foo: 'bar',
+});
+```
+
+!> 当使用命名任务时，你必须为每个添加到队列中的特有名称创建处理者，否则队列会反馈缺失了给定任务的处理器。查看[这里](https://docs.nestjs.com/techniques/queues#consumers)阅读更多关于消费命名任务的信息。
+
+### 任务选项
+
+任务可以包括附加选项。在`Quene.add()`方法的`job`参数之后传递选项对象。任务选项属性有：
+- `priority: number`-选项优先级值。范围从1（最高优先）到MAX_INT（最低优先）。注意使用属性对性能有轻微影响，因此要小心使用。
+- `delay: number`- 任务执行前等待的时间（毫秒）。注意，为了精确延时，服务端和客户端时钟应该同步。
+- `attempts: number`-任务结束前总的尝试次数。
+- `repeat: RepeatOpts`-按照定时设置重复任务记录，查看[RepeatOpts](https://github.com/OptimalBits/bull/blob/master/REFERENCE.md#queueadd)。
+- `backoff: number | BackoffOpts`- 如果任务失败，自动重试闪避设置，查看[BackoffOpts](https://github.com/OptimalBits/bull/blob/master/REFERENCE.md#queueadd)。
+- `lifo: boolean`-如果为`true`，从队列右端添加任务以替代从左边添加（默认为 false)。
+- `timeout: number`-任务超时失败的毫秒数。
+- `jobId: number | string`- 覆盖任务ID-默认地，任务ID是唯一的整数，但你可以使用该参数覆盖它。如果你使用这个选项，你需要保证`jobId`是唯一的。如果你尝试添加一个包含已有id的任务，它不会被添加。
+- `removeOnComplete: boolean | number`-如果为`true`，当任务完成时移除任务。一个数字用来指定要保存的任务数。默认行为是将完成的工作保存在已完成的设置中。
+- `removeOnFail: boolean | number`-如果为`true`，当所有尝试失败时移除任务。一个数字用来指定要保存的任务数。默认行为是将失败的任务保存在已失败的设置中。
+- `stackTraceLimit: number`-限制在`stacktrace`中保存的堆栈跟踪线。
+
+这里是一些带有任务选项的自定义任务示例。
+
+要延迟任务的开始，使用`delay`配置属性：
+
+```typescript
+const job = await this.audioQueue.add(
+  {
+    foo: 'bar',
+  },
+  { delay: 3000 }, // 3 seconds delayed
+);
+```
+
+要从右端添加任务到队列（以LIFO（后进先出）处理任务），设置配置对象的`lifo`属性为`true`。
+
+```typescript
+const job = await this.audioQueue.add(
+  {
+    foo: 'bar',
+  },
+  { lifo: true },
+);
+```
+
+要优先一个任务，使用`priority`属性。
+
+```typescript
+
+const job = await this.audioQueue.add(
+  {
+    foo: 'bar',
+  },
+  { priority: 2 },
+);
+
+```
+
+### 消费者
+
+消费者是一个类，定义的方法要么处理添加到队列中的任务，要么监听队列的事件，或者两者皆有。使用`@Processor()`装饰器来定义消费者类，如下：
+
+```typescript
+import { Processor } from '@nestjs/bull';
+
+@Processor('audio')
+export class AudioConsumer {}
+```
+装饰器的字符串参数（例如,`audio`)是和类方法关联的队列名称。
+
+在消费者类中，使用`@Process()`装饰器来装饰任务处理者。
+
+```typescript
+import { Processor, Process } from '@nestjs/bull';
+import { Job } from 'bull';
+
+@Processor('audio')
+export class AudioConsumer {
+  @Process()
+  async transcode(job: Job<unknown>) {
+    let progress = 0;
+    for (i = 0; i < 100; i++) {
+      await doSomething(job.data);
+      progress += 10;
+      job.progress(progress);
+    }
+    return {};
+  }
+}
+```
+装饰器方法（例如`transcode()`) 在工作空闲或者队列中有消息要处理的时候被调用。该处理器方法接受`job`对象作为其仅有的参数。处理器方法的返回值被保存在任务对象中，可以在之后被访问，例如，在用于完成事件的监听者中。
+
+`Job`对象有多个方法，允许你和他们的状态交互。例如，上述代码使用`progress()`方法来更新工作进程。查看[这里](https://github.com/OptimalBits/bull/blob/master/REFERENCE.md#job)以了解完整的`Job`对象API参照。
+
+你可以指定一个任务处理方法，仅处理指定类型（包含特定`name`的任务）的任务，这可以通过如下所述的将`name`传递给`@Process()`装饰器完成。你在一个给定消费者类中可以有多个`@Process()`处理器，以反应每个任务类型（`name`)，确保每个`name`有相应的处理者。
+
+```typescript
+
+@Process('transcode')
+async transcode(job: Job<unknown>) { ... }
+```
+
+### 事件监听者
+
+当队列和/或任务状态改变时，`Bull`生成一个有用的事件集合。Nest提供了一个装饰器集合，允许订阅一系列标准核心事件集合。他们从`@nestjs/bull`包中导出。
+
+事件监听者必须在一个[消费者](https://docs.nestjs.com/techniques/queues#consumers)类中声明（通过`@Processor()`装饰器）。要监听一个事件，使用如下表格之一的装饰器来声明一个事件处理器。例如，当一个任务进入`audio`队列活跃状态时，要监听其发射的事件，使用下列结构：
+
+```typescript
+import { Processor, Process } from '@nestjs/bull';
+import { Job } from 'bull';
+
+@Processor('audio')
+export class AudioConsumer {
+
+  @OnQueueActive()
+  onActive(job: Job) {
+    console.log(
+      `Processing job ${job.id} of type ${job.name} with data ${job.data}...`,
+    );
+  }
+```
+鉴于BUll运行于分布式（多node）环境，它定义了本地事件概念。该概念可以辨识出一个由完整的单一进程触发的事件，或者由不同进程共享的队列。一个本地事件是指在本地进程中触发的一个队列行为或者状态变更。换句话说，当你的事件生产者和消费者是本地单进程时，队列中所有事件都是本地的。
+
+当一个队列在多个进程中共享时，我们可能要遇到全局事件。对一个由其他进程触发的事件通知器进程的监听者来说，它必须注册为全局事件。
+
+当相应事件发射时事件处理器被唤醒。该处理器被下表所示的签名调用，提供访问事件相关的信息。我们讨论下面签名中本地和全局事件处理器。
+
+|本地事件监听者|全局事件监听者|处理器方法签名/当触发时|
+|---|---|---|
+|@OnQueueError()|@OnGlobalQueueError()|handler(error: Error) - 当错误发生时，`error`包括触发错误
+|@OnQueueWaiting()|@OnGlobalQueueWaiting()|handler(jobId: number | string)-一旦工作者空闲就等待执行的任务，`jobId`包括进入此状态的id
+|@OnQueueActive()|@OnGlobalQueueActive()|handler(job: Job)-`job`任务已启动
+|@OnQueueStalled()|@OnGlobalQueueStalled()|handler(job: Job)-`job`任务被标记为延迟。这在时间循环崩溃或暂停时进行调试工作时是很有效的
+|@OnQueueProgress()|@OnGlobalQueueProgress()|handler(job: Job, progress: number)-`job`任务进程被更新为`progress`值
+|@OnQueueCompleted()|@OnGlobalQueueCompleted()|handler(job: Job, result: any) `job`任务进程成功以`result`结束
+|@OnQueueFailed()|@OnGlobalQueueFailed()|handler(job: Job, err: Error)`job`任务以`err`原因失败
+|@OnQueuePaused()|@OnGlobalQueuePaused()|handler()队列被暂停
+|@OnQueueResumed()|@OnGlobalQueueResumed()|handler(job: Job)队列被恢复
+|@OnQueueCleaned()|@OnGlobalQueueCleaned()|handler(jobs: Job[], type: string) 旧任务从队列中被清理，`job`是一个清理任务数组，`type`是要清理的任务类型
+|@OnQueueDrained()|@OnGlobalQueueDrained()|handler()在队列处理完所有等待的任务（除非有些尚未处理的任务被延迟）时发射出
+|@OnQueueRemoved()|@OnGlobalQueueRemoved()|handler(job: Job)`job`任务被成功移除
+
+当监听全局事件时，签名方法可能和本地有一点不同。特别地，本地版本的任何方法签名接受`job`对象的方法签名而不是全局版本的`jobId(number)`。要在这种情况下获取实际的`job`对象的引用，使用`Queue#getJob`方法。这种调用可能需要等待，因此处理者应该被声明为`async`，例如：
+
+```typescript
+@OnGlobalQueueCompleted()
+async onGlobalCompleted(jobId: number, result: any) {
+  const job = await this.immediateQueue.getJob(jobId);
+  console.log('(Global) on completed: job ', job.id, ' -> result: ', result);
+}
+```
+?> 要获取一个`Queue`对象（使用`getJob()`调用)，你当然必须注入它。同时，队列必须注册到你要注入的模块中。
+
+在特定事件监听器装饰器之外，你可以使用通用的`@OnQueueEvent()`装饰器与`BullQueueEvents`或者`BullQueueGlobalEvents`枚举相结合。在[这里](https://github.com/OptimalBits/bull/blob/master/REFERENCE.md#events)阅读更多有关事件的内容。
+
+### 队列管理
+
+队列有一个API来实现管理功能比如暂停、恢复、检索不同状态的任务数量等。你可以在[这里](https://github.com/OptimalBits/bull/blob/master/REFERENCE.md#queue)找到完整的队列API。直接在`Queue`对象上调用这些方法，如下所示的暂停/恢复示例。
+
+使用`pause()`方法调用来暂停队列。一个暂停的队列在恢复前将不会处理新的任务，但会继续处理完当前执行的任务。
+
+```typescript
+await audioQueue.pause();
+```
+要恢复一个暂停的队列，使用`resume()`方法，如下：
+
+```typescript
+await audioQueue.resume();
+```
+
+### 异步配置
+
+你可能需要异步而不是静态传递队列选项。在这种情况下，使用`registerQueueAsync()`方法，可以提供不同的异步配置方法。
+
+一个方法是使用工厂函数：
+
+```typescript
+BullModule.registerQueueAsync({
+  name: 'audio',
+  useFactory: () => ({
+    redis: {
+      host: 'localhost',
+      port: 6379,
+    },
+  }),
+});
+```
+
+我们的工厂函数方法和其他[异步提供者](https://docs.nestjs.com/fundamentals/async-providers)(它可以是`async`的并可以使用`inject`来注入)方法相同。
+
+```typescript
+BullModule.registerQueueAsync({
+  name: 'audio',
+  imports: [ConfigModule],
+  useFactory: async (configService: ConfigService) => ({
+    redis: {
+      host: configService.get('QUEUE_HOST'),
+      port: +configService.get('QUEUE_PORT'),
+    },
+  }),
+  inject: [ConfigService],
+});
+```
+
+可选的，你可以使用`useClass`语法。
+
+```typescript
+BullModule.registerQueueAsync({
+  name: 'audio',
+  useClass: BullConfigService,
+});
+```
+上述结构在`BullModule`中实例化`BullConfigService`，并通过调用`createBullOptions()`来用它提供一个选项对象。注意这意味着`BullConfigService`要实现`BullOptionsFactory`工厂接口，如下：
+
+```typescript
+@Injectable()
+class BullConfigService implements BullOptionsFactory {
+  createBullOptions(): BullModuleOptions {
+    return {
+      redis: {
+        host: 'localhost',
+        port: 6379,
+      },
+    };
+  }
+}
+```
+要阻止在`BullModule`中创建`BullConfigService`并使用一个从其他模块导入的提供者，可以使用`useExisting`语法。
+
+```typescript
+BullModule.registerQueueAsync({
+  name: 'audio',
+  imports: [ConfigModule],
+  useExisting: ConfigService,
+});
+```
+
+这个结构和`useClass`有一个根本区别——`BullModule`将查找导入的模块来重用现有的`ConfigServie`而不是实例化一个新的。
+
+### 示例
+
+一个可用的示例见[这里](https://github.com/nestjs/nest/tree/master/sample/26-queues)。
 
 ## 日志
 
 
- `Nest`附带一个默认的内部日志记录器实现，它在实例化过程中以及在一些不同的情况下使用，比如发生异常等等。但是，有时您可能希望完全禁用日志记录，或者提供自定义实现并自己处理消息。为了关闭记录器，我们使用 `Nest` 应用程序选项对象。
+ `Nest`附带一个默认的内部日志记录器实现，它在实例化过程中以及在一些不同的情况下使用，比如发生异常等等（例如系统记录）。这由`@nestjs/common`包中的`Logger`类实现。你可以全面控制如下的日志系统的行为：
+ 
+- 完全禁用日志
+- 指定日志系统详细水平（例如，展示错误，警告，调试信息等）
+- 完全覆盖默认日志记录器
+- 通过扩展自定义默认日志记录器
+- 使用依赖注入来简化编写和测试你的应用
+
+你也可以使用内置日志记录器，或者创建你自己的应用来记录你自己应用水平的事件和消息。
+
+更多高级的日志功能，可以使用任何`Node.js`日志包，比如[Winston](https://github.com/winstonjs/winston)，来生成一个完全自定义的生产环境水平的日志系统。
+
+### 基础自定义
+
+要禁用日志，在（可选的）Nest应用选项对象中向`NestFactory.create()`传递第二个参数设置`logger`属性为`false`。
 
 ```typescript
 const app = await NestFactory.create(ApplicationModule, {
@@ -2152,7 +3979,7 @@ const app = await NestFactory.create(ApplicationModule, {
 await app.listen(3000);
 ```
 
-你也可以只启用某些类型的日志:
+你也可以只启用特定日志级别，设置一个字符串形式的`logger`属性数组以确定要显示的日志水平，如下：
 
 ```typescript
 const app = await NestFactory.create(ApplicationModule, {
@@ -2160,8 +3987,11 @@ const app = await NestFactory.create(ApplicationModule, {
 });
 await app.listen(3000);
 ```
+数组中的字符串可以是以下字符串的任意组合：`log`,`error`,`warn`,`debug`和`verbose`。
 
-在某些场景中，我们可能希望在底层使用不同的日志记录器。为此，我们必须传递一个实现 `LoggerService` 接口的对象。例如，一个内置的控制台。
+### 自定义应用
+
+你可以提供一个自定义日志记录器应用，并由Nest作为系统记录使用，这需要设置`logger`属性到一个满足`LoggerService`接口的对象。例如，你可以告诉Nest使用内置的全局JavaScript`console`对象（其应用了`LoggerService`接口），如下：
 
 ```typescript
 const app = await NestFactory.create(ApplicationModule, {
@@ -2169,22 +3999,30 @@ const app = await NestFactory.create(ApplicationModule, {
 });
 await app.listen(3000);
 ```
-
-但这不是一个最好的办法，我们也可以选择创建自定义的记录器：
+应用你的自定义记录器很简单。只要简单实现以下`LoggerService`接口中的每个方法就可以：
 
 ```typescript
 import { LoggerService } from '@nestjs/common';
 
 export class MyLogger implements LoggerService {
-  log(message: string) {}
-  error(message: string, trace: string) {}
-  warn(message: string) {}
-  debug(message: string) {}
-  verbose(message: string) {}
+  log(message: string) {
+    /* your implementation */
+  }
+  error(message: string, trace: string) {
+    /* your implementation */
+  }
+  warn(message: string) {
+    /* your implementation */
+  }
+  debug(message: string) {
+    /* your implementation */
+  }
+  verbose(message: string) {
+    /* your implementation */
+  }
 }
 ```
-
-然后，我们可以 `MyLogger` 直接应用实例：
+你可以通过`logger`属性为Nest应用的选项对象提供一个`MyLogger`实例：
 
 ```typescript
 const app = await NestFactory.create(ApplicationModule, {
@@ -2192,6 +4030,8 @@ const app = await NestFactory.create(ApplicationModule, {
 });
 await app.listen(3000);
 ```
+这个技术虽然很简单，但是没有为`MyLogger`类应用依赖注入。这会带来一些挑战，尤其在测试方面，同时也限制了`MyLogger`的重用性。更好的解决方案参见如下的[依赖注入](https://docs.nestjs.com/techniques/logger#dependency-injection)部分。
+
 
 ### 扩展内置的日志类
 
@@ -2207,10 +4047,14 @@ export class MyLogger extends Logger {
   }
 }
 ```
+你可以按如下[使用应用记录器来记录](https://docs.nestjs.com/techniques/logger#dependency-injection)部分所述，从你的特征模块中使用扩展记录器，也可以按照如下的[依赖注入](https://docs.nestjs.com/techniques/logger#dependency-injection)部分。如果你这样做，你在调用`super`时要小心，如上述代码示例，要委托一个特定的日志方法，调用其父（内置）类，以便Nest可以依赖需要的内置特征。
 
 ### 依赖注入
 
-如果要在 `Logger` 类中启用依赖项注入，则必须使 `MyLogger` 该类成为实际应用程序的一部分。例如，您可以创建一个 `LoggerModule`:
+你可能需要利用依赖注入的优势来使用高级的日志记录功能。例如，你可能想把`ConfigService`注入到你的记录器中来对它自定义，然后把自定义记录器注入到其他控制器和/或提供者中。要为你的自定义记录器启用依赖注入，创建一个实现`LoggerService`的类并将其作为提供者注册在某些模块中，例如，你可以：
+
+1. 定义一个`MyLogger`类来扩展内置的`Logger`或者完全覆盖它，如前节所述。
+2. 创建一个`LoggerModule`如下所示，从该模块中提供`MyLogger`。
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -2222,8 +4066,9 @@ import { MyLogger } from './my-logger.service.ts';
 })
 export class LoggerModule {}
 ```
+通过这个结构，你现在可以提供你的自定义记录器供其他任何模块使用。因为你的`MyLogger`类是模块的一部分，它也可以使用依赖注入（例如，注入一个`ConfigService`）。提供自定义记录器供使用还需要一个技术，即Nest的系统记录（例如，供`bootstrapping`和`error handling`)。
 
-一旦 `LoggerModule` 在其他地方导入，框架将负责创建 `Logger` 类的实例。现在，要在整个应用程序中使用相同的 `Logger` 实例，包括引导和错误处理的东西，请使用以下方式：
+由于应用实例化(`NestFactory.create()`)在任何模块上下文之外发生，它不能参与初始化时正常的依赖注入阶段。因此我们必须保证至少一个应用模块导入了`LoggerModule`来触发`Nest`，从而生成一个我们的`MyLogger`类的单例。我们可以在之后按照下列知道来告诉Nest使用同一个`MyLogger`实例。
 
 ```typescript
 const app = await NestFactory.create(ApplicationModule, {
@@ -2233,8 +4078,76 @@ app.useLogger(app.get(MyLogger));
 await app.listen(3000);
 ```
 
-此解决方案的唯一缺点是您的第一个初始化消息将不会由您的 `Logger` 实例处理，但此时这点并不重要。
+在这里我们在`NestApplication`实例中用了`get()`方法以获取`MyLogger`对象的单例。这个技术在根本上是一个“注入”`logger`实例供`Nest`使用的方法。`app.get()`调用获取`MyLogger`单例，并且像之前所述的那样依赖于第一个注入到其他模块的实例。
 
+你也可以在你的特征类中注入这个`MyLogger`提供者，从而保证`Nest`系统记录和应用记录行为一致。参见如下为应用记录使用记录器部分。
+
+### 为应用记录使用记录器
+
+我们可以组合上述几种技术来提供一致性的行为和格式化以保证我们的应用事件/消息记录和Nest系统记录一致。在本部分，我们采用以下步骤：
+
+1. 我们扩展内置记录器并自定义记录消息的`context`部分（例如，如下的方括号中的`NestFactory`的形式）。
+   ```bash
+    [Nest] 19096   - 12/08/2019, 7:12:59 AM   [NestFactory] Starting Nest application...
+   ```
+2. 我们注入一个[暂态的](https://docs.nestjs.com/fundamentals/injection-scopes)`Logger`实例在我们的特征模块中，从而使它们包含各自的自定义上下文。
+3. 我们提供扩展的记录器供Nest在系统记录中使用。
+
+要开始，使用类似如下的内置记录器代码。我们提供`scope`选项作为一个`Logger`类的配置元数据，指定瞬态范围，以保证我们在每个特征模块中有独一无二的`Logger`的实例。例如，我们没有扩展每个单独的`Logger`方法（例如 `log()`,`warn()`等），尽管你可能选择要这样做。
+
+```typescript
+import { Injectable, Scope, Logger } from '@nestjs/common';
+
+@Injectable({ scope: Scope.TRANSIENT })
+export class MyLogger extends Logger {}
+```
+
+然后，我们采用如下结构创建一个`LoggerModule`：
+
+```typescript
+import { Module } from '@nestjs/common';
+import { MyLogger } from './my-logger.service';
+
+@Module({
+  providers: [MyLogger],
+  exports: [MyLogger],
+})
+export class LoggerModule {}
+```
+
+接下来，在你的特征模块中导入`LoggerModule`，然后设置记录器上下文，并开始使用包含上下文的自定义记录器，如下：
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import { MyLogger } from './my-logger.service';
+
+@Injectable()
+export class CatsService {
+  private readonly cats: Cat[] = [];
+
+  constructor(private myLogger: MyLogger) {
+    this.myLogger.setContext('CatsService');
+  }
+
+  findAll(): Cat[] {
+    this.myLogger.warn('About to return cats!');
+    return this.cats;
+  }
+}
+```
+最后，告诉Nest在你如下的`main.ts`文件中使用一个自定义记录器实例。当然，在本例中，我们没有实际自定义记录器行为（通过扩展`Logger`方法例如`log()`、`warn()`等），因此该步骤并不是必须的。但如果你为这些方法添加了自定义逻辑，并且希望Nest使用它们时就应该这样做：
+
+```typescript
+const app = await NestFactory.create(ApplicationModule, {
+  logger: false,
+});
+app.useLogger(new MyLogger());
+await app.listen(3000);
+
+```
+### 使用外部记录器
+
+生产环境应用通常包括特定的记录需求，包括高级过滤器，格式化和中心化记录。`Nest`的内置记录器用于监控Nest系统状态，在开发时也可以为你的特征模块提供实用的基础的文本格式的记录，但生产环境可能更倾向于使用类似[Winston](https://github.com/winstonjs/winston)的模块，这是一个标准的Node.js应用，你可以在Nest中体验到类似模块的优势。
 
 ## 文件上传
 
@@ -2259,7 +4172,7 @@ uploadFile(@UploadedFile() file) {
 `FileInterceptor()` 接收两个参数：
 
  - 一个 `fieldName` (指向包含文件的 HTML 表单的字段) 
-
+ 
  - 可选 `options` 对象。这些 `MulterOptions` 等效于传入 `multer` 构造函数 ([此处](https://github.com/expressjs/multer#multeropts)有更多详细信息)
 
 
@@ -2328,6 +4241,7 @@ MulterModule.register({
   dest: '/upload',
 });
 ```
+?> `MulterModule`类从`@nestjs/platform-express`包中导出
 
 ### 异步配置
 
@@ -2418,7 +4332,7 @@ export class CatsService {
 
 ### 配置
 
-`Axios` 提供了许多选项，您可以利用这些选项来增加您的 `HttpService` 功能。[在这里](https://github.com/axios/axios#request-config)阅读更多相关信息。要配置底层库实例，请使用 `register()` 方法的 `HttpModule`。
+`Axios` 提供了许多选项，您可以利用这些选项来增加您的 `HttpService` 功能。[在这里](https://github.com/axios/axios#request-config)阅读更多相关信息。要配置底层库实例，请使用 `register()` 方法的 `HttpModule`。所有这些属性都将传递给 `axios` 构造函数。
 
 ```typescript
 @Module({
@@ -2433,7 +4347,6 @@ export class CatsService {
 export class CatsModule {}
 ```
 
-所有这些属性都将传递给 `axios` 构造函数。
 
 ### 异步配置
 
@@ -2573,7 +4486,8 @@ export class AppController {
 }
 ```
 
-?> 事实上，当 `Nest` 检测到 `@Res()` 装饰器时，它会注入 `response` 对象。在[这里](http://www.expressjs.com.cn/4x/api.html)了解更多关于它的能力。
+
+在这个代码中，我们指定模板使用`@Render()`装饰器，同时将路径处理器方法的返回值被传递给要渲染的模板。注意，该返回值是一个包含`message`属性的对象，和我们之前创建模板中的`message`占位符对应。
 
 在应用程序运行时，打开浏览器访问 `http://localhost:3000/` 你应该看到这个 `Hello world!` 消息。
 
@@ -2581,7 +4495,7 @@ export class AppController {
 
 如果应用程序逻辑必须动态决定要呈现哪个模板，那么我们应该使用 `@Res()`装饰器，并在路由处理程序中提供视图名，而不是在 `@Render()` 装饰器中:
 
-当 `Nest` 检测到 `@Res()` 装饰器时，它将注入特定于库的响应对象。我们可以使用这个对象来动态呈现模板。在[这里](http://expressjs.com/en/api.html)了解关于响应对象 `API` 的更多信息。
+?> 当 `Nest` 检测到 `@Res()` 装饰器时，它将注入特定于库的响应对象。我们可以使用这个对象来动态呈现模板。在[这里](http://expressjs.com/en/api.html)了解关于响应对象 `API` 的更多信息。
 
 > app.controller.ts
 
@@ -2607,7 +4521,7 @@ export class AppController {
 
 [这里](https://github.com/nestjs/nest/tree/master/sample/15-mvc)有一个可用的例子。
 
-### MVC（fastify）
+### Fastify
 
 如本章所述，我们可以将任何兼容的 `HTTP` 提供程序与 `Nest` 一起使用。比如  [Fastify](https://github.com/fastify/fastify) 。为了创建具有 `fastify` 的 `MVC` 应用程序，我们必须安装以下包：
 
@@ -2645,7 +4559,7 @@ async function bootstrap() {
 bootstrap();
 ```
 
-`API` 略有不同，但这些方法调用背后的想法保持不变。此外，我们还必须确保传递到 `@Render()` 装饰器中的模板名称包含文件扩展名。
+Fastify的`API` 略有不同，但这些方法调用背后的想法保持不变。使用Fastify时一个明显的需要注意的区别是传递到 `@Render()` 装饰器中的模板名称包含文件扩展名。
 
 > app.controller.ts
 
@@ -2664,17 +4578,17 @@ export class AppController {
 
 在应用程序运行时，打开浏览器并导航至 `http://localhost:3000/` 。你应该看到这个 `Hello world!` 消息。
 
-[这里](https://github.com/nestjs/nest/tree/master/sample/17-mvc-fastify)有 一个可用的例子。
+[这里](https://github.com/nestjs/nest/tree/master/sample/17-mvc-fastify)有一个可用的例子。
 
 ## 性能（Fastify）
 
-在底层，`Nest` 使用了[Express](https://expressjs.com/)，但如前所述，它提供了与各种其他库的兼容性，例如 [Fastify](https://github.com/fastify/fastify)。它是怎么工作的？事实上，`Nest`需要使用您最喜欢的库，它是一个兼容的适配器，它主要将相应的处理程序代理到适当的库特定的方法。此外，您的库必须至少提供与  `express` 类似的请求-响应周期管理。
+在底层，`Nest` 使用了[Express](https://expressjs.com/)框架，但如前所述，它提供了与各种其他库的兼容性，例如 [Fastify](https://github.com/fastify/fastify)。`Nest`应用一个框架适配器，其主要功能是代理中间件和处理器到适当的特定库应用中，从而达到框架的独立性。
+
+?> 注意要应用框架适配器，目标库必须提供在`Express` 类似的请求/响应管道处理
 
 `Fastify` 非常适合这里，因为它以与 `express` 类似的方式解决设计问题。然而，`fastify` 的速度要快得多，达到了几乎两倍的基准测试结果。问题是，为什么 `Nest` 仍然使用 `express` 作为默认的HTTP提供程序？因为 `express` 是应用广泛、广为人知的，而且拥有一套庞大的兼容中间件。
 
 但是由于 `Nest` 提供了框架独立性，因此您可以轻松地在它们之间迁移。当您对快速的性能给予很高的评价时，`Fastify` 可能是更好的选择。要使用 `Fastify`，只需选择 `FastifyAdapter`本章所示的内置功能。
-
-
 
 ### 安装
 
@@ -2745,9 +4659,6 @@ new FastifyAdapter({ logger: true })
 [这里](https://github.com/nestjs/nest/tree/master/sample/10-fastify)有一个工作示例
 
 
-
-（更新中）
-
  ### 译者署名
 
 | 用户名 | 头像 | 职能 | 签名 |
@@ -2757,3 +4668,4 @@ new FastifyAdapter({ logger: true })
 [@Armor](https://github.com/Armor-cn)  | <img class="avatar-66 rm-style" height="70" src="https://avatars3.githubusercontent.com/u/31821714?s=460&v=4">  |  翻译  | 专注于 Java 和 Nest，[@Armor](https://armor.ac.cn/) |
 | [@Erchoc](https://github.com/erchoc)  | <img class="avatar-66 rm-style" height="70" src="https://avatars1.githubusercontent.com/u/19908809?s=400&u=e935620bf39d85bfb749a4ce4b3758b086a57de5&v=4">  |  翻译  | 学习更优雅的架构方式，做更贴切用户的产品。[@Erchoc](https://github/erchoc) at Github |
 | [@havef](https://havef.github.io)  | <img class="avatar-66 rm-style" height="70" src="https://avatars1.githubusercontent.com/u/54462?s=460&v=4">  |  校正  | 数据分析、机器学习、TS/JS技术栈 [@havef](https://havef.github.io) |
+| [@weizy0219](https://github.com/weizy0219)  | <img class="avatar-66 rm-style" height="70" src="https://avatars3.githubusercontent.com/u/19883738?s=60&v=4">  |  翻译  | 专注于TypeScript全栈、物联网和Python数据科学，[@weizhiyong](https://www.weizhiyong.com) | 

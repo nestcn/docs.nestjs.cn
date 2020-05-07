@@ -2366,22 +2366,15 @@ export class DatabaseModule {}
 
 一个标准实践是如果在应用启动过程中未提供需要的环境变量或它们不满足特定的验证规则时抛出异常。`@nestjs/config`包让我们可以使用[Joi npm包](https://github.com/hapijs/joi)来提供这种类型验证。使用Joi,你可以定义一个对象`Schema`对象并验证对应的`JavaScript`对象。
 
-安装Joi(以及`TypeScript`用户的类型声明)。
+> warning **注意** 最新版本的“@hapi/joi”要求您运行Node v12或更高版本。对于较老版本的node，请安装“v16.1.8”。这主要是在“v17.0.2”发布之后，它会在构建期间导致错误。更多信息请参考[他们的文档](https://hapi.dev/family/joi/?v=17.0.2#install)和[github issue](https://github.com/hapijs/joi/issues/2266#issuecomment-571667769)
+> config.service.ts	现在，我们可以定义一个Joi验证模式，并通过`forRoot()`方法的`options`对象的`validationSchema`属性传递它，如下所示
 
-```bash
-$ npm install --save @hapi/joi
-$ npm install --save-dev @types/hapi__joi
-```
-?> 最新版的`@hapi/joi`需要运行在Node V12或更高版本上。老版本的Node请安装`V16.1.8`。`V17.0.2`之后的版本在构建时可能报错，请阅读`[他们的文档](https://hapi.dev/family/joi/?v=17.0.2#install)`和`[github issue](https://hapi.dev/family/joi/?v=17.0.2#install)`。
 
-现在我们可以通过`forRoot()`方法的选项对象的`validationSchema`属性来定义一个Joi验证`schema`，如下：
-
-> app.module.ts
-
-```typescript
-import * as Joi from '@hapi/joi';
-
-@Module({
+```typescript	```typescript
+import * as dotenv from 'dotenv';	app.module.ts
+import * as Joi from '@hapi/joi';	import * as Joi from '@hapi/joi';
+import * as fs from 'fs';	
+export type EnvConfig = Record<string, string>;	@Module({
   imports: [
     ConfigModule.forRoot({
       validationSchema: Joi.object({
@@ -2395,9 +2388,13 @@ import * as Joi from '@hapi/joi';
 })
 export class AppModule {}
 ```
-默认情况下，所有`schema`键都是可选的。在这里，如果环境中（`.env`文件或者进程环境）没有提供这些变量的话，我们可以为`NODE_ENV`和`PORT`设置默认值。此外，我们可以使用`required()`验证方法来获取一个必须在环境中定义的值（`.env`文件或者进程环境）。在这种情况下，如果我们没有在环境中提供变量，验证步骤将抛出异常。查看[Joi验证方法](https://hapi.dev/family/joi/?v=17.0.2#example)来了解更多如何构建验证`schema`的内容。
 
-默认情况下，允许存在未知的环境变量（在`schema`中没有的环境变量键），这不会触发验证异常。默认情况下，所有验证错误都会汇报。你可以选择在`forRoot()`选项对象中的`validationOptions`键中传递一个选项对象来修改这些行为。这个选项对象可以包含任意由[Joi validation options](https://hapi.dev/family/joi/api/?v=17.0.2#anyvalidvalues---aliases-equal)提供的标准验证选项属性。例如，要倒置两个上述设置，需要传递这样的选项：
+
+export class ConfigService {	由于我们为 `NODE_ENV` 和 `PORT` 设置了默认值，因此如果不在环境文件中提供这些变量，验证将不会失败。然而, 我们需要明确提供 `API_AUTH_ENABLED`。如果我们的 `.env` 文件中的变量不是模式（ `schema` ）的一部分, 则验证也会引发错误。此外，`Joi` 还会尝试将 `env` 字符串转换为正确的类型。
+  private readonly envConfig: EnvConfig;	
+
+
+  constructor(filePath: string) {	默认情况下，允许使用未知的环境变量(其键不在模式中出现的环境变量)，并且不会触发验证异常。默认情况下，将报告所有验证错误。您可以通过通过`forRoot()` options对象的`validationOptions`键传递一个options对象来更改这些行为。此选项对象可以包含由Joi验证选项提供的任何标准验证选项属性。例如，要反转上面的两个设置，像这样传递选项:
 
 > app.module.ts
 
@@ -2426,36 +2423,50 @@ export class AppModule {}
 - `allowUnknown`:控制是否允许环境变量中未知的键。默认为`true`。
 - `abortEarly`:如果为`true`，在遇到第一个错误时就停止验证；如果为`false`，返回所有错误。默认为`false`。
 
-注意，一旦你决定传递一个`validationOptions`对象，任何你没有显性传递的设置将按`Joi`标准默认值设置默认（不是`@nestjs/config`默认）。例如，如果在你自定义的`validationOptions`对象中未指定`allowUnknow`，它将被设置为Joi默认值`false`。因此，最安全的方法可能是在你的自定义对象中同时设置这两个设置。
+注意，一旦您决定传递`validationOptions`对象，您没有显式传递的任何设置都将默认为`Joi`标准默认值(而不是`@nestjs/config`默认值)。例如，如果在自定义`validationOptions`对象中保留`allowUnknowns`未指定，它的`Joi`默认值将为`false`。因此，在自定义对象中指定这两个设置可能是最安全的。
 
-### 自定义`getter`函数
+#### 自定义 `getter` 函数
 
-`ConfigService`定义了一个通用的`get()`方法来根据键查找配置值。我们也可能添加一个`getter`函数来使能一些更自然的编码风格：
+`ConfigService`定义了一个通用的`get()`方法来通过键检索配置值。我们还可以添加`getter`函数来启用更自然的编码风格:
 
-```typescript
+
+```typescript	```typescript
+get isApiAuthEnabled(): boolean {	@Injectable()
+  return Boolean(this.envConfig.API_AUTH_ENABLED);	export class ApiConfigService {
+  constructor(private configService: ConfigService) {}
+  get isAuthEnabled(): boolean {
+    return this.configService.get('AUTH_ENABLED') === 'true';
+  }
+}	}
+```	@@switch
+@Dependencies(ConfigService)
 @Injectable()
 export class ApiConfigService {
-  constructor(private configService: ConfigService) {}
-
-  get isAuthEnabled(): boolean {
+  constructor(configService) {
+    this.configService = configService;
+  }
+现在我们可以像下面这样使用getter函数:	  get isAuthEnabled() {
     return this.configService.get('AUTH_ENABLED') === 'true';
   }
 }
 ```
-现在我们可以使用如下的`getter`函数：
 
-> app.service.ts
+
+> app.service.ts	现在我们可以像下面这样使用`getter`函数:
+
 
 ```typescript
-@Injectable()
-export class AppService {
-  constructor(apiConfigService: ApiConfigService) {
-    if (apiConfigService.isAuthEnabled) {
-      // Authentication is enabled
-    }
-  }
-}
-```
+app.service.ts
+@Injectable()	@Injectable()
+export class AppService {	export class AppService {
+  constructor(config: ConfigService) {	  constructor(apiConfigService: ApiConfigService) {
+    if (config.isApiAuthEnabled) {	    if (apiConfigService.isAuthEnabled) {
+      // Authorization is enabled	      // Authentication is enabled
+    }	    }
+  }	  }
+}	}
+```	
+
 #### 扩展变量
 
 `@nestjs/config`包支持环境变量扩展。使用这种技术，您可以创建嵌套的环境变量，其中一个变量在另一个变量的定义中引用。例如:

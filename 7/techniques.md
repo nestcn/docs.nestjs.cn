@@ -293,7 +293,7 @@ $ npm install @types/passport-jwt --save-dev
 
 让我们仔细看看如何处理 `POST`  `/auth/login` 请求。我们使用护照本地策略提供的内置`AuthGuard` 来装饰路由。这意味着:
 
-1. 只有在验证了用户之后，才会调用路由处理程序
+1. 只有在了用户之后，才会调用路由处理程序
 
 2. req参数将包含一个用户属性(在passport-local 身份验证流期间由 `Passport` 填充)
 
@@ -2326,7 +2326,8 @@ export class AppModule {}
 然后我们可以使用标准的构造函数注入，并在我们的类中使用它:	现在，要从数据库命名空间获取`host`的值，请使用符号`.`。使用`'database'`作为属性名称的前缀，该属性名称对应于命名空间的名称（作为传递给`registerAs()`函数的第一个参数）
 
 
-> app.service.ts	```typescript
+> app.service.ts	
+```typescript
 const dbHost = this.configService.get<string>('database.host');
 ```
 
@@ -2455,23 +2456,24 @@ export class AppService {
   }
 }
 ```
-### 可扩充的变量
+#### 扩展变量
 
-`@nestjs/config`包支持环境变量扩展。使用这种技术，你可以创建一个嵌套的环境变量，其中一个变量可以在另一个变量定义内部被引用。例如：
+`@nestjs/config`包支持环境变量扩展。使用这种技术，您可以创建嵌套的环境变量，其中一个变量在另一个变量的定义中引用。例如:
 
-```typescript
+```json
 APP_URL=mywebsite.com
 SUPPORT_EMAIL=support@${APP_URL}
 ```
-在这个结构中，变量`SUPPORT_EMAIL`被解析到`support@mywebsite.com`。注意，使用`${...}`语法来触发并解析在`SUPPORT_EMAIL`定义内部的`APP_URL`值。
 
-?> 在`@nestjs/config`包内部使用[dotenv-expand](https://github.com/motdotla/dotenv-expand)以使用这个特性。
+通过这种构造，变量`SUPPORT_EMAIL`解析为`support@mywebsite.com`。注意${…}语法来触发解析变量`APP_URL`在`SUPPORT_EMAIL`定义中的值。
 
-在传递给`ConfigModule`中`forRoot()`方法的选项对象中使用`expandVariables`属性来使能环境变量扩展。如下所示：
 
-> app.module.ts
+
+> info **提示** 对于这个特性，@nestjs/config包内部使用[dotenv-expand](https://github.com/motdotla/dotenv-expand)实现。
+使用传递给`ConfigModule`的`forRoot()`方法的options对象中的`expandVariables`属性来启用环境变量展开，如下所示:
 
 ```typescript
+app.module.ts
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -2483,16 +2485,19 @@ SUPPORT_EMAIL=support@${APP_URL}
 export class AppModule {}
 ```
 
-### 在`main.ts`中使用
 
-当我们的配置存储在服务中时，它仍然可以在`main.ts`文件中使用。采用这种方法，你可以用它存储例如应用端口或者CORS主机等变量。
 
-要使用它，你必须使用`app.get()`方法，参考如下服务引用：
+在`main.ts`中使用
+
+虽然我们的配置是存储在服务中的，但它仍然可以在main.ts文件中使用。通过这种方式，您可以使用它来存储诸如应用程序端口或CORS主机之类的变量。
+
+要访问它，您必须使用`app.get()`方法，然后是服务引用：
 
 ```typescript
 const configService = app.get(ConfigService);
 ```
-你可以在配置中使用配置键调用`get`方法来像平时那样使用它。
+
+然后你可以像往常一样使用它，通过调用带有配置键的get方法：
 
 ```typescript
 const port = configService.get('PORT');

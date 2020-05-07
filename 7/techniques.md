@@ -4333,7 +4333,7 @@ MulterModule.registerAsync({
 
 [Axios](https://github.com/axios/axios) 是丰富功能的 `HTTP` 客户端, 广泛应用于许多应用程序中。这就是为什么 `Nest` 包装这个包, 并公开它默认为内置 `HttpModule`。`HttpModule` 导出 `HttpService`, 它只是公开了基于 `axios` 的方法来执行 `HTTP` 请求, 而且还将返回类型转换为 `Observables`。
 
-为了使用 `httppservice`，我们需要导入 `HttpModule`。
+为了使用 `httpservice`，我们需要导入 `HttpModule`。
 
 ```typescript
 @Module({

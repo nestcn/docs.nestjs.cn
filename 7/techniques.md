@@ -2333,15 +2333,18 @@ const dbHost = this.configService.get<string>('database.host');
 一个合理的替代方案是直接注入`'database'`的命名空间，我们将从强类型中获益：
 
 
-```typescript	```typescript
+```typescript
 import { Injectable } from '@nestjs/common';	constructor(
 import { ConfigService } from './config/config.service';	  @Inject(databaseConfig.KEY)
   private databaseConfig: ConfigType<typeof databaseConfig>,
 ) {}
 ```
 
+?> info **注意** ` ConfigType` 函数是从 `@nestjs/config` 包导出的。
 
-@Injectable()	> info **注意** ` ConfigType` 函数是从 `@nestjs/config` 包导出的。
+```typescript
+
+@Injectable()
 export class AppService {	
   private isAuthEnabled: boolean;	#### 部分注册
   constructor(config: ConfigService) {	

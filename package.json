@@ -39,6 +39,6 @@
   },
   "devDependencies": {
     "docsify-cli": "4.4.0",
-    "now": "18.0.0"
+    "now": "19.0.0"
   }
 }

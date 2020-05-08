@@ -179,10 +179,10 @@ src
 
 ```typescript
 import { NestFactory } from '@nestjs/core';
-import { ApplicationModule } from './app.module';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(ApplicationModule);
+  const app = await NestFactory.create(AppModule);
   await app.listen(3000);
 }
 bootstrap();
@@ -200,15 +200,15 @@ Nest 旨在成为一个与平台无关的框架。 通过平台，可以创建�
 |      |           |   
 | ------------- |-------------| 
 |platform-express|Express 是一个众所周知的 node.js 简约 Web 框架。 这是一个经过实战考验，适用于生产的库，拥有大量社区资源。 默认情况下使用 `@nestjs/platform-express` 包。 许多用户都可以使用 Express ，并且无需采取任何操作即可启用它。|
-|platform-fastify| Fastify 是一个高性能，低开销的框架，专注于提供最高的效率和速度。 在[这里](6/techniques?id=性能（fastify）)阅读如何使用它。|
+|platform-fastify| Fastify 是一个高性能，低开销的框架，专注于提供最高的效率和速度。 在[这里](7/techniques?id=性能（fastify）)阅读如何使用它。|
 
 
 无论使用哪种平台，它都会暴露自己的 API。 它们分别是 NestExpressApplication 和 NestFastifyApplication。
 
-将类型传递给 NestFactory.create() 方法时，如下例所示，app 对象将具有专用于该特定平台的方法。 但是，请注意，除非您确实要访问底层平台API，否则无需指定类型。
+将类型传递给 NestFactory.create() 函数时，如下例所示，app 对象将具有专用于该特定平台的函数。 但是，请注意，除非您确实要访问底层平台API，否则无需指定类型。
 
 ```typescript
-const app = await NestFactory.create<NestExpressApplication>(ApplicationModule);
+const app = await NestFactory.create<NestExpressApplication>(AppModule);
 ```
 
 

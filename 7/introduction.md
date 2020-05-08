@@ -32,7 +32,7 @@ $ cd project
 $ npm install
 $ npm run start
 ```
-要使用 JavaScript ，请参考 javascript-starter.git 
+要使用 JavaScript ，请在 git 安装替换为 `javascript-starter.git` 
 
 ### ** 手动创建 **
 
@@ -41,8 +41,10 @@ $ npm run start
 ```bash
 $ npm i --save @nestjs/core @nestjs/common rxjs reflect-metadata
 ```
-
 <!-- tabs:end -->
+
+打开浏览器并导航到 http://localhost:3000/
+
 
 
 

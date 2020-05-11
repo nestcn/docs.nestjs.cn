@@ -14,20 +14,12 @@
 
 ## 基础
 
-每个拦截器都有 `intercept()` 方法，它接收2个参数。 第一个是 `ExecutionContext` 实例（与守卫完全相同的对象）。 `ExecutionContext` 继承自 `ArgumentsHost` 。  `ArgumentsHost` 是传递给原始处理程序的参数的一个包装 ，它根据应用程序的类型包含不同的参数数组。你可以在[这里](/6/exceptionfilters.md?id=arguments-host)读更多关于它的内容（在异常过滤器章节中）。
+每个拦截器都有 `intercept()` 方法，它接收2个参数。 第一个是 `ExecutionContext` 实例（与守卫完全相同的对象）。 `ExecutionContext` 继承自 `ArgumentsHost` 。  `ArgumentsHost` 是传递给原始处理程序的参数的一个包装 ，它根据应用程序的类型包含不同的参数数组。你可以在[这里](/7/exceptionfilters.md?id=arguments-host)读更多关于它的内容（在异常过滤器章节中）。
 
 ## 执行上下文
 
-`ExecutionContext` 提供了更多功能，它扩展了 `ArgumentsHost`，但是也提供了有关当前执行过程的更多详细信息。
+通过扩展 `ArgumentsHost`，`ExecutionContext` 还添加了几个新的帮助程序方法，这些方法提供有关当前执行过程的更多详细信息。这些详细信息有助于构建可以在广泛的控制器，方法和执行上下文中使用的更通用的拦截器。`ExecutionContext` 在[此处](/7/fundamentals/execution-context)了解更多信息。
 
-```typescript
-export interface ExecutionContext extends ArgumentsHost {
-  getClass<T = any>(): Type<T>;
-  getHandler(): Function;
-}
-```
-
-`getHandler()` 方法返回对当前处理的处理程序的引用,而 `getClass()` 返回此特定处理程序所属的 `Controller` 类的类型。用另外的话来说,如果用户指向在 `CatsController` 中定义和注册的 `create()` 方法, `getHandler()` 将返回对 `create()` 方法的引用，在这种情况下, `getClass()` 将只返回一个 `CatsController` 的类型（不是实例）。
 
 ## 调用处理程序
 
@@ -82,7 +74,7 @@ export class CatsController {}
 
 由此，`CatsController` 中定义的每个路由处理程序都将使用 `LoggingInterceptor`。当有人调用 GET `/cats` 端点时，您将在控制台窗口中看到以下输出：
 
-```typescript
+```json
 Before...
 After... 1ms
 ```
@@ -117,10 +109,10 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     },
   ],
 })
-export class ApplicationModule {}
+export class AppModule {}
 ```
 
-!> 另一种选择是使用[执行上下文](/6/executioncontext.md)功能。另外，useClass 并不是处理自定义提供商注册的唯一方法。在[这里](/6/fundamentals.md)了解更多。
+!> 另一种选择是使用[执行上下文](/7/executioncontext)功能。另外，useClass 并不是处理自定义提供商注册的唯一方法。在[这里](/7/fundamentals.md)了解更多。
 
 ## 响应映射
 
@@ -154,7 +146,7 @@ export class TransformInterceptor<T> implements NestInterceptor<T, Response<T>> 
 
 之后，当有人调用GET `/cats`端点时，请求将如下所示（我们假设路由处理程序返回一个空 arry `[]`）：
 
-```
+```json
 {
     "data": []
 }
@@ -233,24 +225,32 @@ export class CacheInterceptor implements NestInterceptor {
 
 ## 更多操作者
 
-返回流的可能性为我们提供了许多可能性。让我们考虑另一个常见的用例。假设您想处理 **timeout** 。当端点在一段时间后没有返回任何内容时, 我们希望得到错误响应。
+使用 `RxJS` 运算符操作流的可能性为我们提供了许多功能。让我们考虑另一个常见的用例。假设您要处理路由请求超时。如果您的端点在一段时间后未返回任何内容，则您将以错误响应终止。以下构造可实现此目的：
 
 > timeout.interceptor.ts
 
 ```typescript
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { timeout } from 'rxjs/operators';
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler, RequestTimeoutException } from '@nestjs/common';
+import { Observable, throwError, TimeoutError } from 'rxjs';
+import { catchError, timeout } from 'rxjs/operators';
 
 @Injectable()
 export class TimeoutInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    return next.handle().pipe(timeout(5000))
-  }
-}
+    return next.handle().pipe(
+      timeout(5000),
+      catchError(err => {
+        if (err instanceof TimeoutError) {
+          return throwError(new RequestTimeoutException());
+        }
+        return throwError(err);
+      }),
+    );
+  };
+};
 ```
 
-5秒后，请求处理将被取消。
+5秒后，请求处理将被取消。您还可以在抛出之前添加自定义逻辑`RequestTimeoutException`（例如，释放资源）。
 
  ### 译者署名
 

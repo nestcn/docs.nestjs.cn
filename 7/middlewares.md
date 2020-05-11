@@ -56,8 +56,8 @@ export class AppModule implements NestModule {
       .apply(LoggerMiddleware)
       .forRoutes('cats');
   }
-}
 ```
+
 我们还可以在配置中间件时将包含路由路径的对象和请求方法传递给`forRoutes()`方法。我们为之前在`CatsController`中定义的`/cats`路由处理程序设置了`LoggerMiddleware`。我们还可以在配置中间件时将包含路由路径的对象和请求方法传递给 `forRoutes()`方法，从而进一步将中间件限制为特定的请求方法。在下面的示例中，请注意我们导入了 `RequestMethod`来引用所需的请求方法类型。
 
 > app.module.ts
@@ -84,11 +84,14 @@ export class AppModule implements NestModule {
 
 路由同样支持模式匹配。例如，星号被用作**通配符**，将匹配任何字符组合。
 
-```
+```typescript
 forRoutes({ path: 'ab*cd', method: RequestMethod.ALL });
 ```
 
 以上路由地址将匹配 `abcd` 、 `ab_cd` 、 `abecd` 等。字符 `?` 、 `+` 、 `*` 以及 `()` 是它们的正则表达式对应项的子集。连字符 (`-`) 和点 (`.`) 按字符串路径解析。
+
+
+?> 该 `fastify` 软件包使用该软件包的最新版本，该版本 `path-to-regexp` 不再支持通配符星号*。相反，您必须使用参数（例如(`.*`)，`:splat*`）。
 
 
 ## 中间件消费者
@@ -117,19 +120,23 @@ export class AppModule implements NestModule {
 
 ?> 该 `apply()` 方法可以使用单个中间件，也可以使用多个参数来指定多个**多个中间件**。
 
-我们可能经常希望将某些路由排除在中间件应用之外。当使用类定义中间件时(正如我们到目前为止所做的，而不是使用替代[函数式中间件](6/middlewares?id=函数式中间件)），我们可以使用该 `exclude()` 方法轻松地排除某些路由。该方法采用一个或多个对象标识要排除的 `path` 和 `method`，如下所示：
+有时我们想从应用中间件中排除某些路由。我们可以使用该 `exclude()` 方法轻松排除某些路线。此方法可以采用一个字符串，多个字符串或一个 `RouteInfo` 对象来标识要排除的路由，如下所示：
+
 
 ```typescript
 consumer
   .apply(LoggerMiddleware)
   .exclude(
     { path: 'cats', method: RequestMethod.GET },
-    { path: 'cats', method: RequestMethod.POST }
+    { path: 'cats', method: RequestMethod.POST },
+    'cats/(.*)',
   )
   .forRoutes(CatsController);
 ```
 
-通过上面的示例，`LoggerMiddleware` 将绑定到 `CatsController` 除了 `exclude()` 方法的两个内部定义的所有路由。请注意，该 `exclude()`方法不适用于函数中间件（在函数中而不是在类中定义的中间件;有关更多详细信息，请参阅下文）。此外，此方法不排除来自更通用路由（例如，通配符）的路径。如果您需要这种级别的控制，您应该将路径限制逻辑直接放入中间件，例如，访问请求的 `URL`以有条件地应用中间件逻辑。
+?> 该 `exclude()` 方法使用 `path-to-regexp` 包支持通配符参数。
+
+在上面的示例中，`LoggerMiddleware` 将绑定到内部定义的所有路由，`CatsController` 但传递给 `exclude()` 方法的三个路由除外。
 
 
 ## 函数式中间件
@@ -145,7 +152,7 @@ export function logger(req, res, next) {
 };
 ```
 
-现在在 `ApplicationModule` 中使用它。
+现在在 `AppModule` 中使用它。
 
 > app.module.ts
 

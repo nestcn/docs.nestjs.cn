@@ -16,7 +16,10 @@
 |imports|导入模块的列表，这些模块导出了此模块中所需提供者|
 |exports|由本模块提供并应在其他模块中可用的提供者的子集。|
 
-默认情况下, 模块**封装**提供者。这意味着如果提供者即不是当前模块的一部分, 也不是从另外模块(已导入)导出的，那么它就是无法注入的。
+
+默认情况下，该模块**封装**提供程序。这意味着无法注入既不是当前模块的直接组成部分，也不是从导入的模块导出的提供程序。因此，您可以将从模块导出的提供程序视为模块的公共接口或API。
+
+
 
 ## 功能模块
 
@@ -52,7 +55,7 @@ import { CatsModule } from './cats/cats.module';
 export class ApplicationModule {}
 ```
 
-现在 Nest 知道除了 `ApplicationModule` 之外，注册 `CatsModule` 也是非常重要的。 这就是我们现在的目录结构:
+现在 `Nest` 知道除了 `ApplicationModule` 之外，注册 `CatsModule` 也是非常重要的。 这就是我们现在的目录结构:
 
 ```text
 src
@@ -127,7 +130,7 @@ export class CatsModule {
 }
 ```
 
-但是，由于[循环依赖](/6/fundamentals?id=circular-dependency)性，模块类不能注入到提供者中。
+但是，由于[循环依赖](/7/fundamentals?id=circular-dependency.md)性，模块类不能注入到提供者中。
 
 ## 全局模块
 
@@ -153,7 +156,9 @@ export class CatsModule {}
 
 ## 动态模块
 
-`Nest` 模块系统带有一个称为动态模块的功能。 它使您能够毫不费力地创建可定制的模块。 让我们来看看 `DatabaseModule`：
+`Nest` 模块系统包括一个称为动态模块的强大功能。此功能使您可以轻松创建可自定义的模块，这些模块可以动态注册和配置提供程序。动态模块在这里广泛介绍。在[本章](/7/fundamentals/dynamic-modules)中，我们将简要概述以完成模块介绍。
+
+以下是一个动态模块定义的示例 `DatabaseModule`：
 
 ```typescript
 import { Module, DynamicModule } from '@nestjs/common';
@@ -177,8 +182,21 @@ export class DatabaseModule {
 
 ?> `forRoot()` 可以同步或异步（`Promise`）返回动态模块。
 
-此模块默认定义了 `Connection` 提供者，但另外 - 根据传递的 `options` 和 `entities` - 创建一个提供者集合，例如存储库。实际上，动态模块扩展了模块元数据。当您需要动态注册组件时，这个实质特性非常有用。然后你可以通过以下方式导入 `DatabaseModule`：
+此模块 `Connection` 默认情况下（在 `@Module()` 装饰器元数据中）定义提供程序，但此外-根据传递给方法的 `entities` 和 `options` 对象 `forRoot()` -公开提供程序的集合，例如存储库。请注意，动态模块返回的属性扩展（而不是覆盖）`@Module()` 装饰器中定义的基本模块元数据。这就是从模块导出静态声明的 `Connection` 提供程序和动态生成的存储库提供程序的方式。
 
+如果要在全局范围内注册动态模块，请将 `global` 属性设置为 `true`。
+```typescript
+{
+  global: true,
+  module: DatabaseModule,
+  providers: providers,
+  exports: providers,
+}
+```
+
+?> 如上所述，将所有内容全局化不是一个好的设计决策。
+
+所述 `DatabaseModule` 可以被导入，并且被配置以下列方式：
 ```typescript
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from './database/database.module';
@@ -187,10 +205,10 @@ import { User } from './users/entities/user.entity';
 @Module({
   imports: [DatabaseModule.forRoot([User])],
 })
-export class ApplicationModule {}
+export class AppModule {}
 ```
 
-为了导出动态模块，可以省略函数调用部分：
+如果要依次重新导出动态模块，则可以 `forRoot()` 在导出数组中省略方法调用：
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -201,8 +219,10 @@ import { User } from './users/entities/user.entity';
   imports: [DatabaseModule.forRoot([User])],
   exports: [DatabaseModule],
 })
-export class ApplicationModule {}
+export class AppModule {}
 ```
+
+[动态模块](/7/fundamentals/dynamic-modules)章介绍中更详细地在本主题，并且包括一个[实例](https://github.com/nestjs/nest/tree/master/sample/25-dynamic-modules)。
  ### 译者署名
 
 | 用户名 | 头像 | 职能 | 签名 |

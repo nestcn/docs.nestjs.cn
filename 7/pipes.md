@@ -9,17 +9,26 @@
 - **转换**：管道将输入数据转换为所需的数据输出
 - **验证**：对输入数据进行验证，如果验证成功继续传递; 验证失败则抛出异常;
 
-在这两种情况下, 管道 `参数(arguments)` 会由 [控制器(controllers)的路由处理程序](6/controllers?id=路由参数) 进行处理. Nest 会在调用这个方法之前插入一个管道，管道会先拦截方法的调用参数,进行转换或是验证处理，然后用转换好或是验证好的参数调用原方法。
+在这两种情况下, 管道 `参数(arguments)` 会由 [控制器(controllers)的路由处理程序](/7/controllers?id=路由参数) 进行处理. Nest 会在调用这个方法之前插入一个管道，管道会先拦截方法的调用参数,进行转换或是验证处理，然后用转换好或是验证好的参数调用原方法。
 
-?> 管道在异常区域内运行。这意味着当抛出异常时，它们由核心异常处理程序和应用于当前上下文的 [异常过滤器](6/exceptionfilters.md) 处理。当在 Pipe 中发生异常，controller 不会继续执行任何方法。
+?> 管道在异常区域内运行。这意味着当抛出异常时，它们由核心异常处理程序和应用于当前上下文的 [异常过滤器](/7/exceptionfilters) 处理。当在 Pipe 中发生异常，controller 不会继续执行任何方法。
 
 ## 内置管道
 
-`Nest` 自带三个开箱即用的管道，即 `ValidationPipe`，`ParseIntPipe` 和 `ParseUUIDPipe`。他们从 `@nestjs/common` 包中导出。为了更好地理解它们是如何工作的，我们将从头开始构建它们。
+`Nest` 自带五个个开箱即用的管道，即 
+
+- `ValidationPipe`
+- `ParseIntPipe`
+- `ParseBoolPipe`
+- `ParseArrayPipe`
+- `ParseUUIDPipe`
+
+
+他们从 `@nestjs/common` 包中导出。为了更好地理解它们是如何工作的，我们将从头开始构建它们。
 
 我们从 `ValidationPipe`. 开始。 首先它只接受一个值并立即返回相同的值，其行为类似于一个标识函数。
 
-> validation.pipe.ts
+> validate.pipe.ts
 
 ```typescript
 import { PipeTransform, Injectable, ArgumentMetadata } from '@nestjs/common';
@@ -43,9 +52,9 @@ export class ValidationPipe implements PipeTransform {
 
 ```typescript
 export interface ArgumentMetadata {
-  readonly type: 'body' | 'query' | 'param' | 'custom';
-  readonly metatype?: Type<any>;
-  readonly data?: string;
+  type: 'body' | 'query' | 'param' | 'custom';
+  metatype?: Type<unknown>;
+  data?: string;
 }
 ```
 
@@ -78,9 +87,9 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 ```typescript
 export class CreateCatDto {
-  readonly name: string;
-  readonly age: number;
-  readonly breed: string;
+  name: string;
+  age: number;
+  breed: string;
 }
 ```
 
@@ -106,10 +115,11 @@ $ npm install --save-dev @types/hapi__joi
 
 ```typescript
 import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException } from '@nestjs/common';
+import { ObjectSchema } from '@hapi/joi';
 
 @Injectable()
 export class JoiValidationPipe implements PipeTransform {
-  constructor(private readonly schema: Object) {}
+  constructor(private schema: ObjectSchema) {}
 
   transform(value: any, metadata: ArgumentMetadata) {
     const { error } = this.schema.validate(value);
@@ -135,7 +145,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 ## 类验证器
 
-!> 本节仅适用于 `TypeScript`
+!> 本节中的技术需要 `TypeScript` ，如果您的应用是使用原始 `JavaScript`编写的，则这些技术不可用。
 
 让我们看一下验证的另外一种实现方式
 
@@ -154,21 +164,21 @@ import { IsString, IsInt } from 'class-validator';
 
 export class CreateCatDto {
   @IsString()
-  readonly name: string;
+  name: string;
 
   @IsInt()
-  readonly age: number;
+  age: number;
 
   @IsString()
-  readonly breed: string;
+  breed: string;
 }
 ```
 
-?> 有关 class-validator decorators [在这里阅读更多](https://github.com/typestack/class-validator#usage)
+?> 在[此处](https://github.com/typestack/class-validator#usage)了解有关类验证器修饰符的更多信息。
 
 现在我们来创建一个 `ValidationPipe` 类。
 
-> validation.pipe.ts
+> validate.pipe.ts
 
 ```typescript
 import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException } from '@nestjs/common';
@@ -221,7 +231,7 @@ async create(@Body(new ValidationPipe()) createCatDto: CreateCatDto) {
 
 当验证逻辑仅涉及一个指定的参数时，参数范围的管道非常有用。要在方法级别设置管道，您需要使用 `UsePipes()` 装饰器。
 
-> cats.controler.ts
+> cats.controller.ts
 
 ```typescript
 @Post()
@@ -258,7 +268,7 @@ async function bootstrap() {
 bootstrap();
 ```
 
-!> 在 [混合应用](6/faq?id=混合应用)中 `useGlobalPipes()` 方法不会为网关和微服务设置管道, 对于标准(非混合) 微服务应用使用 `useGlobalPipes()` 全局设置管道。
+!> 在 [混合应用](/7/faq?id=混合应用)中 `useGlobalPipes()` 方法不会为网关和微服务设置管道, 对于标准(非混合) 微服务应用使用 `useGlobalPipes()` 全局设置管道。
 
 全局管道用于整个应用程序、每个控制器和每个路由处理程序。就依赖注入而言，从任何模块外部注册的全局管道（如上例所示）无法注入依赖，因为它们不属于任何模块。为了解决这个问题，可以使用以下构造直接为任何模块设置管道：
 
@@ -279,7 +289,7 @@ import { APP_PIPE } from '@nestjs/core';
 export class AppModule {}
 ```
 
-?> 请注意使用上述方式依赖注入时，请牢记无论你采用那种结构模块管道都是全局的，那么它应该放在哪里呢？使用 `ValidationPipe` 定义管道 另外，useClass 并不是处理自定义提供者注册的唯一方法。在[这里](6/fundamentals?id=custom-providers)了解更多。
+?> 请注意使用上述方式依赖注入时，请牢记无论你采用那种结构模块管道都是全局的，那么它应该放在哪里呢？使用 `ValidationPipe` 定义管道 另外，useClass 并不是处理自定义提供者注册的唯一方法。在[这里](7/fundamentals?id=custom-providers)了解更多。
 
 ## 转换管道
 
@@ -346,50 +356,7 @@ findOne(@Param('id', UserByIdPipe) userEntity: UserEntity) {
 
 ## 内置验证管道
 
-幸运的是，由于 `ValidationPipe` 和 `ParseIntPipe` 是内置管道，因此您不必自己构建这些管道（请记住， `ValidationPipe` 需要同时安装 `class-validator` 和 `class-transformer` 包）。
-
-内置的 `ValidationPipe` 提供了比本章描述的更多的选项，为了简单和减少学习曲线，这些选项一直保持基本。你可以在[这里](https://docs.nestjs.com/techniques/validation)查看很多例子。
-
-另一个选项是**转换**，回想一下前面提到过的反序列化 body 数据没有验证类型（DTO 定义）。到目前为止我们已经使用管道来验证数据，你可能还记得在这个过程中，我们用`class-transform`把普通对象转换为 DTO 可验证对象来进行验证。内置的 `ValidationPipe` 也可以返回转换后的对象，该对象 **transform** 的值为 **true**，如下所示：
-
-> cats.controller.ts
-
-```typescript
-@Post()
-@UsePipes(new ValidationPipe({ transform: true }))
-async create(@Body() createCatDto: CreateCatDto) {
-  this.catsService.create(createCatDto);
-}
-```
-
-?> `ValidationPipe` 是从 `@nestjs/common` 包中导入的。
-
-因为这个管道是基于 `class-validator` 和 `class-transformer` 库的，所以有很多选项可配置。选项如下：
-
-```typescript
-export interface ValidationPipeOptions extends ValidatorOptions {
-  transform?: boolean;
-  disableErrorMessages?: boolean;
-  exceptionFactory?: (errors: ValidationError[]) => any;
-}
-```
-
-下面是 `transform` 属性和所有 `class-validator` 选项（从 `ValidatorOptions` 接口继承）：
-
-| 参数                     | 类型       | 描述                                                                                 |
-| ------------------------ | ---------- | ------------------------------------------------------------------------------------ |
-| `skipMissingProperties`  | `boolean`  | 如果设置为 true，则验证程序将跳过验证对象中缺少的属性的验证。                        |
-| `whitelist`              | `boolean`  | 如果设置为 true，则验证程序将除去未使用任何装饰器的属性的已验证对象。                |
-| `forbidNonWhitelisted`   | `boolean`  | 如果设置为 true，则验证程序将引发异常，而不是取消非白名单属性。                      |
-| `forbidUnknownValues`    | `boolean`  | 如果设置为 true，未知对象的验证将立即失败。                                          |
-| `disableErrorMessages`   | `boolean`  | 如果设置为 true，验证错误将不会转发到客户端。                                        |
-| `exceptionFactory`       | `Function` | 设置异常的工厂方法，用来定义并返回要抛出的异常信息。                                 |
-| `groups`                 | `string[]` | 验证对象期间要使用的组。                                                             |
-| `dismissDefaultMessages` | `boolean`  | 如果设置为 true，验证将不使用默认消息。如果错误消息未显式设置，则为 `undefined` 的。 |
-| `validationError.target` | `boolean`  | 目标是否应在 `ValidationError` 中展示                                                |
-| `validationError.value`  | `boolean`  | 验证值是否应在 `ValidationError` 中展示。                                            |
-
-?> 您可以在他的[库](https://github.com/typestack/class-validator)中找到关于 `class-validator` 包的更多信息。。
+幸运的是，由于 `ValidationPipe` 和 `ParseIntPipe` 是内置管道，因此您不必自己构建这些管道（请记住， `ValidationPipe` 需要同时安装 `class-validator` 和 `class-transformer` 包）。与本章中构建ValidationPipe的示例相比，该内置的功能提供了更多的选项，为了说明管道的基本原理，该示例一直保持基本状态。您可以在[此处](/7/techniques/validation)找到完整的详细信息以及许多示例。
 
 ### 译者署名
 

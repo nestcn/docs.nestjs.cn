@@ -5,7 +5,7 @@
 
 ![](https://docs.nestjs.com/assets/Filter_1.png)
 
-每个发生的异常都由全局异常过滤器处理, 当这个异常**无法被识别**时 (既不是 `HttpException` 也不是继承的类 `HttpException` ) , 用户将收到以下 JSON 响应:
+开箱即用，此操作由内置的全局异常过滤器执行，该过滤器处理类型 `HttpException`（及其子类）的异常。每个发生的异常都由全局异常过滤器处理, 当这个异常**无法被识别**时 (既不是 `HttpException` 也不是继承的类 `HttpException` ) , 用户将收到以下 `JSON` 响应:
 
 ```json
 {
@@ -44,7 +44,7 @@ async findAll() {
 
 - `response` 参数定义 `JSON` 响应体。它可以是 `string` 或 `object`，如下所述。
 
-- `status`参数定义`HTTP`状态代码。
+- `status`参数定义`HTTP`[状态代码](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)。
 
 默认情况下，`JSON` 响应主体包含两个属性：
 
@@ -68,7 +68,7 @@ async findAll() {
   throw new HttpException({
     status: HttpStatus.FORBIDDEN,
     error: 'This is a custom message',
-  }, 403);
+  }, HttpStatus.FORBIDDEN);
 }
 ```
 
@@ -164,16 +164,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
  ## 参数主机
 
- 让我们看看 `catch()`方法的参数。`exception`参数是当前正在处理的异常对象。`host` 参数是一个 `ArgumentsHost` 对象。ArgumentsHost 是传递给原始处理程序的参数的一个包装 ，我们将在其他章节中进一步讨论它。在这个上下文中，它的主要目的是为我们提供一个 `Request` 和 `Response` 对象的引用，这些对象被传递给原始请求处理程序(在产生异常的控制器中)。在本文中，我们使用了 `ArgumentsHost`上的一些帮助方法来获得所需的`Request` 和 `Response` 对象。
+ 让我们看一下该 `catch()` 方法的参数。该 `exception` 参数是当前正在处理的异常对象。该host参数是一个 `ArgumentsHost` 对象。 `ArgumentsHost` 是一个功能强大的实用程序对象，我们将在执行上下文章节 *中进一步进行研究。在此代码示例中，我们使用它来获取对 `Request` 和 `Response` 对象的引用，这些对象被传递给原始请求处理程序（在异常发生的控制器中）。在此代码示例中，我们使用了一些辅助方法 `ArgumentsHost` 来获取所需的 `Request` 和 `Response` 对象。`ArgumentsHost` 在此处了解更多信息。
 
- `switchtohttp()` 返回一个 `HttpArgumentsHost` 对象。`HttpArgumentsHost` 对象有两个方法。我们使用这些方法来提取所需的对象，在本例中还使用了 `Express` 类型断言来返回原生的 `Express`类型化对象:
-
-```typescript
-const response = ctx.getResponse<Response>();
-const request = ctx.getRequest<Request>();
-```
-
-这种抽象级别的原因是 `ArgumentsHost` 在所有上下文中都起作用（例如，我们现在正在使用的`HTTP Server `上下文，以及`微服务`和 `Sockets`）。 稍后，我们将看到如何利用`ArgumentsHost`及其辅助函数的功能为任何执行上下文访问适当的基础参数。 这将使我们能够编写可在所有上下文中运行的通用异常过滤器。
+之所以如此抽象，是因为它 `ArgumentsHost` 可以在所有上下文中使用（例如，我们现在正在使用的 `HTTP` 服务器上下文，以及微服务和 `WebSocket` ）。在执行上下文章中，我们会看到我们如何可以访问相应的基础参数进行任何与动力执行上下文 `ArgumentsHost` 和它的辅助功能。这将使我们能够编写可在所有上下文中运行的通用异常过滤器。
 
 
 ## 绑定过滤器
@@ -249,7 +242,7 @@ import { APP_FILTER } from '@nestjs/core';
 })
 export class AppModule {}
 ```
-?>当使用此方法对过滤器执行依赖注入时，请注意，无论采用哪种结构的模块，过滤器实际上都是全局的。 应该在哪里做？ 选择定义了过滤器（以上示例中为 `HttpExceptionFilter`）的模块。 同样，`useClass`不是处理自定义提供程序注册的唯一方法。 在[这里](/6/fundamentals.md?id=定制提供者)了解更多。
+?>当使用此方法对过滤器执行依赖注入时，请注意，无论采用哪种结构的模块，过滤器实际上都是全局的。 应该在哪里做？ 选择定义了过滤器（以上示例中为 `HttpExceptionFilter`）的模块。 同样，`useClass`不是处理自定义提供程序注册的唯一方法。 在[这里](/7/fundamentals/custom-providers)了解更多。
 
 您可以根据需要添加任意数量的过滤器;只需将每个组件添加到 `providers`（提供者）数组。
 
@@ -260,7 +253,13 @@ export class AppModule {}
 > any-exception.filter.ts
 
 ```typescript
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  ExceptionFilter,
+  Catch,
+  ArgumentsHost,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {

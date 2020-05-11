@@ -18,6 +18,7 @@
 | `@Body(param?: string)`                     | `req.body / req.body[param]`                   |
 | `@Query(param?: string)`                   | `req.query / req.query[param]`                 |
 | `@Headers(param?: string)`　　　　　　　   　　| `req.headers / req.headers[param]`　　　　　　　 |
+| `@Ip()`| `req.ip` | 
 
 另外，你还可以创建**自定义装饰器**。为什么它很有用呢？
 
@@ -32,11 +33,14 @@ const user = req.user;
 > user.decorator.ts
 
 ```typescript
-import { createParamDecorator } from '@nestjs/common';
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
-export const User = createParamDecorator((data, req) => {
-  return req.user;
-});
+export const User = createParamDecorator(
+  (data: unknown, ctx: ExecutionContext) => {
+    const request = ctx.switchToHttp().getRequest();
+    return request.user;
+  },
+);
 ```
 
 现在你可以在任何你想要的地方很方便地使用它。
@@ -67,11 +71,16 @@ async findOne(@User() user: UserEntity) {
 > user.decorator.ts
 
 ```typescript
-import { createParamDecorator } from '@nestjs/common';
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
-export const User = createParamDecorator((data: string, req) => {
-  return data ? req.user && req.user[data] : req.user;
-});
+export const User = createParamDecorator(
+  (data: string, ctx: ExecutionContext) => {
+    const request = ctx.switchToHttp().getRequest();
+    const user = request.user;
+
+    return data ? user && user[data] : user;
+  },
+);
 ```
 
 然后，您可以通过控制器中的 `@User()` 装饰器访问以下特定属性：
@@ -85,6 +94,8 @@ async findOne(@User('firstName') firstName: string) {
 
 您可以使用具有不同键的相同装饰器来访问不同的属性。如果用户对象复杂，这可以使请求处理程序实现更容易、更可读。
 
+?> 对于 `TypeScript` 用户，请注意这 `createParamDecorator<T>()` 是通用的。这意味着您可以显式实施类型安全性，例如 `createParamDecorator<string>((data, ctx) => ...)`或者，在工厂功能中指定参数类型，例如`createParamDecorator((data: string, ctx) => ...)` 。如果省略这两个，该类型 `data` 会 `any`。
+
 ## 使用管道
 
 `Nest` 对待自定义的路由参数装饰器和这些内置的装饰器（`@Body()`，`@Param()` 和 `@Query()`）一样。这意味着管道也会因为自定义注释参数（在本例中为 `user` 参数）而被执行。此外，你还可以直接将管道应用到自定义装饰器上： 
@@ -95,6 +106,34 @@ async findOne(@User(new ValidationPipe()) user: UserEntity) {
   console.log(user);
 }
 ```
+
+`Nest` 提供了一种辅助方法来组成多个装饰器。例如，假设您要将与身份验证相关的所有装饰器组合到一个装饰器中。这可以通过以下构造完成：
+
+```typescript
+import { applyDecorators } from '@nestjs/common';
+
+export function Auth(...roles: Role[]) {
+  return applyDecorators(
+    SetMetadata('roles', roles),
+    UseGuards(AuthGuard, RolesGuard),
+    ApiBearerAuth(),
+    ApiUnauthorizedResponse({ description: 'Unauthorized"' }),
+  );
+}
+```
+
+然后，您可以 `@Auth()` 按以下方式使用此自定义装饰器：
+
+```typescript
+@Get('users')
+@Auth('admin')
+findAllUsers() {}
+```
+
+这具有通过一个声明应用所有四个装饰器的效果。
+
+包装中的 `@ApiHideProperty()` 装饰器 `@nestjs/swagger` 无法组合，因此无法正常使用该 `applyDecorators` 功能。
+
 
  ### 译者署名
 

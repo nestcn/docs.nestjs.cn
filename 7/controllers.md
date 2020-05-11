@@ -6,11 +6,11 @@
 
 控制器的目的是接收应用的特定请求。**路由**机制控制哪个控制器接收哪些请求。通常，每个控制器有多个路由，不同的路由可以执行不同的操作。
 
-为了创建一个基本的控制器，我们必须使用`装饰器`。装饰器将类与所需的元数据关联，并使 `Nest` 能够创建路由映射（将请求绑定到相应的控制器）。
+为了创建一个基本的控制器，我们使用类和`装饰器`。装饰器将类与所需的元数据相关联，并使 `Nest` 能够创建路由映射（将请求绑定到相应的控制器）。
 
 ## 路由
 
-在下面的例子中，我们使用了定义基本控制器所需的 `@Controller('cats')` 装饰器。我们将可选前缀设置为 `cats`。使用前缀可以避免在所有路由共享通用前缀时出现冲突的情况。我们将使用 `@Controller()` 装饰器，这是定义基本控制器所必需的。我们将指定一个路径前缀(可选) `cats`。在 `@Controller()` 装饰器中使用路径前缀，它允许我们轻松对一组相关路由进行分组，并减少重复代码。例如，我们可以选择管理该路由下的客户实体的交互的这部分进行分组 `/customers` ，这样, 我们可以在 `@Controller()` 装饰器中指定路径前缀, 这样我们就不必为文件中的每个路由重新定义前缀。
+在下面的例子中，我们使用控制器所需的 `@Controller()` 装饰器。可选前缀设置为 `cats`。在 `@Controller()` 装饰器中使用路径前缀可以使我们轻松地对一组相关的路由进行分组，并最大程度地减少重复代码。例如，我们可以选择对一组路由进行分组，这些路由管理与该路由下的客户实体的交互 `/customers`。在这种情况下，我们可以 `customers`在 `@Controller()`装饰器中指定路径前缀，这样就不必为文件中的每个路由重复路径的那部分。
 
 
 > cats.controller.ts
@@ -38,7 +38,7 @@ export class CatsController {
 |         |    |
 | -------------   | :----: |
 | 标准（推荐）|   使用这个内置方法，当请求处理程序返回一个 `JavaScript` 对象或数组时，它将自动序列化为 `JSON`。但是，当它返回一个 `JavaScript` 基本类型(例如`string、number、boolean`)时，`Nest` 将只发送值，而不尝试序列化它。这使响应处理变得简单：只需要返回值，其余的由 `Nest`负责。|
-| | 此外，响应的状态码默认情况下始终为 `200`，但使用 `201` 的 `POST`请求除外。我们可以通过在处理程序级别添加 `@HttpCode(...)` 装饰器来轻松更改此行为 （[状态代码](/6/controllers?id=状态码)）|
+| | 此外，响应的状态码默认情况下始终为 `200`，但使用 `201` 的 `POST`请求除外。我们可以通过在处理程序级别添加 `@HttpCode(...)` 装饰器来轻松更改此行为 （[状态代码](/7/controllers?id=状态码)）|
 | 类库特有的 |  我们可以在函数签名通过 `@Res()` 注入类库特定的 响应对象（例如，`Express`），使用此函数，您具有使用该对象的响应处理函数。例如，使用  `Express`，您可以使用类似代码构建响应 `response.status(200).send()`     |
 
 !> 注意！ 禁止同时使用这两种方法。 `Nest` 检测处理程序是否正在使用 `@Res()`或 `@Next()`，如果两个方法都用了的话, 那么在这里的标准方式就是自动禁用此路由, 你将不会得到你想要的结果。
@@ -70,17 +70,18 @@ export class CatsController {
 |||
 |----------|-----------|
 |`@Request()`	|`req`|
-|`@Response()`	|`res`|
+|`@Response() @Res()*`	|`res`|
 |`@Next()`	|`next`|
 |`@Session()`	|`req.session`|
 |`@Param(key?: string)`	|`req.params` / `req.params[key]`       |
 |`@Body(key?: string)`	|`req.body` / `req.body[key]`|
 |`@Query(key?: string)`	|`req.query` / `req.query[key]`|
 |`@Headers(name?: string)`	|`req.headers` / `req.headers[name]`|
+|`@Ip()`| `req.ip`|
 
 为了与底层 `HTTP`平台(如 `Express`和 `Fastify`)之间的类型兼容，`Nest` 提供了 `@Res()`和 `@Response()` 装饰器。`@Res()`只是 `@Response()`的别名。两者都直接公开底层响应对象接口。在使用它们时，您还应该导入底层库的类型(例如：`@types/express`)以充分利用它们。注意，在方法处理程序中注入 `@Res()`或 `@Response()` 时，将 `Nest`置于该处理程序的特定于库的模式中，并负责管理响应。这样做时，必须通过调用响应对象(例如，`res.json(…)`或 `res.send(…)`)发出某种响应，否则HTTP服务器将挂起。
 
-?> 想要了解如何创建自定义的装饰器，阅读[这一章](/6/customdecorators)。
+?> 想要了解如何创建自定义的装饰器，阅读[这一章](/7/customdecorators)。
 
 ## 资源
 
@@ -203,16 +204,41 @@ findOne(@Param('id') id): string {
   return `This action returns a #${id} cat`;
 }
 ```
+## 子域路由
+`@Controller` 装饰器可以接受一个 `host` 选项，以要求传入请求的 `HTTP` 主机匹配某个特定值。
+
+```typescript
+@Controller({ host: 'admin.example.com' })
+export class AdminController {
+  @Get()
+  index(): string {
+    return 'Admin page';
+  }
+}
+```
+?> 因为 `Fastify` 缺乏对嵌套路由器的支持，当使用子域路由时，应该使用(默认) `Express` 适配器。
+
+与路由类似 `path` ，该 `hosts` 选项可以使用令牌来捕获主机名中该位置的动态值。`@Controller()` 下面的装饰器示例中的主机参数令牌演示了此用法。可以使用`@HostParam()` 装饰器访问以这种方式声明的主机参数，该装饰器应添加到方法签名中。
+
+```typescript
+@Controller({ host: ':account.example.com' })
+export class AccountController {
+  @Get()
+  getInfo(@HostParam('account') account: string) {
+    return account;
+  }
+
+```
 
 ## 作用域
 
 对于来自不同编程语言背景的人来说，了解在 `Nest` 中几乎所有内容都可以在传入的请求之间共享，这让人意外。比如我们有一个数据库连接池，具有全局状态的单例服务等。请记住，`Node.js` 不遵循请求/响应多线程无状态模型，每个请求都由主线程处理。因此，使用单例实例对我们的应用程序来说是完全安全的。
 
-但是，存在基于请求的控制器生命周期可能是期望行为的边缘情况，例如 `GraphQL` 应用程序中的请求缓存，比如请求跟踪或多租户。在[这里](/6/fundamentals/id=注入作用域)学习如何控制作用域。
+但是，存在基于请求的控制器生命周期可能是期望行为的边缘情况，例如 `GraphQL` 应用程序中的请求缓存，比如请求跟踪或多租户。在[这里](/7/fundamentals/id=注入作用域)学习如何控制作用域。
 
 ## Async / await
 
-我们喜欢现代 `JavaScript`，而且我们知道数据读取大多是**异步**的。 这就是为什么 `Nest` 支持 `async` 并且与他们一起工作得非常好。
+我们使用`JavaScript`的时候，数据读取大多是**异步**的。这就是为什么 `Nest` 支持 `async` 功能并与功能完美配合的原因。
 
 ?> 了解更多关于 `Async / await` 请点击[这里](https://kamilmysliwiec.com/typescript-2-1-introduction-async-await)
 
@@ -271,7 +297,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 ## 处理错误
 
-这里有一章关于[处理错误](/6/exceptionfilters)（即处理异常）的单独章节。
+这里有一章关于[处理错误](/7/exceptionfilters)（即处理异常）的单独章节。
 
 ## 完整示例
 

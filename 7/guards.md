@@ -124,7 +124,7 @@ import { APP_GUARD } from '@nestjs/core';
 export class AppModule {}
 ```
 
-?> 当使用此方法为守卫程序执行依赖项注入时，请注意，无论使用此构造的模块是什么，守卫程序实际上是全局的。应该在哪里进行?选择定义守卫的模块(上例中的 `RolesGuard`)。此外，`useClass`不是处理自定义 `providers` 注册的唯一方法。在[这里](/6/fundamentals.md?id=自定义providercustomer-provider)了解更多。
+?> 当使用此方法为守卫程序执行依赖项注入时，请注意，无论使用此构造的模块是什么，守卫程序实际上是全局的。应该在哪里进行?选择定义守卫的模块(上例中的 `RolesGuard`)。此外，`useClass`不是处理自定义 `providers` 注册的唯一方法。在[这里](/7/fundamentals?id=自定义providercustomer-provider)了解更多。
 
 ## 反射器
 
@@ -172,12 +172,11 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 ```typescript
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
-import { Observable } from 'rxjs';
 import { Reflector } from '@nestjs/core';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private readonly reflector: Reflector) {}
+  constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
     const roles = this.reflector.get<string[]>('roles', context.getHandler());
@@ -186,24 +185,20 @@ export class RolesGuard implements CanActivate {
     }
     const request = context.switchToHttp().getRequest();
     const user = request.user;
-    const hasRole = () => user.roles.some((role) => roles.includes(role));
-    return user && user.roles && hasRole();
+    return matchRoles(roles, user.roles);
   }
 }
 ```
 
 ?> 在 `node.js` 世界中，将授权用户附加到 `request` 对象是一种常见的做法。 因此，在上面的示例代码中。我们假设 `request.user` 包含用户实例和允许的角色。 在您的应用中，您可能会在自定义身份验证（或中间件）中建立该关联。
 
-键是 `roles`;返回到 `roles.decorator.ts` 文件和在那里进行的 `SetMetadata()` 调用。在上面的示例中，我们传递了 `context.getHandler()`，以便为当前处理的请求方法提取元数据。请记住，`getHandler()`为我们提供了对路由处理程序函数的引用。
-
-反射器 `Reflector` 允许我们很容易地通过指定的键轻松访问元数据。 键是 `roles`;返回到`roles.decorator.ts` 文件和在那里进行的 `SetMetadata()` 调用。在上面的示例中，我们传递了 `context.getHandler()`，以便为当前处理的请求方法提取元数据。请记住，`getHandler()`为我们提供了对路由处理程序函数的引用。
-
-```typescript
-const roles = this.reflector.get<string[]>('roles', context.getClass());
-```
+?> `matchRoles()` 函数内部的逻辑可以根据需要简单或复杂。该示例的重点是显示防护如何适应请求/响应周期。
 
 现在，当用户尝试在没有足够权限的情况下调用 `/cats` POST端点时，`Nest` 会自动返回以下响应：
 
+有关以上下文相关方式进行利用的更多详细信息，请参见“ 执行”上下文章节的“ 反射和元数据”部分。
+
+当特权不足的用户请求端点时，Nest自动返回以下响应：
 ```json
 {
   "statusCode": 403,

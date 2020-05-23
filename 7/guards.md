@@ -32,7 +32,7 @@ export class AuthGuard implements CanActivate {
 ```
 `validateRequest()` 函数中的逻辑可以根据需要变得简单或复杂。本例的主要目的是说明保护如何适应请求/响应周期。
 
-每个保护必须实现一个canActivate()函数。此函数应该返回一个布尔值，指示是否允许当前请求。它可以同步或异步地返回响应(通过 `Promise` 或 `Observable`)。`Nest`使用返回值来控制下一个行为:
+每个守卫必须实现一个canActivate()函数。此函数应该返回一个布尔值，指示是否允许当前请求。它可以同步或异步地返回响应(通过 `Promise` 或 `Observable`)。`Nest`使用返回值来控制下一个行为:
 
 - 如果返回 `true`, 将处理用户调用。
 - 如果返回 `false`, 则 `Nest` 将忽略当前处理的请求。

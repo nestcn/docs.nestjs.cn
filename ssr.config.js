@@ -14,6 +14,7 @@ module.exports = {
     loadSidebar: true,
     loadNavbar: true,
     mergeNavbar: true,
+    routerMode: 'history',
     maxLevel: 4,
     subMaxLevel: 2,
     name: 'docsify',

@@ -6,9 +6,9 @@
 
 基本上，每个本机（特定于平台的）`HTTP` 服务器/库实例都包含在 `adapter`（适配器）中。适配器注册为全局可用的提供程序，可以从应用程序上下文中提取，也可以轻松地注入其他提供程序。
 
-### 外部策略
+### 外部应用上下文策略
 
-为了 `HttpAdapter` 从应用程序上下文中获取，您可以调用 `getHttpAdapter()` 方法。
+为了从应用程序上下文外部获取 `HttpAdapter` 引用，您可以调用 `getHttpAdapter()` 方法。
 
 ```typescript
 const app = await NestFactory.create(ApplicationModule);
@@ -19,26 +19,25 @@ const httpAdapter = app.getHttpAdapter();
 ### 上下文策略
 
 
-为了 `HttpAdapterHost` 从应用程序上下文中获取，您可以采用与任何其他现有提供程序相同的方式注入它（例如，通过 `constructor`）。
+为了从应用程序上下文中获取`HttpAdapterHost` 引用，您可以采用与任何其他现有提供程序相同的方式注入它（例如，通过 `constructor`注入）。
 
 ```typescript
 export class CatsService {
-  constructor(private readonly adapterHost: HttpAdapterHost) {}
+  constructor(private adapterHost: HttpAdapterHost) {}
 }
 ```
 
 !> `HttpAdapterHost` 需要从 `@nestjs/core` 导入包。
 
-### 适配器主机
 
-到目前为止，我们已经学会了如何获得 `HttpAdapterHost` 。但是，它仍然不是真实的 `HttpAdapter` 。为了获得 `HttpAdapter` ，只需访问该 `httpAdapter` 属性。
+`HttpAdapterHost` 不是真实的 `HttpAdapter` 。为了获得 `HttpAdapter` ，只需访问该 `httpAdapter` 属性。
 
 ```typescript
 const adapterHost = app.get(HttpAdapterHost);
 const httpAdapter = adapterHost.httpAdapter;
 ```
 
-这 `httpAdapter` 是底层框架使用的 `HTTP` 适配器的实际实例。它可以是 `ExpressAdapter` 或 `FastifyAdapter`（两个类都扩展了 `AbstractHttpAdapter`）。
+该 `httpAdapter` 是底层框架使用的 `HTTP` 适配器的实际实例。它可以是 `ExpressAdapter` 或 `FastifyAdapter`的实例（两个类都扩展了自`AbstractHttpAdapter`）。
 
 每个适配器都公开了几种与 `HTTP` 服务器交互的有用方法。尽管如此，如果您想直接访问库引用，请调用 `getInstance()` 方法。
 
@@ -58,7 +57,7 @@ app.setGlobalPrefix('v1');
 
 ## 混合应用
 
-混合应用程序是一个应用程序，它监听 `HTTP` 请求，可以通过实例 `connectMicroservice()` 函数将 `INestApplication` 与 `INestMicroservice` 实例的无限计数结合起来。
+混合应用程序是一个应用程序，它监听 `HTTP` 请求，可以通过 `connectMicroservice()` 函数将 `INestApplication` 实例与 `INestMicroservice` 实例结合起来。
 
 ```typescript
 const app = await NestFactory.create(ApplicationModule);
@@ -70,11 +69,34 @@ await app.startAllMicroservicesAsync();
 await app.listen(3001);
 ```
 
+要连接多个微服务实例，要为每个微服务调用`connectMicroservice()`方法：
+
+```typescript
+const app = await NestFactory.create(AppModule);
+// microservice #1
+const microserviceTcp = app.connectMicroservice<MicroserviceOptions>({
+  transport: Transport.TCP,
+  options: {
+    port: 3001,
+  },
+});
+// microservice #2
+const microserviceRedis = app.connectMicroservice<MicroserviceOptions>({
+  transport: Transport.REDIS,
+  options: {
+    url: 'redis://localhost:6379',
+  },
+});
+
+await app.startAllMicroservicesAsync();
+await app.listen(3001);
+```
+
 ## HTTPS 和多服务器
 
 ### HTTPS
 
-为了创建使用 `HTTPS` 协议的应用程序，我们必须传递一个 `options` 对象：
+为了创建使用 `HTTPS` 协议的应用程序，在传递给`NestFactory`的`create()`方法中设置`httpsOptions`属性：
 
 ```typescript
 const httpsOptions = {
@@ -86,7 +108,7 @@ const app = await NestFactory.create(ApplicationModule, {
 });
 await app.listen(3000);
 ```
-如果使用Fastify，则创建 `app` 如下代码：
+如果使用`FastifyAdapter`，则创建应用如下：
 
 ```typescript
 const app = await NestFactory.create<NestFastifyApplication>(
@@ -95,7 +117,8 @@ const app = await NestFactory.create<NestFastifyApplication>(
 );
 ```
 ### 多个同步服务器
-对库实例的完全控制提供了一种简单的方法来创建同时监听多个不同端口的服务器。
+
+下列方法展示了如何使用Nest应用同时监视多个端口（例如，在非HTTPS端口和HTTPS端口）。
 
 ```typescript
 const httpsOptions = {
@@ -113,7 +136,9 @@ await app.init();
 http.createServer(server).listen(3000);
 https.createServer(httpsOptions, server).listen(443);
 ```
-!> `ExpressAdapter` 需要从 `@nestjs/platform-express` 包导入。
+?> `ExpressAdapter` 需要从 `@nestjs/platform-express` 包导入。`http`和`https`包是原生的Node.js包。
+
+!> `GraphQL Subscriptions` 中该方法无法工作。
 
 ## 请求生命周期
 
@@ -213,4 +238,4 @@ export class CatsController {
 | [@zuohuadong](https://github.com/zuohuadong)  | <img class="avatar-66 rm-style" src="https://i.loli.net/2020/03/24/ed8yXDRGni4paQf.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
 | [@Drixn](https://drixn.com/)  | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">  |  翻译  | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/) |  [@Drixn](https://drixn.com/)  | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">  |  翻译  | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/) |
 | [@Armor](https://github.com/Armor-cn)  | <img class="avatar-66 rm-style" height="70" src="https://avatars3.githubusercontent.com/u/31821714?s=460&v=4">  |  翻译  | 专注于 Java 和 Nest，[@Armor](https://armor.ac.cn/) | 
-| [@weizy0219](https://github.com/weizy0219)  | <img class="avatar-66 rm-style" src="https://avatars0.githubusercontent.com/u/19883738?s=400&v=4">  |  翻译  | 专注于TypeScript全栈和Python数据科学，[@weizhiyong](https://www.weizhiyong.com)  |
+| [@weizy0219](https://github.com/weizy0219)  | <img class="avatar-66 rm-style" height="70" src="https://avatars3.githubusercontent.com/u/19883738?s=60&v=4">  |  翻译  | 专注于TypeScript全栈、物联网和Python数据科学，[@weizhiyong](https://www.weizhiyong.com) |

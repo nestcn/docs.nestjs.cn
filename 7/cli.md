@@ -6,7 +6,7 @@
 
 ### 安装
 
-注意:在本指南中，我们描述了如何使用 [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) 来安装包，包括 `Nest CLI`。您可以自行决定是否使用其他包管理器。使用 `npm`，您可以使用几个选项来管理操作系统命令行如何解析嵌套 `CLI` 二进制文件的位置。在这里，我们描述了使用 `-g` 选项全局安装 `nest` 二进制文件。这提供了一种方便方法，也是我们在整个文档中所采用的方法。请注意，全局安装`anynpm` 包将确保运行正确版本的责任留给了用户。这还意味着，如果您有不同的项目，每个项目将运行相同版本的 `CLI` 。一个合理的替代方法是使用 [npx](https://github.com/npm/npx) 程序(或与其他包管理器类似的特性)来确保运行托管版本的 `Nest CLI` 。我们建议您参考 `npx` 文档或您的 `DevOps` 支持人员以获得更多信息。
+注意:在本指南中，我们描述了如何使用 [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) 来安装包，包括 `Nest CLI`。您可以自行决定是否使用其他包管理器。使用 `npm`，您可以使用几个选项来管理操作系统命令行如何解析 `nest CLI` 二进制文件的位置。在这里，我们描述了使用 `-g` 选项全局安装 `nest` 二进制文件。这提供了一种方便方法，也是我们在整个文档中所采用的方法。请注意，全局安装任何`npm` 包将确保运行正确版本的责任留给了用户。这还意味着，如果您有不同的项目，每个项目将运行相同版本的 `CLI` 。一个合理的替代方法是使用 [npx](https://github.com/npm/npx) 程序(或与其他包管理器类似的特性)来确保运行托管版本的 `Nest CLI` 。我们建议您参考 `npx` 文档或您的 `DevOps` 支持人员以获得更多信息。
 
 使用 `npm Install -g` 命令全局安装 `CLI` (有关全局安装的详细信息，请参阅上面的说明)。
 
@@ -97,7 +97,7 @@ $ nest n my-nest-project -d
 | `start` || 编译并运行应用程序（或 `workspace` 中的默认项目）。 |
 | `add` || 导入已打包为`nest`的库，运行其安装示意图。|
 | `update`|`u`| 更新包中的 `@nestjs` `package.json `  `dependencies` 列表的 `@latest` 版本。|
-
+| `info` |`i`| 现实已安装的`nest`包和其他有用的系统信息。|
 
 ## 工作空间
 
@@ -115,13 +115,13 @@ $ nest n my-nest-project -d
 
 当您运行 `nest new` 时，将使用一个内置的示意图为您创建一个新项目。`Nest` 的做法如下:
 
-### 用法
-
-1. 创建一个新文件夹，与您为 `nest new` 提供的名称参数相对应
+1. 创建一个新文件夹，使用你提供给 `nest new` 的`name`相同的参数。
 
 2. 用与最小的基础级 `Nest`应用程序对应的默认文件填充该文件夹。您可以在 [typescript-starter](https://github.com/nestjs/typescript-starter) 存储库中检查这些文件。
 
 3. 提供其他文件，如 `nest-cli.json` 、 `package.json` 和 `tsconfig.json`。启用用于编译、测试和服务应用程序的各种工具。
+
+从这里开始，你可以修改其他起始文件，添加新部件，添加依赖（例如`npm install`)，或者依据本文指导进行开发。
 
 ### Monorepo模式
 
@@ -185,11 +185,11 @@ tslint.json
 
 ###  工作区项目
 
-单体仓库使用工作区的概念来管理其成员实体。 工作区由项目组成。 一个项目可能是：
+`monorepo`使用工作区的概念来管理其成员实体。 工作区由项目组成。 一个项目可能是：
 
 - 一个应用程序：一个完整的 `Nest` 应用程序，包括一个 `main.ts` 文件来引导应用程序。除了编译和构建之外，工作空间中的应用程序类型项目在功能上与标准模式结构中的应用程序相同。
 
-- 库：库是一种打包一组通用功能(模块、提供程序、控制器等)的方法，这些功能可以在其他项目中使用。库不能独立运行，也没有 `mian.ts` 文件。在这里阅读更多关于图书馆的信息。
+- 库：库是一种打包一组通用功能(模块、提供程序、控制器等)的方法，这些功能可以在其他项目中使用。库不能独立运行，也没有 `main.ts` 文件。在这里阅读更多关于图书馆的信息。
 
 所有工作空间都有一个默认项目(应该是应用程序类型的项目)。这是由 `nest-cli.json` 中的顶级“根”属性文件，它指向默认项目的根(有关详细信息，请参阅下面的 `CLI` 属性)。通常，这是您开始使用的标准模式应用程序，然后使用 `nest generate` 应用程序将其转换为 `monorepo`。
 
@@ -215,9 +215,196 @@ $ nest start my-app
 
 然而，该示意图确实生成了特定于项目的 `tsconfig.app.json`。此配置文件自动设置适当的生成选项，包括正确设置编译输出文件夹。该文件扩展了顶级(monorepo) `tsconfig.json` 文件，因此您可以管理单点范围内的全局设置，但是如果需要，可以在项目级别覆盖它们。
 
+### 库
+
+如前所述，库类型的项目，或者简称“库”，是一些打包的Nest组件，可以集成在应用中来运行。可以使用`nest generate library`来生成库类型项目。决定哪些内容在一个库中是架构级别的决策。我们将在“库”一章深入讨论。
+
+### CLI 属性
+
+Nest在`nest-cli.json`文件中保留了组织、创建和部署标准项目和monorepo结构项目的元数据。Nest在你添加项目的项目时会自动添加和更新这些文件，因此一般来说你不需要考虑或者编辑它的内容。当然，有些设置我们可能需要手动修改，因此了解这个文件可能会有所帮助。
+
+在运行上述指令来创建一个monorepo后，`nest-cli.json`文件看上去是这样：
+
+```typescript
+{
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/my-project/src",
+  "monorepo": true,
+  "root": "apps/my-project",
+  "compilerOptions": {
+    "webpack": true,
+    "tsConfigPath": "apps/my-project/tsconfig.app.json"
+  },
+  "projects": {
+    "my-project": {
+      "type": "application",
+      "root": "apps/my-project",
+      "entryFile": "main",
+      "sourceRoot": "apps/my-project/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/my-project/tsconfig.app.json"
+      }
+    },
+    "my-app": {
+      "type": "application",
+      "root": "apps/my-app",
+      "entryFile": "main",
+      "sourceRoot": "apps/my-app/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/my-app/tsconfig.app.json"
+      }
+    }
+  }
+}
+```
+
+该文件被分为以下部分：
+
+- 一个全局部分，包含用于控制标准和monorepo范围设置的顶层属性。
+- 一个顶层属性(`projects`)包含每个项目的元数据。这部分仅仅在monorepo结构中包括。
+
+顶层属性包括：
+
+- "`collection`":用于配置生成部件的schematics组合的点；你一般不需要改变这个值。
+- "`sourceRoot`":标准模式中单项目源代码根入口，或者monorepo模式结构中的默认项目。
+- "`compilerOptions`":一个键值映射用于指定编译选项和选项的设置；详见后文。
+- "`generateOptions`":一个键值映射用于指定全局生成的选项和选项的设置；详见后文。
+- "`monorepo`":(仅用于monorepo)在monorepo结构中，该设置始终为`true`。
+- "`root`":(仅用于monorepo)默认项目的项目根目录要点。
+
+### 全局编译器选项
+
+|属性名称 | 属性值类型 | 描述|
+|---|---|---|
+| `webpack` | `boolean` | 如果为`true`，使用`webpack copiler`。如果`false`或者不存在，使用`tsc`。在monorepo模式中，默认为`true`(使用webpack)，在标准模式下，默认为`false`(使用`tsc`)，详见如下|
+| `tsConfigPath` | `string` | (仅用于monorepo)包含`tsconfig.json`文件设置的点，在使用`nest build`或者`nest start`而未指定`project`选项时将使用该设置（例如，默认项目在构建或启动时） |
+| `webpackConfigPath` |`string`| webpack选项文件，如果不指定，Nest会查找`webpack.config.js`。详见后文。|
+| `deleteOutDir` |`boolean`| 如果为`true`，无论编译器是否激活， 首先会移除汇编输出目录（在`tsconfig.json`中配置，默认`./dist`)。|
+| `assets` |`array`| 当编译步骤开始时，使能非Typescript资源文件的自动部署（在--watch模式下，资源文件在增量编译时不会部署）。详见后文|
+| `watchAssets`|`boolean`| 如果为`true`，在watch模式运行时，监视所有非Typescript资源文件（如果要更精确控制要监控的资源文件，见后续**资源文件**章节）。|
+
+### 全局生成器选项
+
+这些属性指定`nest generate`指令的默认生成选项：
+
+|属性名称 | 属性值类型 | 描述|
+|---|---|---|
+| `spec` | `boolean`或`object` |如果该值是`boolean`，设置为`true`默认使能`spec`生成，设置为`false`禁用它。在`CLI`命令行传递一个`flag`来覆盖这一设置，和项目中`generateOptions`设置一样（见下）。如果该值是`object`，每个键代表一个`schematic`名称，而布尔值则代表是/否为特定`schematic`使能`spec`生成|
+
+下列示例使用一个布尔值并指定默认在所有项目中禁用`spec`文件生成。
+```typescript
+{
+  "generateOptions": {
+    "spec": false
+  },
+  ...
+}
+```
+在下列示例中，`spec`文件生成仅仅在`service`的schematics被禁用（也就是`nest generate service...`):
+```typescript
+{
+  "generateOptions": {
+    "spec": {
+      "service": false
+    }
+  },
+  ...
+}
+```
+
+!> 当指定`spec`作为对象时，生成schematic的键目前还不支持自动生成别名，这意味着例如要将一个键`service:false`通过别名`s`生成服务，`spec`仍然会被生成。要保证通常的schematic名称和别名都可以按意图工作，需要按如下来分别指定通常的名称和别名：
+```typescript
+{
+  "generateOptions": {
+    "spec": {
+      "service": false,
+      "s": false
+    }
+  },
+  ...
+}
+```
+
+### 项目生成选项
+
+在全局生成器选项之外，你可能希望指定针对项目的生成器选项。项目级别的生成选项和全局生成选项格式完全一样，但是针对每个项目单独设置。
+
+项目范围的生成选项会覆盖全局生成选项：
+
+```typescript
+{
+  "projects": {
+    "cats-project": {
+      "generateOptions": {
+        "spec": {
+          "service": false
+        }
+      },
+      ...
+    }
+  },
+  ...
+}
+```
+
+!> 生成选项的顺序如下。在CLI命令行中指定的选项优于项目级别选项。项目级别选项覆盖全局选项。
+
+### 特定编译器
+
+使用不同的默认编译器原因在于针对大型项目时（例如一个典型的monorepo项目），`webpack`在构建时间和生成一个将所有项目部件打包的单一文件时具有明显的优势。如果你希望生成独立的文件。设置`webpack`为`false`，这将使用`tsc`来实现编译过程。
+
+### Webpack选项
+
+webpack选项文件可以包含标准的[webpack配置选项](https://webpack.js.org/configuration/)。例如，要告诉webpack来打包`node_modules`(默认排除在外)，添加下列内容到`webpack.config.js`：
+
+```typescript
+module.exports = {
+  externals: [],
+};
+```
+
+因为`webpack`配置文件是一个JavaScript文件，你可以暴露出一个包含默认选项的函数，其返回一个编辑后的对象：
+```typescript
+module.exports = function(options) {
+  return {
+    ...options,
+    externals: [],
+  };
+};
+```
+
+### 资源文件
+
+TypeScript编译器自动编译输出（`.js`和`.d.ts`文件）到指定的输出文件夹。对非TypeScript文件例如`.graphql`文件、`images`，`html`文件和其他资源文件也同样很方便。这允许你将`nest build`（以及其他编译初始化步骤）作为一个轻型的**开发构建**步骤，你可以编辑非TypeScript文件并进行迭代编译和测试。
+
+`assets`关键字值是一个包含要处理的文件的数组，其元素可以是简单的字符串或者类似`glob`的文件说明，例如：
+
+```typescript
+"assets": ["**/*.graphql"],
+"watchAssets": true,
+```
+为更好的控制，元素可以是包含如下键的对象：
+- "include":指定的要处理的类似`glob`文件。
+- "exclude":从`include`中排除的类似`glob`文件。
+- "outDir":一个指定路径的字符串（相对根目录），用于放置资源文件。默认和编译器配置的输出路径一致。
+- "watchAssets":布尔量，如果为`true`，将运行与watch模式来监控指定资源文件。
+
+例如：
+```typescript
+"assets": [
+  { "include": "**/*.graphql", "exclude": "**/omitted.graphql", "watchAssets": true },
+]
+```
+
+!> 在顶级的`compilerOptions`中设置`watchAssets`，覆盖`assets`中的`watchAssets`。 
+
+### 项目属性
+
+该元素仅存在于monorepo模式结构中。你通常不需要编辑这些属性，因为它们是Nest用来在monorepo中定位项目和它们的配置选项的。
+
 ## 库
 
-如前所述，库类型项目，或简称为“库”，是 `Nest` 组件的程序包，需要将它们组成应用程序才能运行。 您可以使用嵌套生成库来生成库类型的项目。我们在库这章深入讨论库。
+很多应用需要处理类似的问题，或者说是在不同上下文中重用模块化组件。Nest提供了一系列方法来实现这个，每个方法在不同层面上面向不同的架构或组织目标来解决问题。
 
 `Nest` 模块对于提供执行上下文非常有用，它支持在单个应用程序中共享组件。模块还可以与 `npm` 打包，可以在不同项目中创建可重用库。这是一种分发可配置、可重用的库的有效方法，这些库可以由不同的、松散连接的或不可靠的组织使用(例如，通过分发/安装第三方库)。
 
@@ -316,7 +503,7 @@ import { MyLibraryModule } from '@app/my-library';
 export class AppModule {}
 ```
 
-请注意，上面我们在模块导入行中使用了 `@app` 的路径别名，这是我们在上面的 `nest g` 库命令中提供的前缀。`Nest` 通过 `tsconfig` 路径映射处理此问题。 添加库时，`Nest` 会更新全局（`monorepo`）`tsconfig.json`文件的 `“paths”` 键，如下所示：
+请注意，上面我们在模块导入行中使用了 `@app` 的路径别名，这是我们在上面的 `nest g library` 命令中提供的前缀。`Nest` 通过 `tsconfig` 路径映射处理此问题。 添加库时，`Nest` 会更新全局（`monorepo`）`tsconfig.json`文件的 `“paths”` 键，如下所示：
 
 ```json
 "paths": {
@@ -396,7 +583,7 @@ Schematics
 
 |名称|别名|描述|
 |---|---|---|
-|`application`||在 `monorepo` 中生成一个新应用程序(如果它是一个标准结构，则转换为 `monorepo`)。|
+|`app`||在 `monorepo` 中生成一个新应用程序(如果它是一个标准结构，则转换为 `monorepo`)。|
 |`library`|`lib`|在 `monorepo` 中生成一个新库(如果是标准结构，则转换为 `monorepo` )。|
 |`class`|	`cl`|生成一个新类。|
 |`controller`|`co`|生成控制器声明|
@@ -421,6 +608,7 @@ Schematics
 |`--project [project]`|应该将该元素添加到项目中。别名:-p|
 |`--flat`|不要为元素生成文件夹。|
 |`--collection [collectionName]`|指定逻辑示意图集合。 使用已安装的包含原理图的npm软件包的软包名称。别名：-c|
+|`--spec`|强制spec文件生成（默认）|
 |`--no-spec`|禁用spec文件生成|
 
 ### nest build
@@ -446,6 +634,7 @@ $ nest build <name> [options]
 |`--watch`| 在监视模式下运行（实时重载）别名-w|
 |`--webpack`|使用 `webpack` 进行编译。|
 |`--webpackPath`|配置 `webpack` 的路径。|
+|`--tsc`|强制使用 `tsc` 编译。|
 
 ### nest start
 
@@ -467,9 +656,15 @@ $ nest start <name> [options]
 |选项|描述|
 |---|--|
 |`--path [path]`| `tsconfig`文件的路径。别名: `-p`|
+|`--config [path]`| `nest-cli`配置文件的路径。别名: `-c`|
 |`--watch`| 在监视模式下运行（实时重载）别名-w|
+|`--preserveWatchOutput`| 在watch模式下，保存命令行输出内容而不是清空屏幕（仅在`tsc watch`模式下)|
+|`--watchAssets`| 运行在watch模式下（热重载），监控非TS文件（资源文件），见**资源文件**了解更多细节|
+|`--debug [hostport]`| 在debug模式运行（使用--inspect标识），别名-d|
 |`--webpack`|使用 `webpack` 进行编译。|
-|`--webpackPath`|配置 `webpack` 的路径。|
+|`--webpackPath`|webpack配置路径。|
+|`--tsc`|强制使用 `tsc` 编译。|
+|`--exec [binary]`|要运行的二进制文件（默认：`node`）。别名: `-e`|
 
 ### nest add
 
@@ -499,6 +694,8 @@ $ nest add <name> [options]
 
 
 ### nest info
+
+显示nest安装的包和其他有用的系统信息，例如：
 
 ```bash
  _   _             _      ___  _____  _____  _     _____
@@ -608,3 +805,4 @@ $ npm install -D @nestjs/cli
 [@Armor](https://github.com/Armor-cn)  | <img class="avatar-66 rm-style" height="70" src="https://avatars3.githubusercontent.com/u/31821714?s=460&v=4">  |  翻译  | 专注于 Java 和 Nest，[@Armor](https://armor.ac.cn/) 
 | [@Drixn](https://drixn.com/)  | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">  |  翻译  | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/) |
 | [@franken133](https://github.com/franken133)  | <img class="avatar rounded-2" src="https://avatars0.githubusercontent.com/u/17498284?s=400&amp;u=aa9742236b57cbf62add804dc3315caeede888e1&amp;v=4" height="70">  |  翻译  | 专注于 java 和 nest，[@franken133](https://github.com/franken133)|
+| [@weizy0219](https://github.com/weizy0219)  | <img class="avatar-66 rm-style" height="70" src="https://avatars3.githubusercontent.com/u/19883738?s=60&v=4">  |  翻译  | 专注于TypeScript全栈、物联网和Python数据科学，[@weizhiyong](https://www.weizhiyong.com) |

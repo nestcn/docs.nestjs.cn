@@ -1784,7 +1784,7 @@ export class UsersResolver {
 
 ## 健康检查(Terminus)
 
-Nestjs Terminus集成提供了可读的/实时的健康检查。在复杂的后台设置中健康检查是非常重要的。简而言之，在web开发领域所说的健康检查通常由一系列特定地址组成，例如，https://my-website.com/health/readiness。通过一个服务，或者一个你的基础设施的一个部件（例如Kubernetes）来持续检查这个地址。依赖于向这一地址发出的`GET`请求返回的HTTP状态码，该服务会在收到“不健康”响应时采取行动。由于你的服务中对“健康”和“不健康”的定义可能有所不同，Nestjs Teminus支持一系列健康指示。
+Nestjs Terminus集成提供了可读的/实时的健康检查。在复杂的后台设置中健康检查是非常重要的。简而言之，在web开发领域所说的健康检查通常由一系列特定地址组成，例如，https://my-website.com/health/readiness  通过一个服务，或者一个你的基础设施的一个部件（例如Kubernetes）来持续检查这个地址。依赖于向这一地址发出的`GET`请求返回的HTTP状态码，该服务会在收到“不健康”响应时采取行动。由于你的服务中对“健康”和“不健康”的定义可能有所不同，Nestjs Teminus支持一系列健康指示。
 
 作为示例，如果你的服务器使用 MongoDB来存储数据，MongoDB是否正常运行就成了一个至关重要的信息。在这种情况下，你可以使用`MongooseHealthIndicator`。如果配置正常--按后续内容配置--你的健康检查地址将根据MongoDB是否运行来返回健康或者不健康HTTP状态码。
 

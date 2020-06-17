@@ -25,5 +25,10 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
   [JMS 搬瓦工官方的科学上网工具](https://justmysocks2.net/members/aff.php?aff=6423)    
   [【捐赠】](https://gitee.com/notadd/docs.nestjs.cn?donate=true)   
 
-百度云加速：WEB 高防，CDN 加速【5折】 QQ：1256985886
+百度云加速：WEB 高防，CDN 加速  QQ：1256985886
+专业版：30节点 100G/天 10GDDOS 防护  1690元/年 （买一送一）
+商务版：40节点 500G/天 20GDDOS 防护  6990元/年 （买一送一）
+企业版：50节点 1T/天 30GDDOS 防护  24990元/年 （买一送一）
+
+
 [![vultr](https://www.vultr.com/media/banner_1.png)](https://www.vultr.com/?ref=7815855-4F)

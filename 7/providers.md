@@ -95,7 +95,7 @@ Provider 通常具有与应用程序生命周期同步的生命周期（“作�
 
 有时，您可能需要解决一些依赖项。例如，您的类可能依赖于一个**配置对象**，但如果没有传递，则应使用默认值。在这种情况下，关联变为可选的， `provider`  不会因为缺少配置导致错误。
 
-要指示provider是可选的，请在 `constructor` 的参数中使用 `@optional()` 装饰器。
+要指示provider是可选的，请在 `constructor` 的参数中使用 `@Optional()` 装饰器。
 
 ```typescript
 import { Injectable, Optional, Inject } from '@nestjs/common';
@@ -112,7 +112,7 @@ export class HttpService<T> {
 
 ## 基于属性的注入
 
-我们目前使用的技术称为基于构造函数的注入，即通过构造函数方法注入providers。在某些非常特殊的情况下，基于属性的注入可能会有用。例如，如果顶级类依赖于一个或多个 providers，那么通过从构造函数中调用子类中的 `super()` 来传递它们就会非常烦人了。因此，为了避免出现这种情况，可以在属性上使用 `@inject()` 装饰器。
+我们目前使用的技术称为基于构造函数的注入，即通过构造函数方法注入providers。在某些非常特殊的情况下，基于属性的注入可能会有用。例如，如果顶级类依赖于一个或多个 providers，那么通过从构造函数中调用子类中的 `super()` 来传递它们就会非常烦人了。因此，为了避免出现这种情况，可以在属性上使用 `@Inject()` 装饰器。
 
 ```typescript
 import { Injectable, Inject } from '@nestjs/common';

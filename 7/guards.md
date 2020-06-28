@@ -96,7 +96,7 @@ export class CatsController {}
 
 上面的构造将守卫附加到此控制器声明的每个处理程序。如果我们决定只限制其中一个, 我们只需要在方法级别设置守卫。为了绑定全局守卫, 我们使用 Nest 应用程序实例的 `useGlobalGuards()` 方法:
 
-为了设置一个全局警卫，使用Nest应用程序实例的 `useGlobalGuards()` 方法：
+为了设置一个全局守卫，使用Nest应用程序实例的 `useGlobalGuards()` 方法：
 
 ```typescript
 const app = await NestFactory.create(AppModule);

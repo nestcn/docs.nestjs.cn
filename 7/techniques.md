@@ -2161,11 +2161,11 @@ $ npm i --save @nestjs/config
 安装完成之后，我们需要导入`ConfigModule`模块。通常，我们在根模块`AppModule`中导入它，并使用`。forRoot()`静态方法导入它的配置。
 
 ```typescript
-import * as dotenv from 'dotenv';	@@filename(app.module)
-import * as fs from 'fs';	import { Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-export class ConfigService {	@Module({
-  private readonly envConfig: Record<string, string>;	  imports: [ConfigModule.forRoot()],
+
+@Module({
+  imports: [ConfigModule.forRoot()],
 })
 export class AppModule {}
 ```

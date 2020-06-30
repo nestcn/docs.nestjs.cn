@@ -72,7 +72,7 @@ export interface ArgumentMetadata {
 
 我们来关注一下 `CatsController` 的 `create()` 方法：
 
-> cats.controler.ts
+> cats.controller.ts
 
 ```typescript
 @Post()
@@ -220,7 +220,7 @@ export class ValidationPipe implements PipeTransform<any> {
 
 最后一步是设置 `ValidationPipe` 。管道，与[异常过滤器](exceptionfilters.md)相同，它们可以是方法范围的、控制器范围的和全局范围的。另外，管道可以是参数范围的。我们可以直接将管道实例绑定到路由参数装饰器，例如`@Body()`。让我们来看看下面的例子：
 
-> cats.controler.ts
+> cats.controller.ts
 
 ```typescript
 @Post()
@@ -245,7 +245,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 在上面的例子中 `ValidationPipe` 的实例已就地立即创建。另一种可用的方法是直接传入类（而不是实例），让框架承担实例化责任，并启用**依赖注入**。
 
-> cats.controler.ts
+> cats.controller.ts
 
 ```typescript
 @Post()

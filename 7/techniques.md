@@ -4480,6 +4480,14 @@ bootstrap();
 
 我们告诉 `express`，该 `public` 目录将用于存储静态文件，  `views` 将包含模板，并且 `hbs` 应使用模板引擎来呈现 `HTML` 输出。
 
+`app.useStaticAssets` 还支持第二个参数来设置虚拟目录。
+
+``` typescript
+app.useStaticAssets(join(__dirname, '..', 'public'), { 
+  prefix: '/static'
+});
+```
+
 ### 模板渲染
 
 现在，让我们在该文件夹内创建一个 `views` 目录和一个 `index.hbs` 模板。在模板内部，我们将打印从控制器传递的 `message`：

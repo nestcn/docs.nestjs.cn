@@ -1,6 +1,6 @@
 ### 微信交流群： （超过200人，需要添加好友）
 
-<img src="https://s1.ax1x.com/2020/07/04/NvcpM8.jpg" alt="加微信" width="260" height="260" align="bottom" />
+<img src="https://pic.downk.cc/item/5f02e2e114195aa594ed9f59.jpg" alt="加微信" width="260" height="260" align="bottom" />
 
 
 ### QQ 群

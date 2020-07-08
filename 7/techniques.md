@@ -1872,7 +1872,7 @@ export const CatSchema = SchemaFactory.createForClass(Cat);
 `@Schema` 装饰器标记一个类作为`Schema` 定义，它将我们的 `Cat` 类映射到 `MongoDB` 同名复数的集合 `Cats`，这个装饰器接受一个可选的 `Schema` 对象。将它想象为那个你通常会传递给 `mongoose.Schema` 类的构造函数的第二个参数(例如, `new mongoose.Schema(_, options))`)。
 更多可用的 `Schema` 选项可以 [看这里](https://mongoosejs.com/docs/guide.html#options)。
 
-`@Prop` 装饰器在文档中定义了一个属性。举个例子，在上面的 `Schema` 定义中，我们定义了三个属性，分别是：`name` ，`age` 和 `品种`。得益于 `TypeScript` 的元数据（还有反射），这些属性的 [`Schema类型`](https://mongoosejs.com/docs/schematypes.html)会被自动推断。然而在更复杂的场景下，有些类型例如对象和嵌套数组无法正确推断类型，所以我们要向下面一样显式的指出。
+`@Prop` 装饰器在文档中定义了一个属性。举个例子，在上面的 `Schema` 定义中，我们定义了三个属性，分别是：`name` ，`age` 和 `breed`。得益于 `TypeScript` 的元数据（还有反射），这些属性的 [`Schema类型`](https://mongoosejs.com/docs/schematypes.html)会被自动推断。然而在更复杂的场景下，有些类型例如对象和嵌套数组无法正确推断类型，所以我们要向下面一样显式的指出。
 
 ```typescript
 @Prop([String])

@@ -1841,7 +1841,61 @@ export class AppModule {}
 
 ### 模型注入
 
-在`Mongoose`中，一切都源于`[Scheme](http://mongoosejs.com/docs/guide.html)`，我们先定义`CatSchema`:
+在`Mongoose`中，一切都源于 [Scheme](http://mongoosejs.com/docs/guide.html)，每个 `Schema` 都会映射到 `MongoDB` 的一个集合，并定义集合内文档的结构。`Schema` 被用来定义模型，而模型负责从底层创建和读取 `MongoDB` 的文档。
+
+`Schema` 可以用 `NestJS` 内置的装饰器来创建，或者也可以自己动手使用 `Mongoose`的常规方式。使用装饰器来创建 `Schema` 会极大大减少引用并且提高代码的可读性。
+
+我们先定义`CatSchema`:
+
+> schemas/cat.schema.ts
+
+```typescript
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
+
+@Schema()
+export class Cat extends Document {
+  @Prop()
+  name: string;
+
+  @Prop()
+  age: number;
+
+  @Prop()
+  breed: string;
+}
+
+export const CatSchema = SchemaFactory.createForClass(Cat);
+```
+> 注意你也可以通过使用 `DefinitionsFactory` 类（可以从 `@nestjs/mongoose` 导入）来生成一个原始 `Schema` ，这将允许你根据被提供的元数据手动修改生成的 `Schema` 定义。这对于某些很难用装饰器体现所有的极端例子非常有用。
+
+`@Schema` 装饰器标记一个类作为`Schema` 定义，它将我们的 `Cat` 类映射到 `MongoDB` 同名复数的集合 `Cats`，这个装饰器接受一个可选的 `Schema` 对象。将它想象为那个你通常会传递给 `mongoose.Schema` 类的构造函数的第二个参数(例如, `new mongoose.Schema(_, options))`)。
+更多可用的 `Schema` 选项可以 [看这里](https://mongoosejs.com/docs/guide.html#options)。
+
+`@Prop` 装饰器在文档中定义了一个属性。举个例子，在上面的 `Schema` 定义中，我们定义了三个属性，分别是：`name` ，`age` 和 `品种`。得益于 `TypeScript` 的元数据（还有反射），这些属性的 [`Schema类型`](https://mongoosejs.com/docs/schematypes.html)会被自动推断。然而在更复杂的场景下，有些类型例如对象和嵌套数组无法正确推断类型，所以我们要向下面一样显式的指出。
+
+```typescript
+@Prop([String])
+tags: string[];
+```
+
+另外的 `@Prop` 装饰器接受一个可选的参数，通过这个，你可以指示这个属性是否是必须的，是否需要默认值，或者是标记它作为一个常量，下面是例子：
+
+```typescript
+@Prop({ required: true })
+name: string;
+```
+最后的，原始 `Schema` 定义也可以被传递给装饰器。这也非常有用，举个例子，一个属性体现为一个嵌套对象而不是一个定义的类。要使用这个，需要从像下面一样从 `@nestjs/mongoose` 包导入 `raw()`。
+
+```typescript
+@Prop(raw({
+  firstName: { type: String },
+  lastName: { type: String }
+}))
+details: Record<string, any>;
+```
+
+或者，如果你不喜欢使用装饰器，你可以使用 `mongoose.Schema` 手动定义一个 `Schema`。下面是例子：
 
 > schemas/cat.schema.ts
 

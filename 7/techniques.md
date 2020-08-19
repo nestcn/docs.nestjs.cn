@@ -2361,7 +2361,7 @@ export default registerAs('database', () => ({
 
 ?> **注意** `registerAs` 函数是从 `@nestjs/config` 包导出的。
 
-使用`forRott()`的`load`方法载入命名空间的配置，和载入自定义配置文件方法相同：
+使用`forRoot()`的`load`方法载入命名空间的配置，和载入自定义配置文件方法相同：
 
 ```typescript
 // config/database.config.ts

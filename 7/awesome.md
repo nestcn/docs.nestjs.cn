@@ -53,6 +53,7 @@
   - [Nestjs API.ai](https://github.com/adrien2p/nest-js-api-ai) -  在 Node.js中与 api.ai 交互    
   - [Simple Todos](https://github.com/BruceHem/simple-todos) - 基于 Nuxt.js💚 和 Nest Framework 的简单Web应用程序    
   - [Realworld Example App](https://github.com/lujakob/nestjs-realworld-example-app) -  使用 NestJS + TypeORM 构建的示例性后端API    
+  - [uni-pushy-server](https://github.com/SunSeekerX/uni-pushy-server) - 使用 Nestjs 构建的 uni-app 热更新的 
   - [Mant](https://github.com/vladotesanovic/mant) - MongoDB Angular NestJS TypeScript 市场示例.    
   - [REST Nestjs Postgres](https://github.com/crudjs/rest-nestjs-postgres) - 使用 Nest.js 和 Postgres 实现的 REST API    
   - [Nest Permissions Seed](https://github.com/EndyKaufman/nest-permissions-seed) - 一个简单的应用程序，演示了NestJS对权限的基本用法    

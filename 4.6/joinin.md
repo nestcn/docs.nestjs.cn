@@ -82,6 +82,6 @@ Nestcn 官方文档会持续更新，为了保证后续的修改能更新上，�
 
 | 用户名 | 头像 | 职能 | 签名 |
 |---|---|---|---|
-| [@zuohuadong](https://github.com/zuohuadong)  | <img class="avatar-66 rm-style" src="https://ww3.sinaimg.cn/large/0060lm7Tly1fl9dj5cl4nj30960aujrp.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
-| [@zuohuadong](https://github.com/zuohuadong)  | <img class="avatar-66 rm-style" src="https://ww3.sinaimg.cn/large/0060lm7Tly1fl9dj5cl4nj30960aujrp.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
+| [@zuohuadong](https://www.zhihu.com/people/dongcang)  | <img class="avatar-66 rm-style" src="https://ww3.sinaimg.cn/large/0060lm7Tly1fl9dj5cl4nj30960aujrp.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
+| [@zuohuadong](https://www.zhihu.com/people/dongcang)  | <img class="avatar-66 rm-style" src="https://ww3.sinaimg.cn/large/0060lm7Tly1fl9dj5cl4nj30960aujrp.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
 ```

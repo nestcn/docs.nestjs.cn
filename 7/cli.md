@@ -276,7 +276,7 @@ Nest在`nest-cli.json`文件中保留了组织、创建和部署标准项目和m
 
 |属性名称 | 属性值类型 | 描述|
 |---|---|---|
-| `webpack` | `boolean` | 如果为`true`，使用`webpack copiler`。如果`false`或者不存在，使用`tsc`。在monorepo模式中，默认为`true`(使用webpack)，在标准模式下，默认为`false`(使用`tsc`)，详见如下|
+| `webpack` | `boolean` | 如果为`true`，使用`webpack compiler`。如果`false`或者不存在，使用`tsc`。在monorepo模式中，默认为`true`(使用webpack)，在标准模式下，默认为`false`(使用`tsc`)，详见如下|
 | `tsConfigPath` | `string` | (仅用于monorepo)包含`tsconfig.json`文件设置的点，在使用`nest build`或者`nest start`而未指定`project`选项时将使用该设置（例如，默认项目在构建或启动时） |
 | `webpackConfigPath` |`string`| webpack选项文件，如果不指定，Nest会查找`webpack.config.js`。详见后文。|
 | `deleteOutDir` |`boolean`| 如果为`true`，无论编译器是否激活， 首先会移除汇编输出目录（在`tsconfig.json`中配置，默认`./dist`)。|

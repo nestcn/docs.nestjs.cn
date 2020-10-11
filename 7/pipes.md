@@ -15,13 +15,14 @@
 
 ## 内置管道
 
-`Nest` 自带五个个开箱即用的管道，即 
+`Nest` 自带六个开箱即用的管道，即 
 
 - `ValidationPipe`
 - `ParseIntPipe`
 - `ParseBoolPipe`
 - `ParseArrayPipe`
 - `ParseUUIDPipe`
+- `DefaultValuePipe`
 
 
 他们从 `@nestjs/common` 包中导出。为了更好地理解它们是如何工作的，我们将从头开始构建它们。

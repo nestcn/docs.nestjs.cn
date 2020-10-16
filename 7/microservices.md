@@ -226,7 +226,7 @@ async publish() {
 }
 ```
 
-该 `emit()`方法有两个参数，`pattern` 和 `payload`。`pattern` 具有 `@MessagePattern()` 修饰符中定义的这个模式，而`payload` 是我们想要传输到另一个微服务的消息。此方法返回一个 `hot Observable`（不同于`send()`方法返回一个 `cold Observable`），这意味着无论您是否显式订阅该 `Observable`，代理都将立即尝试传递事件。
+该 `emit()`方法有两个参数，`pattern` 和 `payload`。`pattern` 具有 `@EventPattern()` 修饰符中定义的这个模式，而`payload` 是我们想要传输到另一个微服务的消息。此方法返回一个 `hot Observable`（不同于`send()`方法返回一个 `cold Observable`），这意味着无论您是否显式订阅该 `Observable`，代理都将立即尝试传递事件。
 
 ### 作用域
 

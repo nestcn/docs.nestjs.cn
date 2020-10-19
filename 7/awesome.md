@@ -66,6 +66,7 @@
   - [Nestcloud Starter](https://github.com/nest-cloud/nestcloud-starter) - 使用 nestcloud 快速启动微服务应用程序.    
   - [Nodepress](https://github.com/surmon-china/nodepress) - 使用 NestJS 的 Blog/CMS，  RESTful API 服务端应用. 
   - [Serverless-Lambda-DynamoDB](https://github.com/International-Slackline-Association/Rankings-Backend) - 具有AWS Lambda，DynamoDB，DynamoDB Streams的完全无服务器生产应用程序
+  - [Serverless-Lambda-FirestoreDB](https://github.com/mamori-i-japan/mamori-i-japan-api) - 具有 AWS Lambda，FirestoreDB，Firebase Auth，Winston Logger 的完全无服务器生产应用程序，实现了管理员角色授权。
   - [Serverless-nestjs-TypeOrm](https://github.com/kop7/serverless-nestjs-typeorm) - 使用 NestJS 和 TypeORM 的 serverless
   - [Passport Email Auth](https://github.com/marcomelilli/nestjs-email-authentication) 入门项目，包括用于通过MongoDB和PassportJs进行用户电子邮件身份验证的API
   
@@ -82,7 +83,8 @@
   - [NestJS DDD Boilerplate](https://github.com/pezzetti/base-app-nestjs) 具有 NestJS，类验证器和 TypeORM 的领域驱动设计基础应用程序。完全可测试。
   - [Nest Mongo Graphql](https://github.com/benawad/nest-mongo-graphql/) - 带有 NestJS，TypeORM，TypeGrapQL，MongoDB，GraphQL 的 Dockerized API 样板，以及带有 Makefile 的自动化任务。[https://typegraphql.ml/](https://typegraphql.ml/)
   - [Ultimate Backend](https://github.com/juicycleff/ultimate-backend) - 具有 cqrs graphql 微服务架构，Apollo 联盟，事件源和身份验证的企业多租户 SaaS 入门套件
-  - [NestJS GraphQL Boilerplate](https://github.com/fernandohenriques/nestjs-graphql-boilerplate) - 带有 NestJS，TypeORM，TypeGrapQL，MongoDB，GraphQL 的 Dockerized API 样板以及带有 Makefile 的自动化任务。
+  - [NestJS GraphQL 样板](https://github.com/fernandohenriques/nestjs-graphql-boilerplate) - 带有 NestJS，TypeORM，TypeGrapQL，MongoDB，GraphQL 的 Dockerized API 样板以及带有 Makefile 的自动化任务
+  - [The Knests Stack](https://github.com/tudorconstantin/knests/) - 终极示例，其中包括：PostgreSQL，Knex.js，NestJS，Next.js，GraphQL，React(with hooks and typescript)，Material-UI，用于 Docker 的 Docker 多阶段镜像以及已完全配置的 Gitlab CI/CD。
 
 ### 使用 NestJS 的项目
 
@@ -92,6 +94,7 @@
   - [Gauzy](https://github.com/ever-co/gauzy) - 适用于现代代理商和工作室的开源利润分享平台。
   - [LXDhub](https://github.com/Roche/lxdhub) - Linux 容器管理系统（LXC）.
   - [Notadd](https://github.com/notadd/notadd) - 微服务开发架构。
+  - [Pimp My PR](https://github.com/valueadd-poland/pimp-my-pr) - 用于统计和拉取请求管理的开源平台
   
 
 ### 常用库

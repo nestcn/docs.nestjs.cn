@@ -12,6 +12,7 @@
   - [中文文档](https://docs.nestjs.cn/)
 
 - 社区
+  - [中文交流群](https://docs.nestjs.cn/7/discuss)
   - [Gitter](https://gitter.im/nestjs/)
   - [Discord](https://discord.gg/G7Qnnhy)
   - [Telegram (社区维护)](https://t.me/nestjs)

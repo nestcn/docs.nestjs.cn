@@ -26,6 +26,7 @@
   - [让我们用Nestjs来重写一个CNode](https://github.com/jiayisheji/blog/issues/18)
 
 - 英文教程
+  - [揭示框架基础知识：KamilMyśliwiec 幕后的 Nestjs](https://www.youtube.com/watch?v=jo-1EUxMmxc)
   - [现代 Node.js 框架简介](https://kamilmysliwiec.com/nest-release-canditate-is-here-introduction-modern-node-js-framework)
   - [NestJS Node Express](https://auth0.com/blog/nestjs-brings-typescript-to-nodejs-and-express) - 教如何逐步使用 Nestjs
   - [使用 Nest 构建 Web 应用程序](https://kamilmysliwiec.com/build-modern-scalable-node-js-web-applications-with-nest)
@@ -39,10 +40,10 @@
   - [使用 NestJS 和 Swagger 的 MEAN 技术栈](https://medium.com/@ctran2428/mean-stack-with-nestjs-and-swagger-9d8d14862d6b)
   - [NestJS Ideas API](https://www.youtube.com/watch?v=NF9Xn4g5MJY&list=PLBeQxJQNprbiJm55q7nTAfhMmzIC8MWxc)
   - [使用 Nest.js 和 Ably 构建实时 Web 应用程序](https://hackernoon.com/building-real-time-web-applications-using-nest-js-and-ably-d85887e81f06)
-  - [视频教程 - 使用 NestJs，Angular 和 Angular Material 构建一个完整的博客](https://www.youtube.com/watch?v=nz6yFTyLbAQ&list=PLq1kZ5GbKd4qyDcK3IHGSi4FDAL6fRZeL)
-  - [免费视频课程-完整的 NestJS 开发人员。企业 Node.js 框架](https://www.udemy.com/course/the-complete-nestjs-developer-enterprise-nodejs-framework/)
-  - [ChatServer](https://github.com/Pinedo11/nestDemo-ChatServer)-使用 Nest 实现的聊天应用的服务器端	  -[ChatServer](https://github.com/Pinedo11/nestDemo-ChatServer)-使用Nest实现的聊天应用的服务器端
-  - [Nestjs API.ai](https://github.com/adrien2p/nest-js-api-ai)-与Node.js中的api.ai进行交互	  - [Nestjs API.ai](https://github.com/adrien2p/nest-js-api-ai)-与Node.js中的api.ai进行交互
+  - [视频教程](https://www.youtube.com/watch?v=nz6yFTyLbAQ&list=PLq1kZ5GbKd4qyDcK3IHGSi4FDAL6fRZeL) -使用 Nestjs，Angular 和 Angular Material 构建全栈博客
+  - [免费视频课程]（https://www.udemy.com/course/the-complete-nestjs-developer-enterprise-nodejs-framework/）- 开发 NestJS 企业级 Node.js 框架
+  - [ChatServer](https://github.com/Pinedo11/nestDemo-ChatServer) - 使用 NestJS 实现的聊天应用的服务器端
+  - [Nestjs API.ai](https://github.com/adrien2p/nest-js-api-ai) - 与 Node.js 中的 api.ai 进行交互	  
 
 - 例子
   - [官方示例](https://github.com/nestjs/nest/tree/master/sample)    
@@ -176,7 +177,8 @@
   - VSCode
     - [Nestjs Snippets](https://github.com/ashinzekene/vscode-nestjs-snippets) - Vscode nestjs 代码片段
 - AMQP
-  - [Nestjs AMQP](https://github.com/nestjsx/nestjs-amqp) - amqp 连接管理器。
+  - [Nestjs AMQP](https://github.com/nestjsx/nestjs-amqp) - AMQP 连接管理器
+  - [Nestjs RabbitMQ](https://github.com/AlariCode/nestjs-rmq) -  Nestjs 微服务的 AMQP 库,它允许您使用 RabbitMQ 或 AMQP
 - EventStore
   - [Nestjs EventStore](https://github.com/juicycleff/nestjs-event-store) - 带有适配器支持的 NestJs CQRS 的 evenstore.org 模块，可持久保留Catchup 订阅的 lastcheckpoint
 - 支付网关
@@ -190,11 +192,14 @@
 - 前端
   - [NestJS CRUD React Admin](https://github.com/FusionWorks/react-admin-nestjsx-crud-dataprovider) - A React Admin data provider for [NextJS CRUD](https://github.com/nestjsx/crud)
 - 定时任务
-  - [Nest Bull](https://github.com/nestjsx/nest-bull) - Nest框架的Bull模块
+  - [Nest Bull](https://github.com/nestjsx/nest-bull) - Nest 框架的 Bull 模块
   
 - 自动工作流
-  - [Zeebe microservices](https://github.com/pay-k/nestjs-zeebe)
-
+  - [Zeebe microservices](https://github.com/pay-k/nestjs-zeebe)    
+  
+- 聊天机器人
+  - [NestJS Telegraf](https://github.com/bukhalo/nestjs-telegraf) - 基于 [Telegraf](https://github.com/telegraf/telegraf) 使用 Nestjs 创建 Telegram 机器人的模块    
+  
 ### 运行
 
 - 命令行/终端

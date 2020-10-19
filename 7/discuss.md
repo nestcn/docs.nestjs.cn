@@ -8,7 +8,7 @@
 
 二群：    
 
-<img src="https://pic.downk.cc/item/5f8c6dcb1cd1bbb86b7357f0.png" alt="加微信" width="260" height="260" align="bottom" />
+<img src="https://pic.downk.cc/item/5f8c6dcb1cd1bbb86b7357f0.png" alt="加微信" align="bottom" />
 
 
 

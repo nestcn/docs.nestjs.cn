@@ -41,20 +41,21 @@
   - [NestJS Ideas API](https://www.youtube.com/watch?v=NF9Xn4g5MJY&list=PLBeQxJQNprbiJm55q7nTAfhMmzIC8MWxc)
   - [使用 Nest.js 和 Ably 构建实时 Web 应用程序](https://hackernoon.com/building-real-time-web-applications-using-nest-js-and-ably-d85887e81f06)
   - [视频教程](https://www.youtube.com/watch?v=nz6yFTyLbAQ&list=PLq1kZ5GbKd4qyDcK3IHGSi4FDAL6fRZeL) -使用 Nestjs，Angular 和 Angular Material 构建全栈博客
-  - [免费视频课程]（https://www.udemy.com/course/the-complete-nestjs-developer-enterprise-nodejs-framework/）- 开发 NestJS 企业级 Node.js 框架
-  - [ChatServer](https://github.com/Pinedo11/nestDemo-ChatServer) - 使用 NestJS 实现的聊天应用的服务器端
-  - [Nestjs API.ai](https://github.com/adrien2p/nest-js-api-ai) - 与 Node.js 中的 api.ai 进行交互	  
+  - [免费视频课程](https://www.udemy.com/course/the-complete-nestjs-developer-enterprise-nodejs-framework/) - 开发 NestJS 企业级 Node.js 框架
+
 
 - 例子
-  - [官方示例](https://github.com/nestjs/nest/tree/master/sample)    
-  - [nestjs+angular cnode](https://github.com/jiayisheji/AngularNest-Fullstack-CNode)  - Angular + Nest.js 全栈    
-  - [nestjs-typeorm](https://github.com/lujakob/nestjs-realworld-example-app)   - Nestjs + typeorm 示例    
-  - [nestjs-graphql-angular](https://github.com/bojidaryovchev/nest-angular) - NestJS + graphql + angular 示例    
-  - [ChatServer](https://github.com/Pinedo11/nestDemo-ChatServer) - 使用 Nest 实现的 Chat App 的服务器端    
-  - [Nestjs API.ai](https://github.com/adrien2p/nest-js-api-ai) -  在 Node.js中与 api.ai 交互    
-  - [Simple Todos](https://github.com/BruceHem/simple-todos) - 基于 Nuxt.js💚 和 Nest Framework 的简单Web应用程序    
-  - [Realworld Example App](https://github.com/lujakob/nestjs-realworld-example-app) -  使用 NestJS + TypeORM 构建的示例性后端API    
-  - [Uni-pushy-server](https://github.com/SunSeekerX/uni-pushy-server) - 使用 Nestjs，typeorm，redis，mysql，class-validator，restful 构建的 uni-app 热更新的的后台 
+  - [官方示例](https://github.com/nestjs/nest/tree/master/sample)  
+  - [ChatServer](https://github.com/Pinedo11/nestDemo-ChatServer) - 使用 NestJS 实现的聊天应用的服务器端
+  - [Nestjs API.ai](https://github.com/adrien2p/nest-js-api-ai) - 与 Node.js 中的 api.ai 进行交互	  
+  
+  ！- [nestjs+angular cnode](https://github.com/jiayisheji/AngularNest-Fullstack-CNode)  - Angular + Nest.js 全栈    
+  ！- [nestjs-typeorm](https://github.com/lujakob/nestjs-realworld-example-app)   - Nestjs + typeorm 示例    
+  ！- [nestjs-graphql-angular](https://github.com/bojidaryovchev/nest-angular) - NestJS + graphql + angular 示例   
+  
+  - [Simple Todos](https://github.com/BruceHem/simple-todos) - 基于 Nuxt.js💚 和 Nest Framework 的简单 Web 应用程序    
+  - [Realworld Example App](https://github.com/lujakob/nestjs-realworld-example-app) -  使用 Nestjs + TypeORM 构建的示例性后端 API    
+  ！- [Uni-pushy-server](https://github.com/SunSeekerX/uni-pushy-server) - 使用 Nestjs，typeorm，redis，mysql，class-validator，restful 构建的 uni-app 热更新的的后台 
   - [Mant](https://github.com/vladotesanovic/mant) - MongoDB Angular NestJS TypeScript 市场示例.    
   - [REST Nestjs Postgres](https://github.com/crudjs/rest-nestjs-postgres) - 使用 Nest.js 和 Postgres 实现的 REST API    
   - [Nest Permissions Seed](https://github.com/EndyKaufman/nest-permissions-seed) - 一个简单的应用程序，演示了NestJS对权限的基本用法    
@@ -62,14 +63,14 @@
   - [Angular Contact Manager App](https://github.com/Abdallah-khalil/ContactManagerApp) - 使用 Angular，Nestjs，Mongoose，Passport，JWT的 联系人管理程序    
   - [Books Library API](https://github.com/Abdallah-khalil/Books-Library-API) - 一个带有 nestjs，mongoose，Passport，JWT 的 API    
   - [Passport Auth Nestjs](https://github.com/Abdallah-khalil/NodeJsWithPassport) -  使用 nestjs 构建的 Passport 策略，集成了 oauth  
-  - [NestJS Auth0](https://github.com/jajaperson/nestjs-auth0) - 一个 NestJS 应用示例，该应用通过 Passport 使用 Auth0 进行身份验证。
+  - [NestJS Auth0](https://github.com/jajaperson/nestjs-auth0) - 一个 NestJS 应用示例，该应用通过 Passport 使用 Auth0 进行身份验证
   - [Lynx](https://github.com/mentos1386/lynx) - 基于 NestJS 和 TypeORM 构建的 Opinionated Framework    
   - [NestJS Ideas API](https://github.com/kelvin-mai/nest-ideas-api) - 使用 NestJS，PostgresQL 和 TypeORM构 建的 REST 和 GraphQL 服务端的实现    
   - [Nestcloud Starter](https://github.com/nest-cloud/nestcloud-starter) - 使用 nestcloud 快速启动微服务应用程序.    
-  - [Nodepress](https://github.com/surmon-china/nodepress) - 使用 Nest 的 Blog/CMS，  RESTful API 服务端应用. 😎
-  - [Serverless-Lambda-DynamoDB](https://github.com/International-Slackline-Association/Rankings-Backend) - 具有AWS Lambda，DynamoDB，DynamoDB Streams的完全无服务器生产应用程序。
-  - [Serverless-nestjs-TypeOrm](https://github.com/kop7/serverless-nestjs-typeorm) - 示例如何通过 TypeORM less 使用无服务器框架来嵌套 js。
-  - [Passport Email Auth](https://github.com/marcomelilli/nestjs-email-authentication) 入门项目，包括用于通过MongoDB和PassportJs进行用户电子邮件身份验证的API。
+  - [Nodepress](https://github.com/surmon-china/nodepress) - 使用 NestJS 的 Blog/CMS，  RESTful API 服务端应用. 😎
+  - [Serverless-Lambda-DynamoDB](https://github.com/International-Slackline-Association/Rankings-Backend) - 具有AWS Lambda，DynamoDB，DynamoDB Streams的完全无服务器生产应用程序
+  - [Serverless-nestjs-TypeOrm](https://github.com/kop7/serverless-nestjs-typeorm) - 使用 NestJS 和 TypeORM 的 serverless
+  - [Passport Email Auth](https://github.com/marcomelilli/nestjs-email-authentication) 入门项目，包括用于通过MongoDB和PassportJs进行用户电子邮件身份验证的API
   
 
 - 样例

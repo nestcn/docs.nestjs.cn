@@ -48,14 +48,11 @@
   - [官方示例](https://github.com/nestjs/nest/tree/master/sample)  
   - [ChatServer](https://github.com/Pinedo11/nestDemo-ChatServer) - 使用 NestJS 实现的聊天应用的服务器端
   - [NestJS API.ai](https://github.com/adrien2p/nest-js-api-ai) - 与 Node.js 中的 api.ai 进行交互	  
-  
-  ！- [nestjs+angular cnode](https://github.com/jiayisheji/AngularNest-Fullstack-CNode)  - Angular + Nest.js 全栈    
-  ！- [nestjs-typeorm](https://github.com/lujakob/nestjs-realworld-example-app)   - NestJS + typeorm 示例    
-  ！- [nestjs-graphql-angular](https://github.com/bojidaryovchev/nest-angular) - NestJS + graphql + angular 示例   
-  
+  - [nestjs+angular cnode](https://github.com/jiayisheji/AngularNest-Fullstack-CNode)  - Angular + Nest.js 全栈    
+  - [nestjs-graphql-angular](https://github.com/bojidaryovchev/nest-angular) - NestJS + graphql + angular 示例   
   - [Simple Todos](https://github.com/BruceHem/simple-todos) - 基于 Nuxt.js 和 Nest Framework 的简单 Web 应用程序    
   - [Realworld Example App](https://github.com/lujakob/nestjs-realworld-example-app) -  使用 NestJS + TypeORM 构建的示例性后端 API    
-  ！- [Uni-pushy-server](https://github.com/SunSeekerX/uni-pushy-server) - 使用 Nestjs，typeorm，redis，mysql，class-validator，restful 构建的 uni-app 热更新的的后台 
+  - [Uni-pushy-server](https://github.com/SunSeekerX/uni-pushy-server) - 使用 Nestjs，typeorm，redis，mysql，class-validator，restful 构建的 uni-app 热更新的的后台 
   - [Mant](https://github.com/vladotesanovic/mant) - MongoDB Angular NestJS TypeScript 市场示例.    
   - [REST NestJS Postgres](https://github.com/crudjs/rest-nestjs-postgres) - 使用 Nest.js 和 Postgres 实现的 REST API    
   - [Nest Permissions Seed](https://github.com/EndyKaufman/nest-permissions-seed) - 一个简单的应用程序，演示了NestJS对权限的基本用法    
@@ -90,7 +87,7 @@
 ### 使用 NestJS 的项目
 
 - 开源
-  - [EVE Book API](https://github.com/evebook/api) - :milky_way: EVE Book API
+  - [EVE Book API](https://github.com/evebook/api) - EVE Book API
   - [Ever®](https://github.com/ever-co/ever) - 用于按需经济和数字市场的开源商务平台。
   - [Gauzy](https://github.com/ever-co/gauzy) - 适用于现代代理商和工作室的开源利润分享平台。
   - [LXDhub](https://github.com/Roche/lxdhub) - Linux 容器管理系统（LXC）.
@@ -171,7 +168,10 @@
   - [Nest Sequelize JWT](https://github.com/adrien2p/nest-js-sequelize-jwt) - 入门套件 Nest + Sequelize + jwt。
   - [Nest sequelize-typescript](https://github.com/kentloog/nestjs-sequelize-typescript) - Nest + sequelize-typescript + JWT + Jest + Swagger
 - GraphQL
-  - [NestJS Graphql](https://github.com/adrien2p/nest-js-graphql) - 实现 graphql 模块的 NestJS 启动器
+  - [NestJS Graphql](https://github.com/adrien2p/nest-js-graphql) - 实现 Graphql 模块的 NestJS 启动器
+  - [GoLevelUp NestJS GraphQL 请求](https://github.com/golevelup/nestjs/tree/master/packages/graphql-request) - 从服务器端 NestJS 代码轻松注入和使用 GraphQLClient 实例。与第三方GraphQL API 交互很有用
+  - [GoLevelUp NestJS Hasura](https://github.com/golevelup/nestjs/tree/master/packages/hasura) - 与 [Hasura](https://hasura.io/) 一起使用的 NestJS 集成提供了实时 GraphQL Postgres数据库上的 API
+  
 - Pattern
   - [Nest GRPC Transport](https://github.com/fresh8/nestjs-grpc-transport) - NestJS 框架的 GRPC 传输层.
   - [NestJS typeorm paginate](https://github.com/nestjsx/nestjs-typeorm-paginate) - 一个简单的功能和分页界面
@@ -181,12 +181,14 @@
 - AMQP
   - [NestJS AMQP](https://github.com/nestjsx/nestjs-amqp) - AMQP 连接管理器
   - [NestJS RabbitMQ](https://github.com/AlariCode/nestjs-rmq) -  NestJS 微服务的 AMQP 库,它允许您使用 RabbitMQ 或 AMQP
+  - [GoLevelUp NestJS RabbitMQ](https://github.com/golevelup/nestjs/tree/master/packages/rabbitmq) - NestJS 的灵活 AMQP 集成，支持多种消息传递模式和直观的装饰器
 - EventStore
   - [NestJS EventStore](https://github.com/juicycleff/nestjs-event-store) - 带有适配器支持的 NestJs CQRS 的 evenstore.org 模块，可持久保留Catchup 订阅的 lastcheckpoint
 - 支付网关
   - [NestJS Braintree](https://github.com/nestjsx/nestjs-braintree) - 一个用于 webhooks 交易的模块
   - [NestJS Stripe](https://github.com/dhaspden/nestjs-stripe) - 将已配置的 Stripe 客户端注入服务的模块
-  - [Notadd pay](https://github.com/notadd/nt-addon-pay) - 支持微信和支付宝支付。
+  - [ GoLevelUp NestJS Stripe ](https://github.com/golevelup/nestjs/tree/master/packages/stripe) - 可注入客户端加上自动连线的 Stripe Webhook 处理，可实现更深层次的集成
+  - [Notadd pay](https://github.com/notadd/nt-addon-pay) - 支持微信和支付宝支付
 - Consul
   - [Nest Consul](https://github.com/nest-cloud/nestcloud) - 基于 Consul 的 NodeJS 微服务解决方案，由Typescript 语言和 NestJS 框架编写
 - Cache

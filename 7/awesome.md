@@ -53,7 +53,7 @@
   ！- [nestjs-typeorm](https://github.com/lujakob/nestjs-realworld-example-app)   - Nestjs + typeorm 示例    
   ！- [nestjs-graphql-angular](https://github.com/bojidaryovchev/nest-angular) - NestJS + graphql + angular 示例   
   
-  - [Simple Todos](https://github.com/BruceHem/simple-todos) - 基于 Nuxt.js💚 和 Nest Framework 的简单 Web 应用程序    
+  - [Simple Todos](https://github.com/BruceHem/simple-todos) - 基于 Nuxt.js 和 Nest Framework 的简单 Web 应用程序    
   - [Realworld Example App](https://github.com/lujakob/nestjs-realworld-example-app) -  使用 Nestjs + TypeORM 构建的示例性后端 API    
   ！- [Uni-pushy-server](https://github.com/SunSeekerX/uni-pushy-server) - 使用 Nestjs，typeorm，redis，mysql，class-validator，restful 构建的 uni-app 热更新的的后台 
   - [Mant](https://github.com/vladotesanovic/mant) - MongoDB Angular NestJS TypeScript 市场示例.    
@@ -67,7 +67,7 @@
   - [Lynx](https://github.com/mentos1386/lynx) - 基于 NestJS 和 TypeORM 构建的 Opinionated Framework    
   - [NestJS Ideas API](https://github.com/kelvin-mai/nest-ideas-api) - 使用 NestJS，PostgresQL 和 TypeORM构 建的 REST 和 GraphQL 服务端的实现    
   - [Nestcloud Starter](https://github.com/nest-cloud/nestcloud-starter) - 使用 nestcloud 快速启动微服务应用程序.    
-  - [Nodepress](https://github.com/surmon-china/nodepress) - 使用 NestJS 的 Blog/CMS，  RESTful API 服务端应用. 😎
+  - [Nodepress](https://github.com/surmon-china/nodepress) - 使用 NestJS 的 Blog/CMS，  RESTful API 服务端应用. 
   - [Serverless-Lambda-DynamoDB](https://github.com/International-Slackline-Association/Rankings-Backend) - 具有AWS Lambda，DynamoDB，DynamoDB Streams的完全无服务器生产应用程序
   - [Serverless-nestjs-TypeOrm](https://github.com/kop7/serverless-nestjs-typeorm) - 使用 NestJS 和 TypeORM 的 serverless
   - [Passport Email Auth](https://github.com/marcomelilli/nestjs-email-authentication) 入门项目，包括用于通过MongoDB和PassportJs进行用户电子邮件身份验证的API
@@ -78,10 +78,10 @@
   - [Nest BFF](https://github.com/ahrnee/nestjs-bff) - 使用 NestJS 的样板 [BFF](https://samnewman.io/patterns/architectural/bff/) Web 应用程序启动项目。包括 CLI 和 MongoDB 迁移功能。
   - [Nestjs Template](https://github.com/Saluki/nestjs-template) - 使用为 Docker 环境精心设计的生产可用 NestJS 模板，支持最新 TypeScript API
   - [MEAN Todo with NestJS](https://github.com/nartc/nest-mean) - 一个使用 NestJS 和 Swagger 的简单 Todo 应用程序。包含授权/身份验证。
-  - [NestJS Boilerplate 💡](https://github.com/Vivify-Ideas/nestjs-boilerplate) - 具有可用身份验证，typeorm，env 配置和 swagger 的 Boilerplate。开始制作伟大事物所需的一切。🚀
-  - [Awesome Nest Boilerplate 😍](https://github.com/NarHakobyan/awesome-nest-boilerplate), Typescript 💪，Postgresql 🎉，TypeORM，Swagger for Api文档，角色基本访问控制和最佳应用程序架构。
-  - [NestJS Prisma Starter](https://github.com/fivethree-team/nestjs-prisma-client-starter) - NestJS 的入门项目😻 包括带有 Prisma 客户端的 Graphql，Passport-JWT 身份验证，Swagger Api 和 Docker。
-  - [TeanJS](https://github.com/adrien2p/teanjs) - TeanJS是一个入门程序，它为您提供所有方式，以便能够尽快开始编写代码😻
+  - [NestJS Boilerplate](https://github.com/Vivify-Ideas/nestjs-boilerplate) - 具有可用身份验证，typeorm，env 配置和 swagger 的 Boilerplate。开始制作伟大事物所需的一切。🚀
+  - [Awesome Nest Boilerplate](https://github.com/NarHakobyan/awesome-nest-boilerplate), Typescript ，Postgresql ，TypeORM，Swagger for API 文档，角色基本访问控制和最佳应用程序架构。
+  - [NestJS Prisma Starter](https://github.com/fivethree-team/nestjs-prisma-client-starter) - NestJS 的入门项目，包括带有 Prisma 客户端的 Graphql，Passport-JWT 身份验证，Swagger Api 和 Docker。
+  - [TeanJS](https://github.com/adrien2p/teanjs) - TeanJS是一个入门程序，它为您提供所有方式，以便能够尽快开始编写代码
   - [NestJS DDD Boilerplate](https://github.com/pezzetti/base-app-nestjs) 具有 NestJS，类验证器和 TypeORM 的领域驱动设计基础应用程序。完全可测试。
   - [Nest Mongo Graphql](https://github.com/benawad/nest-mongo-graphql/) - 带有 NestJS，TypeORM，TypeGrapQL，MongoDB，GraphQL 的 Dockerized API 样板，以及带有 Makefile 的自动化任务。[https://typegraphql.ml/](https://typegraphql.ml/)
   - [Ultimate Backend](https://github.com/juicycleff/ultimate-backend) - 具有 cqrs graphql 微服务架构，Apollo 联盟，事件源和身份验证的企业多租户 SaaS 入门套件
@@ -129,7 +129,7 @@
   - [Nestjs-Query](https://github.com/doug-martin/nestjs-query) - 用于 GraphQL API 的 Nest CRUD 。
   - [Nest Middlewares](https://github.com/wbhob/nest-middlewares) - NestJS 的通用可注入中间件
 - Errors
-  - [Nestjs Flub](https://github.com/shekohex/nestjs-flub) - 漂亮的错误😫 NestJS框架的Stack Viewer 。
+  - [Nestjs Flub](https://github.com/shekohex/nestjs-flub) - 漂亮的错误 NestJS框架的Stack Viewer 。
   - [Nestjs Enlighten](https://github.com/ozkanonur/nestjs-enlighten) - NestJS 框架的类似 laravel-ignition 的错误页面。
   - [Nest Raven](https://github.com/mentos1386/nest-raven) - Nest.js 框架的 Sentry Raven 模块
 - Lint
@@ -141,7 +141,7 @@
 - 日志
   - [Nest Morgan](https://github.com/mentos1386/nest-morgan) - 用于 nestjs 的 Morgan 模块
   - [Nest Winston](https://github.com/gremo/nest-winston) - 用于 nestjs 的 Winston 模块
-  - [Nest Pino](https://github.com/iamolegga/nestjs-pino) - 用于 nestjs 的 Pino 模块 ，😮在任意位置记录请求上下文😍
+  - [Nest Pino](https://github.com/iamolegga/nestjs-pino) - 用于 nestjs 的 Pino 模块，在任意位置记录请求上下文
 - 监控
   - [Nest Status Monitor](https://github.com/GenFirst/nest-status-monitor) - 基于 Socket.io 和 Chart.js 的简单自托管模块，用于报告 Nest.js 的 node.js 服务器的实时状态。
   - [Nest Terminus](https://github.com/nestjs/terminus) - 综合健康检查, 基于 [Terminus](https://github.com/godaddy/terminus) .
@@ -151,6 +151,8 @@
   - [Nest Event](https://github.com/yak0/nest-event) - 使用 NestJS 框架的装饰器进行事件处理。
 - Auth
   - [Nestjs Session](https://github.com/iamolegga/nestjs-session) - NestJS 的 Session 模块, 基于 [express-session](https://npm.im/express-session)
+- RBAC（基于角色的访问控制）
+  - [Nest RBAC](https://github.com/sergey-telpuk/nestjs-rbac) - 用于 NestJS 的 RBAC 模块，具有动态存储和缓存。
 
 ### 集成
 
@@ -175,8 +177,7 @@
   - [Nestjs typeorm paginate](https://github.com/nestjsx/nestjs-typeorm-paginate) - 一个简单的功能和分页界面
   - [Nest JSON RPC Transport](https://github.com/Insidexa/nestjs-rpc) - Nestjs 框架的 JSON RPC 传输层    
 - 编辑器
-  - VSCode
-    - [Nestjs Snippets](https://github.com/ashinzekene/vscode-nestjs-snippets) - Vscode nestjs 代码片段
+  - [Nestjs Snippets](https://github.com/ashinzekene/vscode-nestjs-snippets) - Vscode nestjs 代码片段
 - AMQP
   - [Nestjs AMQP](https://github.com/nestjsx/nestjs-amqp) - AMQP 连接管理器
   - [Nestjs RabbitMQ](https://github.com/AlariCode/nestjs-rmq) -  Nestjs 微服务的 AMQP 库,它允许您使用 RabbitMQ 或 AMQP

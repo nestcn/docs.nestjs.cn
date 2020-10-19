@@ -66,34 +66,34 @@
   - [Nestcloud Starter](https://github.com/nest-cloud/nestcloud-starter) - 使用 nestcloud 快速启动微服务应用程序.    
   - [Nodepress](https://github.com/surmon-china/nodepress) - 使用 NestJS 的 Blog/CMS，  RESTful API 服务端应用. 
   - [Serverless-Lambda-DynamoDB](https://github.com/International-Slackline-Association/Rankings-Backend) - 具有AWS Lambda，DynamoDB，DynamoDB Streams的完全无服务器生产应用程序
-  - [Serverless-Lambda-FirestoreDB](https://github.com/mamori-i-japan/mamori-i-japan-api) - 具有 AWS Lambda，FirestoreDB，Firebase Auth，Winston Logger 的完全无服务器生产应用程序，实现了管理员角色授权。
+  - [Serverless-Lambda-FirestoreDB](https://github.com/mamori-i-japan/mamori-i-japan-api) - 具有 AWS Lambda，FirestoreDB，Firebase Auth，Winston Logger 的完全无服务器生产应用程序，实现了管理员角色授权
   - [Serverless-nestjs-TypeOrm](https://github.com/kop7/serverless-nestjs-typeorm) - 使用 NestJS 和 TypeORM 的 serverless
   - [Passport Email Auth](https://github.com/marcomelilli/nestjs-email-authentication) 入门项目，包括用于通过MongoDB和PassportJs进行用户电子邮件身份验证的API
   
 
 - 样例
   - [Nest 入门套件](https://github.com/kentloog/nestjs-sequelize-typescript) - Nest + sequelize-typescript + JWT + Jest + Swagger
-  - [Nest BFF](https://github.com/ahrnee/nestjs-bff) - 使用 NestJS 的样板 [BFF](https://samnewman.io/patterns/architectural/bff/) Web 应用程序启动项目。包括 CLI 和 MongoDB 迁移功能。
+  - [Nest BFF](https://github.com/ahrnee/nestjs-bff) - 使用 NestJS 的样板 [BFF](https://samnewman.io/patterns/architectural/bff/) Web 应用程序启动项目包括 CLI 和 MongoDB 迁移功能
   - [NestJS Template](https://github.com/Saluki/nestjs-template) - 使用为 Docker 环境精心设计的生产可用 NestJS 模板，支持最新 TypeScript API
-  - [MEAN Todo with NestJS](https://github.com/nartc/nest-mean) - 一个使用 NestJS 和 Swagger 的简单 Todo 应用程序。包含授权/身份验证。
-  - [NestJS Boilerplate](https://github.com/Vivify-Ideas/nestjs-boilerplate) - 具有可用身份验证，typeorm，env 配置和 swagger 的 Boilerplate。开始制作伟大事物所需的一切。🚀
-  - [Awesome Nest Boilerplate](https://github.com/NarHakobyan/awesome-nest-boilerplate), Typescript ，Postgresql ，TypeORM，Swagger for API 文档，角色基本访问控制和最佳应用程序架构。
-  - [NestJS Prisma Starter](https://github.com/fivethree-team/nestjs-prisma-client-starter) - NestJS 的入门项目，包括带有 Prisma 客户端的 Graphql，Passport-JWT 身份验证，Swagger Api 和 Docker。
+  - [MEAN Todo with NestJS](https://github.com/nartc/nest-mean) - 一个使用 NestJS 和 Swagger 的简单 Todo 应用程序包含授权/身份验证
+  - [NestJS Boilerplate](https://github.com/Vivify-Ideas/nestjs-boilerplate) - 具有可用身份验证，typeorm，env 配置和 swagger 的 Boilerplate开始制作伟大事物所需的一切🚀
+  - [Awesome Nest Boilerplate](https://github.com/NarHakobyan/awesome-nest-boilerplate), Typescript ，Postgresql ，TypeORM，Swagger for API 文档，角色基本访问控制和最佳应用程序架构
+  - [NestJS Prisma Starter](https://github.com/fivethree-team/nestjs-prisma-client-starter) - NestJS 的入门项目，包括带有 Prisma 客户端的 Graphql，Passport-JWT 身份验证，Swagger Api 和 Docker
   - [TeanJS](https://github.com/adrien2p/teanjs) - TeanJS是一个入门程序，它为您提供所有方式，以便能够尽快开始编写代码
-  - [NestJS DDD Boilerplate](https://github.com/pezzetti/base-app-nestjs) 具有 NestJS，类验证器和 TypeORM 的领域驱动设计基础应用程序。完全可测试。
-  - [Nest Mongo Graphql](https://github.com/benawad/nest-mongo-graphql/) - 带有 NestJS，TypeORM，TypeGrapQL，MongoDB，GraphQL 的 Dockerized API 样板，以及带有 Makefile 的自动化任务。[https://typegraphql.ml/](https://typegraphql.ml/)
+  - [NestJS DDD Boilerplate](https://github.com/pezzetti/base-app-nestjs) 具有 NestJS，类验证器和 TypeORM 的领域驱动设计基础应用程序完全可测试
+  - [Nest Mongo Graphql](https://github.com/benawad/nest-mongo-graphql/) - 带有 NestJS，TypeORM，TypeGrapQL，MongoDB，GraphQL 的 Dockerized API 样板，以及带有 Makefile 的自动化任务[https://typegraphql.ml/](https://typegraphql.ml/)
   - [Ultimate Backend](https://github.com/juicycleff/ultimate-backend) - 具有 cqrs graphql 微服务架构，Apollo 联盟，事件源和身份验证的企业多租户 SaaS 入门套件
   - [NestJS GraphQL 样板](https://github.com/fernandohenriques/nestjs-graphql-boilerplate) - 带有 NestJS，TypeORM，TypeGrapQL，MongoDB，GraphQL 的 Dockerized API 样板以及带有 Makefile 的自动化任务
-  - [The Knests Stack](https://github.com/tudorconstantin/knests/) - 终极示例，其中包括：PostgreSQL，Knex.js，NestJS，Next.js，GraphQL，React(with hooks and typescript)，Material-UI，用于 Docker 的 Docker 多阶段镜像以及已完全配置的 Gitlab CI/CD。
+  - [The Knests Stack](https://github.com/tudorconstantin/knests/) - 终极示例，其中包括：PostgreSQL，Knex.js，NestJS，Next.js，GraphQL，React(with hooks and typescript)，Material-UI，用于 Docker 的 Docker 多阶段镜像以及已完全配置的 Gitlab CI/CD
 
 ### 使用 NestJS 的项目
 
 - 开源
   - [EVE Book API](https://github.com/evebook/api) - EVE Book API
-  - [Ever®](https://github.com/ever-co/ever) - 用于按需经济和数字市场的开源商务平台。
-  - [Gauzy](https://github.com/ever-co/gauzy) - 适用于现代代理商和工作室的开源利润分享平台。
+  - [Ever®](https://github.com/ever-co/ever) - 用于按需经济和数字市场的开源商务平台
+  - [Gauzy](https://github.com/ever-co/gauzy) - 适用于现代代理商和工作室的开源利润分享平台
   - [LXDhub](https://github.com/Roche/lxdhub) - Linux 容器管理系统（LXC）.
-  - [Notadd](https://github.com/notadd/notadd) - 微服务开发架构。
+  - [Notadd](https://github.com/notadd/notadd) - 微服务开发架构
   - [Pimp My PR](https://github.com/valueadd-poland/pimp-my-pr) - 用于统计和拉取请求管理的开源平台
   
 
@@ -104,13 +104,13 @@
   - [NestJS Config](https://github.com/nestjsx/nestjs-config) -  处理项目配置的一个很棒的模块
   - [Nest Consul Config](https://github.com/nest-cloud/nest-consul-config) - 从 consul kv 获取配置的模块
   - [Nest Consul Service](https://github.com/nest-cloud/nestcloud) - 基于 Consul 的 NodeJS 微服务解决方案，由 Typescript 语言和 NestJS 框架编写
-  - [NestJS Easy Config](https://github.com/rubiin/nestjs-easyconfig) - 一个用于管理配置的 nestjs模块，提供了一些现代的功能。
+  - [NestJS Easy Config](https://github.com/rubiin/nestjs-easyconfig) - 一个用于管理配置的 nestjs模块，提供了一些现代的功能
   - [Nest Consul Loadbalance](https://github.com/nest-cloud/nest-consul-loadbalance) -  用于 Rest 的软件负载均衡器
-  - [Nest Schedule(官方)](https://github.com/miaowing/nest-schedule) - 装饰器实现的定时任务。
-  - [Nest Schedule](https://github.com/miaowing/nest-schedule) - 装饰器实现的定时任务。
-  - [Nest Queue](https://github.com/owl1n/nest-queue) - 基于 Redis 的简单队列管理，适用于您的应用程序。
-  - [Nest AutoMapper](https://github.com/nestjsx/automapper) - NestJS 的 AutoMapper 模块。    
-  - [Nest Multer Extended](https://github.com/jeffminsungkim/nestjs-multer-extended) - 用于NestJS框架的扩展MulterModule，具有灵活的Amazon S3上传功能和有用的功能。
+  - [Nest Schedule(官方)](https://github.com/miaowing/nest-schedule) - 装饰器实现的定时任务
+  - [Nest Schedule](https://github.com/miaowing/nest-schedule) - 装饰器实现的定时任务
+  - [Nest Queue](https://github.com/owl1n/nest-queue) - 基于 Redis 的简单队列管理，适用于您的应用程序
+  - [Nest AutoMapper](https://github.com/nestjsx/automapper) - NestJS 的 AutoMapper 模块    
+  - [Nest Multer Extended](https://github.com/jeffminsungkim/nestjs-multer-extended) - 用于NestJS框架的扩展MulterModule，具有灵活的Amazon S3上传功能和有用的功能
 - 状态管理
   - [Ngrx Nest](https://github.com/derekkite/ngrx-nest) - 在 Nest 上使用  ngrx/store 和 ngrx/effects.
 - 微信开发
@@ -124,35 +124,35 @@
 - 邮件
   - [Nest Mailer](https://github.com/partyka95/nest-mailer) -  Nest 框架的邮件模块
 - API
-  - [Swagger](https://github.com/nestjs/swagger) - 这是 Nest 的 OpenAPI（Swagger）模块。. _[教程](https://docs.nestjs.com/recipes/swagger)]_.
-  - [Nest CRUD](https://github.com/nestjsx/crud) -  用于 RESTful API 的 Nest CRUD。
-  - [Nestjs-Query](https://github.com/doug-martin/nestjs-query) - 用于 GraphQL API 的 Nest CRUD 。
+  - [Swagger](https://github.com/nestjs/swagger) - 这是 Nest 的 OpenAPI（Swagger）模块. _[教程](https://docs.nestjs.com/recipes/swagger)]_.
+  - [Nest CRUD](https://github.com/nestjsx/crud) -  用于 RESTful API 的 Nest CRUD
+  - [Nestjs-Query](https://github.com/doug-martin/nestjs-query) - 用于 GraphQL API 的 Nest CRUD 
   - [Nest Middlewares](https://github.com/wbhob/nest-middlewares) - NestJS 的通用可注入中间件
 - Errors
-  - [NestJS Flub](https://github.com/shekohex/nestjs-flub) - 漂亮的错误 NestJS框架的Stack Viewer 。
-  - [NestJS Enlighten](https://github.com/ozkanonur/nestjs-enlighten) - NestJS 框架的类似 laravel-ignition 的错误页面。
+  - [NestJS Flub](https://github.com/shekohex/nestjs-flub) - 漂亮的错误 NestJS框架的Stack Viewer 
+  - [NestJS Enlighten](https://github.com/ozkanonur/nestjs-enlighten) - NestJS 框架的类似 laravel-ignition 的错误页面
   - [Nest Raven](https://github.com/mentos1386/nest-raven) - Nest.js 框架的 Sentry Raven 模块
 - Lint
   - [Eslint Plugin Nestjs](https://github.com/unlight/eslint-plugin-nestjs) - 用于 NestJS 框架的 ESLint 规则
 - 路由🚦
-  - [Nest Router](https://github.com/shekohex/nest-router) - NestJS 框架的路由模块🚦 🚀 用于组织路由，创建路由树等。🚦 🚀
+  - [Nest Router](https://github.com/shekohex/nest-router) - NestJS 框架的路由模块🚦 🚀 用于组织路由，创建路由树等🚦 🚀
 - Dialogflow :satellite:
-  - [NestJS Dialogflow](https://github.com/adrien2p/nestjs-dialogflow) - Dialog 流模块，使用 NestJS 简化 NLP 应用程序的 Web 钩子处理。
+  - [NestJS Dialogflow](https://github.com/adrien2p/nestjs-dialogflow) - Dialog 流模块，使用 NestJS 简化 NLP 应用程序的 Web 钩子处理
 - 日志
   - [Nest Morgan](https://github.com/mentos1386/nest-morgan) - 用于 NestJS 的 Morgan 模块
   - [Nest Winston](https://github.com/gremo/nest-winston) - 用于 NestJS 的 Winston 模块
   - [Nest Pino](https://github.com/iamolegga/nestjs-pino) - 用于 NestJS 的 Pino 模块，在任意位置记录请求上下文
 - 监控
-  - [Nest Status Monitor](https://github.com/GenFirst/nest-status-monitor) - 基于 Socket.io 和 Chart.js 的简单自托管模块，用于报告 Nest.js 的 node.js 服务器的实时状态。
+  - [Nest Status Monitor](https://github.com/GenFirst/nest-status-monitor) - 基于 Socket.io 和 Chart.js 的简单自托管模块，用于报告 Nest.js 的 node.js 服务器的实时状态
   - [Nest Terminus](https://github.com/nestjs/terminus) - 综合健康检查, 基于 [Terminus](https://github.com/godaddy/terminus) .
 - 国际化
-  - [Nest i18n](https://github.com/ToonvanStrijp/nestjs-i18n) - 在您的服务器上轻松添加 i18n 支持，内置丰富的格式化 api 。    
+  - [Nest i18n](https://github.com/ToonvanStrijp/nestjs-i18n) - 在您的服务器上轻松添加 i18n 支持，内置丰富的格式化 api     
 - 事件
-  - [Nest Event](https://github.com/yak0/nest-event) - 使用 NestJS 框架的装饰器进行事件处理。
+  - [Nest Event](https://github.com/yak0/nest-event) - 使用 NestJS 框架的装饰器进行事件处理
 - Auth
   - [NestJS Session](https://github.com/iamolegga/nestjs-session) - NestJS 的 Session 模块, 基于 [express-session](https://npm.im/express-session)
 - RBAC（基于角色的访问控制）
-  - [Nest RBAC](https://github.com/sergey-telpuk/nestjs-rbac) - 用于 NestJS 的 RBAC 模块，具有动态存储和缓存。
+  - [Nest RBAC](https://github.com/sergey-telpuk/nestjs-rbac) - 用于 NestJS 的 RBAC 模块，具有动态存储和缓存
 
 ### 集成
 
@@ -161,18 +161,18 @@
   - [NestJS + Auth0](https://github.com/cdiaz/nestjs-auth0) - 使用 Auth0 的 NestJS Framework Web 应用程序
 - 数据库
   - [Typeorm](https://github.com/nestjs/typeorm) - 用于 Nest 框架的 TypeORM 模块 [[Tutorial](http://docs.nestjs.com/recipes/sql-typeorm)].
-  - [hasura](https://hasura.io/) -Hasura 连接到您的数据库和微服务，并提供可用于生产的GraphQL API。
-  - [prisma](https://www.prisma.io/) -Prisma 取代了传统的ORM。
+  - [hasura](https://hasura.io/) -Hasura 连接到您的数据库和微服务，并提供可用于生产的GraphQL API
+  - [prisma](https://www.prisma.io/) -Prisma 取代了传统的ORM
   - [sequelize](https://github.com/sequelize/sequelize) -传统 Node.js ORM
   - [notadd-cli](https://github.com/notadd/notadd-cli) - Typescript 生成 Graphql 
   - [Magnus](https://github.com/notadd/magnus) 自动生成 grpc 及 graphql 的库
   - [Nest Mongoose](https://github.com/nestjs/mongoose) - 用于 Nest 框架的 Mongoose 模块
   - [Nest Typegoose](https://github.com/kpfromer/nestjs-typegoose) - nest.js 的 [Typegoose](https://github.com/szokodiakos/typegoose) 模块
-  - [Nest Sequelize JWT](https://github.com/adrien2p/nest-js-sequelize-jwt) - 入门套件 Nest + Sequelize + jwt。
+  - [Nest Sequelize JWT](https://github.com/adrien2p/nest-js-sequelize-jwt) - 入门套件 Nest + Sequelize + jwt
   - [Nest sequelize-typescript](https://github.com/kentloog/nestjs-sequelize-typescript) - Nest + sequelize-typescript + JWT + Jest + Swagger
 - GraphQL
   - [NestJS Graphql](https://github.com/adrien2p/nest-js-graphql) - 实现 Graphql 模块的 NestJS 启动器
-  - [GoLevelUp NestJS GraphQL 请求](https://github.com/golevelup/nestjs/tree/master/packages/graphql-request) - 从服务器端 NestJS 代码轻松注入和使用 GraphQLClient 实例。与第三方GraphQL API 交互很有用
+  - [GoLevelUp NestJS GraphQL 请求](https://github.com/golevelup/nestjs/tree/master/packages/graphql-request) - 从服务器端 NestJS 代码轻松注入和使用 GraphQLClient 实例与第三方GraphQL API 交互很有用
   - [GoLevelUp NestJS Hasura](https://github.com/golevelup/nestjs/tree/master/packages/hasura) - 与 [Hasura](https://hasura.io/) 一起使用的 NestJS 集成提供了实时 GraphQL Postgres数据库上的 API
   
 - Pattern
@@ -211,13 +211,13 @@
 
 - 命令行/终端
 
-  - [CLI](https://github.com/nestjs/nest-cli) - NestJS 应用程序的 CLI 工具。
+  - [CLI](https://github.com/nestjs/nest-cli) - NestJS 应用程序的 CLI 工具
   - [Yeoman Generator](https://github.com/ashinzekene/generator-nestjs-app) -  用于 nestsjs 应用程序的自动生成器
   - [NestJS Console](https://github.com/Pop-Code/nestjs-console) - 一个为应用程序提供 cli 的 NestJS 模块
 
 
 ### 其他
 
-- [ts-toolbelt](https://github.com/pirix-gh/ts-toolbelt) - ts-toolbelt 是一个类型库，它提供了更新，更改和计算 TypeScript 类型的简单方法。   
+- [ts-toolbelt](https://github.com/pirix-gh/ts-toolbelt) - ts-toolbelt 是一个类型库，它提供了更新，更改和计算 TypeScript 类型的简单方法   
 
 更多... [nestjs-awesome](https://github.com/juliandavidmr/awesome-nestjs)

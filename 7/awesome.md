@@ -70,6 +70,7 @@
   - [Serverless-Lambda-FirestoreDB](https://github.com/mamori-i-japan/mamori-i-japan-api) - 具有 AWS Lambda，FirestoreDB，Firebase Auth，Winston Logger 的完全无服务器生产应用程序，实现了管理员角色授权
   - [Serverless-nestjs-TypeOrm](https://github.com/kop7/serverless-nestjs-typeorm) - 使用 NestJS 和 TypeORM 的 serverless
   - [Passport Email Auth](https://github.com/marcomelilli/nestjs-email-authentication) 入门项目，包括用于通过MongoDB和PassportJs进行用户电子邮件身份验证的API
+  - [genal-chat](https://github.com/genaller/genal-chat) - 使用 NestJS，Vue，Typescript 实现有趣的web聊天室
   
 
 - 样例

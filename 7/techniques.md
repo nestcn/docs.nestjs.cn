@@ -1853,6 +1853,8 @@ export class AppModule {}
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
+export type CatDocument = Cat & Document;
+
 @Schema()
 export class Cat extends Document {
   @Prop()
@@ -1920,10 +1922,10 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CatsController } from './cats.controller';
 import { CatsService } from './cats.service';
-import { CatSchema } from './schemas/cat.schema';
+import { Cat, CatSchema } from './schemas/cat.schema';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: 'Cat', schema: CatSchema }])],
+  imports: [MongooseModule.forFeature([{ name: Cat.name, schema: CatSchema }])],
   controllers: [CatsController],
   providers: [CatsService],
 })
@@ -1940,12 +1942,12 @@ export class CatsModule {}
 import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Cat } from './interfaces/cat.interface';
+import { Cat, CatDocument } from './schemas/cat.schema';
 import { CreateCatDto } from './dto/create-cat.dto';
 
 @Injectable()
 export class CatsService {
-  constructor(@InjectModel('Cat') private catModel: Model<Cat>) {}
+  constructor(@InjectModel('Cat') private catModel: Model<CatDocument>) {}
 
   async create(createCatDto: CreateCatDto): Promise<Cat> {
     const createdCat = new this.catModel(createCatDto);

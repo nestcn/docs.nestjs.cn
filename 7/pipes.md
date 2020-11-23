@@ -15,13 +15,14 @@
 
 ## 内置管道
 
-`Nest` 自带五个个开箱即用的管道，即 
+`Nest` 自带六个开箱即用的管道，即 
 
 - `ValidationPipe`
 - `ParseIntPipe`
 - `ParseBoolPipe`
 - `ParseArrayPipe`
 - `ParseUUIDPipe`
+- `DefaultValuePipe`
 
 
 他们从 `@nestjs/common` 包中导出。为了更好地理解它们是如何工作的，我们将从头开始构建它们。
@@ -362,7 +363,7 @@ findOne(@Param('id', UserByIdPipe) userEntity: UserEntity) {
 
 | 用户名                                       | 头像                                                                                                                                                            | 职能 | 签名                                                                          |
 | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------- |
-| [@zuohuadong](https://github.com/zuohuadong) | <img class="avatar-66 rm-style" src="https://i.loli.net/2020/03/24/ed8yXDRGni4paQf.jpg">                                                        | 翻译 | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github |
+| [@zuohuadong](https://github.com/zuohuadong) | <img class="avatar-66 rm-style" src="https://pic.downk.cc/item/5f4cafe7160a154a67c4047b.jpg">                                                        | 翻译 | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github |
 | [@Drixn](https://drixn.com/)                 | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">                                                                                | 翻译 | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/)                             |
 [@Armor](https://github.com/Armor-cn)  | <img class="avatar-66 rm-style" height="70" src="https://avatars3.githubusercontent.com/u/31821714?s=460&v=4">  |  翻译  | 专注于 Java 和 Nest，[@Armor](https://armor.ac.cn/) |
 | [@tangkai](https://github.com/tangkai123456) | <img class="avatar-66 rm-style" height="70" src="https://avatars1.githubusercontent.com/u/22436910">                                                            | 翻译 | 专注于 React，[@tangkai](https://github.com/tangkai123456)                    |

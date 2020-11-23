@@ -226,7 +226,7 @@ async publish() {
 }
 ```
 
-该 `emit()`方法有两个参数，`pattern` 和 `payload`。`pattern` 具有 `@MessagePattern()` 修饰符中定义的这个模式，而`payload` 是我们想要传输到另一个微服务的消息。此方法返回一个 `hot Observable`（不同于`send()`方法返回一个 `cold Observable`），这意味着无论您是否显式订阅该 `Observable`，代理都将立即尝试传递事件。
+该 `emit()`方法有两个参数，`pattern` 和 `payload`。`pattern` 具有 `@EventPattern()` 修饰符中定义的这个模式，而`payload` 是我们想要传输到另一个微服务的消息。此方法返回一个 `hot Observable`（不同于`send()`方法返回一个 `cold Observable`），这意味着无论您是否显式订阅该 `Observable`，代理都将立即尝试传递事件。
 
 ### 作用域
 
@@ -1163,7 +1163,7 @@ accumulate(data: number[]): number {
 
 | 用户名 | 头像 | 职能 | 签名 |
 |---|---|---|---|
-| [@zuohuadong](https://github.com/zuohuadong)  | <img class="avatar-66 rm-style" src="https://i.loli.net/2020/03/24/ed8yXDRGni4paQf.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
+| [@zuohuadong](https://www.zhihu.com/people/dongcang)  | <img class="avatar-66 rm-style" src="https://pic.downk.cc/item/5f4cafe7160a154a67c4047b.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
 | [@Drixn](https://drixn.com/)  | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">  |  翻译  | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/) |
 | [@Armor](https://github.com/Armor-cn)  | <img class="avatar-66 rm-style" height="70" src="https://avatars3.githubusercontent.com/u/31821714?s=460&v=4">  |  翻译  | 专注于 Java 和 Nest，[@Armor](https://armor.ac.cn/) | 
 | [@tihssiefiL](https://github.com/tihssiefiL)  | <img class="avatar-66 rm-style" height="80" src="https://avatars1.githubusercontent.com/u/27731469?s=460&u=26299e3ac3d46723492efa3daf1eb9703de0616a&v=4">  |  翻译  | 专注于 前端 和 nodejs, [@tihssiefiL](https://blog.ezcomezgo.com) | 

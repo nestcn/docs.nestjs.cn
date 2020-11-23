@@ -276,7 +276,7 @@ Nest在`nest-cli.json`文件中保留了组织、创建和部署标准项目和m
 
 |属性名称 | 属性值类型 | 描述|
 |---|---|---|
-| `webpack` | `boolean` | 如果为`true`，使用`webpack copiler`。如果`false`或者不存在，使用`tsc`。在monorepo模式中，默认为`true`(使用webpack)，在标准模式下，默认为`false`(使用`tsc`)，详见如下|
+| `webpack` | `boolean` | 如果为`true`，使用`webpack compiler`。如果`false`或者不存在，使用`tsc`。在monorepo模式中，默认为`true`(使用webpack)，在标准模式下，默认为`false`(使用`tsc`)，详见如下|
 | `tsConfigPath` | `string` | (仅用于monorepo)包含`tsconfig.json`文件设置的点，在使用`nest build`或者`nest start`而未指定`project`选项时将使用该设置（例如，默认项目在构建或启动时） |
 | `webpackConfigPath` |`string`| webpack选项文件，如果不指定，Nest会查找`webpack.config.js`。详见后文。|
 | `deleteOutDir` |`boolean`| 如果为`true`，无论编译器是否激活， 首先会移除汇编输出目录（在`tsconfig.json`中配置，默认`./dist`)。|
@@ -801,7 +801,7 @@ $ npm install -D @nestjs/cli
 
 | 用户名 | 头像 | 职能 | 签名 |
 |---|---|---|---|
-| [@zuohuadong](https://github.com/zuohuadong)  | <img class="avatar-66 rm-style" src="https://i.loli.net/2020/03/24/ed8yXDRGni4paQf.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
+| [@zuohuadong](https://www.zhihu.com/people/dongcang)  | <img class="avatar-66 rm-style" src="https://pic.downk.cc/item/5f4cafe7160a154a67c4047b.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
 [@Armor](https://github.com/Armor-cn)  | <img class="avatar-66 rm-style" height="70" src="https://avatars3.githubusercontent.com/u/31821714?s=460&v=4">  |  翻译  | 专注于 Java 和 Nest，[@Armor](https://armor.ac.cn/) 
 | [@Drixn](https://drixn.com/)  | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">  |  翻译  | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/) |
 | [@franken133](https://github.com/franken133)  | <img class="avatar rounded-2" src="https://avatars0.githubusercontent.com/u/17498284?s=400&amp;u=aa9742236b57cbf62add804dc3315caeede888e1&amp;v=4" height="70">  |  翻译  | 专注于 java 和 nest，[@franken133](https://github.com/franken133)|

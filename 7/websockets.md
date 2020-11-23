@@ -8,34 +8,34 @@
 
 ![](https://docs.nestjs.com/assets/Gateways_1.png)
 
-?> `提示`网关的行为与简单的`提供者`相同，因此它可以毫不费力地通过构造函数注入依赖关系。另外，网关也可以由其他类（提供者和控制器）注入。
+?> 网关可以被看作是`provider`，这意味着它可以毫不费力地通过构造函数注入依赖关系。另外，网关也可以由其他类（提供者和控制器）注入。
 
 ### 安装
 
-首先，我们需要安装所需的软件包：
+要开始构建基于WebSockets的应用，首先，我们需要安装所需的软件包：
 
 ```bash
 $ npm i --save @nestjs/websockets @nestjs/platform-socket.io
 $ npm i --save-dev @types/socket.io
 ```
 
-### 基本
+### 概述
 
-一般来说，除非你的应用程序不是 `Web` 应用程序，或者您已手动更改端口，否则每个网关都会在**HTTP服务器**运行时监听相同的端口。我们可以通过将参数传递给 `@WebSocketGateway(80)` 装饰器来改变这种行为，其中 `8` 是一个选定的端口号。另外，您可以使用以下构造来设置此网关使用的[命名空间](https://socket.io/docs/rooms-and-namespaces/)：
+一般来说，除非你的应用程序不是 `Web` 应用程序，或者您已手动更改端口，否则每个网关都会在**HTTP服务器**运行时监听相同的端口。我们可以通过将参数传递给 `@WebSocketGateway(80)` 装饰器来改变这种行为，其中 `80` 是一个选定的端口号。另外，您可以使用以下构造来设置此网关使用的[命名空间](https://socket.io/docs/rooms-and-namespaces/)：
 
 ```typescript
 @WebSocketGateway(80, { namespace: 'events' })
 ```
 
-!> 警告只有将网关放入 `providers` 程序数组中，网关才会启动。
+!> 只有将网关放入当前模块的 `providers` 数组中，网关才会实例化。
 
-您可以将任何受支持的选项与第二个参数一起传递给 `@WebSocketGateway()` 装饰器，如下所示:
+你可以在 `@WebSocketGateway()` 装饰器的第二个参数中给socket构造函数传入任何支持的选项，如下所示:
 
 ```typescript
 @WebSocketGateway(81, { transports: ['websocket'] })
 ```
 
-现在，网关现在正在监听，但我们目前尚未订阅收到的消息。让我们创建一个处理程序，它将订阅`事件`消息并使用完全相同的数据响应用户。
+现在，网关现在正在监听，但我们目前尚未订阅收到的消息。让我们创建一个处理程序，它将订阅`events`消息并使用完全相同的数据响应用户。
 
 >events.gateway.ts
 
@@ -92,7 +92,7 @@ socket.emit('events', { name: 'Nest' }, data => console.log(data));
 
 ### 多个响应
 
-确认仅发送一次。而且，原生 `WebSockets` 不支持它。要解决这个限制，可以返回一个包含两个属性的对象。在 `event` 为所发射的事件的名称 `data` 具有要被转发到客户端。
+确认仅发送一次。而且，原生 `WebSockets` 不支持它。要解决这个限制，可以返回一个包含两个属性的对象。发射事件的名称 `event` 和将要转发给客户端的 `data` 。
 
 > events.gateway.ts
 
@@ -113,7 +113,7 @@ socket.on('events', data => console.log(data));
  
 ### 异步响应
 
-消息处理程序可以同步或异步响应。因此，支持异步方法。消息处理程序还能够返回一个 `Observable` 对象，在这种情况下，结果值将被发出，直到流完成。
+消息处理程序可以同步或异步响应。因此，也支持异步方法。消息处理程序还能够返回一个 `Observable` 对象，在这种情况下，结果值将被出去，直到流完成。
 
 > events.gateway.ts
 
@@ -142,9 +142,9 @@ onEvent(@MessageBody() data: unknown): Observable<WsResponse<number>> {
 
 ?> 提示每个生命周期接口都来自 `@nestjs/websockets` 包。
 
-### 服务
+### 服务器
 
-有时，您可能希望直接访问本机的、特定于平台的服务器实例。这个对象的引用作为参数传递给 `afterInit()` 方法( `OnGatewayInit` 接口)。另一个选项是使用 `@WebSocketServer()` 装饰器。
+有时，您可能希望直接访问原生的、特定于平台的服务器实例。这个对象的引用作为参数传递给 `afterInit()` 方法( `OnGatewayInit` 接口)。另一个选项是使用 `@WebSocketServer()` 装饰器。
 
 偶尔，您可能希望直接访问原生`特定库`的服务器实例。此对象的引用作为参数传递给`afterInit()`方法（`OnGatewayInit`接口）。另一个选项是使用 `@WebSocketServer()` 装饰器。
 
@@ -169,7 +169,7 @@ throw new WsException('Invalid credentials.');
 
 ?> 注意 `WsException` 类是从`@nestjs/websockets`包中导入的。
 
-`Nest` 会处理这个异常并用下列数据发出异常消息：
+在上述示例中，`Nest` 会处理这个抛出的异常并使用下列结构发出`exception`消息：
 
 ```json
 {
@@ -180,7 +180,7 @@ throw new WsException('Invalid credentials.');
 
 ### 过滤器
 
-**自定义过滤器**也是非常类似的，并且工作方式与主过滤器完全相同。下面是一个使用手动实例化的方法范围过滤器的示例（类范围的工作原理）。
+**Web sockets**异常过滤器行为和HTTP异常处理器也是非常类似的。下面是一个使用手动实例化的方法范围过滤器的示例。和基于HTTP应用一样，你也可以使用一个网关范围的过滤器（例如，使用`@UseFilters()`装饰器作为网关类的前缀）。
 
 
 ```typescript
@@ -193,7 +193,7 @@ onEvent(client, data: any): WsResponse<any> {
 ```
 ### 继承
 
-通常，您将创建完全自定义的异常过滤器，以满足您的应用程序要求。虽然您希望重用已经实现的核心异常过滤器并根据某些因素覆盖行为，但可能存在用例。
+通常，您将创建完全自定义的异常过滤器，以满足您的应用程序要求。但仍然存在一些情况，你可能需要通过简单的扩展`核心异常过滤器`并基于一些特定要素覆盖其行为。
 
 为了将异常处理委托给基本过滤器，您需要扩展 `BaseWsExceptionFilter` 并调用继承的 `catch()` 方法。
 
@@ -208,18 +208,17 @@ export class AllExceptionsFilter extends BaseWsExceptionFilter {
   }
 }
 ```
-
-显然，您应该使用定制的业务逻辑(例如，添加各种条件)来增强上述实现。
+上述应用只是用于概括性说明该方法如何使用。在您的应用中扩展的异常过滤器应该包含您的业务逻辑(例如，添加各种条件)。
 
 ## 管道
 
-`websockets` 管道和[普通管道](https://docs.nestjs.com/pipes)没有区别。唯一应该注意的是，不要抛出 `HttpException`，而应该使用 `WsException`。此外，所有管道将仅应用于data参数。
+`websockets` 管道和[普通管道](https://docs.nestjs.com/pipes)没有区别。唯一应该注意的是，不要抛出 `HttpException`，而应该使用 `WsException`。此外，所有管道将仅应用于data参数（因为验证或者转换`client`实例没有用）。
 
 ?> 提示`WsException` 类在 `@socketjs/websockets`包中可用。
 
 ### 绑定管道
 
-下面是一个使用手动实例化的方法范围管道的示例（类范围的工作）：
+下面是一个使用手动实例化的方法范围管道的示例，和基于HTTP的应用一样，你可以使用网关范围管道（例如，通过在网关类前加上`@UsePipes()`装饰器）：
 
 ```typescript
 @UsePipes(new ValidationPipe())
@@ -234,11 +233,11 @@ handleEvent(client: Client, data: unknown): WsResponse<unknown> {
 
 `websockets` 和[常规守卫](https://docs.nestjs.com/guards)守卫之间没有区别，但它会抛出`WsException`（而不是`HttpException`）。
 
-?> 提示 `WsException` 类在 `@socketjs/websockets` 包中可用。
+?>  `WsException` 类在 `@socketjs/websockets` 包中可用。
 
 ### 绑定守卫
 
-下面是一个使用方法范围保护的示例（类范围的工作）：
+下面是一个使用方法范围守卫的示例,和基于HTTP的应用一样，你可以使用网关范围的守卫（例如，通过在网关类前加上`@UseGuards()`装饰器）：
 
 ```typescript
 @UseGuards(AuthGuard)
@@ -251,7 +250,7 @@ handleEvent(client: Client, data: unknown): WsResponse<unknown> {
 
 ## 拦截器
 
-常规[拦截器](https://docs.nestjs.com/interceptors)和 `websockets` **拦截器**之间没有区别。 下面是一个使用手动实例化的方法范围拦截器的示例（类范围的工作）。
+常规[拦截器](https://docs.nestjs.com/interceptors)和 `web sockets` **拦截器**之间没有区别。 下面是一个使用手动实例化的方法范围拦截器的示例，和基于HTTP的应用一样，你可以使用网关范围拦截器（例如，通过在网关类前加上`@UseInterceptors()`装饰器）：
 
 ```typescript
 @UseInterceptors(new TransformInterceptor())
@@ -264,7 +263,7 @@ handleEvent(client: Client, data: unknown): WsResponse<unknown> {
 
 ## 适配器
 
-`WebSockets` 模块与平台无关，因此，您可以通过使用 `WebSocketAdapter` 接口来创建自己的库（甚至是原生实现）。此接口强制实施下表中描述的几种方法：
+`WebSockets` 模块与平台无关，因此，您可以通过使用 `WebSocketAdapter` 接口来创建自己的库（甚至是原生实现）。此接口强制使用下表中描述的几种方法：
 
 |                      |                                  |
 | :------------------- | :------------------------------- |
@@ -403,6 +402,7 @@ app.useWebSocketAdapter(new WsAdapter(app));
 
 | 用户名 | 头像 | 职能 | 签名 |
 |---|---|---|---|
-| [@zuohuadong](https://github.com/zuohuadong)  | <img class="avatar-66 rm-style" src="https://i.loli.net/2020/03/24/ed8yXDRGni4paQf.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
+| [@zuohuadong](https://www.zhihu.com/people/dongcang)  | <img class="avatar-66 rm-style" src="https://pic.downk.cc/item/5f4cafe7160a154a67c4047b.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
 [@Armor](https://github.com/Armor-cn)  | <img class="avatar-66 rm-style" height="70" src="https://avatars3.githubusercontent.com/u/31821714?s=460&v=4">  |  翻译  | 专注于 Java 和 Nest，[@Armor](https://armor.ac.cn/) |
 | [@Drixn](https://drixn.com/)  | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">  |  翻译  | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/) |
+| [@weizy0219](https://github.com/weizy0219)  | <img class="avatar-66 rm-style" height="70" src="https://avatars3.githubusercontent.com/u/19883738?s=60&v=4">  |  翻译  | 专注于TypeScript全栈、物联网和Python数据科学，[@weizhiyong](https://www.weizhiyong.com) | 

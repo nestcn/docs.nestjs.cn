@@ -16,7 +16,14 @@
 
 二群：    
 
-<img src="https://pic.downk.cc/item/5f8c6dcb1cd1bbb86b7357f0.png" alt="加微信" width="211" height="280" align="bottom" />
+二维码失效。
+
+
+### 关注
+
+[左华栋的知乎](https://www.zhihu.com/people/dongcang)    
+[汪志成的知乎](https://www.zhihu.com/people/alpha-gde)    
+[justjavac的知乎](https://www.zhihu.com/people/justjavac.com)
 
 
 

@@ -12,7 +12,7 @@ GraphQLModule 仅仅是 [Apollo](https://www.apollographql.com) Server 的包装
 首先，我们需要安装以下依赖包：
 
 ```bash
-$ npm i --save @nestjs/graphql graphql-tools graphql
+$ npm i --save @nestjs/graphql graphql-tools graphql apollo-server-express
 ```
 
 ### 概述

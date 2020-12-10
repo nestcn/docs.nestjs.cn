@@ -332,8 +332,9 @@ export const jwtConstants = {
 
 现在,在`auth` 文件夹下 `auth.module.ts`，并更新它看起来像这样:
 
+> auth/auth.module.tsJS
+
 ```typescript
-auth/auth.module.tsJS
 
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -393,7 +394,7 @@ $ # Note: above JWT truncated
 
 ### 实施 Passport JWT
 
-我们现在可以处理我们的最终需求:通过要求在请求时提供有效的 `JWT` 来保护端点。护照对我们也有帮助。它提供了用于用 `JSON Web` 标记保护 `RESTful` 端点的 `passport-jwt` 策略。在 `auth` 文件夹中 `jwt.strategy.ts`，并添加以下代码:
+我们现在可以处理我们的最终需求:通过要求在请求时提供有效的 `JWT` 来保护端点。护照对我们也有帮助。它提供了用于用 `JSON Web` 标记保护 `RESTful` 端点的 `passport-jwt` 策略。在 `auth` 文件夹中创建 `jwt.strategy.ts`文件，并添加以下代码:
 
 > auth/jwt.strategy.ts 
 
@@ -425,7 +426,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
 `ignoreExpiration`:为了明确起见，我们选择默认的 `false` 设置，它将确保 `JWT` 没有过期的责任委托给 `Passport` 模块。这意味着，如果我们的路由提供了一个过期的 `JWT` ，请求将被拒绝，并发送 `401` 未经授权的响应。护照会自动为我们办理。
 
-`secret orkey`:我们使用权宜的选项来提供对称的秘密来签署令牌。其他选项，如 `pemo` 编码的公钥，可能更适合于生产应用程序(有关更多信息，请参见[此处](https://github.com/mikenicholson/passport-jwt#extracting-the-jwt-from-the-request))。如前所述，无论如何，不要把这个秘密公开。
+`secretOrkey`:我们使用权宜的选项来提供对称的密钥来签署令牌。其他选项，如 `pemo` 编码的公钥，可能更适合于生产应用程序(有关更多信息，请参见[此处](https://github.com/mikenicholson/passport-jwt#extracting-the-jwt-from-the-request))。如前所述，无论如何，不要把这个密钥公开。
 
 `validate()` 方法值得讨论一下。对于 `JWT` 策略，`Passport` 首先验证 `JWT` 的签名并解码 `JSON `。然后调用我们的 `validate()` 方法，该方法将解码后的 `JSON` 作为其单个参数传递。根据 `JWT` 签名的工作方式，我们可以保证接收到之前已签名并发给有效用户的有效 `token` 令牌。
 

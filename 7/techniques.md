@@ -3346,7 +3346,7 @@ export class TasksService {
 
 ?> 使用`JavaScript`日期算法来关联当前日期和计划工作。`@Cron(new Date(Date.now()+10*1000))`用于在应用启动10秒后运行。
 
-你可以在声明后访问并控制一个定时任务，或者使用[动态API](https://docs.nestjs.com/techniques/task-scheduling#dynamic-schedule-module-api)动态创建一个定时任务（其定时模式在运行时定义）。要通过API声明定时任务,你必须通过将选项对象中的`name`属性作为可选的第二个参数传递给装饰器，从而将工作和名称联系起来。
+你可以在声明后访问并控制一个定时任务，或者使用[动态API](https://docs.nestjs.cn/7/techniques?id=%e5%8a%a8%e6%80%81%e8%a7%84%e5%88%92%e6%a8%a1%e5%9d%97api)动态创建一个定时任务（其定时模式在运行时定义）。要通过API声明定时任务,你必须通过将选项对象中的`name`属性作为可选的第二个参数传递给装饰器，从而将工作和名称联系起来。
 
 ```typescript
 @Cron('* * 8 * * *', {

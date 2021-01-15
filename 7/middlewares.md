@@ -20,11 +20,11 @@ Nest 中间件实际上等价于 [express](http://expressjs.com/en/guide/using-m
 
 ```typescript
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {
-  use(req: Request, res: Response, next: Function) {
+  use(req: Request, res: Response, next: NextFunction) {
     console.log('Request...');
     next();
   }

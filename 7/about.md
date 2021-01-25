@@ -39,6 +39,7 @@
 
 - Binding 绑定
 - Bundle (上一代的 package 名称，不翻)
+- Buffer 缓存 （可不译）
 
 ### C
 
@@ -48,6 +49,7 @@
 - Chain 链式
 - Chain Methods 链式调用
 - Circular Dependency 循环依赖
+- claim 权利
 - Classes 类
 - CLI 命令行界面
 - Closure 闭包
@@ -168,7 +170,7 @@
 
 ### R
 
-
+- RBAC 基于角色的访问控制（可不翻）
 - Redis (不翻)
 - Redirect 重定向
 - Repository 仓库 (可不翻)

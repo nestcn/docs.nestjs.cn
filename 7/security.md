@@ -715,17 +715,484 @@ whoAmI(@CurrentUser() user: User) {
 }
 ```
 
-## 授权
+## 权限（Authorization）
 
-授权是指确定一个用户可以做什么的过程。
+权限是指确定一个用户可以做什么的过程。例如，管理员用户可以创建、编辑和删除文章，非管理员用户只能授权阅读文章。
 
-## 安全
+权限和认证是相互独立的。但是权限需要依赖认证机制。
+
+有很多方法和策略来处理权限。这些方法取决于其应用程序的特定需求。本章提供了一些可以灵活运用在不同需求条件下的权限实现方式。
+
+### 基础的RBAC实现
+
+基于角色的访问控制（**RBAC**)是一个基于角色和权限等级的中立的访问控制策略。本节通过使用`Nest`[守卫](7/guards)来实现一个非常基础的`RBAC`。
+
+首先创建一个`Role`枚举来表示系统中的角色：
+
+> role.enum.ts
+
+```TypeScript
+export enum Role {
+  User = 'user',
+  Admin = 'admin',
+}
+```
+
+?>  在更复杂的系统中，角色信息可能会存储在数据库里，或者从一个外部认证提供者那里获取。
+
+然后，创建一个`@Roles()`的装饰器，该装饰器允许某些角色拥有获取特定资源访问权。
+
+> roles.decorator.ts
+
+```TypeScript
+import { SetMetadata } from '@nestjs/common';
+import { Role } from '../enums/role.enum';
+
+export const ROLES_KEY = 'roles';
+export const Roles = (...roles: Role[]) => SetMetadata(ROLES_KEY, roles);
+```
+
+现在可以将`@Roles()`装饰器应用于任何路径处理程序。
+
+>cats.controller.ts
+
+```TypeScript
+@Post()
+@Roles(Role.Admin)
+create(@Body() createCatDto: CreateCatDto) {
+  this.catsService.create(createCatDto);
+}
+```
+
+最后，我们创建一个`RolesGuard`类来比较当前用户拥有的角色和当前路径需要的角色。为了获取路径的角色（自定义元数据），我们使用`Reflector`辅助类，这是个`@nestjs/core`提供的一个开箱即用的类。
+
+> roles.guard.ts
+
+```TypeScript
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+
+@Injectable()
+export class RolesGuard implements CanActivate {
+  constructor(private reflector: Reflector) {}
+
+  canActivate(context: ExecutionContext): boolean {
+    const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    if (!requiredRoles) {
+      return true;
+    }
+    const { user } = context.switchToHttp().getRequest();
+    return requiredRoles.some((role) => user.roles?.includes(role));
+  }
+}
+```
+
+?> 参见[应用上下文]((7/fundamentals))章节的反射与元数据部分，了解在上下文敏感的环境中使用`Reflector`的细节。
+
+!> 该例子被称为“基础的”是因为我们仅仅在路径处理层面检查了用户权限。在实际项目中，你可能有包含不同操作的终端/处理程序，它们各自需要不同的权限组合。在这种情况下，你可能要在你的业务逻辑中提供一个机制来检查角色，这在一定程度上会变得难以维护，因为缺乏一个集中的地方来关联不同的操作与权限。
+
+在这个例子中，我们假设`request.user`包含用户实例以及允许的角色(在`roles`属性中)。在你的应用中，需要将其与你的认证守卫关联起来，参见[认证](#认证（Authentication）)。
+
+要确保该示例可以工作，你的`User`类看上去应该像这样：
+
+```TypeScript
+class User {
+  // ...other properties
+  roles: Role[];
+}
+```
+
+最后，在控制层或者全局注册`RolesGuard`。
+
+```TypeScript
+providers: [
+  {
+    provide: APP_GUARD,
+    useClass: RolesGuard,
+  },
+],
+```
+
+当一个没有有效权限的用户访问一个终端时，Nest自动返回以下响应：
+
+```JSON
+{
+  "statusCode": 403,
+  "message": "Forbidden resource",
+  "error": "Forbidden"
+}
+```
+
+?> 如果你想返回一个不同的错误响应，需要抛出特定异常来代替返回一个布尔值。
+
+### 基于权利（Claims）的权限
+
+一个身份被创建后，可能关联来来自信任方的一个或者多个权利。权利是指一个表示对象可以做什么，而不是对象是什么的键值对。
+
+要在Nest中实现基于权利的权限，你可以参考我们在`RBAC`部分的步骤，仅仅有一个显著区别：比较`许可(permissions)`而不是角色。每个用户应该被授予了一组许可，相似地，每个资源/终端都应该定义其需要的许可（例如通过专属的`@RequirePermissions()`装饰器）。
+
+> cats.controller.ts
+
+```TypeScript
+@Post()
+@RequirePermissions(Permission.CREATE_CAT)
+create(@Body() createCatDto: CreateCatDto) {
+  this.catsService.create(createCatDto);
+}
+```
+
+?> 在这个例子中，`许可`(和RBAC部分的`角色`类似)是一个TypeScript的枚举，它包含了系统中所有的许可。
+
+### 与`CASL`集成
+
+`CASL`是一个权限库，用于限制用户可以访问哪些资源。它被设计为可渐进式增长的，从基础权利权限到完整的基于主题和属性的权限都可以实现。
+
+首先，安装`@cacl/ability`包：
+
+```bash
+$ npm i @casl/ability
+```
+
+?> 在本例中，我们选择`CASL`，但也可以根据项目需要选择其他类似库例如`accesscontrol`或者`acl`。
+
+安装完成后，为了说明CASL的机制，我们定义了两个类实体，`User`和`Article`。
+
+```TypeScript
+class User {
+  id: number;
+  isAdmin: boolean;
+}
+```
+`User`类包含两个属性，`id`是用户的唯一标识，`isAdmin`代表用户是否有管理员权限。
+
+```TypeScript
+class Article {
+  id: number;
+  isPublished: boolean;
+  authorId: string;
+}
+```
+
+`Article`类包含三个属性，分别是`id`、`isPublished`和`authorId`，`id`是文章的唯一标识，`isPublished`代表文章是否发布，`authorId`代表发表该文章的用户id。
+
+接下来回顾并确定本示例中的需求：
+- 管理员可以管理（创建、阅读、更新、删除/CRUD)所有实体
+- 用户对所有内容有阅读权限
+- 用户可以更新自己的文章(`article.authorId===userId`)
+- 已发布的文章不能被删除 (`article.isPublised===true`)
+
+基于这些需求，我们开始创建`Action`枚举，包含了用户可能对实体的所有操作。
+
+```TypeScript
+export enum Action {
+  Manage = 'manage',
+  Create = 'create',
+  Read = 'read',
+  Update = 'update',
+  Delete = 'delete',
+}
+```
+
+!> `manage`是CASL的关键词，代表`任何`操作。
+
+要封装CASL库，需要创建`CaslModule`和`CaslAbilityFactory`。
+
+```bash
+$ nest g module casl
+$ nest g class casl/casl-ability.factory
+```
+
+创建完成后，在`CaslAbilityFactory`中定义`creteForUser()`方法。该方法将为用户创建`Ability`对象。
+
+```TypeScript
+type Subjects = typeof Article | typeof User | Article | User | 'all';
+
+export type AppAbility = Ability<[Action, Subjects]>;
+
+@Injectable()
+export class CaslAbilityFactory {
+  createForUser(user: User) {
+    const { can, cannot, build } = new AbilityBuilder<
+      Ability<[Action, Subjects]>
+    >(Ability as AbilityClass<AppAbility>);
+
+    if (user.isAdmin) {
+      can(Action.Manage, 'all'); // read-write access to everything
+    } else {
+      can(Action.Read, 'all'); // read-only access to everything
+    }
+
+    can(Action.Update, Article, { authorId: user.id });
+    cannot(Action.Delete, Article, { isPublished: true });
+
+    return build();
+  }
+}
+```
+
+!> `all`是CASL的关键词，代表`任何对象`。
+
+?> `Ability`,`AbilityBuilder`,和`AbilityClass`从`@casl/ability`包中导入。
+
+在上述例子中，我们使用`AbilityBuilder`创建了`Ability`实例，如你所见，`can`和`cannot`接受同样的参数，但代表不同含义，`can`允许对一个对象执行操作而`cannot`禁止操作，它们各能接受4个参数，参见[CASL文档](https://casl.js.org/v4/en/guide/intro)。
+
+最后，将`CaslAbilityFactory`添加到提供者中，并在`CaslModule`模块中导出。
+
+```TypeScript
+import { Module } from '@nestjs/common';
+import { CaslAbilityFactory } from './casl-ability.factory';
+
+@Module({
+  providers: [CaslAbilityFactory],
+  exports: [CaslAbilityFactory],
+})
+export class CaslModule {}
+```
+
+现在，只要将`CaslModule`引入对象的上下文中，就可以将`CaslAbilityFactory`注入到任何标准类中。
+
+```TypeScript
+constructor(private caslAbilityFactory: CaslAbilityFactory) {}
+```
+
+在类中使用如下：
+
+```TypeScript
+const ability = this.caslAbilityFactory.createForUser(user);
+if (ability.can(Action.Read, 'all')) {
+  // "user" has read access to everything
+}
+```
+
+?> `Ability`类更多细节参见[CASL 文档](https://casl.js.org/v4/en/guide/intro)。
+
+例如，一个非管理员用户，应该可以阅读文章，但不允许创建一篇新文章或者删除一篇已有文章。
+
+```TypeScript
+const user = new User();
+user.isAdmin = false;
+
+const ability = this.caslAbilityFactory.createForUser(user);
+ability.can(Action.Read, Article); // true
+ability.can(Action.Delete, Article); // false
+ability.can(Action.Create, Article); // false
+```
+
+?> 虽然`Ability`和`AlbilityBuilder`类都提供`can`和`cannot`方法，但其目的并不一样，接受的参数也略有不同。
+
+依照我们的需求，一个用户应该能更新自己的文章。
+
+```TypeScript
+const user = new User();
+user.id = 1;
+
+const article = new Article();
+article.authorId = user.id;
+
+const ability = this.caslAbilityFactory.createForUser(user);
+ability.can(Action.Update, article); // true
+
+article.authorId = 2;
+ability.can(Action.Update, article); // false
+```
+
+如你所见，`Ability`实例允许我们通过一种可读的方式检查许可。`AbilityBuilder`采用类似的方式允许我们定义许可（并定义不同条件）。查看官方文档了解更多示例。
+
+### 进阶：通过策略守卫的实现
+
+本节我们说明如何声明一个更复杂的守卫，用来配置在方法层面（也可以配置在类层面）检查用户是否满足权限策略。在本例中，将使用CASL包进行说明，但它并不是必须的。同样，我们将使用前节创建的`CaslAbilityFactory`提供者。
+
+首先更新我们的需求。目的是提供一个机制来检查每个路径处理程序的特定权限。我们将同时支持对象和方法（分别针对简易检查和面向函数式编程的目的）。
+
+从定义接口和策略处理程序开始。
+
+```TypeScript
+import { AppAbility } from '../casl/casl-ability.factory';
+
+interface IPolicyHandler {
+  handle(ability: AppAbility): boolean;
+}
+
+type PolicyHandlerCallback = (ability: AppAbility) => boolean;
+
+export type PolicyHandler = IPolicyHandler | PolicyHandlerCallback;
+```
+
+如上所述，我们提供了两个可能的定义策略处理程序的方式，一个对象（实现了`IPolicyHandle`接口的类的实例）和一个函数（满足`PolicyHandlerCallback`类型）。
+
+接下来创建一个`@CheckPolicies()`装饰器，该装饰器允许配置访问特定资源需要哪些权限。
+
+```TypeScript
+export const CHECK_POLICIES_KEY = 'check_policy';
+export const CheckPolicies = (...handlers: PolicyHandler[]) =>
+  SetMetadata(CHECK_POLICIES_KEY, handlers);
+```
+现在创建一个`PoliciesGuard`，它将解析并执行所有和路径相关的策略程序。
+
+```TypeScript
+@Injectable()
+export class PoliciesGuard implements CanActivate {
+  constructor(
+    private reflector: Reflector,
+    private caslAbilityFactory: CaslAbilityFactory,
+  ) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const policyHandlers =
+      this.reflector.get<PolicyHandler[]>(
+        CHECK_POLICIES_KEY,
+        context.getHandler(),
+      ) || [];
+
+    const { user } = context.switchToHttp().getRequest();
+    const ability = this.caslAbilityFactory.createForUser(user);
+
+    return policyHandlers.every((handler) =>
+      this.execPolicyHandler(handler, ability),
+    );
+  }
+
+  private execPolicyHandler(handler: PolicyHandler, ability: AppAbility) {
+    if (typeof handler === 'function') {
+      return handler(ability);
+    }
+    return handler.handle(ability);
+  }
+}
+```
+
+?> 在本例中，我们假设`request.user`包含了用户实例。在你的应用中，可能将其与你自定义的认证守卫关联。参见认证章节。
+
+我们分析一下这个例子。`policyHandlers`是一个通过`@CheckPolicies()`装饰器传递给方法的数组，接下来，我们用`CaslAbilityFactory#create`方法创建`Ability`对象，允许我们确定一个用户是否拥有足够的许可去执行特定行为。我们将这个对象传递给一个可能是函数或者实现了`IPolicyHandler`类的实例的策略处理程序，暴露出`handle()`方法并返回一个布尔量。最后，我们使用`Array#every`方法来确保所有处理程序返回`true`。
+
+为了测试这个守卫，我们绑定任意路径处理程序，并且注册一个行内的策略处理程序（函数实现），如下：
+
+```TypeScript
+@Get()
+@UseGuards(PoliciesGuard)
+@CheckPolicies((ability: AppAbility) => ability.can(Action.Read, Article))
+findAll() {
+  return this.articlesService.findAll();
+}
+```
+
+我们也可以定义一个实现了`IPolicyHandler`的类来代替函数。
+
+```TypeScript
+export class ReadArticlePolicyHandler implements IPolicyHandler {
+  handle(ability: AppAbility) {
+    return ability.can(Action.Read, Article);
+  }
+}
+```
+
+并这样使用。
+
+```TypeScript
+@Get()
+@UseGuards(PoliciesGuard)
+@CheckPolicies(new ReadArticlePolicyHandler())
+findAll() {
+  return this.articlesService.findAll();
+}
+```
+
+!> 由于我们必须使用 `new`关键词来实例化一个策略处理函数，`CreateArticlePolicyHandler`类不能使用注入依赖。这在`ModuleRef#get`方法中强调过，参见[这里](7/fundamentals.md#依赖注入))。基本上，要替代通过`@CheckPolicies()`装饰器注册函数和实例，你需要允许传递一个`Type<IPolicyHandler>`，然后在守卫中使用一个类型引用(`moduleRef.get(YOUR_HANDLER_TYPE`)获取实例，或者使用`ModuleRef#create`方法进行动态实例化。
+
 
 ## 加密和散列
 
-### Helmet
+`加密`是一个信息编码的过程。这个过程将原始信息，即明文，转换为密文。理想情况下，只有授权方可以将密文解密为明文。加密本身并不能防止干扰，但是会将可理解内容拒绝给一个可能的拦截器。加密是个双向的函数，包含加密以及使用正确的`key`解密。
 
-通过适当地设置 `HTTP` 头，[Helmet](https://github.com/helmetjs/helmet) 可以帮助保护您的应用免受一些众所周知的 `Web` 漏洞的影响。通常，`Helmet` 只是`14`个较小的中间件函数的集合，它们设置与安全相关的 `HTTP` 头（[阅读更多](https://github.com/helmetjs/helmet#how-it-works)）。首先，安装所需的包：
+`哈希`是一个将给定值转换成另一个值的过程。哈希函数使用数学算法来创建一个新值。一旦哈希完成，是无法从输出值计算回输入值的。
+
+### 加密
+
+`Node.js`提供了一个内置的[crypto模块](https://nodejs.org/api/crypto.html)可用于加密和解密字符串，数字，Buffer，流等等。Nest未在此基础上提供额外的包以减少不必要的干扰。
+
+一个使用`AES(高级加密系统) aes-256-ctr`算法，CTR加密模式。
+
+```TypeScript
+import { createCipheriv, randomBytes } from 'crypto';
+import { promisify } from 'util';
+
+const iv = randomBytes(16);
+const password = 'Password used to generate key';
+
+// The key length is dependent on the algorithm.
+// In this case for aes256, it is 32 bytes.
+const key = (await promisify(scrypt)(password, 'salt', 32)) as Buffer;
+const cipher = createCipheriv('aes-256-ctr', key, iv);
+
+const textToEncrypt = 'Nest';
+const encryptedText = Buffer.concat([
+  cipher.update(textToEncrypt),
+  cipher.final(),
+]);
+```
+
+接下来，解密`encryptedText`值。
+
+```TypeScript
+import { createDecipheriv } from 'crypto';
+
+const decipher = createDecipheriv('aes-256-ctr', key, iv);
+const decryptedText = Buffer.concat([
+  decipher.update(encryptedText),
+  decipher.final(),
+]);
+```
+
+### 散列
+
+散列方面推荐使用 [bcrypt](https://www.npmjs.com/package/bcrypt) 或 [argon2](https://www.npmjs.com/package/argon2)包. Nest自身并未提供任何这些模块的包装器以减少不必要的抽象（让学习曲线更短）。
+
+例如，使用`bcrypt`来哈希一个随机密码。
+
+首先安装依赖。
+
+```bash
+$ npm i bcrypt
+$ npm i -D @types/bcrypt
+```
+依赖安装后，可以使用哈希函数。
+
+```TypeScript
+import * as bcrypt from 'bcrypt';
+
+const saltOrRounds = 10;
+const password = 'random_password';
+const hash = await bcrypt.hash(password, saltOrRounds);
+```
+
+使用`genSalt`函数来生成哈希需要的盐。
+
+```TypeScript
+const salt = await bcrypt.genSalt();
+```
+
+使用`compare`函数来比较/检查密码。
+
+```TypeScript
+const isMatch = await bcrypt.compare(password, hash);
+```
+
+更多函数参见[这里](https://www.npmjs.com/package/bcrypt)。
+
+
+## Helmet
+
+通过适当地设置 `HTTP` 头，[Helmet](https://github.com/helmetjs/helmet) 可以帮助保护您的应用免受一些众所周知的 `Web` 漏洞的影响。通常，`Helmet` 只是`14`个较小的中间件函数的集合，它们设置与安全相关的 `HTTP` 头（[阅读更多](https://github.com/helmetjs/helmet#how-it-works)）。
+
+
+?> 要在全局使用`Helmet`，需要在调用`app.use()`之前或者可能调用`app.use()`函数之前注册。这是由平台底层机制中(EXpress或者Fastify)中间件/路径的定义决定的。如果在定义路径之后使用`helmet`或者`cors`中间件，其之前的路径将不会应用这些中间件，而仅在定义之后的路径中应用。
+
+### 在Express中使用（默认）
+
+首先，安装所需的包：
 
 ```bash
 $ npm i --save helmet
@@ -739,9 +1206,52 @@ import * as helmet from 'helmet';
 app.use(helmet());
 ```
 
-### CORS
+?> 如果在引入`helmet`时返回`This expression is not callable`错误。你可能需要将项目中`tsconfig.json`文件的`allowSyntheticDefaultImports`和`esModuleInterop`选项配置为`true`。在这种情况下，将引入声明修改为：`import helmet from 'helmet'`。
 
-跨源资源共享（`CORS`）是一种允许从另一个域请求资源的机制。在底层，`Nest` 使用了 [cors](https://github.com/expressjs/cors) 包，它提供了一系列选项，您可以根据自己的要求进行自定义。为了启用 `CORS`，您必须调用 `enableCors()` 方法。
+### 在Fastify中使用
+
+如果使用`FastifyAdapter`，安装`fastify-helmet`包：
+
+```bash
+$ npm i --save fastify-helmet
+```
+
+`fastify-helmet`需要作为`Fastify`插件而不是中间件使用，例如，用`app.register()`调用。
+
+```typescript
+import * as helmet from 'fastify-helmet';
+// somewhere in your initialization file
+app.register(helmet);
+```
+
+!> 在使用`apollo-server-fastify`和`fastify-helmet`时，在`GraphQL`应用中与[CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)使用时可能出问题，需要如下配置CSP。
+
+```TypeScript
+app.register(helmet, {
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: [`'self'`],
+      styleSrc: [`'self'`, `'unsafe-inline'`, 'cdn.jsdelivr.net', 'fonts.googleapis.com'],
+      fontSrc: [`'self'`, 'fonts.gstatic.com'],
+      imgSrc: [`'self'`, 'data:', 'cdn.jsdelivr.net'],
+      scriptSrc: [`'self'`, `https: 'unsafe-inline'`, `cdn.jsdelivr.net`],
+    },
+  },
+});
+
+// If you are not going to use CSP at all, you can use this:
+app.register(helmet, {
+  contentSecurityPolicy: false,
+});
+```
+
+## CORS
+
+跨源资源共享（`CORS`）是一种允许从另一个域请求资源的机制。在底层，`Nest` 使用了Express的[cors](https://github.com/expressjs/cors) 包，它提供了一系列选项，您可以根据自己的要求进行自定义。
+
+### 开始
+
+为了启用 `CORS`，必须调用 `enableCors()` 方法。
 
 ```typescript
 const app = await NestFactory.create(ApplicationModule);
@@ -758,15 +1268,19 @@ const app = await NestFactory.create(ApplicationModule, { cors: true });
 await app.listen(3000);
 ```
 
-### `CSRF`保护
+## `CSRF`保护
 
-跨站点请求伪造（称为 `CSRF` 或 `XSRF`）是一种恶意利用网站，其中未经授权的命令从 `Web` 应用程序信任的用户传输。要减轻此类攻击，您可以使用 [csurf](https://github.com/expressjs/csurf) 软件包。首先，安装所需的包：
+跨站点请求伪造（称为 `CSRF` 或 `XSRF`）是一种恶意利用网站，其中未经授权的命令从 `Web` 应用程序信任的用户传输。要减轻此类攻击，您可以使用 [csurf](https://github.com/expressjs/csurf) 软件包。
+
+### 在Express中使用（默认）
+
+首先，安装所需的包：
 
 ```bash
 $ npm i --save csurf
 ```
 
-?> 正如 `csurf` 中间件页面所解释的，`csurf` 模块需要首先初始化会话中间件或 `cookie` 解析器。有关进一步说明，请参阅该[文档](https://github.com/expressjs/csurf#csurf)。 
+!> 正如 `csurf` 中间件页面所解释的，`csurf` 模块需要首先初始化会话中间件或 `cookie` 解析器。有关进一步说明，请参阅该[文档](https://github.com/expressjs/csurf#csurf)。 
 
 安装完成后，将其应用为全局中间件。
 
@@ -776,7 +1290,23 @@ import * as csurf from 'csurf';
 app.use(csurf());
 ```
 
-### 限速
+### 在Fastify中使用
+
+首先，安装所需的包：
+
+```bash
+$ npm i --save fastify-csrf
+```
+
+安装完成后，将其注册为`fastify-csrf`插件。
+
+```typescript
+import fastifyCsrf from 'fastify-csrf';
+// somewhere in your initialization file
+app.register(fastifyCsrf);
+```
+
+## 限速
 
 为了保护您的应用程序免受暴力攻击，您必须实现某种速率限制。幸运的是，`NPM`上已经有很多各种中间件可用。其中之一是[express-rate-limit](https://github.com/nfriedly/express-rate-limit)。
 
@@ -798,10 +1328,13 @@ app.use(
 ```
 如果在服务器和以太网之间存在负载均衡或者反向代理，Express可能需要配置为信任proxy设置的头文件，从而保证最终用户得到正确的IP地址。要如此，首先使用`NestExpressApplication`平台[接口](https://docs.nestjs.com/first-steps#platform)来创建你的`app`实例，然后配置[trust proxy](https://expressjs.com/en/guide/behind-proxies.html)设置。
 
-?> 提示: 如果您在 `FastifyAdapter` 下开发，请考虑使用 [fastify-rate-limit](https://github.com/fastify/fastify-rate-limit)。
+```TypeScript
+const app = await NestFactory.create<NestExpressApplication>(AppModule);
+// see https://expressjs.com/en/guide/behind-proxies.html
+app.set('trust proxy', 1);
+```
 
-
-
+?> 如果使用 `FastifyAdapter`，用 [fastify-rate-limit](https://github.com/fastify/fastify-rate-limit)替换。
 
 ### 译者署名
 

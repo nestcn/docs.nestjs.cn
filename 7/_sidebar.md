@@ -30,6 +30,8 @@
 
 - [CLI](7/cli)
 
+- [OPNAPI](7/openapi)
+
 - [秘籍](7/recipes)
 
 - [FAQ](7/faq)

@@ -470,6 +470,346 @@ export class CatsModule {}
 
 
 
+
+
+## CRUD生成器
+
+在一个项目的生命周期中，当我们新增特性的时候，我们通常需要在应用中添加新的资源。这些资源通常需要我们在每次新增资源的时候进行一些重复操作。
+
+### 介绍
+
+想象一下真实世界中的场景，我们需要通过两个CRUD的终端暴露`User`和`Product`两个实体。参考最佳时间，我们为每个实体进行以下操作。
+
+- 生成一个模块 (nest g mo) 来组织代码，使其保持清晰的界限（将相关模块分组）
+- 生成一个控制器 (nest g co) 来定义CRUD路径（或者GraphQL应用的查询和变更）
+- 生成一个服务 (nest g s) 来表示/隔离业务逻辑
+- 生成一个实体类/接口来代表资源数据类型
+- 生成数据转换对象（或者`GraphQL`应用输入）来决定数据如何通过网络传输
+
+很多步骤！
+
+为了加速执行重复步骤，`Nest CLI`提供了一个生成器（`schematic(原理)`）可以自动生成所有的模板文件以减少上述步骤，同时让开发者感觉更易用。
+
+> 该`schematic`支持生成`HTTP`控制器，`微服务`控制器，`GraphQL`处理器（代码优先或者原理优先），以及`WebSocket`网关等。
+
+### 生成新资源
+
+在项目根目录下执行以下代码来生成资源。
+
+```bash
+$ nest g resource
+```
+
+`nest g resource`命令不仅仅生成所有Nestjs构件模块(模块，服务，控制器类)也生成实体类，`DTO`类和测试(.spec)文件。
+
+如下是一个生成的控制器 (`REST API`):
+
+```TypeScript
+@Controller('users')
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
+
+  @Post()
+  create(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.create(createUserDto);
+  }
+
+  @Get()
+  findAll() {
+    return this.usersService.findAll();
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.usersService.findOne(+id);
+  }
+
+  @Put(':id')
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(+id, updateUserDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.usersService.remove(+id);
+  }
+}
+```
+
+它也自动生成了所有CRUD终端占位符（REST API路径，GraphQL查询和编译，微服务和WebSocket网关的消息订阅器）--一键所有内容。
+
+!> 生成的资源类未与任何特定ORM（或者数据源）绑定，以在任何项目下通用。默认地，所有方法都包含了占位符，允许你用特定项目的数据源填充。类似地，如果你需要生成GraphQL应用的处理器，只要在传输层选择GraphQL（代码优先）或者GraphQL(原理优先)即可。
+
+这里生成一个处理器类而不是一个REST API控制器：
+
+```bash
+$ nest g resource users
+
+> ? What transport layer do you use? GraphQL (code first)
+> ? Would you like to generate CRUD entry points? Yes
+> CREATE src/users/users.module.ts (224 bytes)
+> CREATE src/users/users.resolver.spec.ts (525 bytes)
+> CREATE src/users/users.resolver.ts (1109 bytes)
+> CREATE src/users/users.service.spec.ts (453 bytes)
+> CREATE src/users/users.service.ts (625 bytes)
+> CREATE src/users/dto/create-user.input.ts (195 bytes)
+> CREATE src/users/dto/update-user.input.ts (281 bytes)
+> CREATE src/users/entities/user.entity.ts (187 bytes)
+> UPDATE src/app.module.ts (312 bytes)
+```
+
+?> 像这样传递`--no-spec`参数`nest g resource users --no-spec`来避免生成测试文件。
+
+在下面我们可以看到，不仅生成了所有变更和查询的样板文件，也把他们绑定到了一起，我们可以使用`UsersService`, `User Entity`, 和`DTO`。
+
+```TypeScript
+import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { UsersService } from './users.service';
+import { User } from './entities/user.entity';
+import { CreateUserInput } from './dto/create-user.input';
+import { UpdateUserInput } from './dto/update-user.input';
+
+@Resolver(() => User)
+export class UsersResolver {
+  constructor(private readonly usersService: UsersService) {}
+
+  @Mutation(() => User)
+  createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
+    return this.usersService.create(createUserInput);
+  }
+
+  @Query(() => [User], { name: 'users' })
+  findAll() {
+    return this.usersService.findAll();
+  }
+
+  @Query(() => User, { name: 'user' })
+  findOne(@Args('id', { type: () => Int }) id: number) {
+    return this.usersService.findOne(id);
+  }
+
+  @Mutation(() => User)
+  updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput) {
+    return this.usersService.update(updateUserInput.id, updateUserInput);
+  }
+
+  @Mutation(() => User)
+  removeUser(@Args('id', { type: () => Int }) id: number) {
+    return this.usersService.remove(id);
+  }
+}
+```
+
+## 健康检查(Terminus)
+
+Nestjs Terminus集成提供了可读的/实时的健康检查。在复杂的后台设置中健康检查是非常重要的。简而言之，在web开发领域所说的健康检查通常由一系列特定地址组成，例如，https://my-website.com/health/readiness  通过一个服务，或者一个你的基础设施的一个部件（例如Kubernetes）来持续检查这个地址。依赖于向这一地址发出的`GET`请求返回的HTTP状态码，该服务会在收到“不健康”响应时采取行动。由于你的服务中对“健康”和“不健康”的定义可能有所不同，Nestjs Teminus支持一系列健康指示。
+
+作为示例，如果你的服务器使用 MongoDB来存储数据，MongoDB是否正常运行就成了一个至关重要的信息。在这种情况下，你可以使用`MongooseHealthIndicator`。如果配置正常--按后续内容配置--你的健康检查地址将根据MongoDB是否运行来返回健康或者不健康HTTP状态码。
+
+### 入门
+
+要开始使用 `@nestjs/terminus` ，我们需要安装所需的依赖项。
+
+```bash
+$ npm install --save @nestjs/terminus
+```
+
+### 建立一个健康检查
+
+健康检查表示健康指标的摘要。健康指示器执行服务检查，无论是否处于健康状态。 如果所有分配的健康指示符都已启动并正在运行，则运行状况检查为正。由于许多应用程序需要类似的健康指标，因此 `@nestjs/terminus` 提供了一组预定义的健康指标，例如：
+
+- `DNSHealthIndicator`
+- `TypeOrmHealthIndicator`
+- `MongooseHealthIndicator`
+- `MicroserviceHealthIndicator`
+- `GRPCHealthIndicator`
+- `MemoryHealthIndicator`
+- `DiskHealthIndicator`
+
+要开始我们第一个健康检查，我们需要在`AppModule`引入`TerminusModule`。
+
+> app.module.ts
+
+```typescript
+import { Module } from '@nestjs/common';
+import { TerminusModule } from '@nestjs/terminus';
+
+@Module({
+  imports: [TerminusModule]
+})
+export class AppModule { }
+```
+
+我们的健康检查可以使用控制器来执行，使用`Nestjs CLI`可以快速配置：
+
+```typescript
+$ nest generate controller health
+```
+
+?> 强烈建议在你的应用程序中使用关机钩子。如果启用，Terminus将使用其生命周期事件。在[这里](https://docs.nestjs.com/fundamentals/lifecycle-events#application-shutdown)阅读更多关于关机钩子的内容。
+
+### DNS 健康检查
+
+我们安装了`@nestjs/terminus`后，导入`TerminusModule`并创建一个新的控制器，我们就准备好创建一个新的健康检查了。
+
+> health.controller.ts
+
+```typescript
+@Controller('health')
+export class HealthController {
+  constructor(
+    private health: HealthCheckService,
+    private dns: DNSHealthIndicator,
+  ) {}
+
+  @Get()
+  @HealthCheck()
+  check() {
+    return this.health.check([
+      () => this.dns.pingCheck('nestjs-docs', 'https://docs.nestjs.com'),
+    ]);
+  }
+}
+```
+我们的健康检查现在将发送一个Get请求到`https://docs.nestjs.com`地址，如果我们从该地址得到一个健康响应，我们的路径`http://localhost:3000/health`将在返回200状态码同时返回一个如下对象。
+
+```json
+{
+  "status": "ok",
+  "info": {
+    "nestjs-docs": {
+      "status": "up"
+    }
+  },
+  "error": {},
+  "details": {
+    "nestjs-docs": {
+      "status": "up"
+    }
+  }
+}
+```
+该返回对象可以接口可以通过`@nestjs/terminus`包的`HealthCheckResult`接口来访问。
+
+名称|内容|类型
+--|--|--
+status|如果任何健康检查失败了，状态将是'error'。如果NestJS应用即将关闭，但仍然能接受HTTP请求，状态检查将会返回'shutting_down'状态|'error'\|'ok'\|'shutting_down'
+info|对象包括每个状态是`up`（或者说健康）的健康指示器的信息|`object`
+error|对象包括每个状态是`down`（或者说不健康）的健康指示器的信息|`object`
+details|对象包括每个健康指示器的所有信息|`object`
+
+
+### 自定义健康指标
+
+在某些情况下，`@nestjs/terminus` 提供的预定义健康指标不会涵盖您的所有健康检查要求。 在这种情况下，您可以根据需要设置自定义运行状况指示器。
+
+让我们开始创建一个代表我们自定义健康指标的服务。为了基本了解健康指标的结构，我们将创建一个示例 `DogHealthIndicator` 。如果每个 `Dog` 对象都具有 `goodboy` 类型，则此健康指示器应具有 `'up'` 状态，否则将抛出错误，然后健康指示器将被视为 `'down'` 。
+
+> dog.health.ts
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import { HealthIndicator, HealthIndicatorResult, HealthCheckError } from '@nestjs/terminus';
+
+export interface Dog {
+  name: string;
+  type: string;
+}
+
+@Injectable()
+export class DogHealthIndicator extends HealthIndicator {
+  private dogs: Dog[] = [
+    { name: 'Fido', type: 'goodboy' },
+    { name: 'Rex', type: 'badboy' },
+  ];
+
+  async isHealthy(key: string): Promise<HealthIndicatorResult> {
+    const badboys = this.dogs.filter(dog => dog.type === 'badboy');
+    const isHealthy = badboys.length === 0;
+    const result = this.getStatus(key, isHealthy, { badboys: badboys.length });
+
+    if (isHealthy) {
+      return result;
+    }
+    throw new HealthCheckError('Dogcheck failed', result);
+  }
+}
+```
+
+我们需要做的下一件事是将健康指标注册为提供者。
+
+> app.module.ts
+
+```typescript
+import { Module } from '@nestjs/common';
+import { TerminusModule } from '@nestjs/terminus';
+import { DogHealthIndicator } from './dog.health';
+
+@Module({
+  controllers: [HealthController],
+  imports: [TerminusModule],
+  providers: [DogHealthIndicator]
+})
+export class AppModule { }
+```
+
+?> 在应用程序中，`DogHealthIndicator` 应该在一个单独的模块中提供，例如 `DogModule` ，然后由 `AppModule` 导入。
+
+最后需要做的是在所需的运行状况检查端点中添加现在可用的运行状况指示器。 为此，我们返回到 `HealthController` 并将其实现到 `check` 函数中。
+
+> health.controller.ts
+
+```typescript
+import { HealthCheckService } from '@nestjs/terminus';
+import { Injectable } from '@nestjs/common';
+import { DogHealthIndicator } from './dog.health';
+
+@Injectable()
+export class HealthController {
+  constructor(
+    private health: HealthCheckService,
+    private dogHealthIndicator: DogHealthIndicator
+  ) {}
+
+  @Get()
+  @HealthCheck()
+  healthCheck() {
+    return this.health.check([
+      async () => this.dogHealthIndicator.isHealthy('dog'),
+    ])
+  }
+}
+```
+
+## 文档
+
+**Compodoc**是 `Angular` 应用程序的文档工具。 `Nest` 和 `Angular` 看起来非常相似，因此，**Compodoc**也支持 `Nest` 应用程序。
+
+### 建立
+
+在现有的 `Nest` 项目中设置 `Compodoc` 非常简单。 安装[npm](https://www.npmjs.com/)后，只需在 `OS` 终端中使用以下命令添加 `dev-dependency` ：
+
+```bash
+$ npm i -D @compodoc/compodoc
+```
+
+### 生成
+在[官方文档](https://compodoc.app/guides/usage.html)之后，您可以使用以下命令( `npx`需要`npm 6` )生成文档:
+
+```bash
+$ npx compodoc -p tsconfig.json -s
+```
+
+打开浏览器并导航到 `http://localhost:8080` 。 您应该看到一个初始的 `Nest CLI` 项目：
+
+![img](https://docs.nestjs.com/assets/documentation-compodoc-1.jpg)
+
+![img](https://docs.nestjs.com/assets/documentation-compodoc-2.jpg)
+
+### 贡献
+
+您可以[在此](https://github.com/compodoc/compodoc)参与 `Compodoc` 项目并为其做出贡献。
+
 ## OpenAPI (Swagger)
 
 [OpenAPI](https://swagger.io/specification/)(Swagger)规范是一种用于描述 `RESTful API` 的强大定义格式。 `Nest` 提供了一个专用[模块](https://github.com/nestjs/swagger)来使用它。
@@ -1782,215 +2122,7 @@ export class UsersResolver {
 
 [这里](https://github.com/nestjs/nest/tree/master/sample/22-graphql-prisma)有一个稍微修改过的示例。
 
-## 健康检查(Terminus)
 
-Nestjs Terminus集成提供了可读的/实时的健康检查。在复杂的后台设置中健康检查是非常重要的。简而言之，在web开发领域所说的健康检查通常由一系列特定地址组成，例如，https://my-website.com/health/readiness  通过一个服务，或者一个你的基础设施的一个部件（例如Kubernetes）来持续检查这个地址。依赖于向这一地址发出的`GET`请求返回的HTTP状态码，该服务会在收到“不健康”响应时采取行动。由于你的服务中对“健康”和“不健康”的定义可能有所不同，Nestjs Teminus支持一系列健康指示。
-
-作为示例，如果你的服务器使用 MongoDB来存储数据，MongoDB是否正常运行就成了一个至关重要的信息。在这种情况下，你可以使用`MongooseHealthIndicator`。如果配置正常--按后续内容配置--你的健康检查地址将根据MongoDB是否运行来返回健康或者不健康HTTP状态码。
-
-### 入门
-
-要开始使用 `@nestjs/terminus` ，我们需要安装所需的依赖项。
-
-```bash
-$ npm install --save @nestjs/terminus
-```
-
-### 建立一个健康检查
-
-健康检查表示健康指标的摘要。健康指示器执行服务检查，无论是否处于健康状态。 如果所有分配的健康指示符都已启动并正在运行，则运行状况检查为正。由于许多应用程序需要类似的健康指标，因此 `@nestjs/terminus` 提供了一组预定义的健康指标，例如：
-
-- `DNSHealthIndicator`
-- `TypeOrmHealthIndicator`
-- `MongooseHealthIndicator`
-- `MicroserviceHealthIndicator`
-- `GRPCHealthIndicator`
-- `MemoryHealthIndicator`
-- `DiskHealthIndicator`
-
-要开始我们第一个健康检查，我们需要在`AppModule`引入`TerminusModule`。
-
-> app.module.ts
-
-```typescript
-import { Module } from '@nestjs/common';
-import { TerminusModule } from '@nestjs/terminus';
-
-@Module({
-  imports: [TerminusModule]
-})
-export class AppModule { }
-```
-
-我们的健康检查可以使用控制器来执行，使用`Nestjs CLI`可以快速配置：
-
-```typescript
-$ nest generate controller health
-```
-
-?> 强烈建议在你的应用程序中使用关机钩子。如果启用，Terminus将使用其生命周期事件。在[这里](https://docs.nestjs.com/fundamentals/lifecycle-events#application-shutdown)阅读更多关于关机钩子的内容。
-
-### DNS 健康检查
-
-我们安装了`@nestjs/terminus`后，导入`TerminusModule`并创建一个新的控制器，我们就准备好创建一个新的健康检查了。
-
-> health.controller.ts
-
-```typescript
-@Controller('health')
-export class HealthController {
-  constructor(
-    private health: HealthCheckService,
-    private dns: DNSHealthIndicator,
-  ) {}
-
-  @Get()
-  @HealthCheck()
-  check() {
-    return this.health.check([
-      () => this.dns.pingCheck('nestjs-docs', 'https://docs.nestjs.com'),
-    ]);
-  }
-}
-```
-我们的健康检查现在将发送一个Get请求到`https://docs.nestjs.com`地址，如果我们从该地址得到一个健康响应，我们的路径`http://localhost:3000/health`将在返回200状态码同时返回一个如下对象。
-
-```json
-{
-  "status": "ok",
-  "info": {
-    "nestjs-docs": {
-      "status": "up"
-    }
-  },
-  "error": {},
-  "details": {
-    "nestjs-docs": {
-      "status": "up"
-    }
-  }
-}
-```
-该返回对象可以接口可以通过`@nestjs/terminus`包的`HealthCheckResult`接口来访问。
-
-名称|内容|类型
---|--|--
-status|如果任何健康检查失败了，状态将是'error'。如果NestJS应用即将关闭，但仍然能接受HTTP请求，状态检查将会返回'shutting_down'状态|'error'\|'ok'\|'shutting_down'
-info|对象包括每个状态是`up`（或者说健康）的健康指示器的信息|`object`
-error|对象包括每个状态是`down`（或者说不健康）的健康指示器的信息|`object`
-details|对象包括每个健康指示器的所有信息|`object`
-
-
-### 自定义健康指标
-
-在某些情况下，`@nestjs/terminus` 提供的预定义健康指标不会涵盖您的所有健康检查要求。 在这种情况下，您可以根据需要设置自定义运行状况指示器。
-
-让我们开始创建一个代表我们自定义健康指标的服务。为了基本了解健康指标的结构，我们将创建一个示例 `DogHealthIndicator` 。如果每个 `Dog` 对象都具有 `goodboy` 类型，则此健康指示器应具有 `'up'` 状态，否则将抛出错误，然后健康指示器将被视为 `'down'` 。
-
-> dog.health.ts
-
-```typescript
-import { Injectable } from '@nestjs/common';
-import { HealthIndicator, HealthIndicatorResult, HealthCheckError } from '@nestjs/terminus';
-
-export interface Dog {
-  name: string;
-  type: string;
-}
-
-@Injectable()
-export class DogHealthIndicator extends HealthIndicator {
-  private dogs: Dog[] = [
-    { name: 'Fido', type: 'goodboy' },
-    { name: 'Rex', type: 'badboy' },
-  ];
-
-  async isHealthy(key: string): Promise<HealthIndicatorResult> {
-    const badboys = this.dogs.filter(dog => dog.type === 'badboy');
-    const isHealthy = badboys.length === 0;
-    const result = this.getStatus(key, isHealthy, { badboys: badboys.length });
-
-    if (isHealthy) {
-      return result;
-    }
-    throw new HealthCheckError('Dogcheck failed', result);
-  }
-}
-```
-
-我们需要做的下一件事是将健康指标注册为提供者。
-
-> app.module.ts
-
-```typescript
-import { Module } from '@nestjs/common';
-import { TerminusModule } from '@nestjs/terminus';
-import { DogHealthIndicator } from './dog.health';
-
-@Module({
-  controllers: [HealthController],
-  imports: [TerminusModule],
-  providers: [DogHealthIndicator]
-})
-export class AppModule { }
-```
-
-?> 在应用程序中，`DogHealthIndicator` 应该在一个单独的模块中提供，例如 `DogModule` ，然后由 `AppModule` 导入。
-
-最后需要做的是在所需的运行状况检查端点中添加现在可用的运行状况指示器。 为此，我们返回到 `HealthController` 并将其实现到 `check` 函数中。
-
-> health.controller.ts
-
-```typescript
-import { HealthCheckService } from '@nestjs/terminus';
-import { Injectable } from '@nestjs/common';
-import { DogHealthIndicator } from './dog.health';
-
-@Injectable()
-export class HealthController {
-  constructor(
-    private health: HealthCheckService,
-    private dogHealthIndicator: DogHealthIndicator
-  ) {}
-
-  @Get()
-  @HealthCheck()
-  healthCheck() {
-    return this.health.check([
-      async () => this.dogHealthIndicator.isHealthy('dog'),
-    ])
-  }
-}
-```
-
-## 文档
-
-**Compodoc**是 `Angular` 应用程序的文档工具。 `Nest` 和 `Angular` 看起来非常相似，因此，**Compodoc**也支持 `Nest` 应用程序。
-
-### 建立
-
-在现有的 `Nest` 项目中设置 `Compodoc` 非常简单。 安装[npm](https://www.npmjs.com/)后，只需在 `OS` 终端中使用以下命令添加 `dev-dependency` ：
-
-```bash
-$ npm i -D @compodoc/compodoc
-```
-
-### 生成
-在[官方文档](https://compodoc.app/guides/usage.html)之后，您可以使用以下命令( `npx`需要`npm 6` )生成文档:
-
-```bash
-$ npx compodoc -p tsconfig.json -s
-```
-
-打开浏览器并导航到 `http://localhost:8080` 。 您应该看到一个初始的 `Nest CLI` 项目：
-
-![img](https://docs.nestjs.com/assets/documentation-compodoc-1.jpg)
-
-![img](https://docs.nestjs.com/assets/documentation-compodoc-2.jpg)
-
-### 贡献
-
-您可以[在此](https://github.com/compodoc/compodoc)参与 `Compodoc` 项目并为其做出贡献。
 
 
 ## 热重载

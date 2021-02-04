@@ -67,6 +67,7 @@
 - Cookie (不翻)
 - CORS 跨域资源共享（可不翻）
 - Credentials 凭证
+- CRUD 增删查改（可不翻）
 - CSRF跨站点请求伪造 （可不翻）
 - Custom Decorator 自定义装饰器 &
 - Custom Transport 自定义传输 &

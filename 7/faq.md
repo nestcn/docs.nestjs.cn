@@ -226,6 +226,48 @@ export class CatsController {
   19. 异常过滤器 （路由，之后是控制器，之后是全局）
   20. 服务器响应
 
+## 常见错误
+
+在使用Nestjs开发时，可能遇到不同错误。
+
+### `Cannot resolve dependency(无法处理依赖)`错误
+
+最常见的错误信息可能是Nest无法处理提供者依赖，这个错误看上去往往像这样：
+
+```bash
+Nest can't resolve dependencies of the <provider> (?). Please make sure that the argument <unknown_token> at index [<index>] is available in the <module> context.
+
+Potential solutions:
+- If <unknown_token> is a provider, is it part of the current <module>?
+- If <unknown_token> is exported from a separate @Module, is that module imported within <module>?
+  @Module({
+    imports: [ /* the Module containing <unknown_token> */ ]
+  })
+```
+
+这个错误最常用的原因，是提供者没有列在模块的`provider`数组中。确保提供者在提供者数组中并且遵循以下NestJs提供者实践。
+
+有一些常规的错误。其中一个是把提供者放到了`import`数组里。在这种情况下，错误会是提供者的名字在`<module>`应该在的地方。
+
+如果你在开发过程中遇到这些错误，看看提到的出错信息以及其提供者。确保提供者在提供者数组中，模块可以访问所有的依赖。有时提供者在"Feature Module"和"Root Module"中重复，这意味着Nest将尝试实例化提供者两次。更可能的是，从模块复制的提供者应该替换为在"Root Module"的`imports`数组中引入。
+
+### `Circular dependency（循环依赖）`错误
+
+有时你会发现在应用中无法避免循环依赖。你可能需要做一些工作来帮助Nest解决它，循环依赖错误看上去可能像这样：
+
+```bash
+Nest cannot create the <module> instance.
+The module at index [<index>] of the <module> "imports" array is undefined.
+
+Potential causes:
+- A circular dependency between modules. Use forwardRef() to avoid it. Read more: https://docs.nestjs.com/fundamentals/circular-dependency
+- The module at index [<index>] is of type "undefined". Check your import statements and the type of the module.
+
+Scope [<module_import_chain>]
+# example chain AppModule -> FooModule
+```
+
+循环依赖错误可能来自提供者间的相互依赖，或者TypeScript文件常量相互依赖，例如从一个模型文件中导出常量而在一个服务中引入他们。在后一种情况下，建议为常量创建一个独立的文件。在前一种情况下，查看循环依赖指导并保证两个模块和提供者都标记有`forwarRef`。
 
 ## 实例
 

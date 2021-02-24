@@ -138,7 +138,7 @@ export class User {
 ```typescript
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Photo } from './photo/photo.entity';
+import { User } from './users/user.entity';
 
 @Module({
   imports: [

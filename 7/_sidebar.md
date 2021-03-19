@@ -30,7 +30,7 @@
 
 - [CLI](7/cli)
 
-- [OPNAPI](7/openapi)
+- [OPENAPI](7/openapi)
 
 - [秘籍](7/recipes)
 

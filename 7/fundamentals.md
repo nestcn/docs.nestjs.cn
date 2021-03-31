@@ -339,7 +339,7 @@ export class AppModule {}
 
 文档概述部分中的大多数应用程序代码示例都使用了常规或静态模块。模块定义像**提供者**和**控制器**这样的组件组，它们作为整个应用程序的模块部分组合在一起。它们为这些组件提供了执行上下文或范围。例如，模块中定义的提供程序对模块的其他成员可见，而不需要导出它们。当提供者需要在模块外部可见时，它首先从其主机模块导出，然后导入到其消费模块。
 
-首先，我们将定义一个 `UsersModule` 来提供和导出 `UsersService`。`UsersModule`是 `UsersService`的主模块。
+首先，我们将定义一个 `UsersModule` 来提供和导出 `UsersService`。`UsersModule`是 `UsersService`的主机模块。
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -367,7 +367,7 @@ import { UsersModule } from '../users/users.module';
 export class AuthModule {}
 ```
 
-这些构造使我们能够注入 `UsersService` 例如 `AuthService` 托管在中的 `AuthModule`：
+这些构造使我们能够注入 `UsersService` 例如 `AuthService` 托管在其中的 `AuthModule`：
 
 ```typescript
 import { Injectable } from '@nestjs/common';
@@ -386,7 +386,7 @@ export class AuthService {
 
 1. 实例化 `UsersModule` ，包括传递导入 `UsersModule` 本身使用的其他模块，以及传递的任何依赖项(参见[自定义](7/fundamentals?id=custom-providers)提供程序)。
 
-2. 实例化 `AuthModule` ，并将 `UsersModule` 导出的提供程序提供给 `AuthModule` 中的组件(就像在 `AuthModule` 中声明它们一样)。
+2. 实例化 `AuthModule` ，并将 `UsersModule` 导出的提供者提供给 `AuthModule` 中的组件(就像在 `AuthModule` 中声明它们一样)。
 
 3. 在 `AuthService` 中注入 `UsersService` 实例。
 
@@ -457,7 +457,7 @@ export class AppModule {}
 })
 ```
 
-动态模块必须返回具有完全相同接口的对象，外加一个称为模块的附加属性。 模块属性用作模块的名称，并且应与模块的类名相同，如下例所示。
+动态模块必须返回具有完全相同接口的对象，外加一个称为`module`的附加属性。 `module`属性用作模块的名称，并且应与模块的类名相同，如下例所示。
 
 !> 对于动态模块，模块选项对象的所有属性都是可选的，模块除外。
 

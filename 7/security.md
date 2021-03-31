@@ -905,7 +905,7 @@ $ nest g module casl
 $ nest g class casl/casl-ability.factory
 ```
 
-创建完成后，在`CaslAbilityFactory`中定义`creteForUser()`方法。该方法将为用户创建`Ability`对象。
+创建完成后，在`CaslAbilityFactory`中定义`createForUser()`方法。该方法将为用户创建`Ability`对象。
 
 ```TypeScript
 type Subjects = typeof Article | typeof User | Article | User | 'all';

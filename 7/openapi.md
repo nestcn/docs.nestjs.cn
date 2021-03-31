@@ -557,7 +557,7 @@ export class CatsController {
 
 ![](https://docs.nestjs.com/assets/swagger-response-type.png)
 
-### 文件上产
+### 文件上传
 使用`@ApiBody`装饰器和`@ApiConsumes()`来使能文件上传，这里有一个完整的使用[文件上传](https://docs.nestjs.com/techniques/file-upload)技术的例子。
 
 ```TypeScript

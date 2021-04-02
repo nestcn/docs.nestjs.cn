@@ -617,11 +617,11 @@ TypeOrmModule.forRootAsync({
 
 [这儿](https://github.com/nestjs/nest/tree/master/sample/05-sql-typeorm)有一个可用的例子。
 
-### 序列化集成
+### Sequelize 集成
 
 另一个使用`TypeORM`的选择是使用`@nestjs/sequelize`包中的`Sequelize ROM`。额外地，我们使用`sequelize-typescript`包来提供一系列额外的装饰器以声明实体。
 
-要开始使用它，我们首先安装需要的依赖。在本章中，我们通过流行的`MySQL`关系数据库来进行说明。序列化支持很多种关系数据库，例如`PostgreSQL`,`MySQL`,`Microsoft SQL Server`,`SQLite`以及`MariaDB`。本章中的步骤也适合其他任何序列化支持的数据库。你只要简单地安装所选数据库相应的客户端 API 库就可以。
+要开始使用它，我们首先安装需要的依赖。在本章中，我们通过流行的`MySQL`关系数据库来进行说明。`Sequelize`支持很多种关系数据库，例如`PostgreSQL`,`MySQL`,`Microsoft SQL Server`,`SQLite`以及`MariaDB`。本章中的步骤也适合其他任何`Sequelize`支持的数据库。你只要简单地安装所选数据库相应的客户端 API 库就可以。
 
 ```typescript
 $ npm install --save @nestjs/sequelize sequelize sequelize-typescript mysql2
@@ -652,7 +652,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 export class AppModule {}
 ```
 
-`forRoot()`方法支持所有序列化构造器([了解更多](https://sequelize.org/v5/manual/getting-started.html#setting-up-a-connection))暴露的配置属性。下面是一些额外的配置属性。
+`forRoot()`方法支持所有`Sequelize`构造器([了解更多](https://sequelize.org/v5/manual/getting-started.html#setting-up-a-connection))暴露的配置属性。下面是一些额外的配置属性。
 
 | 名称                | 说明                                                  |
 | ------------------- | ----------------------------------------------------- |
@@ -678,7 +678,7 @@ export class AppService {
 
 ### 模型
 
-序列化采用`活动记录(Active Record)`模式，在这一模式下，你可以使用模型类直接和数据库交互。要继续该示例，我们至少需要一个模型，让我们定义这个`User`模型：
+`Sequelize`采用`活动记录(Active Record)`模式，在这一模式下，你可以使用模型类直接和数据库交互。要继续该示例，我们至少需要一个模型，让我们定义这个`User`模型：
 
 > user.model.ts
 
@@ -702,7 +702,7 @@ export class User extends Model<User> {
 
 `User`模型文件在`users`目录下。该目录包含了和`UsersModule`有关的所有文件。你可以决定在哪里保存模型文件，但我们推荐在他们的**域**中就近创建，即在相应的模块目录中。
 
-要开始使用`User`模型，我们需要通过将其插入到`forRoot()`方法选项的`models`数组中来让序列化知道它的存在。
+要开始使用`User`模型，我们需要通过将其插入到`forRoot()`方法选项的`models`数组中来让`Sequelize`知道它的存在。
 
 > app.module.ts
 
@@ -853,7 +853,7 @@ export class User extends Model<User> {
 }
 ```
 
-?> 阅读[本章](https://github.com/RobinBuschmann/sequelize-typescript#model-association)了解更多关于序列化的内容。
+?> 阅读[本章](https://github.com/RobinBuschmann/sequelize-typescript#model-association)了解更多关于`Sequelize`的内容。
 
 ### 自动载入模型
 
@@ -885,7 +885,7 @@ export class AppModule {}
 
 数据库事务代表在数据库管理系统（DBMS）中针对数据库的一组操作，这组操作是有关的、可靠的并且和其他事务相互独立的。一个事务通常可以代表数据库中的任何变更（[了解更多](https://zh.wikipedia.org/wiki/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BA%8B%E5%8A%A1))。
 
-在[序列化事务](https://sequelize.org/v5/manual/transactions.html)中有很多不同策略来处理事务，下面是一个管理事务的示例（自动回调）。
+在[`Sequelize`事务](https://sequelize.org/v5/manual/transactions.html)中有很多不同策略来处理事务，下面是一个管理事务的示例（自动回调）。
 
 首先，我们需要将`Sequelize`对象以正常方式注入：
 
@@ -938,9 +938,9 @@ async createMany(users: User[]) {
 
 ### 迁移
 
-[迁移](https://typeorm.io/#/migrations)提供了一个在保存数据库中现有数据的同时增量升级数据库使其与应用中的数据模型保持同步的方法。序列化提供了一个专用[CLI 命令行工具](https://sequelize.org/v5/manual/migrations.html#the-cli)用于生成、运行以及回滚迁移。
+[迁移](https://typeorm.io/#/migrations)提供了一个在保存数据库中现有数据的同时增量升级数据库使其与应用中的数据模型保持同步的方法。`Sequelize`提供了一个专用[CLI 命令行工具](https://sequelize.org/v5/manual/migrations.html#the-cli)用于生成、运行以及回滚迁移。
 
-迁移类和`Nest`应用源码是分开的。他们的生命周期由`TypeORM CLI`管理，因此，你不能在迁移中使用依赖注入和其他`Nest`专有特性。在[序列化文档](hhttps://sequelize.org/v5/manual/migrations.html#the-cli) 中查看更多关于迁移的内容。
+迁移类和`Nest`应用源码是分开的。他们的生命周期由`TypeORM CLI`管理，因此，你不能在迁移中使用依赖注入和其他`Nest`专有特性。在[`Sequelize`文档](hhttps://sequelize.org/v5/manual/migrations.html#the-cli) 中查看更多关于迁移的内容。
 
 ### 多个数据库
 

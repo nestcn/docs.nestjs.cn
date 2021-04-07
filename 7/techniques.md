@@ -940,7 +940,7 @@ async createMany(users: User[]) {
 
 [迁移](https://typeorm.io/#/migrations)提供了一个在保存数据库中现有数据的同时增量升级数据库使其与应用中的数据模型保持同步的方法。`Sequelize`提供了一个专用[CLI 命令行工具](https://sequelize.org/v5/manual/migrations.html#the-cli)用于生成、运行以及回滚迁移。
 
-迁移类和`Nest`应用源码是分开的。他们的生命周期由`TypeORM CLI`管理，因此，你不能在迁移中使用依赖注入和其他`Nest`专有特性。在[`Sequelize`文档](hhttps://sequelize.org/v5/manual/migrations.html#the-cli) 中查看更多关于迁移的内容。
+迁移类和`Nest`应用源码是分开的。他们的生命周期由`TypeORM CLI`管理，因此，你不能在迁移中使用依赖注入和其他`Nest`专有特性。在[`Sequelize`文档](https://sequelize.org/v5/manual/migrations.html#the-cli) 中查看更多关于迁移的内容。
 
 ### 多个数据库
 

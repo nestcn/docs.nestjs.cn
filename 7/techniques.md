@@ -3099,10 +3099,10 @@ export class AudioConsumer {
 
 当相应事件发射时事件处理器被唤醒。该处理器被下表所示的签名调用，提供访问事件相关的信息。我们讨论下面签名中本地和全局事件处理器。
 
-| 本地事件监听者      | 全局事件监听者            | 处理器方法签名/当触发时                                                                                    |
-| ------------------- | ------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| 本地事件监听者      | 全局事件监听者            | 处理器方法签名/当触发时                     |
+| ------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------|
 | @OnQueueError()     | @OnGlobalQueueError()     | handler(error: Error) - 当错误发生时，`error`包括触发错误                                                  |
-| @OnQueueWaiting()   | @OnGlobalQueueWaiting()   | handler(jobId: number                                                                                      | string)-一旦工作者空闲就等待执行的任务，`jobId`包括进入此状态的 id |
+| @OnQueueWaiting()   | @OnGlobalQueueWaiting()   | handler(jobId: number \| string) - 一旦工作者空闲就等待执行的任务，`jobId`包括进入此状态的 id |
 | @OnQueueActive()    | @OnGlobalQueueActive()    | handler(job: Job)-`job`任务已启动                                                                          |
 | @OnQueueStalled()   | @OnGlobalQueueStalled()   | handler(job: Job)-`job`任务被标记为延迟。这在时间循环崩溃或暂停时进行调试工作时是很有效的                  |
 | @OnQueueProgress()  | @OnGlobalQueueProgress()  | handler(job: Job, progress: number)-`job`任务进程被更新为`progress`值                                      |

@@ -165,7 +165,7 @@ src
  
 要获取现有实例或动态实例化提供程序，可以使用 [Module reference](/7/fundamentals)。
 
-要在 `bootstrap()` 功能内使用提供程序（例如，对于不带控制器的独立应用程序，或在引导过程中使用配置服务），请参见[独立应用程序](/7/standalone-applications)。
+要在 `bootstrap()` 函数内使用提供程序（例如，对于不带控制器的独立应用程序，或在引导过程中使用配置服务），请参见[独立应用程序](/7/standalone-applications)。
 
  ### 译者署名
 

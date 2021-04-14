@@ -13,7 +13,7 @@
 为了开始使用它，我们首先安装所需的依赖项。在本章中，我们将演示如何使用流行的 [Mysql](https://www.mysql.com/) ， `TypeORM` 提供了对许多关系数据库的支持，比如 `PostgreSQL` 、`Oracle`、`Microsoft SQL Server`、`SQLite`，甚至像 `MongoDB`这样的 `NoSQL` 数据库。我们在本章中介绍的过程对于 `TypeORM` 支持的任何数据库都是相同的。您只需为所选数据库安装相关的客户端 `API` 库。
 
 ```bash
-$ npm install --save @nestjs/typeorm typeorm mysql
+$ npm install --save @nestjs/typeorm typeorm mysql2
 ```
 
 安装过程完成后，我们可以将 `TypeOrmModule` 导入`AppModule` 。

@@ -1744,7 +1744,7 @@ getCustomTransformers: (program: any) => ({
 
 ## CQRS
 
-最简单的 **[CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete)** 应用程序的流程可以使用以下步骤来描述:
+最简单的 **[CQRS](https://microservices.io/patterns/data/cqrs.html)** 应用程序的流程可以使用以下步骤来描述:
 
 1. 控制器层处理**HTTP请求**并将任务委派给服务。
 2. 服务层是处理大部分业务逻辑。

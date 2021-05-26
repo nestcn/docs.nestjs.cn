@@ -1744,16 +1744,16 @@ getCustomTransformers: (program: any) => ({
 
 ## CQRS
 
-最简单的 **[CQRS](https://microservices.io/patterns/data/cqrs.html)** 应用程序的流程可以使用以下步骤来描述:
+可以用下列步骤来描述一个简单的 **[CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete)** 应用程序流程:
 
-1. 控制器层处理**HTTP请求**并将任务委派给服务。
-2. 服务层是处理大部分业务逻辑。
-3. **Services**使用存储库或 `DAOs` 来更改/保留实体。
+1. **控制器层**处理 HTTP 请求并将任务委派给服务层。
+2. **服务层**是处理大部分业务逻辑。
+3. 服务使用**存储库或 DAOs** 来更改/保存实体。
 4. 实体充当值的容器，具有 `setter` 和 `getter` 。
 
-在大多数情况下，没有理由使中小型应用程序更加复杂。 但是，有时它还不够，当我们的需求变得更加复杂时，我们希望拥有可扩展的系统，并且数据流量非常简单。
+在大部分情况下，这种模式对中小型应用来说是足够的。然而，当我们的需求变得更加复杂时，**CQRS** 模型可能更合适并且易于扩展。
 
-这就是为什么`Nest` 提供了一个轻量级的 [CQRS](https://github.com/nestjs/cqrs) 模块，本章描述如何使用它。
+为了简化这个模型，`Nest` 提供了一个轻量级的 [CQRS](https://github.com/nestjs/cqrs) 模块，本章描述如何使用它。
 
 ### 安装
 

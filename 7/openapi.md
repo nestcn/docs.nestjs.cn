@@ -808,8 +808,7 @@ export class CatsController {}
 在运行程序前，使用`DocumentBuilder`在基础文档里添加安全定义。
 
 ```TypeScript
-const opt
-ions = new DocumentBuilder().addBearerAuth();
+const options = new DocumentBuilder().addBearerAuth();
 ```
 
 ### OAuth2认证

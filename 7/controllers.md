@@ -10,11 +10,11 @@
 
 ## 路由
 
-在下面的例子中，我们使用定义控制器所需的 `@Controller()` 装饰器。可选路由路径前缀设置为 `cats`。在 `@Controller()` 装饰器中使用路径前缀可以使我们轻松地对一组相关的路由进行分组，并最大程度地减少重复代码。例如，我们可以选择将一组用于管理与 `/customers` 下的客户实体进行互动的路由进行分组。这样, 我们可以在 `@Controller()` 装饰器中指定路径前缀 `customers`，这样就不必为文件中的每个路由重复路径的那部分。
-
-> cats.controller.ts
+在下面的例子中，我们使用 `@Controller()` 装饰器定义一个基本的控制器。可选 路由路径前缀设置为 `cats`。在 `@Controller()` 装饰器中使用路径前缀可以使我们轻松地对一组相关的路由进行分组，并最大程度地减少重复代码。例如，我们可以选择将一组用于管理与 `/customers` 下的客户实体进行互动的路由进行分组。这样, 我们可以在 `@Controller()` 装饰器中指定路径前缀 `customers`，这样就不必为文件中的每个路由重复路径的那部分。
 
 ```typescript
+/* cats.controller.ts */
+
 import { Controller, Get } from '@nestjs/common';
 
 @Controller('cats')
@@ -34,10 +34,10 @@ export class CatsController {
 
 此函数将返回 `200` 状态代码和相关的响应，在本例中只返回了一个字符串。为什么会这样？ 为了解释原因，首先我们将介绍 Nest 使用两种不同的操作响应选项的概念：
 
-|              |                                                                                                                                                                                                                                                                      |
-| :----------: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|              |                                                                                                                                                                                                                                                                        |
+| :----------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 标准（推荐） | 使用这个内置方法，当请求处理程序返回一个 `JavaScript` 对象或数组时，它将自动序列化为 `JSON`。但是，当它返回一个 `JavaScript` 基本类型（例如`string、number、boolean`）时， Nest 将只发送值，而不尝试序列化它。这使响应处理变得简单：只需要返回值，其余的由 Nest 负责。 |
-|  类库特有的  | 我们可以在函数签名处通过 `@Res()` 注入类库特定的响应对象（例如， `Express`）。使用此方法，你就能使用由该响应对象暴露的原生响应处理函数。例如，使用 `Express`，您可以使用 `response.status(200).send()` 构建响应                                                      |
+|  类库特有的  | 我们可以在函数签名处通过 `@Res()` 注入类库特定的响应对象（例如， `Express`）。使用此方法，你就能使用由该响应对象暴露的原生响应处理函数。例如，使用 `Express`，您可以使用 `response.status(200).send()` 构建响应                                                        |
 
 !> 注意！Nest 检测处理程序何时使用 `@Res()` 或 `@Next()`，表明你选择了特定于库的选项。如果在一个处理函数上同时使用了这两个方法, 那么此处的标准方式就是自动禁用此路由, 你将不会得到你想要的结果。如果需要在某个处理函数上同时使用这两种方法（例如，通过注入响应对象，单独设置 cookie / header，但把其余部分留给框架），你必须再装饰器 `@Res({ passthrough: true })` 中将 `passthrough` 选项设为 `true`
 
@@ -45,9 +45,9 @@ export class CatsController {
 
 处理程序有时需要访问客户端的**请求**细节。Nest 提供了对底层平台（默认为 `Express`）的[**请求对象**](http://expressjs.com/en/api.html#req)（`request·）的访问方式。我们可以在处理函数的签名中使用 `@Req()` 装饰器，指示 Nest 将请求对象注入处理程序。
 
-> cats.controller.ts
-
 ```typescript
+/* cats.controller.ts */
+
 import { Controller, Get, Req } from '@nestjs/common';
 import { Request } from 'express';
 
@@ -86,9 +86,8 @@ export class CatsController {
 我们已经创建了一个端点来获取 cats 的数据（**GET** 路由）。我们通常还希望提供一个创建新记录的端点。为此，让我们创建 **POST** 处理程序:
 
 ```typescript
-/*
-  cats.controller.ts
-*/
+/* cats.controller.ts */
+
 import { Controller, Get, Post } from '@nestjs/common';
 
 @Controller('cats')
@@ -247,9 +246,9 @@ export class AccountController {
 
 每个异步函数都必须返回一个 `Promise`。这意味着您可以返回延迟值, 而 Nest 将自行解析它。让我们看看下面这个例子:
 
-> cats.controller.ts
-
 ```typescript
+/* cats.controller.ts */
+
 @Get()
 async findAll(): Promise<any[]> {
   return [];
@@ -258,9 +257,9 @@ async findAll(): Promise<any[]> {
 
 这是完全有效的。此外,通过返回 RxJS [observable 流](http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html)，Nest 路由处理程序将更加强大。 Nest 将自动订阅下面的源并获取最后发出的值（在流完成后）。
 
-> cats.controller.ts
-
 ```typescript
+/* cats.controller.ts */
+
 @Get()
 findAll(): Observable<any[]> {
   return of([]);
@@ -291,9 +290,8 @@ export class CreateCatDto {
 它只有三个基本属性。 之后，我们可以在 `CatsController` 中使用新创建的`DTO`：
 
 ```typescript
-/*
-  cats.controller.ts
-*/
+/* cats.controller.ts */
+
 @Post()
 async create(@Body() createCatDto: CreateCatDto) {
   return 'This action adds a new cat';
@@ -309,9 +307,8 @@ async create(@Body() createCatDto: CreateCatDto) {
 下面是一个示例，该示例利用几个可用的装饰器来创建基本控制器。 该控制器暴露了几个访问和操作内部数据的方法。
 
 ```typescript
-/*
-  cats.controller.ts
-*/
+/* cats.controller.ts */
+
 import { Controller, Get, Query, Post, Body, Put, Param, Delete } from '@nestjs/common';
 import { CreateCatDto, UpdateCatDto, ListAllEntities } from './dto';
 
@@ -353,9 +350,8 @@ export class CatsController {
 控制器总是属于模块，这就是为什么我们在 `@Module()` 装饰器中包含 `controllers` 数组的原因。 由于除了根模块 `AppModule`之外，我们还没有定义其他模块，所以我们将使用它来介绍 `CatsController`：
 
 ```typescript
-/*
-  app.module.ts
-*/
+/* app.module.ts */
+
 import { Module } from '@nestjs/common';
 import { CatsController } from './cats/cats.controller';
 
@@ -372,9 +368,8 @@ export class AppModule {}
 到目前为止，我们已经讨论了 Nest 操作响应的标准方式。操作响应的第二种方法是使用类库特有的[响应对象(Response)](http://expressjs.com/en/api.html#res)。为了注入特定的响应对象，我们需要使用 `@Res()` 装饰器。为了对比差异，让我们来重写 `CatsController`：
 
 ```typescript
-/*
-  cats.controller.ts
-*/
+/* cats.controller.ts */
+
 import { Controller, Get, Post, Res, HttpStatus } from '@nestjs/common';
 import { Response } from 'express';
 
@@ -392,9 +387,9 @@ export class CatsController {
 }
 ```
 
-尽管此方法有效，并且实际上通过提供对响应对象的完全控制（标头操作，特定于库的功能等）在某些方面提供了更大的灵活性，但应谨慎使用此种方法。通常来说，这种方式非常不清晰，并且有一些缺点。 主要的缺点是你的代码变得依赖于平台（因为不同的底层库在响应对象（Response）上可能具有不同的API），并且更加难以测试（您必须模拟响应对象等）。
+尽管此方法有效，并且实际上通过提供对响应对象的完全控制（标头操作，特定于库的功能等）在某些方面提供了更大的灵活性，但应谨慎使用此种方法。通常来说，这种方式非常不清晰，并且有一些缺点。 主要的缺点是你的代码变得依赖于平台（因为不同的底层库在响应对象（Response）上可能具有不同的 API），并且更加难以测试（您必须模拟响应对象等）。
 
-而且，在上面的示例中，你失去与依赖于Nest标准响应处理的 Nest 功能（例如，拦截器（Interceptors） 和 `@HttpCode()`/`@Header()` 装饰器）的兼容性。要解决此问题，可以将 `passthrough` 选项设置为 `true`，如下所示：
+而且，在上面的示例中，你失去与依赖于 Nest 标准响应处理的 Nest 功能（例如，拦截器（Interceptors） 和 `@HttpCode()`/`@Header()` 装饰器）的兼容性。要解决此问题，可以将 `passthrough` 选项设置为 `true`，如下所示：
 
 ```typescript
 @Get()

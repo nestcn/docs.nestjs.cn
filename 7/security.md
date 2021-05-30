@@ -590,7 +590,7 @@ constructor(private moduleRef: ModuleRef){
 
 在下一步中，请求的实例将被用于获取一个当前上下文标识，而不是生成一个新的（更多关于请求上下文的内容见[这里](https://docs.nestjs.cn/7/fundamentals?id=%e6%a8%a1%e5%9d%97%e5%8f%82%e8%80%83))。
 
-现在，在`LocalStrategy`类的`validate()`方法中，使用`ContextIdFactory`类中的`getByRequest()`方法来创建一个基于请求对向的上下文id，并将其传递给`resolve()`调用：
+现在，在`LocalStrategy`类的`validate()`方法中，使用`ContextIdFactory`类中的`getByRequest()`方法来创建一个基于请求对象的上下文id，并将其传递给`resolve()`调用：
 
 ```typescript
 

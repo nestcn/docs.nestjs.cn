@@ -1,4 +1,6 @@
 node_modules/
 .vscode/
-package-lock.json 
+package-lock.json
 yarn.lock
+pnpm-lock.yaml
+

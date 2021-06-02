@@ -1528,8 +1528,8 @@ DATABASE_PASSWORD=test
 默认情况下，程序在应用程序的根目录中查找`.env`文件。 要为`.env`文件指定另一个路径，请配置`forRoot()`的配置对象 envFilePath 属性(可选)，如下所示：
 
 ```typescript
-import { Module } from '@nestjs/common';	ConfigModule.forRoot({
-import { ConfigService } from './config.service';	  envFilePath: '.development.env',
+ConfigModule.forRoot({
+  envFilePath: '.development.env',
 });
 ```
 

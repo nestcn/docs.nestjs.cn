@@ -10,7 +10,7 @@ Providers 是 `Nest` 的一个基本概念。许多基本的 `Nest` 类可能被
 
 ## 服务
 
-让我们从创建一个简单的 `CatsService` 开始。该服务将负责数据存储和检索，由其使用 `CatsController`，因此它被定义为 `provider` 是一个很好的选择。因此，我们用这个类来装饰 `@Injectable()`。
+让我们从创建一个简单的 `CatsService` 开始。该服务将负责数据存储和检索，其由 `CatsController` 使用，因此把它定义为 `provider`，是一个很好的选择。因此，我们用 `@Injectable()` 来装饰这个类 。
 
 > cats.service.ts
 

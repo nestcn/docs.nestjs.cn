@@ -1570,7 +1570,7 @@ ConfigModule.forRoot({
 自定义配置文件导出一个工厂函数，该函数返回一个配置对象。配置对象可以是任意嵌套的普通 JavaScript 对象。`process.env`对象将包含完全解析的环境变量键/值对（具有如上所述的`.env`文件和已解析和合并的外部定义变量）。因为您控制了返回的配置对象，所以您可以添加任何必需的逻辑来将值转换为适当的类型、设置默认值等等。例如:
 
 ```typescript
-@@filename(config/configuration)
+// config/configuration.ts
 export default () => ({
   port: parseInt(process.env.PORT, 10) || 3000,
   database: {

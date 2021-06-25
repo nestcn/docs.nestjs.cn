@@ -850,7 +850,7 @@ create(@Body() createCatDto: CreateCatDto) {
 
 `CASL`是一个权限库，用于限制用户可以访问哪些资源。它被设计为可渐进式增长的，从基础权利权限到完整的基于主题和属性的权限都可以实现。
 
-首先，安装`@cacl/ability`包：
+首先，安装`@casl/ability`包：
 
 ```bash
 $ npm i @casl/ability

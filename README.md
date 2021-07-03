@@ -20,7 +20,7 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
 
 赞助商广告：
 
-本站托管在： [vultr   （帮助我们，并且获得50美金【10个月】）](https://www.vultr.com/?ref=7786172-4F)    
+本站托管在： [vultr   （免费送 100 美金）](https://www.vultr.com/?ref=8823546-6G)    
   [【推荐】Onevps-更稳定-不限流量](https://www.onevps.com/portal/aff.php?aff=12238)    
   [JMS 搬瓦工官方的科学上网工具](https://justmysocks3.net/members/aff.php?aff=6423)    
   [【捐赠】](https://gitee.com/notadd/docs.nestjs.cn?donate=true)   

@@ -6,9 +6,9 @@
 
 ### QQ 群
 
-一群：  [277386223](https://jq.qq.com/?_wv=1027&k=aaetFYo1)
+一群（2000人群）：  [277386223](https://jq.qq.com/?_wv=1027&k=aaetFYo1)
 
-二群： [1031015552](https://jq.qq.com/?_wv=1027&k=Ay5jLfqo)
+二群：（1000人群）： [1031015552](https://jq.qq.com/?_wv=1027&k=Ay5jLfqo)
 
 
 ### 微信交流群： 

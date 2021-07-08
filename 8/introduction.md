@@ -53,6 +53,6 @@ $ npm i --save @nestjs/core @nestjs/common rxjs reflect-metadata
 网站 - https://nestjs.com
 推特 - @nestframework
 
-本站托管在： [vultr   （帮助我们，并且获得50美金【10个月】）](https://www.vultr.com/?ref=7786172-4F)
+本站托管在： [vultr   （免费送 100 美金）](https://www.vultr.com/?ref=8823546-6G)   
 
 [![vultr](https://www.vultr.com/media/banner_1.png)](https://www.vultr.com/?ref=7815855-4F)

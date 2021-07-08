@@ -2526,6 +2526,8 @@ findOne(): UserEntity {
 
 想了解有关装饰器选项的更多信息，请访问此[页面](https://github.com/typestack/class-transformer)。
 
+## API 多版本
+
 ## 定时任务
 
 定时任务允许你按照指定的日期/时间、一定时间间隔或者一定时间后单次执行来调度(`scheduling`)任意代码（方法/函数）。在`Linux`世界中，这经常通过操作系统层面的`cron`包等执行。在`Node.js`应用中，有几个不同的包可以模拟 cron 包的功能。Nest 提供了`@nestjs/schedule`包，其集成了流行的 Node.js 的`node-cron`包，我们将在本章中应用该包。
@@ -3865,6 +3867,9 @@ MulterModule.registerAsync({
   useExisting: ConfigService,
 });
 ```
+## 流处理文件
+
+（待翻译）
 
 ## HTTP 模块
 

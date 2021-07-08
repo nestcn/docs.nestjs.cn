@@ -1,4 +1,9 @@
 
+### 交流社区
+
+[中文论坛](https://github.com/nestcn/docs.nestjs.cn/discussions)    
+
+
 ### QQ 群
 
 一群：  [277386223](https://jq.qq.com/?_wv=1027&k=aaetFYo1)

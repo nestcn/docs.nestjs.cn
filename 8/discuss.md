@@ -3,19 +3,19 @@
 
 一群：  [277386223](https://jq.qq.com/?_wv=1027&k=aaetFYo1)
 
-二群：（推荐） [1031015552](https://jq.qq.com/?_wv=1027&k=Ay5jLfqo)
+二群： [1031015552](https://jq.qq.com/?_wv=1027&k=Ay5jLfqo)
 
 
 ### 微信交流群： 
 
-一群：（超过200人，需要添加好友）    
+一群：（已满）    
 
-<img src="https://pic.downk.cc/item/5f02e2e114195aa594ed9f59.jpg" alt="加微信" width="260" height="260" align="bottom" />
+【内部邀请】
 
 
 二群：    
 
-二维码失效。
+<img src="https://pic.downk.cc/item/5f02e2e114195aa594ed9f59.jpg" alt="加微信" width="260" height="260" align="bottom" />
 
 
 ### 关注
@@ -24,7 +24,7 @@
 [汪志成的知乎](https://www.zhihu.com/people/alpha-gde)    
 [justjavac的知乎](https://www.zhihu.com/people/justjavac.com)
 
-### 互联网交流    
+### 互联网交流（闲聊）    
 
 左华栋的互联网圈：    
 

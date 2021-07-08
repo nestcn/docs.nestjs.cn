@@ -10,7 +10,7 @@
 
 ## 路由
 
-在下面的例子中，我们使用 `@Controller()` 装饰器定义一个基本的控制器。可选 路由路径前缀设置为 `cats`。在 `@Controller()` 装饰器中使用路径前缀可以使我们轻松地对一组相关的路由进行分组，并最大程度地减少重复代码。例如，我们可以选择将一组用于管理与 `/customers` 下的客户实体进行互动的路由进行分组。这样, 我们可以在 `@Controller()` 装饰器中指定路径前缀 `customers`，这样就不必为文件中的每个路由重复路径的那部分。
+在下面的例子中，我们使用 `@Controller()` 装饰器定义一个基本的控制器。可选 路由路径前缀设置为 `cats`。在 `@Controller()` 装饰器中使用路径前缀可以使我们轻松地对一组相关的路由进行分组，并最大程度地减少重复代码。例如，我们可以选择将一组用于管理与 `/customers` 下的客户实体进行互动的路由进行分组。这样，我们可以在 `@Controller()` 装饰器中指定路径前缀 `customers`，这样就不必为文件中的每个路由重复路径的那部分。
 
 ```typescript
 /* cats.controller.ts */
@@ -39,7 +39,7 @@ export class CatsController {
 | 标准（推荐） | 使用这个内置方法，当请求处理程序返回一个 `JavaScript` 对象或数组时，它将自动序列化为 `JSON`。但是，当它返回一个 `JavaScript` 基本类型（例如`string、number、boolean`）时， Nest 将只发送值，而不尝试序列化它。这使响应处理变得简单：只需要返回值，其余的由 Nest 负责。 |
 |  类库特有的  | 我们可以在函数签名处通过 `@Res()` 注入类库特定的响应对象（例如， `Express`）。使用此方法，你就能使用由该响应对象暴露的原生响应处理函数。例如，使用 `Express`，您可以使用 `response.status(200).send()` 构建响应                                                        |
 
-!> 注意！Nest 检测处理程序何时使用 `@Res()` 或 `@Next()`，表明你选择了特定于库的选项。如果在一个处理函数上同时使用了这两个方法, 那么此处的标准方式就是自动禁用此路由, 你将不会得到你想要的结果。如果需要在某个处理函数上同时使用这两种方法（例如，通过注入响应对象，单独设置 cookie / header，但把其余部分留给框架），你必须在装饰器 `@Res({ passthrough: true })` 中将 `passthrough` 选项设为 `true`
+!> 注意！Nest 检测处理程序何时使用 `@Res()` 或 `@Next()`，表明你选择了特定于库的选项。如果在一个处理函数上同时使用了这两个方法，那么此处的标准方式就是自动禁用此路由, 你将不会得到你想要的结果。如果需要在某个处理函数上同时使用这两种方法（例如，通过注入响应对象，单独设置 cookie / header，但把其余部分留给框架），你必须在装饰器 `@Res({ passthrough: true })` 中将 `passthrough` 选项设为 `true`
 
 ## Request
 
@@ -62,7 +62,7 @@ export class CatsController {
 
 ?> 为了在 `express` 中使用 `Typescript` （如 `request: Request` 上面的参数示例所示），请安装 `@types/express` 。
 
-`Request` 对象代表 `HTTP` 请求，并具有查询字符串，请求参数参数，HTTP 标头（HTTP hearder） 和 正文（HTTP body）的属性（在[这里](https://expressjs.com/en/api.html#req)阅读更多）。在多数情况下, 不必手动获取它们。 我们可以使用专用的装饰器，比如开箱即用的 `@Body()` 或 `@Query()` 。 下面是 Nest 提供的装饰器及其代表的底层平台特定对象的对照列表。
+`Request` 对象代表 `HTTP` 请求，并具有查询字符串，请求参数参数，HTTP 标头（HTTP header） 和 正文（HTTP body）的属性（在[这里](https://expressjs.com/en/api.html#req)阅读更多）。在多数情况下，不必手动获取它们。 我们可以使用专用的装饰器，比如开箱即用的 `@Body()` 或 `@Query()` 。 下面是 Nest 提供的装饰器及其代表的底层平台特定对象的对照列表。
 
 |                           |                                   |
 | ------------------------- | --------------------------------- |
@@ -137,7 +137,7 @@ create() {
 
 ## Headers
 
-要指定自定义响应头，可以使用 `@header()` 装饰器或类库特有的响应对象,（并直接调用 `res.header()`）。
+要指定自定义响应头，可以使用 `@header()` 装饰器或类库特有的响应对象，（并直接调用 `res.header()`）。
 
 ```typescript
 @Post()
@@ -244,7 +244,7 @@ export class AccountController {
 
 ?> 了解更多关于 `Async / await` 请点击[这里](https://kamilmysliwiec.com/typescript-2-1-introduction-async-await)
 
-每个异步函数都必须返回一个 `Promise`。这意味着您可以返回延迟值, 而 Nest 将自行解析它。让我们看看下面这个例子:
+每个异步函数都必须返回一个 `Promise`。这意味着您可以返回延迟值，而 Nest 将自行解析它。让我们看看下面这个例子:
 
 ```typescript
 /* cats.controller.ts */
@@ -255,7 +255,7 @@ async findAll(): Promise<any[]> {
 }
 ```
 
-这是完全有效的。此外,通过返回 RxJS [observable 流](http://reactivex.io/rxjs/class/es8/Observable.js~Observable.html)，Nest 路由处理程序将更加强大。 Nest 将自动订阅下面的源并获取最后发出的值（在流完成后）。
+这是完全有效的。此外，通过返回 RxJS [observable 流](http://reactivex.io/rxjs/class/es8/Observable.js~Observable.html)，Nest 路由处理程序将更加强大。 Nest 将自动订阅下面的源并获取最后发出的值（在流完成后）。
 
 ```typescript
 /* cats.controller.ts */
@@ -266,7 +266,7 @@ findAll(): Observable<any[]> {
 }
 ```
 
-上述的两种方法都是可行的, 你可以选择你喜欢的方式。
+上述的两种方法都是可行的，你可以选择你喜欢的方式。
 
 ## 请求负载
 

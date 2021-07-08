@@ -43,7 +43,7 @@ export class CatsController {
 
 ## Request
 
-处理程序有时需要访问客户端的**请求**细节。Nest 提供了对底层平台（默认为 `Express`）的[**请求对象**](http://expressjs.com/en/api.html#req)（`request·）的访问方式。我们可以在处理函数的签名中使用 `@Req()` 装饰器，指示 Nest 将请求对象注入处理程序。
+处理程序有时需要访问客户端的**请求**细节。Nest 提供了对底层平台（默认为 `Express`）的[**请求对象**](http://expressjs.com/en/api.html#req)（`request`）的访问方式。我们可以在处理函数的签名中使用 `@Req()` 装饰器，指示 Nest 将请求对象注入处理程序。
 
 ```typescript
 /* cats.controller.ts */

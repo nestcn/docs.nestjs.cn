@@ -801,7 +801,7 @@ export class CatsService implements OnModuleInit {
 this.moduleRef.get(Service, { strict: false });
 ```
 
-## 处理范围提供者
+### 处理范围提供者
 
 要动态处理一个范围提供者(瞬态的或请求范围的)，使用`resolve()`方法并将提供者的注入令牌作为参数提供给方法。
 
@@ -910,6 +910,10 @@ export class CatsService implements OnModuleInit {
 }
 ```
 该技术允许你在框架容器之外偶然实例化一个不同的类。
+
+## 懒加载模块
+
+（待翻译）
 
 ## 应用上下文
 

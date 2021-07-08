@@ -361,11 +361,5 @@ findOne(@Param('id', UserByIdPipe) userEntity: UserEntity) {
 
 ### 译者署名
 
-| 用户名                                       | 头像                                                                                                                                                            | 职能 | 签名                                                                          |
-| -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------- |
-| [@zuohuadong](https://github.com/zuohuadong) | <img class="avatar-66 rm-style" src="https://pic.downk.cc/item/5f4cafe7160a154a67c4047b.jpg">                                                        | 翻译 | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github |
-| [@Drixn](https://drixn.com/)                 | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">                                                                                | 翻译 | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/)                             |
-[@Armor](https://github.com/Armor-cn)  | <img class="avatar-66 rm-style" height="70" src="https://avatars3.githubusercontent.com/u/31821714?s=460&v=4">  |  翻译  | 专注于 Java 和 Nest，[@Armor](https://armor.ac.cn/) |
-| [@tangkai](https://github.com/tangkai123456) | <img class="avatar-66 rm-style" height="70" src="https://avatars1.githubusercontent.com/u/22436910">                                                            | 翻译 | 专注于 React，[@tangkai](https://github.com/tangkai123456)                    |
-| [@franken133](https://github.com/franken133) | <img class="avatar rounded-2" src="https://avatars0.githubusercontent.com/u/17498284?s=400&amp;u=aa9742236b57cbf62add804dc3315caeede888e1&amp;v=4" height="70"> | 翻译 | 专注于 java 和 nest，[@franken133](https://github.com/franken133)             |
-| [@Jimmy](https://github.com/Jimmysh)         | <img class="avatar rounded-2" src="https://avatars3.githubusercontent.com/u/230652?s=460&v=4" height="70">                                                      | 翻译 | 专注于 angular, nest，Ionic，[@Jimmy](https://github.com/Jimmysh)             |
+| 用户名 | 头像 | 职能 | 签名 |
+|---|---|---|---|

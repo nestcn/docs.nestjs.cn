@@ -646,14 +646,14 @@ export class CatsService {}
 
 默认使用单例范围,并且不需要声明。如果你想声明一个单例范围的提供者,在`scope`属性中使用`Scope.DEFAULT`值。
 
-## 控制器范围
+### 控制器范围
 
 当涉及到控制器时，传递 `ControllerOptions` 对象
 
 ```typescript
 @Controller({
   path: 'cats',
-  scope: Scope.REQUEST,
+  scope: ,
 })
 export class CatsController {}
 ```

@@ -311,7 +311,7 @@ $ npm i --save redis
 > main.ts
 
 ```typescript
-const app = await NestFactory.createMicroservice(ApplicationModule, {
+const app = await NestFactory.createMicroservice(AppModule, {
   transport: Transport.REDIS,
   options: {
     url: 'redis://localhost:6379',
@@ -391,7 +391,7 @@ $ npm i --save mqtt
 > main.ts
 
 ```typescript
-const app = await NestFactory.createMicroservice<MicroserviceOptions>(ApplicationModule, {
+const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
   transport: Transport.MQTT,
   options: {
     url: 'mqtt://localhost:1883',
@@ -462,7 +462,7 @@ getTemperature(@Ctx() context: MqttContext) {
 在开始之前，我们必须安装所需的软件包:
 
 ```
-$ npm i --save nats
+$ npm i --save nats@^1.4.12
 ```
 
 ### 概述
@@ -472,7 +472,7 @@ $ npm i --save nats
 > main.ts
 
 ```typescript
-const app = await NestFactory.createMicroservice<MicroserviceOptions>(ApplicationModule, {
+const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
   transport: Transport.NATS,
   options: {
     url: 'nats://localhost:4222',
@@ -514,7 +514,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(Applicatio
 ### 请求-响应
 
 
-请求-响应消息风格下，NATS使用内置的[请求-应答(Request-Reply](https://docs.nats.io/nats-concepts/reqreply)机制。一个给定主题(subject)发布的请求携带着答复主题，监听该主题的响应者将响应发送给答复主题(reply subject)。答复主题一般来说是个称为`_INBOX`的主题，无论位于何处，它都将动态地直接返回给请求者。
+请求-响应消息风格下，NATS不是使用内置的[请求-应答(Request-Reply](https://docs.nats.io/nats-concepts/reqreply)机制。相反，一个“请求”通过给定主题使用```publish()```方法携带一个主题名称发布，，监听该主题的响应者将响应发送给答复主题(reply subject)。答复主题无论位于何处，它都将动态地直接返回给请求者。
 
 ### 基于事件
 

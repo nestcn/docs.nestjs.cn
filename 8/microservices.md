@@ -514,7 +514,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 ### 请求-响应
 
 
-请求-响应消息风格下，NATS不是使用内置的[请求-应答(Request-Reply](https://docs.nats.io/nats-concepts/reqreply)机制。相反，一个“请求”通过给定主题使用```publish()```方法携带一个主题名称发布，，监听该主题的响应者将响应发送给答复主题(reply subject)。答复主题无论位于何处，它都将动态地直接返回给请求者。
+请求-响应消息风格下，NATS不是使用内置的[请求-应答(Request-Reply](https://docs.nats.io/nats-concepts/reqreply)机制。相反，一个“请求”通过给定主题使用```publish()```方法携带一个答复主题名称发布，，监听该主题的响应者将响应发送给答复主题(reply subject)。答复主题无论位于何处，它都将动态地直接返回给请求者。
 
 ### 基于事件
 

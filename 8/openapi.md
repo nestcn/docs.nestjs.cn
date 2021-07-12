@@ -1298,4 +1298,3 @@ $ npm run start
 
 | 用户名 | 头像 | 职能 | 签名 |
 |---|---|---|---|
-| [@weizy0219](https://github.com/weizy0219)  | <img class="avatar-66 rm-style" height="70" src="https://avatars3.githubusercontent.com/u/19883738?s=60&v=4">  |  翻译  | 专注于TypeScript全栈、物联网和Python数据科学，[@weizhiyong](https://www.weizhiyong.com) |

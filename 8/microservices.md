@@ -1767,10 +1767,6 @@ accumulate(data: number[]): number {
  ### 译者署名
 
 | 用户名 | 头像 | 职能 | 签名 |
-|---|---|---|---|
-| [@zuohuadong](https://www.zhihu.com/people/dongcang)  | <img class="avatar-66 rm-style" src="https://pic.downk.cc/item/5f4cafe7160a154a67c4047b.jpg">  |  翻译  | 专注于 caddy 和 nest，[@zuohuadong](https://github.com/zuohuadong/) at Github  |
-| [@Drixn](https://drixn.com/)  | <img class="avatar-66 rm-style" src="https://cdn.drixn.com/img/src/avatar1.png">  |  翻译  | 专注于 nginx 和 C++，[@Drixn](https://drixn.com/) |
-| [@Armor](https://github.com/Armor-cn)  | <img class="avatar-66 rm-style" height="70" src="https://avatars3.githubusercontent.com/u/31821714?s=460&v=4">  |  翻译  | 专注于 Java 和 Nest，[@Armor](https://armor.ac.cn/) |
-| [@tihssiefiL](https://github.com/tihssiefiL)  | <img class="avatar-66 rm-style" height="80" src="https://avatars1.githubusercontent.com/u/27731469?s=460&u=26299e3ac3d46723492efa3daf1eb9703de0616a&v=4">  |  翻译  | 专注于 前端 和 nodejs, [@tihssiefiL](https://blog.ezcomezgo.com) |
-| [@weizy0219](https://github.com/weizy0219)  | <img class="avatar-66 rm-style" height="70" src="https://avatars3.githubusercontent.com/u/19883738?s=60&v=4">  |  翻译  | 专注于TypeScript全栈、物联网和Python数据科学，[@weizhiyong](https://www.weizhiyong.com) |
+
 | [@ganshiqingyuan](https://github.com/ganshiqingyuan)  | <img class="avatar-66 rm-style" height="70" src="https://avatars.githubusercontent.com/u/33950951?s=60&v=4">  |  翻译  | typescript全栈爱好者，[@臣以君纲](https://www.jianshu.com/u/3cbb3fb04886) |
+

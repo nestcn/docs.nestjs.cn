@@ -211,7 +211,7 @@ $ nest start my-app
 
 应用程序类型的项目，或者我们通常所说的”应用程序”，是可以运行和部署的完整的 `Nest` 应用程序。使用 `nest generate` 应用程序生成应用程序类型的项目。
 
-该命令自动生成一个项目框架，包括来自 `typescript starter` 的标准 `src` 和测试文件夹。与标准模式不同，`monorepo` 中的应用程序项目不具有任何包依赖项( `package.json` )或其他项目配置构件，如 `.prettierrc` 和 `tslin.json` 。相反，使用单处理器范围的依赖项和配置文件。
+该命令自动生成一个项目框架，包括来自 `typescript starter` 的标准 `src` 和测试文件夹。与标准模式不同，`monorepo` 中的应用程序项目不具有任何包依赖项( `package.json` )或其他项目配置构件，如 `.prettierrc` 和 `tslint.json` 。相反，使用单处理器范围的依赖项和配置文件。
 
 然而，该示意图确实生成了特定于项目的 `tsconfig.app.json`。此配置文件自动设置适当的生成选项，包括正确设置编译输出文件夹。该文件扩展了顶级(monorepo) `tsconfig.json` 文件，因此您可以管理单点范围内的全局设置，但是如果需要，可以在项目级别覆盖它们。
 

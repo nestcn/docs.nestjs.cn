@@ -1767,6 +1767,6 @@ accumulate(data: number[]): number {
  ### 译者署名
 
 | 用户名 | 头像 | 职能 | 签名 |
-
+|---|---|---|---|
 | [@ganshiqingyuan](https://github.com/ganshiqingyuan)  | <img class="avatar-66 rm-style" height="70" src="https://avatars.githubusercontent.com/u/33950951?s=60&v=4">  |  翻译  | typescript全栈爱好者，[@臣以君纲](https://www.jianshu.com/u/3cbb3fb04886) |
 

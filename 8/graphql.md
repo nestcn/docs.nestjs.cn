@@ -977,7 +977,91 @@ creationDate: Date;
 
 ## 指令
 
-【待翻译】
+一个指令可以被附加在一个字段或对象片段上，并能按照服务器所希望的任何方式影响查询语句的执行(参见[此处](https://graphql.org/learn/queries/#directives))。GraphQL 规范中提供了几个默认的指令：
+
+  - `@include(if: Boolean)` - 仅在参数为真时，才在结果中包含此字段
+  - `@skip(if: Boolean)` - 参数为真时，跳过此字段
+  - `@deprecated(reason: String)` - 标记此字段为已弃用，并附上原因
+
+指令其实就是一个带有 `@` 符号前缀的标识符，可选项为后面紧跟着的命名参数列表，它可以出现在 GraphQL 查询和模式语言中的几乎任何元素之后。
+
+
+### 自定义指令
+
+创建自定义模式指令，要先声明一个继承 `SchemaDirectiveVisitor` 的类，这个类是从 `apollo-server` 包中导出。
+
+```typescript
+import { SchemaDirectiveVisitor } from 'apollo-server';
+import { defaultFieldResolver, GraphQLField } from 'graphql';
+
+export class UpperCaseDirective extends SchemaDirectiveVisitor {
+  visitFieldDefinition(field: GraphQLField<any, any>) {
+    const { resolve = defaultFieldResolver } = field;
+    field.resolve = async function(...args) {
+      const result = await resolve.apply(this, args);
+      if (typeof result === 'string') {
+        return result.toUpperCase();
+      }
+      return result;
+    };
+  }
+}
+```
+
+> **提示**
+> 注意指令不能被 `@Injectable()` 装饰器装饰。因此，它们不能被依赖注入。
+
+现在，我们在 `GraphQLModule.forRoot() ` 方法中注册 `UpperCaseDirective` ：
+
+```typescript
+GraphQLModule.forRoot({
+  // ...
+  schemaDirectives: {
+    upper: UpperCaseDirective,
+  },
+});
+```
+
+一旦被注册，我们就可以在 schema 中使用这个 `@upper` 指令。但是，应用指令的方式会有所不同，这取决于你的使用方法（代码优先或模式优先）。
+
+### 代码优先
+
+在代码优先方法中，使用 `@Directive()` 装饰器来应用指令。
+
+```typescript
+@Directive('@upper')
+@Field()
+title: string;
+```
+
+> **提示**
+> `@Directive()` 装饰器是从 `@nestjs/graphql` 包里导出的。
+
+指令可以被应用在字段、字段解析器、输入和对象类型上，同样也可以应用在查询、变更和订阅上。这里有一个将指令应用于查询处理层的例子：
+
+```typescript
+@Directive('@deprecated(reason: "This query will be removed in the next version")')
+@Query(returns => Author, { name: 'author' })
+async getAuthor(@Args({ name: 'id', type: () => Int }) id: number) {
+  return this.authorsService.findOneById(id);
+}
+```
+
+通过 `@Directive()` 装饰器所应用的指令，将不会被映射在生成的模式定义文件中。
+
+### 模式优先
+
+在模式优先方法中，直接在 SDL 中应用指令。
+
+```graphql
+directive @upper on FIELD_DEFINITION
+
+type Post {
+  id: Int!
+  title: String! @upper
+  votes: Int
+}
+```
 
 ## 插件
 

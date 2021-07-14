@@ -125,6 +125,7 @@ async handleUserCreated(data: Record<string, unknown>) {
   // business logic
 }
 ```
+?> 你可以为单独的事件模式注册多个事件处理程序，所有的事件处理程序都会并行执行
 
 该 `handleUserCreated()` 方法正在侦听 `user_created` 事件。事件处理程序接受一个参数，`data` 从客户端传递（在本例中，是一个通过网络发送的事件有效负载）。
 
@@ -142,10 +143,12 @@ getDate(@Payload() data: number[], @Ctx() context: NatsContext) {
 
 ?> `@Payload()`、`@Ctx()` 和 `NatsContext` 需要从 `@nestjs/microservices` 包导入。
 
+?> 你也可以为 `@Payload()` 装饰器传入一个属性key值，来获取通过此装饰器拿到的对象的value值，例如 `@Payload('id')`
+
 ### 客户端
 
  为了交换消息或将事件发布到 `Nest` 微服务，我们使用 `ClientProxy` 类, 它可以通过几种方式创建实例。此类定义了几个方法，例如`send()`（用于请求-响应消息传递）和`emit()`（用于事件驱动消息传递），这些方法允许您与远程微服务通信。使用下列方法之一获取此类的实例。
- 
+
  首先，我们可以使用 `ClientsModule` 暴露的静态`register()` 方法。此方法将数组作为参数，其中每个元素都具有 `name`属性，以及一个可选的`transport`属性（默认是`Transport.TCP`），以及特定于微服务的`options`属性。
 
  `name`属性充当一个 `injection token`，可以在需要时将其用于注入 `ClientProxy` 实例。`name` 属性的值作为注入标记，可以是任意字符串或`JavaScript`符号，[参考这里](https://docs.nestjs.com/fundamentals/custom-providers#non-class-based-provider-tokens)。
@@ -173,7 +176,7 @@ constructor(
 
 ?> `ClientsModule`和 `ClientProxy`类需要从 `@nestjs/microservices` 包导入。
 
-有时候，我们可能需要从另一个服务(比如 `ConfigService` )获取微服务配置而不是硬编码在客户端程序中，为此，我们可以使用 `ClientProxyFactory` 类来注册一个[自定义提供程序](https://docs.nestjs.com/techniques/custom-providers),这个类有一个静态的`create()`方法，接收传输者选项对象，并返回一个自定义的 `ClientProxy` 实例:
+有时候，我们可能需要从另一个服务(比如 `ConfigService` )获取微服务配置而不是硬编码在客户端程序中，为此，我们可以使用 `ClientProxyFactory` 类来注册一个[自定义提供程序](https://docs.nestjs.com/fundamentals/custom-providers),这个类有一个静态的`create()`方法，接收传输者选项对象，并返回一个自定义的 `ClientProxy` 实例:
 
 ```typescript
 @Module({
@@ -270,7 +273,7 @@ export interface RequestContext<T = any> {
 
 `data` 属性是消息生产者发送的消息有效负载。 `pattern` 属性是用于标识适当的处理程序以处理传入消息的模式。
 
-### 处理超时
+#### 处理超时
 
 在分布式系统中，有时微服务可能宕机或者无法访问。要避免无限等待，可以使用超时，超时是一个和其他服务通讯的可信赖的方法。要在微服务中应用超时，你可以使用`RxJS`超时操作符。如果微服务没有在指定时间内返回响应，会抛出异常以便正确捕获与处理。
 
@@ -308,7 +311,7 @@ $ npm i --save redis
 > main.ts
 
 ```typescript
-const app = await NestFactory.createMicroservice(ApplicationModule, {
+const app = await NestFactory.createMicroservice(AppModule, {
   transport: Transport.REDIS,
   options: {
     url: 'redis://localhost:6379',
@@ -388,7 +391,7 @@ $ npm i --save mqtt
 > main.ts
 
 ```typescript
-const app = await NestFactory.createMicroservice<MicroserviceOptions>(ApplicationModule, {
+const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
   transport: Transport.MQTT,
   options: {
     url: 'mqtt://localhost:1883',
@@ -459,7 +462,7 @@ getTemperature(@Ctx() context: MqttContext) {
 在开始之前，我们必须安装所需的软件包:
 
 ```
-$ npm i --save nats
+$ npm i --save nats@^1.4.12
 ```
 
 ### 概述
@@ -469,7 +472,7 @@ $ npm i --save nats
 > main.ts
 
 ```typescript
-const app = await NestFactory.createMicroservice<MicroserviceOptions>(ApplicationModule, {
+const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
   transport: Transport.NATS,
   options: {
     url: 'nats://localhost:4222',
@@ -511,7 +514,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(Applicatio
 ### 请求-响应
 
 
-请求-响应消息风格下，NATS使用内置的[请求-应答(Request-Reply](https://docs.nats.io/nats-concepts/reqreply)机制。一个给定主题(subject)发布的请求携带着答复主题，监听该主题的响应者将响应发送给答复主题(reply subject)。答复主题一般来说是个称为`_INBOX`的主题，无论位于何处，它都将动态地直接返回给请求者。
+请求-响应消息风格下，NATS不是使用内置的[请求-应答(Request-Reply](https://docs.nats.io/nats-concepts/reqreply)机制。相反，一个“请求”通过给定主题使用```publish()```方法携带一个答复主题名称发布，，监听该主题的响应者将响应发送给答复主题(reply subject)。答复主题无论位于何处，它都将动态地直接返回给请求者。
 
 ### 基于事件
 
@@ -774,7 +777,7 @@ send|发送配置选项([参见这里](https://kafka.js.org/docs/producing#optio
 })
 ```
 
-另一种方式建立客户端 ( `ClientProxyFactory`或者`@Client()`) 也可以正常使用。 
+另一种方式建立客户端 ( `ClientProxyFactory`或者`@Client()`) 也可以正常使用。
 
 为了创建客户端实例，我们需要使用 `@Client()` 装饰器。
 
@@ -1018,7 +1021,7 @@ onModuleInit() {
 在开始之前，我们必须安装所需的软件包:
 
 ```
-$ npm i --save grpc @grpc/proto-loader
+$ npm i --save @grpc/grpc-js @grpc/proto-loader
 ```
 ### 概述
 
@@ -1036,6 +1039,18 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 });
 ```
 ?> `join()`函数需要从`path`包导入，`Transport`枚举 需要从 `@nestjs/microservices` 包导入。
+
+在 `nest-cli.json` 文件中，我们添加 `assets` 属性以便于部署非ts文件，添加 `watchAssets` 来对assets文件们进行监听，就grpc而言，我们希望 `.proto` 文件自动复制到 `dist` 文件夹下
+
+```typescript
+{
+  "compilerOptions": {
+    "assets": ["**/*.proto"],
+    "watchAssets": true
+  }
+}
+
+```
 
 ### 选项
 
@@ -1245,6 +1260,8 @@ call(): Observable<any> {
 
 注意，这可能需要更新我们在之前步骤中定义的`HeroesService`接口。
 
+#### 示例
+
 [这里](https://github.com/nestjs/nest/tree/master/sample/04-grpc) 提供了一个完整的示例。
 
 ### gRPC流
@@ -1317,7 +1334,10 @@ bidiHello(messages: Observable<any>, metadata: Metadata, call: ServerDuplexStrea
     });
   };
   const onComplete = () => subject.complete();
-  messages.subscribe(onNext, null, onComplete);
+  messages.subscribe({
+    next: onNext,
+    complete: onComplete,
+  });
 
   return subject.asObservable();
 }
@@ -1423,11 +1443,11 @@ requestStream.on('metadata', (metadata: Metadata) => {
 Nest提供了一系列开箱即用的传输器，也提供了允许用户自定义传输策略的API接口。传输器允许你使用可插拔的通讯层和非常简单的应用层消息协议通过网络连接组件。（阅读[全文](https://dev.to/nestjs/integrate-nestjs-with-external-services-using-microservice-transporters-part-1-p3))
 
 
-?> 不一定非要使用`@nestjs/microservices`包才能创建微服务，例如，如果需要和外部服务通讯 (假设为其他语言编写的其他微服务),你可能不需要 `@nestjs/microservice `提供的全部功能。实际上，如果你不需要装饰器(`@EventPattern`或者`@MessagePattern`)来定义订阅者，运行一个独立的应用并且手动维护连接/订阅频道可能会提供更高的灵活性。 
+?> 不一定非要使用`@nestjs/microservices`包才能创建微服务，例如，如果需要和外部服务通讯 (假设为其他语言编写的其他微服务),你可能不需要 `@nestjs/microservice `提供的全部功能。实际上，如果你不需要装饰器(`@EventPattern`或者`@MessagePattern`)来定义订阅者，运行一个独立的应用并且手动维护连接/订阅频道可能会提供更高的灵活性。
 
 使用自定义传输器，你可以集成任何消息系统/协议（包括`Google Cloud Pub/Sub`, `Amazon Kinesis`等等）或者已有的外部系统，在顶部添加额外的特性（例如用于MQTT的QoS）。
 
-?> 要更好地理解Nest微服务的工作模式以及如何扩展现有传输器，推荐阅读`NestJS Microservices in Action`和`Advanced NestJS Microservices`系列文章。
+?> 要更好地理解Nest微服务的工作模式以及如何扩展现有传输器，推荐阅读 [NestJS Microservices in Action](https://dev.to/johnbiundo/series/4724) 和 [Advanced NestJS Microservices](https://dev.to/nestjs/part-1-introduction-and-setup-1a2l) 系列文章。
 
 ### 创建策略
 
@@ -1664,7 +1684,7 @@ export class ExceptionFilter implements RpcExceptionFilter<RpcException> {
 }
 ```
 
-!> 在使用混合应用程序功能时，不能设置全局的微服务异常过滤器。
+!> 在使用混合应用程序功能时，全局的微服务异常过滤器不是默认开启的。
 
 下面是一个使用手动实例化 **方法作用域** 过滤器,与HTTP应用一样，你也可以使用控制器作用域的过滤器（例如在控制器类前使用`@UseFilters()`装饰器前缀）:
 
@@ -1747,4 +1767,6 @@ accumulate(data: number[]): number {
  ### 译者署名
 
 | 用户名 | 头像 | 职能 | 签名 |
-|---|---|---|---|
+
+| [@ganshiqingyuan](https://github.com/ganshiqingyuan)  | <img class="avatar-66 rm-style" height="70" src="https://avatars.githubusercontent.com/u/33950951?s=60&v=4">  |  翻译  | typescript全栈爱好者，[@臣以君纲](https://www.jianshu.com/u/3cbb3fb04886) |
+

@@ -1008,8 +1008,7 @@ export class UpperCaseDirective extends SchemaDirectiveVisitor {
 }
 ```
 
-> **提示**<br/>
-> 注意指令不能被 `@Injectable()` 装饰器装饰。因此，它们不能被依赖注入。
+?> 注意指令不能被 `@Injectable()` 装饰器装饰。因此，它们不能被依赖注入。
 
 现在，我们在 `GraphQLModule.forRoot() ` 方法中注册 `UpperCaseDirective` ：
 
@@ -1034,8 +1033,7 @@ GraphQLModule.forRoot({
 title: string;
 ```
 
-> **提示**<br/>
-> `@Directive()` 装饰器是从 `@nestjs/graphql` 包里导出的。
+?> `@Directive()` 装饰器是从 `@nestjs/graphql` 包里导出的。
 
 指令可以被应用在字段、字段解析器、输入和对象类型上，同样也可以应用在查询、变更和订阅上。这里有一个将指令应用于查询处理层的例子：
 
@@ -1105,7 +1103,7 @@ Nest 会自动实例化一个插件并将其应用于 Apollo Server。
 
 ### 使用外部插件
 
-有几个开箱即用的插件供我们使用。使用一个现有的插件很简单，导入并把它加入到 `plugins` 数组即可：
+有几个开箱即用的插件。使用一个现成的插件，只需将它导入并加入到 `plugins` 数组即可：
 
 ```typescript
 GraphQLModule.forRoot({
@@ -1114,17 +1112,250 @@ GraphQLModule.forRoot({
 }),
 ```
 
-> **提示**<br/>
-> `ApolloServerOperationRegistry` 插件是从 `apollo-server-plugin-operation-registry` 包里导出的。
+?> `ApolloServerOperationRegistry` 插件是从 `apollo-server-plugin-operation-registry` 包里导出的。
 
 
 ## 接口
 
-【待翻译】
+像许多类型系统一样，GraphQL 支持接口。接口是一种抽象类型，它包含一组特定的字段，类型必须包含这些字段才能实现接口。
+
+### 代码优先
+
+当使用代码优先方法时，你可以通过创建一个带有 `@InterfaceType()` 装饰器注释的抽象类，来定义一个 GraphQL 接口，这个装饰器是从 `@nestjs/graphql` 包里导出。  
+
+```typescript
+import { Field, ID, InterfaceType } from '@nestjs/graphql';
+
+@InterfaceType()
+export abstract class Character {
+  @Field(type => ID)
+  id: string;
+
+  @Field()
+  name: string;
+}
+```
+
+!> TypeScript 接口不能用来定义 GraphQL 接口。
+
+最终的结果是在 SDL 中生成以下部分的 GraphQL schema：
+
+```graphql
+interface Character {
+  id: ID!
+  name: String!
+}
+```
+
+现在，使用 `implements` 关键字来实现 `Character` 这个接口： 
+
+```typescript
+@ObjectType({
+  implements: () => [Character],
+})
+export class Human implements Character {
+  id: string;
+  name: string;
+}
+```
+
+?> `@ObjectType()` 装饰器是从 `@nestjs/graphql` 包里导出。
+
+默认的 `resolveType()` 函数是通过库根据解析器方法返回值提取的类型来生成的。这意味着你必须返回类的实例（你不能返回 JavaScript 对象字面量）。
+
+提供自定义的 `resolveType()` 函数，将 `resolveType` 属性传递给 `@InterfaceType()` 装饰器里的选项对象，如下所示：
+
+```typescript
+@InterfaceType({
+  resolveType(book) {
+    if (book.colors) {
+      return ColoringBook;
+    }
+    return TextBook;
+  },
+})
+export abstract class Book {
+  @Field(type => ID)
+  id: string;
+
+  @Field()
+  title: string;
+}
+```
+
+### 模式优先
+
+在模式优先方法中定义接口，只需使用 SDL 创建一个 GraphQL 接口。
+
+```graphql
+interface Character {
+  id: ID!
+  name: String!
+}
+```
+
+然后，你可以使用类型生成功能（如[快速开始](/8/graphql?id=快速开始)章节所示）生成相应的 TypeScript 定义。
+
+```typescript
+export interface Character {
+  id: string;
+  name: string;
+}
+```
+
+在解析器映射图中，接口需要一个额外的 `__resolveType` 字段，来确定接口应该解析为哪个类型。让我们创建一个 `CharactersResolver` 类并定义 `__resolveType` 方法：
+
+```typescript
+@Resolver('Character')
+export class CharactersResolver {
+  @ResolveField()
+  __resolveType(value) {
+    if ('age' in value) {
+      return Person;
+    }
+    return null;
+  }
+}
+```
+
+?> 所有装饰器都是从 `@nestjs/graphql` 包里导出。
+
 
 ## 联合类型
 
-【待翻译】
+联合类型与接口非常相似，但是它们没有指定类型之间的任何公共字段（详情请参阅[这里](https://graphql.org/learn/schema/#union-types)）。联合类型对于单个字段返回不相交的数据类型很有用。
+
+### 代码优先
+
+要定义 GraphQL 联合类型，我们必须先定义组成这个联合类型的各个类。遵循 Apollo 文档中的[示例](https://www.apollographql.com/docs/apollo-server/schema/unions-interfaces/#union-type)，我们将创建两个类。首先，`Book`：
+
+```typescript
+import { Field, ObjectType } from '@nestjs/graphql';
+
+@ObjectType()
+export class Book {
+  @Field()
+  title: string;
+}
+```
+
+然后是 `Author`：
+
+```typescript
+import { Field, ObjectType } from '@nestjs/graphql';
+
+@ObjectType()
+export class Author {
+  @Field()
+  name: string;
+}
+```
+
+在这里，我们使用从 `@nestjs/graphql` 包里导出的 `createUnionType` 函数来注册 `ResultUnion` 这个联合类型。
+
+```typescript
+export const ResultUnion = createUnionType({
+  name: 'ResultUnion',
+  types: () => [Author, Book],
+});
+```
+
+现在，我们就可以在查询中引用 `ResultUnion` 这个联合类型来。
+
+```typescript
+@Query(returns => [ResultUnion])
+search(): Array<typeof ResultUnion> {
+  return [new Author(), new Book()];
+}
+```
+
+最终的结果是在 SDL 中生成以下部分的 GraphQL schema：
+
+```graphql
+type Author {
+  name: String!
+}
+
+type Book {
+  title: String!
+}
+
+union ResultUnion = Author | Book
+
+type Query {
+  search: [ResultUnion!]!
+}
+```
+
+默认的 `resolveType()` 函数是通过库根据解析器方法返回值提取的类型来生成的。这意味着你必须返回类的实例（你不能返回 JavaScript 对象字面量）。
+
+提供自定义的 `resolveType()` 函数，将 `resolveType` 属性传递给 `@InterfaceType()` 装饰器里的选项对象，如下所示：
+
+```typescript
+export const ResultUnion = createUnionType({
+  name: 'ResultUnion',
+  types: () => [Author, Book],
+  resolveType(value) {
+    if (value.name) {
+      return Author;
+    }
+    if (value.title) {
+      return Book;
+    }
+    return null;
+  },
+});
+```
+
+### 模式优先
+
+在模式优先方法中定义联合类型，只需使用 SDL 创建一个 GraphQL 联合类型。
+
+```graphql
+type Author {
+  name: String!
+}
+
+type Book {
+  title: String!
+}
+
+union ResultUnion = Author | Book
+```
+
+然后，你可以使用类型生成功能（如[快速开始](/8/graphql?id=快速开始)章节所示）生成相应的 TypeScript 定义。
+
+```typescript
+export class Author {
+  name: string;
+}
+
+export class Book {
+  title: string;
+}
+
+export type ResultUnion = Author | Book;
+```
+
+在解析器映射图中，联合类型需要一个额外的 `__resolveType` 字段，来确定联合类型应该解析为哪个类型。另外，请注意， `ResultUnionResolver` 这个类在任何模块中都必须被注册为提供者。让我们创建一个 `ResultUnionResolver` 类并定义 `__resolveType` 方法：
+
+```typescript
+@Resolver('ResultUnion')
+export class ResultUnionResolver {
+  @ResolveField()
+  __resolveType(value) {
+    if (value.name) {
+      return 'Author';
+    }
+    if (value.title) {
+      return 'Book';
+    }
+    return null;
+  }
+}
+```
+
+?> 所有装饰器都是从 `@nestjs/graphql` 包里导出。
 
 ## 字段中间件
 
@@ -1132,7 +1363,132 @@ GraphQLModule.forRoot({
 
 ## 枚举
 
-【待翻译】
+枚举类型是一种特殊的标量，它的值仅限于一组特定的允许值（详情请参阅[这里](https://graphql.org/learn/schema/#enumeration-types)）。这允许你：
+
+- 验证此类型的任何参数都是允许值之一
+- 通过类型系统传递一个字段，这个字段始终是一组有限的值之一
+
+### 代码优先
+
+当使用代码优先方法时，你只需通过创建一个 TypeScript 枚举来定义一个 GraphQL 枚举类型。
+
+```typescript
+export enum AllowedColor {
+  RED,
+  GREEN,
+  BLUE,
+}
+```
+
+在这里，通过使用 `@nestjs/graphql` 包里的 `registerEnumType` 函数就注册 `AllowedColor` 枚举。
+
+```typescript
+registerEnumType(AllowedColor, {
+  name: 'AllowedColor',
+});
+```
+
+现在你可以在我们的类型中引用 `AllowedColor`：
+
+```typescript
+@Field(type => AllowedColor)
+favoriteColor: AllowedColor;
+```
+
+最终的结果是在 SDL 中生成以下部分的 GraphQL schema：
+
+```graphql
+enum AllowedColor {
+  RED
+  GREEN
+  BLUE
+}
+```
+
+要为枚举提供描述，可以将`description` 属性传递给 `registerEnumType()` 函数。
+
+```typescript
+registerEnumType(AllowedColor, {
+  name: 'AllowedColor',
+  description: 'The supported colors.',
+});
+```
+
+要为枚举值提供描述，或将值标记为已弃用，可以传递 `valuesMap` 属性，如下所示：
+
+```typescript
+registerEnumType(AllowedColor, {
+  name: 'AllowedColor',
+  description: 'The supported colors.',
+  valuesMap: {
+    RED: {
+      description: 'The default color.',
+    },
+    BLUE: {
+      deprecationReason: 'Too blue.',
+    },
+  },
+});
+```
+
+最终在 SDL 中生成的 GraphQL schema 如下所示：
+
+```graphql
+"""
+The supported colors.
+"""
+enum AllowedColor {
+  """
+  The default color.
+  """
+  RED
+  GREEN
+  BLUE @deprecated(reason: "Too blue.")
+}
+
+```
+
+### 模式优先
+
+在模式优先方法中定义一个枚举器，只需在 SDL 中创建一个 GraphQL 枚举变量。
+
+```graphql
+enum AllowedColor {
+  RED
+  GREEN
+  BLUE
+}
+```
+
+然后，你可以使用类型生成功能（如[快速开始](/8/graphql?id=快速开始)章节所示）生成相应的 TypeScript 定义。
+
+```typescript
+export enum AllowedColor {
+  RED
+  GREEN
+  BLUE
+}
+```
+
+有时，后端会在内部强制使用与公共 API 不同的枚举值。在这个例子中，API 包含 `RED`，然而在解析器中我们可能会使用 `#f00` 来替代（详情请参阅[此处](https://www.apollographql.com/docs/apollo-server/schema/custom-scalars/#internal-values)）。为此，需要给 `AllowedColor` 枚举声明一个解析器对象：
+
+```typescript
+export const allowedColorResolver: Record<keyof typeof AllowedColor, any> = {
+  RED: '#f00',
+};
+```
+
+?> 所有装饰器都是从 `@nestjs/graphql` 包里导出。
+
+然后，将此解析器对象与 `GraphQLModule#forRoot()` 方法的 `resolvers` 属性一起使用。
+
+```typescript
+GraphQLModule.forRoot({
+  resolvers: {
+    AllowedColor: allowedColorResolver,
+  },
+});
+```
 
 ## 复杂性
 

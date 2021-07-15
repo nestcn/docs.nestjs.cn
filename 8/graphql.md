@@ -1008,7 +1008,7 @@ export class UpperCaseDirective extends SchemaDirectiveVisitor {
 }
 ```
 
-> **提示**
+> **提示**<br/>
 > 注意指令不能被 `@Injectable()` 装饰器装饰。因此，它们不能被依赖注入。
 
 现在，我们在 `GraphQLModule.forRoot() ` 方法中注册 `UpperCaseDirective` ：
@@ -1034,7 +1034,7 @@ GraphQLModule.forRoot({
 title: string;
 ```
 
-> **提示**
+> **提示**<br/>
 > `@Directive()` 装饰器是从 `@nestjs/graphql` 包里导出的。
 
 指令可以被应用在字段、字段解析器、输入和对象类型上，同样也可以应用在查询、变更和订阅上。这里有一个将指令应用于查询处理层的例子：
@@ -1065,7 +1065,58 @@ type Post {
 
 ## 插件
 
-【待翻译】
+插件能让你通过响应某些特定事件时执行自定义操作，来扩展 Apollo Server 的核心功能。现在，这些事件对应 GraphQL 请求生命周期的各个阶段，以及 Apollo Server 本身的启动阶段（参见[这里](https://www.apollographql.com/docs/apollo-server/integrations/plugins/)）。比如，一个基本的日志插件可能会记录每一个发送给 Apollo Server 请求的相关 GraphQL 查询字符串。
+
+
+### 自定义插件
+
+创建插件，首先要声明一个用 `@Plugin` 装饰器注释的类，这个装饰器是从 `@nestjs/graphql` 包里导出的。还有，为了更好的使用代码自动补全功能，我们要从 Apollo-server-plugin-base 包中实现 ApolloServerPlugin 这个接口。
+
+```typescript
+import { Plugin } from '@nestjs/graphql';
+import {
+  ApolloServerPlugin,
+  GraphQLRequestListener,
+} from 'apollo-server-plugin-base';
+
+@Plugin()
+export class LoggingPlugin implements ApolloServerPlugin {
+  requestDidStart(): GraphQLRequestListener {
+    console.log('Request started');
+    return {
+      willSendResponse() {
+        console.log('Will send response');
+      },
+    };
+  }
+}
+```
+
+有了下面这段代码，我们就可以将 `LoggingPlugin` 注册为一个提供者。
+
+```typescript
+@Module({
+  providers: [LoggingPlugin],
+})
+export class CommonModule {}
+```
+
+Nest 会自动实例化一个插件并将其应用于 Apollo Server。
+
+### 使用外部插件
+
+有几个开箱即用的插件供我们使用。使用一个现有的插件很简单，导入并把它加入到 `plugins` 数组即可：
+
+```typescript
+GraphQLModule.forRoot({
+  // ...
+  plugins: [ApolloServerOperationRegistry({ /* options */})]
+}),
+```
+
+> **提示**<br/>
+> `ApolloServerOperationRegistry` 插件是从 `apollo-server-plugin-operation-registry` 包里导出的。
+
 
 ## 接口
 

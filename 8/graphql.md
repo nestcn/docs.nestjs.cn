@@ -1573,7 +1573,7 @@ GraphQLModule.forRoot({
 
 当你构建像 CRUD（创建/查询/更新/删除）这些功能时，在基本实体类型上构造变体通常会很有用。Nest 提供了几个执行类型转换的基础函数，让这项任务变得更加方便。
 
-### Partial
+### Partial 局部
 
 当创建输入验证类型（也被叫做 DTOs）时，同时构建**创建**或**更新**变体通常会很有用。例如，**创建**变体可能会需要全部字段，而**更新**变体则可能全部是可选字段。
 
@@ -1611,7 +1611,7 @@ export class UpdateUserInput extends PartialType(CreateUserInput) {}
 export class UpdateUserInput extends PartialType(User, InputType) {}
 ```
 
-### Pick
+### Pick 选取
 
 `PickType()` 函数可从一个输入类型中选取一组属性并构造一个新的类型（类）。例如，假设我们从这样一个类型开始：
 
@@ -1638,7 +1638,7 @@ export class UpdateEmailInput extends PickType(CreateUserInput, ['email'] as con
 
 ?> `PickType()` 函数是从 `@nestjs/graphql` 包里导出的。
 
-### Omit
+### Omit 排除
 
 `OmitType()` 函数通过从输入类型中选取所有属性然后删除一组特定的键来构造一个类型。例如，假设我们从这样一个类开始：
 
@@ -1660,7 +1660,7 @@ class CreateUserInput {
 
 ?> `OmitType()` 函数是从 `@nestjs/graphql` 包里导出的。
 
-### Intersection
+### Intersection 交集
 
 `IntersectionType()` 函数是合并两个类型到一个新的类型（类）。例如，假设我们从这样一个类开始：
 
@@ -1693,7 +1693,7 @@ export class UpdateUserInput extends IntersectionType(CreateUserInput, Additiona
 
 ?> `IntersectionType()` 函数是从 `@nestjs/graphql` 包里导出的。
 
-### Composition
+### Composition 组合
 
 这些类型映射基础函数是可组合的。例如，以下代码会创建一个类型（类），它拥有 `CreateUserInput` 类型的除了 `email` 的所有属性，而且这些属性将被设置为可选：
 

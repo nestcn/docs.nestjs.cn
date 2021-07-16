@@ -1567,6 +1567,144 @@ GraphQLModule.forRoot({
 });
 ```
 
+## 映射类型
+
+!> 该章节仅适用于代码优先模式。
+
+当你构建像 CRUD（创建/查询/更新/删除）这些功能时，在基本实体类型上构造变体通常会很有用。Nest 提供了几个执行类型转换的基础函数，让这项任务变得更加方便。
+
+### Partial
+
+当创建输入验证类型（也被叫做 DTOs）时，同时构建**创建**或**更新**变体通常会很有用。例如，**创建**变体可能会需要全部字段，而**更新**变体则可能全部是可选字段。
+
+Nest 提供了 `PartialType()` 这个基础函数来简化此任务并最大限度的减少模版文件。
+
+`PartialType()` 函数返回了一个类型（类），其中输入类型的所有属性都设置为可选。例如，假设我们有一个如下的**创建**类型：
+
+```typescript
+@InputType()
+class CreateUserInput {
+  @Field()
+  email: string;
+
+  @Field()
+  password: string;
+
+  @Field()
+  firstName: string;
+}
+```
+
+默认情况下，所有这些字段都是需要的。为创建具有相同字段的类型，但每个字段又都是可选的，可以使用 `PartialType()` 传递类引用（`CreateUserInput`）作为参数：
+
+```typescript
+@InputType()
+export class UpdateUserInput extends PartialType(CreateUserInput) {}
+```
+
+?> `PartialType` 函数是从 `@nestjs/graphql` 包里导出的。
+
+`PartialType` 函数接受一个可选的第二参数，它是对装饰器工厂的引用。此参数可用于更改应用于结果（子）类的装饰器函数。如果未指定，子类有效地使用与**父**类相同的装饰器（第一个参数中引用的类）。在上面的例子中，我们正在继承用 `@InputType()` 装饰器注释的 `CreateUserInput` 类。即使我们希望 `UpdateUserInput` 也被视为用 `@InputType()` 装饰过，我们不必传递 `InputType` 作为第二个参数。如果父类和子类不同，（例如，父类被 `@ObjectType` 装饰），我们才需要传递 `InputType` 作为第二个参数。例如：
+
+```typescript
+@InputType()
+export class UpdateUserInput extends PartialType(User, InputType) {}
+```
+
+### Pick
+
+`PickType()` 函数可从一个输入类型中选取一组属性并构造一个新的类型（类）。例如，假设我们从这样一个类型开始：
+
+```typescript
+@InputType()
+class CreateUserInput {
+  @Field()
+  email: string;
+
+  @Field()
+  password: string;
+
+  @Field()
+  firstName: string;
+}
+```
+
+我们用 `PickType()` 这个基础函数从此类中挑选出一组属性：
+
+```typescript
+@InputType()
+export class UpdateEmailInput extends PickType(CreateUserInput, ['email'] as const) {}
+```
+
+?> `PickType()` 函数是从 `@nestjs/graphql` 包里导出的。
+
+### Omit
+
+`OmitType()` 函数通过从输入类型中选取所有属性然后删除一组特定的键来构造一个类型。例如，假设我们从这样一个类开始：
+
+```typescript
+@InputType()
+class CreateUserInput {
+  @Field()
+  email: string;
+
+  @Field()
+  password: string;
+
+  @Field()
+  firstName: string;
+}
+```
+
+我们可以生成一个派生类型，它具有除了 `email` 之外的所有属性，如下所示。在这个构造中，`OmitType` 的第二个参数是一个属性名数组。
+
+?> `OmitType()` 函数是从 `@nestjs/graphql` 包里导出的。
+
+### Intersection
+
+`IntersectionType()` 函数是合并两个类型到一个新的类型（类）。例如，假设我们从这样一个类开始：
+
+```typescript
+@InputType()
+class CreateUserInput {
+  @Field()
+  email: string;
+
+  @Field()
+  password: string;
+}
+
+@ObjectType()
+export class AdditionalUserInfo {
+  @Field()
+  firstName: string;
+  
+  @Field()
+  lastName: string;
+}
+```
+
+我们可以把两个类型中的所有属性都合并起来生成一个新的类型。
+
+```typescript
+@InputType()
+export class UpdateUserInput extends IntersectionType(CreateUserInput, AdditionalUserInfo) {}
+```
+
+?> `IntersectionType()` 函数是从 `@nestjs/graphql` 包里导出的。
+
+### Composition
+
+这些类型映射基础函数是可组合的。例如，以下代码会创建一个类型（类），它拥有 `CreateUserInput` 类型的除了 `email` 的所有属性，而且这些属性将被设置为可选：
+
+```typescript
+@InputType()
+export class UpdateUserInput extends PartialType(
+  OmitType(CreateUserInput, ['email'] as const),
+) {}
+```
+
+
 ## 复杂性
 
 !> 此章节仅适应于代码优先模式。

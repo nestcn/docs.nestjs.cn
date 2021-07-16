@@ -152,7 +152,7 @@ definitionsFactory.generate({
 
 #### ** 代码优先 **
 
-在代码优先方法中，您将只使用装饰器和 TypeScript 类来生成相应的 GraphQL 架构。
+在代码优先方式中，您将只使用装饰器和 TypeScript 类来生成相应的 GraphQL 架构。
 
 Nest 通过使用一个惊艳的type-graphql 库，来提供此功能。为此，在我们继续之前，您必须安装此软件包。
 
@@ -385,7 +385,7 @@ export class CreatePostInput extends Post {
 ```
 ### ** 代码优先 **
 
-在代码优先方法中，我们不必手动编写SDL。相反，我们只需使用装饰器。
+在代码优先方式中，我们不必手动编写SDL。相反，我们只需使用装饰器。
 
 ```typescript
 import { Field, Int, ObjectType } from 'type-graphql';
@@ -1025,7 +1025,7 @@ GraphQLModule.forRoot({
 
 ### 代码优先
 
-在代码优先方法中，使用 `@Directive()` 装饰器来应用指令。
+在代码优先方式中，使用 `@Directive()` 装饰器来应用指令。
 
 ```typescript
 @Directive('@upper')
@@ -1049,7 +1049,7 @@ async getAuthor(@Args({ name: 'id', type: () => Int }) id: number) {
 
 ### 模式优先
 
-在模式优先方法中，直接在 SDL 中应用指令。
+在模式优先方式中，直接在 SDL 中应用指令。
 
 ```graphql
 directive @upper on FIELD_DEFINITION
@@ -1121,7 +1121,7 @@ GraphQLModule.forRoot({
 
 ### 代码优先
 
-当使用代码优先方法时，你可以通过创建一个带有 `@InterfaceType()` 装饰器注释的抽象类，来定义一个 GraphQL 接口，这个装饰器是从 `@nestjs/graphql` 包里导出。  
+当使用代码优先方式时，你可以通过创建一个带有 `@InterfaceType()` 装饰器注释的抽象类，来定义一个 GraphQL 接口，这个装饰器是从 `@nestjs/graphql` 包里导出。  
 
 ```typescript
 import { Field, ID, InterfaceType } from '@nestjs/graphql';
@@ -1185,7 +1185,7 @@ export abstract class Book {
 
 ### 模式优先
 
-在模式优先方法中定义接口，只需使用 SDL 创建一个 GraphQL 接口。
+在模式优先方式中定义接口，只需使用 SDL 创建一个 GraphQL 接口。
 
 ```graphql
 interface Character {
@@ -1309,7 +1309,7 @@ export const ResultUnion = createUnionType({
 
 ### 模式优先
 
-在模式优先方法中定义联合类型，只需使用 SDL 创建一个 GraphQL 联合类型。
+在模式优先方式中定义联合类型，只需使用 SDL 创建一个 GraphQL 联合类型。
 
 ```graphql
 type Author {
@@ -1359,7 +1359,84 @@ export class ResultUnionResolver {
 
 ## 字段中间件
 
-【待翻译】
+!> 这一章节仅适用于代码优先方式。
+
+字段中间件允许你在解析字段之前或之后运行任意代码。一个字段中间件可被用来转换字段的返回结果，验证字段的参数，甚至验证字段级别的角色（比如，某个执行了中间件函数的目标字段需要验证角色才能访问）。
+
+你可以在一个字段上连接多个中间件函数。在这种情况下，它们将沿着链式顺序调用，即在上一个中间件中决定下一个中间件的调用。中间件函数在 `middleware` 数组中的顺序很重要。第一个解析器是“最外”层，所以它会第一个或最后一个被执行（类似 `graphql-middleware` 包）。第二个解析器是“次外”层，所以它会第二个或倒数第二个被执行。
+
+### 入门指南
+
+让我们开始创建一个简单的中间件，它会在一个字段被返回给客户端之前记录这个字段的值：
+
+```typescript
+import { FieldMiddleware, MiddlewareContext, NextFn } from '@nestjs/graphql';
+
+const loggerMiddleware: FieldMiddleware = async (
+  ctx: MiddlewareContext,
+  next: NextFn,
+) => {
+  const value = await next();
+  console.log(value);
+  return value;
+};
+```
+
+?> `MiddlewareContext` 是一个对象，它是由 GraphQL 解析器函数通常所接收的参数组成（`{ source, args, context, info }`），而 `NextFn` 是一个函数，它可以让你执行堆栈中的下一个中间件（绑定到此字段）或实体字段解析器。
+
+!> 字段中间件函数不能注入依赖项，也不能访问 Nest 的 DI 容器，因为它们被设计为非常轻量级而且不应该执行任何可能耗时的操作（比如从数据库中检索数据）。如果你需要从数据源调用外部服务或查询数据，你应该在一个绑定到根查询或变更处理程序的守卫/拦截器中执行此操作，并将其分配给字段中间件中你可以访问的上下文对象（具体来说，就是来自 `MiddlewareContext` 的对象）。
+
+注意字段中间件必须和 `FieldMiddleware` 接口匹配。在上面的例子中，我们首先运行 `next()` 函数（它执行实际的字段解析器并返回一个字段值），紧接着，我们把这个值记录到我们的终端。另外，这个从中间件函数返回的值完全覆盖了之前的值，并且由于我们不想执行任何更改，因此我们只需返回原始值。
+
+在这里，我们可以直接在 `@Field()` 装饰器里注册中间件。
+
+```typescript
+@ObjectType()
+export class Recipe {
+  @Field({ middleware: [loggerMiddleware] })
+  title: string;
+}
+```
+
+现在每当我们请求 `Recipe` 对象类型中的 `title` 字段时，原始的字段值将会被记录到控制台。
+
+?> 要了解如何使用扩展功能实现字段级权限系统，请查阅此[章节](/8/graphql?id=扩展)。
+
+另外，如上文所说，我们可以通过中间件函数来控制字段的值。出于演示目的，让我们将 recipe 的标题（如果存在）变成大写。
+
+```typescript
+const value = await next();
+return value?.toUpperCase();
+```
+
+在这种情况下，当被请求时，所有的标题会被自动转换为大写。
+
+同样，你可以在一个自定义字段解析器（一个被 `@ResolveField()` 装饰器注释的方法）上绑定字段中间件，如下所示：
+
+```typescript
+@ResolveField(() => String, { middleware: [loggerMiddleware] })
+title() {
+  return 'Placeholder';
+}
+```
+
+!> 如果在字段解析器级别启用来增强器（[了解更多](/8/graphql?id=其他功能)），字段中间件函数将会在所有拦截器，守卫等之前运行，绑定到方法（但在为查询或变更处理程序注册的根级增强器之后）。
+
+### 全局字段中间件
+
+除了将中间件直接绑定到一个特定的字段上，你还可以在全局注册一个或多个中间件函数。在这种情况下，它们将会自动连接到你的对象类型的所有字段上。
+
+```typescript
+GraphQLModule.forRoot({
+  autoSchemaFile: 'schema.gql',
+  buildSchemaOptions: {
+    fieldMiddleware: [loggerMiddleware],
+  },
+}),
+```
+
+?> 全局注册的字段中间件函数将在本地注册的中间件（那些直接绑定到特定字段上的）之前被执行。
+
 
 ## 枚举
 
@@ -1370,7 +1447,7 @@ export class ResultUnionResolver {
 
 ### 代码优先
 
-当使用代码优先方法时，你只需通过创建一个 TypeScript 枚举来定义一个 GraphQL 枚举类型。
+当使用代码优先方式时，你只需通过创建一个 TypeScript 枚举来定义一个 GraphQL 枚举类型。
 
 ```typescript
 export enum AllowedColor {
@@ -1450,7 +1527,7 @@ enum AllowedColor {
 
 ### 模式优先
 
-在模式优先方法中定义一个枚举器，只需在 SDL 中创建一个 GraphQL 枚举变量。
+在模式优先方式中定义一个枚举器，只需在 SDL 中创建一个 GraphQL 枚举变量。
 
 ```graphql
 enum AllowedColor {

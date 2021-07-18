@@ -1667,7 +1667,61 @@ items(@Args('count') count: number) {
 
 ## 扩展
 
-【待翻译】
+!> 此章节仅适应于代码优先模式。
+
+扩展是一种**高级的**，**低级**功能，可让你在类型配置中定义任何数据。将自定义元数据附加到某些字段，允许你创建更复杂的通用解决方案。例如，使用扩展，你可以定义一些只能访问部分字段的字段级角色。这些角色可以在运行时反映出来，以确定调用者是否具有足够的权限来检索特定字段。
+
+### 添加自定义元数据
+
+为字段添加自定义元数据，可以使用从 `@nestjs/graphql` 包中导出的 `@Extensions()` 装饰器。
+
+```typescript
+@Field()
+@Extensions({ role: Role.ADMIN })
+password: string;
+```
+
+在上面的例子中，我们给 `role` 元数据属性分配了 `Role.Admin` 的值。`Role` 是一个简单的 TypeScript 枚举变量，它将使用我们系统的所有用户角色进行分组。
+
+请注意，除了在字段上设置元数据，你也可以在类层级和方法层级（例如，在查询处理程序）上使用 `@Extensions()` 装饰器。
+
+### 使用自定义元数据
+
+利用自定义元数据的逻辑可以根据需求变得复杂。例如，你可以创建一个简单的拦截器，来存储/记录每个方法被调用的事件，或创建一个 **字段中间件**，来匹配检索具有调用者权限（字段级权限系统）的字段所需的角色。
+
+出于说明目的，让我们定义一个 `checkRoleMiddleware`，将用户的角色（此处硬编码）与访问目标字段所需的角色进行比较：
+
+```typescript
+export const checkRoleMiddleware: FieldMiddleware = async (
+  ctx: MiddlewareContext,
+  next: NextFn,
+) => {
+  const { info } = ctx;
+  const { extensions } = info.parentType.getFields()[info.fieldName];
+
+  /**
+   * In a real-world application, the "userRole" variable
+   * should represent the caller's (user) role (for example, "ctx.user.role").
+   */
+  const userRole = Role.USER;
+  if (userRole === extensions.role) {
+    // or just "return null" to ignore
+    throw new ForbiddenException(
+      `User does not have sufficient permissions to access "${info.fieldName}" field.`,
+    );
+  }
+  return next();
+};
+```
+
+在这里，我们可以为 `password` 字段注册一个中间件，如下所示：
+
+```typescript
+@Field({ middleware: [checkRoleMiddleware] })
+@Extensions({ role: Role.ADMIN })
+password: string;
+```
+
 
 ## CLI 插件
 

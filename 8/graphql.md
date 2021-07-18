@@ -1725,7 +1725,184 @@ password: string;
 
 ## CLI 插件
 
-【待翻译】
+!> 此章节仅适用于代码优先模式。
+
+TypeScript 的元数据反射系统有几个限制，例如，确定一个类包含哪些属性或识别给定的属性是可选还是必须的。但是，其中一些约束可以在编译时解决。Nest 提供了一个插件，它可以增强 TypeScript 的编译进程，以减少依赖的模板代码量。
+
+?> 这个插件是**可配置的**。如果你愿意，你可以手动声明所有的装饰器，或者仅在需要的地方声明特定的装饰器。
+
+### 概览
+
+GraphQL 插件会自动：
+
+- 除非使用 `@HideField`，否则使用 `@Field` 注释所有输入对象、对象类型和参数类属性
+- 根据问号设置 `nullable` 属性（例如，`name?: string` 将会设置 `nullable: true`）
+- 根据类型设置 `type` 属性（支持数组）
+- 根据注释生成属性描述（如果 `introspectComments` 设为 `true`）
+
+请注意，为了能被插件分析，你的文件名必须包含以下后缀之一：`['.input.ts', '.args.ts', '.entity.ts', '.model.ts']`（例如，`author.entity.ts`）。如果你用了其他的后缀，你可以通过指定 `typeFileNameSuffix` 选项来调整插件的行为（看下文）。
+
+根据我们到目前为止所学的知识，你必须复制大量代码才能让包知道你的类型应该如何在 GraphQL 中声明。例如，你可以定义一个简单的 `Author` 类，如下所示：
+
+```typescript
+authors/models/author.model.ts
+
+@ObjectType()
+export class Author {
+  @Field(type => ID)
+  id: number;
+
+  @Field({ nullable: true })
+  firstName?: string;
+
+  @Field({ nullable: true })
+  lastName?: string;
+
+  @Field(type => [Post])
+  posts: Post[];
+}
+```
+
+虽然对于中型项目来说不是一个重大问题，但一旦你有大量的类，它就会变得冗长切难以维护。
+
+通过启用 GraphQL 插件，以上的类声明将会变得简单：
+
+```typescript
+authors/models/author.model.ts
+
+@ObjectType()
+export class Author {
+  @Field(type => ID)
+  id: number;
+  firstName?: string;
+  lastName?: string;
+  posts: Post[];
+}
+```
+
+该插件基于**抽象语法树**即时添加适当的装饰器。因此，你不必为散步在整个代码中的 `@Field` 装饰器而烦恼。
+
+?> 该插件将自动生成任何缺失的 GraphQL 属性，但如果你需要覆盖他们，只需通过 `@Feild` 显示地设置它们。
+
+### 注释内省
+
+启用注释内省功能，CLI 插件会根据注释为字段生成描述。
+
+例如，给出一个示例 `roles` 属性：
+
+```typescript
+/**
+ * A list of user's roles
+ */
+@Field(() => [String], {
+  description: `A list of user's roles`
+})
+roles: string[];
+```
+
+你必须复制描述值。当 `introspectComments` 启用时，CLI 插件按可以提取这些注释并自动提供属性描述。现在，上面的字段可以被简单地声明如下：
+
+```typescript
+/**
+ * A list of user's roles
+ */
+roles: string[];
+```
+
+### CLI 插件的使用
+
+要开启插件，请打开 `nest-cli.json`（如果你使用 **Nest CLI**）并添加以下的 `plugins` 配置：
+
+```typescript
+{
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "src",
+  "compilerOptions": {
+    "plugins": ["@nestjs/graphql"]
+  }
+}
+```
+
+你可以用 `options` 属性来自定义插件的行为。
+
+```typescript
+"plugins": [
+  {
+    "name": "@nestjs/graphql",
+    "options": {
+      "typeFileNameSuffix": [".input.ts", ".args.ts"],
+      "introspectComments": true
+    }
+  }
+]
+```
+
+`options` 属性必须满足以下接口：
+
+```typescript
+export interface PluginOptions {
+  typeFileNameSuffix?: string[];
+  introspectComments?: boolean;
+}
+```
+
+| 选项 | 默认值 | 描述 |
+|:---:|---|---|
+| `typeFileNameSuffix` | ```['.input.ts', '.args.ts', '.entity.ts', '.model.ts']``` | GraphQL 类型文件后缀 |
+| `introspectComments` | `false` | 如果为真，插件将会根据注释为属性生成描述 |
+
+如果你不使用 CLI 而是用自定义的 `webpack` 配置，则可以将此插件与 `ts-loader` 结合使用：
+
+```typescript
+getCustomTransformers: (program: any) => ({
+  before: [require('@nestjs/graphql/plugin').before({}, program)]
+}),
+```
+
+### `ts-jest` 集成（e2e 测试）
+
+在启用此插件的情况下运行 e2e 测试时，你可能会遇到编译模式的问题。例如，其中一个最常见的错误是：
+
+```typescript
+Object type <name> must define one or more fields.
+```
+
+发生这种情况是因为 `jest` 配置没有在任何地方导入 `@nestjs/graphql/plugin` 插件。
+
+为解决此问题，我们需要在 e2e 测试目录中创建如下文件：
+
+```typescript
+const transformer = require('@nestjs/graphql/plugin');
+
+module.exports.name = 'nestjs-graphql-transformer';
+// you should change the version number anytime you change the configuration below - otherwise, jest will not detect changes
+module.exports.version = 1;
+
+module.exports.factory = (cs) => {
+  return transformer.before(
+    {
+      // @nestjs/graphql/plugin options (can be empty)
+    },
+    cs.program, // "cs.tsCompiler.program" for older versions of Jest (<= v27)
+  );
+};
+```
+
+在这里，将 AST 转换器导入到你的 `jest` 配置中。默认情况下（在启动应用），e2e 测试配置文件在 `test` 文件夹下并且名字是 `jest-e2e.json`。
+
+```json
+{
+  ... // other configuration
+  "globals": {
+    "ts-jest": {
+      "astTransformers": {
+        "before": ["<path to the file created above>"],
+      }
+    }
+  }
+}
+```
+
 
 ## 生成 SDL
 

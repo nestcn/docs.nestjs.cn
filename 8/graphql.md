@@ -1569,7 +1569,101 @@ GraphQLModule.forRoot({
 
 ## 复杂性
 
-【待翻译】
+!> 此章节仅适应于代码优先模式。
+
+查询复杂性允许你定义某些字段的复杂程度，并限制最大复杂性的查询。其原理是通过使用一个简单的数字来定义每个字段的复杂度。通常每个字段的复杂度默认为1。另外，GraphQL 查询的复杂性计算可以使用所谓的复杂度估算器进行定制。复杂度估算器是一个计算字段复杂度的简单函数。你可以将任意数量的复杂度估算器添加到规则中，然后一个接一个地执行。第一个返回数字复杂度值的估算器确定该字段的复杂度。
+
+`@nestjs/graphql` 包与 `graphql-query-complexity` 等工具很好地集成，他们提供了一种基于成本分析的解决方案。有了这个库，你可以拒绝在你的 GraphQL 服务中执行成本过高的查询。
+
+### 安装
+
+要开始使用它，我们首先要安装它所需要的依赖包。
+
+```bash
+$npm install --save graphql-query-complexity
+```
+
+### 快速开始
+
+一旦安装完，我们就可以定义 `ComplexityPlugin` 这个类：
+
+```typescript
+import { GraphQLSchemaHost, Plugin } from '@nestjs/graphql';
+import {
+  ApolloServerPlugin,
+  GraphQLRequestListener,
+} from 'apollo-server-plugin-base';
+import { GraphQLError } from 'graphql';
+import {
+  fieldExtensionsEstimator,
+  getComplexity,
+  simpleEstimator,
+} from 'graphql-query-complexity';
+
+@Plugin()
+export class ComplexityPlugin implements ApolloServerPlugin {
+  constructor(private gqlSchemaHost: GraphQLSchemaHost) {}
+
+  requestDidStart(): GraphQLRequestListener {
+    const { schema } = this.gqlSchemaHost;
+
+    return {
+      didResolveOperation({ request, document }) {
+        const complexity = getComplexity({
+          schema,
+          operationName: request.operationName,
+          query: document,
+          variables: request.variables,
+          estimators: [
+            fieldExtensionsEstimator(),
+            simpleEstimator({ defaultComplexity: 1 }),
+          ],
+        });
+        if (complexity >= 20) {
+          throw new GraphQLError(
+            `Query is too complex: ${complexity}. Maximum allowed complexity: 20`,
+          );
+        }
+        console.log('Query Complexity:', complexity);
+      },
+    };
+  }
+}
+```
+
+为了演示，我们将允许的最大复杂度指定为 20。在上面的示例中，我们使用了 2 个估算器，`simpleEstimator` 和 `fieldExtensionsEstimator`。
+
+- `simpleEstimator`：简单估算器为每个字段返回一个固定复杂度
+- `fieldExtensionsEstimator`：字段扩展估算器提取 schema 中每个字段的复杂度值
+
+?> 别忘了将此类添加到任意模块中的提供者数组中。
+
+### 字段级复杂性
+
+有了这个插件，我们可以为任意字段定义复杂度了，做法就是在传递给 `@Field()` 装饰器的选项对象中，指定 `complexity` 属性的值，如下所示：
+
+```typescript
+@Field({ complexity: 3 })
+title: string;
+```
+
+或者，你也可以定义估算器函数：
+
+```typescript
+@Field({ complexity: (options: ComplexityEstimatorArgs) => ... })
+title: string;
+```
+
+### 查询/变更级 复杂性
+
+此外，`@Query` 和 `@Mutation()` 装饰器也可以具有指定的复杂性属性，如下所示：
+
+```typescript
+@Query({ complexity: (options: ComplexityEstimatorArgs) => options.args.count * options.childComplexity })
+items(@Args('count') count: number) {
+  return this.itemsService.getItems({ count });
+}
+```
 
 ## 扩展
 

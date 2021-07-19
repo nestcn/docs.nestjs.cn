@@ -2137,7 +2137,421 @@ async upvotePost(
 
 ## 联合服务
 
-【待翻译】
+[<span style="color:red">Apollo 联合服务</span>](https://www.apollographql.com/docs/federation/)提供了一种将单体式 GraphQL 服务器拆分为独立微服务的方法。它由两个组件组成：一个网关和一或多个联合微服务。每个微服务都持有部分 schema，网关将这些 schema 合并为一个可以被客户端使用的 schema。
+
+引用[<span style="color:red">Apollo 文档</span>](https://www.apollographql.com/blog/announcement/apollo-federation-f260cf525d21/)，联合服务的设计遵循以下核心原则：
+
+- 构建图表应该是**声明式**的。使用联合服务，你可以从 schema 内部以声明方式组合图表，而不是编写命令式 schema 拼接代码。
+- 代码应该按**关注点**分割，而不是按类型。通常没有一个团队能控制像 User 或 Product 这种重要类型的各个方面，因此这些类型的定义应该分布在团队和代码库中，而不是写在一起。
+- 图表应尽可能简单，以让客户端使用。同时，联合服务可以形成一个完整的、以产品为中心的图表，准确地反映它在客户端的使用情况。
+- 它只是 GraphQL，仅使用符合规范的语言特性。任何语言，不仅仅是 JavaScript，都可以实现联合服务。
+
+!> Apollo 联合服务到目前为止还不支持订阅。
+
+在接下来的例子中，我们将设置一个带有网关和两个联合端点的演示程序：一个 Users 服务和一个 Posts 服务，
+
+### 联合示例：Users
+
+首先，安装联合服务的依赖包：
+
+```bash
+$ npm install --save @apollo/federation
+```
+
+### 模式优先
+
+Users 服务有一个简单的 schema。注意 `@key` 这个指令：它告诉 Apollo 查询规划器，如果你有它的 `id`，则可以获取特定的 User 实例。另外，请注意我们也要继承这个 `Query` 类型。
+
+```graphql
+type User @key(fields: "id") {
+  id: ID!
+  name: String!
+}
+
+extend type Query {
+  getUser(id: ID!): User
+}
+```
+
+我们的解析器有一个额外的方法：`resolveReference()`。每当相关资源需要 User 实例时，它就会被 Apollo 网关调用。我们在后面的 Posts 服务中也会看到这个例子。请注意 `@ResolveReference()` 这个装饰器。
+
+```typescript
+import { Args, Query, Resolver, ResolveReference } from '@nestjs/graphql';
+import { UsersService } from './users.service';
+
+@Resolver('User')
+export class UsersResolvers {
+  constructor(private usersService: UsersService) {}
+
+  @Query()
+  getUser(@Args('id') id: string) {
+    return this.usersService.findById(id);
+  }
+
+  @ResolveReference()
+  resolveReference(reference: { __typename: string; id: string }) {
+    return this.usersService.findById(reference.id);
+  }
+}
+```
+
+最后，我们在模块中使用 `GraphQLFederationModule` 将所有东西连接起来。此模块接收与常规的 `GraphQLModule` 相同的选项。
+
+```typescript
+import { Module } from '@nestjs/common';
+import { GraphQLFederationModule } from '@nestjs/graphql';
+import { UsersResolvers } from './users.resolvers';
+
+@Module({
+  imports: [
+    GraphQLFederationModule.forRoot({
+      typePaths: ['**/*.graphql'],
+    }),
+  ],
+  providers: [UsersResolvers],
+})
+export class AppModule {}
+```
+
+### 代码优先
+
+代码优先联合服务与常规的代码优先 GraphQL 很像。我们只需添加一些额外的装饰器到 `User` 实体即可。
+
+```typescript
+import { Directive, Field, ID, ObjectType } from '@nestjs/graphql';
+
+@ObjectType()
+@Directive('@key(fields: "id")')
+export class User {
+  @Field((type) => ID)
+  id: number;
+
+  @Field()
+  name: string;
+}
+```
+
+我们的解析器有一个额外的方法：`resolveReference()`。每当相关资源需要 User 实例时，它就会被 Apollo 网关调用。我们在后面的 Posts 服务中也会看到这个例子。请注意 `@ResolveReference()` 这个装饰器。
+
+```typescript
+import { Args, Query, Resolver, ResolveReference } from '@nestjs/graphql';
+import { User } from './user.entity';
+import { UsersService } from './users.service';
+
+@Resolver((of) => User)
+export class UsersResolvers {
+  constructor(private usersService: UsersService) {}
+
+  @Query((returns) => User)
+  getUser(@Args('id') id: number): User {
+    return this.usersService.findById(id);
+  }
+
+  @ResolveReference()
+  resolveReference(reference: { __typename: string; id: number }): User {
+    return this.usersService.findById(reference.id);
+  }
+}
+```
+
+最后，我们在模块中使用 `GraphQLFederationModule` 将所有东西连接起来。此模块接收与常规的 `GraphQLModule` 相同的选项。
+
+```typescript
+import { Module } from '@nestjs/common';
+import { GraphQLFederationModule } from '@nestjs/graphql';
+import { UsersResolvers } from './users.resolvers';
+import { UsersService } from './users.service'; // Not included in this example
+
+@Module({
+  imports: [
+    GraphQLFederationModule.forRoot({
+      autoSchemaFile: true,
+    }),
+  ],
+  providers: [UsersResolvers, UsersService],
+})
+export class AppModule {}
+```
+
+### 联合示例：Posts
+
+我们的 Post 服务通过 `getPosts` 查询提供文章聚合，同时也使用 `user.posts` 来扩展我们的 `User` 类型。
+
+### 模式优先
+
+Posts 服务在它的 schema 中通过用 `extend` 关键字标记来引用 User 类型。它还向 User 类型添加了一个属性。请注意用于匹配 User 实例的 `@key` 指令，以及指示 `id` 字段在别处管理的 `@external` 指令。
+
+```graphql
+type Post @key(fields: "id") {
+  id: ID!
+  title: String!
+  body: String!
+  user: User
+}
+
+extend type User @key(fields: "id") {
+  id: ID! @external
+  posts: [Post]
+}
+
+extend type Query {
+  getPosts: [Post]
+}
+```
+
+在我们的解析器这里有一个有趣的方法：`getUser()`。它返回一个引用，其中包含 `__typename` 和应用程序解析引用所需的任何其他属性，在这个例子中仅是一个属性 `id`。`__typename`被 GraphQL 网关用来精确定位负责 User 类型和请求实例的微服务。上面讨论的 Users 服务将在 `resolveReference()` 方法上被调用。
+
+```typescript
+import { Query, Resolver, Parent, ResolveField } from '@nestjs/graphql';
+import { PostsService } from './posts.service';
+import { Post } from './posts.interfaces';
+
+@Resolver('Post')
+export class PostsResolvers {
+  constructor(private postsService: PostsService) {}
+
+  @Query('getPosts')
+  getPosts() {
+    return this.postsService.findAll();
+  }
+
+  @ResolveField('user')
+  getUser(@Parent() post: Post) {
+    return { __typename: 'User', id: post.userId };
+  }
+}
+```
+
+Posts 服务几乎具有相同的模块，但为了完整起见，我们在下面将它包含进来：
+
+```typescript
+import { Module } from '@nestjs/common';
+import { GraphQLFederationModule } from '@nestjs/graphql';
+import { PostsResolvers } from './posts.resolvers';
+
+@Module({
+  imports: [
+    GraphQLFederationModule.forRoot({
+      typePaths: ['**/*.graphql'],
+    }),
+  ],
+  providers: [PostsResolvers],
+})
+export class AppModule {}
+```
+
+### 代码优先
+
+我们需要创建一个代表我们但 User 实体的类。即使它存在于其他服务中，我们也将使用和继承它。注意 `@extends` 和 `@external` 指令。
+
+```typescript
+import { Directive, ObjectType, Field, ID } from '@nestjs/graphql';
+import { Post } from './post.entity';
+
+@ObjectType()
+@Directive('@extends')
+@Directive('@key(fields: "id")')
+export class User {
+  @Field((type) => ID)
+  @Directive('@external')
+  id: number;
+
+  @Field((type) => [Post])
+  posts?: Post[];
+}
+```
+
+我们在 `User` 实体上为我们的扩展创建解析器，如下所示：
+
+```typescript
+import { Parent, ResolveField, Resolver } from '@nestjs/graphql';
+import { PostsService } from './posts.service';
+import { Post } from './post.entity';
+import { User } from './user.entity';
+
+@Resolver((of) => User)
+export class UsersResolvers {
+  constructor(private readonly postsService: PostsService) {}
+
+  @ResolveField((of) => [Post])
+  public posts(@Parent() user: User): Post[] {
+    return this.postsService.forAuthor(user.id);
+  }
+}
+```
+
+我们还需要创建我们的 `Post` 实体：
+
+```typescript
+import { Directive, Field, ID, Int, ObjectType } from '@nestjs/graphql';
+import { User } from './user.entity';
+
+@ObjectType()
+@Directive('@key(fields: "id")')
+export class Post {
+  @Field((type) => ID)
+  id: number;
+
+  @Field()
+  title: string;
+
+  @Field((type) => Int)
+  authorId: number;
+
+  @Field((type) => User)
+  user?: User;
+}
+```
+
+还有它的解析器：
+
+```typescript
+import { Query, Args, ResolveField, Resolver, Parent } from '@nestjs/graphql';
+import { PostsService } from './posts.service';
+import { Post } from './post.entity';
+import { User } from './user.entity';
+
+@Resolver((of) => Post)
+export class PostsResolvers {
+  constructor(private readonly postsService: PostsService) {}
+
+  @Query((returns) => Post)
+  findPost(@Args('id') id: number): Post {
+    return this.postsService.findOne(id);
+  }
+
+  @Query((returns) => [Post])
+  getPosts(): Post[] {
+    return this.postsService.all();
+  }
+
+  @ResolveField((of) => User)
+  user(@Parent() post: Post): any {
+    return { __typename: 'User', id: post.authorId };
+  }
+}
+```
+
+最后，在模块中把它们串联起来。注意 schema 创建配置，在这里我们指定 `User` 为外部类型。
+
+```typescript
+import { Module } from '@nestjs/common';
+import { GraphQLFederationModule } from '@nestjs/graphql';
+import { User } from './user.entity';
+import { PostsResolvers } from './posts.resolvers';
+import { UsersResolvers } from './users.resolvers';
+import { PostsService } from './posts.service'; // Not included in example
+
+@Module({
+  imports: [
+    GraphQLFederationModule.forRoot({
+      autoSchemaFile: true,
+      buildSchemaOptions: {
+        orphanedTypes: [User],
+      },
+    }),
+  ],
+  providers: [PostsResolvers, UsersResolvers, PostsService],
+})
+export class AppModule {}
+```
+
+联合示例：网关
+
+首先，安装网关的依赖包：
+
+```bash
+$ npm install --save @apollo/gateway
+```
+
+我们的网关只需要一个端点列表，它会从那里自动发现所有的 schemas。因为代码和模式优先是一样的，所以网关的代码很短：
+
+```typescript
+import { Module } from '@nestjs/common';
+import { GraphQLGatewayModule } from '@nestjs/graphql';
+
+@Module({
+  imports: [
+    GraphQLGatewayModule.forRoot({
+      server: {
+        // ... Apollo server options
+        cors: true,
+      },
+      gateway: {
+        serviceList: [
+          { name: 'users', url: 'http://user-service/graphql' },
+          { name: 'posts', url: 'http://post-service/graphql' },
+        ],
+      },
+    }),
+  ],
+})
+export class AppModule {}
+```
+
+?> Apollo 建议你不要依赖生产环境中的服务发现，而是使用它们的[图表管理器](https://www.apollographql.com/docs/federation/managed-federation/overview/)
+
+### 共享上下文
+
+你可以通过一个构建服务来自定义网关和联合服务之间的请求。这让你能够共享有关请求的上下文。你能轻松继承默认的 `RemoteGraphQLDataSource` 并实现其中一个钩子。有关可能性的更多信息，请参阅 [Apollo 文档](https://www.apollographql.com/docs/federation/api/apollo-gateway/#class-remotegraphqldatasource)中的 `RemoteGraphQLDataSource` 章节.
+
+```typescript
+import { Module } from '@nestjs/common';
+import { GATEWAY_BUILD_SERVICE, GraphQLGatewayModule } from '@nestjs/graphql';
+import { RemoteGraphQLDataSource } from '@apollo/gateway';
+import { decode } from 'jsonwebtoken';
+
+class AuthenticatedDataSource extends RemoteGraphQLDataSource {
+  async willSendRequest({ request, context }) {
+    const { userId } = await decode(context.jwt);
+    request.http.headers.set('x-user-id', userId);
+  }
+}
+
+@Module({
+  providers: [
+    {
+      provide: AuthenticatedDataSource,
+      useValue: AuthenticatedDataSource,
+    },
+    {
+      provide: GATEWAY_BUILD_SERVICE,
+      useFactory: (AuthenticatedDataSource) => {
+        return ({ name, url }) => new AuthenticatedDataSource({ url });
+      },
+      inject: [AuthenticatedDataSource],
+    },
+  ],
+  exports: [GATEWAY_BUILD_SERVICE],
+})
+class BuildServiceModule {}
+
+@Module({
+  imports: [
+    GraphQLGatewayModule.forRootAsync({
+      useFactory: async () => ({
+        gateway: {
+          serviceList: [
+            /* services */
+          ],
+        },
+        server: {
+          context: ({ req }) => ({
+            jwt: req.headers.authorization,
+          }),
+        },
+      }),
+      imports: [BuildServiceModule],
+      inject: [GATEWAY_BUILD_SERVICE],
+    }),
+  ],
+})
+export class AppModule {}
+```
+
+### 异步配置
+
+联合服务和网关模块都支持使用相同的 `forRootAsync` 异步初始化，相关文档详见[快速开始](/8/graphql?id=async-配置)。
 
  ### 译者署名
  

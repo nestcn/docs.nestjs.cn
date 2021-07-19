@@ -1918,7 +1918,7 @@ export class Author {
 }
 ```
 
-该插件基于**抽象语法树**即时添加适当的装饰器。因此，你不必再为散布在整个代码中的 `@Field` 装饰器而烦恼。
+该插件基于**抽象语法树**即时添加适当的装饰器。因此，你不必为散布在整个代码中的 `@Field` 装饰器而烦恼。
 
 ?> 该插件将自动生成任何缺失的 GraphQL 属性，但如果你需要覆盖他们，只需通过 `@Feild` 显示地设置它们。
 
@@ -2044,7 +2044,56 @@ module.exports.factory = (cs) => {
 
 ## 生成 SDL
 
-【待翻译】
+!> 此章节仅适用于代码优先模式。
+
+要手动生成一个 GraphQL SDL schema（例如，没有运行应用，连接数据库，挂接解析器等等），可以使用 `GraphQLSchemaBuilderModule`。
+
+```typescript
+async function generateSchema() {
+  const app = await NestFactory.create(GraphQLSchemaBuilderModule);
+  await app.init();
+
+  const gqlSchemaFactory = app.get(GraphQLSchemaFactory);
+  const schema = await gqlSchemaFactory.create([RecipesResolver]);
+  console.log(printSchema(schema));
+}
+```
+
+?> `GraphQLSchemaBuilderModule` 和 `GraphQLSchemaFactory` 是从 `@nestjs/graphql` 包里导出的。`printSchema` 函数是从 `graphql` 包里导出的。
+
+### 用法
+
+`gqlSchemaFactory.create()` 方法接受一个解析器类引用的数组。例如：
+
+```typescript
+const schema = await gqlSchemaFactory.create([
+  RecipesResolver,
+  AuthorsResolver,
+  PostsResolvers,
+]);
+```
+
+它也接受第二个可选的参数，参数是一个标量类的数组：
+
+```typescript
+const schema = await gqlSchemaFactory.create(
+  [RecipesResolver, AuthorsResolver, PostsResolvers],
+  [DurationScalar, DateScalar],
+);
+```
+
+最后，你还可以传递一个配置项对象：
+
+```typescript
+const schema = await gqlSchemaFactory.create([RecipesResolver], {
+  skipCheck: true,
+  orphanedTypes: [],
+});
+```
+
+- `skipCheck`：忽略模式验证；布尔类型，默认值是 `false`
+- `orphanedTypes`：需要生成的非显示引用（不是对象图的一部分）的类列表。正常情况下，如果声明了一个类但没有在图中以其他方式引用，则将其忽略。其属性值是一个类引用数组。
+
 
 ## 其他功能
 

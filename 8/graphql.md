@@ -2456,7 +2456,7 @@ import { PostsService } from './posts.service'; // Not included in example
 export class AppModule {}
 ```
 
-联合示例：网关
+### 联合示例：网关
 
 首先，安装网关的依赖包：
 

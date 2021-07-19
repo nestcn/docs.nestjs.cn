@@ -1068,7 +1068,7 @@ type Post {
 
 ### 自定义插件
 
-创建插件，首先要声明一个用 `@Plugin` 装饰器注释的类，这个装饰器是从 `@nestjs/graphql` 包里导出的。还有，为了更好的使用代码自动补全功能，我们要从 Apollo-server-plugin-base 包中实现 ApolloServerPlugin 这个接口。
+创建插件，首先要声明一个用 `@Plugin` 装饰器注释的类，这个装饰器是从 `@nestjs/graphql` 包里导出的。还有，为了更好的使用代码自动补全功能，我们要从 `Apollo-server-plugin-base` 包中实现 `ApolloServerPlugin` 这个接口。
 
 ```typescript
 import { Plugin } from '@nestjs/graphql';
@@ -1099,7 +1099,7 @@ export class LoggingPlugin implements ApolloServerPlugin {
 export class CommonModule {}
 ```
 
-Nest 会自动实例化一个插件并将其应用于 Apollo Server。
+Nest 会自动实例化一个插件并将其应用于 Apollo 服务。
 
 ### 使用外部插件
 
@@ -1365,7 +1365,7 @@ export class ResultUnionResolver {
 
 你可以在一个字段上连接多个中间件函数。在这种情况下，它们将沿着链式顺序调用，即在上一个中间件中决定下一个中间件的调用。中间件函数在 `middleware` 数组中的顺序很重要。第一个解析器是“最外”层，所以它会第一个或最后一个被执行（类似 `graphql-middleware` 包）。第二个解析器是“次外”层，所以它会第二个或倒数第二个被执行。
 
-### 入门指南
+### 快速开始
 
 让我们开始创建一个简单的中间件，它会在一个字段被返回给客户端之前记录这个字段的值：
 
@@ -1420,7 +1420,7 @@ title() {
 }
 ```
 
-!> 如果在字段解析器级别启用来增强器（[了解更多](/8/graphql?id=其他功能)），字段中间件函数将会在所有拦截器，守卫等之前运行，绑定到方法（但在为查询或变更处理程序注册的根级增强器之后）。
+!> 如果在字段解析器级别启用了增强器（[了解更多](https://docs.nestjs.com/graphql/other-features#execute-enhancers-at-the-field-resolver-level)），字段中间件函数将会在所有拦截器、守卫等之前运行，绑定到方法（但在为查询或变更处理程序注册的根级增强器之后）。
 
 ### 全局字段中间件
 
@@ -1447,7 +1447,7 @@ GraphQLModule.forRoot({
 
 ### 代码优先
 
-当使用代码优先方式时，你只需通过创建一个 TypeScript 枚举来定义一个 GraphQL 枚举类型。
+当使用代码优先方式时，你只需通过创建一个 TypeScript 枚举变量来定义一个 GraphQL 枚举类型。
 
 ```typescript
 export enum AllowedColor {
@@ -1457,7 +1457,7 @@ export enum AllowedColor {
 }
 ```
 
-在这里，通过使用 `@nestjs/graphql` 包里的 `registerEnumType` 函数就注册 `AllowedColor` 枚举。
+在这里，我们使用 `@nestjs/graphql` 包里的 `registerEnumType` 函数来注册 `AllowedColor` 枚举。
 
 ```typescript
 registerEnumType(AllowedColor, {
@@ -1527,7 +1527,7 @@ enum AllowedColor {
 
 ### 模式优先
 
-在模式优先方式中定义一个枚举器，只需在 SDL 中创建一个 GraphQL 枚举变量。
+在模式优先方式中定义一个枚举器，只需在 SDL 中创建一个 GraphQL 枚举类型。
 
 ```graphql
 enum AllowedColor {
@@ -1557,7 +1557,7 @@ export const allowedColorResolver: Record<keyof typeof AllowedColor, any> = {
 
 ?> 所有装饰器都是从 `@nestjs/graphql` 包里导出。
 
-然后，将此解析器对象与 `GraphQLModule#forRoot()` 方法的 `resolvers` 属性一起使用。
+然后，将此解析器对象与 `GraphQLModule#forRoot()` 方法的 `resolvers` 属性一起使用，如下所示：
 
 ```typescript
 GraphQLModule.forRoot({
@@ -1571,7 +1571,7 @@ GraphQLModule.forRoot({
 
 !> 该章节仅适用于代码优先模式。
 
-当你构建像 CRUD（创建/查询/更新/删除）这些功能时，在基本实体类型上构造变体通常会很有用。Nest 提供了几个执行类型转换的基础函数，让这项任务变得更加方便。
+当你构建像 CRUD（创建/查询/更新/删除）这些功能时，在基础实体类型上构造变体通常会很有用。Nest 提供了几个执行类型转换的基础函数，让这项任务变得更加方便。
 
 ### Partial 局部
 
@@ -1595,16 +1595,16 @@ class CreateUserInput {
 }
 ```
 
-默认情况下，所有这些字段都是需要的。为创建具有相同字段的类型，但每个字段又都是可选的，可以使用 `PartialType()` 传递类引用（`CreateUserInput`）作为参数：
+默认情况下，所有这些字段都是必需的。为创建具有相同字段的类型，但每个字段又都是可选的，可以使用 `PartialType()` 传递类引用（`CreateUserInput`）作为参数：
 
 ```typescript
 @InputType()
 export class UpdateUserInput extends PartialType(CreateUserInput) {}
 ```
 
-?> `PartialType` 函数是从 `@nestjs/graphql` 包里导出的。
+?> `PartialType()` 函数是从 `@nestjs/graphql` 包里导出的。
 
-`PartialType` 函数接受一个可选的第二参数，它是对装饰器工厂的引用。此参数可用于更改应用于结果（子）类的装饰器函数。如果未指定，子类有效地使用与**父**类相同的装饰器（第一个参数中引用的类）。在上面的例子中，我们正在继承用 `@InputType()` 装饰器注释的 `CreateUserInput` 类。即使我们希望 `UpdateUserInput` 也被视为用 `@InputType()` 装饰过，我们不必传递 `InputType` 作为第二个参数。如果父类和子类不同，（例如，父类被 `@ObjectType` 装饰），我们才需要传递 `InputType` 作为第二个参数。例如：
+`PartialType()` 函数接受一个可选的第二参数，它是对装饰器工厂的引用。此参数可用于更改应用于结果（子）类的装饰器函数。如果未指定，子类有效地使用与**父**类相同的装饰器（第一个参数中引用的类）。在上面的例子中，我们正在继承用 `@InputType()` 装饰器注释的 `CreateUserInput` 类。即使我们希望 `UpdateUserInput` 也被视为用 `@InputType()` 装饰过，我们不必传递 `InputType` 作为第二个参数。如果父类和子类不同，（例如，父类被 `@ObjectType` 装饰），我们才需要传递 `InputType` 作为第二个参数。例如：
 
 ```typescript
 @InputType()
@@ -1638,7 +1638,7 @@ export class UpdateEmailInput extends PickType(CreateUserInput, ['email'] as con
 
 ?> `PickType()` 函数是从 `@nestjs/graphql` 包里导出的。
 
-### Omit 排除
+### Omit 忽略
 
 `OmitType()` 函数通过从输入类型中选取所有属性然后删除一组特定的键来构造一个类型。例如，假设我们从这样一个类开始：
 
@@ -1709,9 +1709,9 @@ export class UpdateUserInput extends PartialType(
 
 !> 此章节仅适应于代码优先模式。
 
-查询复杂性允许你定义某些字段的复杂程度，并限制最大复杂性的查询。其原理是通过使用一个简单的数字来定义每个字段的复杂度。通常每个字段的复杂度默认为1。另外，GraphQL 查询的复杂性计算可以使用所谓的复杂度估算器进行定制。复杂度估算器是一个计算字段复杂度的简单函数。你可以将任意数量的复杂度估算器添加到规则中，然后一个接一个地执行。第一个返回数字复杂度值的估算器确定该字段的复杂度。
+查询复杂性允许你定义某些字段的复杂程度，并限制**最大复杂性**的查询。其原理是通过使用一个简单的数字来定义每个字段的复杂度。通常每个字段的复杂度默认为1。另外，GraphQL 查询的复杂性计算可以使用所谓的复杂度估算器进行定制。复杂度估算器是一个计算字段复杂度的简单函数。你可以将任意数量的复杂度估算器添加到规则中，然后一个接一个地执行。第一个返回数字复杂度值的估算器确定该字段的复杂度。
 
-`@nestjs/graphql` 包与 `graphql-query-complexity` 等工具很好地集成，他们提供了一种基于成本分析的解决方案。有了这个库，你可以拒绝在你的 GraphQL 服务中执行成本过高的查询。
+`@nestjs/graphql` 包与 <span style="color:red">graphql-query-complexity</span> 等工具能很好地集成，他们提供了一种基于成本分析的解决方案。有了这个库，你可以拒绝在你的 GraphQL 服务中执行成本过高的查询。
 
 ### 安装
 
@@ -1771,10 +1771,10 @@ export class ComplexityPlugin implements ApolloServerPlugin {
 
 为了演示，我们将允许的最大复杂度指定为 20。在上面的示例中，我们使用了 2 个估算器，`simpleEstimator` 和 `fieldExtensionsEstimator`。
 
-- `simpleEstimator`：简单估算器为每个字段返回一个固定复杂度
+- `simpleEstimator`：该简单估算器为每个字段返回一个固定复杂度
 - `fieldExtensionsEstimator`：字段扩展估算器提取 schema 中每个字段的复杂度值
 
-?> 别忘了将此类添加到任意模块中的提供者数组中。
+?> 别忘了将此类添加到任意模块的提供者数组中。
 
 ### 字段级复杂性
 
@@ -1792,9 +1792,9 @@ title: string;
 title: string;
 ```
 
-### 查询/变更级 复杂性
+### 查询/变更级复杂性
 
-此外，`@Query` 和 `@Mutation()` 装饰器也可以具有指定的复杂性属性，如下所示：
+此外，`@Query` 和 `@Mutation()` 装饰器也具有复杂性属性，可以被这样指定：
 
 ```typescript
 @Query({ complexity: (options: ComplexityEstimatorArgs) => options.args.count * options.childComplexity })
@@ -1807,7 +1807,7 @@ items(@Args('count') count: number) {
 
 !> 此章节仅适应于代码优先模式。
 
-扩展是一种**高级的**，**低级**功能，可让你在类型配置中定义任何数据。将自定义元数据附加到某些字段，允许你创建更复杂的通用解决方案。例如，使用扩展，你可以定义一些只能访问部分字段的字段级角色。这些角色可以在运行时反映出来，以确定调用者是否具有足够的权限来检索特定字段。
+扩展是一种**高阶的**，**低级**功能，可让你在类型配置中定义任何数据。附加自定义元数据到某些字段，能让你创建更复杂的通用解决方案。例如，使用扩展，你可以定义一些只能访问部分字段的字段级角色。这些角色可以在运行时被映射出来，进而来确定调用者是否具有足够的权限来检索特定字段。
 
 ### 添加自定义元数据
 
@@ -1819,13 +1819,13 @@ items(@Args('count') count: number) {
 password: string;
 ```
 
-在上面的例子中，我们给 `role` 元数据属性分配了 `Role.Admin` 的值。`Role` 是一个简单的 TypeScript 枚举变量，它将使用我们系统的所有用户角色进行分组。
+在上面的例子中，我们给 `role` 元数据属性分配了 `Role.Admin` 的值。`Role` 是一个简单的 TypeScript 枚举变量，它将我们系统中可用的所有用户角色进行分组。
 
 请注意，除了在字段上设置元数据，你也可以在类层级和方法层级（例如，在查询处理程序）上使用 `@Extensions()` 装饰器。
 
 ### 使用自定义元数据
 
-利用自定义元数据的逻辑可以根据需求变得复杂。例如，你可以创建一个简单的拦截器，来存储/记录每个方法被调用的事件，或创建一个 **字段中间件**，来匹配检索具有调用者权限（字段级权限系统）的字段所需的角色。
+利用自定义元数据的逻辑可以根据需求变得复杂。例如，你可以创建一个简单的拦截器，来存储/记录每个方法被调用的事件，或创建一个<span style="color:red">字段中间件</span>，来匹配检索具有调用者权限（字段级权限系统）限制的字段所需的角色。
 
 出于说明目的，让我们定义一个 `checkRoleMiddleware`，将用户的角色（此处硬编码）与访问目标字段所需的角色进行比较：
 
@@ -1867,20 +1867,20 @@ password: string;
 
 TypeScript 的元数据反射系统有几个限制，例如，确定一个类包含哪些属性或识别给定的属性是可选还是必须的。但是，其中一些约束可以在编译时解决。Nest 提供了一个插件，它可以增强 TypeScript 的编译进程，以减少依赖的模板代码量。
 
-?> 这个插件是**可配置的**。如果你愿意，你可以手动声明所有的装饰器，或者仅在需要的地方声明特定的装饰器。
+?> 这个插件是<span style="color:blue">可配置的</span>。如果你愿意，你可以手动声明所有的装饰器，或者只在需要的地方声明特定的装饰器。
 
 ### 概览
 
-GraphQL 插件会自动：
+GraphQL 插件会自动地：
 
 - 除非使用 `@HideField`，否则使用 `@Field` 注释所有输入对象、对象类型和参数类属性
 - 根据问号设置 `nullable` 属性（例如，`name?: string` 将会设置 `nullable: true`）
 - 根据类型设置 `type` 属性（支持数组）
 - 根据注释生成属性描述（如果 `introspectComments` 设为 `true`）
 
-请注意，为了能被插件分析，你的文件名必须包含以下后缀之一：`['.input.ts', '.args.ts', '.entity.ts', '.model.ts']`（例如，`author.entity.ts`）。如果你用了其他的后缀，你可以通过指定 `typeFileNameSuffix` 选项来调整插件的行为（看下文）。
+请注意，为了能被插件分析，你的文件名**必须包含**以下后缀之一：`['.input.ts', '.args.ts', '.entity.ts', '.model.ts']`（例如，`author.entity.ts`）。如果你用了其他的后缀，你可以通过指定 `typeFileNameSuffix` 配置来调整插件的行为（看下文）。
 
-根据我们到目前为止所学的知识，你必须复制大量代码才能让包知道你的类型应该如何在 GraphQL 中声明。例如，你可以定义一个简单的 `Author` 类，如下所示：
+根据我们到目前为止所学的知识，你必须复制大量代码才能让包知道你的类型在 GraphQL 中应该如何被声明。例如，你可以定义一个简单的 `Author` 类，如下所示：
 
 ```typescript
 authors/models/author.model.ts
@@ -1901,7 +1901,7 @@ export class Author {
 }
 ```
 
-虽然对于中型项目来说不是一个重大问题，但一旦你有大量的类，它就会变得冗长切难以维护。
+虽然对于中型项目来说这不是一个重大问题，但一旦你有大量的类，它就会变得冗长且难以维护。
 
 通过启用 GraphQL 插件，以上的类声明将会变得简单：
 
@@ -1918,7 +1918,7 @@ export class Author {
 }
 ```
 
-该插件基于**抽象语法树**即时添加适当的装饰器。因此，你不必为散步在整个代码中的 `@Field` 装饰器而烦恼。
+该插件基于**抽象语法树**即时添加适当的装饰器。因此，你不必再为散布在整个代码中的 `@Field` 装饰器而烦恼。
 
 ?> 该插件将自动生成任何缺失的 GraphQL 属性，但如果你需要覆盖他们，只需通过 `@Feild` 显示地设置它们。
 
@@ -1926,7 +1926,7 @@ export class Author {
 
 启用注释内省功能，CLI 插件会根据注释为字段生成描述。
 
-例如，给出一个示例 `roles` 属性：
+例如，给出一个 `roles` 属性示例：
 
 ```typescript
 /**
@@ -1938,7 +1938,7 @@ export class Author {
 roles: string[];
 ```
 
-你必须复制描述值。当 `introspectComments` 启用时，CLI 插件按可以提取这些注释并自动提供属性描述。现在，上面的字段可以被简单地声明如下：
+你必须复制描述值。当 `introspectComments` 启用时，CLI 插件可以提取这些注释并自动为属性提供属性。现在，上面的字段可以被简单地声明如下：
 
 ```typescript
 /**
@@ -1949,7 +1949,7 @@ roles: string[];
 
 ### CLI 插件的使用
 
-要开启插件，请打开 `nest-cli.json`（如果你使用 **Nest CLI**）并添加以下的 `plugins` 配置：
+要开启插件，请打开 `nest-cli.json`（如果你使用 <span style="color:red">Nest CLI</span>）并添加以下的 `plugins` 配置：
 
 ```typescript
 {
@@ -1999,13 +1999,13 @@ getCustomTransformers: (program: any) => ({
 
 ### `ts-jest` 集成（e2e 测试）
 
-在启用此插件的情况下运行 e2e 测试时，你可能会遇到编译模式的问题。例如，其中一个最常见的错误是：
+在启用此插件的情况下运行 e2e 测试时，你可能会遇到编译 schema 的问题。例如，其中一个最常见的错误是：
 
 ```typescript
 Object type <name> must define one or more fields.
 ```
 
-发生这种情况是因为 `jest` 配置没有在任何地方导入 `@nestjs/graphql/plugin` 插件。
+发生这种情况是原因是 `jest` 配置没有在任何地方导入 `@nestjs/graphql/plugin` 插件。
 
 为解决此问题，我们需要在 e2e 测试目录中创建如下文件：
 
@@ -2026,7 +2026,7 @@ module.exports.factory = (cs) => {
 };
 ```
 
-在这里，将 AST 转换器导入到你的 `jest` 配置中。默认情况下（在启动应用），e2e 测试配置文件在 `test` 文件夹下并且名字是 `jest-e2e.json`。
+在这里，将 AST 转换器导入到你的 `jest` 配置中。默认情况下（在启动应用中），e2e 测试配置文件在 `test` 文件夹下并且名字是 `jest-e2e.json`。
 
 ```json
 {
@@ -2137,11 +2137,11 @@ async upvotePost(
 
 ## 联合服务
 
-[<span style="color:red">Apollo 联合服务</span>](https://www.apollographql.com/docs/federation/)提供了一种将单体式 GraphQL 服务器拆分为独立微服务的方法。它由两个组件组成：一个网关和一或多个联合微服务。每个微服务都持有部分 schema，网关将这些 schema 合并为一个可以被客户端使用的 schema。
+[<span style="color:red">Apollo 联合服务</span>](https://www.apollographql.com/docs/federation/)提供了一种将单体式 GraphQL 服务器拆分为独立微服务的手段。它有两个组成部分：一个网关和一或多个联合微服务。每个微服务都持有部分 schema，网关将这些 schema 合并为一个可以被客户端使用的 schema。
 
 引用[<span style="color:red">Apollo 文档</span>](https://www.apollographql.com/blog/announcement/apollo-federation-f260cf525d21/)，联合服务的设计遵循以下核心原则：
 
-- 构建图表应该是**声明式**的。使用联合服务，你可以从 schema 内部以声明方式组合图表，而不是编写命令式 schema 拼接代码。
+- 构建图表应该是**声明式**的。使用联合服务，你可以在 schema 内部声明式地组合图表，而不是编写命令式 schema 拼接代码。
 - 代码应该按**关注点**分割，而不是按类型。通常没有一个团队能控制像 User 或 Product 这种重要类型的各个方面，因此这些类型的定义应该分布在团队和代码库中，而不是写在一起。
 - 图表应尽可能简单，以让客户端使用。同时，联合服务可以形成一个完整的、以产品为中心的图表，准确地反映它在客户端的使用情况。
 - 它只是 GraphQL，仅使用符合规范的语言特性。任何语言，不仅仅是 JavaScript，都可以实现联合服务。
@@ -2195,7 +2195,7 @@ export class UsersResolvers {
 }
 ```
 
-最后，我们在模块中使用 `GraphQLFederationModule` 将所有东西连接起来。此模块接收与常规的 `GraphQLModule` 相同的选项。
+最后，我们在模块中使用 `GraphQLFederationModule` 将所有东西连接起来。此模块接收与常规的 `GraphQLModule` 相同的配置。
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -2254,7 +2254,7 @@ export class UsersResolvers {
 }
 ```
 
-最后，我们在模块中使用 `GraphQLFederationModule` 将所有东西连接起来。此模块接收与常规的 `GraphQLModule` 相同的选项。
+最后，我们在模块中使用 `GraphQLFederationModule` 将所有东西连接起来。此模块接收与常规的 `GraphQLModule` 相同的配置。
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -2322,7 +2322,7 @@ export class PostsResolvers {
 }
 ```
 
-Posts 服务几乎具有相同的模块，但为了完整起见，我们在下面将它包含进来：
+Posts 服务几乎具有和 Users 相同的模块，但为了完整起见，我们在下面将它包含进来：
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -2342,7 +2342,7 @@ export class AppModule {}
 
 ### 代码优先
 
-我们需要创建一个代表我们但 User 实体的类。即使它存在于其他服务中，我们也将使用和继承它。注意 `@extends` 和 `@external` 指令。
+我们需要创建一个代表我们的 User 实体的类。即使它存在于其他服务中，我们也将使用和继承它。注意 `@extends` 和 `@external` 指令。
 
 ```typescript
 import { Directive, ObjectType, Field, ID } from '@nestjs/graphql';
@@ -2432,7 +2432,7 @@ export class PostsResolvers {
 }
 ```
 
-最后，在模块中把它们串联起来。注意 schema 创建配置，在这里我们指定 `User` 为外部类型。
+最后，在模块中把它们串联起来。注意 schema 构建配置，在这里我们指定 `User` 为外部类型。
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -2551,7 +2551,7 @@ export class AppModule {}
 
 ### 异步配置
 
-联合服务和网关模块都支持使用相同的 `forRootAsync` 异步初始化，相关文档详见[快速开始](/8/graphql?id=async-配置)。
+联合服务和网关模块都支持使用同样的 `forRootAsync` 异步初始化，相关文档详见[快速开始](/8/graphql?id=async-配置)。
 
  ### 译者署名
  

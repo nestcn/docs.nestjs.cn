@@ -14,6 +14,134 @@
 
 请确保您的操作系统上安装了 [Node.js](http://nodejs.cn/download/)**（>= 10.13.0, v13 版本除外）**。
 
+**一分钟安装 node.js**
+（支持 X86 ARM MIPS 等架构，需要版本管理或者系统为 Raspbian 请直接看 NVM）
+
+ <!-- tabs:start -->
+
+#### ** windows **
+
+1. [点击下载 Node.js](https://npm.taobao.org/mirrors/node/v12.10.0/node-v12.10.0-x64.msi)
+
+2. 安装 Node.js
+
+Powershell/CMD 可以打印出这个说明安装成功。（部分系统需要重启后环境变量才生效）
+
+```
+$node -v
+v12.10.0
+$ npm -v
+6.10.3
+```
+
+#### ** linux（建议） **
+
+（NVM 支持 所有 Linux 及 Raspbian ，支持多版本管理，[windows 点击进入](https://github.com/coreybutler/nvm-windows/releases)）
+
+```
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+
+```
+
+如果没 curl ，可以使用 wget 安装
+
+```
+wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
+```
+
+使用淘宝加速下载（可选）
+
+```
+export NVM_NODEJS_ORG_MIRROR=https://npm.taobao.org/mirrors/node
+```
+
+使用 NVM 安装 nodejs ：
+
+```
+nvm install --lts
+```
+
+终端可以打出以下信息说明安装成功：
+
+```
+$node -v
+v12.10.0
+$ npm -v
+6.10.3
+```
+
+#### ** MacOS **
+
+1. [点击下载 Node.js](https://npm.taobao.org/mirrors/node/v12.10.0/node-v12.10.0.pkg)
+
+2. 安装 Node.js
+
+打印出这个说明安装成功。（部分系统需要重启后环境变量才生效）
+
+```
+$node -v
+v12.10.0
+$ npm -v
+6.10.3
+```
+
+#### ** Debian 系 **
+
+（支持 ARM 及 X86 平台)
+
+```
+curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+
+（如果安装缓慢，可以使用[国内镜像源](http://mirrors.ustc.edu.cn/help/nodesource.html)）
+终端可以打出以下信息说明安装成功：
+
+```
+$node -v
+v12.10.0
+$ npm -v
+6.10.3
+```
+
+#### ** Redhat 系 **
+
+（支持 X86 平台）
+
+```
+curl -sL https://rpm.nodesource.com/setup_12.x | bash -
+```
+
+（如果安装缓慢，可以使用[国内镜像源](http://mirrors.ustc.edu.cn/help/nodesource.html)）
+终端可以打出以下信息说明安装成功：
+
+```
+$node -v
+v12.10.0
+$ npm -v
+6.10.3
+```
+
+#### ** Snap **
+
+（支持 所有 Linux ）
+
+```
+sudo snap install node --classic --channel=12
+```
+
+（如果提示 snap 不存在，请先安装 snapd）
+终端可以打出以下信息说明安装成功：
+
+```
+$node -v
+v12.10.0
+$ npm -v
+6.10.3
+```
+
+<!-- tabs:end -->
+
 ## 起步
 
 使用 [Nest CLI](/8/cli?id=overview) 建立新项目非常简单。 在安装好 npm 后，您可以使用下面命令在您的 OS 终端中创建 Nest 项目：

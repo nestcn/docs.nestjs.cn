@@ -21,17 +21,17 @@
 
 #### ** windows **
 
-1. [点击下载 Node.js](https://npm.taobao.org/mirrors/node/v12.10.0/node-v12.10.0-x64.msi)
+1. [点击下载 Node.js](https://npm.taobao.org/mirrors/node/v14.17.3/node-v14.17.3-x64.msi)
 
 2. 安装 Node.js
 
-Powershell/CMD 可以打印出这个说明安装成功。（部分系统需要重启后环境变量才生效）
+Powershell/CMD 可以打印出这个说明安装成功。（部分系统需要重启后环境变量才生效，如果不会配置环境变量请直接默认安装）
 
 ```
 $node -v
-v12.10.0
+v14.17.3
 $ npm -v
-6.10.3
+7.x.x
 ```
 
 #### ** linux（建议） **
@@ -39,14 +39,14 @@ $ npm -v
 （NVM 支持 所有 Linux 及 Raspbian ，支持多版本管理，[windows 点击进入](https://github.com/coreybutler/nvm-windows/releases)）
 
 ```
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+curl -o- https://ghproxy.com/https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 
 ```
 
 如果没 curl ，可以使用 wget 安装
 
 ```
-wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
+wget -qO- https://ghproxy.com/https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 ```
 
 使用淘宝加速下载（可选）
@@ -65,14 +65,14 @@ nvm install --lts
 
 ```
 $node -v
-v12.10.0
+v14.17.3
 $ npm -v
-6.10.3
+7.x.x
 ```
 
-#### ** MacOS **
+#### ** MacOS (X86)**
 
-1. [点击下载 Node.js](https://npm.taobao.org/mirrors/node/v12.10.0/node-v12.10.0.pkg)
+1. [点击下载 Node.js](https://npm.taobao.org/mirrors/node/v14.17.3/node-v14.17.3.pkg)
 
 2. 安装 Node.js
 
@@ -80,17 +80,33 @@ $ npm -v
 
 ```
 $node -v
-v12.10.0
+v14.17.3
 $ npm -v
-6.10.3
+7.x.x
 ```
+
+#### ** MacOS (M1)**
+
+1. [点击下载 Node.js](https://npm.taobao.org/mirrors/node/v16.5.0/node-v16.5.0.pkg)
+
+2. 安装 Node.js
+
+打印出这个说明安装成功。（部分系统需要重启后环境变量才生效）
+
+```
+$node -v
+v16.5.0
+$ npm -v
+7.x.x
+```
+
 
 #### ** Debian 系 **
 
 （支持 ARM 及 X86 平台)
 
 ```
-curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
 
@@ -99,9 +115,9 @@ sudo apt-get install -y nodejs
 
 ```
 $node -v
-v12.10.0
+v14.17.3
 $ npm -v
-6.10.3
+7.x.x
 ```
 
 #### ** Redhat 系 **
@@ -109,7 +125,7 @@ $ npm -v
 （支持 X86 平台）
 
 ```
-curl -sL https://rpm.nodesource.com/setup_12.x | bash -
+curl -sL https://rpm.nodesource.com/setup_16.x | bash -
 ```
 
 （如果安装缓慢，可以使用[国内镜像源](http://mirrors.ustc.edu.cn/help/nodesource.html)）
@@ -117,9 +133,9 @@ curl -sL https://rpm.nodesource.com/setup_12.x | bash -
 
 ```
 $node -v
-v12.10.0
+v14.17.3
 $ npm -v
-6.10.3
+7.x.x
 ```
 
 #### ** Snap **
@@ -127,7 +143,7 @@ $ npm -v
 （支持 所有 Linux ）
 
 ```
-sudo snap install node --classic --channel=12
+sudo snap install node --classic --channel=14
 ```
 
 （如果提示 snap 不存在，请先安装 snapd）
@@ -135,9 +151,9 @@ sudo snap install node --classic --channel=12
 
 ```
 $node -v
-v12.10.0
+v14.17.3
 $ npm -v
-6.10.3
+7.x.x
 ```
 
 <!-- tabs:end -->

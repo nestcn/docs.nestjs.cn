@@ -74,7 +74,7 @@
 
 ### D
 
-- Deffered value 延迟值 &
+- Deferred value 延迟值 &
 - Dependency Injection 依赖注入 &
 - Driver 驱动
 
@@ -136,7 +136,7 @@
 - Microservices 微服务 &
 - Middleware 中间件  &
 - Migration 迁移
-- Mockgoose （不翻）
+- Mongoose （不翻）
 - Model 模型
 - Modules 模块  &
 - MongoDB （不翻）

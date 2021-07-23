@@ -21,6 +21,48 @@
   - [QQ 群 (中文社区)](https://jq.qq.com/?_wv=1027&k=5DnXWGR)
   - [Reddit (社区维护)](https://www.reddit.com/r/Nestjs_framework)
 
+- 书籍
+  
+
+[《深入浅出 Node.js》](https://union-click.jd.com/jdc?e=&p=JF8AAMQDIgZlGmsVAhADURNdHDJWWA1FBCVbV0IUWVALHEpCAUdETlcNVQtHRRUCEANRE10cHUtCCUZrEBxaXRNvH35ib3U-fgBgdGh7BlguQw4eN1QrWx0GFARUGVwWMiIHUisNewITBlQaWhAGFQBlGmsVBREAUBNcFgMXD1MTaxICGzdVG14VABUCSR1dFAQSBlYbayUyETdlK1slASJFO0kJHQoRUF0dW0FVQgIGGl9GUBEOVhhZFQAQBVFMDBdQIgVUGl8c)
+
+
+[《狼书（卷1）：更了不起的 Node.js》](https://union-click.jd.com/jdc?e=&p=JF8AAMQDIgZlGmsVARUEVxheHDJWWA1FBCVbV0IUWVALHEpCAUdETlcNVQtHRRUBFQRXGF4cHUtCCUZrUVprQBVNOmZnVHEGAQJuBFdvEEg5Uw4eN1QrWx0GFARUGVwWMiIHUisNewITBlQaWhACFwRlGmsVBREAUBNcFwcVD1YeaxICGzdVG14VABUCSR1dFAQSBlYbayUyETdlK1slASJFOx5fRgVAVFcdDBEFQQIFE1gcB0UCBxkOQAUQBlVMC0FRIgVUGl8c)
+
+[《狼书（卷2）：Node.js Web应用开发》](https://union-click.jd.com/jdc?e=&p=JF8AAMQDIgZlGmsVARUHUBNYEzJWWA1FBCVbV0IUWVALHEpCAUdETlcNVQtHRRUBFQdQE1gTHUtCCUZrQkVJASYBWxFidkdcegVqYRRwXWQfZQ4eN1QrWx0GFARUGVwWMiIHUisNewITBlQaWhACFwRlGmsVBREAUBNcEAETBlEYaxICGzdVG14VABUCSR1dFAQSBlYbayUyETdlK1slASJFO0xfQQITAVZPXBcAFwICS1sdVUABV05eQFcaB10YXRAEIgVUGl8c)
+
+[《深入理解 TypeScript》](https://union-click.jd.com/jdc?e=&p=JF8AAMQDIgZlGmsVARQDURxYEDJWWA1FBCVbV0IUWVALHEpCAUdETlcNVQtHRRUBFANRHFgQHUtCCUZraFBxBi8cWBxnR3EsRAVLUUQBMmRcZQ4eN1QrWx0GFARUGVwWMiIHUisNewITBlQaWhACFwRlGmsVBREAUBNcEgsSAVcbaxICGzdVG14VABUCSR1dFAQSBlYbayUyETdlK1slASJFO0kOHAdGU1xIWUBXQQJTS1wdAhABVhJZHQoWD1UeDxMCIgVUGl8c)
+
+[《前端serverless面向全栈的无服务器架构实战》](https://union-click.jd.com/jdc?e=&p=JF8AAMQDIgZlGmsVABEGXBxfEjJWWA1FBCVbV0IUWVALHEpCAUdETlcNVQtHRRUAEQZcHF8SHUtCCUZrYF0SYUtIX3dgR0c2ExMQQhJhL0cAdQ4eN1QrWx0GFARUGVwWMiIHUisNewITBlQaWhACFwRlGmsVBREAURpbFwUQD1ISaxICGzdVG14VABUCSR1dFAQSBlYbayUyETdlK1slASJFOxtbFgobB1NPDkUKEwIFHAlFBRVTBkkPEAcQAwEbWhBXIgVUGl8c)
+
+[《JavaScript悟道》](https://union-click.jd.com/jdc?e=&p=JF8AAMQDIgZlGmsVARsOVxhfHTJWWA1FBCVbV0IUWVALHEpCAUdETlcNVQtHRRUBGw5XGF8dHUtCCUZrcnx7Xx4SGxxhQHUdUhMWcEpVB1tbUw4eN1QrWx0GFARUGVwWMiIHUisNewITBlQaWhAGFQBlGmsVBREAURpbEgYRAVYSaxICGzdVG14VABUCSR1dFAQSBlYbayUyETdlK1slASJFOx4JFgpADgBIDhYHEQIBH1tGV0UBVxIMRgtFDwAcDkIHIgVUGl8c)
+
+[《Node.js设计模式》](https://union-click.jd.com/jdc?e=&p=JF8AALsDIgZlGmsXAxcDXBpZFzJWWA1FBCVbV0IUWVALHEpCAUdETlcNVQtHRRcDFwNcGlkXHUtCCUZrXnhPWh5cLEVnaVdUBRNLQAhvUFMoQw4eN1QrWx0GFARUGVwWMiIHUisQewMiBmUbXBYFFgZVH14dBRUEZRxbHDISB1AbWRIHDgFTGl0VAxEHZStrFjIiN1UrWCVAfFIAHA8cA0YOUUsPHAdGAl0SWBYEEwcHGF1HBhBUBx5cJQATBlES)
+
+
+[《Node.js 区块链开发》](https://union-click.jd.com/jdc?e=&p=JF8AAM4DIgZlGFwXARMOUR9bFTISD1UYUhAGEgRTHmtRXUpZCisCUEdTRV4FRU1HRltKQA4KUExbSxtTFQEbAlEbWBMHDV4QRwYlXRNTERxSSAJyf1J5X2B1WUYcTQdzYh4LZRprFQoWAVYaWRIBIjdVHGtUbBsBVx5cJQMiB1IYXBAKFQRcGlkUBSIAVRJrFQIXB1ccXgkEFAZTG1oWAiI3ZRhrJTISN1YrGXsBQA9dSQ8UBBUCVEheEgNGVAEdDBAHElACHwkTA0dSVytZFAMWDg)    
+
+[《实现领域驱动设计》](https://union-click.jd.com/jdc?e=&p=JF8AAMQDIgZlGmsVABIFVR5THDJWWA1FBCVbV0IUWVALHEpCAUdETlcNVQtHRRUAEgVVHlMcHUtCCUZrE31sADEbEBFien1QE11eAWVEFGAbQw4eN1QrWx0GFARUGVwWMiIHUisNewITBlQaWhACFwRlGmsVBREAURpbEAcaB1MeaxICGzdVG14VABUCSR1dFAQSBlYbayUyETdlK1slASJFO0lSFANCA1xMUxELFQICSQkcUUAOVRlYQldHDgZOXBIDIgVUGl8c)
+
+[《Node.js：来一打 C++ 扩展》](https://union-click.jd.com/jdc?e=&p=JF8AAMQDIgZlGmsVARAOVB5aEDJWWA1FBCVbV0IUWVALHEpCAUdETlcNVQtHRRUBEA5UHloQHUtCCUZrYwFtUhNZHBBhWkdRRylKSVJYPGw_ZQ4eN1QrWx0GFARUGVwWMiIHUisNewITBlQaWhACFwRlGmsVBREAUBNcEQsRBF0faxICGzdVG14VABUCSR1dFAQSBlYbayUyETdlK1slASJFOxpZEQtGAlNPWR1VQQJcGA5GABYCVk5YFgFBBwZLUxNXIgVUGl8c)
+
+[《JavaScript 权威指南》](https://union-click.jd.com/jdc?e=&p=JF8AAMQDIgZlGmsVAxoBUB5ZEjJWWA1FBCVbV0IUWVALHEpCAUdETlcNVQtHRRUDGgFQHlkSHUtCCUZrSn1KXVdOJFBhEXFTfjNqUhFBDEclZQ4eN1QrWx0GFARUGVwWMiIHUisNewITBlQaWhADFgRlGmsVBREAUBNcEwoXBFYZaxICGzdVG14VABUCSR1dFAQSBlYbayUyETdlK1slASJFO0taHAdAUlQTDEUKRQJRG1kcCxZXUBwPEwESDgVMWBUAIgVUGl8c)
+
+
+
+
+数据库:    
+
+[《PostgreSQL修炼之道：从小工到专家（第2版）》](https://union-click.jd.com/jdc?e=&p=JF8AAMQDIgZlGmsVARQFUhhaFTJWWA1FBCVbV0IUWVALHEpCAUdETlcNVQtHRRUBFAVSGFoVHUtCCUZrYGtLXw9uLh1hb1s3WA8TX2ZfCGI9dQ4eN1QrWx0GFARUGVwWMiIHUisNewITBlQaWhADFgRlGmsVBREAUBNcHAQTD1ceaxICGzdVG14VABUCSR1dFAQSBlYbayUyETdlK1slASJFOx9bRwYUUgFJWkJWEQICGAgdURsCBh9dQVdAAVVOWRFQIgVUGl8c)
+
+[《MySQL必知必会》(](https://union-click.jd.com/jdc?e=&p=JF8AAMQDIgZlGmsVARsHXBNSFjJWWA1FBCVbV0IUWVALHEpCAUdETlcNVQtHRRUBGwdcE1IWHUtCCUZrfHVGRAMbA11nW0MRUgRoXmJCCmUwQw4eN1QrWx0GFARUGVwWMiIHUisNewITBlQaWhAGFQBlGmsVBREAUBNcHQUTBVwYaxICGzdVG14VABUCSR1dFAQSBlYbayUyETdlK1slASJFOxIPQAsbAwUcWBUKFQJVSQlGA0FQUR0JFwIXUFUTWhUKIgVUGl8c)
+
+
+[《MongoDB从入门到商业实战》](https://union-click.jd.com/jdc?e=&p=JF8AAMQDIgZlGmsVARYBXRpaFTJWWA1FBCVbV0IUWVALHEpCAUdETlcNVQtHRRUBFgFdGloVHUtCCUZrY1BvZR1cHnBgS1MiQSxOVUR-U0g5Uw4eN1QrWx0GFARUGVwWMiIHUisNewITBlQaWhACFwRlGmsVBREAUBNdFAAQB10SaxICGzdVG14VABUCSR1dFAQSBlYbayUyETdlK1slASJFOx1YEQcVBQIYCBNQGwIHTgtGURBXBR5eQFEQDwUfWkYFIgVUGl8c)
+
+
+
+
 - 中文教程
   - [NestJS 框架教程](https://keelii.com/2019/08/03/nestjs-framework-tutorial-1/)      
   - [NestJS 学习教程](https://github.com/dzzzzzy/Nestjs-Learning)    
@@ -32,12 +74,12 @@
   - [NestJS Node Express](https://auth0.com/blog/nestjs-brings-typescript-to-nodejs-and-express) - 教如何逐步使用 Nestjs
   - [使用 Nest 构建 Web 应用程序](https://kamilmysliwiec.com/build-modern-scalable-node-js-web-applications-with-nest)
   - [使用 Nest.js 和 Google Maps API 构建一个地理围栏 Web 应用程序 ](https://pusher.com/tutorials/geofencing-nestjs-googlemaps)
-  - [使用 Nest.js 和 Dialogflow 构建聊天机器人](https://pusher.com/tutorials/chat-bot-nestjs)
   - [使用 Nest.js 通过情绪分析构建实时评论](https://pusher.com/tutorials/live-comments-sentiment-analysis-nestjs)
   - [使用 Nest.js 构建具有情绪分析的聊天应用程序](https://pusher.com/tutorials/chat-sentiment-analysis-nestjs)
   - [使用 Nest.js 创建实时图形](https://pusher.com/tutorials/realtime-graph-nestjs)
   - [使用 DataTables 和 Nest.js 构建实时表](https://pusher.com/tutorials/realtime-table-datatables-nestjs)
   - [NestJS 基础 Auth 和 Sessions](https://blog.exceptionfound.com/index.php/2018/08/08/nestjs-basic-auth-and-sessions/)
+  - [NestJS Hasura 通过 Schema Stitching 和 JWT Auth 集成](https://blog.exceptionfound.com/2020/12/03/nestjs-hasura-integration-via-schema-stitching/)
   - [使用 NestJS 和 Swagger 的 MEAN 技术栈](https://medium.com/@ctran2428/mean-stack-with-nestjs-and-swagger-9d8d14862d6b)
   - [NestJS Ideas API](https://www.youtube.com/watch?v=NF9Xn4g5MJY&list=PLBeQxJQNprbiJm55q7nTAfhMmzIC8MWxc)
   - [使用 Nest.js 和 Ably 构建实时 Web 应用程序](https://hackernoon.com/building-real-time-web-applications-using-nest-js-and-ably-d85887e81f06)
@@ -70,39 +112,55 @@
   - [Serverless-Lambda-FirestoreDB](https://github.com/mamori-i-japan/mamori-i-japan-api) - 具有 AWS Lambda，FirestoreDB，Firebase Auth，Winston Logger 的完全无服务器生产应用程序，实现了管理员角色授权
   - [Serverless-nestjs-TypeOrm](https://github.com/kop8/serverless-nestjs-typeorm) - 使用 NestJS 和 TypeORM 的 serverless
   - [Passport Email Auth](https://github.com/marcomelilli/nestjs-email-authentication) 入门项目，包括用于通过MongoDB和PassportJs进行用户电子邮件身份验证的API
+  - [NestJS Project Structure](https://github.com/CatsMiaow/node-nestjs-structure) - 用 NestJS 构建项目结构的例子
+  - [NestJS Elasticsearch Vue](https://github.com/kop7/nest-elasticsearch-vue) - 用 NestJS、Elasticsearch 和 Vue 进行自动完成搜索
+  - [TypeScript Clean Architecture](https://github.com/pvarentsov/typescript-clean-architecture) - 基于 NestJS、PostgreSQL 和 TypeORM 的干净架构应用
   - [genal-chat](https://github.com/genaller/genal-chat) - 使用 NestJS，Vue，Typescript 实现有趣的web聊天室
   
 
 - 样例
+  - [NestJS Permission Boilerplate](https://github.com/Ferdysd96/nestjs-permission-boilerplate) - 这是一个基本的 NestJS 模板项目，建立在更强大的 Node.js 框架上，这个项目的主要目的是动态地处理分配给用户的角色和权限。
+  - [SQB NestJS Boilerplate](https://github.com/squareboat/nestjs-boilerplate) - 一个生产就绪的 NestJS 模板，包括电池，别开玩笑了！
   - [Nest 入门套件](https://github.com/kentloog/nestjs-sequelize-typescript) - Nest + sequelize-typescript + JWT + Jest + Swagger
-  - [Nest BFF](https://github.com/ahrnee/nestjs-bff) - 使用 NestJS 的样板 [BFF](https://samnewman.io/patterns/architectural/bff/) Web 应用程序启动项目包括 CLI 和 MongoDB 迁移功能
+  - [Nest BFF](https://github.com/ahrnee/nestjs-bff) - 使用 NestJS 的示例 [BFF](https://samnewman.io/patterns/architectural/bff/) Web 应用程序启动项目包括 CLI 和 MongoDB 迁移功能
   - [NestJS Template](https://github.com/Saluki/nestjs-template) - 使用为 Docker 环境精心设计的生产可用 NestJS 模板，支持最新 TypeScript API
   - [MEAN Todo with NestJS](https://github.com/nartc/nest-mean) - 一个使用 NestJS 和 Swagger 的简单 Todo 应用程序包含授权/身份验证
-  - [NestJS Boilerplate](https://github.com/Vivify-Ideas/nestjs-boilerplate) - 具有可用身份验证，typeorm，env 配置和 swagger 的 Boilerplate开始制作伟大事物所需的一切🚀
-  - [Awesome Nest Boilerplate](https://github.com/NarHakobyan/awesome-nest-boilerplate), Typescript ，Postgresql ，TypeORM，Swagger for API 文档，角色基本访问控制和最佳应用程序架构
+  - [NestJS 示例](https://github.com/Vivify-Ideas/nestjs-boilerplate) - 具有可用身份验证，typeorm，env 配置和 swagger 的 Boilerplate开始制作伟大事物所需的一切🚀
+  - [Awesome Nest 示例](https://github.com/NarHakobyan/awesome-nest-boilerplate), Typescript ，Postgresql ，TypeORM，Swagger for API 文档，角色基本访问控制和最佳应用程序架构
   - [NestJS Prisma Starter](https://github.com/fivethree-team/nestjs-prisma-client-starter) - NestJS 的入门项目，包括带有 Prisma 客户端的 Graphql，Passport-JWT 身份验证，Swagger Api 和 Docker
   - [TeanJS](https://github.com/adrien2p/teanjs) - TeanJS是一个入门程序，它为您提供所有方式，以便能够尽快开始编写代码
-  - [NestJS DDD Boilerplate](https://github.com/pezzetti/base-app-nestjs) 具有 NestJS，类验证器和 TypeORM 的领域驱动设计基础应用程序完全可测试
+  - [NestJS DDD 示例](https://github.com/pezzetti/base-app-nestjs) 具有 NestJS，类验证器和 TypeORM 的领域驱动设计基础应用程序完全可测试
   - [Nest Mongo Graphql](https://github.com/benawad/nest-mongo-graphql/) - 带有 NestJS，TypeORM，TypeGrapQL，MongoDB，GraphQL 的 Dockerized API 样板，以及带有 Makefile 的自动化任务[https://typegraphql.ml/](https://typegraphql.ml/)
   - [Ultimate Backend](https://github.com/juicycleff/ultimate-backend) - 具有 cqrs graphql 微服务架构，Apollo 联盟，事件源和身份验证的企业多租户 SaaS 入门套件
-  - [NestJS GraphQL 样板](https://github.com/fernandohenriques/nestjs-graphql-boilerplate) - 带有 NestJS，TypeORM，TypeGrapQL，MongoDB，GraphQL 的 Dockerized API 样板以及带有 Makefile 的自动化任务
+  - [NestJS GraphQL 示例](https://github.com/fernandohenriques/nestjs-graphql-boilerplate) - 带有 NestJS，TypeORM，TypeGrapQL，MongoDB，GraphQL 的 Dockerized API 样板以及带有 Makefile 的自动化任务
+  - [NextJS & NestJS GraphQL Starter](https://github.com/tomanagle/NextJS-NestJS-GraphQL-Starter) - 带有 NextJS 示例的 GraphQL NestJS，包含 GitHub、Reddit 和 Google OAuth
   - [The Knests Stack](https://github.com/tudorconstantin/knests/) - 终极示例，其中包括：PostgreSQL，Knex.js，NestJS，Next.js，GraphQL，React(with hooks and typescript)，Material-UI，用于 Docker 的 Docker 多阶段镜像以及已完全配置的 Gitlab CI/CD
+  - [Nest Hackathon Starter](https://github.com/ahmetuysal/nest-hackathon-starter) - Hackathon 入门项目，包括 TypeORM、电子邮件验证、Passport-JWT 身份验证、Swagger 等
+  - [Stator](https://github.com/chocolat-chaud-io/stator) - 一个全栈式的模板，可以做所有的事情--自动发布、部署、强制执行
+  - [NestJS REST Starter Kit - By MonstarLab](https://github.com/monstar-lab-oss/nestjs-starter-rest-api) - 一个由MonstarLab提供的生产就绪的 NestJS 模板。核心功能。JWT认证，RBAC授权，TypeORM，winston日志，分页，Docker就绪，自动生成的Swagger。次要特征：更漂亮、提交提示的 husky 钩子、SonarCloud github actions、docker-compose
+
+
+
+
 
 ### 使用 NestJS 的项目
 
 - 开源
   - [EVE Book API](https://github.com/evebook/api) - EVE Book API
   - [Ever®](https://github.com/ever-co/ever) - 用于按需经济和数字市场的开源商务平台
+  - [Feednext](https://github.com/feednext/feednext) - 开源社交媒体应用
   - [Gauzy](https://github.com/ever-co/gauzy) - 适用于现代代理商和工作室的开源利润分享平台
-  - [LXDhub](https://github.com/Roche/lxdhub) - Linux 容器管理系统（LXC）.
+  - [LXDhub](https://github.com/Roche/lxdhub) - Linux 容器管理系统（LXC）
   - [Notadd](https://github.com/notadd/notadd) - 微服务开发架构
   - [Pimp My PR](https://github.com/valueadd-poland/pimp-my-pr) - 用于统计和拉取请求管理的开源平台
+  - [Vendure](https://github.com/vendure-ecommerce/vendure) - 开源的后端 GraphQL 电子商务框架，易于定制的 NestJS 框架
   
 
 ### 常用库
 
 - 公用
   - [Nest CQRS](https://github.com/nestjs/cqrs) - Nest 框架的轻量级 CQRS 模块
+  - [Typed CQRS](https://github.com/valueadd-poland/nestjs-packages/tree/master/packages/typed-cqrs) - Nest CQRS 库的一个封装器，更好支持 TS 
   - [NestJS Config](https://github.com/nestjsx/nestjs-config) -  处理项目配置的一个很棒的模块
   - [Nest Consul Config](https://github.com/nest-cloud/nest-consul-config) - 从 consul kv 获取配置的模块
   - [Nest Consul Service](https://github.com/nest-cloud/nestcloud) - 基于 Consul 的 NodeJS 微服务解决方案，由 Typescript 语言和 NestJS 框架编写
@@ -123,14 +181,22 @@
   - [workflow-es](https://github.com/danielgerlag/workflow-es) 基于 Typescript 的工作流
 - WebSockets
   - [官方](https://docs.nestjs.cn/8/websockets)
-- 邮件
-  - [Nest Mailer](https://github.com/partyka95/nest-mailer) -  Nest 框架的邮件模块
+- Redis
+  - [Nest Ioredis](https://github.com/nest-modules/ioredis) - 一个 ioredis 模块
+  - [📮 Mailman](https://github.com/squareboat/nest-mailman) - 📮 NestJS 的邮件插件
+  - [Nest Mailer](https://github.com/partyka95/nest-mailer) -  NestJS 框架的邮件模块
 - API
-  - [Swagger](https://github.com/nestjs/swagger) - 这是 Nest 的 OpenAPI（Swagger）模块. _[教程](https://docs.nestjs.com/recipes/swagger)]_.
+  - [Swagger](https://github.com/nestjs/swagger) - 这是 Nest 的 OpenAPI（Swagger）模块. _[教程](https://docs.nestjs.com/recipes/swagger)]
   - [Nest CRUD](https://github.com/nestjsx/crud) -  用于 RESTful API 的 Nest CRUD
   - [Nestjs-Query](https://github.com/doug-martin/nestjs-query) - 用于 GraphQL API 的 Nest CRUD 
+  - [Nestia](https://github.com/samchon/nestia) - 为客户端自动生成 SDK
+
+- 中间件
   - [Nest Middlewares](https://github.com/wbhob/nest-middlewares) - NestJS 的通用可注入中间件
+  
+
 - Errors
+  - [👀 Eyewitness](https://github.com/squareboat/nest-eyewitness) - 每当您的 NestJS 应用程序中出现任何异常时，它都会直接将错误报告发送到您的收件箱
   - [NestJS Flub](https://github.com/shekohex/nestjs-flub) - 漂亮的错误 NestJS框架的Stack Viewer 
   - [NestJS Enlighten](https://github.com/ozkanonur/nestjs-enlighten) - NestJS 框架的类似 laravel-ignition 的错误页面
   - [Nest Raven](https://github.com/mentos1388/nest-raven) - Nest.js 框架的 Sentry Raven 模块
@@ -147,15 +213,25 @@
 - 监控
   - [Nest Status Monitor](https://github.com/GenFirst/nest-status-monitor) - 基于 Socket.io 和 Chart.js 的简单自托管模块，用于报告 Nest.js 的 node.js 服务器的实时状态
   - [Nest Terminus](https://github.com/nestjs/terminus) - 综合健康检查, 基于 [Terminus](https://github.com/godaddy/terminus) .
+  - [Nest X-Ray](https://github.com/narando/nest-xray) - 记录 [AWS X-Ray](https://aws.amazon.com/xray/) 的传入和传出请求，也支持自定义检测
+  - [Nest OpenTelemetry (OTEL)](https://github.com/pragmaticivan/nestjs-otel) - NestJS 的 遥测模块
 - 国际化
-  - [Nest i18n](https://github.com/ToonvanStrijp/nestjs-i18n) - 在您的服务器上轻松添加 i18n 支持，内置丰富的格式化 api     
+  - [Nest i18n](https://github.com/ToonvanStrijp/nestjs-i18n) - 在您的服务器上轻松添加 i18n 支持，内置丰富的格式化 api   
+- 货币
+  - [Nestjs Cashify](https://github.com/vahidvdn/nestjs-cashify) - NestJS 的货币转换模块
+  
 - 事件
   - [Nest Event](https://github.com/yak0/nest-event) - 使用 NestJS 框架的装饰器进行事件处理
 - Auth
   - [NestJS Session](https://github.com/iamolegga/nestjs-session) - NestJS 的 Session 模块, 基于 [express-session](https://npm.im/express-session)
 - RBAC（基于角色的访问控制）
   - [Nest RBAC](https://github.com/sergey-telpuk/nestjs-rbac) - 用于 NestJS 的 RBAC 模块，具有动态存储和缓存
+  - [Nest Keycloak Admin](https://github.com/relevantfruit/nestjs-keycloak-admin) - Keycloak Admin Client with support for User Managed Access protocol.
 
+- 多租户
+  - [Nestjs MTenant](https://github.com/AlexanderC/nestjs-mtenant) - NestJS 的一个模块，以实现对多租户的支持，可以与整个系统深度整合
+- 微服务
+  - [NestJS PG Notify](https://github.com/pvarentsov/nestjs-pg-notify) - NestJS 为 PostgreSQL 的 Pub/Sub 定制传输策略。
 ### 集成
 
 - Auth
@@ -200,6 +276,8 @@
   - [Nest Memcached](https://github.com/nest-cloud/nest-memcached) - 用于 Nest 框架的 memcached 模块
 - 前端
   - [NestJS CRUD React Admin](https://github.com/FusionWorks/react-admin-nestjsx-crud-dataprovider) - A React Admin data provider for [NextJS CRUD](https://github.com/nestjsx/crud)
+  - [Nest AdminBro](https://github.com/SoftwareBrothers/admin-bro-nestjs) - NestJS 的  [AdminBro](https://github.com/SoftwareBrothers/admin-bro) 插件，一个可以嵌入到您的应用程序中的自动管理界面。
+
 - 定时任务
   - [Nest Bull](https://github.com/nestjsx/nest-bull) - Nest 框架的 Bull 模块
   

@@ -215,7 +215,7 @@ export class ValidationPipe implements PipeTransform<any> {
 
 下一步，请观察 `toValidate()` 方法。当验证类型不是 JavaScript 的数据类型时，跳过验证。
 
-下一步，我们使用 `class-transformer` 的 `plainToClass()` 方法来转换 JavaScript 的参数为可验证的类型对象。一个请求中的 body 数据是不包行类型信息的，`Class-validator` 需要使用前面定义过的 DTO，就需要做一个类型转换。
+下一步，我们使用 `class-transformer` 的 `plainToClass()` 方法来转换 JavaScript 的参数为可验证的类型对象。一个请求中的 body 数据是不包含类型信息的，`Class-validator` 需要使用前面定义过的 DTO，就需要做一个类型转换。
 
 最后，如前所述，这就是一个验证管道，它要么返回值不变，要么抛出异常。
 

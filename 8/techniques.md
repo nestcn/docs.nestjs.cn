@@ -3869,7 +3869,50 @@ MulterModule.registerAsync({
 ```
 ## 流处理文件
 
-（待翻译）
+!> 这个章节将向你展示如何在`HTTP应用`中流处理文件。以下例子不适用于GraphQL或者微服务应用
+
+有时你可能想从你的REST API向客户端发送文件，想要在Nest中做到这一点，你可能会像下面这样做：
+
+```typescript
+@Controller('file')
+export class FileController {
+  @Get()
+  getFile(@Res() res: Response) {
+    const file = createReadStream(join(process.cwd(), 'package.json'));
+    file.pipe(res);
+  }
+}
+```
+但是这样一来，你就会丢失控制器之后的拦截器逻辑。想要避免这一点，你可以返回一个`StreamableFile`实例，框架会帮你使用管道传输响应。
+
+### Streamable File类
+
+`StreamableFile`是一个持有要返回的流的类。你可以传入一个`Buffer`或者`Stream`到`StreamableFile`类的构造函数来创建一个新的`StreamableFile`实例。
+
+?> `StreamableFile`类可以从`@nestjs/common`中导入
+
+### 跨平台支持
+
+默认情况下，Fastify服务器可以不通过`stream.pipe(res)`直接发送文件的，所以你并不需要使用`StreamableFile`类。但是，Nest仍然支持在这些平台使用`StreamableFile`，所以即使你需要在Express和Fastify之间切换，也不需要担心这两个引擎上的兼容性问题。
+
+### 例子
+
+下面是一个作为文件而不是JSON返回`package.json`的例子，当然，它也适用于图片、文档和所有其他类型的文件。
+
+```typescript
+import { Controller, Get, StreamableFile } from '@nestjs/common';
+import { createReadStream } from 'fs';
+import { join } from 'path';
+
+@Controller('file')
+export class FileController {
+  @Get()
+  getFile(): StreamableFile {
+    const file = createReadStream(join(process.cwd(), 'package.json'));
+    return new StreamableFile(file);
+  }
+}
+```
 
 ## HTTP 模块
 

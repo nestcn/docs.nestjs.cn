@@ -21,6 +21,9 @@
   - [QQ 群 (中文社区)](https://jq.qq.com/?_wv=1027&k=5DnXWGR)
   - [Reddit (社区维护)](https://www.reddit.com/r/Nestjs_framework)
 
+- 中文视频
+  - [全栈之巅](https://github.com/juliandavidmr/awesome-nestjs)
+
 - 书籍
   
 
@@ -154,6 +157,7 @@
   - [Notadd](https://github.com/notadd/notadd) - 微服务开发架构
   - [Pimp My PR](https://github.com/valueadd-poland/pimp-my-pr) - 用于统计和拉取请求管理的开源平台
   - [Vendure](https://github.com/vendure-ecommerce/vendure) - 开源的后端 GraphQL 电子商务框架，易于定制的 NestJS 框架
+  - [iola](https://github.com/pvarentsov/iola) - 支持 Rest API 的 Socket 客户端
   
 
 ### 常用库

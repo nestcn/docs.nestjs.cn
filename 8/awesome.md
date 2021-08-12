@@ -22,7 +22,7 @@
   - [Reddit (社区维护)](https://www.reddit.com/r/Nestjs_framework)
 
 - 中文视频
-  - [全栈之巅](https://github.com/juliandavidmr/awesome-nestjs)
+  - [全栈之巅](https://space.bilibili.com/341919508)
 
 - 书籍
   

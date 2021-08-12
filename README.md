@@ -19,6 +19,10 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
 
 ![](https://pic2.superbed.cn/item/5dee088d1f8f59f4d6586014.jpg)
 
+## 推荐视频
+
+[全栈之巅](https://space.bilibili.com/341919508)
+
 ## 相关书籍
 
 

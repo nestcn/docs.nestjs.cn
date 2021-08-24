@@ -3893,7 +3893,7 @@ export class FileController {
 
 ### 跨平台支持
 
-默认情况下，Fastify服务器可以不通过`stream.pipe(res)`直接发送文件的，所以你并不需要使用`StreamableFile`类。但是，Nest仍然支持在这些平台使用`StreamableFile`，所以即使你需要在Express和Fastify之间切换，也不需要担心这两个引擎上的兼容性问题。
+默认情况下，Fastify服务器可以不通过`stream.pipe(res)`直接发送文件，所以你并不需要使用`StreamableFile`类。但是，Nest仍然支持在所有这些类型的平台上使用`StreamableFile`，所以即使你需要在Express和Fastify之间切换，也不需要担心这两个引擎上的兼容性问题。
 
 ### 例子
 

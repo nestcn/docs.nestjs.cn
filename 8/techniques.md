@@ -2094,7 +2094,8 @@ GET /?ids=1,2,3
 我们首先需要安装所需的包：
 
 ```bash
-$ npm install --save cache-manager
+$ npm install cache-manager
+$ npm install -D @types/cache-manager
 ```
 
 ### 内存缓存
@@ -2112,9 +2113,59 @@ import { AppController } from './app.controller';
 export class ApplicationModule {}
 ```
 
-!> 在`[GraphQL](https://docs.nestjs.com/graphql/quick-start)`应用中，拦截器针对每个字段处理器分别运行，因此，`CacheModule`(使用)
+### 与缓存存储的交互
 
-然后将 `CacheInterceptor` 绑定到需要缓存数据的地方。
+为了和缓存管理器实例进行交互，需要使用`CACHE_MANAGER`标记将其注入到你的类，如下所示:
+
+```typescript
+constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
+```
+
+?> `Cache`类是从`cache-manager`中导入的，而`CACHE_MANAGER`则是从`@nestjs/common`包中导入的。
+
+`Cache`实例(来自cache-manager包)上的`get`方法被用来从缓存中检索键值。如果该键在缓存中不存在，则返回null。
+
+```typescript
+const value = await this.cacheManager.get('key');
+```
+
+使用`set`方法将一个键值对添加到缓存中:
+
+```typescript
+await this.cacheManager.set('key', 'value');
+```
+
+缓存的默认过期时间是5秒。
+
+你可以为特定的键手动指定一个TTL(过期时间，以秒为单位)，如下所示:
+
+```typescript
+await this.cacheManager.set('key', 'value', { ttl: 1000 });
+```
+
+如果要让缓存永不过期，请将配置的`ttl`属性设置为`0`。
+
+```typescript
+await this.cacheManager.set('key', 'value', { ttl: 0 });
+```
+
+使用`del`方法从缓存中删除一个键值对:
+
+```typescript
+await this.cacheManager.del('key');
+```
+
+使用`reset`方法清空整个缓存:
+
+```typescript
+await this.cacheManager.reset();
+```
+
+### 自动缓存响应
+
+!> 在`[GraphQL](https://docs.nestjs.com/graphql/quick-start)`应用中，拦截器针对每个字段解析器分别运行，因此，`CacheModule`(使用拦截器来缓存响应)将无法正常工作。
+
+要启用自动缓存响应，只需在想缓存数据的地方绑定`CacheInterceptor`。
 
 ```typescript
 @Controller()
@@ -2131,7 +2182,7 @@ export class AppController {
 
 ### 全局缓存
 
-为了减少重复代码量，可以一次绑定 `CacheInterceptor` 到每个现有节点:
+为了减少重复代码量，可以将`CacheInterceptor`全局绑定到每个端点(endpoints):
 
 ```typescript
 import { CacheModule, Module, CacheInterceptor } from '@nestjs/common';
@@ -2148,7 +2199,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     },
   ],
 })
-export class ApplicationModule {}
+export class AppModule {}
 ```
 
 ### 定制缓存

@@ -47,7 +47,6 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 `@nestjs/platform-socket.io` 包已升级为使用 `socket.io@4.x.x`版本（Nest v7是基于 `socket.io` v2的）。要了解更多信息，请查看这些文章：<a style="color:red;" href="https://socket.io/blog/socket-io-3-release/">Socket.io 3 Release</a> 和 <a style="color:red;" href="https://socket.io/blog/socket-io-3-release/">Socket.io 4 Release</a>。
 
 
-
 ## Logger 的突破性变化
 
 为了更好的扩展性，我们把 `Logger` 和 `ConsoleLogger` 类分开（<a style="color:red;" href="https://github.com/nestjs/nest/pull/6221">PR</a> ，在 <a style="color:red;" href="https://docs.nestjs.com/techniques/logger">Logging</a> 章节中了解更多）。如果你的应用程序使用了一个扩展了内置 `Logger` 的自定义日志器类，你应该更新它为扩展 `ConsoleLogger` 。

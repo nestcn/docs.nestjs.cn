@@ -1257,17 +1257,17 @@ app.register(helmet, {
 为了启用 `CORS`，必须调用 `enableCors()` 方法。
 
 ```typescript
-const app = await NestFactory.create(ApplicationModule);
+const app = await NestFactory.create(AppModule);
 app.enableCors();
 await app.listen(3000);
 ```
 
-`enableCors()`方法使用一个可选的配置对象参数。该对象的可用属性在其官方[CORS](https://github.com/expressjs/cors#configuration-options)文档中有所描述。
+`enableCors()`方法需要一个可选的配置对象参数。这个对象的可用属性在官方 <a href="https://github.com/expressjs/cors#configuration-options" style="color:red;">CORS</a> 文档中有所描述。另一种方法是传递一个<a href="https://github.com/expressjs/cors#configuring-cors-asynchronously" style="color:red;">回调函数</a>，来让你根据请求异步地定义配置对象。
 
-可选地，通过`create()`方法的选项对象使能`CORS`，设置`cors`属性为`true`来使能CORS的默认属性。可选地，传递一个[CORS配置对象](https://github.com/expressjs/cors#configuration-options)作为`cors`属性值来自定义其行为：
+或者通过 `create()` 方法的选项对象启用CORS。将 `cors`属性设置为`true`，以使用默认设置启用CORS。又或者，传递一个 <a href="https://github.com/expressjs/cors#configuration-options" style="color:red;">CORS 配置对象</a> 或 <a href="https://github.com/expressjs/cors#configuring-cors-asynchronously" style="color:red;">回调函数</a> 作为 `cors` 属性的值来自定义其行为。
 
 ```typescript
-const app = await NestFactory.create(ApplicationModule, { cors: true });
+const app = await NestFactory.create(AppModule, { cors: true });
 await app.listen(3000);
 ```
 

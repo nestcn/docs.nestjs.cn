@@ -1010,7 +1010,7 @@ onModuleInit() {
 
 ## gRPC
 
-[gRPC](https://github.com/grpc/grpc-node) 是一个现代的、高性能RPC框架，可以运行在任何环境下。它可以有效在数据中心之间连接服务，并通过插件支持负载平衡、跟踪、健康诊断和授权。
+[gRPC](https://github.com/grpc/grpc-node) 是一个现代的、高性能RPC框架，可以运行在任何环境下。它可以有效在数据中心之间连接服务，并通过插件支持负载均衡、跟踪、健康诊断和授权。
 
 和很多RPC系统一样，gRPC基于可以定义远程调用的函数（方法）的概念。针对每个方法，定义一个参数并返回类型。服务、参数和返回类型在`.proto`文件中定义，使用谷歌的开源语言——中性[协议缓存(protocol buffers)](https://developers.google.com/protocol-buffers)机制。
 
@@ -1266,7 +1266,7 @@ call(): Observable<any> {
 
 ### gRPC流
 
-`GRPC` 本身支持长期的实时连接（称为流）。 对于诸如聊天，观察或块数据传输之类的服务案例，流可以是非常有用的工具。 您可以在官方文档（[此处](https://grpc.io/docs/guides/concepts/)）中找到更多详细信息。
+`GRPC` 本身支持长期的实时连接（称为流）。 对于诸如聊天，热评或数据块传输之类的服务案例，流可以是非常有用的工具。 您可以在官方文档（[此处](https://grpc.io/docs/guides/concepts/)）中找到更多详细信息。
 
 `Nest` 通过两种可能的方式支持 `GRPC`流处理程序：
 - `RxJS Subject + Observable` 处理程序：可用于在`Controller` 内部编写响应或将其传递给 `Subject / Observable`使用者。

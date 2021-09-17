@@ -48,7 +48,7 @@ export class AppModule {}
 | retryAttempts       | 重试连接数据库的次数（默认：10）                         |
 | retryDelay          | 两次重试连接的间隔(ms)（默认：3000）                     |
 | autoLoadEntities    | 如果为`true`,将自动加载实体(默认：false)                 |
-| keepConnectionAlive | 如果未`true`，在应用程序关闭后连接不会关闭（默认：false) |
+| keepConnectionAlive | 如果为`true`，在应用程序关闭后连接不会关闭（默认：false) |
 
 ?> 更多连接选项见[这里](https://typeorm.io/#/connection-options)
 

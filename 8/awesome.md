@@ -143,6 +143,7 @@
   - [NestJS REST Starter Kit - By MonstarLab](https://github.com/monstar-lab-oss/nestjs-starter-rest-api) - 一个由MonstarLab提供的生产就绪的 NestJS 模板。核心功能。JWT认证，RBAC授权，TypeORM，winston日志，分页，Docker就绪，自动生成的Swagger。次要特征：更漂亮、提交提示的 husky 钩子、SonarCloud github actions、docker-compose
   - [NestJS MikroORM Template](https://github.com/WumaCoder/nest-mikro-template) - 一个 Nest 项目模板，包括 mikro-orm、mongo、git hook、class-verify、swagger、commitlint、无需编译直接运行、自动格式化 ...
   - [NestJS TypeORM Template](https://github.com/WumaCoder/nest-typeorm-template) - 一个 Nest 项目模板，包括 typeorm、mongo、git hook、class-verify、swagger、commitlint、无需编译直接运行、自动格式化 ...
+  - [NesJS file serivce](https://github.com/SJcz/nest-file-svc) - 一个 Nest 项目模板, 专注于 unit test, e2e test, middlwware, file upload, intercaptors, config file.
 
 
 

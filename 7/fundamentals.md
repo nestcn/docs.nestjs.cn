@@ -517,6 +517,7 @@ export class AppModule {}
 import { Injectable } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
+import * as path from 'path';
 import { EnvConfig } from './interfaces';
 
 @Injectable()

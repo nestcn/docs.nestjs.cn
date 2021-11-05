@@ -144,33 +144,33 @@ export class UsersResolver {
 首先，我们安装所需的软件包：
 
 ```bash
-$ npm i --save-dev webpack-node-externals start-server-webpack-plugin
+$ npm i --save-dev webpack-node-externals run-script-webpack-plugin webpack
 ```
 
 ### 配置（Configuration）
 
-然后，我们需要创建一个` webpack.config.js`，它是webpack的一个配置文件，并将其放入根目录。
+然后，我们需要创建一个` webpack-hmr.config.js`，它是webpack的一个配置文件，并将其放入根目录。
 
 ```typescript
-const webpack = require('webpack');
 const nodeExternals = require('webpack-node-externals');
-const StartServerPlugin = require('start-server-webpack-plugin');
+const { RunScriptWebpackPlugin } = require('run-script-webpack-plugin');
 
-module.exports = function(options) {
+module.exports = function (options, webpack) {
   return {
     ...options,
     entry: ['webpack/hot/poll?100', options.entry],
-    watch: true,
     externals: [
       nodeExternals({
-        whitelist: ['webpack/hot/poll?100'],
+        allowlist: ['webpack/hot/poll?100'],
       }),
     ],
     plugins: [
       ...options.plugins,
       new webpack.HotModuleReplacementPlugin(),
-      new webpack.WatchIgnorePlugin([/\.js$/, /\.d\.ts$/]),
-      new StartServerPlugin({ name: options.output.filename }),
+      new webpack.WatchIgnorePlugin({
+        paths: [/\.js$/, /\.d\.ts$/],
+      }),
+      new RunScriptWebpackPlugin({ name: options.output.filename }),
     ],
   };
 };
@@ -200,7 +200,7 @@ bootstrap();
 就这样。为了简化执行过程，请将这两行添加到 `package.json` 文件的脚本中。
 
 ```json
-"start:dev": "nest build --webpack --webpackPath webpack-hmr.config.js"
+"start:dev": "nest build --webpack --webpackPath webpack-hmr.config.js --watch"
 ```
 
 现在只需打开你的命令行并运行下面的命令：
@@ -218,7 +218,7 @@ $ npm run start:dev
 首先安装所需的软件包：
 
 ```bash
-$ npm i --save-dev webpack webpack-cli webpack-node-externals ts-loader start-server-webpack-plugin
+$ npm i --save-dev webpack webpack-cli webpack-node-externals ts-loader run-script-webpack-plugin
 ```
 
 ### 配置
@@ -229,15 +229,14 @@ $ npm i --save-dev webpack webpack-cli webpack-node-externals ts-loader start-se
 const webpack = require('webpack');
 const path = require('path');
 const nodeExternals = require('webpack-node-externals');
-const StartServerPlugin = require('start-server-webpack-plugin');
+const { RunScriptWebpackPlugin } = require('run-script-webpack-plugin');
 
 module.exports = {
   entry: ['webpack/hot/poll?100', './src/main.ts'],
-  watch: true,
   target: 'node',
   externals: [
     nodeExternals({
-      whitelist: ['webpack/hot/poll?100'],
+      allowlist: ['webpack/hot/poll?100'],
     }),
   ],
   module: {
@@ -255,7 +254,7 @@ module.exports = {
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
-    new StartServerPlugin({ name: 'server.js' }),
+    new RunScriptWebpackPlugin({ name: 'server.js' }),
   ],
   output: {
     path: path.join(__dirname, 'dist'),
@@ -288,7 +287,7 @@ bootstrap();
 为了简化执行过程，请将两个脚本添加到 `package.json` 文件中。
 
 ```bash
-"start:dev": "webpack --config webpack.config.js"
+"start:dev": "webpack --config webpack.config.js --watch"
 ```
 
 现在，只需打开命令行并运行以下命令：

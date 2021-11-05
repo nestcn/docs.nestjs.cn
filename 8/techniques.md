@@ -1108,7 +1108,6 @@ SequelizeModule.forRootAsync({
 
 ```bash
 $ npm install --save @nestjs/mongoose mongoose
-$ npm install --save-dev @types/mongoose
 ```
 
 安装过程完成后，我们可以将其 `MongooseModule` 导入到根目录 `AppModule` 中。

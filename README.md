@@ -70,7 +70,7 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
 
 本站托管在： [vultr   （免费送 100 美金）](https://www.vultr.com/?ref=8967015-8H)  
   [RamNode - 3美元-100G 高防](https://clientarea.ramnode.com/aff.php?aff=3451)    
-  [Onevps-不限流量](https://www.onevps.com/portal/aff.php?aff=12238)    
+  [Onevps-不限流量](https://www.onevps.cloud/?aff=12238)    
   [JMS 搬瓦工官方的科学上网工具](https://justmysocks3.net/members/aff.php?aff=6423)    
   [【捐赠】](https://gitee.com/notadd/docs.nestjs.cn?donate=true)   
 

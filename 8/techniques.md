@@ -3273,21 +3273,22 @@ BullModule.registerQueueAsync({
 
 ## 日志
 
-`Nest`附带一个默认的内部日志记录器实现，它在实例化过程中以及在一些不同的情况下使用，比如发生异常等等（例如系统记录）。这由`@nestjs/common`包中的`Logger`类实现。你可以全面控制如下的日志系统的行为：
+`Nest` 附带一个默认的内部日志记录器实现，它在实例化过程中以及在一些不同的情况下使用，比如发生异常等等（例如系统记录）。这由 `@nestjs/common` 包中的 `Logger` 类实现。你可以全面控制如下的日志系统的行为：
 
 - 完全禁用日志
 - 指定日志系统详细水平（例如，展示错误，警告，调试信息等）
+- 覆盖默认日志记录器的时间戳（例如使用 ISO8601 标准作为日期格式）
 - 完全覆盖默认日志记录器
 - 通过扩展自定义默认日志记录器
 - 使用依赖注入来简化编写和测试你的应用
 
 你也可以使用内置日志记录器，或者创建你自己的应用来记录你自己应用水平的事件和消息。
 
-更多高级的日志功能，可以使用任何`Node.js`日志包，比如[Winston](https://github.com/winstonjs/winston)，来生成一个完全自定义的生产环境水平的日志系统。
+更多高级的日志功能，可以使用任何 `Node.js` 日志包，比如[Winston](https://github.com/winstonjs/winston)，来生成一个完全自定义的生产环境水平的日志系统。
 
 ### 基础自定义
 
-要禁用日志，在（可选的）Nest 应用选项对象中向`NestFactory.create()`传递第二个参数设置`logger`属性为`false`。
+要禁用日志，在（可选的）Nest 应用选项对象中向 `NestFactory.create()` 传递第二个参数设置 `logger` 属性为 `false` 。
 
 ```typescript
 const app = await NestFactory.create(ApplicationModule, {
@@ -3296,7 +3297,7 @@ const app = await NestFactory.create(ApplicationModule, {
 await app.listen(3000);
 ```
 
-你也可以只启用特定日志级别，设置一个字符串形式的`logger`属性数组以确定要显示的日志水平，如下：
+你也可以只启用特定日志级别，设置一个字符串形式的 `logger` 属性数组以确定要显示的日志水平，如下：
 
 ```typescript
 const app = await NestFactory.create(ApplicationModule, {
@@ -3305,11 +3306,13 @@ const app = await NestFactory.create(ApplicationModule, {
 await app.listen(3000);
 ```
 
-数组中的字符串可以是以下字符串的任意组合：`log`,`error`,`warn`,`debug`和`verbose`。
+数组中的字符串可以是以下字符串的任意组合： `log` , `error` , `warn` , `debug` 和 `verbose` 。
+
+?>你可以通过设置 `NO_COLOR` 环境变量为非空字符串来禁用默认日志信息的颜色
 
 ### 自定义应用
 
-你可以提供一个自定义日志记录器应用，并由 Nest 作为系统记录使用，这需要设置`logger`属性到一个满足`LoggerService`接口的对象。例如，你可以告诉 Nest 使用内置的全局 JavaScript`console`对象（其应用了`LoggerService`接口），如下：
+你可以提供一个自定义日志记录器应用，并由 Nest 作为系统记录使用，这需要设置`logger`  属性到一个满足 `LoggerService` 接口的对象。例如，你可以告诉 Nest 使用内置的全局 JavaScript `console` 对象（其实现了 `LoggerService` 接口），如下：
 
 ```typescript
 const app = await NestFactory.create(ApplicationModule, {
@@ -3318,31 +3321,40 @@ const app = await NestFactory.create(ApplicationModule, {
 await app.listen(3000);
 ```
 
-应用你的自定义记录器很简单。只要简单实现以下`LoggerService`接口中的每个方法就可以：
+应用你的自定义记录器很简单。只要简单实现以下 `LoggerService` 接口中的每个方法就可以：
 
 ```typescript
 import { LoggerService } from '@nestjs/common';
 
 export class MyLogger implements LoggerService {
-  log(message: string) {
-    /* your implementation */
-  }
-  error(message: string, trace: string) {
-    /* your implementation */
-  }
-  warn(message: string) {
-    /* your implementation */
-  }
-  debug(message: string) {
-    /* your implementation */
-  }
-  verbose(message: string) {
-    /* your implementation */
-  }
+  /**
+   * Write a 'log' level log.
+   */
+  log(message: any, ...optionalParams: any[]) {}
+
+  /**
+   * Write an 'error' level log.
+   */
+  error(message: any, ...optionalParams: any[]) {}
+
+  /**
+   * Write a 'warn' level log.
+   */
+  warn(message: any, ...optionalParams: any[]) {}
+
+  /**
+   * Write a 'debug' level log.
+   */
+  debug?(message: any, ...optionalParams: any[]) {}
+
+  /**
+   * Write a 'verbose' level log.
+   */
+  verbose?(message: any, ...optionalParams: any[]) {}
 }
 ```
 
-你可以通过`logger`属性为 Nest 应用的选项对象提供一个`MyLogger`实例：
+你可以通过 `logger` 属性为 Nest 应用的选项对象提供一个 `MyLogger` 实例：
 
 ```typescript
 const app = await NestFactory.create(ApplicationModule, {
@@ -3351,31 +3363,33 @@ const app = await NestFactory.create(ApplicationModule, {
 await app.listen(3000);
 ```
 
-这个技术虽然很简单，但是没有为`MyLogger`类应用依赖注入。这会带来一些挑战，尤其在测试方面，同时也限制了`MyLogger`的重用性。更好的解决方案参见如下的[依赖注入](https://docs.nestjs.com/techniques/logger#dependency-injection)部分。
+这个技术虽然很简单，但是没有为 `MyLogger` 类应用依赖注入。这会带来一些挑战，尤其在测试方面，同时也限制了 `MyLogger` 的重用性。更好的解决方案参见如下的[依赖注入](https://docs.nestjs.com/techniques/logger#dependency-injection)部分。
 
 ### 扩展内置的日志类
 
-很多实例操作需要创建自己的日志。你不必完全重新发明轮子。只需扩展内置 `Logger` 类以部分覆盖默认实现，并使用 `super` 将调用委托给父类。
+很多实例操作需要创建自己的日志。你不必完全重新发明轮子。只需继承内置 `ConsoleLogger` 类以部分覆盖默认实现，并使用 `super` 将调用委托给父类。
 
 ```typescript
-import { Logger } from '@nestjs/common';
+import { ConsoleLogger } from '@nestjs/common';
 
-export class MyLogger extends Logger {
-  error(message: string, trace: string) {
+export class MyLogger extends ConsoleLogger {
+  error(message: any, stack?: string, context?: string) {
     // add your tailored logic here
-    super.error(message, trace);
+    super.error.apply(this, arguments);
   }
 }
 ```
 
-你可以按如下[使用应用记录器来记录](https://docs.nestjs.com/techniques/logger#dependency-injection)部分所述，从你的特征模块中使用扩展记录器，也可以按照如下的[依赖注入](https://docs.nestjs.com/techniques/logger#dependency-injection)部分。如果你这样做，你在调用`super`时要小心，如上述代码示例，要委托一个特定的日志方法，调用其父（内置）类，以便 Nest 可以依赖需要的内置特征。
+你可以按如下[使用应用记录器来记录](https://docs.nestjs.com/techniques/logger#using-the-logger-for-application-logging)部分所述，从你的特征模块中使用扩展记录器。
+
+你可以把你的扩展日志记录器的实例传递到应用选项对象的 `logger` 属性来让 Nest 使用你的日志记录器记录系统日志（如[自定义应用](https://docs.nestjs.com/techniques/logger#custom-logger-implementation)所述），也可以按照如下的[依赖注入](https://docs.nestjs.com/techniques/logger#dependency-injection)部分。如果你这样做，你在调用 `super` 时要小心，如上述代码示例，要委托一个特定的日志方法，调用其父（内置）类，以便 Nest 可以依赖需要的内置特征。
 
 ### 依赖注入
 
-你可能需要利用依赖注入的优势来使用高级的日志记录功能。例如，你可能想把`ConfigService`注入到你的记录器中来对它自定义，然后把自定义记录器注入到其他控制器和/或提供者中。要为你的自定义记录器启用依赖注入，创建一个实现`LoggerService`的类并将其作为提供者注册在某些模块中，例如，你可以：
+你可能需要利用依赖注入的优势来使用高级的日志记录功能。例如，你可能想把 `ConfigService` 注入到你的记录器中来对它自定义，然后把自定义记录器注入到其他控制器和/或提供者中。要为你的自定义记录器启用依赖注入，创建一个实现 `LoggerService` 的类并将其作为提供者注册在某些模块中，例如，你可以：
 
-1. 定义一个`MyLogger`类来扩展内置的`Logger`或者完全覆盖它，如前节所述。
-2. 创建一个`LoggerModule`如下所示，从该模块中提供`MyLogger`。
+1. 定义一个 `MyLogger` 类来继承内置的 `ConsoleLogger` 或者完全覆盖它，如前节所述。注意一定要实现 `LoggerService` 接口。
+2. 创建一个 `LoggerModule` 如下所示，从该模块中提供 `MyLogger` 。
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -3388,43 +3402,73 @@ import { MyLogger } from './my-logger.service.ts';
 export class LoggerModule {}
 ```
 
-通过这个结构，你现在可以提供你的自定义记录器供其他任何模块使用。因为你的`MyLogger`类是模块的一部分，它也可以使用依赖注入（例如，注入一个`ConfigService`）。提供自定义记录器供使用还需要一个技术，即 Nest 的系统记录（例如，供`bootstrapping`和`error handling`)。
+通过这个结构，你现在可以提供你的自定义记录器供其他任何模块使用。因为你的 `MyLogger` 类是模块的一部分，它也可以使用依赖注入（例如，注入一个 `ConfigService` ）。提供自定义记录器供使用还需要一个技术，即 Nest 的系统记录（例如，供 `bootstrapping` 和 `error handling` ）。
 
-由于应用实例化(`NestFactory.create()`)在任何模块上下文之外发生，它不能参与初始化时正常的依赖注入阶段。因此我们必须保证至少一个应用模块导入了`LoggerModule`来触发`Nest`，从而生成一个我们的`MyLogger`类的单例。我们可以在之后按照下列知道来告诉 Nest 使用同一个`MyLogger`实例。
+由于应用实例化（ `NestFactory.create()` ）在任何模块上下文之外发生，它不能参与初始化时正常的依赖注入阶段。因此我们必须保证至少一个应用模块导入了 `LoggerModule` 来触发 Nest ，从而生成一个我们的 `MyLogger` 类的单例。
+
+我们可以在之后按照下列知道来告诉 Nest 使用同一个 `MyLogger` 实例。
 
 ```typescript
 const app = await NestFactory.create(ApplicationModule, {
-  logger: false,
+  bufferLogs: true,
 });
 app.useLogger(app.get(MyLogger));
 await app.listen(3000);
 ```
 
-在这里我们在`NestApplication`实例中用了`get()`方法以获取`MyLogger`对象的单例。这个技术在根本上是一个“注入”`logger`实例供`Nest`使用的方法。`app.get()`调用获取`MyLogger`单例，并且像之前所述的那样依赖于第一个注入到其他模块的实例。
+?>在上面的例子中，我们把 `bufferLogs` 设置为 `true` 以确保所有的日志都会被放入缓冲区直到一个自定义的日志记录器被接入（在上面的例子中是 `MyLogger` ）并且应用初始化成功或者失败。如果初始化失败，Nest 会回退到原始的 `ConsoleLogger` 以打印出错误信息。你也可以将 `autoFlushLogs` 设置为 `false` （默认为 `true` ）来手动刷新日志缓冲区（使用 `Logger#flush()` 方法）。
 
-你也可以在你的特征类中注入这个`MyLogger`提供者，从而保证`Nest`系统记录和应用记录行为一致。参见如下为应用记录使用记录器部分。
+在这里我们在 `NestApplication` 实例中用了 `get()` 方法以获取 `MyLogger` 对象的单例。这个技术在根本上是个“注入”一个日志记录器的实例供 Nest 使用的方法。 `app.get()` 调用获取 `MyLogger` 单例，并且像之前所述的那样依赖于第一个注入到其他模块的实例。
+
+你也可以在你的特征类中注入这个 `MyLogger` 提供者，从而保证 Nest 系统记录和应用记录行为一致。参考[为应用记录使用记录器](https://docs.nestjs.com/techniques/logger#using-the-logger-for-application-logging)和[注入一个自定义日志记录器](https://docs.nestjs.com/techniques/logger#injecting-a-custom-logger)章节以获取更多信息。
 
 ### 为应用记录使用记录器
 
-我们可以组合上述几种技术来提供一致性的行为和格式化以保证我们的应用事件/消息记录和 Nest 系统记录一致。在本部分，我们采用以下步骤：
+我们可以组合上述几种技术来提供一致性的行为和格式化以保证我们的应用事件/消息记录和 Nest 系统记录一致。
 
-1. 我们扩展内置记录器并自定义记录消息的`context`部分（例如，如下的方括号中的`NestFactory`的形式）。
-   ```bash
-    [Nest] 19096   - 12/08/2019, 7:12:59 AM   [NestFactory] Starting Nest application...
-   ```
-2. 我们注入一个[暂态的](https://docs.nestjs.com/fundamentals/injection-scopes)`Logger`实例在我们的特征模块中，从而使它们包含各自的自定义上下文。
-3. 我们提供扩展的记录器供 Nest 在系统记录中使用。
-
-要开始，使用类似如下的内置记录器代码。我们提供`scope`选项作为一个`Logger`类的配置元数据，指定瞬态范围，以保证我们在每个特征模块中有独一无二的`Logger`的实例。例如，我们没有扩展每个单独的`Logger`方法（例如 `log()`,`warn()`等），尽管你可能选择要这样做。
+一个很好的实践是在每个提供者内实例化 `@nestjs/common` 内的 `Logger` 类。我们可以将提供者的名字当作 `context` 参数传入 `Logger` 的构造函数，就像这样：
 
 ```typescript
-import { Injectable, Scope, Logger } from '@nestjs/common';
+import { Logger, Injectable } from '@nestjs/common';
 
-@Injectable({ scope: Scope.TRANSIENT })
-export class MyLogger extends Logger {}
+@Injectable()
+class MyService {
+  private readonly logger = new Logger(MyService.name);
+
+  doSomething() {
+    this.logger.log('Doing something...');
+  }
+}
 ```
 
-然后，我们采用如下结构创建一个`LoggerModule`：
+在默认的日志记录器实现中， `context` 是包裹在方括号中被打印出来，就像下面例子中的 `NestFactory` ：
+
+```
+[Nest] 19096   - 12/08/2019, 7:12:59 AM   [NestFactory] Starting Nest application...
+```
+
+如果我们通过 `app.useLogger()` 提供一个自定义日志记录器，那么它会在 Nest 内部被使用。这就意味着我们的代码可以保持与实现无关，因为我们可以简单地调用 `app.useLogger()` 用默认日志记录器来代替自定义的那个。
+
+如果我们跟着前面章节一步步做下来并且调用了 `app.useLogger(app.get(MyLogger))` ，那么接下来在 `MyService` 中对 `this.logger.log()` 的调用会造成对 `MyLogger` 实例中方法 `log` 的调用。
+
+这个应该在大多数情况下都适用。但是你如果想要更深入的自定义（比如增加或者调用自定义方法），请看下一章节。
+
+### 注入自定义日志记录器
+
+通过像下面一样的扩展内置的日志记录器来开始这一章节。我们传入 `scope` 选项来配置 `ConsoleLogger` 的元数据，通过指定[瞬态作用域](https://docs.nestjs.com/fundamentals/injection-scopes)来保证在每个模块内都有独一无二的 `MyLogger` 的实例。在下面的例子中，我们没有扩展每个单独的 `ConsoleLogger` 方法（比如 `log()` ， `warn()` 之类），尽管你可能会选择去这么做。
+
+```typescript
+import { Injectable, Scope, ConsoleLogger } from '@nestjs/common';
+
+@Injectable({ scope: Scope.TRANSIENT })
+export class MyLogger extends ConsoleLogger {
+  customLog() {
+    this.log('Please feed the cat!');
+  }
+}
+```
+
+接下来，我们采用如下结构创建一个 `LoggerModule` 。
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -3437,40 +3481,44 @@ import { MyLogger } from './my-logger.service';
 export class LoggerModule {}
 ```
 
-接下来，在你的特征模块中导入`LoggerModule`，然后设置记录器上下文，并开始使用包含上下文的自定义记录器，如下：
+然后，在你的模块中导入 `LoggerModule` 。因为我们继承了默认的 `Logger` ，所以我们可以很方便地调用 `setContext` 方法。之后我们就可以像下面一样开始使用这个包含了上下文的日志记录器了。
 
 ```typescript
-import { Injectable } from '@nestjs/common';
-import { MyLogger } from './my-logger.service';
-
 @Injectable()
 export class CatsService {
   private readonly cats: Cat[] = [];
 
   constructor(private myLogger: MyLogger) {
+    // 因为瞬态作用域的原因， CatService 有属于自己的独一无二的 MyLogger 实例，
+    // 所以在这里设置上下文不会影响到其他提供者的实例
     this.myLogger.setContext('CatsService');
   }
 
   findAll(): Cat[] {
+    // 你可以调用所有的默认方法
     this.myLogger.warn('About to return cats!');
+    // 当然还有你的自定义方法
+    this.myLogger.customLog();
     return this.cats;
   }
 }
 ```
 
-最后，告诉 Nest 在你如下的`main.ts`文件中使用一个自定义记录器实例。当然，在本例中，我们没有实际自定义记录器行为（通过扩展`Logger`方法例如`log()`、`warn()`等），因此该步骤并不是必须的。但如果你为这些方法添加了自定义逻辑，并且希望 Nest 使用它们时就应该这样做：
+最后，和下面一样在你的 `main.ts` 文件中让 Nest 使用自定义日志记录器的实例。当然这只是个例子，我们还没有真正自定义日志记录器的行为（通过扩展像 `log()` ， `warn()` 这些 `Logger` 的方法），所以这一步并不一定需要。但是如果你给这些方法增加了自定义的逻辑而且你想让 Nest 去使用这个实现，那么你还是会需要这一步。
 
 ```typescript
 const app = await NestFactory.create(ApplicationModule, {
-  logger: false,
+  bufferLogs: true,
 });
 app.useLogger(new MyLogger());
 await app.listen(3000);
 ```
 
+?>除了把 `bufferLogs` 设置为`true`，你也可以声明 `logger: false` 来临时禁用日志记录器。需要注意的是如果你给 `NestFactory.create` 提供了 `logger: false` ，在你调用 `useLogger` 以前没有东西会被记录进日志，所以你可能会错过一些重要的初始化错误。如果你不在意一些初始化信息会使用默认日志记录器来记录，那你可以直接设置 `logger: false` 。
+
 ### 使用外部记录器
 
-生产环境应用通常包括特定的记录需求，包括高级过滤器，格式化和中心化记录。`Nest`的内置记录器用于监控 Nest 系统状态，在开发时也可以为你的特征模块提供实用的基础的文本格式的记录，但生产环境可能更倾向于使用类似[Winston](https://github.com/winstonjs/winston)的模块，这是一个标准的 Node.js 应用，你可以在 Nest 中体验到类似模块的优势。
+生产环境应用通常包括特定的记录需求，包括高级过滤器，格式化和中心化记录。Nest 的内置记录器用于监控 Nest 系统状态，在开发时也可以为你的特征模块提供实用的基础的文本格式的记录，但生产环境可能更倾向于使用类似[Winston](https://github.com/winstonjs/winston)的模块，这是一个标准的 Node.js 应用，你可以在 Nest 中体验到类似模块的优势。
 
 ## `Cookies`
 

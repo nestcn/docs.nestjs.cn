@@ -1016,6 +1016,8 @@ export class CommonModule {}
 creationDate: Date;
 ```
 
+<!-- tabs:end -->
+
 ## 指令
 
 一个指令可以被附加在一个字段或对象片段上，并能按照服务器所希望的任何方式影响查询语句的执行(参见[此处](https://graphql.org/learn/queries/#directives))。GraphQL 规范中提供了几个默认的指令：

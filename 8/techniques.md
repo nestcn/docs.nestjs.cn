@@ -1405,7 +1405,7 @@ export class AppModule {}
 为了简化这一过程，`@nestjs/mongoose` 包公开了一个 `getModelToken()` 函数，该函数根据一个 `token` 名称返回一个准备好的`[注入token](https://docs.nestjs.com/fundamentals/custom-providers#di-fundamentals)`。使用此 `token`，你可以轻松地使用任何标准[自定义提供者](https://docs.nestjs.com/fundamentals/custom-providers)技术，包括 `useClass`、`useValue` 和 `useFactory`。例如:
 
 ```typescript
-@@Module({
+@Module({
   providers: [
     CatsService,
     {
@@ -4488,7 +4488,7 @@ sse(): Observable<MessageEvent> {
 
 !> 服务器端事件发送路径必须返回`Observable`流。
 
-在上述示例中，我们定义了一个命名的`sse`来生成实时更新，这些事件可以通过`[EventSource API](https://developer.mozilla.org/en-US/docs/Web/API/EventSource)`监听。
+在上述示例中，我们定义了一个命名的`sse`来生成实时更新，这些事件可以通过 [EventSource API](https://developer.mozilla.org/en-US/docs/Web/API/EventSource) 监听。
 
 `sse`方法返回一个`Observable`并发送多个`MessageEvent`（在本例中，它每秒发射一个新的`MessageEvent`）。`MessageEvent`应该与下列接口相匹配。
 

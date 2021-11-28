@@ -4014,9 +4014,21 @@ export class FileController {
 
 ## HTTP 模块
 
-[Axios](https://github.com/axios/axios) 是丰富功能的 `HTTP` 客户端, 广泛应用于许多应用程序中。这就是为什么 `Nest` 包装这个包, 并公开它默认为内置 `HttpModule`。`HttpModule` 导出 `HttpService`, 它只是公开了基于 `axios` 的方法来执行 `HTTP` 请求, 而且还将返回类型转换为 `Observables`。
+[Axios](https://github.com/axios/axios) 是功能很丰富的 `HTTP` 客户端, 广泛应用于许多应用程序中。这就是为什么 `Nest` 包装这个包, 并以内置模块 `HttpModule` 的形式暴露它。`HttpModule` 导出 `HttpService`, 它只是暴露了基于 Axios 的方法来执行 HTTP 请求, 而且还将返回类型转换为 `Observables`。
 
-为了使用 `httpservice`，我们需要导入 `HttpModule`。
+?>你也可以直接使用包括 [got](https://github.com/sindresorhus/got) 或 [undici](https://github.com/nodejs/undici) 在内的任何通用的 Node.js 的 HTTP 客户端。
+
+### 安装
+
+我们先安装需要的依赖来开始使用它
+
+```shell
+$ npm i --save @nestjs/axios
+```
+
+### 开始使用
+
+安装完成之后，想要使用 `HttpService` ，我们需要导入 `HttpModule` 。
 
 ```typescript
 @Module({
@@ -4026,9 +4038,9 @@ export class FileController {
 export class CatsModule {}
 ```
 
-?> `HttpModule` 是 `@nestjs/common` 包提供的
+接下来，使用构造函数来注入 `HttpService`。
 
-然后，你可以注入 `HttpService`。这个类可以从` @nestjs/common` 包中获取。
+?> `HttpModule` 和 `HttpService` 是 `@nestjs/axios` 包提供的
 
 ```typescript
 @Injectable()
@@ -4041,11 +4053,13 @@ export class CatsService {
 }
 ```
 
-所有方法都返回 `AxiosResponse`, 并使用 `Observable` 对象包装。
+?> `AxiosResponse` 是 `axios` 包（ `$ npm i axios` ）暴露的接口。
+
+所有 `HttpService` 的方法都返回一个包裹在 `Observable` 对象内的 `AxiosResponse` 。
 
 ### 配置
 
-`Axios` 提供了许多选项，您可以利用这些选项来增加您的 `HttpService` 功能。[在这里](https://github.com/axios/axios#request-config)阅读更多相关信息。要配置底层库实例，请使用 `register()` 方法的 `HttpModule`。所有这些属性都将传递给 `axios` 构造函数。
+[Axios](https://github.com/axios/axios) 提供了许多选项，您可以利用这些选项来增加您的 `HttpService` 功能。[在这里](https://github.com/axios/axios#request-config)阅读更多相关信息。要配置底层的 Axios 实例，请使用 `HttpModule` 的 `register()` 方法。所有这些属性都将直接传递给底层的 Axios 构造函数。
 
 ```typescript
 @Module({
@@ -4062,9 +4076,9 @@ export class CatsModule {}
 
 ### 异步配置
 
-通常，您可能希望异步传递模块属性，而不是事先传递它们。在这种情况下，使用 `registerAsync()` 方法，提供了几种处理异步数据的方法。
+如果你要给模块异步地传递选项，就使用 `registerAsync()` 方法。就像大多数动态模块一样， Nest 提供了几种处理异步数据的方法。
 
-第一种可能的方法是使用工厂函数：
+一种方法是使用工厂函数：
 
 ```typescript
 HttpModule.registerAsync({
@@ -4075,7 +4089,7 @@ HttpModule.registerAsync({
 });
 ```
 
-显然，我们的工厂表现得与其他工厂一样（ async 能够通过 inject 注入依赖关系）。
+就像其他工厂提供者一样，我们的工厂函数可以是[异步](https://docs.nestjs.com/fundamentals/custom-providers#factory-providers-usefactory)的而且可以通过 `inject` 参数注入依赖。
 
 ```typescript
 HttpModule.registerAsync({
@@ -4088,7 +4102,7 @@ HttpModule.registerAsync({
 });
 ```
 
-或者，您可以使用类而不是工厂。
+或者，你可以使用类而不是工厂来配置 `HttpModule` ，如下面所示。
 
 ```typescript
 HttpModule.registerAsync({
@@ -4096,7 +4110,7 @@ HttpModule.registerAsync({
 });
 ```
 
-上面的构造将在 `HttpModule` 中实例化 `HttpConfigService`，并利用它来创建 `options` 对象。 `HttpConfigService` 必须实现 `HttpModuleOptionsFactory` 接口。
+上面的构造将在 `HttpModule` 中实例化 `HttpConfigService`，并利用它来创建一个选项对象。注意这个例子， `HttpConfigService` 必须和下面所示的一样实现 `HttpModuleOptionsFactory` 接口。 `HttpModule` 会调用被提供的类的实例上的 `createHttpOptions()` 方法。
 
 ```typescript
 @Injectable()
@@ -4110,7 +4124,7 @@ class HttpConfigService implements HttpModuleOptionsFactory {
 }
 ```
 
-为了防止在 `HttpModule` 中创建 `HttpConfigService` 并使用从不同模块导入的提供者，您可以使用 `useExisting` 语法。
+如果你想要重复使用一个已经存在的选项提供者而不是在 `HttpModule` 内创建一个私有的拷贝，使用 `useExisting` 语法。
 
 ```typescript
 HttpModule.registerAsync({
@@ -4118,8 +4132,6 @@ HttpModule.registerAsync({
   useExisting: ConfigService,
 });
 ```
-
-它的工作原理与 `useClass` 相同，但有一个关键的区别: `HttpModule` 将查找导入的模块来重用已经创建的 `ConfigService`，而不是自己实例化它。
 
 ## `Session(会话)`
 

@@ -15,7 +15,7 @@
 
 三群：    
 
-<img src="https://pic.imgdb.cn/item/61b6f7222ab3f51d913f49e7.jpg" alt="加微信" width="260" height="260" align="bottom" />
+<img src="https://ghproxy.com/https://raw.githubusercontent.com/zuohuadong/imgbed/main/pic/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20211213153131.jpg" alt="加微信" width="260" height="260" align="bottom" />
 
 
 
@@ -46,7 +46,7 @@
 ### 支付宝红包
 
 
-<img src="https://pic.imgdb.cn/item/61b6fb1b2ab3f51d91426b6d.jpg">
+<img src="https://ghproxy.com/https://raw.githubusercontent.com/zuohuadong/imgbed/main/pic/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20211213154942.jpg" alt="支付宝" width="500" height="260" align="bottom" />
 
 
 

@@ -19,7 +19,7 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
 
 微信三群：    
 
-![](https://pic2.superbed.cn/item/61b6f7222ab3f51d913f49e7.jpg)    
+![](https://pic.imgdb.cn/item/61b6f7222ab3f51d913f49e7.jpg)  
 
 
 微信一二群 （由于超过100人，微信限制，请先添加好友）

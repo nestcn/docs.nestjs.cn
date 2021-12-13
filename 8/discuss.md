@@ -21,7 +21,7 @@
 
 二群： （超过100人，需要加好友）   
 
-<img src="https://pic.downk.cc/item/5f8c6c341cd1bbb86b72fc9a.jpg" alt="加微信" width="260" height="260" align="bottom" />
+<img src="https://ghproxy.com/https://raw.githubusercontent.com/zuohuadong/imgbed/main/pic/68747470733a2f2f7069632e646f776e6b2e63632f6974656d2f3566386336633334316364316262623836623732666339612e6a7067.jpg" alt="加微信" width="260" height="260" align="bottom" />
 
 
 一群：（已满）    
@@ -40,13 +40,13 @@
 
 左华栋的互联网圈：    
 
-<img src="https://pic.downk.cc/item/5f02e2e114195aa594ed9f59.jpg" alt="加微信" width="260" height="260" align="bottom" />
+<img src="https://ghproxy.com/https://raw.githubusercontent.com/zuohuadong/imgbed/main/pic/68747470733a2f2f7069632e646f776e6b2e63632f6974656d2f3566303265326531313431393561613539346564396635392e6a7067.jpg" alt="加微信" width="260" height="260" align="bottom" />
 
 
 ### 支付宝红包
 
 
-<img src="https://ghproxy.com/https://raw.githubusercontent.com/zuohuadong/imgbed/main/pic/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20211213154942.jpg" alt="支付宝" width="500" height="260" align="bottom" />
+<img src="https://ghproxy.com/https://raw.githubusercontent.com/zuohuadong/imgbed/main/pic/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20211213154942.jpg" alt="支付宝" width="260" height="400" align="bottom" />
 
 
 

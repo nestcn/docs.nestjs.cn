@@ -97,6 +97,7 @@
   - [LXDhub](https://github.com/Roche/lxdhub) - Linux 容器管理系统（LXC）.
   - [Notadd](https://github.com/notadd/notadd) - 微服务开发架构
   - [Pimp My PR](https://github.com/valueadd-poland/pimp-my-pr) - 用于统计和拉取请求管理的开源平台
+  - [nest-admin](https://github.com/buqiyuan/nest-admin) - 具有完备的权限控制的后台管理系统
   
 
 ### 常用库

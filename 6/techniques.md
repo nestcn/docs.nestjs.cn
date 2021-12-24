@@ -2036,17 +2036,9 @@ await app.listen(3000);
 
 ## 文件上传
 
-为了处理文件上传，Nest 提供了一个内置的基于 [multer](https://github.com/expressjs/multer) 中间件包的  Express 模块。Multer 处理以 `multipart/form-data` 格式发送的数据，该格式主要用于通过 HTTP `POST` 请求上传文件。这个模块是完全可配置的，您可以根据您的应用程序需求调整它的行为。
+为了处理文件上传，`Nest` 提供了一个内置的基于[multer](https://github.com/expressjs/multer)中间件包的 `Express`模块。`Multer` 处理以 `multipart/form-data` 格式发送的数据，该格式主要用于通过 `HTTP POST` 请求上传文件。这个模块是完全可配置的，您可以根据您的应用程序需求调整它的行为。
 
-!> `Multer`无法处理不是受支持的多部分格式（ `multipart/form-data` ）的数据。 另外，请注意此程序包与 `FastifyAdapter` 不兼容。
-
-为了更好的类型安全，我们来安装 Multer 的类型声明包：
-
-```shell
-$ npm i -D @types/multer
-```
-
-只要这个模块被安装，我们就可以使用 `Express.Multer.File` 这个类型（你可以通过 `import { Express } from 'express'` 导入这个类型）。
+!> `Multer`无法处理不是受支持的多部分格式（`multipart/form-data`）的数据。 另外，请注意此程序包与 `FastifyAdapter`不兼容。
 
 ### 基本实例
 
@@ -2055,20 +2047,19 @@ $ npm i -D @types/multer
 ```typescript
 @Post('upload')
 @UseInterceptors(FileInterceptor('file'))
-uploadFile(@UploadedFile() file: Express.Multer.File) {
+uploadFile(@UploadedFile() file) {
   console.log(file);
 }
 ```
 
-?> `FileInterceptor()` 装饰器是 `@nestjs/platform-express` 包提供的， `@UploadedFile()` 装饰器是 `@nestjs/common` 包提供的。
+?> `FileInterceptor()` 装饰器是 `@nestjs/platform-express` 包提供的， `@UploadedFile()` 装饰是 `@nestjs/common` 包提供的。
 
 `FileInterceptor()` 接收两个参数：
 
  - 一个 `fieldName` (指向包含文件的 HTML 表单的字段) 
  
- - 可选 `options` 对象, 类型为 `MulterOptions` 。这个和被传入 multer 构造函数 ([此处](https://github.com/expressjs/multer#multeropts)有更多详细信息) 的对象是同一个对象。
+ - 可选 `options` 对象。这些 `MulterOptions` 等效于传入 `multer` 构造函数 ([此处](https://github.com/expressjs/multer#multeropts)有更多详细信息)
 
-!> `FileInterceptor()` 可能不兼容诸如 Google Firebase 之类的第三方云服务商。
 
 ### 文件数组
 
@@ -2080,25 +2071,25 @@ uploadFile(@UploadedFile() file: Express.Multer.File) {
 
 - `options`:可选的 `MulterOptions` 对象 ，如上所述
 
-使用 `FilesInterceptor()` 时，使用 `@UploadedFiles()` 装饰器从 `request` 中提取文件。
+使用 `FilesInterceptor()` 时，使用 `@UploadedFiles()` 装饰器从请求中提取文件。
 
 ```typescript
 @Post('upload')
 @UseInterceptors(FilesInterceptor('files'))
-uploadFile(@UploadedFiles() files: Array<Express.Multer.File>) {
+uploadFile(@UploadedFiles() files) {
   console.log(files);
 }
 ```
 
-?> `FilesInterceptor()` 装饰器是 `@nestjs/platform-express` 包提供的， `@UploadedFiles()` 装饰器是 `@nestjs/common` 包提供的。
+?> `FilesInterceptor()` 装饰器需要导入 `@nestjs/platform-express`，而 `@UploadedFiles()` 导入  `@nestjs/common`。
 
 ### 多个文件
 
 要上传多个文件（全部使用不同的键），请使用 `FileFieldsInterceptor()` 装饰器。这个装饰器有两个参数:
 
-- `uploadedFields`：对象数组，其中每个对象指定一个必需的 `name` 属性和一个指定字段名的字符串值(如上所述)，以及一个可选的 `maxCount` 属性(如上所述)
+- `uploadedFields`对象数组，其中每个对象指定一个必需的 `name` 属性和一个指定字段名的字符串值(如上所述)，以及一个可选的 `maxCount` 属性(如上所述)
 
-- `options`: 可选的 `MulterOptions` 对象，如上所述
+- `options`:可选的 `MulterOptions` 对象，如上所述
 
 使用 `FileFieldsInterceptor()` 时，使用 `@UploadedFiles()` 装饰器从 `request` 中提取文件。
 
@@ -2108,7 +2099,7 @@ uploadFile(@UploadedFiles() files: Array<Express.Multer.File>) {
   { name: 'avatar', maxCount: 1 },
   { name: 'background', maxCount: 1 },
 ]))
-uploadFile(@UploadedFiles() files: { avatar?: Express.Multer.File[], background?: Express.Multer.File[] }) {
+uploadFile(@UploadedFiles() files) {
   console.log(files);
 }
 ```
@@ -2116,12 +2107,12 @@ uploadFile(@UploadedFiles() files: { avatar?: Express.Multer.File[], background?
 
 要使用任意字段名称键上载所有字段，请使用 `AnyFilesInterceptor()` 装饰器。该装饰器可以接受如上所述的可选选项对象。
 
-使用 `AnyFilesInterceptor()` 时，使用 `@UploadedFiles()` 装饰器从 `request` 中提取文件。
+使用 `FileFieldsInterceptor()` 时，使用 `@UploadedFiles()` 装饰器从 `request` 中提取文件。
 
 ```typescript
 @Post('upload')
 @UseInterceptors(AnyFilesInterceptor())
-uploadFile(@UploadedFiles() files: Array<Express.Multer.File>) {
+uploadFile(@UploadedFiles() files) {
   console.log(files);
 }
 ```
@@ -2135,8 +2126,6 @@ MulterModule.register({
   dest: '/upload',
 });
 ```
-
-?> `MulterModule` 类是 `@nestjs/platform-express` 包提供的。
 
 ### 异步配置
 
@@ -2152,7 +2141,7 @@ MulterModule.registerAsync({
 });
 ```
 
-与其他[工厂提供程序](https://docs.nestjs.cn/8/fundamentals?id=%e5%b7%a5%e5%8e%82%e6%8f%90%e4%be%9b%e8%80%85-usefactory)一样，我们的工厂函数可以是异步的，并且可以通过 `inject` 选项注入依赖。
+与其他工厂提供程序一样，我们的工厂函数可以是异步的，并且可以通过注入注入依赖。
 
 ```typescript
 MulterModule.registerAsync({
@@ -2171,7 +2160,7 @@ MulterModule.registerAsync({
 });
 ```
 
-上面的构造在 `MulterModule` 中实例化 `MulterConfigService` ，使用它来创建所需的选项对象。注意，在本例中，`MulterConfigService` 必须实现 `MulterOptionsFactory` 接口，如下所示。`MulterModule` 将在提供的类的实例化对象上调用 `createMulterOptions()` 方法。
+上面的构造在 `MulterModule` 中实例化 `MulterConfigService` ，使用它来创建所需的 `options` 对象。注意，在本例中，`MulterConfigService` 必须实现 `MulterOptionsFactory` 接口，如下所示。`MulterModule` 将在提供的类的实例化对象上调用 `createMulterOptions()` 方法。
 
 ```typescript
 @Injectable()
@@ -2184,7 +2173,7 @@ class MulterConfigService implements MulterOptionsFactory {
 }
 ```
 
-如果你想要重复使用一个已经存在的选项提供者而不是在 `MulterModule` 内创建一个私有的拷贝，使用 `useExisting` 语法。
+为了防止创建 `MulterConfigService` 内部 `MulterModule` 并使用从不同模块导入的提供程序，您可以使用  `useExisting` 语法。
 
 ```typescript
 MulterModule.registerAsync({
@@ -2192,10 +2181,6 @@ MulterModule.registerAsync({
   useExisting: ConfigService,
 });
 ```
-
-### 例子
-
-一个能够运行的样例[在这里](https://github.com/nestjs/nest/tree/master/sample/29-file-upload)。
 
 
 ## HTTP 模块

@@ -4367,7 +4367,7 @@ findAll(@Session() session: secureSession.Session) {
 
 ## MVC(模型-视图=控制器)
 
-`Nest` 默认使用 `Express` 库，因此有关` Express` 中的 `MVC`（模型 - 视图 - 控制器）模式的每个教程都与 `Nest` 相关。首先，让我们使用 `CLI` 工具搭建一个简单的 `Nest` 应用程序：
+`Nest` 默认使用 `Express` 库，因此，在 `Express` 中使用 `MVC` （模型 - 视图 - 控制器）模式的每一种技术同样适用于 `Nest` 。首先，让我们使用 `CLI` 工具搭建一个简单的 `Nest` 应用程序：
 
 ```bash
 $ npm i -g @nestjs/cli

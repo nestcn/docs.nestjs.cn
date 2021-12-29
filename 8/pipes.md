@@ -102,7 +102,7 @@ export class CreateCatDto {
 
 ## 对象结构验证
 
-有几种方法可以实现，一种常见的方式是使用**基于结构**的验证。[Joi](https://github.com/hapijs/joi) 库是允许您使用一个可读的 API 以非常简单的方式创建 schema，让我们俩试一下基于 Joi 的验证管道。
+有几种方法可以实现，一种常见的方式是使用**基于结构**的验证。[Joi](https://github.com/hapijs/joi) 库是允许您使用一个可读的 API 以非常简单的方式创建 schema，让我们来试一下基于 Joi 的验证管道。
 
 首先安装依赖：
 

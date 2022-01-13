@@ -303,6 +303,7 @@ this.client
 ```
 $ npm i --save redis
 ```
+> ps：如果你的 `redis` 无法使用，请尝试使用 `redis@^3`
 
 ### 概述
 

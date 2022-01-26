@@ -1501,7 +1501,7 @@ $ npm i --save @nestjs/config
 
 ### 开始使用
 
-安装完成之后，我们需要导入`ConfigModule`模块。通常，我们在根模块`AppModule`中导入它，并使用`。forRoot()`静态方法导入它的配置。
+安装完成之后，我们需要导入`ConfigModule`模块。通常，我们在根模块`AppModule`中导入它，并使用`.forRoot()`静态方法导入它的配置。
 
 ```typescript
 import { Module } from '@nestjs/common';

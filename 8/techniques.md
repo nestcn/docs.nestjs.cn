@@ -3670,7 +3670,7 @@ findAll(@Req() request: Request) {
 }
 ```
 
-?> `@Req()`装饰器从`@nestjs/common`中引入，`@Request`从`express`中引入。
+?> `@Req()`装饰器从`@nestjs/common`中引入，Request`从`express`中引入。
 
 要在输出的响应中附加`cookie`，使用`Response#cookie()`方法：
 

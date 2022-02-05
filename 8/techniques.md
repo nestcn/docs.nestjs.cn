@@ -3656,7 +3656,7 @@ app.use(cookieParser());
 - `secret`： 一个字符串或者数组，用来给`cookie`签名。如果不指定这个选项，将不解析签名的`cookie`。如果提供了一个字符串，那么它会被用来作为`secret`。如果提供了一个数组，将尝试依次使用其元素来作为`secret`解析`cookie`。
 - `option`：一个作为第二个参数传递给`cookie.parse`的对象，参见`[cookie](https://www.npmjs.org/package/cookie)`来了解更多内容。
 
-该中间件将从请求的头文件中解析`Cookie`并将其数据作为`req.cookies`暴露出来。如果提供了`secret`，将暴露为`req.signedCokkies`。这些属性以`cookie`名称和属性的键值对保存。
+该中间件将从请求的头文件中解析`Cookie`并将其数据作为`req.cookies`暴露出来。如果提供了`secret`，将暴露为`req.signedCookies`。这些属性以`cookie`名称和属性的键值对保存。
 
 当提供了`secret`时，该中间件将解析并验证所有签名的`cookie`并将其值从`req.cookies`移动到`req.signedCookies`。签名`cookie`是指包含`s:`前缀的`cookie`。验证失败的签名`cookie`值会被替换为`false`而不是被篡改过的值。
 
@@ -3670,7 +3670,7 @@ findAll(@Req() request: Request) {
 }
 ```
 
-?> `@Req()`装饰器从`@nestjs/common`中引入，`@Request`从`express`中引入。
+?> `@Req()`装饰器从`@nestjs/common`中引入，`Request`从`express`中引入。
 
 要在输出的响应中附加`cookie`，使用`Response#cookie()`方法：
 
@@ -3683,7 +3683,7 @@ findAll(@Res({ passthrough: true }) response: Response) {
 
 !> 如果你想把相应处理逻辑留给框架，需要将`passthrough`参数设置为`true`，如上所示。参见[这里](8/controllers)
 
-?> `@Res()`装饰器从`@nestjs/common`中引入，`@Response`从`express`中引入。
+?> `@Res()`装饰器从`@nestjs/common`中引入，`Response`从`express`中引入。
 
 ### 在`Fastify`中使用
 

@@ -178,7 +178,7 @@ definitionsFactory.generate({
 
 在代码优先方式中，您将只使用装饰器和 TypeScript 类来生成相应的 GraphQL schema。
 
-使用代码优先方式，首先要在配置对象里添加 `authSchemaFile` 这个属性：
+使用代码优先方式，首先要在配置对象里添加 `autoSchemaFile` 这个属性：
 
 ```typescript
 GraphQLModule.forRoot({
@@ -186,7 +186,7 @@ GraphQLModule.forRoot({
 }),
 ```
 
-这里 `autoSchemaFile` 属性值是您自动生成的 schema 文件将被创建的路径。或者，schema 也可以被实时创建在内存里。要开启它，需要设置 `authSchemaFile` 属性为 `true`:
+这里 `autoSchemaFile` 属性值是您自动生成的 schema 文件将被创建的路径。或者，schema 也可以被实时创建在内存里。要开启它，需要设置 `autoSchemaFile` 属性为 `true`:
 
 ```typescript
 GraphQLModule.forRoot({

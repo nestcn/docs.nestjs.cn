@@ -291,7 +291,7 @@ this.client
 
 ## Redis
 
-[Redis](https://redis.io/) 传输器实现了[Pub/Sub(发布/订阅)](https://redis.io/topics/pubsub)消息传递范例，并利用了 `Redis` 的 `[Pub/Sub](https://redis.io/topics/pubsub)` 特性。 已发布的消息按渠道分类，不知道哪些订阅者（如果有）最终会收到该消息。 每个微服务可以订阅任意数量的渠道。 此外，一次可以订阅多个频道。这意味着如果发布了一条消息，并且没有订阅者对此消息感兴趣，则该消息将被删除并且无法恢复。 因此，您不能保证消息或事件将至少由一项服务处理。 一条消息可以由多个订户订阅（并接收）。
+[Redis](https://redis.io/) 传输器实现了[Pub/Sub(发布/订阅)](https://redis.io/topics/pubsub)消息传递范例，并利用了 `Redis` 的 [Pub/Sub](https://redis.io/topics/pubsub) 特性。 已发布的消息按渠道分类，不知道哪些订阅者（如果有）最终会收到该消息。 每个微服务可以订阅任意数量的渠道。 此外，一次可以订阅多个频道。这意味着如果发布了一条消息，并且没有订阅者对此消息感兴趣，则该消息将被删除并且无法恢复。 因此，您不能保证消息或事件将至少由一项服务处理。 一条消息可以由多个订户订阅（并接收）。
 
 
 ![](https://docs.nestjs.com/assets/Redis_1.png)

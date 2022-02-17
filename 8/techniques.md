@@ -2272,7 +2272,7 @@ await this.cacheManager.reset();
 
 ### 自动缓存响应
 
-!> 在`[GraphQL](https://docs.nestjs.com/graphql/quick-start)`应用中，拦截器针对每个字段解析器分别运行，因此，`CacheModule`(使用拦截器来缓存响应)将无法正常工作。
+!> 在 [GraphQL](https://docs.nestjs.com/graphql/quick-start) 应用中，拦截器针对每个字段解析器分别运行，因此，`CacheModule`(使用拦截器来缓存响应)将无法正常工作。
 
 要启用自动缓存响应，只需在想缓存数据的地方绑定`CacheInterceptor`。
 

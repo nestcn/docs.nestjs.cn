@@ -4135,6 +4135,27 @@ export class FileController {
 }
 ```
 
+返回的默认类型是 `application/octet-stream`，如果你需要自定义响应类型，你可以使用 `res.set` 方法。
+
+```typescript
+import { Controller, Get, StreamableFile, Response } from '@nestjs/common';
+import { createReadStream } from 'fs';
+import { join } from 'path';
+
+@Controller('file')
+export class FileController {
+  @Get()
+  getFile(@Response({ passthrough: true }) res): StreamableFile {
+    const file = createReadStream(join(process.cwd(), 'package.json'));
+    res.set({
+      'Content-Type': 'application/json',
+      'Content-Disposition': 'attachment; filename="package.json"',
+    });
+    return new StreamableFile(file);
+  }
+}
+```
+
 ## HTTP 模块
 
 [Axios](https://github.com/axios/axios) 是功能很丰富的 `HTTP` 客户端, 广泛应用于许多应用程序中。这就是为什么 `Nest` 包装这个包, 并以内置模块 `HttpModule` 的形式暴露它。`HttpModule` 导出 `HttpService`, 它只是暴露了基于 Axios 的方法来执行 HTTP 请求, 而且还将返回类型转换为 `Observables`。

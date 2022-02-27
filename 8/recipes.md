@@ -1038,7 +1038,7 @@ export class UpdateCatDto extends IntersectionType(CreateCatDto, AdditionalCatIn
 ```
 ?> `IntersectionType()`从`@nestjs/swagger`中导入。
 
-类型映射函数是可以组合的。例如，下列示例将产生一个类（类型），其拥有`name`需要的`CreateCatDto`类型的所有属性，这些属性都被设置为可选的：
+类型映射函数是可以组合的。例如，下列示例将产生一个类（类型），其拥有`name`除外的`CreateCatDto`类型的所有属性，这些属性都被设置为可选的：
 ```typescript
 export class UpdateCatDto extends PartialType(
   OmitType(CreateCatDto, ['name'] as const),

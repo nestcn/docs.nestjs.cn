@@ -21,11 +21,14 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
 
 <img src="https://ghproxy.com/https://raw.githubusercontent.com/zuohuadong/imgbed/main/pic/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20211213153131.jpg" alt="加微信" width="260" height="260" align="bottom" />
 
+如果二维码过期，请添加：
 
-微信一二群 （由于超过100人，微信限制，请先添加好友）
 
 ![](https://ghproxy.com/https://raw.githubusercontent.com/zuohuadong/imgbed/main/pic/68747470733a2f2f7069632e646f776e6b2e63632f6974656d2f3566386336633334316364316262623836623732666339612e6a7067.jpg)    
 
+
+
+微信一二群，目前只接受 开源项目作者、nestjs 文档贡献者、捐赠者。
 
 
 
@@ -73,6 +76,10 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
 
 [《MongoDB从入门到商业实战》](https://union-click.jd.com/jdc?e=&p=JF8AAMQDIgZlGmsVARYBXRpaFTJWWA1FBCVbV0IUWVALHEpCAUdETlcNVQtHRRUBFgFdGloVHUtCCUZrY1BvZR1cHnBgS1MiQSxOVUR-U0g5Uw4eN1QrWx0GFARUGVwWMiIHUisNewITBlQaWhACFwRlGmsVBREAUBNdFAAQB10SaxICGzdVG14VABUCSR1dFAQSBlYbayUyETdlK1slASJFOx1YEQcVBQIYCBNQGwIHTgtGURBXBR5eQFEQDwUfWkYFIgVUGl8c)
 
+
+## 捐赠
+
+![image](https://user-images.githubusercontent.com/11203929/158335069-b51c4493-83f1-4abd-953f-a2e12dfdb8c5.png)
 
 
 

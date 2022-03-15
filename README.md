@@ -79,7 +79,7 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
 
 ## 捐赠
 
-![image](https://ghproxy.com/https://user-images.githubusercontent.com/11203929/158335069-b51c4493-83f1-4abd-953f-a2e12dfdb8c5.png)
+![image](https://user-images.githubusercontent.com/11203929/158335069-b51c4493-83f1-4abd-953f-a2e12dfdb8c5.png)
 
 
 

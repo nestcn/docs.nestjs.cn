@@ -653,7 +653,7 @@ export class CatsService {}
 ```typescript
 @Controller({
   path: 'cats',
-  scope: ,
+  scope: Scope.REQUEST,
 })
 export class CatsController {}
 ```

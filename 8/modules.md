@@ -110,7 +110,7 @@ export class CatsModule {}
 export class CoreModule {}
 ```
 
-# 依赖注入
+## 依赖注入
 
 提供者也可以注入到模块(类)中（例如，用于配置目的）：
 

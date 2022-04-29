@@ -1119,7 +1119,7 @@ findAll() {
 一个使用`AES(高级加密系统) aes-256-ctr`算法，CTR加密模式。
 
 ```TypeScript
-import { createCipheriv, randomBytes } from 'crypto';
+import { createCipheriv, randomBytes, scrypt } from 'crypto';
 import { promisify } from 'util';
 
 const iv = randomBytes(16);

@@ -93,7 +93,7 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
   
 科学工具：
 
-[最低月租5元](https://bbxy.cloud/auth/register?code=GPTR)    
+[BBXY-最低月租5元](https://bbxy.cloud/auth/register?code=GPTR)    
 [JMS 搬瓦工官方的科学上网工具](https://justmysocks3.net/members/aff.php?aff=6423)    
 
 捐赠通道：    

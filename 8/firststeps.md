@@ -245,7 +245,9 @@ $ npm run start
 
 [Onevps-不限流量](https://www.onevps.com/portal/aff.php?aff=12238)
 
-[JMS](https://justmysocks3.net/members/aff.php?aff=6423)
+[BBXY 工具-最低只需5元/月](https://bbxy.cloud/auth/register?code=GPTR)
+
+[JMS 工具](https://justmysocks3.net/members/aff.php?aff=6423)
 
 [【捐赠】](https://gitee.com/notadd/docs.nestjs.cn?donate=true)
 

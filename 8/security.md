@@ -98,7 +98,7 @@ export class UsersService {
 }
 ```
 
-在 `UsersModule` 中，惟一需要做的更改是将 `UsersService` 添加到 `@Module` 装饰器的 `exports` 数组中，以便提供给其他模块外部可见(我们很快将在 `AuthService` 中使用它)。
+在 `UsersModule` 中，唯一需要做的更改是将 `UsersService` 添加到 `@Module` 装饰器的 `exports` 数组中，以便提供给其他模块外部可见(我们很快将在 `AuthService` 中使用它)。
 
 > users/users.module.ts
 

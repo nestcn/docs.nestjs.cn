@@ -39,7 +39,7 @@ export class AuthGuard implements CanActivate {
 
 ## 执行上下文
 
-`canActivate()` 函数接收单个参数 `ExecutionContext` 实例。`ExecutionContext` 继承自 `ArgumentsHost` 。`ArgumentsHost` 是传递给原始处理程序的参数的包装器，在上面的示例中，我们只是使用了之前在 `ArgumentsHost`上定义的帮助器方法来获得对请求对象的引用。有关此主题的更多信息。你可以在[这里](exceptionfilters.md)了解到更多(在异常过滤器章节)。
+`canActivate()` 函数接收单个参数 `ExecutionContext` 实例。`ExecutionContext` 继承自 `ArgumentsHost` 。`ArgumentsHost` 是传递给原始处理程序的参数的包装器，在上面的示例中，我们只是使用了之前在 `ArgumentsHost`上定义的帮助器方法来获得对请求对象的引用。有关此主题的更多信息。你可以在[这里](/8/exceptionfilters?id=参数主机)了解到更多(在异常过滤器章节)。
 
 
 `ExecutionContext` 提供了更多功能，它扩展了 `ArgumentsHost`，但是也提供了有关当前执行过程的更多详细信息。

@@ -359,7 +359,7 @@ findOne(@Param('id', UserByIdPipe) userEntity: UserEntity) {
 
 ## 内置验证管道
 
-幸运的是，由于 `ValidationPipe` 和 `ParseIntPipe` 是内置管道，因此您不必自己构建这些管道（请记住， `ValidationPipe` 需要同时安装 `class-validator` 和 `class-transformer` 包）。与本章中构建ValidationPipe的示例相比，该内置的功能提供了更多的选项，为了说明管道的基本原理，该示例一直保持基本状态。您可以在[此处](/8/techniques/validation)找到完整的详细信息以及许多示例。
+幸运的是，由于 `ValidationPipe` 和 `ParseIntPipe` 是内置管道，因此您不必自己构建这些管道（请记住， `ValidationPipe` 需要同时安装 `class-validator` 和 `class-transformer` 包）。与本章中构建ValidationPipe的示例相比，该内置的功能提供了更多的选项，为了说明管道的基本原理，该示例一直保持基本状态。您可以在[此处](/8/techniques?id=验证)找到完整的详细信息以及许多示例。
 
 ### 译者署名
 

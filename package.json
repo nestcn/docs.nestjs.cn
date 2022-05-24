@@ -19,13 +19,6 @@
   "files": [
     "./"
   ],
-  "now": {
-    "alias": "docsify",
-    "env": {
-      "NODE_ENV": "production",
-      "DEBUG": "docsify"
-    }
-  },
   "docsify": {
     "template": "./ssr.html",
     "config": {

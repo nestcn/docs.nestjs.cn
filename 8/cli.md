@@ -75,7 +75,7 @@ nest commandOrAlias requiredArg [optionalArg] [options]
 $ nest new my-nest-project --dry-run
 ```
 
-在这里，`new` 是命令或别名。 新命令的别名为n.  `my-nest-project` 是必需的参数。 如果命令行上未提供所需的参数，则 `nest` 将提示您输入。 同样，`--dry-run` 也有一个类似的简写形式 `-d` 。 考虑到这一点，以下命令与上面的命令等效：
+在这里，`new` 是 *commandOrAlias*。 `new` 命令的别名为`n` .  `my-nest-project` 是 *requiredArg*。 如果命令行上未提供 *requiredArg*，则 `nest` 将提示您输入。 同样，`--dry-run` 也有一个类似的简写形式 `-d` 。 考虑到这一点，以下命令与上面的命令等效：
 
 ```bash
 $ nest n my-nest-project -d

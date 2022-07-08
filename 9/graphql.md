@@ -1104,59 +1104,6 @@ type Post {
 }
 ```
 
-## 插件
-
-插件能让你通过响应某些特定事件时执行自定义操作，来扩展 Apollo Server 的核心功能。现在，这些事件对应 GraphQL 请求生命周期的各个阶段，以及 Apollo Server 本身的启动阶段（参见[这里](https://www.apollographql.com/docs/apollo-server/integrations/plugins/)）。比如，一个基本的日志插件可能会记录每一个发送给 Apollo Server 请求的相关 GraphQL 查询字符串。
-
-
-### 自定义插件
-
-创建插件，首先要声明一个用 `@Plugin` 装饰器注释的类，这个装饰器是从 `@nestjs/graphql` 包里导出的。还有，为了更好的使用代码自动补全功能，我们要从 `Apollo-server-plugin-base` 包中实现 `ApolloServerPlugin` 这个接口。
-
-```typescript
-import { Plugin } from '@nestjs/graphql';
-import {
-  ApolloServerPlugin,
-  GraphQLRequestListener,
-} from 'apollo-server-plugin-base';
-
-@Plugin()
-export class LoggingPlugin implements ApolloServerPlugin {
-  requestDidStart(): GraphQLRequestListener {
-    console.log('Request started');
-    return {
-      willSendResponse() {
-        console.log('Will send response');
-      },
-    };
-  }
-}
-```
-
-有了下面这段代码，我们就可以将 `LoggingPlugin` 注册为一个提供者。
-
-```typescript
-@Module({
-  providers: [LoggingPlugin],
-})
-export class CommonModule {}
-```
-
-Nest 会自动实例化一个插件并将其应用于 Apollo 服务。
-
-### 使用外部插件
-
-有几个开箱即用的插件。使用一个现成的插件，只需将它导入并加入到 `plugins` 数组即可：
-
-```typescript
-GraphQLModule.forRoot({
-  // ...
-  plugins: [ApolloServerOperationRegistry({ /* options */})]
-}),
-```
-
-?> `ApolloServerOperationRegistry` 插件是从 `apollo-server-plugin-operation-registry` 包里导出的。
-
 
 ## 接口
 
@@ -1264,7 +1211,7 @@ export class CharactersResolver {
 ?> 所有装饰器都是从 `@nestjs/graphql` 包里导出。
 
 
-## 联合类型
+## 联合类型和枚举
 
 联合类型与接口非常相似，但是它们没有指定类型之间的任何公共字段（详情请参阅[这里](https://graphql.org/learn/schema/#union-types)）。联合类型对于单个字段返回不相交的数据类型很有用。
 
@@ -1400,6 +1347,135 @@ export class ResultUnionResolver {
 
 ?> 所有装饰器都是从 `@nestjs/graphql` 包里导出。
 
+### 枚举
+
+枚举类型是一种特殊的标量，它的值仅限于一组特定的允许值（详情请参阅[这里](https://graphql.org/learn/schema/#enumeration-types)）。这允许你：
+
+- 验证此类型的任何参数都是允许值之一
+- 通过类型系统传递一个字段，这个字段始终是一组有限的值之一
+
+#### 代码优先
+
+当使用代码优先方式时，你只需通过创建一个 TypeScript 枚举变量来定义一个 GraphQL 枚举类型。
+
+```typescript
+export enum AllowedColor {
+  RED,
+  GREEN,
+  BLUE,
+}
+```
+
+在这里，我们使用 `@nestjs/graphql` 包里的 `registerEnumType` 函数来注册 `AllowedColor` 枚举。
+
+```typescript
+registerEnumType(AllowedColor, {
+  name: 'AllowedColor',
+});
+```
+
+现在你可以在我们的类型中引用 `AllowedColor`：
+
+```typescript
+@Field(type => AllowedColor)
+favoriteColor: AllowedColor;
+```
+
+最终的结果是在 SDL 中生成以下部分的 GraphQL schema：
+
+```graphql
+enum AllowedColor {
+  RED
+  GREEN
+  BLUE
+}
+```
+
+要为枚举提供描述，可以将`description` 属性传递给 `registerEnumType()` 函数。
+
+```typescript
+registerEnumType(AllowedColor, {
+  name: 'AllowedColor',
+  description: 'The supported colors.',
+});
+```
+
+要为枚举值提供描述，或将值标记为已弃用，可以传递 `valuesMap` 属性，如下所示：
+
+```typescript
+registerEnumType(AllowedColor, {
+  name: 'AllowedColor',
+  description: 'The supported colors.',
+  valuesMap: {
+    RED: {
+      description: 'The default color.',
+    },
+    BLUE: {
+      deprecationReason: 'Too blue.',
+    },
+  },
+});
+```
+
+最终在 SDL 中生成的 GraphQL schema 如下所示：
+
+```graphql
+"""
+The supported colors.
+"""
+enum AllowedColor {
+  """
+  The default color.
+  """
+  RED
+  GREEN
+  BLUE @deprecated(reason: "Too blue.")
+}
+
+```
+
+#### 模式优先
+
+在模式优先方式中定义一个枚举器，只需在 SDL 中创建一个 GraphQL 枚举类型。
+
+```graphql
+enum AllowedColor {
+  RED
+  GREEN
+  BLUE
+}
+```
+
+然后，你可以使用类型生成功能（如[快速开始](/8/graphql?id=快速开始)章节所示）生成相应的 TypeScript 定义。
+
+```typescript
+export enum AllowedColor {
+  RED
+  GREEN
+  BLUE
+}
+```
+
+有时，后端会在内部强制使用与公共 API 不同的枚举值。在这个例子中，API 包含 `RED`，然而在解析器中我们可能会使用 `#f00` 来替代（详情请参阅[此处](https://www.apollographql.com/docs/apollo-server/schema/custom-scalars/#internal-values)）。为此，需要给 `AllowedColor` 枚举声明一个解析器对象：
+
+```typescript
+export const allowedColorResolver: Record<keyof typeof AllowedColor, any> = {
+  RED: '#f00',
+};
+```
+
+?> 所有装饰器都是从 `@nestjs/graphql` 包里导出。
+
+然后，将此解析器对象与 `GraphQLModule#forRoot()` 方法的 `resolvers` 属性一起使用，如下所示：
+
+```typescript
+GraphQLModule.forRoot({
+  resolvers: {
+    AllowedColor: allowedColorResolver,
+  },
+});
+```
+
 ## 字段中间件
 
 !> 这一章节仅适用于代码优先方式。
@@ -1481,134 +1557,7 @@ GraphQLModule.forRoot({
 ?> 全局注册的字段中间件函数将在本地注册的中间件（那些直接绑定到特定字段上的）之前被执行。
 
 
-## 枚举
 
-枚举类型是一种特殊的标量，它的值仅限于一组特定的允许值（详情请参阅[这里](https://graphql.org/learn/schema/#enumeration-types)）。这允许你：
-
-- 验证此类型的任何参数都是允许值之一
-- 通过类型系统传递一个字段，这个字段始终是一组有限的值之一
-
-### 代码优先
-
-当使用代码优先方式时，你只需通过创建一个 TypeScript 枚举变量来定义一个 GraphQL 枚举类型。
-
-```typescript
-export enum AllowedColor {
-  RED,
-  GREEN,
-  BLUE,
-}
-```
-
-在这里，我们使用 `@nestjs/graphql` 包里的 `registerEnumType` 函数来注册 `AllowedColor` 枚举。
-
-```typescript
-registerEnumType(AllowedColor, {
-  name: 'AllowedColor',
-});
-```
-
-现在你可以在我们的类型中引用 `AllowedColor`：
-
-```typescript
-@Field(type => AllowedColor)
-favoriteColor: AllowedColor;
-```
-
-最终的结果是在 SDL 中生成以下部分的 GraphQL schema：
-
-```graphql
-enum AllowedColor {
-  RED
-  GREEN
-  BLUE
-}
-```
-
-要为枚举提供描述，可以将`description` 属性传递给 `registerEnumType()` 函数。
-
-```typescript
-registerEnumType(AllowedColor, {
-  name: 'AllowedColor',
-  description: 'The supported colors.',
-});
-```
-
-要为枚举值提供描述，或将值标记为已弃用，可以传递 `valuesMap` 属性，如下所示：
-
-```typescript
-registerEnumType(AllowedColor, {
-  name: 'AllowedColor',
-  description: 'The supported colors.',
-  valuesMap: {
-    RED: {
-      description: 'The default color.',
-    },
-    BLUE: {
-      deprecationReason: 'Too blue.',
-    },
-  },
-});
-```
-
-最终在 SDL 中生成的 GraphQL schema 如下所示：
-
-```graphql
-"""
-The supported colors.
-"""
-enum AllowedColor {
-  """
-  The default color.
-  """
-  RED
-  GREEN
-  BLUE @deprecated(reason: "Too blue.")
-}
-
-```
-
-### 模式优先
-
-在模式优先方式中定义一个枚举器，只需在 SDL 中创建一个 GraphQL 枚举类型。
-
-```graphql
-enum AllowedColor {
-  RED
-  GREEN
-  BLUE
-}
-```
-
-然后，你可以使用类型生成功能（如[快速开始](/8/graphql?id=快速开始)章节所示）生成相应的 TypeScript 定义。
-
-```typescript
-export enum AllowedColor {
-  RED
-  GREEN
-  BLUE
-}
-```
-
-有时，后端会在内部强制使用与公共 API 不同的枚举值。在这个例子中，API 包含 `RED`，然而在解析器中我们可能会使用 `#f00` 来替代（详情请参阅[此处](https://www.apollographql.com/docs/apollo-server/schema/custom-scalars/#internal-values)）。为此，需要给 `AllowedColor` 枚举声明一个解析器对象：
-
-```typescript
-export const allowedColorResolver: Record<keyof typeof AllowedColor, any> = {
-  RED: '#f00',
-};
-```
-
-?> 所有装饰器都是从 `@nestjs/graphql` 包里导出。
-
-然后，将此解析器对象与 `GraphQLModule#forRoot()` 方法的 `resolvers` 属性一起使用，如下所示：
-
-```typescript
-GraphQLModule.forRoot({
-  resolvers: {
-    AllowedColor: allowedColorResolver,
-  },
-});
-```
 
 ## 映射类型
 
@@ -1747,6 +1696,58 @@ export class UpdateUserInput extends PartialType(
 ) {}
 ```
 
+## 插件
+
+插件能让你通过响应某些特定事件时执行自定义操作，来扩展 Apollo Server 的核心功能。现在，这些事件对应 GraphQL 请求生命周期的各个阶段，以及 Apollo Server 本身的启动阶段（参见[这里](https://www.apollographql.com/docs/apollo-server/integrations/plugins/)）。比如，一个基本的日志插件可能会记录每一个发送给 Apollo Server 请求的相关 GraphQL 查询字符串。
+
+
+### 自定义插件
+
+创建插件，首先要声明一个用 `@Plugin` 装饰器注释的类，这个装饰器是从 `@nestjs/graphql` 包里导出的。还有，为了更好的使用代码自动补全功能，我们要从 `Apollo-server-plugin-base` 包中实现 `ApolloServerPlugin` 这个接口。
+
+```typescript
+import { Plugin } from '@nestjs/graphql';
+import {
+  ApolloServerPlugin,
+  GraphQLRequestListener,
+} from 'apollo-server-plugin-base';
+
+@Plugin()
+export class LoggingPlugin implements ApolloServerPlugin {
+  requestDidStart(): GraphQLRequestListener {
+    console.log('Request started');
+    return {
+      willSendResponse() {
+        console.log('Will send response');
+      },
+    };
+  }
+}
+```
+
+有了下面这段代码，我们就可以将 `LoggingPlugin` 注册为一个提供者。
+
+```typescript
+@Module({
+  providers: [LoggingPlugin],
+})
+export class CommonModule {}
+```
+
+Nest 会自动实例化一个插件并将其应用于 Apollo 服务。
+
+### 使用外部插件
+
+有几个开箱即用的插件。使用一个现成的插件，只需将它导入并加入到 `plugins` 数组即可：
+
+```typescript
+GraphQLModule.forRoot({
+  // ...
+  plugins: [ApolloServerOperationRegistry({ /* options */})]
+}),
+```
+
+?> `ApolloServerOperationRegistry` 插件是从 `apollo-server-plugin-operation-registry` 包里导出的。
 
 ## 复杂性
 

@@ -1,5 +1,9 @@
 # 秘籍
 
+## REPL
+
+（待翻译）
+
 ## CRUD生成器
 
 在一个项目的生命周期中，当我们新增特性的时候，我们通常需要在应用中添加新的资源。这些资源通常需要我们在每次新增资源的时候进行一些重复操作。
@@ -297,6 +301,15 @@ $ npm run start:dev
 ```
 
 [这里](https://github.com/nestjs/nest/tree/master/sample/08-webpack)有一个可用的例子
+
+## mikroorm
+
+(待翻译)
+
+
+
+
+
 
 
 ## TypeORM
@@ -2342,6 +2355,14 @@ export class AppModule {}
 ### 总结
 
 这里有一个工作[示例](https://github.com/nestjs/nest/tree/master/sample/24-serve-static)。
+
+
+## Nest 构建命令行程序
+
+！！！ 待翻译
+
+
+
 
 
  ### 译者署名

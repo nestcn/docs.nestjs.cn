@@ -1,42 +1,42 @@
-- [介绍](8/introduction)
+- [介绍](9/introduction)
 
 - 概述
-  - [第一步](8/firststeps)
-  - [控制器](8/controllers)
-  - [提供者](8/providers)
-  - [模块](8/modules)
-  - [中间件](8/middlewares)
-  - [异常过滤器](8/exceptionfilters)  
-  - [管道](8/pipes)
-  - [守卫](8/guards)
-  - [拦截器](8/interceptors)
-  - [自定义装饰器](8/customdecorators)
-  - [相关资料](8/awesome)
-  - [关于翻译](8/about)
+  - [第一步](9/firststeps)
+  - [控制器](9/controllers)
+  - [提供者](9/providers)
+  - [模块](9/modules)
+  - [中间件](9/middlewares)
+  - [异常过滤器](9/exceptionfilters)  
+  - [管道](9/pipes)
+  - [守卫](9/guards)
+  - [拦截器](9/interceptors)
+  - [自定义装饰器](9/customdecorators)
+  - [相关资料](9/awesome)
+  - [关于翻译](9/about)
 
-- [基本原理](8/fundamentals)
+- [基本原理](9/fundamentals)
 
-- [技术](8/techniques)
+- [技术](9/techniques)
 
-- [安全](8/security)
+- [安全](9/security)
 
-- [GraphQL](8/graphql)
+- [GraphQL](9/graphql)
 
-- [WEBSOCKETS](8/websockets)
+- [WEBSOCKETS](9/websockets)
 
-- [微服务](8/microservices)
+- [微服务](9/microservices)
 
-- [独立应用](8/standalone-applications)
+- [独立应用](9/standalone-applications)
 
-- [CLI](8/cli)
+- [CLI](9/cli)
 
-- [OPENAPI](8/openapi)
+- [OPENAPI](9/openapi)
 
-- [秘籍](8/recipes)
+- [秘籍](9/recipes)
 
-- [FAQ](8/faq)
+- [FAQ](9/faq)
 
-- [迁移指南](8/migrationguide)
+- [迁移指南](9/migrationguide)
 
-- [谁在使用 Nest](8/discover)
+- [谁在使用 Nest](9/discover)
 

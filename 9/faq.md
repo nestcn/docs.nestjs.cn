@@ -4,6 +4,11 @@
 
 【待翻译】
 
+
+
+
+
+
 ## HTTP 适配器
 
 有时，您可能希望在 `Nest` 应用程序上下文中或从外部访问底层 `HTTP` 服务器。
@@ -58,6 +63,17 @@ const instance = httpAdapter.getInstance();
 const app = await NestFactory.create(ApplicationModule);
 app.setGlobalPrefix('v1');
 ```
+
+## raw-body
+
+
+
+！！！待翻译
+
+
+
+
+
 
 ## 混合应用
 

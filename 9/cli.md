@@ -689,8 +689,8 @@ $ nest add <name> [options]
 
 |选项|描述|
 |---|--|
-|`--force`|做升级而不是更新别名: -f|
-|`--tag`|更新为标记版本（使用 `@latest`，`@<tag>`等）别名-wt|
+|`--force`|做升级而不是更新<br />别名: -f|
+|`--tag`|更新为标记版本（使用 `@latest`，`@<tag>`等）<br />别名: -t|
 
 
 ### nest info

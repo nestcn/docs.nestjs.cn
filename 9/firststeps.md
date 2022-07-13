@@ -52,7 +52,7 @@ wget -qO- https://ghproxy.com/https://raw.githubusercontent.com/nvm-sh/nvm/v0.38
 使用淘宝加速下载（可选）
 
 ```
-export NVM_NODEJS_ORG_MIRROR=https://npm.taobao.org/mirrors/node
+export NVM_NODEJS_ORG_MIRROR=https://cdn.npmmirror.com/binaries/node
 ```
 
 使用 NVM 安装 nodejs ：

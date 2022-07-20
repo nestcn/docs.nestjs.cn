@@ -180,7 +180,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 }
 ```
 
-我们遵循了前面描述的所有护照策略。在我们的 `passport-local` 用例中，没有配置选项，因此我们的构造函数只是调用 `super()` ，没有 `options` 对象。
+我们遵循了前面描述的所有`Passport`策略。在我们的 `passport-local` 用例中，没有配置选项，因此我们的构造函数只是调用 `super()` ，没有 `options` 对象。
 
 我们还实现了 `validate()` 方法。对于每个策略，`Passport` 将使用适当的特定于策略的一组参数调用 `verify` 函数(使用 `@nestjs/Passport` 中的 `validate()` 方法实现)。对于本地策略，`Passport` 需要一个具有以下签名的 `validate()` 方法: `validate(username: string, password: string): any`。
 
@@ -225,7 +225,7 @@ export class AuthModule {}
 
 ### 登录路由
 
-有了这个策略，我们现在就可以实现一个简单的 `/auth/login` 路由，并应用内置的守卫来启动护照本地流。
+有了这个策略，我们现在就可以实现一个简单的 `/auth/login` 路由，并应用内置的守卫来启动 `Passport-local` 流。
 打开 `app.controller.ts` 文件，并将其内容替换为以下内容:
 
 > app.controller.ts
@@ -244,7 +244,7 @@ export class AppController {
 }
 ```
 
-对于 `@UseGuard(AuthGuard('local'))`，我们使用的是一个 `AuthGuard` ，它是在我们扩展护照-本地策略时 `@nestjs/passportautomatic` 为我们准备的。我们来分析一下。我们的 `Passport` 本地策略默认名为`"local"` 。我们在 `@UseGuards()` 装饰器中引用这个名称，以便将它与护照本地包提供的代码关联起来。这用于消除在应用程序中有多个 `Passport` 策略时调用哪个策略的歧义(每个策略可能提供一个特定于策略的 `AuthGuard` )。虽然到目前为止我们只有一个这样的策略，但我们很快就会添加第二个，所以这是消除歧义所需要的。
+对于 `@UseGuard(AuthGuard('local'))`，我们使用的是一个 `AuthGuard` ，它是在我们扩展 `Passport-local` 策略时 `@nestjs/passportautomatic` 为我们准备的。我们来分析一下。我们的 `Passport` 本地策略默认名为`"local"` 。我们在 `@UseGuards()` 装饰器中引用这个名称，以便将它与 `Passport-local` 包提供的代码关联起来。这用于消除在应用程序中有多个 `Passport` 策略时调用哪个策略的歧义(每个策略可能提供一个特定于策略的 `AuthGuard` )。虽然到目前为止我们只有一个这样的策略，但我们很快就会添加第二个，所以这是消除歧义所需要的。
 
 为了测试我们的路由，我们将 `/auth/login` 路由简单地返回用户。这还允许我们演示另一个 `Passport` 特性: `Passport` 根据从 `validate()` 方法返回的值自动创建一个 `user` 对象，并将其作为 `req.user` 分配给请求对象。稍后，我们将用创建并返回 `JWT` 的代码替换它。
 
@@ -292,7 +292,7 @@ $ npm install @types/passport-jwt --save-dev
 
 `@nest/jwt` 包是一个实用程序包，可以帮助 `jwt` 操作。`passport-jwt` 包是实现 `JWT` 策略的 `Passport`包，`@types/passport-jwt` 提供 `TypeScript` 类型定义。
 
-让我们仔细看看如何处理 `POST`  `/auth/login` 请求。我们使用护照本地策略提供的内置`AuthGuard` 来装饰路由。这意味着:
+让我们仔细看看如何处理 `POST`  `/auth/login` 请求。我们使用 `Passport-local` 策略提供的内置`AuthGuard` 来装饰路由。这意味着:
 
 1. 只有在了用户之后，才会调用路由处理程序
 
@@ -413,7 +413,7 @@ $ # Note: above JWT truncated
 
 ### 实施 Passport JWT
 
-我们现在可以处理我们的最终需求:通过要求在请求时提供有效的 `JWT` 来保护端点。护照对我们也有帮助。它提供了用于用 `JSON Web` 标记保护 `RESTful` 端点的 `passport-jwt` 策略。在 `auth` 文件夹中 `jwt.strategy.ts`，并添加以下代码:
+我们现在可以处理我们的最终需求:通过要求在请求时提供有效的 `JWT` 来保护端点。`Passport` 对我们也有帮助。它提供了用于用 `JSON Web` 标记保护 `RESTful` 端点的 `passport-jwt` 策略。在 `auth` 文件夹中 `jwt.strategy.ts`，并添加以下代码:
 
 > auth/jwt.strategy.ts 
 
@@ -443,7 +443,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
 - `jwtFromRequest`:提供从请求中提取 `JWT` 的方法。我们将使用在 `API` 请求的授权头中提供`token`的标准方法。这里描述了其他选项。
 
-`ignoreExpiration`:为了明确起见，我们选择默认的 `false` 设置，它将确保 `JWT` 没有过期的责任委托给 `Passport` 模块。这意味着，如果我们的路由提供了一个过期的 `JWT` ，请求将被拒绝，并发送 `401` 未经授权的响应。护照会自动为我们办理。
+`ignoreExpiration`:为了明确起见，我们选择默认的 `false` 设置，它将确保 `JWT` 没有过期的责任委托给 `Passport` 模块。这意味着，如果我们的路由提供了一个过期的 `JWT` ，请求将被拒绝，并发送 `401` 未经授权的响应。`Passport` 会自动为我们办理。
 
 `secret orkey`:我们使用权宜的选项来提供对称的秘密来签署令牌。其他选项，如 `pemo` 编码的公钥，可能更适合于生产应用程序(有关更多信息，请参见[此处](https://github.com/mikenicholson/passport-jwt#extracting-the-jwt-from-the-request))。如前所述，无论如何，不要把这个秘密公开。
 
@@ -532,13 +532,13 @@ $ curl http://localhost:3000/profile -H "Authorization: Bearer eyJhbGciOiJIUzI1N
 $ # result -> {"userId":1,"username":"john"}
 ```
 
-注意，在 `AuthModule` 中，我们将 `JWT` 配置为 `60` 秒过期。这个过期时间可能太短了，而处理令牌过期和刷新的细节超出了本文的范围。然而，我们选择它来展示`JWT` 的一个重要品质和 `jwt` 护照战略。如果您在验证之后等待 `60` 秒再尝试 `GET /profile` 请求，您将收到 `401` 未授权响应。这是因为 `Passport` 会自动检查 `JWT` 的过期时间，从而省去了在应用程序中这样做的麻烦。
+注意，在 `AuthModule` 中，我们将 `JWT` 配置为 `60` 秒过期。这个过期时间可能太短了，而处理令牌过期和刷新的细节超出了本文的范围。然而，我们选择它来展示`JWT` 的一个重要品质和  `Passport-jwt` 策略。如果您在验证之后等待 `60` 秒再尝试 `GET /profile` 请求，您将收到 `401` 未授权响应。这是因为 `Passport` 会自动检查 `JWT` 的过期时间，从而省去了在应用程序中这样做的麻烦。
 
 我们现在已经完成了 `JWT` 身份验证实现。`JavaScript` 客户端(如 `Angular/React/Vue` )和其他 `JavaScript` 应用程序现在可以安全地与我们的 `API` 服务器进行身份验证和通信。在[这里](https://github.com/nestjs/nest/tree/master/sample/19-auth-jwt)可以看到本节完整的程序代码。
 
 ### 默认策略
 
-在我们的 `AppController` 中，我们在 `@AuthGuard()` 装饰器中传递策略的名称。我们需要这样做，因为我们已经介绍了两种 `Passport` 策略(护照本地策略和护照 `jwt` 策略)，这两种策略都提供了各种 `Passport` 组件的实现。传递名称可以消除我们链接到的实现的歧义。当应用程序中包含多个策略时，我们可以声明一个默认策略，这样如果使用该默认策略，我们就不必在 `@AuthGuard` 装饰器中传递名称。下面介绍如何在导入 `PassportModule` 时注册默认策略。这段代码将进入 `AuthModule` :
+在我们的 `AppController` 中，我们在 `@AuthGuard()` 装饰器中传递策略的名称。我们需要这样做，因为我们已经介绍了两种 `Passport` 策略(`Passport-local` 策略和`Passport-jwt` 策略)，这两种策略都提供了各种 `Passport` 组件的实现。传递名称可以消除我们链接到的实现的歧义。当应用程序中包含多个策略时，我们可以声明一个默认策略，这样如果使用该默认策略，我们就不必在 `@AuthGuard` 装饰器中传递名称。下面介绍如何在导入 `PassportModule` 时注册默认策略。这段代码将进入 `AuthModule` :
 
 要确定默认策略行为，您可以注册 `PassportModule` 。
 

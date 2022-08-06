@@ -980,7 +980,7 @@ export class UpdateCatDto extends PartialType(CreateCatDto) {}
 ```
 ?> `PartialType()`从`@nestjs/swagger`中导入。
 
-`PickTYpe()`功能从一个输入类型中选择一部分属性来创建一个新类型（类）。例如，我们由如下类型开始：
+`PickType()`功能从一个输入类型中选择一部分属性来创建一个新类型（类）。例如，我们由如下类型开始：
 
 ```typescript
 import { ApiProperty } from '@nestjs/swagger';
@@ -997,11 +997,11 @@ export class CreateCatDto {
 }
 ```
 
-我们可以使用PickTYpe()函数从这个类中选取一部分属性：
+我们可以使用PickType()函数从这个类中选取一部分属性：
 ```typescript
 export class UpdateCatAgeDto extends PickType(CreateCatDto, ['age'] as const) {}
 ```
-?> `PartialType()`从`@nestjs/swagger`中导入。
+?> `PickType()`从`@nestjs/swagger`中导入。
 
 `OmitType()`函数从一个输入类型中取出所有属性然后移除一些键。例如，我们由如下类型开始：
 

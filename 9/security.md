@@ -353,7 +353,7 @@ export const jwtConstants = {
 现在,在`auth` 文件夹下 `auth.module.ts`，并更新它看起来像这样:
 
 ```typescript
-auth/auth.module.tsJS
+auth/auth.module.ts
 
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';

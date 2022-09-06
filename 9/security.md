@@ -294,7 +294,7 @@ $ npm install @types/passport-jwt --save-dev
 
 让我们仔细看看如何处理 `POST`  `/auth/login` 请求。我们使用 `Passport-local` 策略提供的内置`AuthGuard` 来装饰路由。这意味着:
 
-1. 只有在了用户之后，才会调用路由处理程序
+1. 只有在用户验证通过之后，才会调用路由处理程序
 
 2. req参数将包含一个用户属性(在passport-local 身份验证流期间由 `Passport` 填充)
 

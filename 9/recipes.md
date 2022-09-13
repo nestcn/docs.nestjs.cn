@@ -326,7 +326,7 @@ $ npm run start:dev
 在开始使用这个库前，我们必须安装所有必需的依赖关系
 
 ```bash
-$ npm install --save typeorm mysql
+$ npm install --save typeorm mysql2
 ```
 
 我们需要做的第一步是使用从 `typeorm` 包导入的 `createConnection()` 函数建立与数据库的连接。`createConnection()` 函数返回一个 `Promise`，因此我们必须创建一个[异步提供者](/8/fundamentals.md?id=异步提供者 ( `Asynchronous providers` ))。
@@ -334,26 +334,32 @@ $ npm install --save typeorm mysql
 > database.providers.ts
 
 ```typescript
-import { createConnection } from 'typeorm';
+import { DataSource } from 'typeorm';
 
 export const databaseProviders = [
   {
-    provide: 'DATABASE_CONNECTION',
-    useFactory: async () => await createConnection({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: 'root',
-      database: 'test',
-      entities: [
-          __dirname + '/../**/*.entity{.ts,.js}',
-      ],
-      synchronize: true,
-    }),
+    provide: 'DATA_SOURCE',
+    useFactory: async () => {
+      const dataSource = new DataSource({
+        type: 'mysql',
+        host: 'localhost',
+        port: 3306,
+        username: 'root',
+        password: 'root',
+        database: 'test',
+        entities: [
+            __dirname + '/../**/*.entity{.ts,.js}',
+        ],
+        synchronize: true,
+      });
+
+      return dataSource.initialize();
+    },
   },
 ];
 ```
+
+!> 警告：设置 synchronize: true 不能被用于生产环境，否则您可能会丢失生产环境数据。
 
 ?> 按照最佳实践，我们在分离的文件中声明了自定义提供者，该文件带有 `*.providers.ts` 后缀。
 
@@ -412,14 +418,14 @@ export class Photo {
 > photo.providers.ts
 
 ```typescript
-import { Connection, Repository } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { Photo } from './photo.entity';
 
 export const photoProviders = [
   {
     provide: 'PHOTO_REPOSITORY',
-    useFactory: (connection: Connection) => connection.getRepository(Photo),
-    inject: ['DATABASE_CONNECTION'],
+    useFactory: (dataSource: DataSource) => dataSource.getRepository(Photo),
+    inject: ['DATA_SOURCE'],
   },
 ];
 ```
@@ -441,7 +447,7 @@ import { Photo } from './photo.entity';
 export class PhotoService {
   constructor(
     @Inject('PHOTO_REPOSITORY')
-    private readonly photoRepository: Repository<Photo>,
+    private photoRepository: Repository<Photo>,
   ) {}
 
   async findAll(): Promise<Photo[]> {

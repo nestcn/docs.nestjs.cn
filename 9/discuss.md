@@ -6,9 +6,16 @@
 
 ### QQ 群
 
-一群（2000人群）：  [277386223](https://jq.qq.com/?_wv=1027&k=aaetFYo1)
 
-二群（1000人群）： [1031015552](https://jq.qq.com/?_wv=1027&k=Ay5jLfqo)
+二群（2000人群）： [1031015552](https://jq.qq.com/?_wv=1027&k=Ay5jLfqo)
+
+
+三群： [321735506 （禁止广告）]()
+
+
+### TG 群
+
+[点击加入 TG 群](https://t.me/+TCn0z6Z0wwKA_IFD)
 
 
 ### 微信交流群： 

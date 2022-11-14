@@ -171,6 +171,8 @@ $ nest new project-name
 
 <!-- tabs:end -->
 
+?> 要创建启用 TypeScript `strict`模式的新项目，请将 `--strict` 标志传递给 `nest new` 命令
+
 将会创建 `project-name` 目录， 安装 node_modules 和一些其他样板文件，并将创建一个 `src` 目录，目录中包含几个核心文件。
 
 ```

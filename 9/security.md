@@ -14,7 +14,7 @@
 
 - 将有关经过身份验证的用户的信息附加到请求对象，以便在路由处理程序中进一步使用
 
-`Passport`具有丰富的策略生态系统，可实施各种身份验证机制。 尽管概念上很简单，但是您可以选择的 `Passport` 策略集非常多，并且有很多种类。 `Passport` 将这些不同的步骤抽象为标准模式，而 `@nestjs/passport` 模块将该模式包装并标准化为熟悉的Nest构造。
+`Passport`具有丰富的策略生态系统，可实施各种身份验证机制。 尽管概念上很简单，但是您可以选择的 `Passport` 策略集非常多，并且有很多种类。 `Passport` 将这些不同的步骤抽象为标准模式，而 `@nestjs/passport` 模块将该模式包装并标准化为熟悉的 Nest 构造。
 
 在本章中，我们将使用这些强大而灵活的模块为 `RESTful API`服务器实现完整的端到端身份验证解决方案。您可以使用这里描述的概念来实现 `Passport` 策略，以定制您的身份验证方案。您可以按照本章中的步骤来构建这个完整的示例。您可以在[这里](https://github.com/nestjs/nest/tree/master/sample/19-auth-jwt)找到带有完整示例应用程序的存储库。
 
@@ -43,7 +43,7 @@ $ npm install --save-dev @types/passport-local
 
 2. "验证回调"，在这里您可以告诉 `Passport` 如何与您的用户存储交互(在这里您可以管理用户帐户)。在这里，验证用户是否存在(或创建一个新用户)，以及他们的凭据是否有效。`Passport` 库期望这个回调在验证成功时返回完整的用户消息，在验证失败时返回 `null`(失败定义为用户没有找到，或者在使用 `Passport-local` 的情况下，密码不匹配)。
 
-使用 `@nestjs/passport` ，您可以通过扩展 `PassportStrategy` 类来配置 `passport` 策略。通过调用子类中的 `super()` 方法传递策略选项(上面第1项)，可以选择传递一个 `options` 对象。通过在子类中实现 `validate()` 方法，可以提供`verify` 回调(上面第2项)。
+使用 `@nestjs/passport` ，您可以通过扩展 `PassportStrategy` 类来配置 `passport` 策略。通过调用子类中的 `super()` 方法传递策略选项(上面第 1 项)，可以选择传递一个 `options` 对象。通过在子类中实现 `validate()` 方法，可以提供`verify` 回调(上面第 2 项)。
 
 我们将从生成一个 `AuthModule` 开始，其中有一个 `AuthService` :
 
@@ -93,7 +93,7 @@ export class UsersService {
   }
 
   async findOne(username: string): Promise<User | undefined> {
-    return this.users.find(user => user.username === username);
+    return this.users.find((user) => user.username === username);
   }
 }
 ```
@@ -154,7 +154,7 @@ import { UsersModule } from '../users/users.module';
 export class AuthModule {}
 ```
 
-现在我们可以实现 `Passport` 本地身份验证策略。在auth文件夹中创建一个名为 `local.strategy.ts` 文件，并添加以下代码:
+现在我们可以实现 `Passport` 本地身份验证策略。在 auth 文件夹中创建一个名为 `local.strategy.ts` 文件，并添加以下代码:
 
 > auth/local.strategy.ts
 
@@ -206,7 +206,7 @@ import { LocalStrategy } from './local.strategy';
 export class AuthModule {}
 ```
 
-###  内置 Passport 守卫
+### 内置 Passport 守卫
 
 守卫章节描述了守卫的主要功能:确定请求是否由路由处理程序。这仍然是正确的，我们将很快使用这个标准功能。但是，在使用 `@nestjs/passport` 模块的情况下，我们还将引入一个新的小问题，这个问题一开始可能会让人感到困惑，现在让我们来讨论一下。从身份验证的角度来看，您的应用程序可以以两种状态存在:
 
@@ -255,6 +255,7 @@ $ # POST to /auth/login
 $ curl -X POST http://localhost:3000/auth/login -d '{"username": "john", "password": "changeme"}' -H "Content-Type: application/json"
 $ # result -> {"userId":1,"username":"john"}
 ```
+
 如果上述内容可以正常工作，可以通过直接将策略名称传递给`AuthGuard()`来引入代码库中的魔术字符串。作为替代，我们推荐创建自己的类，如下所示：
 
 > auth/local-auth.guard.ts
@@ -277,11 +278,11 @@ async login(@Request() req) {
 
 ### JWT 功能
 
-我们已经准备好进入JWT部分的认证系统。让我们回顾并完善我们的需求:
+我们已经准备好进入 JWT 部分的认证系统。让我们回顾并完善我们的需求:
 
 - 允许用户使用用户名/密码进行身份验证，返回 `JWT` 以便在后续调用受保护的 `API` 端点时使用。我们正在努力满足这一要求。为了完成它，我们需要编写发出 `JWT` 的代码。
 
-- 创建基于`token` 的有效`JWT` 的存在而受保护的API路由。
+- 创建基于`token` 的有效`JWT` 的存在而受保护的 API 路由。
 
 我们需要安装更多的包来支持我们的 `JWT` 需求:
 
@@ -292,13 +293,13 @@ $ npm install @types/passport-jwt --save-dev
 
 `@nest/jwt` 包是一个实用程序包，可以帮助 `jwt` 操作。`passport-jwt` 包是实现 `JWT` 策略的 `Passport`包，`@types/passport-jwt` 提供 `TypeScript` 类型定义。
 
-让我们仔细看看如何处理 `POST`  `/auth/login` 请求。我们使用 `Passport-local` 策略提供的内置`AuthGuard` 来装饰路由。这意味着:
+让我们仔细看看如何处理 `POST` `/auth/login` 请求。我们使用 `Passport-local` 策略提供的内置`AuthGuard` 来装饰路由。这意味着:
 
 1. 只有在用户验证通过之后，才会调用路由处理程序
 
-2. req参数将包含一个用户属性(在passport-local 身份验证流期间由 `Passport` 填充)
+2. req 参数将包含一个用户属性(在 passport-local 身份验证流期间由 `Passport` 填充)
 
-考虑到这一点，我们现在终于可以生成一个真正的 `JWT` ，并以这种方式返回它。为了使我们的服务保持干净的模块化，我们将在 `authService` 中生成 `JWT` 。在auth文件夹中添加 `auth.service.ts` 文件，并添加 `login()` 方法，导入`JwtService` ，如下图所示:
+考虑到这一点，我们现在终于可以生成一个真正的 `JWT` ，并以这种方式返回它。为了使我们的服务保持干净的模块化，我们将在 `authService` 中生成 `JWT` 。在 auth 文件夹中添加 `auth.service.ts` 文件，并添加 `login()` 方法，导入`JwtService` ，如下图所示:
 
 > auth/auth.service.ts
 
@@ -309,10 +310,7 @@ import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly usersService: UsersService,
-    private readonly jwtService: JwtService
-  ) {}
+  constructor(private readonly usersService: UsersService, private readonly jwtService: JwtService) {}
 
   async validateUser(username: string, pass: string): Promise<any> {
     const user = await this.usersService.findOne(username);
@@ -336,7 +334,7 @@ export class AuthService {
 
 现在，我们需要更新 `AuthModule` 来导入新的依赖项并配置 `JwtModule` 。
 
-首先，在auth文件夹下创建 `auth/constants.ts`，并添加以下代码:
+首先，在 auth 文件夹下创建 `auth/constants.ts`，并添加以下代码:
 
 > auth/constants.ts
 
@@ -353,7 +351,7 @@ export const jwtConstants = {
 现在,在`auth` 文件夹下 `auth.module.ts`，并更新它看起来像这样:
 
 ```typescript
-auth/auth.module.ts
+auth / auth.module.ts;
 
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -379,7 +377,6 @@ export class AuthModule {}
 ```
 
 我们使用 `register()` 配置 `JwtModule` ，并传入一个配置对象。有关 `Nest JwtModule` 的更多信息请参见[此处](https://github.com/nestjs/jwt/blob/master/README.md)，有关可用配置选项的更多信息请参见[此处](https://github.com/auth0/node-jsonwebtoken#usage)。
-
 
 现在我们可以更新 `/auth/login` 路径来返回 `JWT` 。
 
@@ -415,7 +412,7 @@ $ # Note: above JWT truncated
 
 我们现在可以处理我们的最终需求:通过要求在请求时提供有效的 `JWT` 来保护端点。`Passport` 对我们也有帮助。它提供了用于用 `JSON Web` 标记保护 `RESTful` 端点的 `passport-jwt` 策略。在 `auth` 文件夹中 `jwt.strategy.ts`，并添加以下代码:
 
-> auth/jwt.strategy.ts 
+> auth/jwt.strategy.ts
 
 ```typescript
 import { ExtractJwt, Strategy } from 'passport-jwt';
@@ -449,7 +446,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
 `validate()` 方法值得讨论一下。对于 `JWT` 策略，`Passport` 首先验证 `JWT` 的签名并解码 `JSON `。然后调用我们的 `validate()` 方法，该方法将解码后的 `JSON` 作为其单个参数传递。根据 `JWT` 签名的工作方式，我们可以保证接收到之前已签名并发给有效用户的有效 `token` 令牌。
 
-因此，我们对 `validate()` 回调的响应很简单:我们只是返回一个包含 `userId` 和 `username` 属性的对象。再次回忆一下，`Passport` 将基于 `validate()` 方法的返回值构建一个`user`  对象，并将其作为属性附加到请求对象上。
+因此，我们对 `validate()` 回调的响应很简单:我们只是返回一个包含 `userId` 和 `username` 属性的对象。再次回忆一下，`Passport` 将基于 `validate()` 方法的返回值构建一个`user` 对象，并将其作为属性附加到请求对象上。
 
 同样值得指出的是，这种方法为我们留出了将其他业务逻辑注入流程的空间(就像"挂钩"一样)。例如，我们可以在 `validate()` 方法中执行数据库查询，以提取关于用户的更多信息，从而在请求中提供更丰富的用户对象。这也是我们决定进行进一步令牌验证的地方，例如在已撤销的令牌列表中查找 `userId` ，使我们能够执行令牌撤销。我们在示例代码中实现的模型是一个快速的 `"无状态JWT"` 模型，其中根据有效 `JWT` 的存在立即对每个 `API` 调用进行授权，并在请求管道中提供关于请求者(其 `userid` 和 `username`)的少量信息。
 
@@ -483,7 +480,6 @@ export class AuthModule {}
 ```
 
 通过导入 `JWT` 签名时使用的相同密钥，我们可以确保 `Passport` 执行的验证阶段和 `AuthService` 执行的签名阶段使用公共密钥。
-
 
 实现受保护的路由和 `JWT` 策略保护，我们现在可以实现受保护的路由及其相关的保护。
 
@@ -532,7 +528,7 @@ $ curl http://localhost:3000/profile -H "Authorization: Bearer eyJhbGciOiJIUzI1N
 $ # result -> {"userId":1,"username":"john"}
 ```
 
-注意，在 `AuthModule` 中，我们将 `JWT` 配置为 `60` 秒过期。这个过期时间可能太短了，而处理令牌过期和刷新的细节超出了本文的范围。然而，我们选择它来展示`JWT` 的一个重要品质和  `Passport-jwt` 策略。如果您在验证之后等待 `60` 秒再尝试 `GET /profile` 请求，您将收到 `401` 未授权响应。这是因为 `Passport` 会自动检查 `JWT` 的过期时间，从而省去了在应用程序中这样做的麻烦。
+注意，在 `AuthModule` 中，我们将 `JWT` 配置为 `60` 秒过期。这个过期时间可能太短了，而处理令牌过期和刷新的细节超出了本文的范围。然而，我们选择它来展示`JWT` 的一个重要品质和 `Passport-jwt` 策略。如果您在验证之后等待 `60` 秒再尝试 `GET /profile` 请求，您将收到 `401` 未授权响应。这是因为 `Passport` 会自动检查 `JWT` 的过期时间，从而省去了在应用程序中这样做的麻烦。
 
 我们现在已经完成了 `JWT` 身份验证实现。`JavaScript` 客户端(如 `Angular/React/Vue` )和其他 `JavaScript` 应用程序现在可以安全地与我们的 `API` 服务器进行身份验证和通信。在[这里](https://github.com/nestjs/nest/tree/master/sample/19-auth-jwt)可以看到本节完整的程序代码。
 
@@ -561,16 +557,17 @@ import { JwtStrategy } from './jwt.strategy';
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '60s' },
     }),
-    UsersModule
+    UsersModule,
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy],
   exports: [AuthService],
 })
 export class AuthModule {}
 ```
+
 ### 请求范围策略
 
-`passport`API基于将策略注册到库的全局实例。因此策略并没有设计为依赖请求的选项的或者根据每个请求动态生成实例（更多内容见[请求范围提供者](https://docs.nestjs.cn/8/fundamentals?id=%e6%89%80%e6%9c%89%e8%af%b7%e6%b1%82%e6%b3%a8%e5%85%a5)）。当你配置你的策略为请求范围时，`Nest`永远不会将其实例化，因为它并没有和任何特定路径绑定。并没有一个物理方法来决定哪个"请求范围"策略会根据每个请求执行。
+`passport`API 基于将策略注册到库的全局实例。因此策略并没有设计为依赖请求的选项的或者根据每个请求动态生成实例（更多内容见[请求范围提供者](https://docs.nestjs.cn/8/fundamentals?id=%e6%89%80%e6%9c%89%e8%af%b7%e6%b1%82%e6%b3%a8%e5%85%a5)）。当你配置你的策略为请求范围时，`Nest`永远不会将其实例化，因为它并没有和任何特定路径绑定。并没有一个物理方法来决定哪个"请求范围"策略会根据每个请求执行。
 
 然而，在策略中总有办法动态处理请求范围提供者。我们在这里利用[模块参考](https://docs.nestjs.cn/8/fundamentals?id=%e6%a8%a1%e5%9d%97%e5%8f%82%e8%80%83)特性。
 
@@ -590,7 +587,7 @@ constructor(private moduleRef: ModuleRef){
 
 在下一步中，请求的实例将被用于获取一个当前上下文标识，而不是生成一个新的（更多关于请求上下文的内容见[这里](https://docs.nestjs.cn/8/fundamentals?id=%e6%a8%a1%e5%9d%97%e5%8f%82%e8%80%83))。
 
-现在，在`LocalStrategy`类的`validate()`方法中，使用`ContextIdFactory`类中的`getByRequest()`方法来创建一个基于请求对象的上下文id，并将其传递给`resolve()`调用：
+现在，在`LocalStrategy`类的`validate()`方法中，使用`ContextIdFactory`类中的`getByRequest()`方法来创建一个基于请求对象的上下文 id，并将其传递给`resolve()`调用：
 
 ```typescript
 
@@ -613,12 +610,7 @@ async validate(
 在大多数情况下，使用一个提供的`AuthGuard`类是有用的。然而，在一些用例中你可能只是希望简单地扩展默认的错误处理或者认证逻辑。在这种情况下，你可以通过一个子类来扩展内置的类并且覆盖其方法。
 
 ```typescript
-
-import {
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
@@ -637,17 +629,16 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     return user;
   }
 }
-
-
 ```
 
 ### 自定义 Passport
- 
-根据所使用的策略，`Passport`会采用一系列影响库行为的属性。使用  `register()` 方法将选项对象直接传递给`Passport`实例。例如：
+
+根据所使用的策略，`Passport`会采用一系列影响库行为的属性。使用 `register()` 方法将选项对象直接传递给`Passport`实例。例如：
 
 ```typescript
 PassportModule.register({ session: true });
 ```
+
 您还可以在策略的构造函数中传递一个 `options` 对象来配置它们。至于本地策略，你可以通过例如:
 
 ```typescript
@@ -658,6 +649,7 @@ constructor(private readonly authService: AuthService) {
   });
 }
 ```
+
 看看[Passport Website](http://www.passportjs.org/docs/oauth/)官方文档吧。
 
 ### 命名策略
@@ -683,6 +675,7 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
   }
 }
 ```
+
 要使用上述结构，请确保在 `GraphQL` 模块设置中将 `request (req)`对象作为上下文值的一部分传递:
 
 ```typescript
@@ -697,12 +690,10 @@ GraphQLModule.forRoot({
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 
-export const CurrentUser = createParamDecorator(
-  (data: unknown, context: ExecutionContext) => {
-    const ctx = GqlExecutionContext.create(context);
-    return ctx.getContext().req.user;
-  },
-);
+export const CurrentUser = createParamDecorator((data: unknown, context: ExecutionContext) => {
+  const ctx = GqlExecutionContext.create(context);
+  return ctx.getContext().req.user;
+});
 ```
 
 要在解析器中使用上述装饰器，请确保将其作为查询的参数:
@@ -723,7 +714,7 @@ whoAmI(@CurrentUser() user: User) {
 
 有很多方法和策略来处理权限。这些方法取决于其应用程序的特定需求。本章提供了一些可以灵活运用在不同需求条件下的权限实现方式。
 
-### 基础的RBAC实现
+### 基础的 RBAC 实现
 
 基于角色的访问控制（**RBAC**)是一个基于角色和权限等级的中立的访问控制策略。本节通过使用`Nest`[守卫](8/guards)来实现一个非常基础的`RBAC`。
 
@@ -738,7 +729,7 @@ export enum Role {
 }
 ```
 
-?>  在更复杂的系统中，角色信息可能会存储在数据库里，或者从一个外部认证提供者那里获取。
+?> 在更复杂的系统中，角色信息可能会存储在数据库里，或者从一个外部认证提供者那里获取。
 
 然后，创建一个`@Roles()`的装饰器，该装饰器允许某些角色拥有获取特定资源访问权。
 
@@ -754,7 +745,7 @@ export const Roles = (...roles: Role[]) => SetMetadata(ROLES_KEY, roles);
 
 现在可以将`@Roles()`装饰器应用于任何路径处理程序。
 
->cats.controller.ts
+> cats.controller.ts
 
 ```TypeScript
 @Post()
@@ -790,7 +781,7 @@ export class RolesGuard implements CanActivate {
 }
 ```
 
-?> 参见[应用上下文]((8/fundamentals))章节的反射与元数据部分，了解在上下文敏感的环境中使用`Reflector`的细节。
+?> 参见[应用上下文](<(8/fundamentals)>)章节的反射与元数据部分，了解在上下文敏感的环境中使用`Reflector`的细节。
 
 !> 该例子被称为“基础的”是因为我们仅仅在路径处理层面检查了用户权限。在实际项目中，你可能有包含不同操作的终端/处理程序，它们各自需要不同的权限组合。在这种情况下，你可能要在你的业务逻辑中提供一个机制来检查角色，这在一定程度上会变得难以维护，因为缺乏一个集中的地方来关联不同的操作与权限。
 
@@ -816,7 +807,7 @@ providers: [
 ],
 ```
 
-当一个没有有效权限的用户访问一个终端时，Nest自动返回以下响应：
+当一个没有有效权限的用户访问一个终端时，Nest 自动返回以下响应：
 
 ```JSON
 {
@@ -832,7 +823,7 @@ providers: [
 
 一个身份被创建后，可能关联来来自信任方的一个或者多个权利。权利是指一个表示对象可以做什么，而不是对象是什么的键值对。
 
-要在Nest中实现基于权利的权限，你可以参考我们在`RBAC`部分的步骤，仅仅有一个显著区别：比较`许可(permissions)`而不是角色。每个用户应该被授予了一组许可，相似地，每个资源/终端都应该定义其需要的许可（例如通过专属的`@RequirePermissions()`装饰器）。
+要在 Nest 中实现基于权利的权限，你可以参考我们在`RBAC`部分的步骤，仅仅有一个显著区别：比较`许可(permissions)`而不是角色。每个用户应该被授予了一组许可，相似地，每个资源/终端都应该定义其需要的许可（例如通过专属的`@RequirePermissions()`装饰器）。
 
 > cats.controller.ts
 
@@ -844,7 +835,7 @@ create(@Body() createCatDto: CreateCatDto) {
 }
 ```
 
-?> 在这个例子中，`许可`(和RBAC部分的`角色`类似)是一个TypeScript的枚举，它包含了系统中所有的许可。
+?> 在这个例子中，`许可`(和 RBAC 部分的`角色`类似)是一个 TypeScript 的枚举，它包含了系统中所有的许可。
 
 ### 与`CASL`集成
 
@@ -858,7 +849,7 @@ $ npm i @casl/ability
 
 ?> 在本例中，我们选择`CASL`，但也可以根据项目需要选择其他类似库例如`accesscontrol`或者`acl`。
 
-安装完成后，为了说明CASL的机制，我们定义了两个类实体，`User`和`Article`。
+安装完成后，为了说明 CASL 的机制，我们定义了两个类实体，`User`和`Article`。
 
 ```TypeScript
 class User {
@@ -866,6 +857,7 @@ class User {
   isAdmin: boolean;
 }
 ```
+
 `User`类包含两个属性，`id`是用户的唯一标识，`isAdmin`代表用户是否有管理员权限。
 
 ```TypeScript
@@ -876,9 +868,10 @@ class Article {
 }
 ```
 
-`Article`类包含三个属性，分别是`id`、`isPublished`和`authorId`，`id`是文章的唯一标识，`isPublished`代表文章是否发布，`authorId`代表发表该文章的用户id。
+`Article`类包含三个属性，分别是`id`、`isPublished`和`authorId`，`id`是文章的唯一标识，`isPublished`代表文章是否发布，`authorId`代表发表该文章的用户 id。
 
 接下来回顾并确定本示例中的需求：
+
 - 管理员可以管理（创建、阅读、更新、删除/CRUD)所有实体
 - 用户对所有内容有阅读权限
 - 用户可以更新自己的文章(`article.authorId===userId`)
@@ -896,9 +889,9 @@ export enum Action {
 }
 ```
 
-!> `manage`是CASL的关键词，代表`任何`操作。
+!> `manage`是 CASL 的关键词，代表`任何`操作。
 
-要封装CASL库，需要创建`CaslModule`和`CaslAbilityFactory`。
+要封装 CASL 库，需要创建`CaslModule`和`CaslAbilityFactory`。
 
 ```bash
 $ nest g module casl
@@ -936,11 +929,11 @@ export class CaslAbilityFactory {
 }
 ```
 
-!> `all`是CASL的关键词，代表`任何对象`。
+!> `all`是 CASL 的关键词，代表`任何对象`。
 
 ?> `Ability`,`AbilityBuilder`,和`AbilityClass`从`@casl/ability`包中导入。
 
-在上述例子中，我们使用`AbilityBuilder`创建了`Ability`实例，如你所见，`can`和`cannot`接受同样的参数，但代表不同含义，`can`允许对一个对象执行操作而`cannot`禁止操作，它们各能接受4个参数，参见[CASL文档](https://casl.js.org/v4/en/guide/intro)。
+在上述例子中，我们使用`AbilityBuilder`创建了`Ability`实例，如你所见，`can`和`cannot`接受同样的参数，但代表不同含义，`can`允许对一个对象执行操作而`cannot`禁止操作，它们各能接受 4 个参数，参见[CASL 文档](https://casl.js.org/v4/en/guide/intro)。
 
 最后，将`CaslAbilityFactory`添加到提供者中，并在`CaslModule`模块中导出。
 
@@ -1006,7 +999,7 @@ ability.can(Action.Update, article); // false
 
 ### 进阶：通过策略守卫的实现
 
-本节我们说明如何声明一个更复杂的守卫，用来配置在方法层面（也可以配置在类层面）检查用户是否满足权限策略。在本例中，将使用CASL包进行说明，但它并不是必须的。同样，我们将使用前节创建的`CaslAbilityFactory`提供者。
+本节我们说明如何声明一个更复杂的守卫，用来配置在方法层面（也可以配置在类层面）检查用户是否满足权限策略。在本例中，将使用 CASL 包进行说明，但它并不是必须的。同样，我们将使用前节创建的`CaslAbilityFactory`提供者。
 
 首先更新我们的需求。目的是提供一个机制来检查每个路径处理程序的特定权限。我们将同时支持对象和方法（分别针对简易检查和面向函数式编程的目的）。
 
@@ -1033,6 +1026,7 @@ export const CHECK_POLICIES_KEY = 'check_policy';
 export const CheckPolicies = (...handlers: PolicyHandler[]) =>
   SetMetadata(CHECK_POLICIES_KEY, handlers);
 ```
+
 现在创建一个`PoliciesGuard`，它将解析并执行所有和路径相关的策略程序。
 
 ```TypeScript
@@ -1105,7 +1099,6 @@ findAll() {
 
 !> 由于我们必须使用 `new`关键词来实例化一个策略处理函数，`CreateArticlePolicyHandler`类不能使用注入依赖。这在`ModuleRef#get`方法中强调过，参见[这里](8/fundamentals.md#依赖注入))。基本上，要替代通过`@CheckPolicies()`装饰器注册函数和实例，你需要允许传递一个`Type<IPolicyHandler>`，然后在守卫中使用一个类型引用(`moduleRef.get(YOUR_HANDLER_TYPE`)获取实例，或者使用`ModuleRef#create`方法进行动态实例化。
 
-
 ## 加密和散列
 
 `加密`是一个信息编码的过程。这个过程将原始信息，即明文，转换为密文。理想情况下，只有授权方可以将密文解密为明文。加密本身并不能防止干扰，但是会将可理解内容拒绝给一个可能的拦截器。加密是个双向的函数，包含加密以及使用正确的`key`解密。
@@ -1114,9 +1107,9 @@ findAll() {
 
 ### 加密
 
-`Node.js`提供了一个内置的[crypto模块](https://nodejs.org/api/crypto.html)可用于加密和解密字符串，数字，Buffer，流等等。Nest未在此基础上提供额外的包以减少不必要的干扰。
+`Node.js`提供了一个内置的[crypto 模块](https://nodejs.org/api/crypto.html)可用于加密和解密字符串，数字，Buffer，流等等。Nest 未在此基础上提供额外的包以减少不必要的干扰。
 
-一个使用`AES(高级加密系统) aes-256-ctr`算法，CTR加密模式。
+一个使用`AES(高级加密系统) aes-256-ctr`算法，CTR 加密模式。
 
 ```TypeScript
 import { createCipheriv, randomBytes, scrypt } from 'crypto';
@@ -1151,7 +1144,7 @@ const decryptedText = Buffer.concat([
 
 ### 散列
 
-散列方面推荐使用 [bcrypt](https://www.npmjs.com/package/bcrypt) 或 [argon2](https://www.npmjs.com/package/argon2)包. Nest自身并未提供任何这些模块的包装器以减少不必要的抽象（让学习曲线更短）。
+散列方面推荐使用 [bcrypt](https://www.npmjs.com/package/bcrypt) 或 [argon2](https://www.npmjs.com/package/argon2)包. Nest 自身并未提供任何这些模块的包装器以减少不必要的抽象（让学习曲线更短）。
 
 例如，使用`bcrypt`来哈希一个随机密码。
 
@@ -1161,6 +1154,7 @@ const decryptedText = Buffer.concat([
 $ npm i bcrypt
 $ npm i -D @types/bcrypt
 ```
+
 依赖安装后，可以使用哈希函数。
 
 ```TypeScript
@@ -1185,15 +1179,13 @@ const isMatch = await bcrypt.compare(password, hash);
 
 更多函数参见[这里](https://www.npmjs.com/package/bcrypt)。
 
-
 ## Helmet
 
 通过适当地设置 `HTTP` 头，[Helmet](https://github.com/helmetjs/helmet) 可以帮助保护您的应用免受一些众所周知的 `Web` 漏洞的影响。通常，`Helmet` 只是`14`个较小的中间件函数的集合，它们设置与安全相关的 `HTTP` 头（[阅读更多](https://github.com/helmetjs/helmet#how-it-works)）。
 
+?> 要在全局使用`Helmet`，需要在调用`app.use()`之前或者可能调用`app.use()`函数之前注册。这是由平台底层机制中(EXpress 或者 Fastify)中间件/路径的定义决定的。如果在定义路径之后使用`helmet`或者`cors`中间件，其之前的路径将不会应用这些中间件，而仅在定义之后的路径中应用。
 
-?> 要在全局使用`Helmet`，需要在调用`app.use()`之前或者可能调用`app.use()`函数之前注册。这是由平台底层机制中(EXpress或者Fastify)中间件/路径的定义决定的。如果在定义路径之后使用`helmet`或者`cors`中间件，其之前的路径将不会应用这些中间件，而仅在定义之后的路径中应用。
-
-### 在Express中使用（默认）
+### 在 Express 中使用（默认）
 
 首先，安装所需的包：
 
@@ -1211,7 +1203,7 @@ app.use(helmet());
 
 ?> 如果在引入`helmet`时返回`This expression is not callable`错误。你可能需要将项目中`tsconfig.json`文件的`allowSyntheticDefaultImports`和`esModuleInterop`选项配置为`true`。在这种情况下，将引入声明修改为：`import helmet from 'helmet'`。
 
-### 在Fastify中使用
+### 在 Fastify 中使用
 
 如果使用`FastifyAdapter`，安装`fastify-helmet`包：
 
@@ -1227,7 +1219,7 @@ import * as helmet from 'fastify-helmet';
 app.register(helmet);
 ```
 
-!> 在使用`apollo-server-fastify`和`fastify-helmet`时，在`GraphQL`应用中与[CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)使用时可能出问题，需要如下配置CSP。
+!> 在使用`apollo-server-fastify`和`fastify-helmet`时，在`GraphQL`应用中与[CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)使用时可能出问题，需要如下配置 CSP。
 
 ```TypeScript
 app.register(helmet, {
@@ -1250,7 +1242,7 @@ app.register(helmet, {
 
 ## CORS
 
-跨源资源共享（`CORS`）是一种允许从另一个域请求资源的机制。在底层，`Nest` 使用了Express的[cors](https://github.com/expressjs/cors) 包，它提供了一系列选项，您可以根据自己的要求进行自定义。
+跨源资源共享（`CORS`）是一种允许从另一个域请求资源的机制。在底层，`Nest` 使用了 Express 的[cors](https://github.com/expressjs/cors) 包，它提供了一系列选项，您可以根据自己的要求进行自定义。
 
 ### 开始
 
@@ -1264,7 +1256,7 @@ await app.listen(3000);
 
 `enableCors()`方法需要一个可选的配置对象参数。这个对象的可用属性在官方 <a href="https://github.com/expressjs/cors#configuration-options" style="color:red;">CORS</a> 文档中有所描述。另一种方法是传递一个<a href="https://github.com/expressjs/cors#configuring-cors-asynchronously" style="color:red;">回调函数</a>，来让你根据请求异步地定义配置对象。
 
-或者通过 `create()` 方法的选项对象启用CORS。将 `cors`属性设置为`true`，以使用默认设置启用CORS。又或者，传递一个 <a href="https://github.com/expressjs/cors#configuration-options" style="color:red;">CORS 配置对象</a> 或 <a href="https://github.com/expressjs/cors#configuring-cors-asynchronously" style="color:red;">回调函数</a> 作为 `cors` 属性的值来自定义其行为。
+或者通过 `create()` 方法的选项对象启用 CORS。将 `cors`属性设置为`true`，以使用默认设置启用 CORS。又或者，传递一个 <a href="https://github.com/expressjs/cors#configuration-options" style="color:red;">CORS 配置对象</a> 或 <a href="https://github.com/expressjs/cors#configuring-cors-asynchronously" style="color:red;">回调函数</a> 作为 `cors` 属性的值来自定义其行为。
 
 ```typescript
 const app = await NestFactory.create(AppModule, { cors: true });
@@ -1275,7 +1267,7 @@ await app.listen(3000);
 
 跨站点请求伪造（称为 `CSRF` 或 `XSRF`）是一种恶意利用网站，其中未经授权的命令从 `Web` 应用程序信任的用户传输。要减轻此类攻击，您可以使用 [csurf](https://github.com/expressjs/csurf) 软件包。
 
-### 在Express中使用（默认）
+### 在 Express 中使用（默认）
 
 首先，安装所需的包：
 
@@ -1283,7 +1275,7 @@ await app.listen(3000);
 $ npm i --save csurf
 ```
 
-!> 正如 `csurf` 中间件页面所解释的，`csurf` 模块需要首先初始化会话中间件或 `cookie` 解析器。有关进一步说明，请参阅该[文档](https://github.com/expressjs/csurf#csurf)。 
+!> 正如 `csurf` 中间件页面所解释的，`csurf` 模块需要首先初始化会话中间件或 `cookie` 解析器。有关进一步说明，请参阅该[文档](https://github.com/expressjs/csurf#csurf)。
 
 安装完成后，将其应用为全局中间件。
 
@@ -1293,7 +1285,7 @@ import * as csurf from 'csurf';
 app.use(csurf());
 ```
 
-### 在Fastify中使用
+### 在 Fastify 中使用
 
 首先，安装所需的包：
 
@@ -1320,16 +1312,17 @@ $ npm i --save express-rate-limit
 安装完成后，将其应用为全局中间件。
 
 ```typescript
-import * as rateLimit from 'express-rate-limit';
+import rateLimit from 'express-rate-limit';
 // somewhere in your initialization file
 app.use(
   rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100, // limit each IP to 100 requests per windowMs
-  }),
+  })
 );
 ```
-如果在服务器和以太网之间存在负载均衡或者反向代理，Express可能需要配置为信任proxy设置的头文件，从而保证最终用户得到正确的IP地址。要如此，首先使用`NestExpressApplication`平台[接口](https://docs.nestjs.com/first-steps#platform)来创建你的`app`实例，然后配置[trust proxy](https://expressjs.com/en/guide/behind-proxies.html)设置。
+
+如果在服务器和以太网之间存在负载均衡或者反向代理，Express 可能需要配置为信任 proxy 设置的头文件，从而保证最终用户得到正确的 IP 地址。要如此，首先使用`NestExpressApplication`平台[接口](https://docs.nestjs.com/first-steps#platform)来创建你的`app`实例，然后配置[trust proxy](https://expressjs.com/en/guide/behind-proxies.html)设置。
 
 ```TypeScript
 const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -1341,6 +1334,6 @@ app.set('trust proxy', 1);
 
 ### 译者署名
 
-| 用户名 | 头像 | 职能 | 签名 |
-|---|---|---|---|
-| [@weizy0219](https://github.com/weizy0219)  | <img class="avatar-66 rm-style" height="70" src="https://avatars3.githubusercontent.com/u/19883738?s=60&v=4">  |  翻译  | 专注于TypeScript全栈、物联网和Python数据科学，[@weizhiyong](https://www.weizhiyong.com) |
+| 用户名                                     | 头像                                                                                                          | 职能 | 签名                                                                                        |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------- |
+| [@weizy0219](https://github.com/weizy0219) | <img class="avatar-66 rm-style" height="70" src="https://avatars3.githubusercontent.com/u/19883738?s=60&v=4"> | 翻译 | 专注于 TypeScript 全栈、物联网和 Python 数据科学，[@weizhiyong](https://www.weizhiyong.com) |

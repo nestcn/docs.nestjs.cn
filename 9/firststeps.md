@@ -196,8 +196,9 @@ src
 
 `main.ts` 包含一个异步函数，它负责**引导**我们的应用程序：
 
+> main.ts
+
 ```typescript
-/* main.ts */
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 

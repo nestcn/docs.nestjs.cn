@@ -12,9 +12,9 @@
 
 在下面的例子中，我们使用 `@Controller()` 装饰器定义一个基本的控制器。可选 路由路径前缀设置为 `cats`。在 `@Controller()` 装饰器中使用路径前缀可以使我们轻松地对一组相关的路由进行分组，并最大程度地减少重复代码。例如，我们可以选择将一组用于管理与 `/customers` 下的客户实体进行互动的路由进行分组。这样, 我们可以在 `@Controller()` 装饰器中指定路径前缀 `customers`，这样就不必为文件中的每个路由重复路径的那部分。
 
-```typescript
-/* cats.controller.ts */
+> cats.controller.ts
 
+```typescript
 import { Controller, Get } from '@nestjs/common';
 
 @Controller('cats')
@@ -45,9 +45,9 @@ export class CatsController {
 
 处理程序有时需要访问客户端的**请求**细节。Nest 提供了对底层平台（默认为 `Express`）的[**请求对象**](http://expressjs.com/en/api.html#req)（`request·）的访问方式。我们可以在处理函数的签名中使用 `@Req()` 装饰器，指示 Nest 将请求对象注入处理程序。
 
-```typescript
-/* cats.controller.ts */
+> cats.controller.ts
 
+```typescript
 import { Controller, Get, Req } from '@nestjs/common';
 import { Request } from 'express';
 
@@ -85,9 +85,9 @@ export class CatsController {
 
 我们已经创建了一个端点来获取 cats 的数据（**GET** 路由）。我们通常还希望提供一个创建新记录的端点。为此，让我们创建 **POST** 处理程序:
 
-```typescript
-/* cats.controller.ts */
+> cats.controller.ts
 
+```typescript
 import { Controller, Get, Post } from '@nestjs/common';
 
 @Controller('cats')
@@ -246,9 +246,9 @@ export class AccountController {
 
 每个异步函数都必须返回一个 `Promise`。这意味着您可以返回延迟值, 而 Nest 将自行解析它。让我们看看下面这个例子:
 
-```typescript
-/* cats.controller.ts */
+> cats.controller.ts
 
+```typescript
 @Get()
 async findAll(): Promise<any[]> {
   return [];
@@ -257,9 +257,9 @@ async findAll(): Promise<any[]> {
 
 这是完全有效的。此外,通过返回 RxJS [observable 流](http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html)，Nest 路由处理程序将更加强大。 Nest 将自动订阅下面的源并获取最后发出的值（在流完成后）。
 
-```typescript
-/* cats.controller.ts */
+> cats.controller.ts
 
+```typescript
 @Get()
 findAll(): Observable<any[]> {
   return of([]);
@@ -276,10 +276,9 @@ findAll(): Observable<any[]> {
 
 现在，我们来创建 `CreateCatDto` 类：
 
+> create-cat.dto.ts
+
 ```typescript
-/*
-  create-cat.dto.ts
-*/
 export class CreateCatDto {
   readonly name: string;
   readonly age: number;
@@ -289,9 +288,9 @@ export class CreateCatDto {
 
 它只有三个基本属性。 之后，我们可以在 `CatsController` 中使用新创建的`DTO`：
 
-```typescript
-/* cats.controller.ts */
+> cats.controller.ts
 
+```typescript
 @Post()
 async create(@Body() createCatDto: CreateCatDto) {
   return 'This action adds a new cat';
@@ -306,9 +305,9 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 下面是一个示例，该示例利用几个可用的装饰器来创建基本控制器。 该控制器暴露了几个访问和操作内部数据的方法。
 
-```typescript
-/* cats.controller.ts */
+> cats.controller.ts
 
+```typescript
 import { Controller, Get, Query, Post, Body, Put, Param, Delete } from '@nestjs/common';
 import { CreateCatDto, UpdateCatDto, ListAllEntities } from './dto';
 
@@ -349,9 +348,9 @@ export class CatsController {
 
 控制器总是属于模块，这就是为什么我们在 `@Module()` 装饰器中包含 `controllers` 数组的原因。 由于除了根模块 `AppModule`之外，我们还没有定义其他模块，所以我们将使用它来介绍 `CatsController`：
 
-```typescript
-/* app.module.ts */
+> app.module.ts
 
+```typescript
 import { Module } from '@nestjs/common';
 import { CatsController } from './cats/cats.controller';
 
@@ -367,9 +366,9 @@ export class AppModule {}
 
 到目前为止，我们已经讨论了 Nest 操作响应的标准方式。操作响应的第二种方法是使用类库特有的[响应对象(Response)](http://expressjs.com/en/api.html#res)。为了注入特定的响应对象，我们需要使用 `@Res()` 装饰器。为了对比差异，让我们来重写 `CatsController`：
 
-```typescript
-/* cats.controller.ts */
+> cats.controller.ts
 
+```typescript
 import { Controller, Get, Post, Res, HttpStatus } from '@nestjs/common';
 import { Response } from 'express';
 

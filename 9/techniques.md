@@ -80,7 +80,6 @@ export class AppModule {
 > user.entity.ts
 
 ```typescript
-@@filename(user.entity)
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()

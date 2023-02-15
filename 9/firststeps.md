@@ -68,7 +68,7 @@ $ npm -v
 7.x.x
 ```
 
-#### ** MacOS (X86 & M1)**
+#### ** MacOS **
 
 1. [点击下载 Node.js](https://npmmirror.com/mirrors/node/v16.18.1/node-v16.18.1.pkg)
 
@@ -86,7 +86,6 @@ $ npm -v
 
 #### ** Snap **
 
-（支持 所有 Linux ）
 
 ```
 sudo snap install node --classic --channel=16

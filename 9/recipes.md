@@ -2161,161 +2161,540 @@ $ npx compodoc -p tsconfig.json -s
 
 ## Prisma
 
-`Prisma` 将您的数据库转换为 `GraphQL API`，并允许将 `GraphQL` 用作所有数据库的通用查询语言(译者注：替代 orm )。您可以直接使用 `GraphQL` 查询数据库，而不是编写 `SQL` 或使用 `NoSQL API`。在本章中，我们不会详细介绍 `Prisma`，因此请访问他们的网站，了解可用的[功能](https://www.prisma.io/features/)。
+[Prisma](https://www.prisma.io/) 是用于 Node.js 和 TypeScript 的 [开源](https://github.com/prisma/prisma) ORM。 它被用作编写原生 SQL 或使用其他数据库访问工具例如 SQL query builders（如 [knex.js](https://knexjs.org/)）或 ORM（如 [TypeORM](https://typeorm.io/) 和 [Sequelize](https://sequelize.org/)）的替代方法。 Prisma 目前支持 PostgreSQL、MySQL、SQL Server、SQLite、MongoDB 和 CockroachDB（[查看详情](https://www.prisma.io/docs/reference/database-reference/supported-databases)）。
 
-!> 注意： 在本文中，您将学习如何集成 `Prisma` 到 `Nest` 框架中。我们假设您已经熟悉  `GraphQL` 概念和 `@nestjs/graphql` 模块。
+虽然 Prisma 可以与原生 JavaScript 一起使用，但它支持 TypeScript， 并提供了超越 TypeScript 生态系统中其他 ORM 的类型安全保证。 您可以在[此处](https://www.prisma.io/docs/concepts/more/comparisons/prisma-and-typeorm#type-safety)深入比较 Prisma 和 TypeORM 的类型安全保证。
 
-### 依赖
+?> 如果您想快速了解 Prisma 的工作原理，可以按照[快速入门](https://www.prisma.io/docs/getting-started/quickstart)或阅读[文档](https://www.prisma.io/docs)中的简介。 [prisma-examples](https://github.com/prisma/prisma-examples/) 存储库中还有 [REST](https://github.com/prisma/prisma-examples/tree/latest/typescript/rest-nestjs) 和 [GraphQL](https://github.com/prisma/prisma-examples/tree/latest/typescript/graphql-nestjs) 的现成运行示例。
 
-首先，我们需要安装所需的包：
+### 起步
+
+在本秘籍中，您将了解如何从头开始使用NestJS和Prisma。您将使用REST API构建一个NestJS应用程序，它可以在数据库中读写数据。
+
+为达到本指南的目的，您将使用[SQLite](https://sqlite.org/index.html)数据库来保存设置数据库服务器的开销。请注意，即使您使用的是PostgreSQL或MySQL，您仍然可以遵循本指南——您会在合适的地方获得使用这些数据库的额外说明。
+
+?> 如果您已经有了一个现有的项目并考虑迁移到Prisma，您可以按照指南[将Prisma添加到现有的项目中](https://www.prisma.io/docs/getting-started/setup-prisma/add-to-existing-project/relational-databases-typescript-postgres)。如果您正在从TypeORM迁移，您可以阅读[从TypeORM迁移到Prisma指南](https://www.prisma.io/docs/guides/migrate-to-prisma/migrate-from-typeorm)。
+
+### 创建你的NestJS项目
+
+首先，使用以下命令安装NestJS CLI并创建您的应用框架：
+```bash
+$ npm install -g @nestjs/cli
+$ nest new hello-prisma
+```
+
+请参见[第一步](/9/firststeps.md)页以了解有关通过上述命令创建的项目文件的详细信息。现在可以运行 `npm start` 来启动应用程序。在 `http://localhost:3000/` 上运行的REST API目前只提供一个在 `src/app.controller.ts` 中实现的路由。在本指南的学习过程中，您将实现其他路由来存储和检索有关*用户和帖子*的数据。
+
+### 安装Prisma
+
+首先，在你的项目上以 `development dependency` 方式安装 Prisma Cli：
+```bash
+$ cd hello-prisma
+$ npm install prisma --save-dev
+```
+
+下一步，我们将利用[Prisma Cli](https://www.prisma.io/docs/concepts/components/prisma-cli)。最佳实践是使用 `npx` 在本地调用CLI：
+```bash
+$ npx prisma
+```
+
+<details>
+<summary>使用Yarn</summary>
+
+如果您正在使用Yarn，则可以按如下所示安装Prisma CLI：
 
 ```bash
-$ npm install --save prisma-binding
+$ yarn add prisma --dev
 ```
 
-### 设置 Prisma
+安装后，您可以通过给它添加 `yarn` 前缀来调用它：
 
-在使用 `Prisma` 时，您可以使用自己的实例或使用 [Prisma Cloud](https://www.prisma.io/cloud/) 。在本简介中，我们将使用 `Prisma` 提供的演示服务器。
-
-1. 安装 Prisma CLI `npm install -g prisma`
-2. 创建新服务 `prisma init` , 选择演示服务器并按照说明操作。
-3. 部署您的服务 `prisma deploy`
-
-如果您发现自己遇到麻烦，请跳转到[「快速入门」](https://www.prisma.io/docs/quickstart/) 部分以获取更多详细信息。最终，您应该在项目目录中看到两个新文件， `prisma.yaml` 配置文件：
-
-```yaml
-endpoint: https://us1.prisma.sh/nest-f6ec12/prisma/dev
-datamodel: datamodel.graphql
+```bash
+$ yarn prisma
 ```
-并自动创建数据模型， `datamodel.graphql` 。
+</details>
 
-```graphql
-type User {
-  id: ID! @unique
-  name: String!
+现在使用Prisma CLI的 `init` 命令创建初始的Prisma设置：
+```bash
+$ npx prisma init
+```
+
+此命令创建一个新的 `prisma` 目录，其内容如下：
+* `schema.prisma` :指定数据库连接并包含数据库schema
+* `.env` ：[dotenv](https://github.com/motdotla/dotenv)文件，通常用于将数据库凭据存储在一组环境变量中
+
+### 设置数据库连接
+
+数据库连接是在 `schema.prisma` 文件的 `datasource` 块中配置的。默认设置为 `postgresql` ，但由于您在本指南中使用的是SQLite数据库，因此需要将 `datasource` 块的 `provider` 字段调整为 `sqlite` ：
+
+```
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
 }
 ```
 
-!> 注意： 在实际应用程序中，您将创建更复杂的数据模型。有关Prisma中数据建模的更多信息，请单击[此处](https://www.prisma.io/features/data-modeling/)。
-
-输入： `prisma playground` 您可以打开 `Prisma GraphQL API` 控制台。
-
-### 创建客户端
-
-有几种方法可以集成 `GraphQL API`。这里我们将使用 [GraphQL CLI](https://www.npmjs.com/package/graphql-cli)，这是一个用于常见 `GraphQL` 开发工作流的命令行工具。要安装 `GraphQL CLI`，请使用以下命令：
+接下来，打开 `.env` 并将 `DATABASE_URL` 环境变量调整为如下所示：
 
 ```bash
-$ npm install -g graphql-cli
+DATABASE_URL="file:./dev.db"
 ```
 
-接下来，在 `Nest` 应用程序的根目录中创建 `.graphqlconfig` ：
+SQLite数据库是简单的文件；不需要服务器来使用SQLite数据库。因此，您不必使用主机和端口配置连接URL，只需将其指向本地文件，在本例中该文件名为 `dev.db` 。此文件将在下一步中创建。
+
+
+<details>
+<summary>使用PostgreSQL或MySQL</summary>
+
+对于PostgreSQL和MySQL，您需要配置数据库服务器的URL。您可以在[此处](https://www.prisma.io/docs/reference/database-reference/connection-urls)了解关于所需连接的URL格式的详细信息。
+
+#### PostgreSQL
+
+如果您使用的是PostgreSQL，则必须调整schema.prisma和.env文件，如下所示：
+
+`schema.prisma`
+```
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+```
+
+`.env`
+```
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=SCHEMA"
+```
+
+将占位符(全是大写字符的字符串)替换为您的数据库凭据。请注意，如果您不确定为 `SCHEMA` 占位符提供什么，则很可能是默认值 `public`：
+```
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public"
+```
+
+如果你想学习如何建立一个PostgreSQL数据库，你可以按照这个指南[在Heroku上建立一个免费的PostgreSQL数据库](https://dev.to/prisma/how-to-setup-a-free-postgresql-database-on-heroku-1dc1)。
+
+#### MySQL
+
+如果您使用的是MySQL，则必须按如下方式调整 `schema.prisma` 和 `.env` 文件：
+
+`schema.prisma`
+```
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+```
+
+`.env`
+```
+DATABASE_URL="mysql://USER:PASSWORD@HOST:PORT/DATABASE"
+```
+
+将所有大写字母拼写的占位符替换为您的数据库凭据。
+</details>
+
+
+### 使用Prisma Migrate创建两个数据库表
+
+在本节中，您将使用[Prisma Migrate](https://www.prisma.io/docs/concepts/components/prisma-migrate)在数据库中创建两个新表。Prisma Migrate为Prisma schema的声明性数据模型定义生成SQL迁移文件。这些迁移文件是完全可定制的，因此您可以配置底层数据库的任何附加功能或包括附加命令。
+
+将以下两个模型添加到 `schema.prisma` 文件中：
+
+```
+model User {
+  id    Int     @default(autoincrement()) @id
+  email String  @unique
+  name  String?
+  posts Post[]
+}
+
+model Post {
+  id        Int      @default(autoincrement()) @id
+  title     String
+  content   String?
+  published Boolean? @default(false)
+  author    User?    @relation(fields: [authorId], references: [id])
+  authorId  Int?
+}
+```
+
+创建Prisma模型后，您可以生成SQL迁移文件并在数据库运行它们。在终端中运行以下命令：
 
 ```bash
-touch .graphqlconfig.yml
+$ npx prisma migrate dev --name init
 ```
 
-将以下内容放入其中：
+这个 `prisma migrate dev` 命令生成SQL文件并直接在数据库运行它们。在本例中，在现有 `prisma` 目录中创建了以下迁移文件：
 
-```yaml
-projects:
-  database:
-    schemaPath: src/prisma/prisma-types.graphql
-    extensions:
-      endpoints:
-        default: https://us1.prisma.sh/nest-f6ec12/prisma/dev
-      codegen:
-        - generator: prisma-binding
-          language: typescript
-          output:
-            binding: src/prisma/prisma.binding.ts
- ```
-
- 要将 `Prisma GraphQL` 架构下载到 `prisma/prisma-types.graphql` 并在 `prisma/prisma.binding.graphql` 下创建 `Prisma` 客户端，请在终端中运行以下命令：
-
- ```bash
-$ graphql get-schema --project database
-$ graphql codegen --project database
+```
+$ tree prisma
+prisma
+├── dev.db
+├── migrations
+│   └── 20201207100915_init
+│       └── migration.sql
+└── schema.prisma
 ```
 
-### 集成
+<details>
+<summary>展开以查看生成的SQL语句</summary>
 
-现在，让我们为 `Prisma` 集成创建一个模块。
+在SQLite数据库中创建了以下表格：
 
-> prisma.service.ts
+```
+-- CreateTable
+CREATE TABLE "User" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "email" TEXT NOT NULL,
+    "name" TEXT
+);
 
+-- CreateTable
+CREATE TABLE "Post" (
+"id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+"title" TEXT NOT NULL,
+"content" TEXT,
+"published" BOOLEAN DEFAULT false,
+"authorId" INTEGER,
+
+    FOREIGN KEY ("authorId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User.email_unique" ON "User"("email");
+```
+
+</details>
+
+### 安装并生成Prisma客户端
+
+Prisma Client是一个类型安全的数据库客户端，它是从Prisma模型定义*生成*的。由于这种方法，Prisma Client可以对外暴露为模型定制的[CRUD](https://www.prisma.io/docs/concepts/components/prisma-client/crud)操作。
+
+要在项目中安装Prisma客户端，请在终端中运行以下命令：
+
+```bash
+$ npm install @prisma/client
+```
+
+请注意，在安装过程中，Prisma会自动为您调用 `prisma generate` 命令。将来，您需要在每次更改Prisma模型后运行此命令，以更新生成的Prisma客户端。
+
+?> `prisma generate` 命令读取您的Prisma schema并更新 `node_modules/@prisma/client` 中生成的Prisma Client库。
+
+### 在NestJS services中使用Prisma客户端
+
+现在您可以使用Prisma Client发送数据库查询。如果您想了解更多关于使用Prisma Client构建查询的信息，请查看[API文档](https://www.prisma.io/docs/concepts/components/prisma-client/crud)。
+
+在设置NestJS应用程序时，您可能希望将Prisma Client API抽象出来，用于服务中的数据库查询。开始时，您可以创建一个新的 `PrismaService`，负责实例化 `PrismaClient` 并连接到您的数据库。
+
+在 `src` 目录中，创建一个新文件 `prisma.service.ts`，并向其中添加以下代码：
 ```typescript
-import { Injectable } from '@nestjs/common';
-import { Prisma } from './prisma.binding';
+import { INestApplication, Injectable, OnModuleInit } from '@nestjs/common';
+import { PrismaClient } from '@prisma/client';
 
 @Injectable()
-export class PrismaService extends Prisma {
-  constructor() {
-    super({
-      endpoint: 'https://us1.prisma.sh/nest-f6ec12/prisma/dev',
-      debug: false,
+export class PrismaService extends PrismaClient implements OnModuleInit {
+  async onModuleInit() {
+    await this.$connect();
+  }
+
+  async enableShutdownHooks(app: INestApplication) {
+    this.$on('beforeExit', async () => {
+      await app.close();
     });
   }
 }
 ```
 
-一旦 `PrismaService` 准备就绪，我们需要创建一个对应模块。
+?> `onModuleInit` 是可选的——如果不使用它，Prisma将在第一次调用数据库时延迟连接。我们不需要使用 `onModuleDestroy`，因为Prisma有自己的shutdown钩子，它会在那里销毁连接。有关 `enableShutdownHooks` 的详细信息，请参阅 <a href="/9/recipes?id=enableShutdownHooks的问题">enableShutdownHooks的问题</a>
 
-> prisma.module
+接下来，您可以编写services，用于从Prisma schema中为 `User` 和 `Post` 模型进行数据库调用。
 
+在src目录中，创建一个名为 `user.service.ts` 的新文件，并向其中添加以下代码：
 ```typescript
-import { Module } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
+import { User, Prisma } from '@prisma/client';
 
-@Module({
-  providers: [PrismaService],
-  exports: [PrismaService],
-})
-export class PrismaModule {}
-```
+@Injectable()
+export class UserService {
+  constructor(private prisma: PrismaService) {}
 
-?> 提示： 要立即创建新模块和服务，我们可以使用 [Nest CLI](/8/cli.md)。创建 `PrismaModule` 类型 `nest g module prisma` 和服务 `nest g service prisma/prisma`
+  async user(
+    userWhereUniqueInput: Prisma.UserWhereUniqueInput,
+  ): Promise<User | null> {
+    return this.prisma.user.findUnique({
+      where: userWhereUniqueInput,
+    });
+  }
 
-### 用法
+  async users(params: {
+    skip?: number;
+    take?: number;
+    cursor?: Prisma.UserWhereUniqueInput;
+    where?: Prisma.UserWhereInput;
+    orderBy?: Prisma.UserOrderByWithRelationInput;
+  }): Promise<User[]> {
+    const { skip, take, cursor, where, orderBy } = params;
+    return this.prisma.user.findMany({
+      skip,
+      take,
+      cursor,
+      where,
+      orderBy,
+    });
+  }
 
-若要使用新的服务，我们要 import `PrismaModule`，并注入 `PrismaService` 到 `UsersResolver`。
+  async createUser(data: Prisma.UserCreateInput): Promise<User> {
+    return this.prisma.user.create({
+      data,
+    });
+  }
 
-> users.module.ts
+  async updateUser(params: {
+    where: Prisma.UserWhereUniqueInput;
+    data: Prisma.UserUpdateInput;
+  }): Promise<User> {
+    const { where, data } = params;
+    return this.prisma.user.update({
+      data,
+      where,
+    });
+  }
 
-```typescript
-import { Module } from '@nestjs/common';
-import { UsersResolver } from './users.resolver';
-import { PrismaModule } from '../prisma/prisma.module';
-
-@Module({
-  imports: [PrismaModule],
-  providers: [UsersResolver],
-})
-export class UsersModule {}
-```
-
-导入 `PrismaModule` 可以在 `UsersModule` 上下文中使用导出的 `PrismaService` 。
-
-> users.resolver.ts
-
-```typescript
-import { Query, Resolver, Args, Info } from '@nestjs/graphql';
-import { PrismaService } from '../prisma/prisma.service';
-import { User } from '../graphql.schema';
-
-@Resolver()
-export class UsersResolver {
-  constructor(private readonly prisma: PrismaService) {}
-
-  @Query('users')
-  async getUsers(@Args() args, @Info() info): Promise<User[]> {
-    return await this.prisma.query.users(args, info);
+  async deleteUser(where: Prisma.UserWhereUniqueInput): Promise<User> {
+    return this.prisma.user.delete({
+      where,
+    });
   }
 }
 ```
 
-### 例子
+请注意您如何使用 Prisma Client 的生成类型来确保您的服务公开的方法类型正确。 因此，您可以节省键入模型和创建其他接口或 DTO 文件的样板文件。
 
-[这里](https://github.com/nestjs/nest/tree/master/sample/22-graphql-prisma)有一个稍微修改过的示例。
+现在对 `Post` 模型执行相同的操作。
+
+仍然在 `src` 目录中，创建一个新文件 `post.service.ts` ，并向其中添加以下代码：
+```typescript
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from './prisma.service';
+import { Post, Prisma } from '@prisma/client';
+
+@Injectable()
+export class PostService {
+  constructor(private prisma: PrismaService) {}
+
+  async post(
+    postWhereUniqueInput: Prisma.PostWhereUniqueInput,
+  ): Promise<Post | null> {
+    return this.prisma.post.findUnique({
+      where: postWhereUniqueInput,
+    });
+  }
+
+  async posts(params: {
+    skip?: number;
+    take?: number;
+    cursor?: Prisma.PostWhereUniqueInput;
+    where?: Prisma.PostWhereInput;
+    orderBy?: Prisma.PostOrderByWithRelationInput;
+  }): Promise<Post[]> {
+    const { skip, take, cursor, where, orderBy } = params;
+    return this.prisma.post.findMany({
+      skip,
+      take,
+      cursor,
+      where,
+      orderBy,
+    });
+  }
+
+  async createPost(data: Prisma.PostCreateInput): Promise<Post> {
+    return this.prisma.post.create({
+      data,
+    });
+  }
+
+  async updatePost(params: {
+    where: Prisma.PostWhereUniqueInput;
+    data: Prisma.PostUpdateInput;
+  }): Promise<Post> {
+    const { data, where } = params;
+    return this.prisma.post.update({
+      data,
+      where,
+    });
+  }
+
+  async deletePost(where: Prisma.PostWhereUniqueInput): Promise<Post> {
+    return this.prisma.post.delete({
+      where,
+    });
+  }
+}
+```
+
+您的 `UserService` 和 `PostService` 当前包装了Prisma客户端中可用的CRUD查询。在真实的应用程序中，services也是向应用程序添加业务逻辑的地方。例如，您可以在 `UserService` 中拥有一个名为 `updatePassword` 的方法用来负责更新用户的密码。
+
+**在主应用控制器中实现 `REST API` 路由**
+
+最后，您将使用您在前几节中创建的服务来实现应用的不同路由。在本指南中，您将把所有路由放入现有的 `AppController` 类中。
+
+将 `app.controller.ts` 文件的内容替换为以下代码：
+```typescript
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Body,
+  Put,
+  Delete,
+} from '@nestjs/common';
+import { UserService } from './user.service';
+import { PostService } from './post.service';
+import { User as UserModel, Post as PostModel } from '@prisma/client';
+
+@Controller()
+export class AppController {
+  constructor(
+    private readonly userService: UserService,
+    private readonly postService: PostService,
+  ) {}
+
+  @Get('post/:id')
+  async getPostById(@Param('id') id: string): Promise<PostModel> {
+    return this.postService.post({ id: Number(id) });
+  }
+
+  @Get('feed')
+  async getPublishedPosts(): Promise<PostModel[]> {
+    return this.postService.posts({
+      where: { published: true },
+    });
+  }
+
+  @Get('filtered-posts/:searchString')
+  async getFilteredPosts(
+    @Param('searchString') searchString: string,
+  ): Promise<PostModel[]> {
+    return this.postService.posts({
+      where: {
+        OR: [
+          {
+            title: { contains: searchString },
+          },
+          {
+            content: { contains: searchString },
+          },
+        ],
+      },
+    });
+  }
+
+  @Post('post')
+  async createDraft(
+    @Body() postData: { title: string; content?: string; authorEmail: string },
+  ): Promise<PostModel> {
+    const { title, content, authorEmail } = postData;
+    return this.postService.createPost({
+      title,
+      content,
+      author: {
+        connect: { email: authorEmail },
+      },
+    });
+  }
+
+  @Post('user')
+  async signupUser(
+    @Body() userData: { name?: string; email: string },
+  ): Promise<UserModel> {
+    return this.userService.createUser(userData);
+  }
+
+  @Put('publish/:id')
+  async publishPost(@Param('id') id: string): Promise<PostModel> {
+    return this.postService.updatePost({
+      where: { id: Number(id) },
+      data: { published: true },
+    });
+  }
+
+  @Delete('post/:id')
+  async deletePost(@Param('id') id: string): Promise<PostModel> {
+    return this.postService.deletePost({ id: Number(id) });
+  }
+}
+```
+
+该控制器实现以下路由：
+
+`GET`
+* `/post/:id`：获取 `id` 查询单个帖子
+* `、feed`: 查询所有*已发布*的帖子
+* `/filter-posts/:searchString`: 通过 `title` 或 `content` 字段过滤帖子
+
+`POST`
+* `/post`: 创建一个新的帖子
+  * Body:
+    * `title: String`(必选): 帖子的标题
+    * `content: String`(可选): 帖子的内容
+    * `authorEmail: String`(必选): 发帖人的邮箱
+* `/user`: 创建一个新用户
+  * Body：
+    * `email: String`(必选): 用户的邮箱地址 
+    * `name: String`(可选): 用户的名字
+
+`PUT`
+* `/publish/:id`：发布指定 `id` 的帖子
+
+`DELETE`
+* `/post/:id`：删除指定 `id` 的帖子
+
+### enableShutdownHooks的问题
+
+Prisma通过 `enableShutdownHooks` 干扰NestJS。Prisma监听关闭信号，并在应用程序关闭的回调钩子触发之前调用 `process.exit()`。要解决这个问题，您需要为Prisma `beforeExit` 事件添加一个监听器。
+
+```typescript
+// main.ts
+...
+import { PrismaService } from './services/prisma/prisma.service';
+...
+async function bootstrap() {
+  ...
+  const prismaService = app.get(PrismaService);
+  await prismaService.enableShutdownHooks(app)
+  ...
+}
+bootstrap()
+```
+
+您可以[阅读更多](https://github.com/prisma/prisma/issues/2917#issuecomment-708340112)关于Prisma处理关闭信号和 `beforeExit` 事件的信息。
+
+### 总结
+
+在本秘籍中，您学习了如何使用通过Prisma和NestJS来实现REST API。实现API路由的控制器调用 `PrismaService`，`PrismaService` 通过Prisma客户端向数据库发送查询，以满足传入请求的数据需求。
+
+如果您想了解更多有关将NestJS与Prisma结合使用的信息，请务必查看以下资源：
+* [NestJS & Prisma](https://www.prisma.io/nestjs)
+* [Ready-to-run example projects for REST & GraphQL](https://github.com/prisma/prisma-examples/)
+* [Production-ready starter kit](https://github.com/notiz-dev/nestjs-prisma-starter#instructions)
+* [Video: Accessing Databases using NestJS with Prisma (5min)](https://www.youtube.com/watch?v=UlVJ340UEuk) by [Marc Stammerjohann](https://github.com/marcjulian)
+
+
+
+
 
 
 

@@ -187,6 +187,13 @@ $ npm run start
 
 此命令启动 HTTP 服务监听定义在 `src/main.ts` 文件中定义的端口号。在应用程序运行后, 打开浏览器并访问 `http://localhost:3000/`。 你应该看到 `Hello world!` 信息。
 
+要监听文件中的更改，您可以运行以下命令来启动应用程序：
+```
+$ npm run start:dev
+```
+
+此命令将监听您的文件，自动重新编译并重新加载服务器。
+
 **[学习资料](https://docs.nestjs.cn/9/awesome?id=%e7%9b%b8%e5%85%b3%e8%b5%84%e6%ba%90)**
 
 ### 支持我们

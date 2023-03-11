@@ -4,11 +4,9 @@
 
 身份验证是大多数现有应用程序的重要组成部分。有许多不同的方法、策略和方法来处理用户授权。任何项目采用的方法取决于其特定的应用程序要求。本章介绍了几种可以适应各种不同要求的身份验证方法。
 
-`passport` 是目前最流行的 `node.js` 认证库，为社区所熟知，并相继应用于许多生产应用中。将此工具与 `Nest` 框架集成起来非常简单。为了演示，我们将设置 passport-http-bearer 和 passport-jwt 策略。
+`Passport`是最流行的 `node.js` 身份验证库，为社区所熟知，并成功地应用于许多生产应用程序中。使用 `@nestjs/passport` 模块，可以很容易地将这个库与 `Nest` 应用程序集成。从高层次来看，`Passport` 执行一系列步骤以：
 
-`Passport`是最流行的 `node.js` 身份验证库，为社区所熟知，并成功地应用于许多生产应用程序中。将这个库与使用 `@nestjs/passport` 模块的 `Nest` 应用程序集成起来非常简单。在较高级别，`Passport` 执行一系列步骤以：
-
-- 通过验证用户的"证"(例如用户名/密码、`JSON Web`令牌( `JWT` )或身份提供者的身份令牌)来验证用户的身份。
+- 通过验证用户的"凭证"(例如用户名/密码、`JSON Web`令牌( `JWT` )或身份提供者的身份令牌)来验证用户的身份。
 
 - 管理经过身份验证的状态(通过发出可移植的令牌，例如 `JWT`，或创建一个 `Express` 会话)
 
@@ -33,7 +31,7 @@ $ npm install --save-dev @types/passport-local
 
 对于您选择的任何 `Passport` 策略，都需要 `@nestjs/Passport` 和 `Passport` 包。然后，需要安装特定策略的包(例如，`passport-jwt` 或 `passport-local`)，它实现您正在构建的特定身份验证策略。此外，您还可以安装任何 `Passport`策略的类型定义，如上面的 `@types/passport-local` 所示，它在编写 `TypeScript` 代码时提供了帮助。
 
-### Passport 策略
+### 实现 Passport 策略
 
 现在可以实现身份认证功能了。我们将首先概述用于任何 `Passport` 策略的流程。将 `Passport` 本身看作一个框架是有帮助的。框架的优雅之处在于，它将身份验证过程抽象为几个基本步骤，您可以根据实现的策略对这些步骤进行自定义。它类似于一个框架，因为您可以通过提供定制参数(作为 `JSON` 对象)和回调函数( `Passport` 在适当的时候调用这些回调函数)的形式来配置它。 `@nestjs/passport` 模块将该框架包装在一个 `Nest` 风格的包中，使其易于集成到 `Nest` 应用程序中。下面我们将使用 `@nestjs/passport` ，但首先让我们考虑一下 `vanilla Passport` 是如何工作的。
 
@@ -153,6 +151,7 @@ import { UsersModule } from '../users/users.module';
 })
 export class AuthModule {}
 ```
+### 实现 Passport local
 
 现在我们可以实现 `Passport` 本地身份验证策略。在 auth 文件夹中创建一个名为 `local.strategy.ts` 文件，并添加以下代码:
 
@@ -287,7 +286,7 @@ async login(@Request() req) {
 我们需要安装更多的包来支持我们的 `JWT` 需求:
 
 ```bash
-$ npm install @nestjs/jwt passport-jwt
+$ npm install --save @nestjs/jwt passport-jwt
 $ npm install @types/passport-jwt --save-dev
 ```
 
@@ -408,7 +407,7 @@ $ # result -> {"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."}
 $ # Note: above JWT truncated
 ```
 
-### 实施 Passport JWT
+### 实现 Passport JWT
 
 我们现在可以处理我们的最终需求:通过要求在请求时提供有效的 `JWT` 来保护端点。`Passport` 对我们也有帮助。它提供了用于用 `JSON Web` 标记保护 `RESTful` 端点的 `passport-jwt` 策略。在 `auth` 文件夹中 `jwt.strategy.ts`，并添加以下代码:
 
@@ -440,7 +439,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
 - `jwtFromRequest`:提供从请求中提取 `JWT` 的方法。我们将使用在 `API` 请求的授权头中提供`token`的标准方法。这里描述了其他选项。
 
-`ignoreExpiration`:为了明确起见，我们选择默认的 `false` 设置，它将确保 `JWT` 没有过期的责任委托给 `Passport` 模块。这意味着，如果我们的路由提供了一个过期的 `JWT` ，请求将被拒绝，并发送 `401` 未经授权的响应。`Passport` 会自动为我们办理。
+`ignoreExpiration`:为了明确起见，我们选择默认的 `false` 设置，它将确保 `JWT` 没有过期的责任委托给 `Passport` 模块。这意味着，如果我们的路由提供了一个过期的 `JWT` ，请求将被拒绝，并发送 `401 Unauthorized` 的响应。`Passport` 会自动为我们办理。
 
 `secret orkey`:我们使用权宜的选项来提供对称的秘密来签署令牌。其他选项，如 `pemo` 编码的公钥，可能更适合于生产应用程序(有关更多信息，请参见[此处](https://github.com/mikenicholson/passport-jwt#extracting-the-jwt-from-the-request))。如前所述，无论如何，不要把这个秘密公开。
 
@@ -481,7 +480,9 @@ export class AuthModule {}
 
 通过导入 `JWT` 签名时使用的相同密钥，我们可以确保 `Passport` 执行的验证阶段和 `AuthService` 执行的签名阶段使用公共密钥。
 
-实现受保护的路由和 `JWT` 策略保护，我们现在可以实现受保护的路由及其相关的保护。
+### 实现受保护的路由和 JWT 策略守卫
+
+我们现在可以实现受保护的路由及其相关的守卫。
 
 打开 `app.controller.ts` 文件，更新如下:
 
@@ -510,7 +511,7 @@ export class AppController {
 }
 ```
 
-同样，我们将应用在配置 `passport-jwt` 模块时 `@nestjs/passport` 模块自动为我们提供的 `AuthGuard` 。这个保护由它的默认名称 `jwt` 引用。当我们请求` GET /profile` 路由时，保护程序将自动调用我们的 `passport-jwt` 自定义配置逻辑，验证 `JWT` ，并将用户属性分配给请求对象。
+同样，我们将应用 `AuthGuard` 守卫，在我们配置 `passport-jwt` 模块时 `@nestjs/passport` 模块自动为我们提供过它。这个守卫由它的默认名称 `jwt` 引用。当我们请求` GET /profile` 路由时，守卫程序将自动调用我们的 `passport-jwt` 自定义配置逻辑，验证 `JWT` ，并将用户属性分配给请求对象。
 
 确保应用程序正在运行，并使用 `cURL` 测试路由。
 
@@ -528,7 +529,7 @@ $ curl http://localhost:3000/profile -H "Authorization: Bearer eyJhbGciOiJIUzI1N
 $ # result -> {"userId":1,"username":"john"}
 ```
 
-注意，在 `AuthModule` 中，我们将 `JWT` 配置为 `60` 秒过期。这个过期时间可能太短了，而处理令牌过期和刷新的细节超出了本文的范围。然而，我们选择它来展示`JWT` 的一个重要品质和 `Passport-jwt` 策略。如果您在验证之后等待 `60` 秒再尝试 `GET /profile` 请求，您将收到 `401` 未授权响应。这是因为 `Passport` 会自动检查 `JWT` 的过期时间，从而省去了在应用程序中这样做的麻烦。
+注意，在 `AuthModule` 中，我们将 `JWT` 配置为 `60` 秒过期。这个过期时间可能太短了，而处理令牌过期和刷新的细节超出了本文的范围。然而，我们选择它来展示`JWT` 的一个重要品质和 `Passport-jwt` 策略。如果您在验证之后等待 `60` 秒再尝试 `GET /profile` 请求，您将收到 `401 Unauthorized` 响应。这是因为 `Passport` 会自动检查 `JWT` 的过期时间，从而省去了在应用程序中这样做的麻烦。
 
 我们现在已经完成了 `JWT` 身份验证实现。`JavaScript` 客户端(如 `Angular/React/Vue` )和其他 `JavaScript` 应用程序现在可以安全地与我们的 `API` 服务器进行身份验证和通信。在[这里](https://github.com/nestjs/nest/tree/master/sample/19-auth-jwt)可以看到本节完整的程序代码。
 
@@ -563,6 +564,66 @@ import { JwtStrategy } from './jwt.strategy';
   exports: [AuthService],
 })
 export class AuthModule {}
+```
+
+### 启用全局身份验证
+
+如果您的大多数端点都应该默认受到保护，您可以将身份验证守卫注册为[全局守卫](https://docs.nestjs.cn/9/guards?id=%e7%bb%91%e5%ae%9a%e5%ae%88%e5%8d%ab)，而不是在每个控制器上使用 `@UseGuards()` 装饰器，您可以简单地标记哪些路由应该是公开的。
+
+首先，使用以下构造（在任何模块中）将 `JwtAuthGuard` 注册为全局守卫：
+
+```typescript
+providers: [
+  {
+    provide: APP_GUARD,
+    useClass: JwtAuthGuard,
+  },
+],
+```
+
+有了这个，`Nest` 将自动将 `JwtAuthGuard` 绑定到所有端点。
+
+现在我们必须提供一种机制来声明哪些路由是公开的。为此，我们可以使用 `SetMetadata` 装饰器工厂函数创建一个自定义装饰器。
+
+```typescript
+import { SetMetadata } from '@nestjs/common';
+
+export const IS_PUBLIC_KEY = 'isPublic';
+export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
+```
+
+在上面的文件中，我们导出了两个常量。一个是我们的元数据键，名为 `IS_PUBLIC_KEY`，另一个是我们要称为 `Public` 的新装饰器（您也可以将其命名为 `SkipAuth` 或 `AllowAnon`，任何适合您项目的名称）。
+
+现在我们有了一个自定义的 `@Public()` 装饰器，我们可以用它来装饰任何方法，如下所示：
+
+```typescript
+@Public()
+@Get()
+findAll() {
+  return [];
+}
+```
+
+最后，我们需要在找到 “`isPublic`” 元数据时，让 `JwtAuthGuard` 返回 `true`。为此，我们将使用 `Reflector` 类（在[这里](https://docs.nestjs.cn/9/guards?id=%e5%b0%8f%e7%bb%93)阅读更多）。
+
+```typescript
+@Injectable()
+export class JwtAuthGuard extends AuthGuard('jwt') {
+  constructor(private reflector: Reflector) {
+    super();
+  }
+
+  canActivate(context: ExecutionContext) {
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    if (isPublic) {
+      return true;
+    }
+    return super.canActivate(context);
+  }
+}
 ```
 
 ### 请求范围策略

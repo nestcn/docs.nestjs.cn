@@ -2660,7 +2660,7 @@ get fullName(): string {
 您可以使用 `@Transform()` 装饰器执行其他数据转换。例如，您要选择一个名称 `RoleEntity` 而不是返回整个对象。
 
 ```typescript
-@Transform(role => role.name)
+@Transform(({value}) => value.name)
 role: RoleEntity;
 ```
 

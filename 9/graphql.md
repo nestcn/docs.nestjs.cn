@@ -1,15 +1,42 @@
 # GraphQL
 
-## 驾驭 TypeScript 和 GraphQL 的强大功能
+## 利用 TypeScript 和 GraphQL 的强大能力
 
-[<span style="color:red">GraphQL</span>](https://graphql.org/) 是一种用于 API 的强大查询语言，是使用现有数据来完成这些查询的运行时。这是一种优雅的方法，可以解决我们在典型REST APIs 中遇到的许多问题 。为了解背景，我们建议你阅读一下 GraphQL 和 REST 之间的[<span style="color:red">比较</span>](https://dev-blog.apollodata.com/graphql-vs-rest-5d425123e34b) 。GraphQL 与 [<span style="color:red">TypeScript</span>](https://www.typescriptlang.org/) 相结合，能帮你在 GraphQL 查询中开发出更好的类型安全性，从而为你提供端到端的输入。
+[<span style="color:red">GraphQL</span>](https://graphql.org/) 是一种功能强大的API查询语言，也是一种使用已有数据完成这些查询的运行时。这是一种优雅的方式，可以解决通常在REST API种发现的诸多问题。作为背景知识，我们建议你阅读这篇关于GraphQL 和 REST[<span style="color:red">对比</span>](https://dev-blog.apollodata.com/graphql-vs-rest-5d425123e34b)的文章 。GraphQL 与 [<span style="color:red">TypeScript</span>](https://www.typescriptlang.org/) 相结合可以帮助你通过使用GraphQL查询语句开发出更好的安全类型查询，为你提供端到端的类型验证。
 
-在本章中, 我们假设你对 GraphQL 已经有了基本的了解，我们将不解释什么是 GraphQL, 而是重点介绍如何使用内置的 `@nestjs/graphql` 模块。`GraphQLModule` 仅仅是 [<span style="color:red">Apollo</span>](https://www.apollographql.com) Server 的包装器。我们没有造轮子, 而是提供一个现成的模块, 这让 GraphQL 和 Nest 有了比较简洁的融合方式。
+在本章中，我们假定你已经对GraphQL有了基本的了解，所以我们只关注如何使用内置的 `@nestjs/graphql` 模块进行开发。GraphQLModule 可以配置为使用 [Apollo 服务](https://www.apollographql.com/) （使用 `@nestjs/apollo` 驱动程序）或 [Mercurius](https://github.com/mercurius-js/mercurius) 服务（使用 `@nestjs/mercurius` 驱动程序）。我们给这些久经考验的 GraphQL 包提供官方集成方案，提供了一个简单的方式来使用 GraphQL 和 Nest 。另外你也可以构建自己专用的驱动程序（[参考此处](/graphql/other-features#creating-a-custom-driver)）。
+
+
 
 
 ### 安装
 
 首先，我们需要安装以下依赖包：
+
+ <!-- tabs:start -->
+ 
+#### ** For Express and Apollo (default) **
+
+```
+$ npm i @nestjs/graphql @nestjs/apollo graphql apollo-server-express
+```
+
+#### ** For Express and Apollo (default) **
+ 
+```
+npm i @nestjs/graphql @nestjs/apollo graphql apollo-server-fastify
+```
+
+#### ** For Express and Apollo (default) **
+
+```
+npm i @nestjs/graphql @nestjs/mercurius graphql mercurius fastify
+```
+
+<!-- tabs:end -->
+
+
+
 
 ```bash
 $ npm i --save @nestjs/graphql graphql-tools graphql apollo-server-express@2.x.x

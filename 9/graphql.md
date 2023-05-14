@@ -21,13 +21,13 @@
 $ npm i @nestjs/graphql @nestjs/apollo graphql apollo-server-express
 ```
 
-#### ** For Express and Apollo (default) **
+#### ** For Fastify and Apollo **
  
 ```
 npm i @nestjs/graphql @nestjs/apollo graphql apollo-server-fastify
 ```
 
-#### ** For Express and Apollo (default) **
+#### ** Fastify and Mercurius **
 
 ```
 npm i @nestjs/graphql @nestjs/mercurius graphql mercurius fastify
@@ -37,12 +37,8 @@ npm i @nestjs/graphql @nestjs/mercurius graphql mercurius fastify
 
 
 
+>? 警告 @nestjs/graphql@>9 和 @nestjs/apollo^10这 两个包兼容 Apollo v3（查阅Apollo Server 3 [迁移指南](https://www.apollographql.com/docs/apollo-server/migration/)获取更新信息），但是 @nestjs/graphql@^8 只支持 Apollo v2（例如：apollo-server-express@2.x.x 这个包）。
 
-```bash
-$ npm i --save @nestjs/graphql graphql-tools graphql apollo-server-express@2.x.x
-```
-
-?> 如果你使用 Fastify，则安装 `apollo-server-fastify`，替代安装 `apollo-server-express`。
 
 ### 概述
 

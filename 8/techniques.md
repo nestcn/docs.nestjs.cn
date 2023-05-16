@@ -3943,7 +3943,7 @@ app.use(cookieParser());
 可以向`cookieParser`中间件中传递一些参数：
 
 - `secret`： 一个字符串或者数组，用来给`cookie`签名。如果不指定这个选项，将不解析签名的`cookie`。如果提供了一个字符串，那么它会被用来作为`secret`。如果提供了一个数组，将尝试依次使用其元素来作为`secret`解析`cookie`。
-- `option`：一个作为第二个参数传递给`cookie.parse`的对象，参见`[cookie](https://www.npmjs.org/package/cookie)`来了解更多内容。
+- `option`：一个作为第二个参数传递给`cookie.parse`的对象，参见[cookie](https://www.npmjs.org/package/cookie)来了解更多内容。
 
 该中间件将从请求的头文件中解析`Cookie`并将其数据作为`req.cookies`暴露出来。如果提供了`secret`，将暴露为`req.signedCookies`。这些属性以`cookie`名称和属性的键值对保存。
 

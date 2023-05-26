@@ -2303,7 +2303,9 @@ import { AppController } from './app.controller';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
-  imports: [CacheModule.register()],
+  imports: [CacheModule.register({
+   isGlobal: true,
+  })],
   controllers: [AppController],
   providers: [
     {

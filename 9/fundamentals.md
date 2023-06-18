@@ -766,7 +766,7 @@ export class CommonService {
 export class CommonModule {}
 ```
 
-## 模块参考
+## 模块引用
 
 Nest提供了一个`ModuleRef`类来导航到内部提供者列表，并使用注入令牌作为查找键名来获取一个引用。`ModuleRef`类也提供了一个动态实例化静态和范围的提供者的方法。`ModuleRef`可以通过常规方法注入到类中：
 

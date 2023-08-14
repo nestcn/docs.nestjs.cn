@@ -27,7 +27,7 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
 
 微信三群：    
 
-<img src="https://ghproxy.com/https://raw.githubusercontent.com/zuohuadong/imgbed/main/pic/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20211213153131.jpg" alt="加微信" width="260" height="260" align="bottom" />
+<img src="https://ghproxy.com/https://raw.githubusercontent.com/zuohuadong/imgbed/main/pic/siqun.jpg" alt="加微信" width="260" height="260" align="bottom" />
 
 如果二维码过期，请添加：
 

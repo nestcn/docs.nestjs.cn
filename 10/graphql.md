@@ -253,7 +253,7 @@ definitionsFactory.generate({
 
 要用 [Apollo Sandbox](https://www.apollographql.com/blog/announcement/platform/apollo-sandbox-an-open-graphql-ide-for-local-development/) 替代 graphql-playground 作为你本地开发的 GraphQL IDE，使用以下配置：
 
-```
+```typescript
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -347,7 +347,7 @@ GraphQLModule.forRootAsync<ApolloDriverConfig>({
 
 除了使用Apollo，Fastify用户（[在此](https://docs.nestjs.com/techniques/performance)了解更多信息）也可以使用@nestjs/mercurius驱动程序。    
 
-```
+```typescript
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { MercuriusDriver, MercuriusDriverConfig } from '@nestjs/mercurius';

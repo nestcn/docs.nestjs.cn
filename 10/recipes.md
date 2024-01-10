@@ -4,7 +4,7 @@
 
 REPL 是一个简单的交互式环境，它接受单个用户输入，执行这些输入，并将结果返回给用户。REPL 功能允许您直接从终端检查依赖关系图并调用提供程序（和控制器）上的方法。
 
-#### 用法
+### 用法
 
 若要在 REPL 模式下运行 NestJS 应用程序，请创建一个新 `repl.ts` 文件 (与现有的 `main.ts` 文件放在一起) ，并在其中添加以下代码：
 
@@ -87,7 +87,7 @@ AppModule:
 
 您可以在下面的小节中找到有关现有的、预定义的本机方法的更多信息。
 
-#### 原生函数
+### 原生函数
 
 内置的 NestJS REPL 提供了一些全局可用的原生函数。你可以调用 `help()` 来列出它们。
 
@@ -113,7 +113,7 @@ Interface: $(token: InjectionToken) => any
 | `resolve`    | 解析可注入对象或控制器的瞬态或请求作用域实例，否则抛出异常。   | `resolve(token: InjectionToken, contextId: any) => Promise<any>`      |
 | `select`     | 允许在模块树中导航，例如，从选定的模块中拉出特定实例。         | `select(token: DynamicModule \| ClassRef) => INestApplicationContext` |
 
-#### 监视模式
+### 监视模式
 
 在开发过程中，可以在监视模式下运行REPL，以自动反映所有代码更改:
 

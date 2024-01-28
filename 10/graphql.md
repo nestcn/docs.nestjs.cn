@@ -99,17 +99,17 @@ export class AppModule {}
 
 ### GraphQL playground
 
-palyground 是一个图形化、可交互、嵌入浏览器内的 GraphQL IDE，和 GraphQL 服务本身的默认 URL 是一样的。要使用 playground，你需要配置并运行一个基础的 GraphQ L服务。要现在看，你可以安装并构建这个[示例项目](https://github.com/nestjs/nest/tree/master/sample/23-graphql-code-first)。或者，如果你跟着这些代码样例学习，一旦你完成了[解析器章节]()中的步骤，你就可以进入 playground 了。
+Playground 是一个图形化、可交互、嵌入浏览器内的 GraphQL IDE，和 GraphQL 服务本身的默认 URL 是一样的。要使用 playground，你需要配置并运行一个基础的 GraphQ L服务。要现在看，你可以安装并构建这个[示例项目](https://github.com/nestjs/nest/tree/master/sample/23-graphql-code-first)。或者，如果你跟着这些代码样例学习，一旦你完成了[解析器章节]()中的步骤，你就可以进入 playground 了。
 
 到时候，只要将你的程序运行起来，你就可以打开浏览器并导航到 `http://localhost:3000/graphql` （主机名和端口可能根据你自己的配置有所不同）。你将看到 GraphQL playground，如下所示。
 
 ![](https://docs.nestjs.com/assets/playground.png)
 
-?> 注意 @nestjs/mercurius 集成方案中不包含内置的 GraphQL Playground的集成。你可以使用 GraphiQL（设置graphiql: true）替代。
+?> 注意 `@nestjs/mercurius` 集成方案中不包含内置的 GraphQL Playground的集成。你可以使用 GraphiQL（设置graphiql: true）替代。
 
 ### 多个端点
 
-`@estjs/graphql` 模块的另一个非常有用的特性是可以同时启动多个端点。这能让你自己决定哪个端点将包含哪些模块。默认情况下，GraphQL会在整个应用程序中搜索解析器。要限制该扫描仅在部分模块中进行，使用 include 属性。
+`@nestjs/graphql` 模块的另一个非常有用的特性是可以同时启动多个端点。这能让你自己决定哪个端点将包含哪些模块。默认情况下，GraphQL会在整个应用程序中搜索解析器。要限制该扫描仅在部分模块中进行，使用 include 属性。
 ```typescript
 GraphQLModule.forRoot({
   include: [CatsModule],
@@ -335,7 +335,7 @@ class GqlConfigService implements GqlOptionsFactory {
 }
 ```
 
-如果你希望重用一个现有的选项提供者而不是在 GraphQLModule 中创建私有副本，可使用 useExisting 语法。
+如果你希望重用一个现有的选项提供者而不是在 `GraphQLModule` 中创建私有副本，可使用 `useExisting` 语法。
 
 ```typescript
 GraphQLModule.forRootAsync<ApolloDriverConfig>({

@@ -99,7 +99,7 @@ async findOne(@User('firstName') firstName: string) {
 
 ```typescript
 @Get()
-async findOne(@User(new ValidationPipe()) user: UserEntity) {
+async findOne(@User(new ValidationPipe({ validateCustomDecorators: true })) user: UserEntity) {
   console.log(user);
 }
 ```

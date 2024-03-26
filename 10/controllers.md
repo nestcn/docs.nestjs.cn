@@ -62,12 +62,12 @@ export class CatsController {
 
 ?> 为了在 `express` 中使用 `Typescript` （如 `request: Request` 上面的参数示例所示），请安装 `@types/express` 。
 
-`Request` 对象代表 `HTTP` 请求，并具有查询字符串，请求参数参数，HTTP 标头（HTTP header） 和 正文（HTTP body）的属性（在[这里](https://expressjs.com/en/api.html#req)阅读更多）。在多数情况下，不必手动获取它们。 我们可以使用专用的装饰器，比如开箱即用的 `@Body()` 或 `@Query()` 。 下面是 Nest 提供的装饰器及其代表的底层平台特定对象的对照列表。
+`Request` 对象代表 `HTTP` 请求，并具有查询字符串，请求参数，HTTP 标头（HTTP header） 和 正文（HTTP body）的属性（在[这里](https://expressjs.com/en/api.html#req)阅读更多）。在多数情况下，不必手动获取它们。 我们可以使用专用的装饰器，比如开箱即用的 `@Body()` 或 `@Query()` 。 下面是 Nest 提供的装饰器及其代表的底层平台特定对象的对照列表。
 
 |                           |                                   |
 | ------------------------- | --------------------------------- |
 | `@Request()，@Req()`      | `req`                             |
-| `@Response()，@Res()*`    | `res`                             |
+| `@Response()，@Res()`     | `res`                             |
 | `@Next()`                 | `next`                            |
 | `@Session()`              | `req.session`                     |
 | `@Param(key?: string)`    | `req.params`/`req.params[key]`    |

@@ -67,7 +67,7 @@ export class CatsController {
 |                           |                                   |
 | ------------------------- | --------------------------------- |
 | `@Request()，@Req()`      | `req`                             |
-| `@Response()，@Res()*`    | `res`                             |
+| `@Response()，@Res()`     | `res`                             |
 | `@Next()`                 | `next`                            |
 | `@Session()`              | `req.session`                     |
 | `@Param(key?: string)`    | `req.params`/`req.params[key]`    |

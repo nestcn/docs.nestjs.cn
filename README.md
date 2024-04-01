@@ -42,7 +42,7 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
 
 ## 赞助商广告：
 
-[UClould 59元一年 VPS](https://www.ucloud.cn/site/active/kuaijiesale.html?invitation_code=C1x5337F9CEC60E59)
+[UClould 59元一年 VPS](https://www.ucloud.cn/site/active/kuaijiesale.html?invitation_code=C1x5337F9CEC60E)
 
 
 本站托管在： 

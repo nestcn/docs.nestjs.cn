@@ -46,7 +46,8 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
 
 
 本站托管在： 
-[CloudFlare](https://www.cloudflare.com)    
+[CloudFlare](https://www.cloudflare.com)   
+[京东云 六折优惠](https://partner.jdcloud.com/partner/notice/39c68afb71a544e4883b6cd79bb5dffd)
 [vultr   （免费送 100 美金）](https://www.vultr.com/?ref=8967015-8H)  
 [RamNode - 3美元-100G 高防](https://clientarea.ramnode.com/aff.php?aff=3451)    
 [Onevps-不限流量](https://www.onevps.cloud/?aff=12238)    
@@ -62,10 +63,7 @@ SSL 证书：
 捐赠通道：    
 [【捐赠】](https://gitee.com/notadd/docs.nestjs.cn?donate=true)   
 
-百度云加速：WEB 高防，CDN 加速  QQ：1256985886     
-专业版：30节点 100G/天 10GDDOS 防护  1690元/年 （买一送一）    
-商务版：40节点 500G/天 20GDDOS 防护  6990元/年 （买一送一）    
-企业版：50节点 1T/天 30GDDOS 防护  24990元/年 （买一送一）     
+  
 
 
 [![vultr](https://www.vultr.com/media/banner_1.png)](https://www.vultr.com/?ref=7815855-4F)

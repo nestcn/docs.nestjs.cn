@@ -42,7 +42,8 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
 
 ## 赞助商广告：
 
-[UClould 59元一年 VPS](https://www.ucloud.cn/site/active/kuaijiesale.html?invitation_code=C1x5337F9CEC60E)
+[京东云 产品6折起](https://partner.jdcloud.com/partner/notice/39c68afb71a544e4883b6cd79bb5dffd)
+[京东云 296元3年 VPS](https://www.jdcloud.com/cn/pages/2024618)
 
 
 本站托管在： 

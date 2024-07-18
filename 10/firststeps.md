@@ -21,7 +21,8 @@
 
 #### ** windows **
 
-1. [点击下载 Node.js](https://npmmirror.com/mirrors/node/v16.18.1/node-v16.18.1-x64.msi)
+1. [点击下载 Node.js](https://npmmirror.com/mirrors/node/v20.15.0/node-v20.15.0-x64.msi)
+
 
 
 2. 安装 Node.js
@@ -30,9 +31,9 @@ Powershell/CMD 可以打印出这个说明安装成功。（部分系统需要�
 
 ```
 $node -v
-v16.18.1
+v20.15.0
 $ npm -v
-7.x.x
+8.x.x
 ```
 
 #### ** linux **
@@ -63,9 +64,9 @@ nvm install --lts
 
 ```
 $node -v
-v16.18.1
+v20.x.x
 $ npm -v
-7.x.x
+8.x.x
 ```
 
 #### ** MacOS **
@@ -78,9 +79,9 @@ $ npm -v
 
 ```
 $node -v
-v16.18.1
+v20.x.x
 $ npm -v
-7.x.x
+8.x.x
 ```
 
 
@@ -96,9 +97,9 @@ sudo snap install node --classic --channel=16
 
 ```
 $node -v
-v16.18.1
+v20.x.x
 $ npm -v
-7.x.x
+8.x.x
 ```
 
 <!-- tabs:end -->

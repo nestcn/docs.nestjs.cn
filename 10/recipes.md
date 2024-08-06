@@ -9,15 +9,6 @@ REPL 是一个简单的交互式环境，它接受单个用户输入，执行这
 若要在 REPL 模式下运行 NestJS 应用程序，请创建一个新 `repl.ts` 文件 (与现有的 `main.ts` 文件放在一起) ，并在其中添加以下代码：
 
 ```typescript
-@@filename(repl)
-import { repl } from '@nestjs/core';
-import { AppModule } from './app.module';
-
-async function bootstrap() {
-  await repl(AppModule);
-}
-bootstrap();
-@@switch
 import { repl } from '@nestjs/core';
 import { AppModule } from './app.module';
 
@@ -83,7 +74,7 @@ AppModule:
 
 快速演示：
 
-<figure><img src="/assets/repl.gif" alt="REPL example" /></figure>
+<figure><img src="https://docs.nestjs.com/assets/repl.gif" alt="REPL example" /></figure>
 
 您可以在下面的小节中找到有关现有的、预定义的本机方法的更多信息。
 

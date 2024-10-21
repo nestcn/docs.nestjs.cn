@@ -1556,7 +1556,7 @@ $ npm run start:dev
 $ npm install --save typeorm mysql2
 ```
 
-我们需要做的第一步是使用从 `typeorm` 包导入的 `createConnection()` 函数建立与数据库的连接。`createConnection()` 函数返回一个 `Promise`，因此我们必须创建一个[异步提供者](/8/fundamentals.md?id=异步提供者 ( `Asynchronous providers` ))。
+我们需要做的第一步是使用从 `typeorm` 包导入的 `new DataSource().initialize()` 建立与数据库的连接。`initialize()` 函数返回一个 `Promise`，因此我们必须创建一个[异步提供者](/8/fundamentals.md?id=异步提供者 ( `Asynchronous providers` ))。
 
 > database.providers.ts
 

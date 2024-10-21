@@ -1605,7 +1605,7 @@ import { databaseProviders } from './database.providers';
 export class DatabaseModule {}
 ```
 
-现在我们可以使用 `@Inject()` 装饰器注入 `Connection` 对象。依赖于 `Connection` 异步提供者的每个类都将等待 `Promise` 被解析。
+现在我们可以使用 `@Inject()` 装饰器注入 `DATA_SOURCE` 对象。依赖于 `DATA_SOURCE` 异步提供者的每个类都将等待 `Promise` 被解析。
 
 ### 存储库模式
 

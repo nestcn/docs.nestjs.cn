@@ -186,6 +186,8 @@ const app = await NestFactory.create<NestExpressApplication>(AppModule);
 $ npm run start
 ```
 
+?> 为了加快开发过程（构建速度快x20倍），您可以使用 [SWC builder](/recipes/swc) 请将 `-b swc` 标志传递给 `start` 脚本, 比如这样 `npm run start -- -b swc`.
+
 此命令启动 HTTP 服务监听定义在 `src/main.ts` 文件中定义的端口号。在应用程序运行后, 打开浏览器并访问 `http://localhost:3000/`。 你应该看到 `Hello world!` 信息。
 
 要监听文件中的更改，您可以运行以下命令来启动应用程序：
@@ -194,6 +196,17 @@ $ npm run start:dev
 ```
 
 此命令将监听您的文件，自动重新编译并重新加载服务器。
+
+
+#### 检查工具和格式化工具
+
+[CLI](/cli/overview) 提供一个可靠的大规模开发工作流框架。因此生成的 Nest 项目默认集成了代码检查工具和格式化工具（分别是 [eslint](https://eslint.org/) 和 [prettier](https://prettier.io/)）。
+
+?>  如果您不确定格式化工具和检查工具的作用区别。Not sure about the role of formatters vs linters? 点击 [这里](https://prettier.io/docs/en/comparison.html) 了解区别。
+
+为了确保最大的稳定性和可扩展性，我们使用了 [`eslint`](https://www.npmjs.com/package/eslint) 和 [`prettier`](https://www.npmjs.com/package/prettier) 的基础工具包。这种预设从设计上允许与官方（指Eslint，Prettier）的扩展进行整洁的IDE集成。
+
+对于不需要IDE的无头环境（如持续集成、Git钩子等），Nest项目自带了开箱即用的 `npm` 脚本。
 
 **[学习资料](https://docs.nestjs.cn/10/awesome?id=%e7%9b%b8%e5%85%b3%e8%b5%84%e6%ba%90)**
 
@@ -216,4 +229,5 @@ $ npm run start:dev
 | 用户名 | 头像 | 职能 | 签名 |
 |---------|--------------|-------------|---------------|
 | [@qianfeiqianlan](https://www.zhihu.com/people/li-yang-yang-94-14) | <img class="avatar-66 rm-style" width='100' src="https://avatars.githubusercontent.com/u/12892568?v=4">                  | 校正 | 全栈开发工程师，专注于效能提升、DevOps、架构设计等领域[@qianfeiqianlan](https://github.com/qianfeiqianlan) at Github |
+| [@IOLOII](https://github.com/IOLOII) | <img class="avatar-66 rm-style" width='100' src="https://avatars.githubusercontent.com/u/34856171?v=4">                  | 校正 | 如果编程无法改变未来, 那为什么要成为程序员? [@IOLOII](https://github.com/IOLOII) at Github |
 

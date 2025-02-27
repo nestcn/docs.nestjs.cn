@@ -12,7 +12,7 @@
 
 ## 先决条件
 
-请确保您的操作系统上安装了 [Node.js](http://nodejs.cn/download/)**（版本 >= 16）**。
+请确保您的操作系统上安装了 [Node.js](http://nodejs.cn/download/)**（版本 >= 20）**。
 
 **一分钟安装 node.js**
 （支持 X86 ARM MIPS 等架构，需要版本管理或者系统为 Raspbian 请直接看 NVM）
@@ -21,7 +21,7 @@
 
 #### ** windows **
 
-1. [点击下载 Node.js](https://npmmirror.com/mirrors/node/v20.15.0/node-v20.15.0-x64.msi)
+1. [点击下载 Node.js](https://npmmirror.com/mirrors/node/v22.14.0/node-v22.14.0-x64.msi)
 
 
 
@@ -31,7 +31,7 @@ Powershell/CMD 可以打印出这个说明安装成功。（部分系统需要�
 
 ```
 $node -v
-v20.15.0
+v22.14.0
 $ npm -v
 8.x.x
 ```
@@ -64,14 +64,14 @@ nvm install --lts
 
 ```
 $node -v
-v20.x.x
+v22.x.x
 $ npm -v
 8.x.x
 ```
 
 #### ** MacOS **
 
-1. [点击下载 Node.js](https://npmmirror.com/mirrors/node/v16.18.1/node-v16.18.1.pkg)
+1. [点击下载 Node.js](https://npmmirror.com/mirrors/node/v22.14.0/node-v22.14.0.pkg)
 
 2. 安装 Node.js
 
@@ -89,7 +89,7 @@ $ npm -v
 
 
 ```
-sudo snap install node --classic --channel=16
+sudo snap install node --classic --channel=22
 ```
 
 （如果提示 snap 不存在，请先安装 snapd）
@@ -97,7 +97,7 @@ sudo snap install node --classic --channel=16
 
 ```
 $node -v
-v20.x.x
+v22.x.x
 $ npm -v
 8.x.x
 ```
@@ -106,7 +106,7 @@ $ npm -v
 
 ## 起步
 
-使用 [Nest CLI](/8/cli?id=overview) 建立新项目非常简单。 在安装好 npm 后，您可以使用下面命令在您的 OS 终端中创建 Nest 项目：
+使用 [Nest CLI](/11/cli?id=overview) 建立新项目非常简单。 在安装好 npm 后，您可以使用下面命令在您的 OS 终端中创建 Nest 项目：
 
 <!-- tabs:start -->
 

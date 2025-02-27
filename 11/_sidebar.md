@@ -1,42 +1,42 @@
-- [介绍](10/introduction)
+- [介绍](11/introduction)
 
 - 概述
-  - [第一步](10/firststeps)
-  - [控制器](10/controllers)
-  - [提供者](10/providers)
-  - [模块](10/modules)
-  - [中间件](10/middlewares)
-  - [异常过滤器](10/exceptionfilters)  
-  - [管道](10/pipes)
-  - [守卫](10/guards)
-  - [拦截器](10/interceptors)
-  - [自定义装饰器](10/customdecorators)
-  - [相关资料](10/awesome)
-  - [关于翻译](10/about)
+  - [第一步](11/firststeps)
+  - [控制器](11/controllers)
+  - [提供者](11/providers)
+  - [模块](11/modules)
+  - [中间件](11/middlewares)
+  - [异常过滤器](11/exceptionfilters)  
+  - [管道](11/pipes)
+  - [守卫](11/guards)
+  - [拦截器](11/interceptors)
+  - [自定义装饰器](11/customdecorators)
+  - [相关资料](11/awesome)
+  - [关于翻译](11/about)
 
-- [基本原理](10/fundamentals)
+- [基本原理](11/fundamentals)
 
-- [技术](10/techniques)
+- [技术](11/techniques)
 
-- [安全](10/security)
+- [安全](11/security)
 
-- [GraphQL](10/graphql)
+- [GraphQL](11/graphql)
 
-- [WEBSOCKETS](10/websockets)
+- [WEBSOCKETS](11/websockets)
 
-- [微服务](10/microservices)
+- [微服务](11/microservices)
 
-- [独立应用](10/standalone-applications)
+- [独立应用](11/standalone-applications)
 
-- [CLI](10/cli)
+- [CLI](11/cli)
 
-- [OPENAPI](10/openapi)
+- [OPENAPI](11/openapi)
 
-- [秘籍](10/recipes)
+- [秘籍](11/recipes)
 
-- [FAQ](10/faq)
+- [FAQ](11/faq)
 
-- [迁移指南](10/migrationguide)
+- [迁移指南](11/migrationguide)
 
-- [谁在使用 Nest](10/discover)
+- [谁在使用 Nest](11/discover)
 

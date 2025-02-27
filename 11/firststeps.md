@@ -150,7 +150,7 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
+  await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
 ```
@@ -208,7 +208,15 @@ $ npm run start:dev
 
 对于不需要IDE的无头环境（如持续集成、Git钩子等），Nest项目自带了开箱即用的 `npm` 脚本。
 
-**[学习资料](https://docs.nestjs.cn/10/awesome?id=%e7%9b%b8%e5%85%b3%e8%b5%84%e6%ba%90)**
+```
+
+$ npm run lint
+
+# 或者你使用了 prettier
+$ npm run format
+```
+
+**[学习资料](https://docs.nestjs.cn/11/awesome?id=%e7%9b%b8%e5%85%b3%e8%b5%84%e6%ba%90)**
 
 ### 支持我们
 

@@ -10,7 +10,7 @@
 
 为了与 `SQL`和 `NoSQL` 数据库集成，`Nest` 提供了 `@nestjs/typeorm` 包。`Nest` 使用[TypeORM](https://github.com/typeorm/typeorm)是因为它是 `TypeScript` 中最成熟的对象关系映射器( `ORM` )。因为它是用 `TypeScript` 编写的，所以可以很好地与 `Nest` 框架集成。
 
-为了开始使用它，我们首先安装所需的依赖项。在本章中，我们将演示如何使用流行的 [Mysql](https://www.mysql.com/) ， `TypeORM` 提供了对许多关系数据库的支持，比如 `PostgreSQL` 、`Oracle`、`Microsoft SQL Server`、`SQLite`，甚至像 `MongoDB`这样的 `NoSQL` 数据库。我们在本章中介绍的过程对于 `TypeORM` 支持的任何数据库都是相同的。您只需为所选数据库安装相关的客户端 `API` 库。
+为了开始使用它，我们首先安装所需的依赖项。在本章中，我们将演示如何使用流行的关系型数据库 [Mysql](https://www.mysql.com/) ， `TypeORM` 提供了对许多关系数据库的支持，比如 `PostgreSQL` 、`Oracle`、`Microsoft SQL Server`、`SQLite`，甚至像 `MongoDB` 这样的 `NoSQL` 数据库。我们在本章中介绍的步骤对于 `TypeORM` 支持的任何数据库都是相同的。您只需为所选数据库安装相关的客户端 `API` 库。
 
 ```bash
 $ npm install --save @nestjs/typeorm typeorm mysql2
@@ -41,6 +41,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 export class AppModule {}
 ```
 
+!> 警告：设置 `synchronize: true` 不能被用于生产环境，否则您可能会丢失生产环境数据
+
 `forRoot()` 方法支持所有`TypeORM`包中`createConnection()`函数暴露出的配置属性。其他一些额外的配置参数描述如下：
 
 | 参数                | 说明                                                     |
@@ -48,55 +50,24 @@ export class AppModule {}
 | retryAttempts       | 重试连接数据库的次数（默认：10）                         |
 | retryDelay          | 两次重试连接的间隔(ms)（默认：3000）                     |
 | autoLoadEntities    | 如果为`true`,将自动加载实体(默认：false)                 |
-| keepConnectionAlive | 如果为`true`，在应用程序关闭后连接不会关闭（默认：false) |
 
-?> 更多连接选项见[这里](https://typeorm.io/#/connection-options)
+?> 更多关于数据源选项见[这里](https://typeorm.io/data-source-options)
 
-另外，我们可以创建 `ormconfig.json` ，而不是将配置对象传递给 `forRoot()`。
-
-```bash
-{
-  "type": "mysql",
-  "host": "localhost",
-  "port": 3306,
-  "username": "root",
-  "password": "root",
-  "database": "test",
-  "entities": ["dist/**/*.entity{.ts,.js}"],
-  "synchronize": true
-}
-```
-
-然后，我们可以不带任何选项地调用 `forRoot()` :
+一旦完成，`TypeORM` 的`DataSource`和 `EntityManager` 对象就可以在整个项目中注入(不需要导入任何模块)，例如:
 
 > app.module.ts
 
 ```typescript
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
+@Dependencies(DataSource)
 @Module({
-  imports: [TypeOrmModule.forRoot()],
-})
-export class AppModule {}
-```
-
-?> 静态全局路径(例如 `dist/**/*.entity{ .ts,.js}` )不适用于 Webpack 热重载。
-
-!> 注意，`ormconfig.json` 文件由`typeorm`库载入，因此，任何上述参数之外的属性都不会被应用（例如由`forRoot()`方法内部支持的属性--例如`autoLoadEntities`和`retryDelay()`)
-
-一旦完成，`TypeORM` 的`Connection`和 `EntityManager` 对象就可以在整个项目中注入(不需要导入任何模块)，例如:
-
-> app.module.ts
-
-```typescript
-import { Connection } from 'typeorm';
-
-@Module({
-  imports: [TypeOrmModule.forRoot(), PhotoModule],
+  imports: [TypeOrmModule.forRoot(), UsersModule],
 })
 export class AppModule {
-  constructor(private readonly connection: Connection) {}
+  constructor(dataSource) {
+    this.dataSource = dataSource;
+  }
 }
 ```
 
@@ -318,22 +289,22 @@ export class AppModule {}
 
 在[TypeORM 事务](https://typeorm.io/#/transactions)中有很多不同策略来处理事务，我们推荐使用`QueryRunner`类，因为它对事务是完全可控的。
 
-首先，我们需要将`Connection`对象以正常方式注入：
+首先，我们需要将`DataSource`对象以正常方式注入：
 
 ```typescript
 @Injectable()
 export class UsersService {
-  constructor(private connection: Connection) {}
+  constructor(private dataSource: DataSource) {}
 }
 ```
 
-?> `Connection`类需要从`typeorm`包中导入
+?> `DataSource`类需要从`typeorm`包中导入
 
 现在，我们可以使用这个对象来创建一个事务。
 
 ```typescript
 async createMany(users: User[]) {
-  const queryRunner = this.connection.createQueryRunner();
+  const queryRunner = this.dataSource.createQueryRunner();
 
   await queryRunner.connect();
   await queryRunner.startTransaction();
@@ -352,13 +323,13 @@ async createMany(users: User[]) {
 }
 ```
 
-?> 注意`connection`仅用于创建`QueryRunner`。然而，要测试这个类，就需要模拟整个`Connection`对象（它暴露出来的几个方法），因此，我们推荐采用一个帮助工厂类（也就是`QueryRunnerFactory`)并且定义一个包含仅限于维持事务需要的方法的接口。这一技术让模拟这些方法变得非常直接。
+?> 注意`dataSource`仅用于创建`QueryRunner`。然而，要测试这个类，就需要模拟整个`DataSource`对象（它暴露出来的几个方法），因此，我们推荐采用一个帮助工厂类（也就是`QueryRunnerFactory`)并且定义一个包含仅限于维持事务需要的方法的接口。这一技术让模拟这些方法变得非常直接。
 
-可选地，你可以使用一个`Connection`对象的回调函数风格的`transaction`方法([阅读更多](https://typeorm.io/#/transactions/creating-and-using-transactions))。
+可选地，你可以使用一个`DataSource`对象的回调函数风格的`transaction`方法([阅读更多](https://typeorm.io/#/transactions/creating-and-using-transactions))。
 
 ```typescript
 async createMany(users: User[]) {
-  await this.connection.transaction(async manager => {
+  await this.dataSource.transaction(async manager => {
     await manager.save(users[0]);
     await manager.save(users[1]);
   });
@@ -372,13 +343,18 @@ async createMany(users: User[]) {
 使用 TypeORM[订阅者](https://typeorm.io/#/listeners-and-subscribers/what-is-a-subscriber)，你可以监听特定的实体事件。
 
 ```typescript
-import { Connection, EntitySubscriberInterface, EventSubscriber, InsertEvent } from 'typeorm';
+import {
+  DataSource,
+  EntitySubscriberInterface,
+  EventSubscriber,
+  InsertEvent,
+} from 'typeorm';
 import { User } from './user.entity';
 
 @EventSubscriber()
 export class UserSubscriber implements EntitySubscriberInterface<User> {
-  constructor(connection: Connection) {
-    connection.subscribers.push(this);
+  constructor(dataSource: DataSource) {
+    dataSource.subscribers.push(this);
   }
 
   listenTo() {
@@ -455,6 +431,18 @@ export class AppModule {}
 
 ?> 如果未为连接设置任何 `name` ，则该连接的名称将设置为 `default`。请注意，不应该有多个没有名称或同名的连接，否则它们会被覆盖。
 
+?> 如果您正在使用 `TypeOrmModule.forRootAsync`，您必须在外面设置数据源名称 `useFactory` 。示例：
+
+```typescript
+TypeOrmModule.forRootAsync({ 
+  name: 'albumsConnection', 
+  useFactory: ...,
+  inject: ...,
+}),
+```
+> 有关详细信息，请参阅 [此问题](https://github.com/nestjs/typeorm/issues/86)
+
+
 此时，您的`User` 和 `Album` 实体中的每一个都已在各自的连接中注册。通过此设置，您必须告诉 `TypeOrmModule.forFeature()` 方法和 `@InjectRepository()` 装饰器应该使用哪种连接。如果不传递任何连接名称，则使用 `default` 连接。
 
 ```typescript
@@ -464,18 +452,34 @@ export class AppModule {}
 export class AppModule {}
 ```
 
-您也可以为给定的连接注入 `Connection` 或 `EntityManager`：
+您也可以为给定的数据源注入 `DataSource` 或 `EntityManager`：
 
 ```typescript
 @Injectable()
 export class AlbumsService {
   constructor(
     @InjectConnection('albumsConnection')
-    private connection: Connection,
+    private dataSource: DataSource,
     @InjectEntityManager('albumsConnection')
-    private entityManager: EntityManager
+    private entityManager: EntityManager,
   ) {}
 }
+```
+
+也可以向提供者注入任何 `DataSource`：
+```typescript
+@Module({
+  providers: [
+    {
+      provide: AlbumsService,
+      useFactory: (albumsConnection: DataSource) => {
+        return new AlbumsService(albumsConnection);
+      },
+      inject: [getDataSourceToken('albumsConnection')],
+    },
+  ],
+})
+export class AlbumsModule {}
 ```
 
 ### 测试
@@ -825,9 +829,9 @@ export class UserHttpModule {}
 
 | 名称          | 说明                                                                                                                      |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| 一对一        | 主表中的每一行在外部表中有且仅有一个对应行。使用`@OneToOne()`装饰器来定义这种类型的关系                                   |
-| 一对多/多对一 | 主表中的每一行在外部表中有一个或多的对应行。使用`@OneToMany()`和`@ManyToOne()`装饰器来定义这种类型的关系                  |
-| 多对多        | 主表中的每一行在外部表中有多个对应行，外部表中的每个记录在主表中也有多个行。使用`@ManyToMany()`装饰器来定义这种类型的关系 |
+| 一对一        | 主表中的每一行在外部表中有且仅有一个对应行。 |
+| 一对多/多对一 | 主表中的每一行在外部表中有一个或多的对应行。 |
+| 多对多        | 主表中的每一行在外部表中有多个对应行，外部表中的每个记录在主表中也有多个行。|
 
 使用对应的装饰器来定义实体的关系。例如，要定义每个`User`可以有多个`Photo`，可以使用`@HasMany()`装饰器。
 
@@ -1130,7 +1134,7 @@ export class AppModule {}
 
 在`Mongoose`中，一切都源于 [Scheme](http://mongoosejs.com/docs/guide.html)，每个 `Schema` 都会映射到 `MongoDB` 的一个集合，并定义集合内文档的结构。`Schema` 被用来定义模型，而模型负责从底层创建和读取 `MongoDB` 的文档。
 
-`Schema` 可以用 `NestJS` 内置的装饰器来创建，或者也可以自己动手使用 `Mongoose`的常规方式。使用装饰器来创建 `Schema` 会极大大减少引用并且提高代码的可读性。
+`Schema` 可以用 `NestJS` 内置的装饰器来创建，或者也可以自己动手使用 `Mongoose`的常规方式。使用装饰器来创建 `Schema` 会极大减少引用并且提高代码的可读性。
 
 我们先定义`CatSchema`:
 
@@ -2299,7 +2303,9 @@ import { AppController } from './app.controller';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
-  imports: [CacheModule.register()],
+  imports: [CacheModule.register({
+   isGlobal: true,
+  })],
   controllers: [AppController],
   providers: [
     {
@@ -2656,7 +2662,7 @@ get fullName(): string {
 您可以使用 `@Transform()` 装饰器执行其他数据转换。例如，您要选择一个名称 `RoleEntity` 而不是返回整个对象。
 
 ```typescript
-@Transform(role => role.name)
+@Transform(({value}) => value.name)
 role: RoleEntity;
 ```
 

@@ -12,7 +12,7 @@
 
 ## 先决条件
 
-请确保您的操作系统上安装了 [Node.js](http://nodejs.cn/download/)**（>= 10.13.0, v13 版本除外）**。
+请确保您的操作系统上安装了 [Node.js](http://nodejs.cn/download/)**（版本 >= 16）**。
 
 **一分钟安装 node.js**
 （支持 X86 ARM MIPS 等架构，需要版本管理或者系统为 Raspbian 请直接看 NVM）
@@ -21,7 +21,9 @@
 
 #### ** windows **
 
-1. [点击下载 Node.js](https://npm.taobao.org/mirrors/node/v14.17.3/node-v14.17.3-x64.msi)
+1. [点击下载 Node.js](https://npmmirror.com/mirrors/node/v20.15.0/node-v20.15.0-x64.msi)
+
+
 
 2. 安装 Node.js
 
@@ -29,31 +31,28 @@ Powershell/CMD 可以打印出这个说明安装成功。（部分系统需要�
 
 ```
 $node -v
-v14.17.3
+v20.15.0
 $ npm -v
-7.x.x
+8.x.x
 ```
 
-#### ** linux（建议） **
+#### ** linux **
 
-（NVM 支持 所有 Linux 及 Raspbian ，支持多版本管理，[windows 点击进入](https://github.com/coreybutler/nvm-windows/releases)）
+（NVM 支持 所有 Linux 及 Raspbian ，支持多版本管理，[windows 点击进入](https://github.com/coreybutler/nvm-windows/releases)）    
+注：该版本为国内加速版。
 
 ```
-curl -o- https://ghproxy.com/https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+bash -c "$(curl -fsSL https://gitee.com/RubyKids/nvm-cn/raw/main/install.sh)"
 
 ```
 
 如果没 curl ，可以使用 wget 安装
 
 ```
-wget -qO- https://ghproxy.com/https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
-```
-
-使用淘宝加速下载（可选）
+bash -c "$(wget -qO- https://gitee.com/RubyKids/nvm-cn/raw/main/install.sh)"
 
 ```
-export NVM_NODEJS_ORG_MIRROR=https://npm.taobao.org/mirrors/node
-```
+
 
 使用 NVM 安装 nodejs ：
 
@@ -65,14 +64,14 @@ nvm install --lts
 
 ```
 $node -v
-v14.17.3
+v20.x.x
 $ npm -v
-7.x.x
+8.x.x
 ```
 
-#### ** MacOS (X86)**
+#### ** MacOS **
 
-1. [点击下载 Node.js](https://npm.taobao.org/mirrors/node/v14.17.3/node-v14.17.3.pkg)
+1. [点击下载 Node.js](https://npmmirror.com/mirrors/node/v16.18.1/node-v16.18.1.pkg)
 
 2. 安装 Node.js
 
@@ -80,70 +79,17 @@ $ npm -v
 
 ```
 $node -v
-v14.17.3
+v20.x.x
 $ npm -v
-7.x.x
+8.x.x
 ```
 
-#### ** MacOS (M1)**
-
-1. [点击下载 Node.js](https://npm.taobao.org/mirrors/node/v16.5.0/node-v16.5.0.pkg)
-
-2. 安装 Node.js
-
-打印出这个说明安装成功。（部分系统需要重启后环境变量才生效）
-
-```
-$node -v
-v16.5.0
-$ npm -v
-7.x.x
-```
-
-
-#### ** Debian 系 **
-
-（支持 ARM 及 X86 平台)
-
-```
-curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
-sudo apt-get install -y nodejs
-```
-
-（如果安装缓慢，可以使用[国内镜像源](http://mirrors.ustc.edu.cn/help/nodesource.html)）
-终端可以打出以下信息说明安装成功：
-
-```
-$node -v
-v14.17.3
-$ npm -v
-7.x.x
-```
-
-#### ** Redhat 系 **
-
-（支持 X86 平台）
-
-```
-curl -sL https://rpm.nodesource.com/setup_16.x | bash -
-```
-
-（如果安装缓慢，可以使用[国内镜像源](http://mirrors.ustc.edu.cn/help/nodesource.html)）
-终端可以打出以下信息说明安装成功：
-
-```
-$node -v
-v14.17.3
-$ npm -v
-7.x.x
-```
 
 #### ** Snap **
 
-（支持 所有 Linux ）
 
 ```
-sudo snap install node --classic --channel=14
+sudo snap install node --classic --channel=16
 ```
 
 （如果提示 snap 不存在，请先安装 snapd）
@@ -151,9 +97,9 @@ sudo snap install node --classic --channel=14
 
 ```
 $node -v
-v14.17.3
+v20.x.x
 $ npm -v
-7.x.x
+8.x.x
 ```
 
 <!-- tabs:end -->
@@ -170,6 +116,8 @@ $ nest new project-name
 ```
 
 <!-- tabs:end -->
+
+?> 要创建启用 TypeScript `strict`模式的新项目，请将 `--strict` 标志传递给 `nest new` 命令
 
 将会创建 `project-name` 目录， 安装 node_modules 和一些其他样板文件，并将创建一个 `src` 目录，目录中包含几个核心文件。
 
@@ -194,8 +142,9 @@ src
 
 `main.ts` 包含一个异步函数，它负责**引导**我们的应用程序：
 
+> main.ts
+
 ```typescript
-/* main.ts */
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
@@ -209,6 +158,8 @@ bootstrap();
 要创建一个 Nest 应用实例，我们使用了 `NestFactory` 核心类。`NestFactory` 暴露了一些静态方法用于创建应用实例。 `create()` 方法返回一个实现 `INestApplication` 接口的对象。该对象提供了一组可用的方法，我们会在后面的章节中对这些方法进行详细描述。 在上面的 `main.ts` 示例中，我们只是启动 HTTP 服务，让应用程序等待 HTTP 请求。
 
 请注意，使用 Nest CLI 搭建的项目会创建一个初始项目结构，我们鼓励开发人员将每个模块保存在自己的专用目录中。
+
+?> 默认情况下，如果在创建应用程序时发生了任何错误，你的应用程序会退出并返回错误代码 `1`。如果你想让它抛出错误，请禁用 `abortOnError` 选项(例如，`NestFactory.create(AppModule, { abortOnError: false })`)。
 
 ## 平台
 
@@ -235,13 +186,35 @@ const app = await NestFactory.create<NestExpressApplication>(AppModule);
 $ npm run start
 ```
 
+?> 为了加快开发过程（构建速度快x20倍），您可以使用 [SWC builder](/recipes/swc) 请将 `-b swc` 标志传递给 `start` 脚本, 比如这样 `npm run start -- -b swc`.
+
 此命令启动 HTTP 服务监听定义在 `src/main.ts` 文件中定义的端口号。在应用程序运行后, 打开浏览器并访问 `http://localhost:3000/`。 你应该看到 `Hello world!` 信息。
 
-**[学习资料](https://docs.nestjs.cn/8/awesome?id=%e7%9b%b8%e5%85%b3%e8%b5%84%e6%ba%90)**
+要监听文件中的更改，您可以运行以下命令来启动应用程序：
+```
+$ npm run start:dev
+```
+
+此命令将监听您的文件，自动重新编译并重新加载服务器。
+
+
+#### 检查工具和格式化工具
+
+[CLI](/cli/overview) 提供一个可靠的大规模开发工作流框架。因此生成的 Nest 项目默认集成了代码检查工具和格式化工具（分别是 [eslint](https://eslint.org/) 和 [prettier](https://prettier.io/)）。
+
+?>  如果您不确定格式化工具和检查工具的作用区别。Not sure about the role of formatters vs linters? 点击 [这里](https://prettier.io/docs/en/comparison.html) 了解区别。
+
+为了确保最大的稳定性和可扩展性，我们使用了 [`eslint`](https://www.npmjs.com/package/eslint) 和 [`prettier`](https://www.npmjs.com/package/prettier) 的基础工具包。这种预设从设计上允许与官方（指Eslint，Prettier）的扩展进行整洁的IDE集成。
+
+对于不需要IDE的无头环境（如持续集成、Git钩子等），Nest项目自带了开箱即用的 `npm` 脚本。
+
+**[学习资料](https://docs.nestjs.cn/10/awesome?id=%e7%9b%b8%e5%85%b3%e8%b5%84%e6%ba%90)**
 
 ### 支持我们
 
-[当前网站托管在：vultr](https://www.vultr.com/?ref=7786172-4F)
+[CloudFlare](https://www.cloudflare.com)      
+
+[vultr](https://www.vultr.com/?ref=7786172-4F)
 
 [Onevps-不限流量](https://www.onevps.com/portal/aff.php?aff=12238)
 
@@ -256,4 +229,5 @@ $ npm run start
 | 用户名 | 头像 | 职能 | 签名 |
 |---------|--------------|-------------|---------------|
 | [@qianfeiqianlan](https://www.zhihu.com/people/li-yang-yang-94-14) | <img class="avatar-66 rm-style" width='100' src="https://avatars.githubusercontent.com/u/12892568?v=4">                  | 校正 | 全栈开发工程师，专注于效能提升、DevOps、架构设计等领域[@qianfeiqianlan](https://github.com/qianfeiqianlan) at Github |
+| [@IOLOII](https://github.com/IOLOII) | <img class="avatar-66 rm-style" width='100' src="https://avatars.githubusercontent.com/u/34856171?v=4">                  | 校正 | 如果编程无法改变未来, 那为什么要成为程序员? [@IOLOII](https://github.com/IOLOII) at Github |
 

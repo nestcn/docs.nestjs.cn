@@ -222,7 +222,7 @@ import { User } from './users/entities/user.entity';
 export class AppModule {}
 ```
 
-[动态模块](/8/fundamentals/dynamic-modules)章介绍中更详细地在本主题，并且包括一个[实例](https://github.com/nestjs/nest/tree/master/sample/25-dynamic-modules)。
+[动态模块](/10/fundamentals?id=%e5%8a%a8%e6%80%81%e6%a8%a1%e5%9d%97)章介绍中更详细地在本主题，并且包括一个[实例](https://github.com/nestjs/nest/tree/master/sample/25-dynamic-modules)。
  ### 译者署名
 
 | 用户名 | 头像 | 职能 | 签名 |

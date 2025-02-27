@@ -25,7 +25,8 @@
   - [全栈之巅](https://space.bilibili.com/341919508)
 
 - 书籍
-  
+
+[《NestJS全栈开发解析：快速上手与实践》（大陆首发🎉🎉🎉）](https://union-click.jd.com/jdc?e=618%7Cpc%7C&p=JF8BAQoJK1olXwIBVFlaAUwWC18IHlgcXwQLXG4ZVxNJXF9RXh5UHw0cSgYYXBcIWDoXSQVJQwYHV1dfCkIfHDZNRwYlJ0FKTg4NeEtydit2TVl1BlEcThY2XkcbM244G1MRWwUDVlleOHsXBF9adYOj696n5UKJosTCi_g4GmsVWwUFXFhUCEweAGYBK1wVVDYCVFtdCkwSH2kOGl0VXAUCZG5tC3sQA2YcHSlUDxIEJm5tCHsUM28JG1IcXQYKXFhVFEsWBWcMGkcVWwUFXFhUCEwWB28MK1kUXAILZG5tXhVyQQsMEyhUDlBKUFgObDMfcTBLZFN3MwRKEBcDcxlzCi5oew1LXAYFUG5YOA)
 
 [《深入浅出 Node.js》](https://union-click.jd.com/jdc?e=&p=JF8AAMQDIgZlGmsVAhADURNdHDJWWA1FBCVbV0IUWVALHEpCAUdETlcNVQtHRRUCEANRE10cHUtCCUZrEBxaXRNvH35ib3U-fgBgdGh7BlguQw4eN1QrWx0GFARUGVwWMiIHUisNewITBlQaWhAGFQBlGmsVBREAUBNcFgMXD1MTaxICGzdVG14VABUCSR1dFAQSBlYbayUyETdlK1slASJFO0kJHQoRUF0dW0FVQgIGGl9GUBEOVhhZFQAQBVFMDBdQIgVUGl8c)
 
@@ -67,7 +68,7 @@
 
 
 - 中文教程
-  - [NestJS 框架教程](https://keelii.com/2019/08/03/nestjs-framework-tutorial-1/)      
+  - [NestJS 框架教程](https://keelii.com/20110/08/03/nestjs-framework-tutorial-1/)      
   - [NestJS 学习教程](https://github.com/dzzzzzy/Nestjs-Learning)    
   - [让我们用Nestjs来重写一个CNode](https://github.com/jiayisheji/blog/issues/18)
 
@@ -92,6 +93,8 @@
 
 - 例子
   - [官方示例](https://github.com/nestjs/nest/tree/master/sample)  
+  - [NestJS Backend Project](https://github.com/wenjianmin/store-web-backend) - 使用 NestJS + TypeOrm + MySql + Redis + Docker 实现的数字门店系统 - 服务端
+  - [NestJS Frontend Project](https://github.com/wenjianmin/store-web-frontend) - 使用 Vite + React + Mobx + TypeScript 实现的数字门店系统 - 前端
   - [ChatServer](https://github.com/Pinedo11/nestDemo-ChatServer) - 使用 NestJS 实现的聊天应用的服务器端
   - [NestJS API.ai](https://github.com/adrien2p/nest-js-api-ai) - 与 Node.js 中的 api.ai 进行交互	  
   - [nestjs+angular cnode](https://github.com/jiayisheji/AngularNest-Fullstack-CNode)  - Angular + Nest.js 全栈    

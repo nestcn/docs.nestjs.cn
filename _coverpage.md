@@ -12,6 +12,6 @@
 - Node.js 版的 spring
 - 构建微服务应用
 
-[10.x 文档](/10/firststeps.md)
+[11.x 文档(翻译中)](/11/firststeps.md)
 [学习资料/库](https://docs.nestjs.cn/10/awesome)
 [学习交流群](https://docs.nestjs.cn/10/discuss)

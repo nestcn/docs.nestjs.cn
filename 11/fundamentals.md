@@ -925,7 +925,7 @@ Nest提供了一些应用类来简化在不同应用上下文之间编写应用(
 
 `ArgumentsHost`类提供了获取传递给处理程序的参数。它允许选择合适的上下文(例如HTTP，RPC(微服务)或者Websockets)来从框架中获取参数。框架提供了`ArgumentsHost`的实例，作为`host`参数提供给需要获取的地方。例如，在异常过滤器中传入`ArgumentsHost`参数来调用`catch()`方法。
 
-`ArgumentsHost`简单地抽象为处理程序参数。例如，在HTTP应用中(使用`@nestjs/platform-express`时),host对象封装了Express的`[request, response, next] `数组,`reuest`是一个`request`对象，`response`是一个`response`对象，`next`是控制应用的请求响应循环的函数。此外，在GraphQL应用中，host包含`[root, args, context, info]`数组。
+`ArgumentsHost`简单地抽象为处理程序参数。例如，在HTTP应用中(使用`@nestjs/platform-express`时),host对象封装了Express的`[request, response, next] `数组,`request`是一个`request`对象，`response`是一个`response`对象，`next`是控制应用的请求响应循环的函数。此外，在GraphQL应用中，host包含`[root, args, context, info]`数组。
 
 ### 当前应用上下文
 
@@ -960,7 +960,7 @@ const request = host.getArgByIndex(0);
 const response = host.getArgByIndex(1);
 ```
 
-在这些例子中我们通过索引来获取请求响应对象，这并不推荐，因为它将应用和特定上下文耦合。为了使代码鲁棒性更好，更可复用，你可以在程序中使用host对象的应用方法来切换合适的应用上下文，如下所示：
+在这些例子中我们通过索引来获取请求响应对象，这并不推荐，因为它将应用和特定上下文耦合。为了使代码更健壮，更可复用，你可以在程序中使用host对象的应用方法来切换合适的应用上下文，如下所示：
 
 ```typescript
 /**

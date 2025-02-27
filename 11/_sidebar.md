@@ -26,6 +26,8 @@
 
 - [微服务](11/microservices)
 
+- [部署](11/deployment)
+
 - [独立应用](11/standalone-applications)
 
 - [CLI](11/cli)

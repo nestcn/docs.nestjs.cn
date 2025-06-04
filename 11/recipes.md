@@ -1543,7 +1543,7 @@ $ npm run start:dev
 
 **本章仅适用于TypeScript**
 
-!> 在本文中，您将学习如何使用自定义提供者机制从零开始创建基于 **TypeORM** 包的 `DatabaseModule` 。由于该解决方案包含许多开销，因此您可以使用开箱即用的 `@nestjs/typeorm` 软件包。要了解更多信息，请参阅 [此处](/8/techniques.md?id=数据库)。
+!> 在本文中，您将学习如何使用自定义提供者机制从零开始创建基于 **TypeORM** 包的 `DatabaseModule` 。由于该解决方案包含许多开销，因此您可以使用开箱即用的 `@nestjs/typeorm` 软件包。要了解更多信息，请参阅 [此处](/11/techniques.md?id=数据库)。
 
 
 [TypeORM](https://github.com/typeorm/typeorm) 无疑是 `node.js` 世界中最成熟的对象关系映射器（`ORM` ）。由于它是用 `TypeScript` 编写的，所以它在 `Nest` 框架下运行得非常好。
@@ -1556,7 +1556,7 @@ $ npm run start:dev
 $ npm install --save typeorm mysql2
 ```
 
-我们需要做的第一步是使用从 `typeorm` 包导入的 `new DataSource().initialize()` 建立与数据库的连接。`initialize()` 函数返回一个 `Promise`，因此我们必须创建一个[异步提供者](/8/fundamentals.md?id=异步提供者 ( `Asynchronous providers` ))。
+我们需要做的第一步是使用从 `typeorm` 包导入的 `new DataSource().initialize()` 建立与数据库的连接。`initialize()` 函数返回一个 `Promise`，因此我们必须创建一个[异步提供者](/11/fundamentals.md?id=异步提供者 ( `Asynchronous providers` ))。
 
 > database.providers.ts
 
@@ -1722,7 +1722,7 @@ $ npm install --save mongoose
 $ npm install --save-dev @types/mongoose
 ```
 
-我们需要做的第一步是使用 `connect()` 函数建立与数据库的连接。`connect()` 函数返回一个 `Promise`，因此我们必须创建一个 [异步提供者](/8/fundamentals.md?id=异步提供者 (Asynchronous providers))。
+我们需要做的第一步是使用 `connect()` 函数建立与数据库的连接。`connect()` 函数返回一个 `Promise`，因此我们必须创建一个 [异步提供者](/11/fundamentals.md?id=异步提供者 (Asynchronous providers))。
 
 > database.providers.ts
 

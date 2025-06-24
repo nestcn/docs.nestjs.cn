@@ -12,6 +12,31 @@
 
 请确保您的操作系统已安装 [Node.js](https://nodejs.org)（版本 ≥20）。
 
+### Node.js 安装指南
+
+**推荐安装方式：**
+
+1. **访问官网下载**：前往 [Node.js 官网](https://nodejs.cn/download/) 下载最新的 LTS（长期支持）版本
+2. **使用包管理器**：
+   - **Windows**: 使用 [Chocolatey](https://chocolatey.org/) 或 [Scoop](https://scoop.sh/)
+   - **macOS**: 使用 [Homebrew](https://brew.sh/) 或 [MacPorts](https://www.macports.org/)
+   - **Linux**: 使用系统包管理器（如 `apt`、`yum`、`dnf` 等）
+3. **使用版本管理器**：
+   - [nvm](https://github.com/nvm-sh/nvm)（Linux/macOS）
+   - [nvm-windows](https://github.com/coreybutler/nvm-windows)（Windows）
+   - [fnm](https://github.com/Schniz/fnm)（跨平台）
+
+**验证安装：**
+
+安装完成后，可以通过以下命令验证 Node.js 和 npm 是否正确安装：
+
+```bash
+$ node --version
+$ npm --version
+```
+
+确保 Node.js 版本为 20 或更高版本，npm 版本为 9 或更高版本。
+
 ## 安装
 
 使用 [Nest CLI](/cli/overview) 创建新项目非常简单。安装 [npm](https://www.npmjs.com/) 后，您可以在操作系统终端中运行以下命令来创建新的 Nest 项目：
@@ -25,6 +50,8 @@ $ nest new project-name
 
 将创建 `project-name` 目录，安装 node 模块和一些其他样板文件，并创建 `src/` 目录，其中会生成若干核心文件。
 
+```
+
 src
 
 app.controller.spec.ts
@@ -36,6 +63,8 @@ app.module.ts
 app.service.ts
 
 main.ts
+```
+
 
 以下是这些核心文件的简要概述：
 

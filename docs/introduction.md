@@ -14,6 +14,19 @@ Nest 提供了一套开箱即用的应用架构，使开发者和团队能够创
 
 ## 安装
 
+### 环境准备
+
+在开始之前，请确保您的开发环境满足以下要求：
+
+- **Node.js**：版本 ≥20（推荐使用最新 LTS 版本）
+- **包管理器**：npm（Node.js 自带）、yarn 或 pnpm
+
+:::tip 提示
+推荐使用 [nvm](https://github.com/nvm-sh/nvm)（Linux/macOS）或 [nvm-windows](https://github.com/coreybutler/nvm-windows)（Windows）来管理 Node.js 版本，这样可以方便地在不同项目间切换 Node.js 版本。
+:::
+
+### 创建项目
+
 要开始使用，您可以使用 [Nest CLI](/cli/overview) 创建项目脚手架，或者[克隆一个初始项目](#alternatives) （两种方式会产生相同的结果）。
 
 要使用 Nest CLI 创建项目脚手架，请运行以下命令。这将创建一个新的项目目录，并用初始的核心 Nest 文件和支持模块填充该目录，为您的项目构建一个常规的基础结构。对于首次使用的用户，建议使用 **Nest CLI** 创建新项目。我们将在[第一步](/overview/first-steps)中继续采用这种方法。

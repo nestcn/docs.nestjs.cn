@@ -33,16 +33,6 @@ export class ExceptionFilter implements RpcExceptionFilter<RpcException> {
     return throwError(() => exception.getError());
   }
 }
-@@switch
-import { Catch } from '@nestjs/common';
-import { throwError } from 'rxjs';
-
-@Catch(RpcException)
-export class ExceptionFilter {
-  catch(exception, host) {
-    return throwError(() => exception.getError());
-  }
-}
 ```
 
 > warning **警告** 使用[混合应用](/faq/hybrid-application)时，全局微服务异常过滤器默认未启用。
@@ -54,12 +44,6 @@ export class ExceptionFilter {
 @UseFilters(new ExceptionFilter())
 @MessagePattern({ cmd: 'sum' })
 accumulate(data: number[]): number {
-  return (data || []).reduce((a, b) => a + b);
-}
-@@switch
-@UseFilters(new ExceptionFilter())
-@MessagePattern({ cmd: 'sum' })
-accumulate(data) {
   return (data || []).reduce((a, b) => a + b);
 }
 ```
@@ -78,16 +62,6 @@ import { BaseRpcExceptionFilter } from '@nestjs/microservices';
 @Catch()
 export class AllExceptionsFilter extends BaseRpcExceptionFilter {
   catch(exception: any, host: ArgumentsHost) {
-    return super.catch(exception, host);
-  }
-}
-@@switch
-import { Catch } from '@nestjs/common';
-import { BaseRpcExceptionFilter } from '@nestjs/microservices';
-
-@Catch()
-export class AllExceptionsFilter extends BaseRpcExceptionFilter {
-  catch(exception, host) {
     return super.catch(exception, host);
   }
 }

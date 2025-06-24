@@ -21,14 +21,6 @@ export class CatsService {
     private commonService: CommonService,
   ) {}
 }
-@@switch
-@Injectable()
-@Dependencies(forwardRef(() => CommonService))
-export class CatsService {
-  constructor(commonService) {
-    this.commonService = commonService;
-  }
-}
 ```
 
 > info **提示** `forwardRef()` 函数是从 `@nestjs/common` 包中导入的。
@@ -43,14 +35,6 @@ export class CommonService {
     @Inject(forwardRef(() => CatsService))
     private catsService: CatsService,
   ) {}
-}
-@@switch
-@Injectable()
-@Dependencies(forwardRef(() => CatsService))
-export class CommonService {
-  constructor(catsService) {
-    this.catsService = catsService;
-  }
 }
 ```
 

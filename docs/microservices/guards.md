@@ -15,10 +15,4 @@
 accumulate(data: number[]): number {
   return (data || []).reduce((a, b) => a + b);
 }
-@@switch
-@UseGuards(AuthGuard)
-@MessagePattern({ cmd: 'sum' })
-accumulate(data) {
-  return (data || []).reduce((a, b) => a + b);
-}
 ```

@@ -40,12 +40,6 @@ export const User = createParamDecorator(
 async findOne(@User() user: UserEntity) {
   console.log(user);
 }
-@@switch
-@Get()
-@Bind(User())
-async findOne(user) {
-  console.log(user);
-}
 ```
 
 #### 传递数据
@@ -76,15 +70,6 @@ export const User = createParamDecorator(
     return data ? user?.[data] : user;
   },
 );
-@@switch
-import { createParamDecorator } from '@nestjs/common';
-
-export const User = createParamDecorator((data, ctx) => {
-  const request = ctx.switchToHttp().getRequest();
-  const user = request.user;
-
-  return data ? user && user[data] : user;
-});
 ```
 
 以下是您可以通过控制器中的 `@User()` 装饰器访问特定属性的方式：
@@ -93,12 +78,6 @@ export const User = createParamDecorator((data, ctx) => {
 @@filename()
 @Get()
 async findOne(@User('firstName') firstName: string) {
-  console.log(`Hello ${firstName}`);
-}
-@@switch
-@Get()
-@Bind(User('firstName'))
-async findOne(firstName) {
   console.log(`Hello ${firstName}`);
 }
 ```
@@ -120,12 +99,6 @@ async findOne(
 ) {
   console.log(user);
 }
-@@switch
-@Get()
-@Bind(User(new ValidationPipe({ validateCustomDecorators: true })))
-async findOne(user) {
-  console.log(user);
-}
 ```
 
 > info **注意** 需要将 `validateCustomDecorators` 选项设置为 true。默认情况下 `ValidationPipe` 不会验证带有自定义装饰器注解的参数。
@@ -139,17 +112,6 @@ Nest 提供了一个辅助方法来组合多个装饰器。例如，假设您希
 import { applyDecorators } from '@nestjs/common';
 
 export function Auth(...roles: Role[]) {
-  return applyDecorators(
-    SetMetadata('roles', roles),
-    UseGuards(AuthGuard, RolesGuard),
-    ApiBearerAuth(),
-    ApiUnauthorizedResponse({ description: 'Unauthorized' }),
-  );
-}
-@@switch
-import { applyDecorators } from '@nestjs/common';
-
-export function Auth(...roles) {
   return applyDecorators(
     SetMetadata('roles', roles),
     UseGuards(AuthGuard, RolesGuard),

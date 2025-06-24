@@ -26,17 +26,6 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
     },
   },
 });
-@@switch
-const app = await NestFactory.createMicroservice(AppModule, {
-  transport: Transport.RMQ,
-  options: {
-    urls: ['amqp://localhost:5672'],
-    queue: 'cats_queue',
-    queueOptions: {
-      durable: false
-    },
-  },
-});
 ```
 
 > **提示** `Transport` 枚举是从 `@nestjs/microservices` 包中导入的。
@@ -86,12 +75,6 @@ const app = await NestFactory.createMicroservice(AppModule, {
 getNotifications(@Payload() data: number[], @Ctx() context: RmqContext) {
   console.log(`Pattern: ${context.getPattern()}`);
 }
-@@switch
-@Bind(Payload(), Ctx())
-@MessagePattern('notifications')
-getNotifications(data, context) {
-  console.log(`Pattern: ${context.getPattern()}`);
-}
 ```
 
 > info **提示**`@Payload()`、`@Ctx()` 和 `RmqContext` 均从 `@nestjs/microservices` 包导入
@@ -104,12 +87,6 @@ getNotifications(data, context) {
 getNotifications(@Payload() data: number[], @Ctx() context: RmqContext) {
   console.log(context.getMessage());
 }
-@@switch
-@Bind(Payload(), Ctx())
-@MessagePattern('notifications')
-getNotifications(data, context) {
-  console.log(context.getMessage());
-}
 ```
 
 要获取 RabbitMQ [通道](https://www.rabbitmq.com/channels.html)的引用，请使用 `RmqContext` 对象的 `getChannelRef` 方法，如下所示：
@@ -118,12 +95,6 @@ getNotifications(data, context) {
 @@filename()
 @MessagePattern('notifications')
 getNotifications(@Payload() data: number[], @Ctx() context: RmqContext) {
-  console.log(context.getChannelRef());
-}
-@@switch
-@Bind(Payload(), Ctx())
-@MessagePattern('notifications')
-getNotifications(data, context) {
   console.log(context.getChannelRef());
 }
 ```
@@ -151,15 +122,6 @@ options: {
 @@filename()
 @MessagePattern('notifications')
 getNotifications(@Payload() data: number[], @Ctx() context: RmqContext) {
-  const channel = context.getChannelRef();
-  const originalMsg = context.getMessage();
-
-  channel.ack(originalMsg);
-}
-@@switch
-@Bind(Payload(), Ctx())
-@MessagePattern('notifications')
-getNotifications(data, context) {
   const channel = context.getChannelRef();
   const originalMsg = context.getMessage();
 
@@ -193,13 +155,6 @@ this.client.send('replace-emoji', record).subscribe(...);
 @@filename()
 @MessagePattern('replace-emoji')
 replaceEmoji(@Payload() data: string, @Ctx() context: RmqContext): string {
-  const { properties: { headers } } = context.getMessage();
-  return headers['x-version'] === '1.0.0' ? '🐱' : '🐈';
-}
-@@switch
-@Bind(Payload(), Ctx())
-@MessagePattern('replace-emoji')
-replaceEmoji(data, context) {
   const { properties: { headers } } = context.getMessage();
   return headers['x-version'] === '1.0.0' ? '🐱' : '🐈';
 }

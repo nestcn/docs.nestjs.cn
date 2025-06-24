@@ -51,24 +51,6 @@ export class LoggingInterceptor implements NestInterceptor {
       );
   }
 }
-@@switch
-import { Injectable } from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
-
-@Injectable()
-export class LoggingInterceptor {
-  intercept(context, next) {
-    console.log('Before...');
-
-    const now = Date.now();
-    return next
-      .handle()
-      .pipe(
-        tap(() => console.log(`After... ${Date.now() - now}ms`)),
-      );
-  }
-}
 ```
 
 > info **提示** `NestInterceptor<T, R>` 是一个泛型接口，其中 `T` 表示 `Observable<T>` 的类型（支持响应流），而 `R` 是 `Observable<R>` 所包装值的类型。
@@ -157,16 +139,6 @@ export class TransformInterceptor<T> implements NestInterceptor<T, Response<T>> 
     return next.handle().pipe(map(data => ({ data })));
   }
 }
-@@switch
-import { Injectable } from '@nestjs/common';
-import { map } from 'rxjs/operators';
-
-@Injectable()
-export class TransformInterceptor {
-  intercept(context, next) {
-    return next.handle().pipe(map(data => ({ data })));
-  }
-}
 ```
 
 > info **提示** Nest 拦截器同时支持同步和异步的 `intercept()` 方法。如果需要，你可以简单地将方法切换为 `async`。
@@ -190,18 +162,6 @@ import { map } from 'rxjs/operators';
 @Injectable()
 export class ExcludeNullInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    return next
-      .handle()
-      .pipe(map(value => value === null ? '' : value ));
-  }
-}
-@@switch
-import { Injectable } from '@nestjs/common';
-import { map } from 'rxjs/operators';
-
-@Injectable()
-export class ExcludeNullInterceptor {
-  intercept(context, next) {
     return next
       .handle()
       .pipe(map(value => value === null ? '' : value ));
@@ -235,21 +195,6 @@ export class ErrorsInterceptor implements NestInterceptor {
       );
   }
 }
-@@switch
-import { Injectable, BadGatewayException } from '@nestjs/common';
-import { throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-
-@Injectable()
-export class ErrorsInterceptor {
-  intercept(context, next) {
-    return next
-      .handle()
-      .pipe(
-        catchError(err => throwError(() => new BadGatewayException())),
-      );
-  }
-}
 ```
 
 #### 流覆盖
@@ -264,20 +209,6 @@ import { Observable, of } from 'rxjs';
 @Injectable()
 export class CacheInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const isCached = true;
-    if (isCached) {
-      return of([]);
-    }
-    return next.handle();
-  }
-}
-@@switch
-import { Injectable } from '@nestjs/common';
-import { of } from 'rxjs';
-
-@Injectable()
-export class CacheInterceptor {
-  intercept(context, next) {
     const isCached = true;
     if (isCached) {
       return of([]);
@@ -302,25 +233,6 @@ import { catchError, timeout } from 'rxjs/operators';
 @Injectable()
 export class TimeoutInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    return next.handle().pipe(
-      timeout(5000),
-      catchError(err => {
-        if (err instanceof TimeoutError) {
-          return throwError(() => new RequestTimeoutException());
-        }
-        return throwError(() => err);
-      }),
-    );
-  };
-};
-@@switch
-import { Injectable, RequestTimeoutException } from '@nestjs/common';
-import { Observable, throwError, TimeoutError } from 'rxjs';
-import { catchError, timeout } from 'rxjs/operators';
-
-@Injectable()
-export class TimeoutInterceptor {
-  intercept(context, next) {
     return next.handle().pipe(
       timeout(5000),
       catchError(err => {

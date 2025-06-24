@@ -174,13 +174,6 @@ export class AppController {
 handleEvent(client: Client, data: string[]): Observable<string[]> {
   return [];
 }
-@@switch
-@CacheKey('events')
-@UseInterceptors(CacheInterceptor)
-@SubscribeMessage('events')
-handleEvent(client, data) {
-  return [];
-}
 ```
 
 但需要额外使用 `@CacheKey()` 装饰器来指定用于后续存储和检索缓存数据的键。同时请注意**不应缓存所有内容** ，执行业务操作而非单纯查询数据的操作永远不应被缓存。
@@ -193,13 +186,6 @@ handleEvent(client, data) {
 @UseInterceptors(CacheInterceptor)
 @SubscribeMessage('events')
 handleEvent(client: Client, data: string[]): Observable<string[]> {
-  return [];
-}
-@@switch
-@CacheTTL(10)
-@UseInterceptors(CacheInterceptor)
-@SubscribeMessage('events')
-handleEvent(client, data) {
   return [];
 }
 ```

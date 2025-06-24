@@ -23,13 +23,6 @@ const httpAdapter = app.getHttpAdapter();
 export class CatsService {
   constructor(private adapterHost: HttpAdapterHost) {}
 }
-@@switch
-@Dependencies(HttpAdapterHost)
-export class CatsService {
-  constructor(adapterHost) {
-    this.adapterHost = adapterHost;
-  }
-}
 ```
 
 > **提示** `HttpAdapterHost` 是从 `@nestjs/core` 包导入的。

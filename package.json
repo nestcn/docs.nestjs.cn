@@ -8,6 +8,7 @@
     "preview": "rspress preview"
   },
   "dependencies": {
+    "glob": "^11.0.3",
     "rspress": "^1.40.2"
   },
   "devDependencies": {

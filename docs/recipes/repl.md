@@ -15,14 +15,6 @@ async function bootstrap() {
   await repl(AppModule);
 }
 bootstrap();
-@@switch
-import { repl } from '@nestjs/core';
-import { AppModule } from './src/app.module';
-
-async function bootstrap() {
-  await repl(AppModule);
-}
-bootstrap();
 ```
 
 现在在终端中，使用以下命令启动 REPL：

@@ -36,23 +36,6 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
-@@switch
-import { NestFactory } from '@nestjs/core';
-import { join } from 'path';
-import { AppModule } from './app.module';
-
-async function bootstrap() {
-  const app = await NestFactory.create(
-    AppModule,
-  );
-
-  app.useStaticAssets(join(__dirname, '..', 'public'));
-  app.setBaseViewsDir(join(__dirname, '..', 'views'));
-  app.setViewEngine('hbs');
-
-  await app.listen(process.env.PORT ?? 3000);
-}
-bootstrap();
 ```
 
 我们告诉 [Express](https://github.com/expressjs/express)：`public` 目录将用于存放静态资源，`views` 目录存放模板文件，并使用 `hbs` 模板引擎来渲染 HTML 输出。
@@ -146,27 +129,6 @@ async function bootstrap() {
     AppModule,
     new FastifyAdapter(),
   );
-  app.useStaticAssets({
-    root: join(__dirname, '..', 'public'),
-    prefix: '/public/',
-  });
-  app.setViewEngine({
-    engine: {
-      handlebars: require('handlebars'),
-    },
-    templates: join(__dirname, '..', 'views'),
-  });
-  await app.listen(process.env.PORT ?? 3000);
-}
-bootstrap();
-@@switch
-import { NestFactory } from '@nestjs/core';
-import { FastifyAdapter } from '@nestjs/platform-fastify';
-import { AppModule } from './app.module';
-import { join } from 'path';
-
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule, new FastifyAdapter());
   app.useStaticAssets({
     root: join(__dirname, '..', 'public'),
     prefix: '/public/',

@@ -22,13 +22,6 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
     servers: ['nats://localhost:4222'],
   },
 });
-@@switch
-const app = await NestFactory.createMicroservice(AppModule, {
-  transport: Transport.NATS,
-  options: {
-    servers: ['nats://localhost:4222'],
-  },
-});
 ```
 
 > info **提示** `Transport` 枚举是从 `@nestjs/microservices` 包中导入的。
@@ -97,12 +90,6 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 getNotifications(@Payload() data: number[], @Ctx() context: NatsContext) {
   console.log(`Subject: ${context.getSubject()}`);
 }
-@@switch
-@Bind(Payload(), Ctx())
-@MessagePattern('notifications')
-getNotifications(data, context) {
-  console.log(`Subject: ${context.getSubject()}`);
-}
 ```
 
 > info：**提示**`@Payload()`、`@Ctx()` 和 `NatsContext` 均从 `@nestjs/microservices` 包导入。
@@ -115,13 +102,6 @@ getNotifications(data, context) {
 @@filename()
 @MessagePattern('time.us.*')
 getDate(@Payload() data: number[], @Ctx() context: NatsContext) {
-  console.log(`Subject: ${context.getSubject()}`); // e.g. "time.us.east"
-  return new Date().toLocaleTimeString(...);
-}
-@@switch
-@Bind(Payload(), Ctx())
-@MessagePattern('time.us.*')
-getDate(data, context) {
   console.log(`Subject: ${context.getSubject()}`); // e.g. "time.us.east"
   return new Date().toLocaleTimeString(...);
 }
@@ -150,13 +130,6 @@ this.client.send('replace-emoji', record).subscribe(...);
 @@filename()
 @MessagePattern('replace-emoji')
 replaceEmoji(@Payload() data: string, @Ctx() context: NatsContext): string {
-  const headers = context.getHeaders();
-  return headers['x-version'] === '1.0.0' ? '🐱' : '🐈';
-}
-@@switch
-@Bind(Payload(), Ctx())
-@MessagePattern('replace-emoji')
-replaceEmoji(data, context) {
   const headers = context.getHeaders();
   return headers['x-version'] === '1.0.0' ? '🐱' : '🐈';
 }

@@ -51,18 +51,6 @@ getDate(@Payload() data: number[], @Ctx() context: NatsContext) {
 getTCPDate(@Payload() data: number[]) {
   return new Date().toLocaleTimeString(...);
 }
-@@switch
-@Bind(Payload(), Ctx())
-@MessagePattern('time.us.*', Transport.NATS)
-getDate(data, context) {
-  console.log(`Subject: ${context.getSubject()}`); // e.g. "time.us.east"
-  return new Date().toLocaleTimeString(...);
-}
-@Bind(Payload(), Ctx())
-@MessagePattern({ cmd: 'time.us' }, Transport.TCP)
-getTCPDate(data, context) {
-  return new Date().toLocaleTimeString(...);
-}
 ```
 
 > info **提示**`@Payload()`、`@Ctx()`、`Transport` 和 `NatsContext` 都是从 `@nestjs/microservices` 导入的。

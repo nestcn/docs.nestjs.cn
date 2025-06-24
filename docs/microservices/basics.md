@@ -36,18 +36,6 @@ async function bootstrap() {
   await app.listen();
 }
 bootstrap();
-@@switch
-import { NestFactory } from '@nestjs/core';
-import { Transport } from '@nestjs/microservices';
-import { AppModule } from './app.module';
-
-async function bootstrap() {
-  const app = await NestFactory.createMicroservice(AppModule, {
-    transport: Transport.TCP,
-  });
-  await app.listen();
-}
-bootstrap();
 ```
 
 > info **注意** 微服务默认使用 **TCP** 传输层。
@@ -86,17 +74,6 @@ export class MathController {
     return (data || []).reduce((a, b) => a + b);
   }
 }
-@@switch
-import { Controller } from '@nestjs/common';
-import { MessagePattern } from '@nestjs/microservices';
-
-@Controller()
-export class MathController {
-  @MessagePattern({ cmd: 'sum' })
-  accumulate(data) {
-    return (data || []).reduce((a, b) => a + b);
-  }
-}
 ```
 
 在上述代码中，`accumulate()` **消息处理器**会监听与 `{{ '{' }} cmd: 'sum' {{ '}' }}` 消息模式匹配的消息。该消息处理器接收一个参数，即客户端传递的 `data`。在本例中，数据是需要累加的数字数组。
@@ -111,22 +88,12 @@ export class MathController {
 async accumulate(data: number[]): Promise<number> {
   return (data || []).reduce((a, b) => a + b);
 }
-@@switch
-@MessagePattern({ cmd: 'sum' })
-async accumulate(data) {
-  return (data || []).reduce((a, b) => a + b);
-}
 ```
 
 消息处理器也可以返回一个 `Observable`，此时结果值将持续发射直到流完成。
 
 ```typescript
 @@filename()
-@MessagePattern({ cmd: 'sum' })
-accumulate(data: number[]): Observable<number> {
-  return from([1, 2, 3]);
-}
-@@switch
 @MessagePattern({ cmd: 'sum' })
 accumulate(data: number[]): Observable<number> {
   return from([1, 2, 3]);
@@ -149,11 +116,6 @@ accumulate(data: number[]): Observable<number> {
 async handleUserCreated(data: Record<string, unknown>) {
   // business logic
 }
-@@switch
-@EventPattern('user_created')
-async handleUserCreated(data) {
-  // business logic
-}
 ```
 
 > **提示** 您可以为**同一个**事件模式注册多个事件处理器，它们都将被自动并行触发。
@@ -168,13 +130,6 @@ async handleUserCreated(data) {
 @@filename()
 @MessagePattern('time.us.*')
 getDate(@Payload() data: number[], @Ctx() context: NatsContext) {
-  console.log(`Subject: ${context.getSubject()}`); // e.g. "time.us.east"
-  return new Date().toLocaleTimeString(...);
-}
-@@switch
-@Bind(Payload(), Ctx())
-@MessagePattern('time.us.*')
-getDate(data, context) {
   console.log(`Subject: ${context.getSubject()}`); // e.g. "time.us.east"
   return new Date().toLocaleTimeString(...);
 }
@@ -289,12 +244,6 @@ accumulate(): Observable<number> {
   const payload = [1, 2, 3];
   return this.client.send<number>(pattern, payload);
 }
-@@switch
-accumulate() {
-  const pattern = { cmd: 'sum' };
-  const payload = [1, 2, 3];
-  return this.client.send(pattern, payload);
-}
 ```
 
 `send()` 方法接收两个参数：`pattern` 和 `payload`。`pattern` 应与 `@MessagePattern()` 装饰器中定义的模式匹配。`payload` 则是我们想要传输给远程微服务的消息。该方法返回一个**冷 `Observable`**，这意味着必须显式订阅它才会发送消息。
@@ -307,10 +256,6 @@ accumulate() {
 @@filename()
 async publish() {
   this.client.emit<number>('user_created', new UserCreatedEvent());
-}
-@@switch
-async publish() {
-  this.client.emit('user_created', new UserCreatedEvent());
 }
 ```
 
@@ -414,10 +359,6 @@ const netServer = server.unwrap<Server>();
 @@filename()
 this.client
   .send<TResult, TInput>(pattern, data)
-  .pipe(timeout(5000));
-@@switch
-this.client
-  .send(pattern, data)
   .pipe(timeout(5000));
 ```
 

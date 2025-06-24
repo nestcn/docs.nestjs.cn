@@ -30,16 +30,6 @@ export class LoggerMiddleware implements NestMiddleware {
     next();
   }
 }
-@@switch
-import { Injectable } from '@nestjs/common';
-
-@Injectable()
-export class LoggerMiddleware {
-  use(req, res, next) {
-    console.log('Request...');
-    next();
-  }
-}
 ```
 
 #### Dependency injection
@@ -66,21 +56,6 @@ export class AppModule implements NestModule {
       .forRoutes('cats');
   }
 }
-@@switch
-import { Module } from '@nestjs/common';
-import { LoggerMiddleware } from './common/middleware/logger.middleware';
-import { CatsModule } from './cats/cats.module';
-
-@Module({
-  imports: [CatsModule],
-})
-export class AppModule {
-  configure(consumer) {
-    consumer
-      .apply(LoggerMiddleware)
-      .forRoutes('cats');
-  }
-}
 ```
 
 在上述示例中，我们为之前定义在 `CatsController` 中的 `/cats` 路由处理器配置了 `LoggerMiddleware`。在配置中间件时，我们还可以通过向 `forRoutes()` 方法传递包含路由 `path` 和请求 `method` 的对象来进一步限制中间件仅适用于特定请求方法。在下面的示例中，请注意我们导入了 `RequestMethod` 枚举来引用所需的请求方法类型。
@@ -96,21 +71,6 @@ import { CatsModule } from './cats/cats.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(LoggerMiddleware)
-      .forRoutes({ path: 'cats', method: RequestMethod.GET });
-  }
-}
-@@switch
-import { Module, RequestMethod } from '@nestjs/common';
-import { LoggerMiddleware } from './common/middleware/logger.middleware';
-import { CatsModule } from './cats/cats.module';
-
-@Module({
-  imports: [CatsModule],
-})
-export class AppModule {
-  configure(consumer) {
     consumer
       .apply(LoggerMiddleware)
       .forRoutes({ path: 'cats', method: RequestMethod.GET });
@@ -165,22 +125,6 @@ export class AppModule implements NestModule {
       .forRoutes(CatsController);
   }
 }
-@@switch
-import { Module } from '@nestjs/common';
-import { LoggerMiddleware } from './common/middleware/logger.middleware';
-import { CatsModule } from './cats/cats.module';
-import { CatsController } from './cats/cats.controller';
-
-@Module({
-  imports: [CatsModule],
-})
-export class AppModule {
-  configure(consumer) {
-    consumer
-      .apply(LoggerMiddleware)
-      .forRoutes(CatsController);
-  }
-}
 ```
 
 > **提示** `apply()` 方法既可接收单个中间件，也可通过多个参数指定[多个中间件](/middleware#multiple-middleware) 。
@@ -217,11 +161,6 @@ consumer
 import { Request, Response, NextFunction } from 'express';
 
 export function logger(req: Request, res: Response, next: NextFunction) {
-  console.log(`Request...`);
-  next();
-};
-@@switch
-export function logger(req, res, next) {
   console.log(`Request...`);
   next();
 };

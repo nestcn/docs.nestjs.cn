@@ -63,35 +63,6 @@ export class AppModule implements NestModule {
       .forRoutes('*path');
   }
 }
-@@switch
-@Module({
-  imports: [AlsModule],
-  providers: [CatsService],
-  controllers: [CatsController],
-})
-@Dependencies(AsyncLocalStorage)
-export class AppModule {
-  constructor(als) {
-    // inject the AsyncLocalStorage in the module constructor,
-    this.als = als
-  }
-
-  configure(consumer) {
-    // bind the middleware,
-    consumer
-      .apply((req, res, next) => {
-        // populate the store with some default values
-        // based on the request,
-        const store = {
-          userId: req.headers['x-user-id'],
-        };
-        // and pass the "next" function as callback
-        // to the "als.run" method together with the store.
-        this.als.run(store, () => next());
-      })
-      .forRoutes('*path');
-  }
-}
 ```
 
 3.  现在，在请求生命周期的任何地方，我们都可以访问本地存储实例。
@@ -105,23 +76,6 @@ export class CatsService {
     private readonly als: AsyncLocalStorage,
     private readonly catsRepository: CatsRepository,
   ) {}
-
-  getCatForUser() {
-    // The "getStore" method will always return the
-    // store instance associated with the given request.
-    const userId = this.als.getStore()["userId"] as number;
-    return this.catsRepository.getForUser(userId);
-  }
-}
-@@switch
-@Injectable()
-@Dependencies(AsyncLocalStorage, CatsRepository)
-export class CatsService {
-  constructor(als, catsRepository) {
-    // We can inject the provided ALS instance.
-    this.als = als
-    this.catsRepository = catsRepository
-  }
 
   getCatForUser() {
     // The "getStore" method will always return the
@@ -193,22 +147,6 @@ export class CatsService {
     private readonly cls: ClsService,
     private readonly catsRepository: CatsRepository,
   ) {}
-
-  getCatForUser() {
-    // and use the "get" method to retrieve any stored value.
-    const userId = this.cls.get('userId');
-    return this.catsRepository.getForUser(userId);
-  }
-}
-@@switch
-@Injectable()
-@Dependencies(AsyncLocalStorage, CatsRepository)
-export class CatsService {
-  constructor(cls, catsRepository) {
-    // We can inject the provided ClsService instance,
-    this.cls = cls
-    this.catsRepository = catsRepository
-  }
 
   getCatForUser() {
     // and use the "get" method to retrieve any stored value.

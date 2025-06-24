@@ -47,16 +47,6 @@ export class AllExceptionsFilter extends BaseWsExceptionFilter {
     super.catch(exception, host);
   }
 }
-@@switch
-import { Catch } from '@nestjs/common';
-import { BaseWsExceptionFilter } from '@nestjs/websockets';
-
-@Catch()
-export class AllExceptionsFilter extends BaseWsExceptionFilter {
-  catch(exception, host) {
-    super.catch(exception, host);
-  }
-}
 ```
 
 上述实现仅是一个展示方法的框架。您对扩展异常过滤器的实现将包含您定制的**业务逻辑** （例如处理各种条件）。

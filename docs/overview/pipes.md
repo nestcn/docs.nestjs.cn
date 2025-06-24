@@ -96,12 +96,6 @@ async findOne(@Query('id', ParseIntPipe) id: number) {
 async findOne(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
   return this.catsService.findOne(uuid);
 }
-@@switch
-@Get(':uuid')
-@Bind(Param('uuid', new ParseUUIDPipe()))
-async findOne(uuid) {
-  return this.catsService.findOne(uuid);
-}
 ```
 
 > info **注意** 使用 `ParseUUIDPipe()` 时会解析版本 3、4 或 5 的 UUID，若只需特定版本的 UUID，可在管道选项中传入版本号。
@@ -123,15 +117,6 @@ import { PipeTransform, Injectable, ArgumentMetadata } from '@nestjs/common';
 @Injectable()
 export class ValidationPipe implements PipeTransform {
   transform(value: any, metadata: ArgumentMetadata) {
-    return value;
-  }
-}
-@@switch
-import { Injectable } from '@nestjs/common';
-
-@Injectable()
-export class ValidationPipe {
-  transform(value, metadata) {
     return value;
   }
 }
@@ -168,11 +153,6 @@ export interface ArgumentMetadata {
 @@filename()
 @Post()
 async create(@Body() createCatDto: CreateCatDto) {
-  this.catsService.create(createCatDto);
-}
-@@switch
-@Post()
-async create(@Body() createCatDto) {
   this.catsService.create(createCatDto);
 }
 ```
@@ -231,22 +211,6 @@ export class ZodValidationPipe implements PipeTransform {
     }
   }
 }
-@@switch
-import { BadRequestException } from '@nestjs/common';
-
-export class ZodValidationPipe {
-  constructor(private schema) {}
-
-  transform(value, metadata) {
-    try {
-      const parsedValue = this.schema.parse(value);
-      return parsedValue;
-    } catch (error) {
-      throw new BadRequestException('Validation failed');
-    }
-  }
-}
-
 ```
 
 #### 绑定验证管道
@@ -284,13 +248,6 @@ export type CreateCatDto = z.infer<typeof createCatSchema>;
 @Post()
 @UsePipes(new ZodValidationPipe(createCatSchema))
 async create(@Body() createCatDto: CreateCatDto) {
-  this.catsService.create(createCatDto);
-}
-@@switch
-@Post()
-@Bind(Body())
-@UsePipes(new ZodValidationPipe(createCatSchema))
-async create(createCatDto) {
   this.catsService.create(createCatDto);
 }
 ```
@@ -452,19 +409,6 @@ export class ParseIntPipe implements PipeTransform<string, number> {
     return val;
   }
 }
-@@switch
-import { Injectable, BadRequestException } from '@nestjs/common';
-
-@Injectable()
-export class ParseIntPipe {
-  transform(value, metadata) {
-    const val = parseInt(value, 10);
-    if (isNaN(val)) {
-      throw new BadRequestException('Validation failed');
-    }
-    return val;
-  }
-}
 ```
 
 然后我们可以将这个管道绑定到指定参数，如下所示：
@@ -475,12 +419,6 @@ export class ParseIntPipe {
 async findOne(@Param('id', new ParseIntPipe()) id) {
   return this.catsService.findOne(id);
 }
-@@switch
-@Get(':id')
-@Bind(Param('id', new ParseIntPipe()))
-async findOne(id) {
-  return this.catsService.findOne(id);
-}
 ```
 
 另一个有用的转换场景是从数据库中选择一个**已存在的用户**实体，使用请求中提供的 ID：
@@ -489,12 +427,6 @@ async findOne(id) {
 @@filename()
 @Get(':id')
 findOne(@Param('id', UserByIdPipe) userEntity: UserEntity) {
-  return userEntity;
-}
-@@switch
-@Get(':id')
-@Bind(Param('id', UserByIdPipe))
-findOne(userEntity) {
   return userEntity;
 }
 ```

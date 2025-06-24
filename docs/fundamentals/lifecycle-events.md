@@ -44,15 +44,6 @@ export class UsersService implements OnModuleInit {
     console.log(`The module has been initialized.`);
   }
 }
-@@switch
-import { Injectable } from '@nestjs/common';
-
-@Injectable()
-export class UsersService {
-  onModuleInit() {
-    console.log(`The module has been initialized.`);
-  }
-}
 ```
 
 #### 异步初始化
@@ -62,10 +53,6 @@ export class UsersService {
 ```typescript
 @@filename()
 async onModuleInit(): Promise<void> {
-  await this.fetch();
-}
-@@switch
-async onModuleInit() {
   await this.fetch();
 }
 ```
@@ -102,13 +89,6 @@ bootstrap();
 @Injectable()
 class UsersService implements OnApplicationShutdown {
   onApplicationShutdown(signal: string) {
-    console.log(signal); // e.g. "SIGINT"
-  }
-}
-@@switch
-@Injectable()
-class UsersService implements OnApplicationShutdown {
-  onApplicationShutdown(signal) {
     console.log(signal); // e.g. "SIGINT"
   }
 }

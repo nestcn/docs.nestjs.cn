@@ -132,21 +132,6 @@ import { CatsService } from './cats.service';
 export class CatsModule {
   constructor(private catsService: CatsService) {}
 }
-@@switch
-import { Module, Dependencies } from '@nestjs/common';
-import { CatsController } from './cats.controller';
-import { CatsService } from './cats.service';
-
-@Module({
-  controllers: [CatsController],
-  providers: [CatsService],
-})
-@Dependencies(CatsService)
-export class CatsModule {
-  constructor(catsService) {
-    this.catsService = catsService;
-  }
-}
 ```
 
 但由于 [循环依赖](/fundamentals/circular-dependency) 的存在，模块类本身不能作为提供者被注入。
@@ -191,25 +176,6 @@ import { Connection } from './connection.provider';
 })
 export class DatabaseModule {
   static forRoot(entities = [], options?): DynamicModule {
-    const providers = createDatabaseProviders(options, entities);
-    return {
-      module: DatabaseModule,
-      providers: providers,
-      exports: providers,
-    };
-  }
-}
-@@switch
-import { Module } from '@nestjs/common';
-import { createDatabaseProviders } from './database.providers';
-import { Connection } from './connection.provider';
-
-@Module({
-  providers: [Connection],
-  exports: [Connection],
-})
-export class DatabaseModule {
-  static forRoot(entities = [], options) {
     const providers = createDatabaseProviders(options, entities);
     return {
       module: DatabaseModule,

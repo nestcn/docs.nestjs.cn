@@ -25,15 +25,6 @@ export const databaseProviders = [
       mongoose.connect('mongodb://localhost/nest'),
   },
 ];
-@@switch
-import * as mongoose from 'mongoose';
-
-export const databaseProviders = [
-  {
-    provide: 'DATABASE_CONNECTION',
-    useFactory: () => mongoose.connect('mongodb://localhost/nest'),
-  },
-];
 ```
 
 > **提示** 遵循最佳实践，我们在单独的文件中声明了自定义提供者，该文件具有 `*.providers.ts` 后缀。
@@ -85,16 +76,6 @@ export const catsProviders = [
     inject: ['DATABASE_CONNECTION'],
   },
 ];
-@@switch
-import { CatSchema } from './schemas/cat.schema';
-
-export const catsProviders = [
-  {
-    provide: 'CAT_MODEL',
-    useFactory: (connection) => connection.model('Cat', CatSchema),
-    inject: ['DATABASE_CONNECTION'],
-  },
-];
 ```
 
 > warning **警告** 在实际应用中应避免使用**魔法字符串** 。`CAT_MODEL` 和 `DATABASE_CONNECTION` 都应保存在独立的 `constants.ts` 文件中。
@@ -121,25 +102,6 @@ export class CatsService {
   }
 
   async findAll(): Promise<Cat[]> {
-    return this.catModel.find().exec();
-  }
-}
-@@switch
-import { Injectable, Dependencies } from '@nestjs/common';
-
-@Injectable()
-@Dependencies('CAT_MODEL')
-export class CatsService {
-  constructor(catModel) {
-    this.catModel = catModel;
-  }
-
-  async create(createCatDto) {
-    const createdCat = new this.catModel(createCatDto);
-    return createdCat.save();
-  }
-
-  async findAll() {
     return this.catModel.find().exec();
   }
 }

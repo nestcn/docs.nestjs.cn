@@ -15,8 +15,6 @@
 ```bash
 @@filename()
 $ npm i --save @nestjs/websockets @nestjs/platform-socket.io
-@@switch
-$ npm i --save @nestjs/websockets @nestjs/platform-socket.io
 ```
 
 #### 概述
@@ -41,12 +39,6 @@ $ npm i --save @nestjs/websockets @nestjs/platform-socket.io
 @@filename(events.gateway)
 @SubscribeMessage('events')
 handleEvent(@MessageBody() data: string): string {
-  return data;
-}
-@@switch
-@Bind(MessageBody())
-@SubscribeMessage('events')
-handleEvent(data) {
   return data;
 }
 ```
@@ -75,13 +67,6 @@ handleEvent(@MessageBody('id') id: number): number {
   // id === messageBody.id
   return id;
 }
-@@switch
-@Bind(MessageBody('id'))
-@SubscribeMessage('events')
-handleEvent(id) {
-  // id === messageBody.id
-  return id;
-}
 ```
 
 如果您不想使用装饰器，以下代码在功能上是等效的：
@@ -90,11 +75,6 @@ handleEvent(id) {
 @@filename(events.gateway)
 @SubscribeMessage('events')
 handleEvent(client: Socket, data: string): string {
-  return data;
-}
-@@switch
-@SubscribeMessage('events')
-handleEvent(client, data) {
   return data;
 }
 ```
@@ -110,12 +90,6 @@ handleEvent(
   @MessageBody() data: string,
   @ConnectedSocket() client: Socket,
 ): string {
-  return data;
-}
-@@switch
-@Bind(MessageBody(), ConnectedSocket())
-@SubscribeMessage('events')
-handleEvent(data, client) {
   return data;
 }
 ```
@@ -147,13 +121,6 @@ handleEvent(@MessageBody() data: unknown): WsResponse<unknown> {
   const event = 'events';
   return { event, data };
 }
-@@switch
-@Bind(MessageBody())
-@SubscribeMessage('events')
-handleEvent(data) {
-  const event = 'events';
-  return { event, data };
-}
 ```
 
 > info **提示** `WsResponse` 接口是从 `@nestjs/websockets` 包中导入的。
@@ -174,17 +141,6 @@ socket.on('events', (data) => console.log(data));
 @@filename(events.gateway)
 @SubscribeMessage('events')
 onEvent(@MessageBody() data: unknown): Observable<WsResponse<number>> {
-  const event = 'events';
-  const response = [1, 2, 3];
-
-  return from(response).pipe(
-    map(data => ({ event, data })),
-  );
-}
-@@switch
-@Bind(MessageBody())
-@SubscribeMessage('events')
-onEvent(data) {
   const event = 'events';
   const response = [1, 2, 3];
 

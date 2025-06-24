@@ -175,28 +175,6 @@ export class CatsService {
     return this.catModel.find().exec();
   }
 }
-@@switch
-import { Model } from 'mongoose';
-import { Injectable, Dependencies } from '@nestjs/common';
-import { getModelToken } from '@nestjs/mongoose';
-import { Cat } from './schemas/cat.schema';
-
-@Injectable()
-@Dependencies(getModelToken(Cat.name))
-export class CatsService {
-  constructor(catModel) {
-    this.catModel = catModel;
-  }
-
-  async create(createCatDto) {
-    const createdCat = new this.catModel(createCatDto);
-    return createdCat.save();
-  }
-
-  async findAll() {
-    return this.catModel.find().exec();
-  }
-}
 ```
 
 #### 连接
@@ -305,14 +283,6 @@ export class CatsService {
 @Injectable()
 export class CatsService {
   constructor(@InjectModel(Cat.name, 'cats') private catModel: Model<Cat>) {}
-}
-@@switch
-@Injectable()
-@Dependencies(getModelToken(Cat.name, 'cats'))
-export class CatsService {
-  constructor(catModel) {
-    this.catModel = catModel;
-  }
 }
 ```
 

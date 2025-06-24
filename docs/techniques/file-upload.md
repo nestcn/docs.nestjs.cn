@@ -23,13 +23,6 @@ $ npm i -D @types/multer
 uploadFile(@UploadedFile() file: Express.Multer.File) {
   console.log(file);
 }
-@@switch
-@Post('upload')
-@UseInterceptors(FileInterceptor('file'))
-@Bind(UploadedFile())
-uploadFile(file) {
-  console.log(file);
-}
 ```
 
 > **提示** `FileInterceptor()` 装饰器从 `@nestjs/platform-express` 包导出。`@UploadedFile()` 装饰器从 `@nestjs/common` 导出。
@@ -177,13 +170,6 @@ file: Express.Multer.File,
 uploadFile(@UploadedFiles() files: Array<Express.Multer.File>) {
   console.log(files);
 }
-@@switch
-@Post('upload')
-@UseInterceptors(FilesInterceptor('files'))
-@Bind(UploadedFiles())
-uploadFile(files) {
-  console.log(files);
-}
 ```
 
 > **提示** `FilesInterceptor()` 装饰器从 `@nestjs/platform-express` 包导出。`@UploadedFiles()` 装饰器从 `@nestjs/common` 导出
@@ -207,16 +193,6 @@ uploadFile(files) {
 uploadFile(@UploadedFiles() files: { avatar?: Express.Multer.File[], background?: Express.Multer.File[] }) {
   console.log(files);
 }
-@@switch
-@Post('upload')
-@Bind(UploadedFiles())
-@UseInterceptors(FileFieldsInterceptor([
-  { name: 'avatar', maxCount: 1 },
-  { name: 'background', maxCount: 1 },
-]))
-uploadFile(files) {
-  console.log(files);
-}
 ```
 
 #### 任意文件
@@ -230,13 +206,6 @@ uploadFile(files) {
 @Post('upload')
 @UseInterceptors(AnyFilesInterceptor())
 uploadFile(@UploadedFiles() files: Array<Express.Multer.File>) {
-  console.log(files);
-}
-@@switch
-@Post('upload')
-@Bind(UploadedFiles())
-@UseInterceptors(AnyFilesInterceptor())
-uploadFile(files) {
   console.log(files);
 }
 ```

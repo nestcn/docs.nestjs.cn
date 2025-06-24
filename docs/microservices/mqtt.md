@@ -22,13 +22,6 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
     url: 'mqtt://localhost:1883',
   },
 });
-@@switch
-const app = await NestFactory.createMicroservice(AppModule, {
-  transport: Transport.MQTT,
-  options: {
-    url: 'mqtt://localhost:1883',
-  },
-});
 ```
 
 > info **注意** `Transport` 枚举是从 `@nestjs/microservices` 包中导入的。
@@ -72,12 +65,6 @@ const app = await NestFactory.createMicroservice(AppModule, {
 getNotifications(@Payload() data: number[], @Ctx() context: MqttContext) {
   console.log(`Topic: ${context.getTopic()}`);
 }
-@@switch
-@Bind(Payload(), Ctx())
-@MessagePattern('notifications')
-getNotifications(data, context) {
-  console.log(`Topic: ${context.getTopic()}`);
-}
 ```
 
 > **提示** `@Payload()`、`@Ctx()` 和 `MqttContext` 均从 `@nestjs/microservices` 包导入。
@@ -88,12 +75,6 @@ getNotifications(data, context) {
 @@filename()
 @MessagePattern('notifications')
 getNotifications(@Payload() data: number[], @Ctx() context: MqttContext) {
-  console.log(context.getPacket());
-}
-@@switch
-@Bind(Payload(), Ctx())
-@MessagePattern('notifications')
-getNotifications(data, context) {
   console.log(context.getPacket());
 }
 ```
@@ -108,12 +89,6 @@ getNotifications(data, context) {
 getTemperature(@Ctx() context: MqttContext) {
   console.log(`Topic: ${context.getTopic()}`);
 }
-@@switch
-@Bind(Ctx())
-@MessagePattern('sensors/+/temperature/+')
-getTemperature(context) {
-  console.log(`Topic: ${context.getTopic()}`);
-}
 ```
 
 #### 服务质量(QoS)
@@ -123,16 +98,6 @@ getTemperature(context) {
 ```typescript
 @@filename(main)
 const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
-  transport: Transport.MQTT,
-  options: {
-    url: 'mqtt://localhost:1883',
-    subscribeOptions: {
-      qos: 2
-    },
-  },
-});
-@@switch
-const app = await NestFactory.createMicroservice(AppModule, {
   transport: Transport.MQTT,
   options: {
     url: 'mqtt://localhost:1883',
@@ -166,13 +131,6 @@ client.send('replace-emoji', record).subscribe(...);
 @@filename()
 @MessagePattern('replace-emoji')
 replaceEmoji(@Payload() data: string, @Ctx() context: MqttContext): string {
-  const { properties: { userProperties } } = context.getPacket();
-  return userProperties['x-version'] === '1.0.0' ? '🐱' : '🐈';
-}
-@@switch
-@Bind(Payload(), Ctx())
-@MessagePattern('replace-emoji')
-replaceEmoji(data, context) {
   const { properties: { userProperties } } = context.getPacket();
   return userProperties['x-version'] === '1.0.0' ? '🐱' : '🐈';
 }

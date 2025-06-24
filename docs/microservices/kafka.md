@@ -30,15 +30,6 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
     }
   }
 });
-@@switch
-const app = await NestFactory.createMicroservice(AppModule, {
-  transport: Transport.KAFKA,
-  options: {
-    client: {
-      brokers: ['localhost:9092'],
-    }
-  }
-});
 ```
 
 > **提示** `Transport` 枚举是从 `@nestjs/microservices` 包中导入的。
@@ -233,12 +224,6 @@ export class HeroesController {
 killDragon(@Payload() message: KillDragonMessage, @Ctx() context: KafkaContext) {
   console.log(`Topic: ${context.getTopic()}`);
 }
-@@switch
-@Bind(Payload(), Ctx())
-@MessagePattern('hero.kill.dragon')
-killDragon(message, context) {
-  console.log(`Topic: ${context.getTopic()}`);
-}
 ```
 
 > info **提示**`@Payload()`、`@Ctx()` 和 `KafkaContext` 都是从 `@nestjs/microservices` 包导入的。
@@ -249,14 +234,6 @@ killDragon(message, context) {
 @@filename()
 @MessagePattern('hero.kill.dragon')
 killDragon(@Payload() message: KillDragonMessage, @Ctx() context: KafkaContext) {
-  const originalMessage = context.getMessage();
-  const partition = context.getPartition();
-  const { headers, timestamp } = originalMessage;
-}
-@@switch
-@Bind(Payload(), Ctx())
-@MessagePattern('hero.kill.dragon')
-killDragon(message, context) {
   const originalMessage = context.getMessage();
   const partition = context.getPartition();
   const { headers, timestamp } = originalMessage;
@@ -482,18 +459,6 @@ async handleUserCreated(@Payload() data: IncomingMessage, @Ctx() context: KafkaC
   const consumer = context.getConsumer();
   await consumer.commitOffsets([{ topic, partition, offset }])
 }
-@@switch
-@Bind(Payload(), Ctx())
-@EventPattern('user.created')
-async handleUserCreated(data, context) {
-  // business logic
-
-  const { offset } = context.getMessage();
-  const partition = context.getPartition();
-  const topic = context.getTopic();
-  const consumer = context.getConsumer();
-  await consumer.commitOffsets([{ topic, partition, offset }])
-}
 ```
 
 要禁用消息自动提交，请在 `run` 配置中设置 `autoCommit: false`，如下所示：
@@ -501,18 +466,6 @@ async handleUserCreated(data, context) {
 ```typescript
 @@filename(main)
 const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
-  transport: Transport.KAFKA,
-  options: {
-    client: {
-      brokers: ['localhost:9092'],
-    },
-    run: {
-      autoCommit: false
-    }
-  }
-});
-@@switch
-const app = await NestFactory.createMicroservice(AppModule, {
   transport: Transport.KAFKA,
   options: {
     client: {

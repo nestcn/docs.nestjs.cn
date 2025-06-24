@@ -31,11 +31,6 @@ import { Role } from '../enums/role.enum';
 
 export const ROLES_KEY = 'roles';
 export const Roles = (...roles: Role[]) => SetMetadata(ROLES_KEY, roles);
-@@switch
-import { SetMetadata } from '@nestjs/common';
-
-export const ROLES_KEY = 'roles';
-export const Roles = (...roles) => SetMetadata(ROLES_KEY, roles);
 ```
 
 现在我们有了自定义的 `@Roles()` 装饰器，可以用它来装饰任何路由处理器。
@@ -45,13 +40,6 @@ export const Roles = (...roles) => SetMetadata(ROLES_KEY, roles);
 @Post()
 @Roles(Role.Admin)
 create(@Body() createCatDto: CreateCatDto) {
-  this.catsService.create(createCatDto);
-}
-@@switch
-@Post()
-@Roles(Role.Admin)
-@Bind(Body())
-create(createCatDto) {
   this.catsService.create(createCatDto);
 }
 ```
@@ -77,29 +65,6 @@ export class RolesGuard implements CanActivate {
     }
     const { user } = context.switchToHttp().getRequest();
     return requiredRoles.some((role) => user.roles?.includes(role));
-  }
-}
-@@switch
-import { Injectable, Dependencies } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-
-@Injectable()
-@Dependencies(Reflector)
-export class RolesGuard {
-  constructor(reflector) {
-    this.reflector = reflector;
-  }
-
-  canActivate(context) {
-    const requiredRoles = this.reflector.getAllAndOverride(ROLES_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-    if (!requiredRoles) {
-      return true;
-    }
-    const { user } = context.switchToHttp().getRequest();
-    return requiredRoles.some((role) => user.roles.includes(role));
   }
 }
 ```
@@ -153,13 +118,6 @@ providers: [
 @Post()
 @RequirePermissions(Permission.CREATE_CAT)
 create(@Body() createCatDto: CreateCatDto) {
-  this.catsService.create(createCatDto);
-}
-@@switch
-@Post()
-@RequirePermissions(Permission.CREATE_CAT)
-@Bind(Body())
-create(createCatDto) {
   this.catsService.create(createCatDto);
 }
 ```

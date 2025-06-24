@@ -38,18 +38,6 @@ export class CatsService {
     return this.httpService.get('http://localhost:3000/cats');
   }
 }
-@@switch
-@Injectable()
-@Dependencies(HttpService)
-export class CatsService {
-  constructor(httpService) {
-    this.httpService = httpService;
-  }
-
-  findAll() {
-    return this.httpService.get('http://localhost:3000/cats');
-  }
-}
 ```
 
 > info **提示**`AxiosResponse` 是从 `axios` 包(`$ npm i axios`)导出的接口。

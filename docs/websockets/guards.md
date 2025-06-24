@@ -16,11 +16,4 @@ handleEvent(client: Client, data: unknown): WsResponse<unknown> {
   const event = 'events';
   return { event, data };
 }
-@@switch
-@UseGuards(AuthGuard)
-@SubscribeMessage('events')
-handleEvent(client, data) {
-  const event = 'events';
-  return { event, data };
-}
 ```

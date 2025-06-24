@@ -28,16 +28,6 @@ export class AuthGuard implements CanActivate {
     return validateRequest(request);
   }
 }
-@@switch
-import { Injectable } from '@nestjs/common';
-
-@Injectable()
-export class AuthGuard {
-  async canActivate(context) {
-    const request = context.switchToHttp().getRequest();
-    return validateRequest(request);
-  }
-}
 ```
 
 > info **提示** 若需查看如何在应用中实现认证机制的实际案例，请访问[本章节](/security/authentication) 。同样地，如需更复杂的授权示例，请参阅[此页面](/security/authorization) 。
@@ -69,15 +59,6 @@ export class RolesGuard implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    return true;
-  }
-}
-@@switch
-import { Injectable } from '@nestjs/common';
-
-@Injectable()
-export class RolesGuard {
-  canActivate(context) {
     return true;
   }
 }
@@ -163,13 +144,6 @@ export const Roles = Reflector.createDecorator<string[]>();
 async create(@Body() createCatDto: CreateCatDto) {
   this.catsService.create(createCatDto);
 }
-@@switch
-@Post()
-@Roles(['admin'])
-@Bind(Body())
-async create(createCatDto) {
-  this.catsService.create(createCatDto);
-}
 ```
 
 这里我们将 `Roles` 装饰器元数据附加到 `create()` 方法上，表明只有具有 `admin` 角色的用户才被允许访问此路由。
@@ -191,28 +165,6 @@ export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const roles = this.reflector.get(Roles, context.getHandler());
-    if (!roles) {
-      return true;
-    }
-    const request = context.switchToHttp().getRequest();
-    const user = request.user;
-    return matchRoles(roles, user.roles);
-  }
-}
-@@switch
-import { Injectable, Dependencies } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { Roles } from './roles.decorator';
-
-@Injectable()
-@Dependencies(Reflector)
-export class RolesGuard {
-  constructor(reflector) {
-    this.reflector = reflector;
-  }
-
-  canActivate(context) {
     const roles = this.reflector.get(Roles, context.getHandler());
     if (!roles) {
       return true;

@@ -63,20 +63,6 @@ export class HeroesGameService {
     );
   }
 }
-@@switch
-@Injectable()
-@Dependencies(CommandBus)
-export class HeroesGameService {
-  constructor(commandBus) {
-    this.commandBus = commandBus;
-  }
-
-  async killDragon(heroId, killDragonDto) {
-    return this.commandBus.execute(
-      new KillDragonCommand(heroId, killDragonDto.dragonId)
-    );
-  }
-}
 ```
 
 在上述代码片段中，我们实例化了 `KillDragonCommand` 类并将其传递给 `CommandBus` 的 `execute()` 方法。以下是演示的命令类：
@@ -90,13 +76,6 @@ export class KillDragonCommand extends Command<{
     public readonly heroId: string,
     public readonly dragonId: string,
   ) {}
-}
-@@switch
-export class KillDragonCommand extends Command {
-  constructor(heroId, dragonId) {
-    this.heroId = heroId;
-    this.dragonId = dragonId;
-  }
 }
 ```
 
@@ -115,27 +94,6 @@ export class KillDragonHandler implements ICommandHandler<KillDragonCommand> {
   constructor(private repository: HeroesRepository) {}
 
   async execute(command: KillDragonCommand) {
-    const { heroId, dragonId } = command;
-    const hero = this.repository.findOneById(+heroId);
-
-    hero.killEnemy(dragonId);
-    await this.repository.persist(hero);
-
-    // "ICommandHandler<KillDragonCommand>" forces you to return a value that matches the command's return type
-    return {
-      actionId: crypto.randomUUID(), // This value will be returned to the caller
-    }
-  }
-}
-@@switch
-@CommandHandler(KillDragonCommand)
-@Dependencies(HeroesRepository)
-export class KillDragonHandler {
-  constructor(repository) {
-    this.repository = repository;
-  }
-
-  async execute(command) {
     const { heroId, dragonId } = command;
     const hero = this.repository.findOneById(+heroId);
 
@@ -186,18 +144,6 @@ export class GetHeroHandler implements IQueryHandler<GetHeroQuery> {
     return this.repository.findOneById(query.hero);
   }
 }
-@@switch
-@QueryHandler(GetHeroQuery)
-@Dependencies(HeroesRepository)
-export class GetHeroHandler {
-  constructor(repository) {
-    this.repository = repository;
-  }
-
-  async execute(query) {
-    return this.repository.findOneById(query.hero);
-  }
-}
 ```
 
 `GetHeroHandler` 类实现了 `IQueryHandler` 接口，该接口要求实现 `execute()` 方法。`execute()` 方法接收查询对象作为参数，并必须返回与查询返回类型匹配的数据（在本例中为 `Hero` 对象）。
@@ -228,13 +174,6 @@ export class HeroKilledDragonEvent {
     public readonly dragonId: string,
   ) {}
 }
-@@switch
-export class HeroKilledDragonEvent {
-  constructor(heroId, dragonId) {
-    this.heroId = heroId;
-    this.dragonId = dragonId;
-  }
-}
 ```
 
 虽然可以直接使用 `EventBus.publish()` 方法派发事件，但我们也可以从模型中进行派发。让我们更新 `Hero` 模型，使其在调用 `killEnemy()` 方法时派发 `HeroKilledDragonEvent` 事件。
@@ -247,18 +186,6 @@ export class Hero extends AggregateRoot {
   }
 
   killEnemy(enemyId: string) {
-    // Business logic
-    this.apply(new HeroKilledDragonEvent(this.id, enemyId));
-  }
-}
-@@switch
-export class Hero extends AggregateRoot {
-  constructor(id) {
-    super();
-    this.id = id;
-  }
-
-  killEnemy(enemyId) {
     // Business logic
     this.apply(new HeroKilledDragonEvent(this.id, enemyId));
   }
@@ -277,24 +204,6 @@ export class KillDragonHandler implements ICommandHandler<KillDragonCommand> {
   ) {}
 
   async execute(command: KillDragonCommand) {
-    const { heroId, dragonId } = command;
-    const hero = this.publisher.mergeObjectContext(
-      await this.repository.findOneById(+heroId),
-    );
-    hero.killEnemy(dragonId);
-    hero.commit();
-  }
-}
-@@switch
-@CommandHandler(KillDragonCommand)
-@Dependencies(HeroesRepository, EventPublisher)
-export class KillDragonHandler {
-  constructor(repository, publisher) {
-    this.repository = repository;
-    this.publisher = publisher;
-  }
-
-  async execute(command) {
     const { heroId, dragonId } = command;
     const hero = this.publisher.mergeObjectContext(
       await this.repository.findOneById(+heroId),
@@ -376,17 +285,6 @@ Saga 是一个极其强大的功能。单个 saga 可以监听 1..\* 个事件�
 export class HeroesGameSagas {
   @Saga()
   dragonKilled = (events$: Observable<any>): Observable<ICommand> => {
-    return events$.pipe(
-      ofType(HeroKilledDragonEvent),
-      map((event) => new DropAncientItemCommand(event.heroId, fakeItemID)),
-    );
-  }
-}
-@@switch
-@Injectable()
-export class HeroesGameSagas {
-  @Saga()
-  dragonKilled = (events$) => {
     return events$.pipe(
       ofType(HeroKilledDragonEvent),
       map((event) => new DropAncientItemCommand(event.heroId, fakeItemID)),

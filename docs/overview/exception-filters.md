@@ -187,26 +187,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
       });
   }
 }
-@@switch
-import { Catch, HttpException } from '@nestjs/common';
-
-@Catch(HttpException)
-export class HttpExceptionFilter {
-  catch(exception, host) {
-    const ctx = host.switchToHttp();
-    const response = ctx.getResponse();
-    const request = ctx.getRequest();
-    const status = exception.getStatus();
-
-    response
-      .status(status)
-      .json({
-        statusCode: status,
-        timestamp: new Date().toISOString(),
-        path: request.url,
-      });
-  }
-}
 ```
 
 > info **提示** 所有异常过滤器都应实现泛型接口 `ExceptionFilter<T>`。这要求您提供带有指定签名的 `catch(exception: T, host: ArgumentsHost)` 方法。`T` 表示异常的类型。
@@ -232,13 +212,6 @@ export class HttpExceptionFilter {
 async create(@Body() createCatDto: CreateCatDto) {
   throw new ForbiddenException();
 }
-@@switch
-@Post()
-@UseFilters(new HttpExceptionFilter())
-@Bind(Body())
-async create(createCatDto) {
-  throw new ForbiddenException();
-}
 ```
 
 > info **注意** `@UseFilters()` 装饰器是从 `@nestjs/common` 包中导入的。
@@ -250,13 +223,6 @@ async create(createCatDto) {
 @Post()
 @UseFilters(HttpExceptionFilter)
 async create(@Body() createCatDto: CreateCatDto) {
-  throw new ForbiddenException();
-}
-@@switch
-@Post()
-@UseFilters(HttpExceptionFilter)
-@Bind(Body())
-async create(createCatDto) {
   throw new ForbiddenException();
 }
 ```
@@ -369,16 +335,6 @@ import { BaseExceptionFilter } from '@nestjs/core';
 @Catch()
 export class AllExceptionsFilter extends BaseExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
-    super.catch(exception, host);
-  }
-}
-@@switch
-import { Catch } from '@nestjs/common';
-import { BaseExceptionFilter } from '@nestjs/core';
-
-@Catch()
-export class AllExceptionsFilter extends BaseExceptionFilter {
-  catch(exception, host) {
     super.catch(exception, host);
   }
 }

@@ -46,28 +46,6 @@ describe('CatsController', () => {
     });
   });
 });
-@@switch
-import { CatsController } from './cats.controller';
-import { CatsService } from './cats.service';
-
-describe('CatsController', () => {
-  let catsController;
-  let catsService;
-
-  beforeEach(() => {
-    catsService = new CatsService();
-    catsController = new CatsController(catsService);
-  });
-
-  describe('findAll', () => {
-    it('should return an array of cats', async () => {
-      const result = ['test'];
-      jest.spyOn(catsService, 'findAll').mockImplementation(() => result);
-
-      expect(await catsController.findAll()).toBe(result);
-    });
-  });
-});
 ```
 
 > info **提示** 将测试文件保存在它们所测试的类附近。测试文件应带有 `.spec` 或 `.test` 后缀。
@@ -87,34 +65,6 @@ import { CatsService } from './cats.service';
 describe('CatsController', () => {
   let catsController: CatsController;
   let catsService: CatsService;
-
-  beforeEach(async () => {
-    const moduleRef = await Test.createTestingModule({
-        controllers: [CatsController],
-        providers: [CatsService],
-      }).compile();
-
-    catsService = moduleRef.get(CatsService);
-    catsController = moduleRef.get(CatsController);
-  });
-
-  describe('findAll', () => {
-    it('should return an array of cats', async () => {
-      const result = ['test'];
-      jest.spyOn(catsService, 'findAll').mockImplementation(() => result);
-
-      expect(await catsController.findAll()).toBe(result);
-    });
-  });
-});
-@@switch
-import { Test } from '@nestjs/testing';
-import { CatsController } from './cats.controller';
-import { CatsService } from './cats.service';
-
-describe('CatsController', () => {
-  let catsController;
-  let catsService;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -207,42 +157,6 @@ describe('CatsController', () => {
 
 ```typescript
 @@filename(cats.e2e-spec)
-import * as request from 'supertest';
-import { Test } from '@nestjs/testing';
-import { CatsModule } from '../../src/cats/cats.module';
-import { CatsService } from '../../src/cats/cats.service';
-import { INestApplication } from '@nestjs/common';
-
-describe('Cats', () => {
-  let app: INestApplication;
-  let catsService = { findAll: () => ['test'] };
-
-  beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({
-      imports: [CatsModule],
-    })
-      .overrideProvider(CatsService)
-      .useValue(catsService)
-      .compile();
-
-    app = moduleRef.createNestApplication();
-    await app.init();
-  });
-
-  it(`/GET cats`, () => {
-    return request(app.getHttpServer())
-      .get('/cats')
-      .expect(200)
-      .expect({
-        data: catsService.findAll(),
-      });
-  });
-
-  afterAll(async () => {
-    await app.close();
-  });
-});
-@@switch
 import * as request from 'supertest';
 import { Test } from '@nestjs/testing';
 import { CatsModule } from '../../src/cats/cats.module';

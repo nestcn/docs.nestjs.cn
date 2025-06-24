@@ -150,13 +150,6 @@ export const Roles = Reflector.createDecorator<string[]>();
 async create(@Body() createCatDto: CreateCatDto) {
   this.catsService.create(createCatDto);
 }
-@@switch
-@Post()
-@Roles(['admin'])
-@Bind(Body())
-async create(createCatDto) {
-  this.catsService.create(createCatDto);
-}
 ```
 
 这里我们将 `Roles` 装饰器元数据附加到 `create()` 方法上，表明只有具有 `admin` 角色的用户才被允许访问此路由。
@@ -168,14 +161,6 @@ async create(createCatDto) {
 @Injectable()
 export class RolesGuard {
   constructor(private reflector: Reflector) {}
-}
-@@switch
-@Injectable()
-@Dependencies(Reflector)
-export class CatsService {
-  constructor(reflector) {
-    this.reflector = reflector;
-  }
 }
 ```
 
@@ -193,10 +178,6 @@ const roles = this.reflector.get(Roles, context.getHandler());
 
 ```typescript
 @@filename(cats.controller)
-@Roles(['admin'])
-@Controller('cats')
-export class CatsController {}
-@@switch
 @Roles(['admin'])
 @Controller('cats')
 export class CatsController {}
@@ -221,17 +202,6 @@ export class CatsController {
   @Post()
   @Roles(['admin'])
   async create(@Body() createCatDto: CreateCatDto) {
-    this.catsService.create(createCatDto);
-  }
-}
-@@switch
-@Roles(['user'])
-@Controller('cats')
-export class CatsController {}
-  @Post()
-  @Roles(['admin'])
-  @Bind(Body())
-  async create(createCatDto) {
     this.catsService.create(createCatDto);
   }
 }
@@ -272,13 +242,6 @@ const roles = this.reflector.getAllAndMerge(Roles, [
 async create(@Body() createCatDto: CreateCatDto) {
   this.catsService.create(createCatDto);
 }
-@@switch
-@Post()
-@SetMetadata('roles', ['admin'])
-@Bind(Body())
-async create(createCatDto) {
-  this.catsService.create(createCatDto);
-}
 ```
 
 > info **注意** `@SetMetadata()` 装饰器是从 `@nestjs/common` 包中导入的。
@@ -290,10 +253,6 @@ async create(createCatDto) {
 import { SetMetadata } from '@nestjs/common';
 
 export const Roles = (...roles: string[]) => SetMetadata('roles', roles);
-@@switch
-import { SetMetadata } from '@nestjs/common';
-
-export const Roles = (...roles) => SetMetadata('roles', roles);
 ```
 
 这种方法更加简洁易读，某种程度上类似于 `Reflector#createDecorator` 的实现方式。不同之处在于，使用 `@SetMetadata` 您可以更好地控制元数据的键和值，并且可以创建接受多个参数的装饰器。
@@ -307,13 +266,6 @@ export const Roles = (...roles) => SetMetadata('roles', roles);
 async create(@Body() createCatDto: CreateCatDto) {
   this.catsService.create(createCatDto);
 }
-@@switch
-@Post()
-@Roles('admin')
-@Bind(Body())
-async create(createCatDto) {
-  this.catsService.create(createCatDto);
-}
 ```
 
 为了访问路由的角色信息（自定义元数据），我们将再次使用 `Reflector` 辅助类：
@@ -323,14 +275,6 @@ async create(createCatDto) {
 @Injectable()
 export class RolesGuard {
   constructor(private reflector: Reflector) {}
-}
-@@switch
-@Injectable()
-@Dependencies(Reflector)
-export class CatsService {
-  constructor(reflector) {
-    this.reflector = reflector;
-  }
 }
 ```
 

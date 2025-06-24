@@ -21,19 +21,6 @@ export class CatsService {
     return this.cats;
   }
 }
-@@switch
-import { Injectable } from '@nestjs/common';
-
-@Injectable()
-export class CatsService {
-  constructor() {
-    this.cats = [];
-  }
-
-  findAll() {
-    return this.cats;
-  }
-}
 ```
 
 然后我们请求 Nest 将这个提供者注入到我们的控制器类中：
@@ -50,22 +37,6 @@ export class CatsController {
 
   @Get()
   async findAll(): Promise<Cat[]> {
-    return this.catsService.findAll();
-  }
-}
-@@switch
-import { Controller, Get, Bind, Dependencies } from '@nestjs/common';
-import { CatsService } from './cats.service';
-
-@Controller('cats')
-@Dependencies(CatsService)
-export class CatsController {
-  constructor(catsService) {
-    this.catsService = catsService;
-  }
-
-  @Get()
-  async findAll() {
     return this.catsService.findAll();
   }
 }
@@ -194,12 +165,6 @@ export class AppModule {}
 export class CatsRepository {
   constructor(@Inject('CONNECTION') connection: Connection) {}
 }
-@@switch
-@Injectable()
-@Dependencies('CONNECTION')
-export class CatsRepository {
-  constructor(connection) {}
-}
 ```
 
 > info **提示** `@Inject()` 装饰器是从 `@nestjs/common` 包中导入的。
@@ -254,27 +219,6 @@ const connectionProvider = {
   providers: [
     connectionProvider,
     MyOptionsProvider, // class-based provider
-    // { provide: 'SomeOptionalProvider', useValue: 'anything' },
-  ],
-})
-export class AppModule {}
-@@switch
-const connectionProvider = {
-  provide: 'CONNECTION',
-  useFactory: (optionsProvider, optionalProvider) => {
-    const options = optionsProvider.get();
-    return new DatabaseConnection(options);
-  },
-  inject: [MyOptionsProvider, { token: 'SomeOptionalProvider', optional: true }],
-  //       \______________/            \__________________/
-  //        This provider               The provider with this token
-  //        is mandatory.               can resolve to `undefined`.
-};
-
-@Module({
-  providers: [
-    connectionProvider,
-    MyOptionsProvider, // class-base provider
     // { provide: 'SomeOptionalProvider', useValue: 'anything' },
   ],
 })
@@ -342,21 +286,6 @@ const connectionFactory = {
   exports: ['CONNECTION'],
 })
 export class AppModule {}
-@@switch
-const connectionFactory = {
-  provide: 'CONNECTION',
-  useFactory: (optionsProvider) => {
-    const options = optionsProvider.get();
-    return new DatabaseConnection(options);
-  },
-  inject: [OptionsProvider],
-};
-
-@Module({
-  providers: [connectionFactory],
-  exports: ['CONNECTION'],
-})
-export class AppModule {}
 ```
 
 或者，使用完整的提供者对象导出：
@@ -366,21 +295,6 @@ export class AppModule {}
 const connectionFactory = {
   provide: 'CONNECTION',
   useFactory: (optionsProvider: OptionsProvider) => {
-    const options = optionsProvider.get();
-    return new DatabaseConnection(options);
-  },
-  inject: [OptionsProvider],
-};
-
-@Module({
-  providers: [connectionFactory],
-  exports: [connectionFactory],
-})
-export class AppModule {}
-@@switch
-const connectionFactory = {
-  provide: 'CONNECTION',
-  useFactory: (optionsProvider) => {
     const options = optionsProvider.get();
     return new DatabaseConnection(options);
   },

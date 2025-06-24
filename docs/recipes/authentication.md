@@ -51,45 +51,12 @@ export class UsersService {
     return this.users.find(user => user.username === username);
   }
 }
-@@switch
-import { Injectable } from '@nestjs/common';
-
-@Injectable()
-export class UsersService {
-  constructor() {
-    this.users = [
-      {
-        userId: 1,
-        username: 'john',
-        password: 'changeme',
-      },
-      {
-        userId: 2,
-        username: 'maria',
-        password: 'guess',
-      },
-    ];
-  }
-
-  async findOne(username) {
-    return this.users.find(user => user.username === username);
-  }
-}
 ```
 
 在 `UsersModule` 中，唯一需要做的改动是将 `UsersService` 添加到 `@Module` 装饰器的 exports 数组中，以便该服务在此模块外可见（稍后我们将把它用于 `AuthService` 中）。
 
 ```typescript
 @@filename(users/users.module)
-import { Module } from '@nestjs/common';
-import { UsersService } from './users.service';
-
-@Module({
-  providers: [UsersService],
-  exports: [UsersService],
-})
-export class UsersModule {}
-@@switch
 import { Module } from '@nestjs/common';
 import { UsersService } from './users.service';
 
@@ -124,28 +91,6 @@ export class AuthService {
     return result;
   }
 }
-@@switch
-import { Injectable, Dependencies, UnauthorizedException } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
-
-@Injectable()
-@Dependencies(UsersService)
-export class AuthService {
-  constructor(usersService) {
-    this.usersService = usersService;
-  }
-
-  async signIn(username: string, pass: string) {
-    const user = await this.usersService.findOne(username);
-    if (user?.password !== pass) {
-      throw new UnauthorizedException();
-    }
-    const { password, ...result } = user;
-    // TODO: Generate a JWT and return it here
-    // instead of the user object
-    return result;
-  }
-}
 ```
 
 > warning **警告** 在实际应用中，当然不应以明文存储密码。正确的做法是使用类似 [bcrypt](https://github.com/kelektiv/node.bcrypt.js#readme) 的库，配合加盐的单向哈希算法。采用这种方式时，你只需存储哈希后的密码，然后将存储的密码与**用户输入**密码的哈希值进行比对，从而避免以明文形式存储或暴露用户密码。为了让示例应用保持简单，我们违反了这个绝对原则而使用了明文存储。 **切勿在实际应用中这样做！**
@@ -154,18 +99,6 @@ export class AuthService {
 
 ```typescript
 @@filename(auth/auth.module)
-import { Module } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { AuthController } from './auth.controller';
-import { UsersModule } from '../users/users.module';
-
-@Module({
-  imports: [UsersModule],
-  providers: [AuthService],
-  controllers: [AuthController],
-})
-export class AuthModule {}
-@@switch
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
@@ -244,30 +177,6 @@ export class AuthService {
     };
   }
 }
-@@switch
-import { Injectable, Dependencies, UnauthorizedException } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
-import { JwtService } from '@nestjs/jwt';
-
-@Dependencies(UsersService, JwtService)
-@Injectable()
-export class AuthService {
-  constructor(usersService, jwtService) {
-    this.usersService = usersService;
-    this.jwtService = jwtService;
-  }
-
-  async signIn(username, pass) {
-    const user = await this.usersService.findOne(username);
-    if (user?.password !== pass) {
-      throw new UnauthorizedException();
-    }
-    const payload = { username: user.username, sub: user.userId };
-    return {
-      access_token: await this.jwtService.signAsync(payload),
-    };
-  }
-}
 ```
 
 我们使用 `@nestjs/jwt` 库，它提供了 `signAsync()` 函数来从 `user` 对象属性的子集生成 JWT，然后我们将其作为带有单个 `access_token` 属性的简单对象返回。注意：我们选择 `sub` 属性名来存储 `userId` 值以符合 JWT 标准。
@@ -281,10 +190,6 @@ export class AuthService {
 export const jwtConstants = {
   secret: 'DO NOT USE THIS VALUE. INSTEAD, CREATE A COMPLEX SECRET AND KEEP IT SAFE OUTSIDE OF THE SOURCE CODE.',
 };
-@@switch
-export const jwtConstants = {
-  secret: 'DO NOT USE THIS VALUE. INSTEAD, CREATE A COMPLEX SECRET AND KEEP IT SAFE OUTSIDE OF THE SOURCE CODE.',
-};
 ```
 
 我们将使用它在 JWT 签名和验证步骤之间共享密钥。
@@ -295,28 +200,6 @@ export const jwtConstants = {
 
 ```typescript
 @@filename(auth/auth.module)
-import { Module } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { UsersModule } from '../users/users.module';
-import { JwtModule } from '@nestjs/jwt';
-import { AuthController } from './auth.controller';
-import { jwtConstants } from './constants';
-
-@Module({
-  imports: [
-    UsersModule,
-    JwtModule.register({
-      global: true,
-      secret: jwtConstants.secret,
-      signOptions: { expiresIn: '60s' },
-    }),
-  ],
-  providers: [AuthService],
-  controllers: [AuthController],
-  exports: [AuthService],
-})
-export class AuthModule {}
-@@switch
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersModule } from '../users/users.module';

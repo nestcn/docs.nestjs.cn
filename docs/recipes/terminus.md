@@ -82,41 +82,8 @@ export class HealthController {
     ]);
   }
 }
-@@switch
-import { Controller, Dependencies, Get } from '@nestjs/common';
-import { HealthCheckService, HttpHealthIndicator, HealthCheck } from '@nestjs/terminus';
-
-@Controller('health')
-@Dependencies(HealthCheckService, HttpHealthIndicator)
-export class HealthController {
-  constructor(
-    private health,
-    private http,
-  ) { }
-
-  @Get()
-  @HealthCheck()
-  healthCheck() {
-    return this.health.check([
-      () => this.http.pingCheck('nestjs-docs', 'https://docs.nestjs.com'),
-    ])
-  }
-}
-```
-
 ```typescript
 @@filename(health.module)
-import { Module } from '@nestjs/common';
-import { TerminusModule } from '@nestjs/terminus';
-import { HttpModule } from '@nestjs/axios';
-import { HealthController } from './health.controller';
-
-@Module({
-  imports: [TerminusModule, HttpModule],
-  controllers: [HealthController],
-})
-export class HealthModule {}
-@@switch
 import { Module } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
 import { HttpModule } from '@nestjs/axios';
@@ -204,23 +171,6 @@ export class HealthController {
     ]);
   }
 }
-@@switch
-@Controller('health')
-@Dependencies(HealthCheckService, TypeOrmHealthIndicator)
-export class HealthController {
-  constructor(
-    private health,
-    private db,
-  ) { }
-
-  @Get()
-  @HealthCheck()
-  healthCheck() {
-    return this.health.check([
-      () => this.db.pingCheck('database'),
-    ])
-  }
-}
 ```
 
 如果您的数据库可访问，现在通过 `GET` 请求访问 `http://localhost:3000/health` 时，应该会看到以下 JSON 结果：
@@ -289,20 +239,6 @@ export class HealthController {
     ]);
   }
 }
-@@switch
-@Controller('health')
-@Dependencies(HealthCheckService, DiskHealthIndicator)
-export class HealthController {
-  constructor(health, disk) {}
-
-  @Get()
-  @HealthCheck()
-  healthCheck() {
-    return this.health.check([
-      () => this.disk.checkStorage('storage', { path: '/', thresholdPercent: 0.5 }),
-    ])
-  }
-}
 ```
 
 通过 `DiskHealthIndicator.checkStorage` 函数，你还可以检查固定大小的存储空间。以下示例中，如果路径 `/my-app/` 超过 250GB，健康状态将变为不健康。
@@ -344,20 +280,6 @@ export class HealthController {
     return this.health.check([
       () => this.memory.checkHeap('memory_heap', 150 * 1024 * 1024),
     ]);
-  }
-}
-@@switch
-@Controller('health')
-@Dependencies(HealthCheckService, MemoryHealthIndicator)
-export class HealthController {
-  constructor(health, memory) {}
-
-  @Get()
-  @HealthCheck()
-  healthCheck() {
-    return this.health.check([
-      () => this.memory.checkHeap('memory_heap', 150 * 1024 * 1024),
-    ])
   }
 }
 ```
@@ -418,34 +340,6 @@ export class DogHealthIndicator {
     return indicator.up();
   }
 }
-@@switch
-import { Injectable } from '@nestjs/common';
-import { HealthIndicatorService } from '@nestjs/terminus';
-
-@Injectable()
-@Dependencies(HealthIndicatorService)
-export class DogHealthIndicator {
-  constructor(healthIndicatorService) {
-    this.healthIndicatorService = healthIndicatorService;
-  }
-
-  private dogs = [
-    { name: 'Fido', type: 'goodboy' },
-    { name: 'Rex', type: 'badboy' },
-  ];
-
-  async isHealthy(key){
-    const indicator = this.healthIndicatorService.check(key);
-    const badboys = this.dogs.filter(dog => dog.type === 'badboy');
-    const isHealthy = badboys.length === 0;
-
-    if (!isHealthy) {
-      return indicator.down({ badboys: badboys.length });
-    }
-
-    return indicator.up();
-  }
-}
 ```
 
 接下来我们需要将健康指标注册为提供者。
@@ -480,30 +374,6 @@ export class HealthController {
     private health: HealthCheckService,
     private dogHealthIndicator: DogHealthIndicator
   ) {}
-
-  @Get()
-  @HealthCheck()
-  healthCheck() {
-    return this.health.check([
-      () => this.dogHealthIndicator.isHealthy('dog'),
-    ])
-  }
-}
-@@switch
-import { HealthCheckService, HealthCheck } from '@nestjs/terminus';
-import { Injectable, Get } from '@nestjs/common';
-import { DogHealthIndicator } from './dog.health';
-
-@Injectable()
-@Dependencies(HealthCheckService, DogHealthIndicator)
-export class HealthController {
-  constructor(
-    health,
-    dogHealthIndicator
-  ) {
-    this.health = health;
-    this.dogHealthIndicator = dogHealthIndicator;
-  }
 
   @Get()
   @HealthCheck()

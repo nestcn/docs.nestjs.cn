@@ -60,18 +60,6 @@ import { DataSource } from 'typeorm';
 export class AppModule {
   constructor(private dataSource: DataSource) {}
 }
-@@switch
-import { DataSource } from 'typeorm';
-
-@Dependencies(DataSource)
-@Module({
-  imports: [TypeOrmModule.forRoot(), UsersModule],
-})
-export class AppModule {
-  constructor(dataSource) {
-    this.dataSource = dataSource;
-  }
-}
 ```
 
 #### 仓储模式
@@ -172,30 +160,6 @@ export class UsersService {
   }
 
   async remove(id: number): Promise<void> {
-    await this.usersRepository.delete(id);
-  }
-}
-@@switch
-import { Injectable, Dependencies } from '@nestjs/common';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { User } from './user.entity';
-
-@Injectable()
-@Dependencies(getRepositoryToken(User))
-export class UsersService {
-  constructor(usersRepository) {
-    this.usersRepository = usersRepository;
-  }
-
-  findAll() {
-    return this.usersRepository.find();
-  }
-
-  findOne(id) {
-    return this.usersRepository.findOneBy({ id });
-  }
-
-  async remove(id) {
     await this.usersRepository.delete(id);
   }
 }
@@ -740,17 +704,6 @@ import { Sequelize } from 'sequelize-typescript';
 export class AppService {
   constructor(private sequelize: Sequelize) {}
 }
-@@switch
-import { Injectable } from '@nestjs/common';
-import { Sequelize } from 'sequelize-typescript';
-
-@Dependencies(Sequelize)
-@Injectable()
-export class AppService {
-  constructor(sequelize) {
-    this.sequelize = sequelize;
-  }
-}
 ```
 
 #### 模型
@@ -848,35 +801,6 @@ export class UsersService {
   }
 
   async remove(id: string): Promise<void> {
-    const user = await this.findOne(id);
-    await user.destroy();
-  }
-}
-@@switch
-import { Injectable, Dependencies } from '@nestjs/common';
-import { getModelToken } from '@nestjs/sequelize';
-import { User } from './user.model';
-
-@Injectable()
-@Dependencies(getModelToken(User))
-export class UsersService {
-  constructor(usersRepository) {
-    this.usersRepository = usersRepository;
-  }
-
-  async findAll() {
-    return this.userModel.findAll();
-  }
-
-  findOne(id) {
-    return this.userModel.findOne({
-      where: {
-        id,
-      },
-    });
-  }
-
-  async remove(id) {
     const user = await this.findOne(id);
     await user.destroy();
   }

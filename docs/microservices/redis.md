@@ -25,14 +25,6 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
     port: 6379,
   },
 });
-@@switch
-const app = await NestFactory.createMicroservice(AppModule, {
-  transport: Transport.REDIS,
-  options: {
-    host: 'localhost',
-    port: 6379,
-  },
-});
 ```
 
 > **提示** `Transport` 枚举是从 `@nestjs/microservices` 包中导入的。
@@ -79,12 +71,6 @@ const app = await NestFactory.createMicroservice(AppModule, {
 @@filename()
 @MessagePattern('notifications')
 getNotifications(@Payload() data: number[], @Ctx() context: RedisContext) {
-  console.log(`Channel: ${context.getChannel()}`);
-}
-@@switch
-@Bind(Payload(), Ctx())
-@MessagePattern('notifications')
-getNotifications(data, context) {
   console.log(`Channel: ${context.getChannel()}`);
 }
 ```

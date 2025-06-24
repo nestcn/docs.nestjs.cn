@@ -27,14 +27,6 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
     protoPath: join(__dirname, 'hero/hero.proto'),
   },
 });
-@@switch
-const app = await NestFactory.createMicroservice(AppModule, {
-  transport: Transport.GRPC,
-  options: {
-    package: 'hero',
-    protoPath: join(__dirname, 'hero/hero.proto'),
-  },
-});
 ```
 
 > info **提示** `join()` 函数是从 `path` 包导入的；`Transport` 枚举是从 `@nestjs/microservices` 包导入的。
@@ -99,18 +91,6 @@ export class HeroesController {
     return items.find(({ id }) => id === data.id);
   }
 }
-@@switch
-@Controller()
-export class HeroesController {
-  @GrpcMethod('HeroesService', 'FindOne')
-  findOne(data, metadata, call) {
-    const items = [
-      { id: 1, name: 'John' },
-      { id: 2, name: 'Doe' },
-    ];
-    return items.find(({ id }) => id === data.id);
-  }
-}
 ```
 
 > info **提示** `@GrpcMethod()` 装饰器是从 `@nestjs/microservices` 包导入的，而 `Metadata` 和 `ServerUnaryCall` 则来自 `grpc` 包。
@@ -134,18 +114,6 @@ export class HeroesController {
     return items.find(({ id }) => id === data.id);
   }
 }
-@@switch
-@Controller()
-export class HeroesController {
-  @GrpcMethod('HeroesService')
-  findOne(data, metadata, call) {
-    const items = [
-      { id: 1, name: 'John' },
-      { id: 2, name: 'Doe' },
-    ];
-    return items.find(({ id }) => id === data.id);
-  }
-}
 ```
 
 你也可以省略第一个 `@GrpcMethod()` 参数。在这种情况下，Nest 会根据定义处理程序的 **class** 名称，自动将该处理程序与 proto 定义文件中的服务定义关联起来。例如，在以下代码中，类 `HeroesService` 会基于名称 `'HeroesService'` 的匹配，将其处理程序方法与 `hero.proto` 文件中的 `HeroesService` 服务定义相关联。
@@ -156,18 +124,6 @@ export class HeroesController {
 export class HeroesService {
   @GrpcMethod()
   findOne(data: HeroById, metadata: Metadata, call: ServerUnaryCall<any, any>): Hero {
-    const items = [
-      { id: 1, name: 'John' },
-      { id: 2, name: 'Doe' },
-    ];
-    return items.find(({ id }) => id === data.id);
-  }
-}
-@@switch
-@Controller()
-export class HeroesService {
-  @GrpcMethod()
-  findOne(data, metadata, call) {
     const items = [
       { id: 1, name: 'John' },
       { id: 2, name: 'Doe' },
@@ -267,11 +223,6 @@ interface HeroesService {
 @@filename(heroes.controller)
 @Get()
 call(): Observable<any> {
-  return this.heroesService.findOne({ id: 1 });
-}
-@@switch
-@Get()
-call() {
   return this.heroesService.findOne({ id: 1 });
 }
 ```
@@ -511,23 +462,6 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 export class HeroesService {
   @GrpcMethod()
   findOne(data: HeroById, metadata: Metadata, call: ServerUnaryCall<any, any>): Hero {
-    const serverMetadata = new Metadata();
-    const items = [
-      { id: 1, name: 'John' },
-      { id: 2, name: 'Doe' },
-    ];
-
-    serverMetadata.add('Set-Cookie', 'yummy_cookie=choco');
-    call.sendMetadata(serverMetadata);
-
-    return items.find(({ id }) => id === data.id);
-  }
-}
-@@switch
-@Controller()
-export class HeroesService {
-  @GrpcMethod()
-  findOne(data, metadata, call) {
     const serverMetadata = new Metadata();
     const items = [
       { id: 1, name: 'John' },

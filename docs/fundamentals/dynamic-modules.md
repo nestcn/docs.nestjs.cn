@@ -298,11 +298,6 @@ import { ConfigModuleOptions } from './interfaces/config-module-options.interfac
 
 export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
   new ConfigurableModuleBuilder<ConfigModuleOptions>().build();
-@@switch
-import { ConfigurableModuleBuilder } from '@nestjs/common';
-
-export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
-  new ConfigurableModuleBuilder().build();
 ```
 
 现在打开 `config.module.ts` 文件，修改其实现以利用自动生成的 `ConfigurableModuleClass`：
@@ -395,9 +390,6 @@ export class ConfigService {
 @@filename(config.module-definition)
 export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
   new ConfigurableModuleBuilder<ConfigModuleOptions>().setClassMethodName('forRoot').build();
-@@switch
-export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
-  new ConfigurableModuleBuilder().setClassMethodName('forRoot').build();
 ```
 
 此构造将指示 `ConfigurableModuleBuilder` 生成一个公开 `forRoot` 和 `forRootAsync` 的类。示例：
@@ -441,9 +433,6 @@ export class AppModule {}
 @@filename(config.module-definition)
 export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
   new ConfigurableModuleBuilder<ConfigModuleOptions>().setFactoryMethodName('createConfigOptions').build();
-@@switch
-export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
-  new ConfigurableModuleBuilder().setFactoryMethodName('createConfigOptions').build();
 ```
 
 现在，`ConfigModuleOptionsFactory` 类需要公开 `createConfigOptions` 方法（而非原先的 `create` 方法）：

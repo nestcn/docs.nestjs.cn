@@ -124,18 +124,6 @@ async function bootstrap() {
 }
 
 bootstrap();
-@@switch
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { NestExpressApplication } from '@nestjs/platform-express';
-
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.set('trust proxy', 'loopback'); // Trust requests from the loopback address
-  await app.listen(3000);
-}
-
-bootstrap();
 ```
 
 启用 `trust proxy` 可让你从 `X-Forwarded-For` 头部获取原始 IP 地址。你还可以通过重写 `getTracker()` 方法来自定义应用行为，从此头部提取 IP 地址而非依赖 `req.ip`。以下示例展示了如何在 Express 和 Fastify 中实现：

@@ -18,14 +18,6 @@
 export class CatsService {
   constructor(private lazyModuleLoader: LazyModuleLoader) {}
 }
-@@switch
-@Injectable()
-@Dependencies(LazyModuleLoader)
-export class CatsService {
-  constructor(lazyModuleLoader) {
-    this.lazyModuleLoader = lazyModuleLoader;
-  }
-}
 ```
 
 > info **说明** `LazyModuleLoader` 类是从 `@nestjs/core` 包中导入的。

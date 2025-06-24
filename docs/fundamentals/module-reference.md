@@ -8,14 +8,6 @@ Nest 提供了 `ModuleRef` 类来导航内部提供者列表，并使用其注�
 export class CatsService {
   constructor(private moduleRef: ModuleRef) {}
 }
-@@switch
-@Injectable()
-@Dependencies(ModuleRef)
-export class CatsService {
-  constructor(moduleRef) {
-    this.moduleRef = moduleRef;
-  }
-}
 ```
 
 > info **提示** `ModuleRef` 类是从 `@nestjs/core` 包中导入的。
@@ -30,18 +22,6 @@ export class CatsService {
 export class CatsService implements OnModuleInit {
   private service: Service;
   constructor(private moduleRef: ModuleRef) {}
-
-  onModuleInit() {
-    this.service = this.moduleRef.get(Service);
-  }
-}
-@@switch
-@Injectable()
-@Dependencies(ModuleRef)
-export class CatsService {
-  constructor(moduleRef) {
-    this.moduleRef = moduleRef;
-  }
 
   onModuleInit() {
     this.service = this.moduleRef.get(Service);
@@ -72,18 +52,6 @@ export class CatsService implements OnModuleInit {
     this.transientService = await this.moduleRef.resolve(TransientService);
   }
 }
-@@switch
-@Injectable()
-@Dependencies(ModuleRef)
-export class CatsService {
-  constructor(moduleRef) {
-    this.moduleRef = moduleRef;
-  }
-
-  async onModuleInit() {
-    this.transientService = await this.moduleRef.resolve(TransientService);
-  }
-}
 ```
 
 `resolve()` 方法会从它自己的**依赖注入容器子树**中返回该提供者的唯一实例。每个子树都有一个唯一的**上下文标识符** 。因此，如果多次调用此方法并比较实例引用，你会发现它们并不相同。
@@ -102,22 +70,6 @@ export class CatsService implements OnModuleInit {
     console.log(transientServices[0] === transientServices[1]); // false
   }
 }
-@@switch
-@Injectable()
-@Dependencies(ModuleRef)
-export class CatsService {
-  constructor(moduleRef) {
-    this.moduleRef = moduleRef;
-  }
-
-  async onModuleInit() {
-    const transientServices = await Promise.all([
-      this.moduleRef.resolve(TransientService),
-      this.moduleRef.resolve(TransientService),
-    ]);
-    console.log(transientServices[0] === transientServices[1]); // false
-  }
-}
 ```
 
 要在多个 `resolve()` 调用间生成单一实例，并确保它们共享相同的依赖注入容器子树，你可以向 `resolve()` 方法传入一个上下文标识符。使用 `ContextIdFactory` 类来生成上下文标识符，该类提供了 `create()` 方法，可返回一个合适的唯一标识符。
@@ -127,23 +79,6 @@ export class CatsService {
 @Injectable()
 export class CatsService implements OnModuleInit {
   constructor(private moduleRef: ModuleRef) {}
-
-  async onModuleInit() {
-    const contextId = ContextIdFactory.create();
-    const transientServices = await Promise.all([
-      this.moduleRef.resolve(TransientService, contextId),
-      this.moduleRef.resolve(TransientService, contextId),
-    ]);
-    console.log(transientServices[0] === transientServices[1]); // true
-  }
-}
-@@switch
-@Injectable()
-@Dependencies(ModuleRef)
-export class CatsService {
-  constructor(moduleRef) {
-    this.moduleRef = moduleRef;
-  }
 
   async onModuleInit() {
     const contextId = ContextIdFactory.create();
@@ -181,14 +116,6 @@ export class CatsService {
     @Inject(REQUEST) private request: Record<string, unknown>,
   ) {}
 }
-@@switch
-@Injectable()
-@Dependencies(REQUEST)
-export class CatsService {
-  constructor(request) {
-    this.request = request;
-  }
-}
 ```
 
 > info **了解**请求提供者的更多信息，请点击[此处](https://docs.nestjs.com/fundamentals/injection-scopes#request-provider) 。
@@ -210,18 +137,6 @@ const catsRepository = await this.moduleRef.resolve(CatsRepository, contextId);
 export class CatsService implements OnModuleInit {
   private catsFactory: CatsFactory;
   constructor(private moduleRef: ModuleRef) {}
-
-  async onModuleInit() {
-    this.catsFactory = await this.moduleRef.create(CatsFactory);
-  }
-}
-@@switch
-@Injectable()
-@Dependencies(ModuleRef)
-export class CatsService {
-  constructor(moduleRef) {
-    this.moduleRef = moduleRef;
-  }
 
   async onModuleInit() {
     this.catsFactory = await this.moduleRef.create(CatsFactory);

@@ -1,6 +1,8 @@
 # 介绍
 
 > **关于本文档**：这是 NestJS 官方文档的中文翻译版本。文档源码托管在 [GitHub](https://github.com/nestcn/docs.nestjs.cn)，欢迎 Star、Fork 和贡献翻译！如发现翻译问题或需要改进，请提交 Issue 或 Pull Request。
+> 
+> **旧版文档**：如需访问旧版文档，请点击 [这里](https://25650abe.nestjs.pages.dev/)。
 
 Nest（NestJS）是一个用于构建高效、可扩展的 [Node.js](https://nodejs.org/) 服务端应用的框架。它采用渐进式 JavaScript，使用 [TypeScript](http://www.typescriptlang.org/) 构建并全面支持 TypeScript（同时仍允许开发者使用纯 JavaScript 编码），融合了 OOP（面向对象编程）、FP（函数式编程）和 FRP（函数响应式编程）的元素。
 

@@ -12,6 +12,9 @@ hero:
     - theme: alt
       text: 官方站点
       link: https://docs.nestjs.com/
+    - theme: alt
+      text: 加入社群
+      link: https://github.com/nestcn/docs.nestjs.cn
   image:
     src: /nestjs-hero-logo.svg
     alt: NestJS Logo

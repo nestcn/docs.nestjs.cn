@@ -4,7 +4,13 @@
 
 ## 语言特性
 
-我们热爱 [TypeScript](https://www.typescriptlang.org/)，但最重要的是——我们热爱 [Node.js](https://nodejs.org/en/)。因此 Nest 同时兼容 TypeScript 和纯 JavaScript。Nest 利用了最新的语言特性，所以要在原生 JavaScript 中使用它，我们需要一个 [Babel](https://babeljs.io/) 编译器。
+我们热爱 [TypeScript](https://www.ty[CLI](/cli/overview) 致力于为大规模开发提供可靠的工作流脚手架。因此，生成的 Nest 项目已预装了代码 **检查工具** 和 **格式化工具** （分别是 [eslint](https://eslint.org/) 和 [prettier](https://prettier.io/)）。
+
+> info **提示** 不确定格式化工具与代码检查工具的区别？请查看[此处](https://prettier.io/docs/en/comparison.html)了解。
+
+为了确保最大的稳定性和可扩展性，我们使用基础的 [`eslint`](https://www.npmjs.com/package/eslint) 和 [`prettier`](https://www.npmjs.com/package/prettier) cli 包。这种设置允许与官方扩展进行良好的 IDE 集成。
+
+对于不依赖 IDE 的无头环境（持续集成、Git hooks 等），Nest 项目附带了可立即使用的 `npm` 脚本。tlang.org/)，但最重要的是——我们热爱 [Node.js](https://nodejs.org/en/)。因此 Nest 同时兼容 TypeScript 和纯 JavaScript。Nest 利用了最新的语言特性，所以要在原生 JavaScript 中使用它，我们需要一个 [Babel](https://babeljs.io/) 编译器。
 
 我们提供的示例将主要使用 TypeScript，但您可以随时**切换代码片段**至原生 JavaScript 语法（只需点击每个代码片段右上角的语言切换按钮即可）。
 
@@ -16,7 +22,7 @@
 
 **推荐安装方式：**
 
-1. **访问官网下载**：前往 [Node.js 官网](https://nodejs.cn/download/) 下载最新的 LTS（长期支持）版本
+1. **访问官网下载**：前往 [Node.js 官网](https://nodejs.org/) 下载最新的 LTS（长期支持）版本
 2. **使用包管理器**：
    - **Windows**: 使用 [Chocolatey](https://chocolatey.org/) 或 [Scoop](https://scoop.sh/)
    - **macOS**: 使用 [Homebrew](https://brew.sh/) 或 [MacPorts](https://www.macports.org/)
@@ -51,18 +57,12 @@ $ nest new project-name
 将创建 `project-name` 目录，安装 node 模块和一些其他样板文件，并创建 `src/` 目录，其中会生成若干核心文件。
 
 ```
-
-src
-
-app.controller.spec.ts
-
-app.controller.ts
-
-app.module.ts
-
-app.service.ts
-
-main.ts
+src/
+├── app.controller.spec.ts
+├── app.controller.ts
+├── app.module.ts
+├── app.service.ts
+└── main.ts
 ```
 
 
@@ -80,16 +80,6 @@ main.ts
 
 ```typescript
 @@filename(main)
-
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(process.env.PORT ?? 3000);
-}
-bootstrap();
-@@switch
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 

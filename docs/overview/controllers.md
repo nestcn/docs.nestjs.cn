@@ -25,16 +25,6 @@ export class CatsController {
     return 'This action returns all cats';
   }
 }
-@@switch
-import { Controller, Get } from '@nestjs/common';
-
-@Controller('cats')
-export class CatsController {
-  @Get()
-  findAll() {
-    return 'This action returns all cats';
-  }
-}
 ```
 
 > info **提示** 要使用 CLI 创建控制器，只需执行 `$ nest g controller [name]` 命令。
@@ -67,17 +57,6 @@ export class CatsController {
     return 'This action returns all cats';
   }
 }
-@@switch
-import { Controller, Bind, Get, Req } from '@nestjs/common';
-
-@Controller('cats')
-export class CatsController {
-  @Get()
-  @Bind(Req())
-  findAll(request) {
-    return 'This action returns all cats';
-  }
-}
 ```
 
 > info **提示** 要充分利用 `express` 的类型定义（如上面 `request: Request` 参数示例所示），请确保安装 `@types/express` 包。
@@ -107,21 +86,6 @@ export class CatsController {
 
   @Get()
   findAll(): string {
-    return 'This action returns all cats';
-  }
-}
-@@switch
-import { Controller, Get, Post } from '@nestjs/common';
-
-@Controller('cats')
-export class CatsController {
-  @Post()
-  create() {
-    return 'This action adds a new cat';
-  }
-
-  @Get()
-  findAll() {
     return 'This action returns all cats';
   }
 }
@@ -214,13 +178,6 @@ findOne(@Param() params: any): string {
   console.log(params.id);
   return `This action returns a #${params.id} cat`;
 }
-@@switch
-@Get(':id')
-@Bind(Param())
-findOne(params) {
-  console.log(params.id);
-  return `This action returns a #${params.id} cat`;
-}
 ```
 
 `@Param()` 装饰器用于修饰方法参数（如上例中的 `params`），使得**路由**参数可以在方法内部通过该装饰参数的属性进行访问。如代码所示，你可以通过 `params.id` 来访问 `id` 参数。或者，你也可以向装饰器传递特定的参数标记，直接在方法体中按名称引用路由参数。
@@ -231,12 +188,6 @@ findOne(params) {
 @@filename()
 @Get(':id')
 findOne(@Param('id') id: string): string {
-  return `This action returns a #${id} cat`;
-}
-@@switch
-@Get(':id')
-@Bind(Param('id'))
-findOne(id) {
   return `This action returns a #${id} cat`;
 }
 ```
@@ -285,11 +236,6 @@ export class AccountController {
 async findAll(): Promise<any[]> {
   return [];
 }
-@@switch
-@Get()
-async findAll() {
-  return [];
-}
 ```
 
 这段代码完全有效。但 Nest 更进一步，允许路由处理器返回 RxJS 的[可观察流](https://rxjs-dev.firebaseapp.com/guide/observable) ，Nest 会在内部处理订阅并在流完成时解析最终发出的值。
@@ -298,11 +244,6 @@ async findAll() {
 @@filename(cats.controller)
 @Get()
 findAll(): Observable<any[]> {
-  return of([]);
-}
-@@switch
-@Get()
-findAll() {
   return of([]);
 }
 ```
@@ -332,12 +273,6 @@ export class CreateCatDto {
 @@filename(cats.controller)
 @Post()
 async create(@Body() createCatDto: CreateCatDto) {
-  return 'This action adds a new cat';
-}
-@@switch
-@Post()
-@Bind(Body())
-async create(createCatDto) {
   return 'This action adds a new cat';
 }
 ```
@@ -433,42 +368,6 @@ export class CatsController {
     return `This action removes a #${id} cat`;
   }
 }
-@@switch
-import { Controller, Get, Query, Post, Body, Put, Param, Delete, Bind } from '@nestjs/common';
-
-@Controller('cats')
-export class CatsController {
-  @Post()
-  @Bind(Body())
-  create(createCatDto) {
-    return 'This action adds a new cat';
-  }
-
-  @Get()
-  @Bind(Query())
-  findAll(query) {
-    console.log(query);
-    return `This action returns all cats (limit: ${query.limit} items)`;
-  }
-
-  @Get(':id')
-  @Bind(Param('id'))
-  findOne(id) {
-    return `This action returns a #${id} cat`;
-  }
-
-  @Put(':id')
-  @Bind(Param('id'), Body())
-  update(id, updateCatDto) {
-    return `This action updates a #${id} cat`;
-  }
-
-  @Delete(':id')
-  @Bind(Param('id'))
-  remove(id) {
-    return `This action removes a #${id} cat`;
-  }
-}
 ```
 
 > info **Nest CLI** 提供了一个生成器（schematic），可自动创建**所有样板代码** ，省去手动操作并提升开发体验。详细了解此功能请点击[此处](/recipes/crud-generator) 。
@@ -513,23 +412,6 @@ export class CatsController {
      res.status(HttpStatus.OK).json([]);
   }
 }
-@@switch
-import { Controller, Get, Post, Bind, Res, Body, HttpStatus } from '@nestjs/common';
-
-@Controller('cats')
-export class CatsController {
-  @Post()
-  @Bind(Res(), Body())
-  create(res, createCatDto) {
-    res.status(HttpStatus.CREATED).send();
-  }
-
-  @Get()
-  @Bind(Res())
-  findAll(res) {
-     res.status(HttpStatus.OK).json([]);
-  }
-}
 ```
 
 虽然这种方法有效，并且通过完全控制响应对象（如头部操作和访问库特定功能）提供了更大的灵活性，但应谨慎使用。通常，这种方法不够清晰且存在一些缺点。主要缺点是代码会变得与平台相关，因为不同的底层库可能具有不同的响应对象 API。此外，它还会使测试更具挑战性，因为您需要模拟响应对象等。
@@ -540,13 +422,6 @@ export class CatsController {
 @@filename()
 @Get()
 findAll(@Res({ passthrough: true }) res: Response) {
-  res.status(HttpStatus.OK);
-  return [];
-}
-@@switch
-@Get()
-@Bind(Res({ passthrough: true }))
-findAll(res) {
   res.status(HttpStatus.OK);
   return [];
 }

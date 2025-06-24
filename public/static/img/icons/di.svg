@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-code">
+  <defs>
+    <linearGradient id="grad" x1="0%" x2="100%" y1="0%" y2="0%">
+      <stop offset="0%" stop-color="#ea2845" />
+      <stop offset="100%" stop-color="#ea2868" />
+    </linearGradient>
+  </defs>
+  <path stroke="url(#grad)" d="m9 9-2 2 2 2"/>
+  <path d="m13 13 2-2-2-2"/>
+  <circle cx="11" cy="11" r="8"/>
+  <path d="m21 21-4.3-4.3"/>
+</svg>

@@ -1,35 +1,16 @@
 {
-  "name": "nest-docs",
+  "name": "nestjsdocs",
   "version": "1.0.0",
-  "description": "> Nest是构建高效，可扩展的 Node.js Web 应用程序的框架。 它使用现代的 JavaScript 或 TypeScript（保留与纯 JavaScript 的兼容性），并结合 OOP（面向对象编程），FP（函数式编程）和FRP（函数响应式编程）的元素。Nest 基于 Express，可以方便地使用各种可用的第三方插件。",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "start": "docsify start ./ --config ssr.config.js"
+    "build": "rspress build",
+    "dev": "rspress dev",
+    "preview": "rspress preview"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/nestcn/docs.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/nestcn/docs/issues"
-  },
-  "homepage": "https://github.com/nestcn/docs#readme",
-  "files": [
-    "./"
-  ],
-  "docsify": {
-    "template": "./ssr.html",
-    "config": {
-      "basePath": "https://docs.nestjs.cn/",
-      "loadSidebar": true,
-      "loadNavbar": true,
-      "coverpage": true,
-      "name": "nest.js 中文文档"
-    }
+  "dependencies": {
+    "rspress": "^1.40.2"
   },
   "devDependencies": {
-    "docsify-cli": "4.4.4"
+    "@types/node": "^18.11.17"
   }
 }

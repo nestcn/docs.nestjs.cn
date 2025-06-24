@@ -1,0 +1,45 @@
+/* RSPress Hero 副标题字体大小调整 - 使用更通用的选择器 */
+.hero-text,
+.hero .text,
+.hero p,
+[data-page-type="home"] .hero p,
+[data-page-type="home"] p:nth-child(2),
+.rspress-hero > p,
+.rspress-hero-content p,
+.rspress-hero-text,
+.rspress-home-hero .rspress-hero-text,
+[data-page-type="home"] .rspress-hero-text,
+.rspress-hero .rspress-hero-text {
+  font-size: 1.1rem !important;
+  font-weight: 500 !important;
+  line-height: 1.4 !important;
+}
+
+/* 更激进的通用选择器 */
+[class*="hero"] p,
+[class*="hero-text"],
+[class*="hero"][class*="text"],
+div[data-page-type="home"] div p:not(:first-child):not(:last-child) {
+  font-size: 1.1rem !important;
+}
+
+/* 最强力的选择器 - 覆盖所有可能的 hero 文本 */
+* [data-page-type="home"] * {
+  --hero-text-size: 1.1rem;
+}
+
+html body [data-page-type="home"] * p,
+html body [data-page-type="home"] * div,
+html body [data-page-type="home"] * span {
+  font-size: 1.1rem !important;
+}
+
+/* 针对可能的内联样式 */
+[style*="font-size"] {
+  font-size: 1.1rem !important;
+}
+
+/* 使用 CSS 变量覆盖 */
+:root {
+  --rspress-hero-text-size: 1.1rem !important;
+}

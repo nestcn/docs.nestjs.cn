@@ -11,7 +11,12 @@ export default defineConfig({
     dark: '/rspress-dark-logo.png',
   },
   themeConfig: {
-    nav: [],
+    nav: [
+      {
+        text: '文档仓库',
+        link: 'https://github.com/nestcn/docs.nestjs.cn',
+      },
+    ],
     socialLinks: [
       {
         icon: 'github',

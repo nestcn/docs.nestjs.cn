@@ -33,7 +33,7 @@ features:
     details: 被全球众多企业和开源项目采用，拥有完善的文档和最佳实践。
     icon: 🏢
   - title: 中文社区
-    details: 本站为官方文档中文翻译，致力于服务国内开发者。欢迎加入我们的社群，共同完善中文文档！
+    details: 本站为官方文档中文翻译，致力于服务国内开发者。文档源码托管在 GitHub（https://github.com/nestcn/docs.nestjs.cn），欢迎 Star 和贡献！
     icon: 🇨🇳
 
 footer:

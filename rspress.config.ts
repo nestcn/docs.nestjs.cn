@@ -5,7 +5,7 @@ export default defineConfig({
   root: path.join(__dirname, 'docs'),
   title: 'NestJS 中文文档',
   description: 'NestJS 是一个用于构建高效、可扩展的 Node.js 服务器端应用程序的开发框架',
-  icon: '/rspress-icon.png',
+  icon: '/favicon.ico',
   logo: {
     light: '/rspress-light-logo.png',
     dark: '/rspress-dark-logo.png',

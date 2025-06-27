@@ -6,14 +6,13 @@
 
 ![](/assets/Gateways_1.png)
 
-> info **注意** 网关可以被视为[提供者](/providers) ；这意味着它们可以通过类构造函数注入依赖项。同时，网关也可以被其他类（提供者和控制器）注入。
+> info **提示** 网关可以被视为[提供者](/providers) ；这意味着它们可以通过类构造函数注入依赖项。同时，网关也可以被其他类（提供者和控制器）注入。
 
 #### 安装
 
 要开始构建基于 WebSocket 的应用程序，首先需要安装所需的包：
 
 ```bash
-@@filename()
 $ npm i --save @nestjs/websockets @nestjs/platform-socket.io
 ```
 
@@ -36,18 +35,171 @@ $ npm i --save @nestjs/websockets @nestjs/platform-socket.io
 网关已开始监听，但尚未订阅任何传入消息。让我们创建一个处理器来订阅 `events` 消息，并用完全相同的数据向用户响应。
 
 ```typescript
-@@filename(events.gateway)
 @SubscribeMessage('events')
 handleEvent(@MessageBody() data: string): string {
   return data;
 }
 ```
 
-> info：**提示**`@SubscribeMessage()` 和 `@MessageBody()` 装饰器是从 `@nestjs/websockets` 包导入的。
+> info **提示** `@SubscribeMessage()` 和 `@MessageBody()` 装饰器是从 `@nestjs/websockets` 包导入的。
 
 网关创建完成后，我们可以在模块中注册它。
 
 ```typescript
+import { Module } from '@nestjs/common';
+import { EventsGateway } from './events.gateway';
+
+@Module({
+  providers: [EventsGateway]
+})
+export class EventsModule {}
+```
+
+您还可以在装饰器中传入属性键来从消息正文中提取它：
+
+```typescript
+@SubscribeMessage('events')
+handleEvent(@MessageBody('id') id: number): number {
+  // id === messageBody.id
+  return id;
+}
+```
+
+如果您不想使用装饰器，以下代码在功能上是等效的：
+
+```typescript
+@SubscribeMessage('events')
+handleEvent(client: Socket, data: string): string {
+  return data;
+}
+```
+
+在上面的示例中，`handleEvent()` 函数有两个参数。第一个是平台特定的[套接字实例](https://socket.io/docs/v4/server-api/#socket) ，第二个是从客户端接收的数据。不过，不建议使用这种方法，因为它需要在每个单元测试中模拟 `socket` 实例。
+
+一旦收到 `events` 消息，处理器就会发送一个确认，其中包含通过网络发送的相同数据。此外，还可以使用特定于库的方法发出消息，例如，使用 `client.emit()` 方法。为了访问连接的套接字实例，请使用 `@ConnectedSocket()` 装饰器。
+
+```typescript
+@SubscribeMessage('events')
+handleEvent(
+  @MessageBody() data: string,
+  @ConnectedSocket() client: Socket,
+): string {
+  return data;
+}
+```
+
+> info **提示** `@ConnectedSocket()` 装饰器是从 `@nestjs/websockets` 包导入的。
+
+但是，在这种情况下，您将无法利用拦截器。如果您不想向用户回应，可以简单地跳过 `return` 语句（或明确返回"虚假"值，例如 `undefined`）。
+
+现在当客户端发出如下消息时：
+
+```typescript
+socket.emit('events', { name: 'Nest' });
+```
+
+`handleEvent()` 方法将被执行。为了监听上述处理程序内部发出的消息，客户端必须附加相应的确认监听器：
+
+```typescript
+socket.emit('events', { name: 'Nest' }, (data) => console.log(data));
+```
+
+#### 多重响应
+
+确认通知仅会发送一次。此外，原生 WebSockets 实现并不支持此功能。为解决这一限制，您可以返回一个包含两个属性的对象：`event` 表示触发事件的名称，`data` 则是需要转发给客户端的数据。
+
+```typescript
+@SubscribeMessage('events')
+handleEvent(@MessageBody() data: unknown): WsResponse<unknown> {
+  const event = 'events';
+  return { event, data };
+}
+```
+
+> info **提示** `WsResponse` 接口是从 `@nestjs/websockets` 包中导入的。
+
+> warning **注意** 如果您的 `data` 字段依赖于 `ClassSerializerInterceptor`，则应返回实现 `WsResponse` 的类实例，因为该拦截器会忽略普通的 JavaScript 对象响应。
+
+客户端需要添加另一个事件监听器才能接收传入的响应。
+
+```typescript
+socket.on('events', (data) => console.log(data));
+```
+
+#### 异步响应
+
+消息处理器能够以**同步**或**异步**方式响应。因此，支持 `async` 方法。消息处理器还能返回一个 `Observable`，在这种情况下，结果值将持续发射直到流完成。
+
+```typescript
+@SubscribeMessage('events')
+onEvent(@MessageBody() data: unknown): Observable<WsResponse<number>> {
+  const event = 'events';
+  const response = [1, 2, 3];
+
+  return from(response).pipe(
+    map(data => ({ event, data })),
+  );
+}
+```
+
+在上例中，消息处理器将**响应 3 次** （对应数组中的每个元素）。
+
+#### 生命周期钩子
+
+提供了 3 个实用的生命周期钩子。它们都有对应的接口，如下表所述：
+
+<table>
+  <tr>
+    <td>
+      <code>OnGatewayInit</code>
+    </td>
+    <td>
+      强制实现 <code>afterInit()</code> 方法。接收特定库的服务器实例作为参数（如果需要会展开其余部分）
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>OnGatewayConnection</code>
+    </td>
+    <td>
+      强制实现 <code>handleConnection()</code> 方法。接收特定库的客户端套接字实例作为参数
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>OnGatewayDisconnect</code>
+    </td>
+    <td>
+      强制实现 <code>handleDisconnect()</code> 方法。接收特定库的客户端套接字实例作为参数
+    </td>
+  </tr>
+</table>
+
+> info **提示** 每个生命周期接口都从 `@nestjs/websockets` 包中导出。
+
+#### 服务器与命名空间
+
+有时您可能需要直接访问原生的**平台特定**服务器实例。该对象的引用会作为参数传递给 `afterInit()` 方法（`OnGatewayInit` 接口）。另一种方式是使用 `@WebSocketServer()` 装饰器。
+
+```typescript
+@WebSocketServer()
+server: Server;
+```
+
+您还可以通过 `namespace` 属性获取对应的命名空间，如下所示：
+
+```typescript
+@WebSocketServer({ namespace: 'my-namespace' })
+namespace: Namespace;
+```
+
+> warning **注意** `@WebSocketServer()` 装饰器需要从 `@nestjs/websockets` 包中导入。
+
+一旦服务器实例准备就绪，Nest 会自动将其分配给该属性。
+
+#### 示例
+
+一个可用的示例在[此处](https://github.com/nestjs/nest/tree/master/sample/02-gateways)查看。
 import { Module } from '@nestjs/common';
 import { EventsGateway } from './events.gateway';
 

@@ -6,7 +6,24 @@
 
 支持 4 种类型的版本控制：
 
-<table data-immersive-translate-walked="e5f69ebb-d60b-480e-8b64-78ae9d68ffd5"><tbody data-immersive-translate-walked="e5f69ebb-d60b-480e-8b64-78ae9d68ffd5"><tr data-immersive-translate-walked="e5f69ebb-d60b-480e-8b64-78ae9d68ffd5"><td data-immersive-translate-walked="e5f69ebb-d60b-480e-8b64-78ae9d68ffd5">URI Versioning</td><td data-immersive-translate-walked="e5f69ebb-d60b-480e-8b64-78ae9d68ffd5" data-immersive-translate-paragraph="1">版本将通过请求的 URI 传递（默认）</td></tr><tr data-immersive-translate-walked="e5f69ebb-d60b-480e-8b64-78ae9d68ffd5"><td data-immersive-translate-walked="e5f69ebb-d60b-480e-8b64-78ae9d68ffd5">Header Versioning</td><td data-immersive-translate-walked="e5f69ebb-d60b-480e-8b64-78ae9d68ffd5" data-immersive-translate-paragraph="1">自定义请求头将指定版本</td></tr><tr data-immersive-translate-walked="e5f69ebb-d60b-480e-8b64-78ae9d68ffd5"><td data-immersive-translate-walked="e5f69ebb-d60b-480e-8b64-78ae9d68ffd5">Media Type Versioning</td><td data-immersive-translate-walked="e5f69ebb-d60b-480e-8b64-78ae9d68ffd5" data-immersive-translate-paragraph="1">请求的 Accept 头将指定版本</td></tr><tr data-immersive-translate-walked="e5f69ebb-d60b-480e-8b64-78ae9d68ffd5"><td data-immersive-translate-walked="e5f69ebb-d60b-480e-8b64-78ae9d68ffd5">Custom Versioning</td><td data-immersive-translate-walked="e5f69ebb-d60b-480e-8b64-78ae9d68ffd5" data-immersive-translate-paragraph="1">请求的任何部分都可用于指定版本，并提供了自定义函数来提取所述版本。</td></tr></tbody></table>
+<table>
+  <tr>
+    <td>URI Versioning</td>
+    <td>版本将通过请求的 URI 传递（默认）</td>
+  </tr>
+  <tr>
+    <td>Header Versioning</td>
+    <td>自定义请求头将指定版本</td>
+  </tr>
+  <tr>
+    <td>Media Type Versioning</td>
+    <td>请求的 Accept 头将指定版本</td>
+  </tr>
+  <tr>
+    <td>Custom Versioning</td>
+    <td>请求的任何部分都可用于指定版本，并提供了自定义函数来提取所述版本。</td>
+  </tr>
+</table>
 
 #### URI 版本控制类型
 

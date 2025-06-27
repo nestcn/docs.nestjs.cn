@@ -2,26 +2,13 @@
 
 WebSocket 守卫与[常规 HTTP 应用守卫](/guards)没有本质区别。唯一的不同在于，你应该使用 `WsException` 而不是抛出 `HttpException`。
 
-> info **注意** `WsException` 类是从 `@nestjs/websockets` 包中导出的。
+> info **提示** `WsException` 类是从 `@nestjs/websockets` 包中导出的。
 
 #### 绑定守卫
 
 以下示例使用了方法作用域的守卫。与基于 HTTP 的应用一样，你也可以使用网关作用域的守卫（即在网关类前添加 `@UseGuards()` 装饰器）。
 
 ```typescript
-@@filename()
-### 守卫
-
-WebSocket 守卫与[常规 HTTP 应用守卫](/guards)没有本质区别。唯一的不同在于，你应该使用 `WsException` 而不是抛出 `HttpException`。
-
-> info **注意** `WsException` 类是从 `@nestjs/websockets` 包中导出的。
-
-#### 绑定守卫
-
-以下示例使用了方法作用域的守卫。与基于 HTTP 的应用一样，你也可以使用网关作用域的守卫（即在网关类前添加 `@UseGuards()` 装饰器）。
-
-```typescript
-@@filename()
 @UseGuards(AuthGuard)
 @SubscribeMessage('events')
 handleEvent(client: Client, data: unknown): WsResponse<unknown> {
@@ -29,25 +16,6 @@ handleEvent(client: Client, data: unknown): WsResponse<unknown> {
   return { event, data };
 }
 ```
-
-#### JWT 认证守卫
-
-实现 WebSocket JWT 认证守卫：
-
-```typescript
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
-import { WsException } from '@nestjs/websockets';
-import { JwtService } from '@nestjs/jwt';
-import { Socket } from 'socket.io';
-
-@Injectable()
-export class WsJwtGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
-
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    try {
-      const client: Socket = context.switchToWs().getClient<Socket>();
-      const authToken = this.extractTokenFromSocket(client);
       
       if (!authToken) {
         throw new WsException('未找到认证令牌');

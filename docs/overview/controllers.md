@@ -1,21 +1,20 @@
-# 控制器
+### 控制器
 
-控制器负责处理传入的**请求**并向客户端返回**响应** 。
+控制器负责处理传入的**请求**并向客户端返回**响应**。
 
-![](/assets/Controllers_1.png)
+<figure><img class="illustrative-image" src="/assets/Controllers_1.png" /></figure>
 
-控制器的目的是处理应用程序的特定请求。 **路由**机制决定了哪个控制器将处理每个请求。通常，一个控制器具有多个路由，每个路由可以执行不同的操作。
+控制器的目的是处理应用程序的特定请求。**路由**机制决定了哪个控制器将处理每个请求。通常，一个控制器具有多个路由，每个路由可以执行不同的操作。
 
-要创建基本控制器，我们使用类和**装饰器** 。装饰器将类与必要的元数据关联起来，使 Nest 能够创建将请求连接到相应控制器的路由映射。
+要创建基本控制器，我们使用类和**装饰器**。装饰器将类与必要的元数据关联起来，使 Nest 能够创建将请求连接到相应控制器的路由映射。
 
-> info **提示** 要快速创建带有内置[验证](https://docs.nestjs.com/techniques/validation)功能的 CRUD 控制器，可以使用 CLI 的 [CRUD 生成器](https://docs.nestjs.com/recipes/crud-generator#crud-generator) ：`nest g resource [name]`。
+> info **提示** 要快速创建带有内置[验证](https://docs.nestjs.com/techniques/validation)功能的 CRUD 控制器，可以使用 CLI 的 [CRUD 生成器](https://docs.nestjs.com/recipes/crud-generator#crud-generator)：`nest g resource [name]`。
 
 #### 路由
 
 在以下示例中，我们将使用 `@Controller()` 装饰器，这是定义基本控制器**必需**的。我们将指定一个可选的路径前缀 `cats`。在 `@Controller()` 装饰器中使用路径前缀有助于我们将相关路由分组，并减少重复代码。例如，如果我们想将与猫实体交互的路由分组到 `/cats` 路径下，可以在 `@Controller()` 装饰器中指定 `cats` 路径前缀。这样，我们就不需要为文件中的每个路由重复该路径部分。
 
 ```typescript
-@@filename(cats.controller)
 import { Controller, Get } from '@nestjs/common';
 
 @Controller('cats')
@@ -37,17 +36,21 @@ export class CatsController {
 
 该方法将返回 200 状态码及关联响应（本例中仅为一个字符串）。为什么会这样？为了解释，我们首先需要介绍 Nest 采用的两种**不同**响应处理方式：
 
-<table data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe"><tbody data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe"><tr data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe"><td data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe" data-immersive-translate-paragraph="1">标准方式（推荐）</td><td data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe" data-immersive-translate-paragraph="1">使用这种内置方法时，当请求处理程序返回 JavaScript 对象或数组时，它会自动 可被序列化为 JSON。然而，当返回 JavaScript 基本类型（如 string、number、boolean）时，Nest 会直接发送该值而不进行序列化。这使得响应处理变得简单：只需返回值，Nest 会处理其余部分。 此外，默认情况下响应的状态码始终为 200，POST 请求除外 （POST 请求使用 201 状态码）。我们可以通过在处理器级别添加 @HttpCode(...) 装饰器来轻松更改此行为（参见状态码 ）。</td></tr><tr data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe"><td data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe" data-immersive-translate-paragraph="1">特定库实现</td><td data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe" data-immersive-translate-paragraph="1">我们可以使用特定库（如 Express）的响应对象 ，通过在方法处理程序签名中使用 @Res() 装饰器注入（例如 findAll(@Res() response)）。采用这种方式，您能够使用该对象暴露的原生响应处理方法。例如，在 Express 中，您可以使用类似 response.status(200).send() 的代码构建响应。</td></tr></tbody></table>
+<table>
+  <tr>
+    <td>标准方式（推荐）</td>
+    <td>使用这种内置方法时，当请求处理程序返回 JavaScript 对象或数组时，它会自动序列化为 JSON。然而，当返回 JavaScript 基本类型（如 string、number、boolean）时，Nest 会直接发送该值而不进行序列化。这使得响应处理变得简单：只需返回值，Nest 会处理其余部分。
+    <br /><br />
+    此外，默认情况下响应的状态码始终为 200，POST 请求除外（POST 请求使用 201 状态码）。我们可以通过在处理器级别添加 `@HttpCode(...)` 装饰器来轻松更改此行为（参见<a href="controllers#status-code">状态码</a>）。
+    </td>
+  </tr>
+  <tr>
+    <td>特定库实现</td>
+    <td>我们可以使用特定库（如 Express）的<a href="https://expressjs.com/en/api.html#res">响应对象</a>，通过在方法处理程序签名中使用 `@Res()` 装饰器注入（例如 `findAll(@Res() response)`）。采用这种方式，您能够使用该对象暴露的原生响应处理方法。例如，在 Express 中，您可以使用类似 `response.status(200).send()` 的代码构建响应。</td>
+  </tr>
+</table>
 
-> **警告** 当 Nest 检测到处理程序使用了 `@Res()` 或 `@Next()` 时，表明您选择了特定库实现方式。如果同时使用两种方式，标准方式将针对该路由**自动禁用**且不再按预期工作。若要同时使用两种方式（例如通过注入响应对象仅设置 cookies/headers 但仍将剩余工作交给框架处理），必须在 `@Res({{ '{' }} passthrough: true {{ '}' }})` 装饰器中将 `passthrough` 选项设为 `true`。
-
-#### 请求对象
-
-处理程序通常需要访问客户端的**请求**详细信息。Nest 提供了从底层平台（默认为 Express）获取[请求对象](https://expressjs.com/en/api.html#req)的方式。您可以通过在处理器签名中使用 `@Req()` 装饰器来指示 Nest 注入请求对象。
-
-```typescript
-@@filename(cats.controller)
-import { Controller, Get, Req } from '@nestjs/common';
+> warning **警告** 当 Nest 检测到处理程序使用了 `@Res()` 或 `@Next()` 时，表明您选择了特定库实现方式。如果同时使用两种方式，标准方式将针对该路由**自动禁用**且不再按预期工作。若要同时使用两种方式（例如通过注入响应对象仅设置 cookies/headers 但仍将剩余工作交给框架处理），必须在 `@Res({ passthrough: true })` 装饰器中将 `passthrough` 选项设为 `true`。
 import { Request } from 'express';
 
 @Controller('cats')
@@ -63,7 +66,48 @@ export class CatsController {
 
 请求对象代表 HTTP 请求，包含查询字符串、参数、HTTP 标头和正文等属性（更多信息请参阅[此处](https://expressjs.com/en/api.html#req) ）。在大多数情况下，您不需要手动访问这些属性。相反，可以直接使用开箱即用的专用装饰器，如 `@Body()` 或 `@Query()`。以下是提供的装饰器及其对应平台特定对象的列表。
 
-<table data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe"><tbody data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe"><tr data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe"><td data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe">@Request(), @Req()</td><td data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe">req</td></tr><tr data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe"><td data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe" data-immersive-translate-paragraph="1">@Response(), @Res()*</td><td data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe">res</td></tr><tr data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe"><td data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe">@Next()</td><td data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe">next</td></tr><tr data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe"><td data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe">@Session()</td><td data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe">req.session</td></tr><tr data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe"><td data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe">@Param(key?: string)</td><td data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe" data-immersive-translate-paragraph="1">req.params / req.params[key]</td></tr><tr data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe"><td data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe">@Body(key?: string)</td><td data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe" data-immersive-translate-paragraph="1">req.body / req.body[key]</td></tr><tr data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe"><td data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe">@Query(key?: string)</td><td data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe" data-immersive-translate-paragraph="1">req.query / req.query[key]</td></tr><tr data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe"><td data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe">@Headers(name?: string)</td><td data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe" data-immersive-translate-paragraph="1">req.headers / req.headers[name]</td></tr><tr data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe"><td data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe">@Ip()</td><td data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe">req.ip</td></tr><tr data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe"><td data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe">@HostParam()</td><td data-immersive-translate-walked="deef574c-dcb8-48b8-840d-9f40a89ae7fe">req.hosts</td></tr></tbody></table>
+<table>
+  <tr>
+    <td><code>@Request(), @Req()</code></td>
+    <td><code>req</code></td>
+  </tr>
+  <tr>
+    <td><code>@Response(), @Res()*</code></td>
+    <td><code>res</code></td>
+  </tr>
+  <tr>
+    <td><code>@Next()</code></td>
+    <td><code>next</code></td>
+  </tr>
+  <tr>
+    <td><code>@Session()</code></td>
+    <td><code>req.session</code></td>
+  </tr>
+  <tr>
+    <td><code>@Param(key?: string)</code></td>
+    <td><code>req.params</code> / <code>req.params[key]</code></td>
+  </tr>
+  <tr>
+    <td><code>@Body(key?: string)</code></td>
+    <td><code>req.body</code> / <code>req.body[key]</code></td>
+  </tr>
+  <tr>
+    <td><code>@Query(key?: string)</code></td>
+    <td><code>req.query</code> / <code>req.query[key]</code></td>
+  </tr>
+  <tr>
+    <td><code>@Headers(name?: string)</code></td>
+    <td><code>req.headers</code> / <code>req.headers[name]</code></td>
+  </tr>
+  <tr>
+    <td><code>@Ip()</code></td>
+    <td><code>req.ip</code></td>
+  </tr>
+  <tr>
+    <td><code>@HostParam()</code></td>
+    <td><code>req.hosts</code></td>
+  </tr>
+</table>
 
 \* 为兼容底层 HTTP 平台（如 Express 和 Fastify）的类型定义，Nest 提供了 `@Res()` 和 `@Response()` 装饰器。`@Res()` 是 `@Response()` 的别名。两者都直接暴露底层原生平台的 `response` 对象接口。使用时还需导入相应底层库的类型定义（如 `@types/express`）以获得完整支持。注意：在方法处理程序中注入 `@Res()` 或 `@Response()` 时，该处理程序将进入**库特定模式** ，此时需手动管理响应。必须通过调用 `response` 对象方法（如 `res.json(...)` 或 `res.send(...)`）返回响应，否则 HTTP 服务器会挂起。
 

@@ -1,15 +1,8 @@
 ### 拦截器
 
-常规拦截器与 WebSocket 拦截器之间并无区别。以下示例使用手动实例化的方法作用域拦截器。与基于 HTTP 的应用相同，您也可以使用网关作用域拦截器（即在网关类前添加 `@UseInterceptors()` 装饰器）。
+[常规拦截器](/interceptors)与 WebSocket 拦截器之间并无区别。以下示例使用手动实例化的方法作用域拦截器。与基于 HTTP 的应用相同，您也可以使用网关作用域拦截器（即在网关类前添加 `@UseInterceptors()` 装饰器）。
 
 ```typescript
-@@filename()
-### 拦截器
-
-常规拦截器与 WebSocket 拦截器之间并无区别。以下示例使用手动实例化的方法作用域拦截器。与基于 HTTP 的应用相同，您也可以使用网关作用域拦截器（即在网关类前添加 `@UseInterceptors()` 装饰器）。
-
-```typescript
-@@filename()
 @UseInterceptors(new TransformInterceptor())
 @SubscribeMessage('events')
 handleEvent(client: Client, data: unknown): WsResponse<unknown> {
@@ -17,37 +10,6 @@ handleEvent(client: Client, data: unknown): WsResponse<unknown> {
   return { event, data };
 }
 ```
-
-#### 日志拦截器
-
-记录 WebSocket 消息的详细信息：
-
-```typescript
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
-import { Socket } from 'socket.io';
-
-@Injectable()
-export class WsLoggingInterceptor implements NestInterceptor {
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const ctx = context.switchToWs();
-    const client: Socket = ctx.getClient();
-    const data = ctx.getData();
-    const handler = context.getHandler().name;
-
-    const startTime = Date.now();
-    
-    console.log(`[WS] 收到消息 - 处理器: ${handler}, 客户端: ${client.id}, 数据:`, data);
-
-    return next.handle().pipe(
-      tap((response) => {
-        const duration = Date.now() - startTime;
-        console.log(`[WS] 消息处理完成 - 处理器: ${handler}, 耗时: ${duration}ms, 响应:`, response);
-      }),
-    );
-  }
-}
 ```
 
 #### 转换拦截器

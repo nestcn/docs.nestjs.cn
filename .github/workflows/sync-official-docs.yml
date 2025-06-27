@@ -1,0 +1,210 @@
+name: Sync Official NestJS Docs
+
+on:
+  schedule:
+    # 每天 UTC 时间 02:00 运行（北京时间 10:00）
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    # 允许手动触发
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/sync-official-docs.yml'
+
+jobs:
+  sync-docs:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout current repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Clone official NestJS docs repository
+        run: |
+          git clone --depth 1 https://github.com/nestjs/docs.nestjs.com.git official-docs
+
+      - name: Compare and sync content folder
+        id: sync-content
+        run: |
+          if [ ! -d "official-docs/content" ]; then
+            echo "❌ Content folder not found in official repository"
+            exit 1
+          fi
+          
+          echo "🔍 Comparing content folder..."
+          CONTENT_CHANGED=false
+          
+          # 检查 content 文件夹是否存在差异
+          if [ -d "content" ]; then
+            # 使用 rsync 的 dry-run 模式检查差异
+            if ! rsync -avu --dry-run --delete official-docs/content/ content/ > /tmp/content-diff.log 2>&1; then
+              CONTENT_CHANGED=true
+            elif [ -s /tmp/content-diff.log ]; then
+              # 检查是否有实际的文件差异（过滤掉仅有的时间戳差异）
+              if grep -E "^(deleting|>|<|\*)" /tmp/content-diff.log > /dev/null; then
+                CONTENT_CHANGED=true
+              fi
+            fi
+          else
+            echo "📁 Content folder does not exist locally, will create"
+            CONTENT_CHANGED=true
+          fi
+          
+          if [ "$CONTENT_CHANGED" = true ]; then
+            echo "📋 Content changes detected:"
+            cat /tmp/content-diff.log || echo "Initial sync - no diff available"
+            
+            # 备份现有内容（如果存在）
+            if [ -d "content" ]; then
+              echo "💾 Backing up current content..."
+              mv content content-backup-$(date +%Y%m%d-%H%M%S)
+            fi
+            
+            # 同步新内容
+            echo "🔄 Syncing content folder..."
+            cp -r official-docs/content ./
+            echo "✅ Content folder synced successfully"
+            echo "content_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "✅ Content folder is up to date, no changes needed"
+            echo "content_changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Compare and sync assets folder
+        id: sync-assets
+        run: |
+          ASSETS_CHANGED=false
+          
+          if [ -d "official-docs/src/assets" ]; then
+            echo "🔍 Comparing assets folder..."
+            
+            # 创建 public 目录（如果不存在）
+            mkdir -p public
+            
+            # 检查 assets 文件夹是否存在差异
+            if [ -d "public/assets" ]; then
+              # 使用 rsync 的 dry-run 模式检查差异
+              if ! rsync -avu --dry-run --delete official-docs/src/assets/ public/assets/ > /tmp/assets-diff.log 2>&1; then
+                ASSETS_CHANGED=true
+              elif [ -s /tmp/assets-diff.log ]; then
+                # 检查是否有实际的文件差异
+                if grep -E "^(deleting|>|<|\*)" /tmp/assets-diff.log > /dev/null; then
+                  ASSETS_CHANGED=true
+                fi
+              fi
+            else
+              echo "📁 Assets folder does not exist locally, will create"
+              ASSETS_CHANGED=true
+            fi
+            
+            if [ "$ASSETS_CHANGED" = true ]; then
+              echo "📋 Assets changes detected:"
+              cat /tmp/assets-diff.log || echo "Initial sync - no diff available"
+              
+              # 同步新资源
+              echo "🔄 Syncing assets folder..."
+              rsync -av --delete official-docs/src/assets/ public/assets/
+              echo "✅ Assets folder synced successfully"
+              echo "assets_changed=true" >> $GITHUB_OUTPUT
+            else
+              echo "✅ Assets folder is up to date, no changes needed"
+              echo "assets_changed=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "⚠️ Assets folder not found in official repository, skipping..."
+            echo "assets_changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Clean up
+        run: |
+          rm -rf official-docs
+
+      - name: Check for changes
+        id: changes
+        run: |
+          git add .
+          if git diff --cached --quiet; then
+            echo "No changes detected"
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changes detected"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            
+            # 输出变更的文件列表
+            echo "📋 Changed files:"
+            git diff --cached --name-status
+          fi
+
+      - name: Commit and push changes
+        if: steps.changes.outputs.has_changes == 'true'
+        run: |
+          # 生成详细的提交信息
+          COMMIT_MSG="🔄 Sync official NestJS docs content and assets"
+          
+          if [ "${{ steps.sync-content.outputs.content_changed }}" == "true" ]; then
+            COMMIT_MSG="${COMMIT_MSG}
+
+          📝 Content changes detected and synced"
+          fi
+          
+          if [ "${{ steps.sync-assets.outputs.assets_changed }}" == "true" ]; then
+            COMMIT_MSG="${COMMIT_MSG}
+
+          🎨 Assets changes detected and synced"
+          fi
+          
+          # 添加同步信息
+          COMMIT_MSG="${COMMIT_MSG}
+
+          🕒 Sync date: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+          📦 Source: https://github.com/nestjs/docs.nestjs.com"
+          
+          git commit -m "$COMMIT_MSG"
+          git push
+
+      - name: Create summary
+        run: |
+          echo "## 📋 Sync Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Sync Date**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "- **Source Repository**: https://github.com/nestjs/docs.nestjs.com" >> $GITHUB_STEP_SUMMARY
+          
+          # Content 同步状态
+          if [ "${{ steps.sync-content.outputs.content_changed }}" == "true" ]; then
+            echo "- **Content Synced**: ✅ Yes (changes detected and applied)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Content Synced**: ✅ Up to date (no changes needed)" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Assets 同步状态
+          if [ "${{ steps.sync-assets.outputs.assets_changed }}" == "true" ]; then
+            echo "- **Assets Synced**: ✅ Yes (changes detected and applied)" >> $GITHUB_STEP_SUMMARY
+          elif [ -d "public/assets" ]; then
+            echo "- **Assets Synced**: ✅ Up to date (no changes needed)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Assets Synced**: ⚠️ Not found in source" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Git 提交状态
+          if [ "${{ steps.changes.outputs.has_changes }}" == "true" ]; then
+            echo "- **Changes Committed**: ✅ Yes, changes committed and pushed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Changes Committed**: ❌ No changes to commit" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "## ❌ Sync Failed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The sync operation failed. Please check the logs for details." >> $GITHUB_STEP_SUMMARY
+          echo "You can manually trigger this workflow again or investigate the issue." >> $GITHUB_STEP_SUMMARY

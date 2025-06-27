@@ -26,6 +26,7 @@
 - [🔌 第三方集成](#第三方集成)
 - [⚡ 运行时环境](#运行时环境)
 - [🎯 聚会活动](#聚会活动)
+- [💰 支持我们](#支持我们)
 - [🤝 如何贡献](#如何贡献)
 
 ## 🏠 官方资源
@@ -37,13 +38,66 @@
 - [📖 中文文档](https://docs.nestjs.cn) - 简体中文文档（本站）
 - [🐙 GitHub 仓库](https://github.com/nestjs/nest) - NestJS 核心代码仓库
 - [📺 YouTube 频道](https://www.youtube.com/@nestframework) - 官方视频教程
+- [💻 开发工具](https://devtools.nestjs.com) - 官方开发工具和图形可视化
+- [🎓 官方课程](https://courses.nestjs.com) - NestJS 官方培训课程
+
+### 企业服务
+
+- [🏢 企业支持](https://enterprise.nestjs.com) - 官方企业级支持和咨询服务
+- [📋 工作机会](https://jobs.nestjs.com) - NestJS 相关工作职位
+- [💼 官方咨询](https://trilon.io) - 官方合作伙伴 Trilon 咨询服务
+
+### 开发工具
+
+- [🛠️ NestJS DevTools](https://devtools.nestjs.com) - 应用程序图可视化和调试工具
+- [⚙️ NestJS CLI](https://github.com/nestjs/nest-cli) - 官方命令行工具
+- [📊 CI/CD 集成](https://docs.nestjs.com/devtools/ci-cd) - 持续集成和部署工具
 
 ### 示例项目
 
 - [📦 TypeScript 启动器](https://github.com/nestjs/typescript-starter) - 官方 TypeScript 项目模板
 - [📦 JavaScript 启动器](https://github.com/nestjs/javascript-starter) - 官方 JavaScript 项目模板
 
+### 官方示例
+
+- [📄 GraphQL Schema First](https://github.com/nestjs/nest/tree/master/sample/12-graphql-schema-first) - GraphQL Schema First 方法示例
+- [🔗 GraphQL Federation (Code First)](https://github.com/nestjs/nest/tree/master/sample/31-graphql-federation-code-first) - GraphQL 联邦代码优先示例
+- [🔗 GraphQL Federation (Schema First)](https://github.com/nestjs/nest/tree/master/sample/32-graphql-federation-schema-first) - GraphQL 联邦模式优先示例
+- [💎 GraphQL + Prisma](https://github.com/nestjs/nest/tree/master/sample/22-graphql-prisma) - GraphQL 与 Prisma 集成示例
+- [🔄 微服务通信](https://github.com/nestjs/nest/tree/master/sample) - 官方微服务示例集合
+- [🌐 WebSocket 网关](https://github.com/nestjs/nest/tree/master/sample) - WebSocket 实时通信示例
+
 ## 👥 社区与交流
+
+### 即时通讯
+
+- ![Discord](https://img.shields.io/discord/520622812742811698?style=flat-square&logo=nestjs&color=a61b3a) [Discord 官方社区](https://discord.gg/nestjs) - 英文官方社区
+- [📱 Telegram 国际群](https://t.me/nestjs) - 国际电报群
+- [📱 Telegram 中文群](/contributors#社区交流) - 中文电报群（社区维护）
+- [💬 微信群](/contributors#社区交流) - 中文微信群
+- [💬 QQ 群](/contributors#社区交流) - 中文QQ群
+
+### 其他社区
+
+- [📱 Telegram 俄语群](https://t.me/nest_ru) - 俄语社区
+- [📱 Telegram 乌克兰语群](https://t.me/nest_ukraine) - 乌克兰语社区  
+- [💼 Slack 韩语群](https://nestjs.slack.com) - 韩语职场群
+- [🔴 Reddit 论坛](https://www.reddit.com/r/Nestjs_framework) - Reddit 讨论区
+- [👥 Facebook 波兰群](https://www.facebook.com/groups/606785643208589) - 波兰语 Facebook 群
+
+## 📚 学习资源
+
+### 官方课程与培训
+
+- [🎓 NestJS 官方课程](https://courses.nestjs.com) - 官方认证培训课程
+- [🏢 企业培训](https://enterprise.nestjs.com) - 为团队提供的定制化培训
+- [📖 最佳实践指南](https://enterprise.nestjs.com) - 官方最佳实践和代码审查
+
+### 在线教程
+
+- [📖 官方文档教程](https://docs.nestjs.com) - 完整的官方学习路径
+- [🎯 快速开始指南](https://docs.nestjs.com/first-steps) - 新手入门指南
+- [🔧 CLI 工具指南](https://docs.nestjs.com/cli/overview) - 命令行工具使用教程
 
 
 ### 文档资源
@@ -151,6 +205,7 @@
 ### 监控
 
 - [`@nestjs/terminus`](https://github.com/nestjs/terminus) - 基于 Terminus 包的集成健康检查
+- [`@nestjs/devtools`](https://www.npmjs.com/package/@nestjs/devtools) - 官方开发工具包
 - ![](https://img.shields.io/github/stars/pragmaticivan/nestjs-otel.svg?style=flat-square) [`nestjs-otel`](https://github.com/pragmaticivan/nestjs-otel) - NestJS 的 OpenTelemetry 模块
 - ![](https://img.shields.io/github/stars/willsoto/nestjs-prometheus.svg?style=flat-square) [`nestjs-prometheus`](https://github.com/willsoto/nestjs-prometheus) - NestJS 的 Prometheus 模块
 
@@ -218,7 +273,27 @@
 - [NestJS 欧洲](https://nestjs-meetup.com/europe) - 欧洲 NestJS 聚会
 - [NestJS 美洲](https://nestjs-meetup.com/americas) - 美洲 NestJS 聚会
 
-## 贡献
+## 💰 支持我们
+
+NestJS 是一个采用 MIT 许可证的开源项目，它能够持续发展得益于这些出色人员的支持。如果您也想加入他们，请阅读[更多信息](https://docs.nestjs.com/support)。
+
+### 主要赞助商
+
+- [**Trilon**](https://trilon.io/) - NestJS 官方合作伙伴，提供企业级咨询服务
+- [**Mojam**](https://mojam.co/) - 官方赞助商
+
+### 赞助商与合作伙伴
+
+- [**西安核音智言科技有限公司**](https://www.speechx.cn) - AI 语音技术公司
+- [成为赞助商](https://opencollective.com/nest) - 支持 NestJS 发展
+
+### 如何支持
+
+- [💝 OpenCollective 捐赠](https://opencollective.com/nest) - 通过 OpenCollective 平台支持
+- [🏢 企业赞助](https://enterprise.nestjs.com) - 企业级赞助和支持
+- [⭐ GitHub Star](https://github.com/nestjs/nest) - 为项目点星支持
+
+## 🤝 如何贡献
 
 欢迎贡献！请阅读[贡献指南](CONTRIBUTING.md)。
 

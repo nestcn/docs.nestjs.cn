@@ -13,11 +13,162 @@
 
 ## 贡献指南
 
-1. Fork 本仓库
-2. 创建你的特性分支 (`git checkout -b feature/amazing-feature`)
-3. 提交你的修改 (`git commit -m 'Add some amazing feature'`)
-4. 推送到分支 (`git push origin feature/amazing-feature`)
-5. 开启一个 Pull Request
+### 开始之前
+
+在提交贡献之前，请确保：
+
+1. **搜索现有问题**：查看 [GitHub Issues](https://github.com/nestcn/docs.nestjs.cn/issues) 是否已有相关讨论
+2. **了解项目结构**：熟悉文档的组织方式和文件结构
+3. **遵循规范**：确保你的贡献符合项目的编码和文档规范
+
+### 提交步骤
+
+1. **Fork 本仓库**
+   ```bash
+   # 在 GitHub 上点击 Fork 按钮
+   git clone https://github.com/YOUR_USERNAME/docs.nestjs.cn.git
+   cd docs.nestjs.cn
+   ```
+
+2. **创建特性分支**
+   ```bash
+   git checkout -b feature/amazing-feature
+   # 或者
+   git checkout -b fix/some-bug
+   ```
+
+3. **进行你的修改**
+   - 📝 翻译新内容或改进现有翻译
+   - 🐛 修复文档中的错误
+   - ✨ 添加示例代码或补充说明
+   - 🎨 改进文档的格式和样式
+
+4. **测试你的修改**
+   ```bash
+   npm install
+   npm run dev
+   ```
+   在浏览器中查看你的修改效果
+
+5. **提交你的修改**
+   ```bash
+   git add .
+   git commit -m "feat: add some amazing feature"
+   # 或者
+   git commit -m "fix: correct translation error"
+   ```
+
+6. **推送到你的分支**
+   ```bash
+   git push origin feature/amazing-feature
+   ```
+
+7. **创建 Pull Request**
+   - 访问你的 Fork 仓库页面
+   - 点击 "New Pull Request" 按钮
+   - 填写详细的 PR 描述
+
+### 提交消息规范
+
+我们使用 [约定式提交](https://www.conventionalcommits.org/zh-hans/v1.0.0/) 规范：
+
+```
+<类型>[可选的作用域]: <描述>
+
+[可选的正文]
+
+[可选的脚注]
+```
+
+**类型包括：**
+- `feat`: 新功能
+- `fix`: 修复问题
+- `docs`: 文档修改
+- `style`: 代码格式修改
+- `refactor`: 重构代码
+- `test`: 测试相关
+- `chore`: 构建过程或辅助工具的变动
+
+**示例：**
+```bash
+feat(awesome): add new learning resources section
+fix(contributors): correct community link
+docs(readme): update installation instructions
+```
+
+### 翻译指南
+
+#### 术语一致性
+
+请参考我们的 [术语表](https://github.com/nestcn/docs.nestjs.cn/wiki/术语表) 确保翻译的一致性：
+
+| 英文 | 中文 | 说明 |
+|------|------|------|
+| Controller | 控制器 | 不翻译为"控制器类" |
+| Provider | 提供者 | 不翻译为"提供商" |
+| Module | 模块 | - |
+| Service | 服务 | - |
+| Decorator | 装饰器 | - |
+| Middleware | 中间件 | - |
+| Guard | 守卫 | 不翻译为"守护" |
+| Interceptor | 拦截器 | - |
+| Pipe | 管道 | - |
+| Exception Filter | 异常过滤器 | - |
+
+#### 翻译原则
+
+1. **准确性**：确保翻译内容与原文意思一致
+2. **流畅性**：使用自然的中文表达方式
+3. **专业性**：保持技术术语的准确性
+4. **一致性**：在整个项目中使用统一的术语
+
+#### 代码示例
+
+- 保留所有英文代码和注释
+- 仅翻译代码注释中的说明文字
+- 变量名和函数名保持英文
+
+### 文档结构
+
+```
+docs/
+├── overview/          # 概览
+├── fundamentals/      # 基础概念
+├── techniques/        # 技术指南
+├── security/         # 安全
+├── microservices/    # 微服务
+├── graphql/          # GraphQL
+├── websockets/       # WebSockets
+├── cli/              # CLI
+├── recipes/          # 使用指南
+├── faq/              # 常见问题
+└── ...
+```
+
+## 社区交流
+
+我们建立了多个交流群，欢迎所有对 NestJS 感兴趣的开发者加入：
+
+### QQ 群
+
+- **二群**：1031015552（禁止广告）
+- **三群**：321735506（禁止广告）
+
+### Telegram 群
+
+[点击加入 TG 群](https://t.me/+TCn0z6Z0wwKA_IFD)
+
+### 微信群
+
+微信三群：
+
+<img src="https://ghproxy.net/https://raw.githubusercontent.com/zuohuadong/imgbed/main/pic/siqun.jpg" alt="加微信" width="260" height="260" />
+
+如果二维码过期，请添加：
+
+<img src="https://ghproxy.net/https://raw.githubusercontent.com/zuohuadong/imgbed/main/pic/68747470733a2f2f7069632e646f776e6b2e63632f6974656d2f3566386336633334316364316262623836623732666339612e6a7067.jpg" alt="微信联系人" width="200" />
+
+微信一二群，目前只接受开源项目作者、NestJS 文档贡献者、捐赠者。
 
 ## 项目贡献者
 
@@ -1208,7 +1359,46 @@
 
 感谢以下企业对本项目的支持：
 
-- **西安核音智言科技有限公司** - 为项目提供技术支持与资源赞助
+### 主要赞助商
+
+<div align="center">
+  <a href="https://trilon.io/" target="_blank">
+    <img src="https://trilon.io/logo.svg" alt="Trilon Logo" width="200" />
+  </a>
+  <br />
+  <a href="https://mojam.co/" target="_blank">
+    <img src="https://mojam.co/logo.png" alt="Mojam Logo" width="200" />
+  </a>
+</div>
+
+### 支持我们
+
+NestJS 是一个基于 MIT 许可证的开源项目，它的持续发展离不开社区的支持。如果你喜欢这个框架，或者你的企业在使用 NestJS，请考虑赞助我们的开发工作，以确保你依赖的项目能够得到积极的维护和改进。
+
+#### 如何支持我们
+
+- **💰 成为赞助商或支持者**：通过 [OpenCollective](https://opencollective.com/nest) 支持我们
+- **🎯 一次性捐赠**：使用 [PayPal](https://paypal.me/kamilmysliwiec) 进行一次性捐赠
+- **📧 直接联系**：发送邮件至 [mail@kamilmysliwiec.com](mailto:mail@kamilmysliwiec.com)
+- **⭐ GitHub Star**：给我们的 [GitHub 仓库](https://github.com/nestjs/nest) 一个星标
+- **🔄 分享推广**：在社交媒体和技术社区中分享 NestJS
+
+#### 为什么支持我们很重要
+
+NestJS 没有大公司的持续资金支持，完全依靠社区的善意 ❤️。你的支持将帮助我们：
+
+- 💻 **持续开发新功能**：让框架变得更加强大和完善
+- 📚 **创建更多内容**：编写教程、博客文章和录制视频
+- 🛠️ **及时修复问题**：快速响应社区反馈和问题
+- 🌱 **支持生态发展**：维护相关工具和库
+
+### 企业支持
+
+如果你的企业正在使用 NestJS，可以考虑：
+
+- **📈 企业赞助**：通过 [企业支持计划](https://enterprise.nestjs.com) 获得专业服务
+- **🎓 团队培训**：安排 NestJS 官方培训和工作坊
+- **💼 技术咨询**：获得 NestJS 核心团队的直接技术指导
 
 ---
 

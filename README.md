@@ -1312,6 +1312,8 @@ SSL 证书：
 
 这是基于 [Next.js](https://nextjs.org) 和 [Nextra](https://nextra.site) 构建的 NestJS 中文文档站点，使用 Turbopack 进行优化。
 
+
+
 ## 开始使用
 
 首先，运行开发服务器：
@@ -1366,8 +1368,4 @@ pnpm dev
 - **Tailwind CSS** - 样式框架
 - **Flexsearch** - 全文搜索
 
-## 部署
 
-项目可以轻松部署到 [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme)。
-
-查看 [Next.js 部署文档](https://nextjs.org/docs/app/building-your-application/deploying) 了解更多详情。

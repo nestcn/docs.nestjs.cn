@@ -67,14 +67,14 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
         <a href="https://github.com/franken133">
             <img src="https://avatars.githubusercontent.com/u/17498284?v=4" width="100;" alt="franken133"/>
             <br />
-            <sub><b>franken133</b></sub>
+            <sub><b>Franken133</b></sub>
         </a>
     </td>
     <td align="center">
         <a href="https://github.com/fanybook">
             <img src="https://avatars.githubusercontent.com/u/7055107?v=4" width="100;" alt="fanybook"/>
             <br />
-            <sub><b>fanybook</b></sub>
+            <sub><b>Fanybook</b></sub>
         </a>
     </td>
     <td align="center">
@@ -132,7 +132,7 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
         <a href="https://github.com/sunsssshine">
             <img src="https://avatars.githubusercontent.com/u/22254736?v=4" width="100;" alt="sunsssshine"/>
             <br />
-            <sub><b>sunsssshine</b></sub>
+            <sub><b>Sunsssshine</b></sub>
         </a>
     </td>
     <td align="center">
@@ -175,7 +175,7 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
         <a href="https://github.com/zxC0der">
             <img src="https://avatars.githubusercontent.com/u/73784351?v=4" width="100;" alt="zxC0der"/>
             <br />
-            <sub><b>zxC0der</b></sub>
+            <sub><b>ZxC0der</b></sub>
         </a>
     </td>
     <td align="center">
@@ -189,7 +189,7 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
         <a href="https://github.com/iyangsheng">
             <img src="https://avatars.githubusercontent.com/u/39045336?v=4" width="100;" alt="iyangsheng"/>
             <br />
-            <sub><b>iyangsheng</b></sub>
+            <sub><b>Iyangsheng</b></sub>
         </a>
     </td>
     <td align="center">
@@ -246,7 +246,7 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
         <a href="https://github.com/franken133521">
             <img src="https://avatars.githubusercontent.com/u/111852977?v=4" width="100;" alt="franken133521"/>
             <br />
-            <sub><b>franken133521</b></sub>
+            <sub><b>Franken133521</b></sub>
         </a>
     </td>
     <td align="center">
@@ -296,7 +296,7 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
         <a href="https://github.com/bigggge">
             <img src="https://avatars.githubusercontent.com/u/9855604?v=4" width="100;" alt="bigggge"/>
             <br />
-            <sub><b>bigggge</b></sub>
+            <sub><b>Bigggge</b></sub>
         </a>
     </td></tr>
 <tr>
@@ -311,7 +311,7 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
         <a href="https://github.com/lpjia">
             <img src="https://avatars.githubusercontent.com/u/33349672?v=4" width="100;" alt="lpjia"/>
             <br />
-            <sub><b>lpjia</b></sub>
+            <sub><b>Lpjia</b></sub>
         </a>
     </td>
     <td align="center">
@@ -368,7 +368,7 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
         <a href="https://github.com/zhixiangyao">
             <img src="https://avatars.githubusercontent.com/u/49728521?v=4" width="100;" alt="zhixiangyao"/>
             <br />
-            <sub><b>zhixiangyao</b></sub>
+            <sub><b>Zhixiangyao</b></sub>
         </a>
     </td>
     <td align="center">
@@ -619,7 +619,7 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
         <a href="https://github.com/dangqi888">
             <img src="https://avatars.githubusercontent.com/u/39114778?v=4" width="100;" alt="dangqi888"/>
             <br />
-            <sub><b>dangqi888</b></sub>
+            <sub><b>Dangqi888</b></sub>
         </a>
     </td>
     <td align="center">
@@ -741,7 +741,7 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
         <a href="https://github.com/zemor923">
             <img src="https://avatars.githubusercontent.com/u/30496751?v=4" width="100;" alt="zemor923"/>
             <br />
-            <sub><b>zemor923</b></sub>
+            <sub><b>Zemor923</b></sub>
         </a>
     </td>
     <td align="center">
@@ -755,7 +755,7 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
         <a href="https://github.com/xdlover">
             <img src="https://avatars.githubusercontent.com/u/21051235?v=4" width="100;" alt="xdlover"/>
             <br />
-            <sub><b>xdlover</b></sub>
+            <sub><b>Xdlover</b></sub>
         </a>
     </td>
     <td align="center">
@@ -769,7 +769,7 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
         <a href="https://github.com/wujingquan">
             <img src="https://avatars.githubusercontent.com/u/22289015?v=4" width="100;" alt="wujingquan"/>
             <br />
-            <sub><b>wujingquan</b></sub>
+            <sub><b>Wujingquan</b></sub>
         </a>
     </td></tr>
 <tr>
@@ -784,14 +784,14 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
         <a href="https://github.com/uxuip">
             <img src="https://avatars.githubusercontent.com/u/110730129?v=4" width="100;" alt="uxuip"/>
             <br />
-            <sub><b>uxuip</b></sub>
+            <sub><b>Uxuip</b></sub>
         </a>
     </td>
     <td align="center">
         <a href="https://github.com/sunet693">
             <img src="https://avatars.githubusercontent.com/u/12874803?v=4" width="100;" alt="sunet693"/>
             <br />
-            <sub><b>sunet693</b></sub>
+            <sub><b>Sunet693</b></sub>
         </a>
     </td>
     <td align="center">
@@ -805,14 +805,14 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
         <a href="https://github.com/skipsoul">
             <img src="https://avatars.githubusercontent.com/u/17571715?v=4" width="100;" alt="skipsoul"/>
             <br />
-            <sub><b>skipsoul</b></sub>
+            <sub><b>Skipsoul</b></sub>
         </a>
     </td>
     <td align="center">
         <a href="https://github.com/redismsgs">
             <img src="https://avatars.githubusercontent.com/u/32961930?v=4" width="100;" alt="redismsgs"/>
             <br />
-            <sub><b>redismsgs</b></sub>
+            <sub><b>Redismsgs</b></sub>
         </a>
     </td></tr>
 <tr>

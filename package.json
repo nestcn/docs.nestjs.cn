@@ -1,17 +1,39 @@
 {
-  "name": "nestjsdocs",
-  "version": "1.0.0",
+  "name": "docs.nestjs.cn",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "rspress build",
-    "dev": "rspress dev",
-    "preview": "rspress preview"
+    "dev": "bun next dev",
+    "dev:turbo": "bun next dev --turbo",
+    "build": "bun next build",
+    "build:    "glob": "^11.0.3",
+turbo": "bun next build --experimental-build-mode=compile",
+    "start": "bun next start",
+    "lint": "bun next lint",
+    "export": "bun next build && bun next export",
+    "deploy": "bun next build && bun next export && touch out/.nojekyll && git add out/ && git commit -m \"Deploy to gh-pages\" && git subtree push --prefix out origin gh-pages"
   },
   "dependencies": {
-    "glob": "^11.0.3",
-    "rspress": "^1.40.2"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "next": "14.2.5",
+    "nextra": "^2.13.4",
+    "nextra-theme-docs": "^2.13.4",
+    "flexsearch": "^0.7.43"
   },
   "devDependencies": {
-    "@types/node": "^18.11.17"
+    "@eslint/eslintrc": "^3",
+    "@mdx-js/loader": "^3.0.0",
+    "@mdx-js/react": "^3.0.0",
+    "@tailwindcss/postcss": "^4.1.10",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9",
+    "eslint-config-next": "15.3.4",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.10",
+    "typescript": "^5"
   }
 }

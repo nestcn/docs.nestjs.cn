@@ -37,6 +37,6 @@ features:
     icon: 🇨🇳
 
 footer:
-  message: "NestJS 是 MIT 协议开源项目。文档内容版权归原作者所有。"
-  copyright: "© 2025 NestJS 中文文档 | 由社区维护"
+  message: "NestJS 是 MIT 协议开源项目。本中文文档项目基于 Apache 2.0 协议开源。"
+  copyright: "© 2025 NestJS 中文文档 | 由社区维护 | Apache 2.0 许可证"
 ---

@@ -1308,32 +1308,66 @@ SSL 证书：
 
 
 
-# Rspress website
+# NestJS 中文文档站点
 
-## Setup
+这是基于 [Next.js](https://nextjs.org) 和 [Nextra](https://nextra.site) 构建的 NestJS 中文文档站点，使用 Turbopack 进行优化。
 
-Install the dependencies:
+## 开始使用
 
-```bash
-npm install
-```
-
-## Get started
-
-Start the dev server:
+首先，运行开发服务器：
 
 ```bash
+# 使用 Turbopack（推荐）
+bun run dev
+# 或者
+bun run dev:turbo
+
+# 或使用其他包管理器
 npm run dev
+yarn dev
+pnpm dev
 ```
 
-Build the website for production:
+打开 [http://localhost:3000](http://localhost:3000) 在浏览器中查看结果。
 
-```bash
-npm run build
-```
+## Turbopack 支持
 
-Preview the production build locally:
+本项目已配置为使用 Next.js 的 Turbopack 打包工具，提供：
 
-```bash
-npm run preview
-```
+- 🚀 更快的开发服务器启动
+- ⚡ 更快的热重载
+- 📦 优化的 MDX 文件处理
+- 🔄 增量编译
+
+### 可用脚本
+
+- `bun run dev` - 启动开发服务器（已启用 Turbopack）
+- `bun run dev:turbo` - 明确使用 Turbopack 启动开发服务器
+- `bun run build` - 构建生产版本
+- `bun run build:turbo` - 使用实验性编译模式构建
+- `bun run start` - 启动生产服务器
+- `bun run lint` - 运行代码检查
+
+## 功能特性
+
+- 📚 完整的 NestJS 中文文档
+- 🔍 全文搜索支持（中文优化）
+- 🌙 深色/浅色主题切换
+- 📱 响应式设计
+- ⚡ Turbopack 性能优化
+- 🎨 NestJS 官方主题样式
+
+## 技术栈
+
+- **Next.js 15** - React 框架
+- **Nextra** - 文档站点生成器
+- **Turbopack** - 下一代打包工具
+- **TypeScript** - 类型安全
+- **Tailwind CSS** - 样式框架
+- **Flexsearch** - 全文搜索
+
+## 部署
+
+项目可以轻松部署到 [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme)。
+
+查看 [Next.js 部署文档](https://nextjs.org/docs/app/building-your-application/deploying) 了解更多详情。

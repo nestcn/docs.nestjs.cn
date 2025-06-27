@@ -33,6 +33,16 @@
 - **NestJS 官方团队** - 创造了这个优秀的框架
 - **中文开发者社区** - 提供了宝贵的反馈和建议
 
+## 赞助商
+
+感谢以下企业对本项目的支持：
+
+- **西安核音智言科技有限公司** - 为项目提供技术支持与资源赞助
+
 ---
 
 *想要加入我们吗？查看 [GitHub 仓库](https://github.com/nestcn/docs.nestjs.cn) 开始贡献！*
+
+## 许可证
+
+本项目基于 [Apache License 2.0](https://github.com/nestcn/docs.nestjs.cn/blob/main/LICENSE) 许可证开源。

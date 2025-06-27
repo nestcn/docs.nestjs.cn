@@ -38,6 +38,9 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
 
 微信一二群，目前只接受 开源项目作者、nestjs 文档贡献者、捐赠者。
 
+## 贡献者
+<!-- readme: collaborators,contributors -start -->
+<!-- readme: collaborators,contributors -end -->
 
 
 ## 赞助商广告：

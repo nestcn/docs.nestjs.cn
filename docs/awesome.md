@@ -45,21 +45,6 @@
 
 ## 👥 社区与交流
 
-### 即时通讯
-
-- ![Discord](https://img.shields.io/discord/520622812742811698?style=flat-square&logo=nestjs&color=a61b3a) [Discord 官方社区](https://discord.gg/nestjs) - 英文官方社区
-- [📱 Telegram 国际群](https://t.me/nestjs) - 国际电报群
-- [📱 Telegram 中文群](https://t.me/nestjscn) - 中文电报群（社区维护）
-- [💬 微信群](https://docs.nestjs.cn/contributors#微信群) - 中文微信群
-- [💬 QQ 群](https://docs.nestjs.cn/contributors#中文交流qq群) - 中文QQ群
-
-### 其他社区
-
-- [📱 Telegram 俄语群](https://t.me/nest_ru) - 俄语社区
-- [📱 Telegram 乌克兰语群](https://t.me/nest_ukraine) - 乌克兰语社区  
-- [💼 Slack 韩语群](https://nestjs.slack.com) - 韩语职场群
-- [🔴 Reddit 论坛](https://www.reddit.com/r/Nestjs_framework) - Reddit 讨论区
-- [👥 Facebook 波兰群](https://www.facebook.com/groups/606785643208589) - 波兰语 Facebook 群
 
 ### 文档资源
 

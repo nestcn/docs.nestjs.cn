@@ -141,6 +141,12 @@ export default defineConfig({
           collapsed: true,
           items: [
             { text: '基础', link: '/websockets/index' },
+            { text: '网关', link: '/websockets/gateways' },
+            { text: '守卫', link: '/websockets/guards' },
+            { text: '管道', link: '/websockets/pipes' },
+            { text: '拦截器', link: '/websockets/interceptors' },
+            { text: '异常过滤器', link: '/websockets/exception-filters' },
+            { text: '适配器', link: '/websockets/adapter' },
           ],
         },
         {

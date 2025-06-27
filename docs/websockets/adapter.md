@@ -77,7 +77,7 @@ app.useWebSocketAdapter(new WsAdapter(app));
 
 ```typescript
 const wsAdapter = new WsAdapter(app, {
-  // To handle messages in the [event, data] format
+  // 处理 [event, data] 格式的消息
   messageParser: (data) => {
     const [event, payload] = JSON.parse(data.toString());
     return { event, data: payload };
@@ -85,7 +85,39 @@ const wsAdapter = new WsAdapter(app, {
 });
 ```
 
-或者，您也可以在创建适配器后通过 `setMessageParser` 方法配置消息解析器。
+或者，您也可以在创建适配器后通过 `setMessageParser` 方法配置消息解析器：
+
+```typescript
+const wsAdapter = new WsAdapter(app);
+wsAdapter.setMessageParser((data) => {
+  const parsed = JSON.parse(data.toString());
+  return { event: parsed.type, data: parsed.payload };
+});
+app.useWebSocketAdapter(wsAdapter);
+```
+
+#### ws 库的优势
+
+使用 `ws` 库相比 `socket.io` 有以下优势：
+
+- **性能更高**：`ws` 是原生 WebSocket 实现，性能更佳
+- **更轻量**：包体积更小，依赖更少
+- **浏览器兼容**：与浏览器原生 WebSocket API 完全兼容
+- **更低延迟**：减少了额外的协议开销
+
+但也有一些限制：
+
+- **功能较少**：缺少自动重连、房间等高级功能
+- **无命名空间**：不支持 `socket.io` 的命名空间特性（可通过不同路径挂载多个服务器来模拟）
+
+```typescript
+// 在不同路径挂载多个 WebSocket 服务器来模拟命名空间
+@WebSocketGateway({ path: '/chat' })
+export class ChatGateway {}
+
+@WebSocketGateway({ path: '/notifications' })
+export class NotificationsGateway {}
+```
 
 #### 高级选项（自定义适配器）
 

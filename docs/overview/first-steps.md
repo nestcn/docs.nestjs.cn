@@ -4,13 +4,39 @@
 
 ## 语言特性
 
-我们热爱 [TypeScript](https://www.ty[CLI](/cli/overview) 致力于为大规模开发提供可靠的工作流脚手架。因此，生成的 Nest 项目已预装了代码 **检查工具** 和 **格式化工具** （分别是 [eslint](https://eslint.org/) 和 [prettier](https://prettier.io/)）。
+我们热爱 [TypeScript](https:#### 代码检查与格式化
 
-> info **提示** 不确定格式化工具与代码检查工具的区别？请查看[此处](https://prettier.io/docs/en/comparison.html)了解。
+[CLI](/cli/overview) 致力于为大规模开发提供可靠的工作流脚手架。因此，生成的 Nest 项目已预装了代码 **检查#### 代码检查与格式化
+
+[CLI](/cli/overview) 致力于为大规模开发提供可靠的工作流脚手架。因此，生成的 Nest 项目已预装了代码 **检查工具** 和 **格式化工具** （分别是 [eslint](https://eslint.org/) 和 [prettier](https://prettier.io/)）。
+
+> **提示** 不确定格式化工具与代码检查工具的区别？请查看[此处](https://prettier.io/docs/en/comparison.html)了解。
 
 为了确保最大的稳定性和可扩展性，我们使用基础的 [`eslint`](https://www.npmjs.com/package/eslint) 和 [`prettier`](https://www.npmjs.com/package/prettier) cli 包。这种设置允许与官方扩展进行良好的 IDE 集成。
 
-对于不依赖 IDE 的无头环境（持续集成、Git hooks 等），Nest 项目附带了可立即使用的 `npm` 脚本。tlang.org/)，但最重要的是——我们热爱 [Node.js](https://nodejs.org/en/)。因此 Nest 同时兼容 TypeScript 和纯 JavaScript。Nest 利用了最新的语言特性，所以要在原生 JavaScript 中使用它，我们需要一个 [Babel](https://babeljs.io/) 编译器。
+对于不依赖 IDE 的无头环境（持续集成、Git hooks 等），Nest 项目附带了可立即使用的 `npm` 脚本：
+
+```bash
+# 使用 eslint 进行代码检查和自动修复
+$ npm run lint
+
+# 使用 prettier 进行代码格式化
+$ npm run format
+```（分别是 [eslint](https://eslint.org/) 和 [prettier](https://prettier.io/)）。
+
+> **提示** 不确定格式化工具与代码检查工具的区别？请查看[此处](https://prettier.io/docs/en/comparison.html)了解。
+
+为了确保最大的稳定性和可扩展性，我们使用基础的 [`eslint`](https://www.npmjs.com/package/eslint) 和 [`prettier`](https://www.npmjs.com/package/prettier) cli 包。这种设置允许与官方扩展进行良好的 IDE 集成。
+
+对于不依赖 IDE 的无头环境（持续集成、Git hooks 等），Nest 项目附带了可立即使用的 `npm` 脚本。
+
+```bash
+# 使用 eslint 进行代码检查和自动修复
+$ npm run lint
+
+# 使用 prettier 进行代码格式化
+$ npm run format
+```ang.org/)，但最重要的是——我们热爱 [Node.js](https://nodejs.org/en/)。因此 Nest 同时兼容 TypeScript 和纯 JavaScript。Nest 利用了最新的语言特性，所以要在原生 JavaScript 中使用它，我们需要一个 [Babel](https://babeljs.io/) 编译器。
 
 我们提供的示例将主要使用 TypeScript，但您可以随时**切换代码片段**至原生 JavaScript 语法（只需点击每个代码片段右上角的语言切换按钮即可）。
 
@@ -52,7 +78,73 @@ $ npm i -g @nestjs/cli
 $ nest new project-name
 ```
 
-> info **注意** 要使用 TypeScript 更严格的特性集创建新项目，请向 `nest new` 命令传递 `--strict` 标志。
+> **注意** 要使用 TypeScript 更严格的特性集创建新项目，请向 `nest new` 命令传递 `--strict` 标志。
+
+### 安装选项
+
+创建新项目时，Nest CLI 会询问您一些配置选项：
+
+1. **包管理器选择**：可以选择 npm、yarn、或 pnpm
+2. **项目描述**：为您的项目添加描述
+3. **Git 初始化**：是否初始化 Git 仓库
+
+**使用不同包管理器：**
+
+```bash
+# 使用 yarn
+$ nest new project-name --package-manager yarn
+
+# 使用 pnpm
+$ nest new project-name --package-manager pnpm
+
+# 跳过包安装（手动安装依赖）
+$ nest new project-name --skip-install
+```
+
+**其他有用的选项：**
+
+```bash
+# 使用严格模式 TypeScript
+$ nest new project-name --strict
+
+# 指定特定目录
+$ nest new project-name --directory my-app
+
+# 跳过 Git 初始化
+$ nest new project-name --skip-git
+```
+
+### 故障排除
+
+如果遇到安装问题，请尝试以下解决方案：
+
+1. **权限问题（Linux/macOS）**：
+   ```bash
+   # 使用 sudo（不推荐）
+   $ sudo npm i -g @nestjs/cli
+   
+   # 或者配置 npm 全局目录（推荐）
+   $ mkdir ~/.npm-global
+   $ npm config set prefix '~/.npm-global'
+   $ echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.profile
+   $ source ~/.profile
+   ```
+
+2. **网络问题**：
+   ```bash
+   # 使用淘宝镜像
+   $ npm config set registry https://registry.npmmirror.com
+   
+   # 或者使用 cnpm
+   $ npm install -g cnpm --registry=https://registry.npmmirror.com
+   $ cnpm i -g @nestjs/cli
+   ```
+
+3. **代理设置**：
+   ```bash
+   $ npm config set proxy http://proxy.company.com:8080
+   $ npm config set https-proxy http://proxy.company.com:8080
+   ```
 
 将创建 `project-name` 目录，安装 node 模块和一些其他样板文件，并创建 `src/` 目录，其中会生成若干核心文件。
 
@@ -150,3 +242,112 @@ $ npm run lint
 # Format with prettier
 $ npm run format
 ```
+
+## 开发技巧
+
+### 1. 使用开发工具
+
+**推荐的 VSCode 扩展：**
+- [NestJS Files](https://marketplace.visualstudio.com/items?itemName=AbstractAPI.vscode-nestjs-generator) - 快速生成 NestJS 文件
+- [TypeScript Importer](https://marketplace.visualstudio.com/items?itemName=pmneo.tsimporter) - 自动导入 TypeScript 模块
+- [Auto Import - ES6, TS, JSX, TSX](https://marketplace.visualstudio.com/items?itemName=steoates.autoimport) - 智能导入
+- [Bracket Pair Colorizer](https://marketplace.visualstudio.com/items?itemName=CoenraadS.bracket-pair-colorizer) - 括号配对着色
+
+**配置 debugger：**
+
+在 `.vscode/launch.json` 中添加调试配置：
+
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Nest Framework",
+      "type": "node",
+      "request": "launch",
+      "args": ["${workspaceFolder}/src/main.ts"],
+      "runtimeArgs": ["--nolazy", "-r", "ts-node/register"],
+      "sourceMaps": true,
+      "cwd": "${workspaceFolder}",
+      "protocol": "inspector",
+      "env": {
+        "NODE_ENV": "development"
+      }
+    }
+  ]
+}
+```
+
+### 2. 有用的开发命令
+
+```bash
+# 生成新模块
+$ nest generate module cats
+$ nest g mo cats  # 简写
+
+# 生成控制器
+$ nest generate controller cats
+$ nest g co cats
+
+# 生成服务
+$ nest generate service cats
+$ nest g s cats
+
+# 生成完整的 CRUD 资源
+$ nest generate resource cats
+
+# 查看所有可用的生成器
+$ nest generate --help
+```
+
+### 3. 环境配置
+
+创建 `.env` 文件来管理环境变量：
+
+```bash
+# .env
+NODE_ENV=development
+PORT=3000
+DATABASE_URL=postgresql://user:password@localhost:5432/mydb
+JWT_SECRET=your-secret-key
+```
+
+在 `main.ts` 中使用环境变量：
+
+```typescript
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  
+  // 从环境变量读取端口，默认 3000
+  const port = process.env.PORT || 3000;
+  
+  await app.listen(port);
+  console.log(`应用程序运行在 http://localhost:${port}`);
+}
+bootstrap();
+```
+
+## 下一步
+
+现在您已经完成了基本设置，可以开始探索 NestJS 的核心概念：
+
+1. **[控制器 (Controllers)](/overview/controllers)** - 学习如何处理传入请求
+2. **[提供者 (Providers)](/overview/providers)** - 了解依赖注入和服务
+3. **[模块 (Modules)](/overview/modules)** - 组织应用程序结构
+4. **[中间件 (Middleware)](/overview/middleware)** - 请求/响应处理
+5. **[异常过滤器 (Exception Filters)](/overview/exception-filters)** - 错误处理
+6. **[管道 (Pipes)](/overview/pipes)** - 数据验证和转换
+7. **[守卫 (Guards)](/overview/guards)** - 认证和授权
+8. **[拦截器 (Interceptors)](/overview/interceptors)** - 请求/响应拦截
+
+### 实用资源
+
+- **[官方示例](https://github.com/nestjs/nest/tree/master/sample)** - 各种功能的示例代码
+- **[NestJS 教程](https://docs.nestjs.com/first-steps)** - 官方教程
+- **[社区资源](/awesome)** - 社区贡献的资源和工具
+- **[常见问题](/faq)** - 常见问题解答
+
+开始构建令人惊叹的 Node.js 应用程序吧！🚀

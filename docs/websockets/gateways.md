@@ -156,9 +156,49 @@ onEvent(@MessageBody() data: unknown): Observable<WsResponse<number>> {
 
 提供了 3 个实用的生命周期钩子。它们都有对应的接口，如下表所述：
 
-<table data-immersive-translate-walked="4e67664c-ede4-4640-b9b7-dfcc937d9cbb"><tbody data-immersive-translate-walked="4e67664c-ede4-4640-b9b7-dfcc937d9cbb"><tr data-immersive-translate-walked="4e67664c-ede4-4640-b9b7-dfcc937d9cbb"><td data-immersive-translate-walked="4e67664c-ede4-4640-b9b7-dfcc937d9cbb">OnGatewayInit</td><td data-immersive-translate-walked="4e67664c-ede4-4640-b9b7-dfcc937d9cbb" data-immersive-translate-paragraph="1">强制实现 afterInit() 方法。接收特定库的服务器实例作为参数（并且 如果需要会展开其余部分）。</td></tr><tr data-immersive-translate-walked="4e67664c-ede4-4640-b9b7-dfcc937d9cbb"><td data-immersive-translate-walked="4e67664c-ede4-4640-b9b7-dfcc937d9cbb">OnGatewayConnection</td><td data-immersive-translate-walked="4e67664c-ede4-4640-b9b7-dfcc937d9cbb" data-immersive-translate-paragraph="1">强制实现 handleConnection() 方法。接收特定库的客户端套接字实例作为 一个参数。</td></tr><tr data-immersive-translate-walked="4e67664c-ede4-4640-b9b7-dfcc937d9cbb"><td data-immersive-translate-walked="4e67664c-ede4-4640-b9b7-dfcc937d9cbb">OnGatewayDisconnect</td><td data-immersive-translate-walked="4e67664c-ede4-4640-b9b7-dfcc937d9cbb" data-immersive-translate-paragraph="1">强制实现 handleDisconnect() 方法。接收特定库的客户端套接字实例作为 参数。</td></tr></tbody></table>
+| 钩子                    | 描述                                             |
+| ----------------------- | ------------------------------------------------ |
+| `OnGatewayInit`         | 强制实现 `afterInit()` 方法。接收特定库的服务器实例作为参数（如果需要会展开其余部分） |
+| `OnGatewayConnection`   | 强制实现 `handleConnection()` 方法。接收特定库的客户端套接字实例作为参数 |
+| `OnGatewayDisconnect`   | 强制实现 `handleDisconnect()` 方法。接收特定库的客户端套接字实例作为参数 |
 
-> info **提示** 每个生命周期接口都从 `@nestjs/websockets` 包中导出。
+> **提示** 每个生命周期接口都从 `@nestjs/websockets` 包中导出。
+
+以下是实现这些生命周期钩子的完整示例：
+
+```typescript
+import {
+  OnGatewayInit,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  WebSocketGateway,
+  WebSocketServer,
+} from '@nestjs/websockets';
+import { Server, Socket } from 'socket.io';
+import { Logger } from '@nestjs/common';
+
+@WebSocketGateway()
+export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+  private logger: Logger = new Logger('EventsGateway');
+
+  @WebSocketServer()
+  server: Server;
+
+  afterInit(server: Server) {
+    this.logger.log('WebSocket 服务器初始化完成');
+  }
+
+  handleConnection(client: Socket, ...args: any[]) {
+    this.logger.log(`客户端连接: ${client.id}`);
+    // 可以在这里执行连接时的逻辑，如用户认证
+  }
+
+  handleDisconnect(client: Socket) {
+    this.logger.log(`客户端断开连接: ${client.id}`);
+    // 可以在这里执行断开连接时的清理逻辑
+  }
+}
+```
 
 #### 服务器与命名空间
 
@@ -179,6 +219,366 @@ namespace: Namespace;
 > warning **注意** `@WebSocketServer()` 装饰器需要从 `@nestjs/websockets` 包中导入。
 
 一旦服务器实例准备就绪，Nest 会自动将其分配给该属性。
+
+#### 认证和授权
+
+在 WebSocket 应用中实现认证通常需要在连接建立时验证用户身份：
+
+```typescript
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+
+@UseGuards(AuthGuard('jwt'))
+@WebSocketGateway()
+export class AuthenticatedGateway implements OnGatewayConnection {
+  handleConnection(client: Socket) {
+    // 从 JWT 令牌中获取用户信息
+    const user = client.request.user;
+    console.log('用户已连接:', user.username);
+  }
+
+  @SubscribeMessage('private-message')
+  handlePrivateMessage(
+    @MessageBody() data: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const user = client.request.user;
+    return `私人消息来自 ${user.username}: ${data}`;
+  }
+}
+```
+
+#### 自定义中间件
+
+可以在网关中使用自定义中间件来处理连接：
+
+```typescript
+import { IoAdapter } from '@nestjs/platform-socket.io';
+import { Socket } from 'socket.io';
+
+export class AuthenticatedSocketIoAdapter extends IoAdapter {
+  createIOServer(port: number, options?: any): any {
+    const server = super.createIOServer(port, options);
+    
+    server.use((socket: Socket, next) => {
+      // 验证令牌
+      const token = socket.handshake.auth.token;
+      if (this.validateToken(token)) {
+        next();
+      } else {
+        next(new Error('Authentication error'));
+      }
+    });
+
+    return server;
+  }
+
+  private validateToken(token: string): boolean {
+    // 实现令牌验证逻辑
+    return token === 'valid-token';
+  }
+}
+```
+
+#### 错误处理
+
+正确处理 WebSocket 错误：
+
+```typescript
+@WebSocketGateway()
+export class ErrorHandlingGateway {
+  @SubscribeMessage('risky-operation')
+  async handleRiskyOperation(@MessageBody() data: any) {
+    try {
+      // 可能抛出异常的操作
+      const result = await this.performRiskyOperation(data);
+      return result;
+    } catch (error) {
+      throw new WsException({
+        status: 'error',
+        message: error.message,
+        code: 'RISKY_OPERATION_FAILED'
+      });
+    }
+  }
+
+  private async performRiskyOperation(data: any) {
+    // 模拟可能失败的操作
+    if (Math.random() > 0.5) {
+      throw new Error('操作失败');
+    }
+    return { success: true, data };
+  }
+}
+```
+
+#### 房间和命名空间管理
+
+高级房间管理功能：
+
+```typescript
+@WebSocketGateway({ namespace: 'chat' })
+export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  @WebSocketServer()
+  server: Server;
+
+  private userRooms = new Map<string, Set<string>>();
+
+  handleConnection(client: Socket) {
+    console.log(`客户端 ${client.id} 已连接`);
+  }
+
+  handleDisconnect(client: Socket) {
+    // 清理用户的房间信息
+    this.leaveAllRooms(client.id);
+    console.log(`客户端 ${client.id} 已断开连接`);
+  }
+
+  @SubscribeMessage('join-room')
+  handleJoinRoom(
+    @MessageBody() room: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    client.join(room);
+    
+    // 记录用户的房间
+    if (!this.userRooms.has(client.id)) {
+      this.userRooms.set(client.id, new Set());
+    }
+    this.userRooms.get(client.id).add(room);
+
+    client.to(room).emit('user-joined', {
+      userId: client.id,
+      message: `用户 ${client.id} 加入了房间 ${room}`
+    });
+
+    return { status: 'success', room };
+  }
+
+  @SubscribeMessage('leave-room')
+  handleLeaveRoom(
+    @MessageBody() room: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    client.leave(room);
+    
+    // 更新用户房间记录
+    if (this.userRooms.has(client.id)) {
+      this.userRooms.get(client.id).delete(room);
+    }
+
+    client.to(room).emit('user-left', {
+      userId: client.id,
+      message: `用户 ${client.id} 离开了房间 ${room}`
+    });
+
+    return { status: 'success', room };
+  }
+
+  @SubscribeMessage('broadcast-to-room')
+  handleBroadcastToRoom(
+    @MessageBody() data: { room: string; message: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    this.server.to(data.room).emit('room-message', {
+      from: client.id,
+      message: data.message,
+      timestamp: new Date(),
+    });
+  }
+
+  private leaveAllRooms(clientId: string) {
+    if (this.userRooms.has(clientId)) {
+      const rooms = this.userRooms.get(clientId);
+      rooms.forEach(room => {
+        this.server.to(room).emit('user-left', {
+          userId: clientId,
+          message: `用户 ${clientId} 离开了房间 ${room}`
+        });
+      });
+      this.userRooms.delete(clientId);
+    }
+  }
+
+  // 获取房间信息
+  @SubscribeMessage('get-room-info')
+  async handleGetRoomInfo(@MessageBody() room: string) {
+    const sockets = await this.server.in(room).fetchSockets();
+    return {
+      room,
+      userCount: sockets.length,
+      users: sockets.map(socket => socket.id),
+    };
+  }
+}
+```
+
+#### 性能优化
+
+WebSocket 性能优化建议：
+
+```typescript
+@WebSocketGateway({
+  cors: {
+    origin: process.env.ALLOWED_ORIGINS?.split(',') || '*',
+  },
+  transports: ['websocket'], // 仅使用 WebSocket，避免轮询
+  maxHttpBufferSize: 1e6, // 限制消息大小
+  pingTimeout: 60000,
+  pingInterval: 25000,
+})
+export class OptimizedGateway {
+  @WebSocketServer()
+  server: Server;
+
+  // 使用节流来限制消息频率
+  @SubscribeMessage('high-frequency-event')
+  @Throttle(10, 60) // 每 60 秒最多 10 次
+  handleHighFrequencyEvent(@MessageBody() data: any) {
+    return { received: data, timestamp: Date.now() };
+  }
+
+  // 批量处理消息
+  private messageQueue: any[] = [];
+  private processingTimer: NodeJS.Timeout;
+
+  @SubscribeMessage('bulk-message')
+  handleBulkMessage(@MessageBody() message: any) {
+    this.messageQueue.push(message);
+    
+    if (!this.processingTimer) {
+      this.processingTimer = setTimeout(() => {
+        this.processBulkMessages();
+        this.processingTimer = null;
+      }, 100); // 100ms 后批量处理
+    }
+  }
+
+  private processBulkMessages() {
+    if (this.messageQueue.length > 0) {
+      const messages = [...this.messageQueue];
+      this.messageQueue = [];
+      
+      // 批量处理并广播
+      this.server.emit('bulk-processed', {
+        count: messages.length,
+        processedAt: new Date(),
+      });
+    }
+  }
+}
+```
+
+#### 测试 WebSocket 网关
+
+测试 WebSocket 网关的示例：
+
+```typescript
+import { Test } from '@nestjs/testing';
+import { INestApplication } from '@nestjs/common';
+import { Socket, io } from 'socket.io-client';
+import { EventsGateway } from './events.gateway';
+
+describe('EventsGateway', () => {
+  let app: INestApplication;
+  let gateway: EventsGateway;
+  let clientSocket: Socket;
+
+  beforeAll(async () => {
+    const moduleRef = await Test.createTestingModule({
+      providers: [EventsGateway],
+    }).compile();
+
+    app = moduleRef.createNestApplication();
+    gateway = moduleRef.get<EventsGateway>(EventsGateway);
+    
+    await app.listen(3001);
+    
+    clientSocket = io('http://localhost:3001');
+  });
+
+  afterAll(async () => {
+    clientSocket.close();
+    await app.close();
+  });
+
+  it('应该处理消息事件', (done) => {
+    clientSocket.emit('events', { test: 'data' });
+    
+    clientSocket.on('events', (data) => {
+      expect(data).toEqual({ test: 'data' });
+      done();
+    });
+  });
+
+  it('应该处理连接', () => {
+    expect(gateway.server).toBeDefined();
+  });
+});
+```
+
+#### 监控和调试
+
+添加监控和调试功能：
+
+```typescript
+@WebSocketGateway()
+export class MonitoredGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+  @WebSocketServer()
+  server: Server;
+
+  private connectionCount = 0;
+  private messageCount = 0;
+
+  afterInit(server: Server) {
+    console.log('WebSocket 服务器已初始化');
+    
+    // 定期报告统计信息
+    setInterval(() => {
+      console.log(`连接数: ${this.connectionCount}, 消息数: ${this.messageCount}`);
+    }, 30000);
+  }
+
+  handleConnection(client: Socket) {
+    this.connectionCount++;
+    console.log(`新连接: ${client.id}, 总连接数: ${this.connectionCount}`);
+    
+    // 发送连接统计
+    this.server.emit('stats', {
+      connections: this.connectionCount,
+      messages: this.messageCount,
+    });
+  }
+
+  handleDisconnect(client: Socket) {
+    this.connectionCount--;
+    console.log(`连接断开: ${client.id}, 剩余连接数: ${this.connectionCount}`);
+    
+    this.server.emit('stats', {
+      connections: this.connectionCount,
+      messages: this.messageCount,
+    });
+  }
+
+  @SubscribeMessage('any-message')
+  handleAnyMessage(@MessageBody() data: any) {
+    this.messageCount++;
+    return data;
+  }
+
+  // 健康检查端点
+  @SubscribeMessage('health-check')
+  handleHealthCheck() {
+    return {
+      status: 'healthy',
+      uptime: process.uptime(),
+      connections: this.connectionCount,
+      messages: this.messageCount,
+      memory: process.memoryUsage(),
+    };
+  }
+}
+```
 
 #### 示例
 

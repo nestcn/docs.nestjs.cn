@@ -35,6 +35,7 @@ export default defineConfig({
         {
           text: '概述',
           collapsible: true,
+          collapsed: true,
           items: [
             { text: '第一步', link: '/overview/first-steps' },
             { text: '控制器', link: '/overview/controllers' },
@@ -51,6 +52,7 @@ export default defineConfig({
         {
           text: '基础',
           collapsible: true,
+          collapsed: true,
           items: [
             { text: '依赖注入', link: '/fundamentals/dependency-injection' },
             { text: '动态模块', link: '/fundamentals/dynamic-modules' },
@@ -69,6 +71,7 @@ export default defineConfig({
         {
           text: '技术',
           collapsible: true,
+          collapsed: true,
           items: [
             { text: '配置', link: '/techniques/configuration' },
             { text: 'SQL', link: '/techniques/sql' },
@@ -95,6 +98,7 @@ export default defineConfig({
         {
           text: 'GraphQL',
           collapsible: true,
+          collapsed: true,
           items: [
             { text: '快速开始', link: '/graphql/quick-start' },
             { text: '解析器', link: '/graphql/resolvers-map' },
@@ -115,6 +119,7 @@ export default defineConfig({
         {
           text: '微服务',
           collapsible: true,
+          collapsed: true,
           items: [
             { text: '基础', link: '/microservices/basics' },
             { text: '自定义传输', link: '/microservices/custom-transport' },
@@ -133,6 +138,7 @@ export default defineConfig({
         {
           text: 'WebSocket',
           collapsible: true,
+          collapsed: true,
           items: [
             { text: '基础', link: '/websockets/index' },
           ],
@@ -140,6 +146,7 @@ export default defineConfig({
         {
           text: 'OpenAPI',
           collapsible: true,
+          collapsed: true,
           items: [
             { text: '介绍', link: '/openapi/introduction' },
             { text: '装饰器', link: '/openapi/decorators' },
@@ -154,6 +161,7 @@ export default defineConfig({
         {
           text: 'CLI',
           collapsible: true,
+          collapsed: true,
           items: [
             { text: '概述', link: '/cli/overview' },
             { text: '库', link: '/cli/libraries' },
@@ -165,6 +173,7 @@ export default defineConfig({
         {
           text: '实用食谱',
           collapsible: true,
+          collapsed: true,
           items: [
             { text: 'AsyncLocalStorage', link: '/recipes/async-local-storage' },
             { text: '认证', link: '/recipes/authentication' },
@@ -174,11 +183,31 @@ export default defineConfig({
             { text: 'CRUD 生成器', link: '/recipes/crud-generator' },
             { text: 'CSRF', link: '/recipes/csrf' },
             { text: '文档', link: '/recipes/documentation' },
+            { text: '加密与哈希', link: '/recipes/encryption-hashing' },
+            { text: 'Helmet', link: '/recipes/helmet' },
+            { text: '热重载', link: '/recipes/hot-reload' },
+            { text: 'MikroORM', link: '/recipes/mikroorm' },
+            { text: 'MongoDB', link: '/recipes/mongodb' },
+            { text: 'Necord', link: '/recipes/necord' },
+            { text: 'Commander', link: '/recipes/nest-commander' },
+            { text: 'Passport', link: '/recipes/passport' },
+            { text: 'Prisma', link: '/recipes/prisma' },
+            { text: '限流', link: '/recipes/rate-limiting' },
+            { text: 'REPL', link: '/recipes/repl' },
+            { text: '路由模块', link: '/recipes/router-module' },
+            { text: 'Sentry', link: '/recipes/sentry' },
+            { text: '静态资源', link: '/recipes/serve-static' },
+            { text: 'Sequelize', link: '/recipes/sql-sequelize' },
+            { text: 'TypeORM', link: '/recipes/sql-typeorm' },
+            { text: 'Suites (Automock)', link: '/recipes/suites' },
+            { text: 'SWC', link: '/recipes/swc' },
+            { text: '健康检查', link: '/recipes/terminus' },
           ],
         },
         {
           text: '常见问题',
           collapsible: true,
+          collapsed: true,
           items: [
             { text: '错误', link: '/faq/errors' },
             { text: '全局前缀', link: '/faq/global-prefix' },
@@ -194,6 +223,7 @@ export default defineConfig({
         {
           text: '安全',
           collapsible: true,
+          collapsed: true,
           items: [
             { text: '安全', link: '/security/index' },
           ],
@@ -201,6 +231,7 @@ export default defineConfig({
         {
           text: '开发工具',
           collapsible: true,
+          collapsed: true,
           items: [
             { text: '概述', link: '/devtools/overview' },
             { text: 'CI/CD', link: '/devtools/ci-cd' },
@@ -209,13 +240,16 @@ export default defineConfig({
         {
           text: '生态与案例',
           collapsible: true,
+          collapsed: true,
           items: [
             { text: '谁在用', link: '/discover/who-uses' },
+            { text: '精彩资源', link: '/awesome' },
           ],
         },
         {
           text: '支持',
           collapsible: true,
+          collapsed: true,
           items: [
             { text: '支持', link: '/support/index' },
           ],
@@ -223,6 +257,7 @@ export default defineConfig({
         {
           text: '社区',
           collapsible: true,
+          collapsed: true,
           items: [
             { text: '贡献者', link: '/contributors' },
           ],

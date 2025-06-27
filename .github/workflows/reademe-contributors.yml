@@ -4,12 +4,36 @@ on:
     branches:
       - main
 name: Generate a list of contributors
+
 jobs:
-  contrib-readme-en-job:
+  contrib-readme-job:
     runs-on: ubuntu-latest
-    name: A job to automate contrib in readme
+    name: Update contributors in README and docs
     steps:
-      - name: Contribute List
-        uses: akhilmhdh/contributors-readme-action@v2.3.4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.CONTRIBUTORS_TOKEN }}
+      
+      - name: Update README contributors
+        uses: akhilmhdh/contributors-readme-action@v2.3.6
+        with:
+          readme_path: 'README.md'
+          use_username: true
+          max_columns: 6
+          image_size: 100
+          commit_message: 'docs: update README contributors'
+        env:
+          GITHUB_TOKEN: ${{ secrets.CONTRIBUTORS_TOKEN }}
+      
+      - name: Update docs contributors
+        uses: akhilmhdh/contributors-readme-action@v2.3.6
+        with:
+          readme_path: 'docs/contributors.md'
+          use_username: true
+          max_columns: 6
+          image_size: 100
+          commit_message: 'docs: update contributors page'
         env:
           GITHUB_TOKEN: ${{ secrets.CONTRIBUTORS_TOKEN }}

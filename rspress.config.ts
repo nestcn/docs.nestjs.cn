@@ -220,6 +220,13 @@ export default defineConfig({
             { text: '支持', link: '/support/index' },
           ],
         },
+        {
+          text: '社区',
+          collapsible: true,
+          items: [
+            { text: '贡献者', link: '/contributors' },
+          ],
+        },
       ],
     },
   },

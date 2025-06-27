@@ -64,3 +64,14 @@ $ npm run start
 要安装 JavaScript 版本的入门项目，在上述命令序列中使用 `javascript-starter.git`。
 
 你也可以通过安装核心和支持包从零开始新项目。请注意需要自行设置项目样板文件。至少需要以下依赖项：`@nestjs/core`、`@nestjs/common`、`rxjs` 和 `reflect-metadata`。查看这篇短文了解如何创建完整项目：[5 步从零创建最简 NestJS 应用！](https://dev.to/micalevisk/5-steps-to-create-a-bare-minimum-nestjs-app-from-scratch-5c3b)。
+
+---
+
+## 关于本文档
+
+本中文文档由社区贡献者共同维护。感谢所有[贡献者](/contributors)的努力，让更多中文开发者能够学习和使用 NestJS！
+
+如果你发现文档中的错误或希望改进内容，欢迎：
+- 在 [GitHub](https://github.com/nestcn/docs.nestjs.cn) 上提交 Issue
+- 直接提交 Pull Request 进行改进
+- 加入我们的贡献者行列

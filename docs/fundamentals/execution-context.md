@@ -126,6 +126,8 @@ const className = ctx.getClass().name; // "CatsController"
 
 能够访问当前类和处理器方法的引用提供了极大的灵活性。最重要的是，它使我们有机会在守卫或拦截器内部访问通过 `Reflector#createDecorator` 创建的装饰器或内置 `@SetMetadata()` 装饰器设置的元数据。我们将在下文介绍这个用例。
 
+<app-banner-enterprise></app-banner-enterprise>
+
 #### 反射与元数据
 
 Nest 提供了通过 `Reflector#createDecorator` 方法创建的装饰器以及内置 `@SetMetadata()` 装饰器将**自定义元数据**附加到路由处理程序的能力。在本节中，我们将比较这两种方法，并了解如何从守卫或拦截器内部访问元数据。
@@ -150,17 +152,32 @@ export const Roles = Reflector.createDecorator<string[]>();
 async create(@Body() createCatDto: CreateCatDto) {
   this.catsService.create(createCatDto);
 }
+@@switch
+@Post()
+@Roles(['admin'])
+@Bind(Body())
+async create(createCatDto) {
+  this.catsService.create(createCatDto);
+}
 ```
 
 这里我们将 `Roles` 装饰器元数据附加到 `create()` 方法上，表明只有具有 `admin` 角色的用户才被允许访问此路由。
 
-要访问路由的角色（自定义元数据），我们将再次使用 `Reflector` 辅助类。`Reflector` 可以通过常规方式注入到类中：
+为了访问路由的角色（自定义元数据），我们将再次使用 `Reflector` 辅助类。`Reflector` 可以通过常规方式注入到类中：
 
 ```typescript
 @@filename(roles.guard)
 @Injectable()
 export class RolesGuard {
   constructor(private reflector: Reflector) {}
+}
+@@switch
+@Injectable()
+@Dependencies(Reflector)
+export class CatsService {
+  constructor(reflector) {
+    this.reflector = reflector;
+  }
 }
 ```
 
@@ -178,6 +195,10 @@ const roles = this.reflector.get(Roles, context.getHandler());
 
 ```typescript
 @@filename(cats.controller)
+@Roles(['admin'])
+@Controller('cats')
+export class CatsController {}
+@@switch
 @Roles(['admin'])
 @Controller('cats')
 export class CatsController {}
@@ -202,6 +223,17 @@ export class CatsController {
   @Post()
   @Roles(['admin'])
   async create(@Body() createCatDto: CreateCatDto) {
+    this.catsService.create(createCatDto);
+  }
+}
+@@switch
+@Roles(['user'])
+@Controller('cats')
+export class CatsController {}
+  @Post()
+  @Roles(['admin'])
+  @Bind(Body())
+  async create(createCatDto) {
     this.catsService.create(createCatDto);
   }
 }
@@ -242,6 +274,13 @@ const roles = this.reflector.getAllAndMerge(Roles, [
 async create(@Body() createCatDto: CreateCatDto) {
   this.catsService.create(createCatDto);
 }
+@@switch
+@Post()
+@SetMetadata('roles', ['admin'])
+@Bind(Body())
+async create(createCatDto) {
+  this.catsService.create(createCatDto);
+}
 ```
 
 > info **注意** `@SetMetadata()` 装饰器是从 `@nestjs/common` 包中导入的。
@@ -253,6 +292,10 @@ async create(@Body() createCatDto: CreateCatDto) {
 import { SetMetadata } from '@nestjs/common';
 
 export const Roles = (...roles: string[]) => SetMetadata('roles', roles);
+@@switch
+import { SetMetadata } from '@nestjs/common';
+
+export const Roles = (...roles) => SetMetadata('roles', roles);
 ```
 
 这种方法更加简洁易读，某种程度上类似于 `Reflector#createDecorator` 的实现方式。不同之处在于，使用 `@SetMetadata` 您可以更好地控制元数据的键和值，并且可以创建接受多个参数的装饰器。
@@ -266,6 +309,13 @@ export const Roles = (...roles: string[]) => SetMetadata('roles', roles);
 async create(@Body() createCatDto: CreateCatDto) {
   this.catsService.create(createCatDto);
 }
+@@switch
+@Post()
+@Roles('admin')
+@Bind(Body())
+async create(createCatDto) {
+  this.catsService.create(createCatDto);
+}
 ```
 
 为了访问路由的角色信息（自定义元数据），我们将再次使用 `Reflector` 辅助类：
@@ -275,6 +325,14 @@ async create(@Body() createCatDto: CreateCatDto) {
 @Injectable()
 export class RolesGuard {
   constructor(private reflector: Reflector) {}
+}
+@@switch
+@Injectable()
+@Dependencies(Reflector)
+export class CatsService {
+  constructor(reflector) {
+    this.reflector = reflector;
+  }
 }
 ```
 

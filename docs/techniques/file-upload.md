@@ -25,7 +25,7 @@ uploadFile(@UploadedFile() file: Express.Multer.File) {
 }
 ```
 
-> **提示** `FileInterceptor()` 装饰器从 `@nestjs/platform-express` 包导出。`@UploadedFile()` 装饰器从 `@nestjs/common` 导出。
+> info **提示** `FileInterceptor()` 装饰器从 `@nestjs/platform-express` 包导出。`@UploadedFile()` 装饰器从 `@nestjs/common` 导出。
 
 `FileInterceptor()` 装饰器接收两个参数：
 
@@ -88,7 +88,16 @@ uploadFileAndPassValidation(
 
 如你所见，需要指定一个文件验证器数组，这些验证器将由 `ParseFilePipe` 执行。我们将讨论验证器的接口，但值得一提的是这个管道还有两个额外的**可选**选项：
 
-<table data-immersive-translate-walked="d5e56f2b-229d-43d2-b71f-be922dab53fb"><tbody data-immersive-translate-walked="d5e56f2b-229d-43d2-b71f-be922dab53fb"><tr data-immersive-translate-walked="d5e56f2b-229d-43d2-b71f-be922dab53fb"><td data-immersive-translate-walked="d5e56f2b-229d-43d2-b71f-be922dab53fb">errorHttpStatusCode</td><td data-immersive-translate-walked="d5e56f2b-229d-43d2-b71f-be922dab53fb" data-immersive-translate-paragraph="1">当任意验证器失败时抛出的 HTTP 状态码。默认为 400（错误请求）</td></tr><tr data-immersive-translate-walked="d5e56f2b-229d-43d2-b71f-be922dab53fb"><td data-immersive-translate-walked="d5e56f2b-229d-43d2-b71f-be922dab53fb">exceptionFactory</td><td data-immersive-translate-walked="d5e56f2b-229d-43d2-b71f-be922dab53fb" data-immersive-translate-paragraph="1">一个接收错误信息并返回错误的工厂函数。</td></tr></tbody></table>
+<table>
+  <tr>
+    <td><code>errorHttpStatusCode</code></td>
+    <td>当任意验证器失败时抛出的 HTTP 状态码。默认为 400（错误请求）</td>
+  </tr>
+  <tr>
+    <td><code>exceptionFactory</code></td>
+    <td>一个接收错误信息并返回错误的工厂函数。</td>
+  </tr>
+</table>
 
 现在回到 `FileValidator` 接口。要将验证器与此管道集成，你必须使用内置实现或提供自定义的 `FileValidator`。示例如下：
 
@@ -172,7 +181,7 @@ uploadFile(@UploadedFiles() files: Array<Express.Multer.File>) {
 }
 ```
 
-> **提示** `FilesInterceptor()` 装饰器从 `@nestjs/platform-express` 包导出。`@UploadedFiles()` 装饰器从 `@nestjs/common` 导出
+> info **提示** `FilesInterceptor()` 装饰器从 `@nestjs/platform-express` 包导出。`@UploadedFiles()` 装饰器从 `@nestjs/common` 导出
 
 #### 多个文件
 
@@ -195,6 +204,8 @@ uploadFile(@UploadedFiles() files: { avatar?: Express.Multer.File[], background?
 }
 ```
 
+> info **提示** `FileFieldsInterceptor()` 装饰器从 `@nestjs/platform-express` 包导出。`@UploadedFiles()` 装饰器从 `@nestjs/common` 导出。
+
 #### 任意文件
 
 要上传所有具有任意字段名键的字段，请使用 `AnyFilesInterceptor()` 装饰器。该装饰器可以接受一个可选的 `options` 对象，如上所述。
@@ -210,98 +221,24 @@ uploadFile(@UploadedFiles() files: Array<Express.Multer.File>) {
 }
 ```
 
-#### 无文件
-
-若要接收 `multipart/form-data` 但不允许上传任何文件，请使用 `NoFilesInterceptor`。这会将 multipart 数据设置为请求体上的属性。任何随请求发送的文件都将抛出 `BadRequestException`。
-
-```typescript
-@Post('upload')
-@UseInterceptors(NoFilesInterceptor())
-handleMultiPartData(@Body() body) {
-  console.log(body)
-}
-```
+> info **提示** `AnyFilesInterceptor()` 装饰器从 `@nestjs/platform-express` 包导出。`@UploadedFiles()` 装饰器从 `@nestjs/common` 导出。
 
 #### 默认选项
 
-如上述所述，您可以在文件拦截器中指定 multer 选项。要设置默认选项，可以在导入 `MulterModule` 时调用静态方法 `register()`，并传入支持的选项。您可以使用此处列出的所有选项 [here](https://github.com/expressjs/multer#multeropts)。
+您可以在 `MulterModule` 中设置 multer 选项。这些选项将被传递给 multer 构造函数。
 
 ```typescript
 MulterModule.register({
-  dest: './upload',
+  dest: '/upload',
 });
 ```
 
-> info **提示** `MulterModule` 类是从 `@nestjs/platform-express` 包中导出的。
+> info **提示** `MulterModule` 模块从 `@nestjs/platform-express` 包导出。
 
-#### 异步配置
+#### Azure 存储及其他云提供商
 
-当需要异步而非静态地设置 `MulterModule` 选项时，请使用 `registerAsync()` 方法。与大多数动态模块一样，Nest 提供了多种处理异步配置的技术。
+一个关于如何将 `nest-multer-storage` 与 Azure Storage 集成的示例可以在[这里](https://github.com/vahid-sohrabloo/nest-multer-storage/blob/master/examples/azure-storage.md)找到。
 
-其中一种技术是使用工厂函数：
+#### Fastify
 
-```typescript
-MulterModule.registerAsync({
-  useFactory: () => ({
-    dest: './upload',
-  }),
-});
-```
-
-与其他[工厂提供者](https://docs.nestjs.com/fundamentals/custom-providers#factory-providers-usefactory)类似，我们的工厂函数可以是 `async` 的，并能通过 `inject` 注入依赖项。
-
-```typescript
-MulterModule.registerAsync({
-  imports: [ConfigModule],
-  useFactory: async (configService: ConfigService) => ({
-    dest: configService.get<string>('MULTER_DEST'),
-  }),
-  inject: [ConfigService],
-});
-```
-
-或者，您也可以使用类而非工厂来配置 `MulterModule`，如下所示：
-
-```typescript
-MulterModule.registerAsync({
-  useClass: MulterConfigService,
-});
-```
-
-上述结构在 `MulterModule` 内部实例化 `MulterConfigService`，用它来创建所需的选项对象。请注意，在此示例中，`MulterConfigService` 必须实现 `MulterOptionsFactory` 接口，如下所示。`MulterModule` 将在提供的类的实例化对象上调用 `createMulterOptions()` 方法。
-
-```typescript
-@Injectable()
-class MulterConfigService implements MulterOptionsFactory {
-  createMulterOptions(): MulterModuleOptions {
-    return {
-      dest: './upload',
-    };
-  }
-}
-```
-
-若想复用现有的选项提供者而非在 `MulterModule` 内创建私有副本，请使用 `useExisting` 语法。
-
-```typescript
-MulterModule.registerAsync({
-  imports: [ConfigModule],
-  useExisting: ConfigService,
-});
-```
-
-你也可以向 `registerAsync()` 方法传递所谓的 `extraProviders`，这些提供者将与模块提供者合并。
-
-```typescript
-MulterModule.registerAsync({
-  imports: [ConfigModule],
-  useClass: ConfigService,
-  extraProviders: [MyAdditionalProvider],
-});
-```
-
-当需要向工厂函数或类构造函数提供额外依赖项时，这一功能非常实用。
-
-#### 示例
-
-一个可用的示例[在此处](https://github.com/nestjs/nest/tree/master/sample/29-file-upload)查看。
+使用 `FastifyAdapter` 时，你需要一个不同的文件拦截器。它不是基于 `multer`，而是使用了 `@fastify/multipart` 包。你可以在[这里](https://docs.nestjs.com/techniques/fastify#file-upload)找到相关文档。

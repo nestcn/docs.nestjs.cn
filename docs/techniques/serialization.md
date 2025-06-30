@@ -44,9 +44,9 @@ findOne(): UserEntity {
 }
 ```
 
-> **警告** 注意必须返回类的实例。如果返回普通的 JavaScript 对象（例如 `{{ '{' }} user: new UserEntity() {{ '}' }}` ），该对象将无法被正确序列化。
+> **警告** 注意必须返回类的实例。如果返回普通的 JavaScript 对象（例如 `{ user: new UserEntity() }` ），该对象将无法被正确序列化。
 
-> info **注意** `ClassSerializerInterceptor` 是从 `@nestjs/common` 导入的。
+> info **提示** `ClassSerializerInterceptor` 是从 `@nestjs/common` 导入的。
 
 当请求此端点时，客户端会收到以下响应：
 
@@ -127,7 +127,7 @@ findOne(@Query() { id }: { id: number }): UserEntity {
 }
 ```
 
-> info **注意** 通过为控制器指定预期的返回类型，你可以利用 TypeScript 的类型检查功能来确保返回的普通对象符合 DTO 或实体的结构。`plainToInstance` 函数不提供这种级别的类型提示，如果普通对象与预期的 DTO 或实体结构不匹配，可能会导致潜在错误。
+> info **提示** 通过为控制器指定预期的返回类型，你可以利用 TypeScript 的类型检查功能来确保返回的普通对象符合 DTO 或实体的结构。`plainToInstance` 函数不提供这种级别的类型提示，如果普通对象与预期的 DTO 或实体结构不匹配，可能会导致潜在错误。
 
 #### 示例
 

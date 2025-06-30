@@ -38,7 +38,7 @@ export class AppModule {}
 constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 ```
 
-> info **注意** `Cache` 类是从 `cache-manager` 导入的，而 `CACHE_MANAGER` 令牌则来自 `@nestjs/cache-manager` 包。
+> info **提示** `Cache` 类是从 `cache-manager` 导入的，而 `CACHE_MANAGER` 令牌则来自 `@nestjs/cache-manager` 包。
 
 `Cache` 实例（来自 `cache-manager` 包）上的 `get` 方法用于从缓存中检索项目。如果缓存中不存在该项目，将返回 `null`。
 
@@ -158,7 +158,7 @@ export class AppController {
 }
 ```
 
-> info **注意** `@CacheKey()` 和 `@CacheTTL()` 装饰器是从 `@nestjs/cache-manager` 包导入的。
+> info **提示** `@CacheKey()` 和 `@CacheTTL()` 装饰器是从 `@nestjs/cache-manager` 包导入的。
 
 `@CacheKey()` 装饰器可以单独使用，也可以与 `@CacheTTL()` 装饰器配合使用，反之亦然。开发者可以选择仅覆盖 `@CacheKey()` 或仅覆盖 `@CacheTTL()`。未被装饰器覆盖的配置将使用全局注册的默认值（参见[自定义缓存](https://docs.nestjs.com/techniques/caching#customize-caching) ）。
 
@@ -190,7 +190,7 @@ handleEvent(client: Client, data: string[]): Observable<string[]> {
 }
 ```
 
-> **提示** `@CacheTTL()` 装饰器可以单独使用，也可以与对应的 `@CacheKey()` 装饰器配合使用。
+> info **提示** `@CacheTTL()` 装饰器可以单独使用，也可以与对应的 `@CacheKey()` 装饰器配合使用。
 
 #### 调整追踪方式
 

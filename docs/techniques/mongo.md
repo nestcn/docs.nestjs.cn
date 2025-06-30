@@ -53,7 +53,7 @@ export class Cat {
 export const CatSchema = SchemaFactory.createForClass(Cat);
 ```
 
-> **提示** 请注意，你也可以使用 `DefinitionsFactory` 类（来自 `nestjs/mongoose`）生成原始模式定义。这允许你手动修改基于所提供元数据生成的模式定义。对于某些难以完全用装饰器表示的边缘情况，这非常有用。
+> info **提示** 请注意，你也可以使用 `DefinitionsFactory` 类（来自 `nestjs/mongoose`）生成原始模式定义。这允许你手动修改基于所提供元数据生成的模式定义。对于某些难以完全用装饰器表示的边缘情况，这非常有用。
 
 `@Schema()` 装饰器将一个类标记为模式定义。它将我们的 `Cat` 类映射到同名的 MongoDB 集合，但末尾会添加一个"s"——因此最终的 Mongo 集合名称将是 `cats`。该装饰器接受一个可选参数，即模式选项对象。可以将其视为通常作为 `mongoose.Schema` 类构造函数的第二个参数传递的对象（例如 `new mongoose.Schema(_, options)` ）。要了解有关可用模式选项的更多信息，请参阅[本章](https://mongoosejs.com/docs/guide.html#options) 。
 
@@ -172,6 +172,28 @@ export class CatsService {
   }
 
   async findAll(): Promise<Cat[]> {
+    return this.catModel.find().exec();
+  }
+}
+@@switch
+import { Model } from 'mongoose';
+import { Injectable, Dependencies } from '@nestjs/common';
+import { getModelToken } from '@nestjs/mongoose';
+import { Cat } from './schemas/cat.schema';
+
+@Injectable()
+@Dependencies(getModelToken(Cat.name))
+export class CatsService {
+  constructor(catModel) {
+    this.catModel = catModel;
+  }
+
+  async create(createCatDto) {
+    const createdCat = new this.catModel(createCatDto);
+    return createdCat.save();
+  }
+
+  async findAll() {
     return this.catModel.find().exec();
   }
 }
@@ -402,7 +424,7 @@ export class Event {
 export const EventSchema = SchemaFactory.createForClass(Event);
 ```
 
-> info **注意** Mongoose 通过"鉴别键"来区分不同的鉴别器模型，默认情况下该键为 `__t`。Mongoose 会在您的模式中添加一个名为 `__t` 的字符串路径，用于跟踪该文档属于哪个鉴别器的实例。您也可以使用 `discriminatorKey` 选项来定义鉴别路径。
+> info **提示** Mongoose 通过"鉴别键"来区分不同的鉴别器模型，默认情况下该键为 `__t`。Mongoose 会在您的模式中添加一个名为 `__t` 的字符串路径，用于跟踪该文档属于哪个鉴别器的实例。您也可以使用 `discriminatorKey` 选项来定义鉴别路径。
 
 `SignedUpEvent` 和 `ClickedLinkEvent` 实例将与通用事件存储在同一集合中。
 

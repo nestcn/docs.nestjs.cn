@@ -166,12 +166,12 @@ export class CatsService {
         catchError((error: AxiosError) => {
           this.logger.error(error.response.data);
           throw 'An error happened!';
-        })
-      )
+        }),
+      ),
     );
     return data;
   }
 }
 ```
 
-> info 访问 RxJS 文档查看 `firstValueFrom` 与 `lastValueFrom` 之间的区别。
+> info **提示** 请访问 RxJS 关于 [`firstValueFrom`](https://rxjs.dev/api/index/function/firstValueFrom) 和 [`lastValueFrom`](https://rxjs.dev/api/index/function/lastValueFrom) 的文档，以了解它们之间的区别。

@@ -15,7 +15,6 @@ $ npm i --save @nestjs/event-emitter
 安装完成后，将 `EventEmitterModule` 导入根模块 `AppModule`，并运行静态方法 `forRoot()`，如下所示：
 
 ```typescript
-@@filename(app.module)
 import { Module } from '@nestjs/common';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 
@@ -58,7 +57,7 @@ EventEmitterModule.forRoot({
 constructor(private eventEmitter: EventEmitter2) {}
 ```
 
-> **提示** 从 `@nestjs/event-emitter` 包中导入 `EventEmitter2`。
+> info **提示** 从 `@nestjs/event-emitter` 包中导入 `EventEmitter2`。
 
 然后在类中按如下方式使用：
 

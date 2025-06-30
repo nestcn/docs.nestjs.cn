@@ -6,11 +6,11 @@
 
 我们还将介绍如何解决模块间的循环依赖问题。
 
-> warning **警告** 使用"barrel files"/index.ts 文件分组导入时也可能导致循环依赖。涉及模块/提供者类时应忽略 barrel 文件。例如，在导入与 barrel 文件同目录下的文件时不应使用 barrel 文件，即 `cats/cats.controller` 不应通过导入 `cats` 来引入 `cats/cats.service` 文件。更多详情请参阅[此 GitHub issue](https://github.com/nestjs/nest/issues/1181#issuecomment-430197191)。
+> warning **警告** 使用“桶文件”/index.ts 文件对导入进行分组也可能导致循环依赖。在涉及模块/提供者类时，应省略桶文件。例如，在导入与桶文件位于同一目录中的文件时不应使用桶文件，即 `cats/cats.controller` 不应导入 `cats` 来导入 `cats/cats.service` 文件。更多详情请参阅[此 GitHub issue](https://github.com/nestjs/nest/issues/1181#issuecomment-430197191)。
 
 #### 前向引用
 
-**前向引用**允许 Nest 通过 `forwardRef()` 工具函数引用尚未定义的类。例如，若 `CatsService` 与 `CommonService` 相互依赖，双方都可以使用 `@Inject()` 和 `forwardRef()` 工具来解决循环依赖。否则 Nest 将无法实例化它们，因为所有必要的元数据都不可用。示例如下：
+**前向引用**允许 Nest 通过 `forwardRef()` 工具函数引用尚未定义的类。例如，如果 `CatsService` 和 `CommonService` 相互依赖，关系的两侧都可以使用 `@Inject()` 和 `forwardRef()` 工具来解决循环依赖。否则，Nest 将不会实例化它们，因为所有必要的元数据都将不可用。示例如下：
 
 ```typescript
 @@filename(cats.service)
@@ -21,11 +21,19 @@ export class CatsService {
     private commonService: CommonService,
   ) {}
 }
+@@switch
+@Injectable()
+@Dependencies(forwardRef(() => CommonService))
+export class CatsService {
+  constructor(commonService) {
+    this.commonService = commonService;
+  }
+}
 ```
 
 > info **提示** `forwardRef()` 函数是从 `@nestjs/common` 包中导入的。
 
-这涵盖了关系的一侧。现在让我们对 `CommonService` 进行同样的操作：
+这涵盖了关系的一侧。现在让我们对 `CommonService` 做同样的事情：
 
 ```typescript
 @@filename(common.service)
@@ -36,17 +44,25 @@ export class CommonService {
     private catsService: CatsService,
   ) {}
 }
+@@switch
+@Injectable()
+@Dependencies(forwardRef(() => CatsService))
+export class CommonService {
+  constructor(catsService) {
+    this.catsService = catsService;
+  }
+}
 ```
 
-> warning **警告** 实例化顺序是不确定的。请确保您的代码不依赖于哪个构造函数先被调用。循环依赖若依赖于具有 `Scope.REQUEST` 的提供者，可能导致未定义的依赖关系。更多信息请参见 [此处](https://github.com/nestjs/nest/issues/5778)
+> warning **警告** 实例化顺序是不确定的。请确保您的代码不依赖于首先调用哪个构造函数。依赖于具有 `Scope.REQUEST` 的提供者的循环依赖可能导致未定义的依赖关系。更多信息请参见[此处](https://github.com/nestjs/nest/issues/5778)。
 
 #### ModuleRef 类的替代方案
 
-An alternative to using `forwardRef()` is to refactor your code and use the `ModuleRef` class to retrieve a provider on one side of the (otherwise) circular relationship. Learn more about the `ModuleRef` utility class [here](/fundamentals/module-ref).
+除了使用 `forwardRef()`，另一种方法是重构您的代码，并使用 `ModuleRef` 类在（原本）循环关系的一侧检索提供者。在[此处](/fundamentals/module-ref)了解有关 `ModuleRef` 实用工具类的更多信息。
 
-#### Module forward reference
+#### 模块前向引用
 
-In order to resolve circular dependencies between modules, use the same `forwardRef()` utility function on both sides of the modules association. For example:
+为了解决模块之间的循环依赖，请在模块关联的两侧使用相同的 `forwardRef()` 工具函数。例如：
 
 ```typescript
 @@filename(common.module)
@@ -56,7 +72,7 @@ In order to resolve circular dependencies between modules, use the same `forward
 export class CommonModule {}
 ```
 
-That covers one side of the relationship. Now let's do the same with `CatsModule`:
+这涵盖了关系的一侧。现在让我们对 `CatsModule` 做同样的事情：
 
 ```typescript
 @@filename(cats.module)

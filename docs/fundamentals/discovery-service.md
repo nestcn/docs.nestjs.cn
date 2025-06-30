@@ -26,6 +26,14 @@ export class ExampleModule {}
 export class ExampleService {
   constructor(private readonly discoveryService: DiscoveryService) {}
 }
+@@switch
+@Injectable()
+@Dependencies(DiscoveryService)
+export class ExampleService {
+  constructor(discoveryService) {
+    this.discoveryService = discoveryService;
+  }
+}
 ```
 
 #### 发现提供者和控制器

@@ -18,7 +18,6 @@ $ npm install --save hbs
 我们使用了 `hbs`（[Handlebars](https://github.com/pillarjs/hbs#readme)）模板引擎，当然你也可以根据需求选择其他引擎。安装完成后，需要通过以下代码配置 express 实例：
 
 ```typescript
-@@filename(main)
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
@@ -60,7 +59,6 @@ bootstrap();
 接下来，打开 `app.controller` 文件，将 `root()` 方法替换为以下代码：
 
 ```typescript
-@@filename(app.controller)
 import { Get, Controller, Render } from '@nestjs/common';
 
 @Controller()
@@ -81,11 +79,10 @@ export class AppController {
 
 如果应用逻辑需要动态决定渲染哪个模板，则应使用 `@Res()` 装饰器，并在路由处理器中提供视图名称，而非在 `@Render()` 装饰器中指定：
 
-> info **注意** 当 Nest 检测到 `@Res()` 装饰器时，会注入特定库的 `response` 对象。我们可以利用该对象动态渲染模板。了解更多关于 `response` 对象 API 的信息请[点击此处](https://expressjs.com/en/api.html) 。
+> info **提示** 当 Nest 检测到 `@Res()` 装饰器时，会注入特定库的 `response` 对象。我们可以利用该对象动态渲染模板。了解更多关于 `response` 对象 API 的信息请[点击此处](https://expressjs.com/en/api.html) 。
 
 ```typescript
-@@filename(app.controller)
-import { Get, Controller, Res, Render } from '@nestjs/common';
+import { Get, Controller, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { AppService } from './app.service';
 
@@ -118,7 +115,6 @@ $ npm i --save @fastify/static @fastify/view handlebars
 接下来的步骤与 Express 几乎相同，仅存在一些平台特有的细微差异。安装过程完成后，打开 `main.ts` 文件并更新其内容：
 
 ```typescript
-@@filename(main)
 import { NestFactory } from '@nestjs/core';
 import { NestFastifyApplication, FastifyAdapter } from '@nestjs/platform-fastify';
 import { AppModule } from './app.module';
@@ -149,7 +145,6 @@ Fastify API 存在一些差异，但这些方法调用的最终结果相同。�
 配置方式如下：
 
 ```typescript
-@@filename(app.controller)
 import { Get, Controller, Render } from '@nestjs/common';
 
 @Controller()

@@ -18,7 +18,7 @@ $ npm i --save @nestjs/config
 
 > info **提示** `@nestjs/config` 包内部使用了 [dotenv](https://github.com/motdotla/dotenv)。
 
-> warning **Note**`@nestjs/config` 需要 TypeScript 4.1 或更高版本。
+> warning **注意**`@nestjs/config` 需要 TypeScript 4.1 或更高版本。
 
 #### 快速开始
 
@@ -188,6 +188,8 @@ export default () => {
 
 现在，如果端口超出指定范围，应用程序将在启动时抛出错误。
 
+<app-banner-devtools></app-banner-devtools>
+
 #### 使用 `ConfigService`
 
 要从 `ConfigService` 获取配置值，首先需要注入 `ConfigService`。与任何提供程序一样，需将其所属模块——`ConfigModule`——导入到将使用它的模块中（除非在传递给 `ConfigModule.forRoot()` 方法的选项对象中将 `isGlobal` 属性设为 `true`）。如下所示将其导入功能模块。
@@ -281,7 +283,7 @@ constructor(private configService: ConfigService<{ PORT: number }, true>) {
 }
 ```
 
-info **提示** 为确保 `ConfigService#get` 方法仅从自定义配置文件中获取值而忽略 `process.env` 变量，请在 `ConfigModule` 的 `forRoot()` 方法的选项对象中将 `skipProcessEnv` 选项设为 `true`。
+> info **提示** 为确保 `ConfigService#get` 方法仅从自定义配置文件中获取值而忽略 `process.env` 变量，请在 `ConfigModule` 的 `forRoot()` 方法的选项对象中将 `skipProcessEnv` 选项设为 `true`。
 
 #### 配置命名空间
 

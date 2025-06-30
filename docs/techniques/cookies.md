@@ -98,9 +98,9 @@ findAll(@Res({ passthrough: true }) response: FastifyReply) {
 
 要了解更多关于 `FastifyReply#setCookie()` 方法的信息，请查看此[页面](https://github.com/fastify/fastify-cookie#sending) 。
 
-> warning **警告** 若要将响应处理逻辑交由框架处理，请记得将 `passthrough` 选项设为 `true`，如上所示。更多信息请参阅[此处](/controllers#library-specific-approach) 。
+> warning **警告** 如果希望将响应处理逻辑交由框架处理，请记得将 `passthrough` 选项设为 `true`，如上所示。更多信息请参阅 [此处](/controllers#library-specific-approach) 。
 
-> info **提示** `@Res()` 装饰器需从 `@nestjs/common` 导入，而 `FastifyReply` 则来自 `fastify` 包。
+> info **提示** `@Res()` 装饰器从 `@nestjs/common` 导入，而 `FastifyReply` 则来自 `fastify` 包。
 
 #### 创建自定义装饰器（跨平台）
 

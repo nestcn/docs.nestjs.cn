@@ -8,19 +8,19 @@
 
 <table>
   <tr>
-    <td><a href='#uri-版本控制类型'><code>URI Versioning</code></a></td>
+    <td>URI Versioning</td>
     <td>版本将通过请求的 URI 传递（默认）</td>
   </tr>
   <tr>
-    <td><a href='#头部-版本控制类型'><code>Header Versioning</code></a></td>
+    <td>Header Versioning</td>
     <td>自定义请求头将指定版本</td>
   </tr>
   <tr>
-    <td><a href='#媒体类型-版本控制类型'><code>Media Type Versioning</code></a></td>
+    <td>Media Type Versioning</td>
     <td>请求的 Accept 头将指定版本</td>
   </tr>
   <tr>
-    <td><a href='#自定义-版本控制类型'><code>Custom Versioning</code></a></td>
+    <td>Custom Versioning</td>
     <td>请求的任何部分都可用于指定版本，并提供了自定义函数来提取所述版本。</td>
   </tr>
 </table>
@@ -34,7 +34,6 @@ URI 版本控制使用请求 URI 中传递的版本号，例如 `https://example
 要为您的应用程序启用 URI 版本控制，请执行以下操作：
 
 ```typescript
-@@filename(main)
 const app = await NestFactory.create(AppModule);
 // or "app.enableVersioning()"
 app.enableVersioning({
@@ -51,12 +50,11 @@ await app.listen(process.env.PORT ?? 3000);
 
 头部版本控制通过自定义的用户指定请求头来指定版本，该请求头的值将作为请求使用的版本号。
 
-头部版本控制的 HTTP 请求示例：
+HTTP 头部版本控制的示例请求：
 
 要为您的应用程序启用**头部版本控制** ，请执行以下操作：
 
 ```typescript
-@@filename(main)
 const app = await NestFactory.create(AppModule);
 app.enableVersioning({
   type: VersioningType.HEADER,
@@ -78,7 +76,6 @@ await app.listen(process.env.PORT ?? 3000);
 要为应用程序启用**媒体类型版本控制** ，请执行以下操作：
 
 ```typescript
-@@filename(main)
 const app = await NestFactory.create(AppModule);
 app.enableVersioning({
   type: VersioningType.MEDIA_TYPE,
@@ -89,7 +86,7 @@ await app.listen(process.env.PORT ?? 3000);
 
 `key` 属性应作为包含版本信息的键值对的键名和分隔符。例如 `Accept: application/json;v=2` 中，`key` 属性应设置为 `v=`。
 
-> info **提示** `VersioningType` 枚举可用于 `type` 属性，该枚举从 `@nestjs/common` 包导入。
+> **提示** `VersioningType` 枚举可用于 `type` 属性，该枚举从 `@nestjs/common` 包导入。
 
 #### 自定义版本控制类型
 
@@ -139,7 +136,6 @@ await app.listen(process.env.PORT ?? 3000);
 要为控制器添加版本，请执行以下操作：
 
 ```typescript
-@@filename(cats.controller)
 @Controller({
   version: '1',
 })
@@ -158,7 +154,6 @@ export class CatsControllerV1 {
 要为单个路由添加版本，请执行以下操作：
 
 ```typescript
-@@filename(cats.controller)
 import { Controller, Get, Version } from '@nestjs/common';
 
 @Controller()
@@ -184,7 +179,6 @@ export class CatsController {
 添加多个版本的操作如下：
 
 ```typescript
-@@filename(cats.controller)
 @Controller({
   version: ['1', '2'],
 })

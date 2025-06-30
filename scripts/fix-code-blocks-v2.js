@@ -107,7 +107,7 @@ class CodeBlockFixer {
       }
     });
 
-    // 处理不完整的代码块（缺少结束标记）- 但排除引用块中的代码
+    // 处理不完整的代码块（缺少结束标记）- 但排除引用块中的代码和表格
     const result3 = result2.replace(/^```(\w+)(\s+title="[^"]*")?\n([\s\S]*?)(\n(?=[#\n]|$))/gm, (match, lang, titlePart, codeContent, endPart) => {
       // 检查是否已经有结束的```
       if (codeContent.includes('\n```')) {
@@ -121,6 +121,12 @@ class CodeBlockFixer {
       const lastLine = lines[lines.length - 1];
       if (lastLine.trim().startsWith('>')) {
         return match; // 在引用块内，不处理
+      }
+      
+      // 检查是否在表格中（避免修改表格链接中的内容）
+      const isInTable = beforeMatch.split('\n').slice(-5).some(line => line.includes('|'));
+      if (isInTable) {
+        return match; // 在表格中，不处理
       }
       
       // 检查代码内容是否看起来像是被截断的
@@ -137,6 +143,7 @@ class CodeBlockFixer {
       return match;
     });
 
+    // 不要自动修复模板语法，这些应该手动检查
     return result3;
   }
 

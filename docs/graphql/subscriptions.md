@@ -98,7 +98,7 @@ type Subscription {
 }
 ```
 
-这表明订阅必须返回一个顶层属性名为 `commentAdded` 的对象，其值为 `Comment` 对象。关键点在于：`PubSub#publish` 方法发出的事件负载结构必须与订阅预期的返回值结构相对应。因此在上例中， `pubSub.publish('commentAdded', {{ '{' }} commentAdded: newComment {{ '}' }})` 语句发布了带有正确结构负载的 `commentAdded` 事件。如果结构不匹配，您的订阅将在 GraphQL 验证阶段失败。
+这表明订阅必须返回一个顶层属性名为 `commentAdded` 的对象，其值为 `Comment` 对象。关键点在于：`PubSub#publish` 方法发出的事件负载结构必须与订阅预期的返回值结构相对应。因此在上例中， `pubSub.publish('commentAdded', { commentAdded: newComment })` 语句发布了带有正确结构负载的 `commentAdded` 事件。如果结构不匹配，您的订阅将在 GraphQL 验证阶段失败。
 
 #### 过滤订阅内容
 
@@ -127,7 +127,7 @@ commentAdded() {
 }
 ```
 
-> warning **注意** 如果使用 `resolve` 选项，应当返回未经包装的有效载荷（例如在我们的示例中，直接返回 `newComment` 对象，而非 `{{ '{' }} commentAdded: newComment {{ '}' }}` 对象）。
+> warning **注意** 如果使用 `resolve` 选项，应当返回未经包装的有效载荷（例如在我们的示例中，直接返回 `newComment` 对象，而非 `{ commentAdded: newComment }` 对象）。
 
 如需访问注入的提供程序（例如使用外部服务验证数据），请采用以下构造方式。
 
@@ -435,7 +435,7 @@ type Subscription {
 }
 ```
 
-这表明订阅必须返回一个顶级属性名为 `commentAdded` 的对象，其值为 `Comment` 对象。关键点在于：`PubSub#publish` 方法发出的事件负载结构必须与订阅期望返回值的结构相对应。因此在上例中， `pubSub.publish({{ '{' }} topic: 'commentAdded', payload: {{ '{' }} commentAdded: newComment {{ '}' }} {{ '}' }})` 语句发布的 `commentAdded` 事件带有正确结构的负载。若结构不匹配，订阅将在 GraphQL 验证阶段失败。
+这表明订阅必须返回一个顶级属性名为 `commentAdded` 的对象，其值为 `Comment` 对象。关键点在于：`PubSub#publish` 方法发出的事件负载结构必须与订阅期望返回值的结构相对应。因此在上例中， `pubSub.publish({ topic: 'commentAdded', payload: { commentAdded: newComment } })` 语句发布的 `commentAdded` 事件带有正确结构的负载。若结构不匹配，订阅将在 GraphQL 验证阶段失败。
 
 #### 订阅过滤
 

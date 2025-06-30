@@ -157,7 +157,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 
 我们已按照前述方法为所有 Passport 策略实现了配置。在使用 passport-local 的案例中，由于没有配置选项，我们的构造函数仅调用 `super()` 而不传入选项对象。
 
-> **提示** 我们可以在调用 `super()` 时传入选项对象来自定义 passport 策略的行为。本例中，passport-local 策略默认要求请求体包含名为 `username` 和 `password` 的属性。通过传入选项对象可指定不同的属性名，例如： `super({{ '{' }} usernameField: 'email' {{ '}' }})` 。更多信息请参阅 [Passport 文档](http://www.passportjs.org/docs/configure/) 。
+> **提示** 我们可以在调用 `super()` 时传入选项对象来自定义 passport 策略的行为。本例中，passport-local 策略默认要求请求体包含名为 `username` 和 `password` 的属性。通过传入选项对象可指定不同的属性名，例如： `super({ usernameField: 'email' })` 。更多信息请参阅 [Passport 文档](http://www.passportjs.org/docs/configure/) 。
 
 我们还实现了 `validate()` 方法。对于每个策略，Passport 会使用特定策略的参数集合来调用验证函数（在 `@nestjs/passport` 中通过 `validate()` 方法实现）。对于 local-strategy，Passport 期望 `validate()` 方法具有以下签名： `validate(username: string, password:string): any` 。
 

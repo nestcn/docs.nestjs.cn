@@ -77,7 +77,7 @@ type Author {
 title: string;
 ```
 
-info **提示** 你也可以为整个对象类型添加描述或标记为已弃用： `@ObjectType({{ '{' }} description: 'Author model' {{ '}' }})` 。
+info **提示** 你也可以为整个对象类型添加描述或标记为已弃用： `@ObjectType({ description: 'Author model' })` 。
 
 当字段为数组类型时，必须在 `Field()` 装饰器的类型函数中手动声明数组类型，如下所示：
 
@@ -222,7 +222,7 @@ type Query {
 
 #### 查询装饰器选项
 
-`@Query()` 装饰器的选项对象（我们在上面传递 `{{ '{' }}name: 'author'{{ '}' }}` 的地方）接受多个键/值对：
+`@Query()` 装饰器的选项对象（我们在上面传递 `{name: 'author'}` 的地方）接受多个键/值对：
 
 - `name`: 查询名称；一个 `string` 类型
 - `description`: 用于生成 GraphQL 模式文档的描述（例如在 GraphQL playground 中）；一个 `string` 类型

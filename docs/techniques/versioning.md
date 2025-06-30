@@ -8,20 +8,20 @@
 
 <table>
   <tr>
-    <td><a href='techniques/versioning#uri-versioning-type'><code>URI Versioning</code></a></td>
+    <td>URI Versioning</td>
     <td>版本将通过请求的 URI 传递（默认）</td>
   </tr>
   <tr>
-    <td><a href='techniques/versioning#header-versioning-type'><code>Header Versioning</code></a></td>
+    <td>Header Versioning</td>
     <td>自定义请求头将指定版本</td>
   </tr>
   <tr>
-    <td><a href='techniques/versioning#media-type-versioning-type'><code>Media Type Versioning</code></a></td>
-    <td>请求的 <code>Accept</code> 头将指定版本</td>
+    <td>Media Type Versioning</td>
+    <td>请求的 Accept 头将指定版本</td>
   </tr>
   <tr>
-    <td><a href='techniques/versioning#custom-versioning-type'><code>Custom Versioning</code></a></td>
-    <td>请求的任何部分都可用于指定版本(s)。提供自定义函数来提取所述版本(s)。</td>
+    <td>Custom Versioning</td>
+    <td>请求的任何部分都可用于指定版本。提供了自定义函数来提取所述版本。</td>
   </tr>
 </table>
 

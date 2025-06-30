@@ -23,7 +23,7 @@ const loggerMiddleware: FieldMiddleware = async (
 };
 ```
 
-> info **提示** `MiddlewareContext` 是一个包含与 GraphQL 解析器函数通常接收的相同参数的对象 ( `{{ '{' }} source, args, context, info {{ '}' }}` )，而 `NextFn` 是一个允许您执行堆栈中下一个中间件（绑定到此字段）或实际字段解析器的函数。
+> info **提示** `MiddlewareContext` 是一个包含与 GraphQL 解析器函数通常接收的相同参数的对象 ( `{ source, args, context, info }` )，而 `NextFn` 是一个允许您执行堆栈中下一个中间件（绑定到此字段）或实际字段解析器的函数。
 
 > warning **注意** 字段中间件函数无法注入依赖项也无法访问 Nest 的 DI 容器，因为它们被设计得非常轻量级且不应执行任何可能耗时的操作（如从数据库检索数据）。如果您需要调用外部服务/从数据源查询数据，应在绑定到根查询/变更处理程序的守卫/拦截器中完成，并将其分配给可从字段中间件内部（特别是从 `MiddlewareContext` 对象中）访问的 `context` 对象。
 

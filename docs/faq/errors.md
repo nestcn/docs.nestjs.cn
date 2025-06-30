@@ -63,7 +63,7 @@ Nest 无法解析 <provider> 的依赖项（?）。
 解决方案：
 
 - 对于 **Yarn** Workspaces，使用 [nohoist 特性](https://classic.yarnpkg.com/blog/2018/02/15/nohoist)来阻止提升 `@nestjs/core` 包。
-- 对于 **pnpm** 工作区，请在其他模块中将 `@nestjs/core` 设置为 peerDependencies，并在导入该模块的应用 package.json 中添加 `"dependenciesMeta": {{ '{' }}"other-module-name": {{ '{' }}"injected": true &#125;&#125;` 。参见：[dependenciesmetainjected](https://pnpm.io/package_json#dependenciesmetainjected)
+- 对于 **pnpm** 工作区，请在其他模块中将 `@nestjs/core` 设置为 peerDependencies，并在导入该模块的应用 package.json 中添加 `"dependenciesMeta": {"other-module-name": {"injected": true}}` 。参见：[dependenciesmetainjected](https://pnpm.io/package_json#dependenciesmetainjected)
 
 #### "循环依赖"错误
 

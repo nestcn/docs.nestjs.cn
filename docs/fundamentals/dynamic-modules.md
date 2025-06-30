@@ -273,7 +273,7 @@ export const CONFIG_OPTIONS = 'CONFIG_OPTIONS';
 
 当创建模块时：
 
-- `register`，表示你希望配置一个动态模块，该配置仅由调用模块使用。例如，使用 Nest 的 `@nestjs/axios`： `HttpModule.register({{ '{' }} baseUrl: 'someUrl' {{ '}' }})` 。如果在另一个模块中使用 `HttpModule.register({{ '{' }} baseUrl: 'somewhere else' {{ '}' }})` ，它将具有不同的配置。你可以根据需要为任意多个模块进行此操作。
+- `register`，表示你希望配置一个动态模块，该配置仅由调用模块使用。例如，使用 Nest 的 `@nestjs/axios`： `HttpModule.register({ baseUrl: 'someUrl' })` 。如果在另一个模块中使用 `HttpModule.register({ baseUrl: 'somewhere else' })` ，它将具有不同的配置。你可以根据需要为任意多个模块进行此操作。
 - `forRoot`，表示你希望一次性配置动态模块，并在多个地方复用该配置（尽管可能由于抽象而不知情）。这就是为什么你只有一个 `GraphQLModule.forRoot()`、一个 `TypeOrmModule.forRoot()` 等。
 - `forFeature`，表示你希望使用动态模块的 `forRoot` 配置，但需要根据调用模块的需求修改某些特定配置（例如该模块应访问哪些存储库，或记录器应使用的上下文）。
 

@@ -7,7 +7,9 @@
     "build": "rspress build",
     "dev": "rspress dev",
     "preview": "rspress preview",
-    "fix-code-blocks": "node scripts/fix-code-blocks-v2.js"
+    "fix-code-blocks": "node scripts/fix-code-blocks-v2.js",
+    "fix-template-syntax": "node scripts/fix-template-syntax.js",
+    "fix-all": "npm run fix-code-blocks && npm run fix-template-syntax"
   },
   "dependencies": {
     "glob": "^11.0.3",

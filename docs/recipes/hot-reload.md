@@ -50,7 +50,7 @@ module.exports = function (options, webpack) {
 };
 ```
 
-> **提示** 使用 **Yarn Berry**（非经典 Yarn）时，不要在 `externals` 配置属性中使用 `nodeExternals`，而应改用 `webpack-pnp-externals` 包中的 `WebpackPnpExternals`： `WebpackPnpExternals({{ '{' }} exclude: ['webpack/hot/poll?100'] {{ '}' }})` 。
+> **提示** 使用 **Yarn Berry**（非经典 Yarn）时，不要在 `externals` 配置属性中使用 `nodeExternals`，而应改用 `webpack-pnp-externals` 包中的 `WebpackPnpExternals`： `WebpackPnpExternals({ exclude: ['webpack/hot/poll?100'] })` 。
 
 该函数第一个参数接收包含默认 webpack 配置的原始对象，第二个参数接收 Nest CLI 使用的底层 `webpack` 包引用。它返回一个修改后的 webpack 配置，其中包含 `HotModuleReplacementPlugin`、`WatchIgnorePlugin` 和 `RunScriptWebpackPlugin` 插件。
 
@@ -141,7 +141,7 @@ module.exports = {
 };
 ```
 
-> **提示** 使用 **Yarn Berry**（非经典版 Yarn）时，不要在 `externals` 配置属性中使用 `nodeExternals`，而应改用 `webpack-pnp-externals` 包中的 `WebpackPnpExternals`： `WebpackPnpExternals({{ '{' }} exclude: ['webpack/hot/poll?100'] {{ '}' }})` 。
+> **提示** 使用 **Yarn Berry**（非经典版 Yarn）时，不要在 `externals` 配置属性中使用 `nodeExternals`，而应改用 `webpack-pnp-externals` 包中的 `WebpackPnpExternals`： `WebpackPnpExternals({ exclude: ['webpack/hot/poll?100'] })` 。
 
 此配置向 webpack 说明了关于应用程序的几个关键信息：入口文件的位置、存放**编译后**文件的目录，以及用于编译源文件的加载器类型。通常即使您不完全理解所有选项，也可以直接使用此文件。
 

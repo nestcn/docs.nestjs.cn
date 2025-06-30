@@ -719,7 +719,7 @@ export class AudioConsumer {
 async transcode(job: Job<unknown>) { ... }
 ```
 
-> warning **注意** 当为同一队列定义多个消费者时， `@Process({{ '{' }} concurrency: 1 {{ '}' }})` 中的 `concurrency` 选项将不会生效。最低 `concurrency` 值将与定义的消费者数量匹配。即使 `@Process()` 处理器使用不同的`名称`来处理命名任务，此规则同样适用。
+> warning **注意** 当为同一队列定义多个消费者时， `@Process({ concurrency: 1 })` 中的 `concurrency` 选项将不会生效。最低 `concurrency` 值将与定义的消费者数量匹配。即使 `@Process()` 处理器使用不同的`名称`来处理命名任务，此规则同样适用。
 
 #### 请求作用域的消费者
 

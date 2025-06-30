@@ -82,7 +82,7 @@ create(@Body() createUserDto: CreateUserDto) {
 
 > info **提示** 由于 TypeScript 不会存储关于**泛型或接口**的元数据，当你在 DTO 中使用它们时，`ValidationPipe` 可能无法正确验证传入数据。因此，请考虑在 DTO 中使用具体类。
 
-> info **提示** 导入 DTO 时，不能使用仅类型导入，因为这在运行时会被擦除，即记得使用 `import {{ '{' }} CreateUserDto {{ '}' }}` 而不是 `import type {{ '{' }} CreateUserDto {{ '}' }}` 。
+> info **提示** 导入 DTO 时，不能使用仅类型导入，因为这在运行时会被擦除，即记得使用 `import { CreateUserDto }` 而不是 `import type { CreateUserDto }` 。
 
 现在我们可以在 `CreateUserDto` 中添加一些验证规则。我们使用 `class-validator` 包提供的装饰器来实现这一点，具体描述见[此处](https://github.com/typestack/class-validator#validation-decorators) 。通过这种方式，任何使用 `CreateUserDto` 的路由都会自动执行这些验证规则。
 

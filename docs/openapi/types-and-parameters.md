@@ -13,7 +13,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 基于 `CreateCatDto`，Swagger UI 将创建以下模型定义：
 
-![](/assets/swagger-dto.png)
+<figure><img src="/assets/swagger-dto.png" /></figure>
 
 如你所见，虽然该类已声明了几个属性，但定义仍是空的。为了让类属性对 `SwaggerModule` 可见，我们必须用 `@ApiProperty()` 装饰器标注它们，或者使用 CLI 插件（详见**插件**章节）来自动完成这一操作：
 
@@ -36,7 +36,7 @@ export class CreateCatDto {
 
 让我们打开浏览器验证生成的 `CreateCatDto` 模型：
 
-![](/assets/swagger-dto2.png)
+<figure><img src="/assets/swagger-dto2.png" /></figure>
 
 此外，`@ApiProperty()` 装饰器支持设置多种 [Schema 对象](https://swagger.io/specification/#schemaObject) 属性：
 

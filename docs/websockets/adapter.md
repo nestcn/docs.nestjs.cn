@@ -62,7 +62,7 @@ app.useWebSocketAdapter(redisIoAdapter);
 
 另一个可用的适配器是 `WsAdapter`，它充当框架与集成的极速且经过全面测试的 [ws](https://github.com/websockets/ws) 库之间的代理。该适配器完全兼容原生浏览器 WebSocket，且比 socket.io 包快得多。遗憾的是，它开箱即用的功能要少得多。不过在有些情况下，您可能并不需要这些功能。
 
-> info： **注意** `ws` 库不支持命名空间（由 `socket.io` 推广的通信通道）。但为了模拟这一特性，您可以在不同路径上挂载多个 `ws` 服务器（示例： `@WebSocketGateway({{ '{' }} path: '/users' {{ '}' }})` ）。
+> info： **注意** `ws` 库不支持命名空间（由 `socket.io` 推广的通信通道）。但为了模拟这一特性，您可以在不同路径上挂载多个 `ws` 服务器（示例： `@WebSocketGateway({ path: '/users' })` ）。
 
 要使用 `ws`，我们首先需要安装这个必需的包：
 
@@ -79,7 +79,7 @@ app.useWebSocketAdapter(new WsAdapter(app));
 
 > **提示** `WsAdapter` 是从 `@nestjs/platform-ws` 导入的。
 
-`wsAdapter` 设计用于处理 `{{ '{' }} event: string, data: any {{ '}' }}` 格式的消息。如果需要接收和处理其他格式的消息，需配置消息解析器将其转换为所需格式。
+`wsAdapter` 设计用于处理 `{ event: string, data: any }` 格式的消息。如果需要接收和处理其他格式的消息，需配置消息解析器将其转换为所需格式。
 
 ```typescript
 const wsAdapter = new WsAdapter(app, {

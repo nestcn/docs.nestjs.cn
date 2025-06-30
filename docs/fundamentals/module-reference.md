@@ -29,7 +29,7 @@ export class CatsService implements OnModuleInit {
 
 > warning **警告** 无法通过 `get()` 方法检索作用域提供者（瞬时或请求作用域）。请改用下文[所述技术](https://docs.nestjs.com/fundamentals/module-ref#resolving-scoped-providers) 。了解如何控制作用域请参阅[此处](/fundamentals/injection-scopes) 。
 
-要从全局上下文中检索提供者（例如，如果该提供者已注入到其他模块中），请将 `{{ '{' }} strict: false {{ '}' }}` 选项作为第二个参数传递给 `get()`。
+要从全局上下文中检索提供者（例如，如果该提供者已注入到其他模块中），请将 `{ strict: false }` 选项作为第二个参数传递给 `get()`。
 
 ```typescript
 this.moduleRef.get(Service, { strict: false });

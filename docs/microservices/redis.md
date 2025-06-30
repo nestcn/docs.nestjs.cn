@@ -33,7 +33,13 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 
 `options` 属性取决于所选传输器类型。**Redis** 传输器暴露的配置属性如下所述：
 
-<table data-immersive-translate-walked="88723c64-5cd4-49fb-acdf-d533ee2a049b"><tbody data-immersive-translate-walked="88723c64-5cd4-49fb-acdf-d533ee2a049b"><tr data-immersive-translate-walked="88723c64-5cd4-49fb-acdf-d533ee2a049b"><td data-immersive-translate-walked="88723c64-5cd4-49fb-acdf-d533ee2a049b">host</td><td data-immersive-translate-walked="88723c64-5cd4-49fb-acdf-d533ee2a049b" data-immersive-translate-paragraph="1">连接 URL</td></tr><tr data-immersive-translate-walked="88723c64-5cd4-49fb-acdf-d533ee2a049b"><td data-immersive-translate-walked="88723c64-5cd4-49fb-acdf-d533ee2a049b">port</td><td data-immersive-translate-walked="88723c64-5cd4-49fb-acdf-d533ee2a049b" data-immersive-translate-paragraph="1">连接端口</td></tr><tr data-immersive-translate-walked="88723c64-5cd4-49fb-acdf-d533ee2a049b"><td data-immersive-translate-walked="88723c64-5cd4-49fb-acdf-d533ee2a049b">retryAttempts</td><td data-immersive-translate-walked="88723c64-5cd4-49fb-acdf-d533ee2a049b" data-immersive-translate-paragraph="1">消息重试次数（默认：0）</td></tr><tr data-immersive-translate-walked="88723c64-5cd4-49fb-acdf-d533ee2a049b"><td data-immersive-translate-walked="88723c64-5cd4-49fb-acdf-d533ee2a049b">retryDelay</td><td data-immersive-translate-walked="88723c64-5cd4-49fb-acdf-d533ee2a049b" data-immersive-translate-paragraph="1">消息重试尝试之间的延迟（毫秒）（默认：0）</td></tr><tr data-immersive-translate-walked="88723c64-5cd4-49fb-acdf-d533ee2a049b"><td data-immersive-translate-walked="88723c64-5cd4-49fb-acdf-d533ee2a049b">wildcards</td><td data-immersive-translate-walked="88723c64-5cd4-49fb-acdf-d533ee2a049b" data-immersive-translate-paragraph="1">启用 Redis 通配符订阅功能，指示传输器在底层使用 psubscribe/pmessage（默认：false）</td></tr></tbody></table>
+|                |                                                                                                |
+| -------------- | ---------------------------------------------------------------------------------------------- |
+| `host`         | 连接 URL                                                                                      |
+| `port`         | 连接端口                                                                                      |
+| `retryAttempts`| 消息重试次数（默认：0）                                                                       |
+| `retryDelay`   | 消息重试尝试之间的延迟（毫秒）（默认：0）                                                      |
+| `wildcards`    | 启用 Redis 通配符订阅功能，指示传输器在底层使用 psubscribe/pmessage（默认：false）            |
 
 官方 [ioredis](https://redis.github.io/ioredis/index.html#RedisOptions) 客户端支持的所有属性，该传输器同样支持。
 

@@ -1,8 +1,8 @@
-### 异常过滤器
+# 异常过滤器
 
 Nest 内置了一个**异常处理层** ，负责处理应用程序中所有未捕获的异常。当应用程序代码未处理某个异常时，该层会捕获它并自动返回用户友好的响应。
 
-![](/assets/Filter_1.png)
+<figure><img class="illustrative-image" src="/assets/Filter_1.png" /></figure>
 
 默认情况下，这个功能由内置的**全局异常过滤器**实现，它能处理 `HttpException` 类型（及其子类）的异常。当遇到**无法识别**的异常（既不是 `HttpException` 也不是其继承类）时，内置异常过滤器会生成以下默认 JSON 响应：
 

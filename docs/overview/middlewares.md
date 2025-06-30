@@ -2,21 +2,24 @@
 
 中间件是在路由处理程序**之前**调用的函数。中间件函数可以访问[请求](https://expressjs.com/en/4x/api.html#req)和[响应](https://expressjs.com/en/4x/api.html#res)对象，以及应用程序请求-响应周期中的 `next()` 中间件函数。 **下一个**中间件函数通常由名为 `next` 的变量表示。
 
-![](/assets/Middlewares_1.png)
+<figure><img class="illustrative-image" src="/assets/Middlewares_1.png" /></figure>
 
 默认情况下，Nest 中间件等同于 [express](https://expressjs.com/en/guide/using-middleware.html) 中间件。以下来自 express 官方文档的描述说明了中间件的功能：
 
-> 中间件函数可以执行以下任务：
->
-> - 执行任意代码。
-> - 修改请求和响应对象。
-> - 结束请求-响应周期。
-> - 调用堆栈中的下一个中间件函数。
-> - if the current middleware function does not end the request-response cycle, it must call `next()` to pass control to the next middleware function. Otherwise, the request will be left hanging.
+<blockquote class="external">
+  中间件函数可以执行以下任务：
+  <ul>
+    <li>执行任意代码。</li>
+    <li>修改请求和响应对象。</li>
+    <li>结束请求-响应周期。</li>
+    <li>调用堆栈中的下一个中间件函数。</li>
+    <li>如果当前中间件函数没有结束请求-响应周期，它必须调用 <code>next()</code> 将控制权传递给下一个中间件函数。否则，请求将被挂起。</li>
+  </ul>
+</blockquote>
 
-You implement custom Nest middleware in either a function, or in a class with an `@Injectable()` decorator. The class should implement the `NestMiddleware` interface, while the function does not have any special requirements. Let's start by implementing a simple middleware feature using the class method.
+您可以在函数中或在带有 `@Injectable()` 装饰器的类中实现自定义 Nest 中间件。该类应该实现 `NestMiddleware` 接口，而函数没有任何特殊要求。让我们首先使用类方法实现一个简单的中间件功能。
 
-> warning **警告** `Express` and `fastify` handle middleware differently and provide different method signatures, read more [here](/techniques/performance#middleware).
+> warning **警告** `Express` 和 `fastify` 处理中间件的方式不同，并提供不同的方法签名，更多信息请阅读[此处](/techniques/performance#middleware)。
 
 ```typescript
 @@filename(logger.middleware)

@@ -2,7 +2,7 @@
 
 模块是一个用 `@Module()` 装饰器注解的类。该装饰器提供了 **Nest** 用于高效组织和管理应用结构的元数据。
 
-![](/assets/Modules_1.png)
+<figure><img class="illustrative-image" src="/assets/Modules_1.png" /></figure>
 
 每个 Nest 应用至少有一个模块，即**根模块** ，它作为 Nest 构建**应用图**的起点。这个图是 Nest 用于解析模块与提供者之间关系和依赖的内部结构。虽然小型应用可能仅有一个根模块，但通常情况并非如此。我们**强烈建议**使用模块作为组织组件的有效方式。对于大多数应用，你可能会拥有多个模块，每个模块封装一组紧密相关的**功能** 。
 
@@ -53,33 +53,33 @@ export class AppModule {}
 
 以下是当前目录结构：
 
-src
-
-cats
-
-数据传输对象
-
-create-cat.dto.ts
-
-接口
-
-cat.interface.ts
-
-cats.controller.ts
-
-cats.module.ts
-
-cats.service.ts
-
-app.module.ts
-
-main.ts
+<div class="file-tree">
+  <div class="item">src</div>
+  <div class="children">
+    <div class="item">cats</div>
+    <div class="children">
+      <div class="item">dto</div>
+      <div class="children">
+        <div class="item">create-cat.dto.ts</div>
+      </div>
+      <div class="item">interfaces</div>
+      <div class="children">
+        <div class="item">cat.interface.ts</div>
+      </div>
+      <div class="item">cats.controller.ts</div>
+      <div class="item">cats.module.ts</div>
+      <div class="item">cats.service.ts</div>
+    </div>
+    <div class="item">app.module.ts</div>
+    <div class="item">main.ts</div>
+  </div>
+</div>
 
 #### 共享模块
 
 在 Nest 中，模块默认是**单例**的，因此您可以轻松地在多个模块之间共享同一个提供者实例。
 
-![](/assets/Shared_Module_1.png)
+<figure><img class="illustrative-image" src="/assets/Shared_Module_1.png" /></figure>
 
 每个模块自动成为**共享模块** 。一旦创建，它就可以被任何模块重复使用。假设我们想在多个其他模块之间共享 `CatsService` 的实例。为此，我们首先需要通过将该提供者添加到模块的 `exports` 数组来**导出** `CatsService`，如下所示：
 
@@ -103,6 +103,8 @@ export class CatsModule {}
 
 通过将 `CatsService` 封装在模块中（例如 `CatsModule`）并将其导出，我们确保导入 `CatsModule` 的所有模块都重用同一个 `CatsService` 实例。这不仅减少了内存消耗，还带来了更可预测的行为，因为所有模块共享同一实例，使得管理共享状态或资源更加容易。这是 NestJS 等框架中模块化和依赖注入的关键优势之一——允许服务在整个应用程序中高效共享。
 
+<app-banner-devtools></app-banner-devtools>
+
 #### 模块再导出
 
 如上所示，模块可以导出其内部提供者。此外，它们还能重新导出所导入的模块。在以下示例中，`CommonModule` 既被导入到 **又** 从 `CoreModule` 中导出，使得导入该模块的其他模块也能使用它。
@@ -115,7 +117,7 @@ export class CatsModule {}
 export class CoreModule {}
 ```
 
-#### Dependency injection
+#### 依赖注入
 
 模块类本身也可以 **注入** 提供者（例如用于配置目的）：
 
@@ -156,9 +158,9 @@ import { CatsService } from './cats.service';
 export class CatsModule {}
 ```
 
-`@Global()` 装饰器使模块具有全局作用域。全局模块通常应由根模块或核心模块**仅注册一次** 。在上例中，`CatsService` 提供者将无处不在，希望注入该服务的模块无需在其 imports 数组中导入 `CatsModule`。
+`@Global()` 装饰器使模块具有全局作用域。全局模块通常应由根模块或核心模块**仅注册一次**。在上例中，`CatsService` 提供者将无处不在，希望注入该服务的模块无需在其 imports 数组中导入 `CatsModule`。
 
-> info **注意** 从设计实践角度不推荐将所有内容全局化。虽然全局模块能减少样板代码，但通常更好的做法是使用 `imports` 数组来可控且清晰地暴露模块 API 给其他模块。这种方式能提供更好的结构和可维护性，确保只共享模块的必要部分，同时避免应用无关部分之间产生不必要的耦合。
+> info **提示** 从设计实践角度不推荐将所有内容全局化。虽然全局模块能减少样板代码，但通常更好的做法是使用 `imports` 数组来可控且清晰地暴露模块 API 给其他模块。这种方式能提供更好的结构和可维护性，确保只共享模块的必要部分，同时避免应用无关部分之间产生不必要的耦合。
 
 #### 动态模块
 
@@ -186,7 +188,7 @@ export class DatabaseModule {
 }
 ```
 
-> info **注意** `forRoot()` 方法可以同步或异步（例如通过 `Promise`）返回动态模块。
+> info **提示** `forRoot()` 方法可以同步或异步（例如通过 `Promise`）返回动态模块。
 
 该模块默认定义了 `Connection` 提供者（在 `@Module()` 装饰器元数据中），此外根据传入 `forRoot()` 方法的 `entities` 和 `options` 对象，还会暴露一系列提供者，例如存储库。请注意动态模块返回的属性会**扩展** （而非覆盖）`@Module()` 装饰器中定义的基础模块元数据。这样既保留了静态声明的 `Connection` 提供者**又**能导出动态生成的存储库提供者。
 
@@ -201,7 +203,7 @@ export class DatabaseModule {
 }
 ```
 
-> warning **警告** 如前所述，将所有内容全局化**并非良好的设计决策** 。
+> warning **警告** 如前所述，将所有内容全局化**并非良好的设计决策**。
 
 可按以下方式导入并配置 `DatabaseModule`：
 

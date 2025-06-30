@@ -1,8 +1,8 @@
-### 管道
+# 管道
 
 管道是一个用 `@Injectable()` 装饰器注解的类，它实现了 `PipeTransform` 接口。
 
-![](/assets/Pipe_1.png)
+<figure><img class="illustrative-image" src="/assets/Pipe_1.png" /></figure>
 
 管道有两种典型用例：
 
@@ -141,7 +141,11 @@ export interface ArgumentMetadata {
 
 这些属性描述了当前正在处理的参数。
 
-<table data-immersive-translate-walked="9ddb9d37-5914-46bd-bca0-b9c0e7bd66eb"><tbody data-immersive-translate-walked="9ddb9d37-5914-46bd-bca0-b9c0e7bd66eb"><tr data-immersive-translate-walked="9ddb9d37-5914-46bd-bca0-b9c0e7bd66eb"><td data-immersive-translate-walked="9ddb9d37-5914-46bd-bca0-b9c0e7bd66eb">type</td><td data-immersive-translate-walked="9ddb9d37-5914-46bd-bca0-b9c0e7bd66eb" data-immersive-translate-paragraph="1">表示该参数是否为请求体 @Body()，查询 @Query() 参数 @Param() 或自定义参数（了解更多 此处 ）。</td></tr><tr data-immersive-translate-walked="9ddb9d37-5914-46bd-bca0-b9c0e7bd66eb"><td data-immersive-translate-walked="9ddb9d37-5914-46bd-bca0-b9c0e7bd66eb">metatype</td><td data-immersive-translate-walked="9ddb9d37-5914-46bd-bca0-b9c0e7bd66eb" data-immersive-translate-paragraph="1">提供参数的元类型，例如 String。注意：该值为 undefined，如果您在路由处理方法签名中省略类型声明，或使用原生 JavaScript。</td></tr><tr data-immersive-translate-walked="9ddb9d37-5914-46bd-bca0-b9c0e7bd66eb"><td data-immersive-translate-walked="9ddb9d37-5914-46bd-bca0-b9c0e7bd66eb">data</td><td data-immersive-translate-walked="9ddb9d37-5914-46bd-bca0-b9c0e7bd66eb" data-immersive-translate-paragraph="1">传递给装饰器的字符串，例如 @Body('string')。它是 如果装饰器括号留空，undefined 将被返回。</td></tr></tbody></table>
+|            |                                                                                                                 |
+| ---------- | --------------------------------------------------------------------------------------------------------------- |
+| `type`     | 表示该参数是否为请求体 `@Body()`，查询 `@Query()` 参数 `@Param()` 或自定义参数（了解更多[此处](/custom-decorators)）。 |
+| `metatype` | 提供参数的元类型，例如 `String`。注意：该值为 `undefined`，如果您在路由处理方法签名中省略类型声明，或使用原生 JavaScript。  |
+| `data`     | 传递给装饰器的字符串，例如 `@Body('string')`。如果装饰器括号留空，则为 `undefined`。                              |
 
 > **警告** TypeScript 接口在转译过程中会被移除。因此，如果方法参数的类型声明为接口而非类，`metatype` 的值将会是 `Object`。
 

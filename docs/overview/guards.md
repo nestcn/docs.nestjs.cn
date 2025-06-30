@@ -1,8 +1,8 @@
-### 守卫
+# 守卫
 
 守卫是一个用 `@Injectable()` 装饰器注解的类，它实现了 `CanActivate` 接口。
 
-![](/assets/Guards_1.png)
+<figure><img class="illustrative-image" src="/assets/Guards_1.png" /></figure>
 
 守卫具有**单一职责** 。它们根据运行时存在的某些条件（如权限、角色、访问控制列表等）来决定是否由路由处理程序处理给定请求。这通常被称为**授权** 。授权（及其通常与之协作的**认证** ）在传统的 Express 应用中通常由[中间件](/middleware)处理。中间件非常适合处理认证，因为像令牌验证和向 `request` 对象附加属性这类操作与特定路由上下文（及其元数据）没有强关联。
 

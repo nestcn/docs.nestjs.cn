@@ -1,8 +1,8 @@
-### 拦截器
+# 拦截器
 
 拦截器是一个用 `@Injectable()` 装饰器注解并实现了 `NestInterceptor` 接口的类。
 
-![](/assets/Interceptors_1.png)
+<figure><img class="illustrative-image" src="/assets/Interceptors_1.png" /></figure>
 
 拦截器拥有一系列受[面向切面编程](https://en.wikipedia.org/wiki/Aspect-oriented_programming) (AOP)技术启发的实用功能，它们能够实现：
 

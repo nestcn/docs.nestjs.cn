@@ -10,6 +10,7 @@
 
 ```bash
 Nest 无法解析 <provider> 的依赖项（?）。请确保索引 [<index>] 处的参数 <unknown_token> 在 <module> 上下文中可用。
+```
 
 可能的解决方案：
 - <module> 是一个有效的 NestJS 模块吗？

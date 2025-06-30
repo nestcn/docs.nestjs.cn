@@ -1,8 +1,10 @@
 # 提供者
 
-提供者是 Nest 的核心概念。许多基础的 Nest 类，如服务、存储库、工厂和辅助工具，都可以被视为提供者。提供者的核心理念在于它可以作为依赖项被**注入** ，这使得对象之间能够形成各种关联关系。这些对象的"连接"工作主要由 Nest 运行时系统负责处理。
+提供者是 Nest 的核心概念。许多基础的 Nest 类，如服务、存储库、工厂和辅助工具，都可以被视为提供者。提供者的核心理念在于它可以作为依赖项被**注提供程序通常具有与应用程序生命周期一致的生存期（"作用域"）。当应用程序启动时，每个依赖项都必须被解析，这意味着每个提供程序都会被实例化。同样，当应用程序关闭时，所有提供程序都会被销毁。但也可以将提供程序设置为**请求作用域**，这意味着其生存期与特定请求而非应用程序生命周期相关联。您可以在[注入作用域](/fundamentals/injection-scopes)章节中了解更多相关技术。
 
-![](/assets/Components_1.png)
+<app-banner-courses></app-banner-courses>** ，这使得对象之间能够形成各种关联关系。这些对象的"连接"工作主要由 Nest 运行时系统负责处理。
+
+<figure><img class="illustrative-image" src="/assets/Components_1.png" /></figure>
 
 在前一章中，我们创建了一个简单的 `CatsController`。控制器应当处理 HTTP 请求，并将更复杂的任务委托给**提供者** 。提供者是在 NestJS 模块中被声明为 `providers` 的普通 JavaScript 类。更多细节请参阅"模块"章节。
 
@@ -141,25 +143,26 @@ export class AppModule {}
 
 此时，我们的目录结构应该如下所示：
 
-src
-
-猫
-
-数据传输对象
-
-create-cat.dto.ts
-
-接口
-
-cat.interface.ts
-
-cats.controller.ts
-
-cats.service.ts
-
-app.module.ts
-
-main.ts
+<div class="file-tree">
+<div class="item">src</div>
+<div class="children">
+<div class="item">cats</div>
+<div class="children">
+<div class="item">dto</div>
+<div class="children">
+<div class="item">create-cat.dto.ts</div>
+</div>
+<div class="item">interfaces</div>
+<div class="children">
+<div class="item">cat.interface.ts</div>
+</div>
+<div class="item">cats.controller.ts</div>
+<div class="item">cats.service.ts</div>
+</div>
+<div class="item">app.module.ts</div>
+<div class="item">main.ts</div>
+</div>
+</div>
 
 #### 手动实例化
 

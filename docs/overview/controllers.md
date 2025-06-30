@@ -51,7 +51,13 @@ export class CatsController {
 </table>
 
 > warning **警告** 当 Nest 检测到处理程序使用了 `@Res()` 或 `@Next()` 时，表明您选择了特定库实现方式。如果同时使用两种方式，标准方式将针对该路由**自动禁用**且不再按预期工作。若要同时使用两种方式（例如通过注入响应对象仅设置 cookies/headers 但仍将剩余工作交给框架处理），必须在 `@Res({ passthrough: true })` 装饰器中将 `passthrough` 选项设为 `true`。
-import { Request } from 'express';
+
+#### 请求对象
+
+处理程序通常需要访问客户端的**请求**详细信息。Nest 提供了对底层平台（默认为 Express）[请求对象](https://expressjs.com/en/api.html#req)的访问。您可以通过在处理程序签名中使用 `@Req()` 装饰器来指示 Nest 注入请求对象。
+
+```typescript
+import { Controller, Get, Req } from '@nestjs/common';
 
 @Controller('cats')
 export class CatsController {

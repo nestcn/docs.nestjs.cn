@@ -107,19 +107,28 @@ class CodeBlockFixer {
       }
     });
 
-    // 处理不完整的代码块（缺少结束标记）
-    const result3 = result2.replace(/```(\w+)(\s+title="[^"]*")?\n([\s\S]*?)(\n(?=[#\n]|$))/g, (match, lang, titlePart, codeContent, endPart) => {
+    // 处理不完整的代码块（缺少结束标记）- 但排除引用块中的代码
+    const result3 = result2.replace(/^```(\w+)(\s+title="[^"]*")?\n([\s\S]*?)(\n(?=[#\n]|$))/gm, (match, lang, titlePart, codeContent, endPart) => {
       // 检查是否已经有结束的```
       if (codeContent.includes('\n```')) {
         return match; // 已经有结束标记，不处理
       }
       
-      // 检查代码内容是否看起来像是被截断的
-      const lines = codeContent.split('\n');
+      // 检查是否在引用块内（前面是否有 > 符号）
+      const matchIndex = result2.indexOf(match);
+      const beforeMatch = result2.substring(0, matchIndex);
+      const lines = beforeMatch.split('\n');
       const lastLine = lines[lines.length - 1];
+      if (lastLine.trim().startsWith('>')) {
+        return match; // 在引用块内，不处理
+      }
+      
+      // 检查代码内容是否看起来像是被截断的
+      const codeLines = codeContent.split('\n');
+      const lastCodeLine = codeLines[codeLines.length - 1];
       
       // 如果最后一行看起来不完整（比如缺少花括号），添加结束标记
-      if (lastLine && !lastLine.trim().endsWith('}') && !lastLine.trim().endsWith(';')) {
+      if (lastCodeLine && !lastCodeLine.trim().endsWith('}') && !lastCodeLine.trim().endsWith(';')) {
         console.log(`检测到可能不完整的代码块，lang=${lang}`);
         modified = true;
         return `\`\`\`${lang}${titlePart || ''}\n${codeContent}\n\`\`\`${endPart}`;

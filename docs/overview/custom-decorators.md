@@ -8,7 +8,50 @@ Nest 的核心构建基于一种称为**装饰器**的语言特性。装饰器�
 
 Nest 提供了一组实用的**参数装饰器** ，可与 HTTP 路由处理程序结合使用。以下是提供的装饰器及其对应的原生 Express（或 Fastify）对象列表：
 
-<table data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9"><tbody data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9"><tr data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9"><td data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9">@Request(), @Req()</td><td data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9">req</td></tr><tr data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9"><td data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9">@Response(), @Res()</td><td data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9">res</td></tr><tr data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9"><td data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9">@Next()</td><td data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9">next</td></tr><tr data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9"><td data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9">@Session()</td><td data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9">req.session</td></tr><tr data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9"><td data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9">@Param(param?: string)</td><td data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9" data-immersive-translate-paragraph="1">req.params / req.params[param]</td></tr><tr data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9"><td data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9">@Body(param?: string)</td><td data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9" data-immersive-translate-paragraph="1">req.body / req.body[param]</td></tr><tr data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9"><td data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9">@Query(param?: string)</td><td data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9" data-immersive-translate-paragraph="1">req.query / req.query[param]</td></tr><tr data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9"><td data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9">@Headers(param?: string)</td><td data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9" data-immersive-translate-paragraph="1">req.headers / req.headers[param]</td></tr><tr data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9"><td data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9">@Ip()</td><td data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9">req.ip</td></tr><tr data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9"><td data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9">@HostParam()</td><td data-immersive-translate-walked="36a50866-3077-48a0-a000-9ee5221b57c9">req.hosts</td></tr></tbody></table>
+<table>
+  <tbody>
+    <tr>
+      <td><code>@Request(), @Req()</code></td>
+      <td><code>req</code></td>
+    </tr>
+    <tr>
+      <td><code>@Response(), @Res()</code></td>
+      <td><code>res</code></td>
+    </tr>
+    <tr>
+      <td><code>@Next()</code></td>
+      <td><code>next</code></td>
+    </tr>
+    <tr>
+      <td><code>@Session()</code></td>
+      <td><code>req.session</code></td>
+    </tr>
+    <tr>
+      <td><code>@Param(param?: string)</code></td>
+      <td><code>req.params</code> / <code>req.params[param]</code></td>
+    </tr>
+    <tr>
+      <td><code>@Body(param?: string)</code></td>
+      <td><code>req.body</code> / <code>req.body[param]</code></td>
+    </tr>
+    <tr>
+      <td><code>@Query(param?: string)</code></td>
+      <td><code>req.query</code> / <code>req.query[param]</code></td>
+    </tr>
+    <tr>
+      <td><code>@Headers(param?: string)</code></td>
+      <td><code>req.headers</code> / <code>req.headers[param]</code></td>
+    </tr>
+    <tr>
+      <td><code>@Ip()</code></td>
+      <td><code>req.ip</code></td>
+    </tr>
+    <tr>
+      <td><code>@HostParam()</code></td>
+      <td><code>req.hosts</code></td>
+    </tr>
+  </tbody>
+</table>
 
 Additionally, you can create your own **custom decorators**. Why is this useful?
 

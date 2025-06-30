@@ -398,13 +398,6 @@ docs/
         </a>
     </td>
     <td align="center">
-        <a href="https://github.com/Huauauaa">
-            <img src="https://avatars.githubusercontent.com/u/21063170?v=4" width="100;" alt="Huauauaa"/>
-            <br />
-            <sub><b>Huauauaa</b></sub>
-        </a>
-    </td>
-    <td align="center">
         <a href="https://github.com/warriorsloong">
             <img src="https://avatars.githubusercontent.com/u/177649003?v=4" width="100;" alt="warriorsloong"/>
             <br />
@@ -412,10 +405,17 @@ docs/
         </a>
     </td>
     <td align="center">
-        <a href="https://github.com/ZhangLinkang">
-            <img src="https://avatars.githubusercontent.com/u/39427729?v=4" width="100;" alt="ZhangLinkang"/>
+        <a href="https://github.com/Huauauaa">
+            <img src="https://avatars.githubusercontent.com/u/21063170?v=4" width="100;" alt="Huauauaa"/>
             <br />
-            <sub><b>ZhangLinkang</b></sub>
+            <sub><b>Huauauaa</b></sub>
+        </a>
+    </td>
+    <td align="center">
+        <a href="https://github.com/meepobrother">
+            <img src="https://avatars.githubusercontent.com/u/8385261?v=4" width="100;" alt="meepobrother"/>
+            <br />
+            <sub><b>meepobrother</b></sub>
         </a>
     </td>
     <td align="center">
@@ -541,13 +541,6 @@ docs/
         </a>
     </td>
     <td align="center">
-        <a href="https://github.com/meepobrother">
-            <img src="https://avatars.githubusercontent.com/u/8385261?v=4" width="100;" alt="meepobrother"/>
-            <br />
-            <sub><b>meepobrother</b></sub>
-        </a>
-    </td>
-    <td align="center">
         <a href="https://github.com/Alkaidcc">
             <img src="https://avatars.githubusercontent.com/u/54631354?v=4" width="100;" alt="Alkaidcc"/>
             <br />
@@ -560,15 +553,15 @@ docs/
             <br />
             <sub><b>Char2sGu</b></sub>
         </a>
-    </td></tr>
-<tr>
+    </td>
     <td align="center">
         <a href="https://github.com/GuoJikun">
             <img src="https://avatars.githubusercontent.com/u/21582741?v=4" width="100;" alt="GuoJikun"/>
             <br />
             <sub><b>GuoJikun</b></sub>
         </a>
-    </td>
+    </td></tr>
+<tr>
     <td align="center">
         <a href="https://github.com/hengistchan">
             <img src="https://avatars.githubusercontent.com/u/46242125?v=4" width="100;" alt="hengistchan"/>
@@ -603,20 +596,27 @@ docs/
             <br />
             <sub><b>ThisIsLoui</b></sub>
         </a>
-    </td></tr>
-<tr>
+    </td>
     <td align="center">
         <a href="https://github.com/wu-yu-pei">
             <img src="https://avatars.githubusercontent.com/u/73653265?v=4" width="100;" alt="wu-yu-pei"/>
             <br />
             <sub><b>wu-yu-pei</b></sub>
         </a>
-    </td>
+    </td></tr>
+<tr>
     <td align="center">
         <a href="https://github.com/Wzb3422">
             <img src="https://avatars.githubusercontent.com/u/42794622?v=4" width="100;" alt="Wzb3422"/>
             <br />
             <sub><b>Wzb3422</b></sub>
+        </a>
+    </td>
+    <td align="center">
+        <a href="https://github.com/Xecuss">
+            <img src="https://avatars.githubusercontent.com/u/16537413?v=4" width="100;" alt="Xecuss"/>
+            <br />
+            <sub><b>Xecuss</b></sub>
         </a>
     </td>
     <td align="center">
@@ -634,10 +634,10 @@ docs/
         </a>
     </td>
     <td align="center">
-        <a href="https://github.com/Xecuss">
-            <img src="https://avatars.githubusercontent.com/u/16537413?v=4" width="100;" alt="Xecuss"/>
+        <a href="https://github.com/ZhangLinkang">
+            <img src="https://avatars.githubusercontent.com/u/39427729?v=4" width="100;" alt="ZhangLinkang"/>
             <br />
-            <sub><b>Xecuss</b></sub>
+            <sub><b>ZhangLinkang</b></sub>
         </a>
     </td>
     <td align="center">

@@ -113,6 +113,7 @@ const extractor = (request: FastifyRequest): string | string[] =>
      .filter(v => !!v)
      .sort()
      .reverse()
+```
 
 const app = await NestFactory.create(AppModule);
 app.enableVersioning({

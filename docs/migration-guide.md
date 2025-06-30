@@ -2,7 +2,7 @@
 
 本文提供了从 NestJS 版本 10 迁移到版本 11 的综合指南。要了解 v11 中引入的新功能，请查看[这篇文章](https://trilon.io/blog/announcing-nestjs-11-whats-new)。虽然此更新包含一些小的重大更改，但它们不太可能影响大多数用户。您可以在[这里](https://github.com/nestjs/nest/releases/tag/v11.0.0)查看完整的更改列表。
 
-## 升级包
+### 升级包
 
 虽然您可以手动升级包，但我们建议使用 [npm-check-updates (ncu)](https://npmjs.com/package/npm-check-updates) 来简化流程。
 
@@ -12,19 +12,19 @@ ncu -u
 npm install
 ```
 
-## Express v5 重要更改
+### Express v5
 
 经过多年的开发，Express v5 于 2024 年正式发布，并在 2025 年成为稳定版本。在 NestJS 11 中，Express v5 现在是集成到框架中的默认版本。虽然对大多数用户来说这个更新是无缝的，但重要的是要了解 Express v5 引入了一些重大更改。详细指导请参考 [Express v5 迁移指南](https://expressjs.com/en/guide/migrating-5.html)。
 
 Express v5 中最显著的更新之一是修订的路径路由匹配算法。以下更改已引入到路径字符串如何与传入请求匹配：
 
-- 通配符 `*` 必须有名称，匹配参数的行为：使用 `/*splat` 或 `/{*splat}` 而不是 `/*`。`splat` 只是通配符参数的名称，没有特殊含义。您可以随意命名，例如 `*wildcard`
-- 不再支持可选字符 `?`，请使用大括号：`/:file{.:ext}`
-- 不支持正则表达式字符
-- 一些字符已被保留以避免升级期间的混淆 `(()[]?+!)`，使用 `\` 来转义它们
-- 参数名称现在支持有效的 JavaScript 标识符，或引用如 `:"this"`
+- 通配符 `*` 必须有名称，匹配参数的行为：使用 `/*splat` 或 `/{*splat}` 而不是 `/*`。`splat` 只是通配符参数的名称，没有特殊含义。您可以随意命名，例如 `*wildcard`。
+- 不再支持可选字符 `?`，请使用大括号：`/:file{.:ext}`。
+- 不支持正则表达式字符。
+- 一些字符已被保留以避免升级期间的混淆 `(()[]?+!)`，使用 `\` 来转义它们。
+- 参数名称现在支持有效的 JavaScript 标识符，或引用如 `:"this"`。
 
-以前在 Express v4 中工作的路由可能在 Express v5 中不工作。例如：
+也就是说，以前在 Express v4 中工作的路由可能在 Express v5 中不工作。例如：
 
 ```typescript
 @Get('users/*')
@@ -52,14 +52,17 @@ findAll() {
 // 在 NestJS 11 中，这将自动转换为有效的 Express v5 路由。
 // 虽然它可能仍然有效，但不再建议在 Express v5 中使用此通配符语法。
 forRoutes('*'); // <-- 这在 Express v5 中不应该工作
+```
 
-// 相反，您可以更新路径以使用命名通配符：
+相反，您可以更新路径以使用命名通配符：
+
+```typescript
 forRoutes('{*splat}'); // <-- 这在 Express v5 中将工作
 ```
 
 注意 `{*splat}` 是一个命名通配符，匹配包括根路径在内的任何路径。外部大括号使路径可选。
 
-## 查询参数解析
+### 查询参数解析
 
 > **注意** 此更改仅适用于 Express v5。
 
@@ -67,7 +70,7 @@ forRoutes('{*splat}'); // <-- 这在 Express v5 中将工作
 
 因此，像这样的查询字符串：
 
-```
+```plaintext
 ?filter[where][name]=John&filter[where][age]=30
 ?item[]=1&item[]=2
 ```
@@ -88,7 +91,7 @@ async function bootstrap() {
 bootstrap();
 ```
 
-## Fastify v5
+### Fastify v5
 
 `@nestjs/platform-fastify` v11 现在最终支持 Fastify v5。对大多数用户来说这个更新应该是无缝的；但是，Fastify v5 引入了一些重大更改，尽管这些不太可能影响大多数 NestJS 用户。更详细的信息，请参考 [Fastify v5 迁移指南](https://fastify.dev/docs/v5.1.x/Guides/Migration-Guide-V5/)。
 
@@ -99,20 +102,15 @@ bootstrap();
 默认情况下，只允许 [CORS 安全列表方法](https://fetch.spec.whatwg.org/#methods)。如果您需要启用其他方法（如 `PUT`、`PATCH` 或 `DELETE`），必须在 `methods` 选项中明确定义它们。
 
 ```typescript
-const methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']; // 或逗号分隔的字符串 'GET,POST,PUT,PATCH,DELETE'
+const methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']; // 或逗号分隔的字符串 'GET,POST,PUT,PATH,DELETE'
 
 const app = await NestFactory.create<NestFastifyApplication>(
   AppModule,
   new FastifyAdapter(),
-  { cors: { methods } },
 );
-
-// 或者，您可以使用 `enableCors` 方法
-const app = await NestFactory.create<NestFastifyApplication>(
-  AppModule,
-  new FastifyAdapter(),
-);
-app.enableCors({ methods });
+app.enableCors({
+  methods,
+});
 ```
 
 ### Fastify 中间件注册

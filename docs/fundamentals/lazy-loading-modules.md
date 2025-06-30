@@ -24,7 +24,7 @@ export class CatsService {
 或者，你也可以从应用程序引导文件(`main.ts`)中获取 `LazyModuleLoader` 提供者的引用，如下所示：
 
 ```typescript
-// "app" represents a Nest application instance
+// "app" 代表 Nest 应用实例
 const lazyModuleLoader = app.get(LazyModuleLoader);
 ```
 

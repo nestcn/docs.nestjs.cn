@@ -1,6 +1,6 @@
 ### 流式文件
 
-> **注意** 本章展示如何从你的 **HTTP 应用**中流式传输文件。以下示例不适用于 GraphQL 或微服务应用。
+> info **注意** 本章展示如何从你的 **HTTP 应用**中流式传输文件。以下示例不适用于 GraphQL 或微服务应用。
 
 有时你可能需要从 REST API 向客户端返回文件。在 Nest 中通常你会这样做：
 
@@ -52,8 +52,7 @@ export class FileController {
 import { Controller, Get, StreamableFile, Res } from '@nestjs/common';
 import { createReadStream } from 'fs';
 import { join } from 'path';
-import type { Response } from 'express'; // Assuming that we are using the ExpressJS HTTP Adapter
-```
+import type { Response } from 'express'; // 假设我们使用的是 ExpressJS HTTP 适配器
 
 @Controller('file')
 export class FileController {
@@ -63,12 +62,12 @@ export class FileController {
     return new StreamableFile(file, {
       type: 'application/json',
       disposition: 'attachment; filename="package.json"',
-      // If you want to define the Content-Length value to another value instead of file's length:
+      // 如果你想将 Content-Length 值定义为文件长度以外的其他值：
       // length: 123,
     });
   }
 
-  // Or even:
+  // 或者：
   @Get()
   getFileChangingResponseObjDirectly(
     @Res({ passthrough: true }) res: Response
@@ -81,7 +80,7 @@ export class FileController {
     return new StreamableFile(file);
   }
 
-  // Or even:
+  // 或者：
   @Get()
   @Header('Content-Type', 'application/json')
   @Header('Content-Disposition', 'attachment; filename="package.json"')

@@ -19,7 +19,7 @@ export class CatsController {}
 ```typescript
 @ApiHeader({
   name: 'X-MyHeader',
-  description: 'Custom header',
+  description: '自定义请求头',
 })
 @Controller('cats')
 export class CatsController {}
@@ -31,8 +31,8 @@ export class CatsController {}
 
 ```typescript
 @Post()
-@ApiResponse({ status: 201, description: 'The record has been successfully created.'})
-@ApiResponse({ status: 403, description: 'Forbidden.'})
+@ApiResponse({ status: 201, description: '记录已成功创建。'})
+@ApiResponse({ status: 403, description: '禁止访问。'})
 async create(@Body() createCatDto: CreateCatDto) {
   this.catsService.create(createCatDto);
 }
@@ -69,8 +69,8 @@ Nest 提供了一组继承自 `@ApiResponse` 装饰器的简写 **API 响应**�
 
 ```typescript
 @Post()
-@ApiCreatedResponse({ description: 'The record has been successfully created.'})
-@ApiForbiddenResponse({ description: 'Forbidden.'})
+@ApiCreatedResponse({ description: '记录已成功创建。'})
+@ApiForbiddenResponse({ description: '禁止访问。'})
 async create(@Body() createCatDto: CreateCatDto) {
   this.catsService.create(createCatDto);
 }
@@ -102,7 +102,7 @@ export class Cat {
 export class CatsController {
   @Post()
   @ApiCreatedResponse({
-    description: 'The record has been successfully created.',
+    description: '记录已成功创建。',
     type: Cat,
   })
   async create(@Body() createCatDto: CreateCatDto): Promise<Cat> {
@@ -121,9 +121,9 @@ export class CatsController {
 const config = new DocumentBuilder()
   .addGlobalResponse({
     status: 500,
-    description: 'Internal server error',
+    description: '内部服务器错误',
   })
-  // other configurations
+  // 其他配置
   .build();
 ```
 
@@ -135,7 +135,7 @@ const config = new DocumentBuilder()
 @UseInterceptors(FileInterceptor('file'))
 @ApiConsumes('multipart/form-data')
 @ApiBody({
-  description: 'List of cats',
+  description: '猫咪列表',
   type: FileUploadDto,
 })
 uploadFile(@UploadedFile() file: Express.Multer.File) {}

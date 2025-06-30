@@ -8,20 +8,20 @@
 
 <table>
   <tr>
-    <td><a href='#uri-版本控制类型'><code>URI Versioning</code></a></td>
+    <td><a href='techniques/versioning#uri-versioning-type'><code>URI Versioning</code></a></td>
     <td>版本将通过请求的 URI 传递（默认）</td>
   </tr>
   <tr>
-    <td><a href='#头部-版本控制类型'><code>Header Versioning</code></a></td>
+    <td><a href='techniques/versioning#header-versioning-type'><code>Header Versioning</code></a></td>
     <td>自定义请求头将指定版本</td>
   </tr>
   <tr>
-    <td><a href='#媒体类型-版本控制类型'><code>Media Type Versioning</code></a></td>
-    <td>请求的 Accept 头将指定版本</td>
+    <td><a href='techniques/versioning#media-type-versioning-type'><code>Media Type Versioning</code></a></td>
+    <td>请求的 <code>Accept</code> 头将指定版本</td>
   </tr>
   <tr>
-    <td><a href='#自定义-版本控制类型'><code>Custom Versioning</code></a></td>
-    <td>请求的任何部分都可用于指定版本，并提供了自定义函数来提取所述版本。</td>
+    <td><a href='techniques/versioning#custom-versioning-type'><code>Custom Versioning</code></a></td>
+    <td>请求的任何部分都可用于指定版本(s)。提供自定义函数来提取所述版本(s)。</td>
   </tr>
 </table>
 
@@ -29,7 +29,7 @@
 
 URI 版本控制使用请求 URI 中传递的版本号，例如 `https://example.com/v1/route` 和 `https://example.com/v2/route`。
 
-> warning **注意** 使用 URI 版本控制时，版本号会自动添加到 [全局路径前缀](faq/global-prefix) （如果存在）之后的 URI 中，且位于任何控制器或路由路径之前。
+> warning **注意** 使用 URI 版本控制时，版本号会自动添加到 URI 中，位于<a href="faq/global-prefix">全局路径前缀</a>（如果存在）之后，任何控制器或路由路径之前。
 
 要为您的应用程序启用 URI 版本控制，请执行以下操作：
 
@@ -42,9 +42,9 @@ app.enableVersioning({
 await app.listen(process.env.PORT ?? 3000);
 ```
 
-> warning **注意** URI 中的版本号默认会自动添加 `v` 前缀，但您可以通过设置 `prefix` 键值来自定义前缀，或设为 `false` 来禁用该功能。
+> warning **注意** URI 中的版本号默认会自动添加前缀 `v`，但您可以通过设置 `prefix` 键来自定义前缀值，或设为 `false` 来禁用该功能。
 
-> info **说明** 您可以使用从 `@nestjs/common` 包导入的 `VersioningType` 枚举来设置 `type` 属性。
+> info **提示** `VersioningType` 枚举可用于 `type` 属性，它从 `@nestjs/common` 包中导入。
 
 #### 头部版本控制类型
 
@@ -98,22 +98,21 @@ await app.listen(process.env.PORT ?? 3000);
 
 例如，如果传入请求指定支持版本 `1`、`2` 和 `3`，则 `extractor` **必须**返回 `[3, 2, 1]`。这确保会优先选择最高可能的路由版本。
 
-如果提取的版本是 `[3, 2, 1]`，但仅存在版本 `2` 和 `1` 的路由，则会匹配版本 `2` 的路由 已选中（版本 `3` 会被自动忽略）
+如果提取的版本是 `[3, 2, 1]`，但仅存在版本 `2` 和 `1` 的路由，则会选中匹配版本 `2` 的路由（版本 `3` 会被自动忽略）。
 
-> warning **注意** 由于设计限制，基于 `extractor` 返回的数组选择最高匹配版本 > **在 Express 适配器中无法可靠工作** 。单一版本（字符串或单元素数组）在 Express 中可正常工作。Fastify 则能正确支持最高匹配版本选择和单一版本选择。
+> warning **注意** 由于设计限制，基于 `extractor` 返回的数组选择最高匹配版本**在 Express 适配器中无法可靠工作**。单一版本（字符串或单元素数组）在 Express 中可正常工作。Fastify 则能正确支持最高匹配版本选择和单一版本选择。
 
 要为应用启用 **自定义版本控制** ，请创建 `extractor` 函数并按如下方式传入应用：
 
 ```typescript title="main"
-// Example extractor that pulls out a list of versions from a custom header and turns it into a sorted array.
-// This example uses Fastify, but Express requests can be processed in a similar way.
+// 从自定义头部提取版本列表并转换为排序数组的示例提取器。
+// 此示例使用 Fastify，但 Express 请求也可以类似处理。
 const extractor = (request: FastifyRequest): string | string[] =>
   [request.headers['custom-versioning-field'] ?? '']
      .flatMap(v => v.split(','))
      .filter(v => !!v)
      .sort()
      .reverse()
-```
 
 const app = await NestFactory.create(AppModule);
 app.enableVersioning({
@@ -253,4 +252,4 @@ export class AppModule implements NestModule {
 
 通过上述代码，`LoggerMiddleware` 将仅应用于'2'版本的 `/cats` 端点。
 
-> info **注意** 中间件适用于本节描述的任何版本控制类型：`URI`、`Header`、`Media Type` 或 `Custom`。
+> info **提示** 中间件适用于本节描述的任何版本控制类型：`URI`、`Header`、`Media Type` 或 `Custom`。

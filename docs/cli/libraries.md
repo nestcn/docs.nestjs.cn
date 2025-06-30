@@ -25,26 +25,28 @@ $ nest g library my-library
 运行该命令时，`library` 原理图会提示您输入库的前缀（又称别名）：
 
 ```bash
-What prefix would you like to use for the library (default: @app)?
+您希望为该库使用什么前缀（默认：@app）？
 ```
 
-This creates a new project in your workspace called `my-library`. A library-type project, like an application-type project, is generated into a named folder using a schematic. Libraries are managed under the `libs` folder of the monorepo root. Nest creates the `libs` folder the first time a library is created.
+这会在您的工作空间中创建一个名为 `my-library` 的新项目。库类型项目与应用类型项目一样，使用原理图生成到指定文件夹中。库在 monorepo 根目录的 `libs` 文件夹下管理。Nest 在首次创建库时会创建 `libs` 文件夹。
 
-The files generated for a library are slightly different from those generated for an application. Here is the contents of the `libs` folder after executing the command above:
+为库生成的文件与为应用生成的文件略有不同。执行上述命令后，`libs` 文件夹的内容如下：
 
-库
-
-my-library
-
-src
-
-索引.ts
-
-my-library.module.ts
-
-my-library.service.ts
-
-tsconfig.库.json
+<div class="file-tree">
+  <div class="item">libs</div>
+  <div class="children">
+    <div class="item">my-library</div>
+    <div class="children">
+      <div class="item">src</div>
+      <div class="children">
+        <div class="item">index.ts</div>
+        <div class="item">my-library.module.ts</div>
+        <div class="item">my-library.service.ts</div>
+      </div>
+      <div class="item">tsconfig.lib.json</div>
+    </div>
+  </div>
+</div>
 
 `nest-cli.json` 文件将在 `"projects"` 键下新增一个库的条目：
 

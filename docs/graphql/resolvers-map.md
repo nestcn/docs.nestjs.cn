@@ -623,7 +623,26 @@ export class CreatePostInput extends Post {
 
 我们可以通过专用装饰器访问标准 GraphQL 解析器参数。下表对比了 Nest 装饰器与其对应的原生 Apollo 参数：
 
-<table data-immersive-translate-walked="9f001e6e-8302-4a13-83e5-8ff468676706"><tbody data-immersive-translate-walked="9f001e6e-8302-4a13-83e5-8ff468676706"><tr data-immersive-translate-walked="9f001e6e-8302-4a13-83e5-8ff468676706"><td data-immersive-translate-walked="9f001e6e-8302-4a13-83e5-8ff468676706" data-immersive-translate-paragraph="1">@Root() 和 @Parent()</td><td data-immersive-translate-walked="9f001e6e-8302-4a13-83e5-8ff468676706" data-immersive-translate-paragraph="1">根 / 父级</td></tr><tr data-immersive-translate-walked="9f001e6e-8302-4a13-83e5-8ff468676706"><td data-immersive-translate-walked="9f001e6e-8302-4a13-83e5-8ff468676706">@Context(param?: string)</td><td data-immersive-translate-walked="9f001e6e-8302-4a13-83e5-8ff468676706" data-immersive-translate-paragraph="1">上下文 / 上下文[参数]</td></tr><tr data-immersive-translate-walked="9f001e6e-8302-4a13-83e5-8ff468676706"><td data-immersive-translate-walked="9f001e6e-8302-4a13-83e5-8ff468676706">@Info(param?: string)</td><td data-immersive-translate-walked="9f001e6e-8302-4a13-83e5-8ff468676706" data-immersive-translate-paragraph="1">信息 / 信息[参数]</td></tr><tr data-immersive-translate-walked="9f001e6e-8302-4a13-83e5-8ff468676706"><td data-immersive-translate-walked="9f001e6e-8302-4a13-83e5-8ff468676706">@Args(param?: string)</td><td data-immersive-translate-walked="9f001e6e-8302-4a13-83e5-8ff468676706" data-immersive-translate-paragraph="1">参数 / 参数[参数]</td></tr></tbody></table>
+<table>
+  <tbody>
+    <tr>
+      <td>@Root() 和 @Parent()</td>
+      <td>根 / 父级</td>
+    </tr>
+    <tr>
+      <td>@Context(param?: string)</td>
+      <td>上下文 / 上下文[参数]</td>
+    </tr>
+    <tr>
+      <td>@Info(param?: string)</td>
+      <td>信息 / 信息[参数]</td>
+    </tr>
+    <tr>
+      <td>@Args(param?: string)</td>
+      <td>参数 / 参数[参数]</td>
+    </tr>
+  </tbody>
+</table>
 
 这些参数具有以下含义：
 

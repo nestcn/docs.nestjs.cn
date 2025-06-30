@@ -32,19 +32,19 @@ export class AppModule {}
 
 ```typescript
 EventEmitterModule.forRoot({
-  // set this to `true` to use wildcards
+  // 设置为 `true` 以使用通配符
   wildcard: false,
-  // the delimiter used to segment namespaces
+  // 用于分割命名空间的分隔符
   delimiter: '.',
-  // set this to `true` if you want to emit the newListener event
+  // 如果您希望触发 newListener 事件，请设置为 `true`
   newListener: false,
-  // set this to `true` if you want to emit the removeListener event
+  // 如果您希望触发 removeListener 事件，请设置为 `true`
   removeListener: false,
-  // the maximum amount of listeners that can be assigned to an event
+  // 可以分配给事件的最大监听器数量
   maxListeners: 10,
-  // show event name in memory leak message when more than maximum amount of listeners is assigned
+  // 当监听器数量超过最大值时，在内存泄漏消息中显示事件名称
   verboseMemoryLeak: false,
-  // disable throwing uncaughtException if an error event is emitted and it has no listeners
+  // 当错误事件被触发且没有监听器时，禁用抛出 uncaughtException
   ignoreErrors: false,
 });
 ```
@@ -78,7 +78,7 @@ this.eventEmitter.emit(
 ```typescript
 @OnEvent('order.created')
 handleOrderCreatedEvent(payload: OrderCreatedEvent) {
-  // handle and process "OrderCreatedEvent" event
+  // 处理和处理 "OrderCreatedEvent" 事件
 }
 ```
 
@@ -91,7 +91,7 @@ handleOrderCreatedEvent(payload: OrderCreatedEvent) {
 ```typescript
 export type OnEventOptions = OnOptions & {
   /**
-   * If "true", prepends (instead of append) the given listener to the array of listeners.
+   * 如果为 "true"，则将给定的监听器前置（而非追加）到监听器数组中。
    *
    * @see https://github.com/EventEmitter2/EventEmitter2#emitterprependlistenerevent-listener-options
    *
@@ -100,7 +100,7 @@ export type OnEventOptions = OnOptions & {
   prependListener?: boolean;
 
   /**
-   * If "true", the onEvent callback will not throw an error while handling the event. Otherwise, if "false" it will throw an error.
+   * 如果为 "true"，onEvent 回调在处理事件时不会抛出错误。如果为 "false"，则会抛出错误。
    *
    * @default true
    */
@@ -113,7 +113,7 @@ export type OnEventOptions = OnOptions & {
 ```typescript
 @OnEvent('order.created', { async: true })
 handleOrderCreatedEvent(payload: OrderCreatedEvent) {
-  // handle and process "OrderCreatedEvent" event
+  // 处理和处理 "OrderCreatedEvent" 事件
 }
 ```
 
@@ -122,7 +122,7 @@ handleOrderCreatedEvent(payload: OrderCreatedEvent) {
 ```typescript
 @OnEvent('order.*')
 handleOrderEvents(payload: OrderCreatedEvent | OrderRemovedEvent | OrderUpdatedEvent) {
-  // handle and process an event
+  // 处理和处理事件
 }
 ```
 
@@ -133,7 +133,7 @@ handleOrderEvents(payload: OrderCreatedEvent | OrderRemovedEvent | OrderUpdatedE
 ```typescript
 @OnEvent('**')
 handleEverything(payload: any) {
-  // handle and process an event
+  // 处理和处理事件
 }
 ```
 

@@ -9,15 +9,14 @@
 最常见的错误消息是关于 Nest 无法解析提供者的依赖项。错误消息通常如下所示：
 
 ```bash
-Nest can't resolve dependencies of the <provider> (?). Please make sure that the argument <unknown_token> at index [<index>] is available in the <module> context.
-```
+Nest 无法解析 <provider> 的依赖项（?）。请确保索引 [<index>] 处的参数 <unknown_token> 在 <module> 上下文中可用。
 
-Potential solutions:
-- Is <module> a valid NestJS module?
-- If <unknown_token> is a provider, is it part of the current <module>?
-- If <unknown_token> is exported from a separate @Module, is that module imported within <module>?
+可能的解决方案：
+- <module> 是一个有效的 NestJS 模块吗？
+- 如果 <unknown_token> 是一个提供者，它是当前 <module> 的一部分吗？
+- 如果 <unknown_token> 是从单独的 @Module 导出的，该模块是否已导入到 <module> 中？
   @Module({
-    imports: [ /* the Module containing <unknown_token> */ ]
+    imports: [ /* 包含 <unknown_token> 的模块 */ ]
   })
 ```
 
@@ -39,8 +38,8 @@ Potential solutions:
 如果你处于 **monorepo 设置**中，可能会遇到与上述相同的错误，但核心提供者 `ModuleRef` 会显示为 `<unknown_token>`：
 
 ```bash
-Nest can't resolve dependencies of the <provider> (?).
-Please make sure that the argument ModuleRef at index [<index>] is available in the <module> context.
+Nest 无法解析 <provider> 的依赖项（?）。
+请确保索引 [<index>] 处的参数 ModuleRef 在 <module> 上下文中可用。
 ...
 ```
 

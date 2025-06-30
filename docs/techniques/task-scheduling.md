@@ -74,7 +74,30 @@ seconds (optional)
 
 一些示例的 cron 模式包括：
 
-<table data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3"><tbody data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3"><tr data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3"><td data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3">* * * * * *</td><td data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3" data-immersive-translate-paragraph="1">每秒</td></tr><tr data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3"><td data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3">45 * * * * *</td><td data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3" data-immersive-translate-paragraph="1">每分钟，在第45秒</td></tr><tr data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3"><td data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3">0 10 * * * *</td><td data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3" data-immersive-translate-paragraph="1">每小时，在第10分钟开始时</td></tr><tr data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3"><td data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3">0 */30 9-17 * * *</td><td data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3" data-immersive-translate-paragraph="1">上午9点至下午5点之间每30分钟一次</td></tr><tr data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3"><td data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3">0 30 11 * * 1-5</td><td data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3" data-immersive-translate-paragraph="1">周一至周五上午11:30</td></tr></tbody></table>
+<table>
+  <tbody>
+    <tr>
+      <td><code>* * * * * *</code></td>
+      <td>每秒</td>
+    </tr>
+    <tr>
+      <td><code>45 * * * * *</code></td>
+      <td>每分钟，在第45秒</td>
+    </tr>
+    <tr>
+      <td><code>0 10 * * * *</code></td>
+      <td>每小时，在第10分钟开始时</td>
+    </tr>
+    <tr>
+      <td><code>0 */30 9-17 * * *</code></td>
+      <td>上午9点至下午5点之间每30分钟一次</td>
+    </tr>
+    <tr>
+      <td><code>0 30 11 * * 1-5</code></td>
+      <td>周一至周五上午11:30</td>
+    </tr>
+  </tbody>
+</table>
 
 `@nestjs/schedule` 包提供了一个包含常用 cron 模式的便捷枚举。您可以按如下方式使用此枚举：
 
@@ -101,7 +124,13 @@ export class TasksService {
 
 此外，你还可以将额外选项作为第二个参数传给 `@Cron()` 装饰器。
 
-<table data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3"><tbody data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3"><tr data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3"><td data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3">name</td><td data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3" data-immersive-translate-paragraph="1">这在声明后访问和控制 cron 任务时非常有用。</td></tr><tr data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3"><td data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3">timeZone</td><td data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3" data-immersive-translate-paragraph="1">指定执行时区。这将根据您的时区调整实际时间。若时区无效，将抛出错误。您可在 Moment Timezone 网站查看所有可用时区。</td></tr><tr data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3"><td data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3">utcOffset</td><td data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3" data-immersive-translate-paragraph="1">此选项允许您直接指定时区偏移量，而无需使用 timeZone 参数。</td></tr><tr data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3"><td data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3">waitForCompletion</td><td data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3" data-immersive-translate-paragraph="1">若设为 true，当前 onTick 回调完成前将不会运行该定时任务的其他实例。当前任务执行期间所有新触发的计划执行都将被跳过。</td></tr><tr data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3"><td data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3">disabled</td><td data-immersive-translate-walked="a5580e6d-0330-44d3-ad6a-c19183cbebc3" data-immersive-translate-paragraph="1">此参数表示该任务是否会被执行。</td></tr></tbody></table>
+| 选项              | 描述                                                                                          |
+| ---------------- | --------------------------------------------------------------------------------------------- |
+| `name`           | 这在声明后访问和控制 cron 任务时非常有用。                                                     |
+| `timeZone`       | 指定执行时区。这将根据您的时区调整实际时间。若时区无效，将抛出错误。您可在 Moment Timezone 网站查看所有可用时区。 |
+| `utcOffset`      | 此选项允许您直接指定时区偏移量，而无需使用 timeZone 参数。                                       |
+| `waitForCompletion` | 若设为 true，当前 onTick 回调完成前将不会运行该定时任务的其他实例。当前任务执行期间所有新触发的计划执行都将被跳过。 |
+| `disabled`       | 此参数表示该任务是否会被执行。                                                               |
 
 ```typescript
 import { Injectable } from '@nestjs/common';

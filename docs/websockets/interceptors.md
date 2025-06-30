@@ -10,23 +10,6 @@ handleEvent(client: Client, data: unknown): WsResponse<unknown> {
   return { event, data };
 }
 ```
-```
-
-#### 转换拦截器
-
-转换 WebSocket 响应格式：
-
-```typescript
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-
-export interface WsResponse<T> {
-  success: boolean;
-  data: T;
-  timestamp: string;
-  messageId: string;
-}
 
 @Injectable()
 export class WsTransformInterceptor<T> implements NestInterceptor<T, WsResponse<T>> {

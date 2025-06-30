@@ -219,11 +219,69 @@ export class GqlThrottlerGuard extends ThrottlerGuard {
 
 以下选项适用于传递给 `ThrottlerModule` 选项数组的对象：
 
-<table data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780"><tbody data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780"><tr data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780"><td data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780">name</td><td data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780" data-immersive-translate-paragraph="1">用于内部跟踪正在使用的限流器集合的名称。如果不传递则默认为 default</td></tr><tr data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780"><td data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780">ttl</td><td data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780" data-immersive-translate-paragraph="1">每个请求在存储中持续的毫秒数</td></tr><tr data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780"><td data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780">limit</td><td data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780" data-immersive-translate-paragraph="1">TTL 限制内的最大请求数</td></tr><tr data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780"><td data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780">blockDuration</td><td data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780" data-immersive-translate-paragraph="1">请求将被阻止的毫秒数</td></tr><tr data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780"><td data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780">ignoreUserAgents</td><td data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780" data-immersive-translate-paragraph="1">一组正则表达式数组，用于指定在节流请求时要忽略的用户代理</td></tr><tr data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780"><td data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780">skipIf</td><td data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780" data-immersive-translate-paragraph="1">一个接收 ExecutionContext 并返回 boolean 以短路节流逻辑的函数。类似于 @SkipThrottler()，但基于请求条件</td></tr></tbody></table>
+<table>
+  <tbody>
+    <tr>
+      <td><code>name</code></td>
+      <td>用于内部跟踪正在使用的限流器集合的名称。如果不传递则默认为 <code>default</code></td>
+    </tr>
+    <tr>
+      <td><code>ttl</code></td>
+      <td>每个请求在存储中持续的毫秒数</td>
+    </tr>
+    <tr>
+      <td><code>limit</code></td>
+      <td>TTL 限制内的最大请求数</td>
+    </tr>
+    <tr>
+      <td><code>blockDuration</code></td>
+      <td>请求将被阻止的毫秒数</td>
+    </tr>
+    <tr>
+      <td><code>ignoreUserAgents</code></td>
+      <td>一组正则表达式数组，用于指定在节流请求时要忽略的用户代理</td>
+    </tr>
+    <tr>
+      <td><code>skipIf</code></td>
+      <td>一个接收 ExecutionContext 并返回 boolean 以短路节流逻辑的函数。类似于 <code>@SkipThrottler()</code>，但基于请求条件</td>
+    </tr>
+  </tbody>
+</table>
 
 如果需要设置存储，或者希望以更全局的方式使用上述选项（应用于每个节流器组），可以通过 `throttlers` 选项键传递上述选项，并使用下表
 
-<table data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780"><tbody data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780"><tr data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780"><td data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780">storage</td><td data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780" data-immersive-translate-paragraph="1">用于跟踪节流状态的自定义存储服务。 参见此处。</td></tr><tr data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780"><td data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780">ignoreUserAgents</td><td data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780" data-immersive-translate-paragraph="1">一组正则表达式，用于指定在节流请求时应忽略的用户代理</td></tr><tr data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780"><td data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780">skipIf</td><td data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780" data-immersive-translate-paragraph="1">一个接收 ExecutionContext 并返回 boolean 值的函数，用于短路限流器逻辑。类似于 @SkipThrottler()，但基于请求进行判断</td></tr><tr data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780"><td data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780">throttlers</td><td data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780" data-immersive-translate-paragraph="1">限流器集合数组，使用上表定义</td></tr><tr data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780"><td data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780">errorMessage</td><td data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780" data-immersive-translate-paragraph="1">一个 string 类型值，或接收 ExecutionContext 和 ThrottlerLimitDetail 并返回 string 的函数，用于覆盖默认的限流器错误消息</td></tr><tr data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780"><td data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780">getTracker</td><td data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780" data-immersive-translate-paragraph="1">一个接收 Request 并返回 string 的函数，用于覆盖 getTracker 方法的默认逻辑</td></tr><tr data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780"><td data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780">generateKey</td><td data-immersive-translate-walked="7266d95f-a5c0-47d3-a0f5-f04f282f3780" data-immersive-translate-paragraph="1">一个接收 ExecutionContext、追踪器 string 和节流器名称作为 string 参数的函数，返回用于覆盖最终键值（存储速率限制值）的 string。这会覆盖 generateKey 方法的默认逻辑</td></tr></tbody></table>
+<table>
+  <tbody>
+    <tr>
+      <td><code>storage</code></td>
+      <td>用于跟踪节流状态的自定义存储服务。参见此处。</td>
+    </tr>
+    <tr>
+      <td><code>ignoreUserAgents</code></td>
+      <td>一组正则表达式，用于指定在节流请求时应忽略的用户代理</td>
+    </tr>
+    <tr>
+      <td><code>skipIf</code></td>
+      <td>一个接收 ExecutionContext 并返回 boolean 值的函数，用于短路限流器逻辑。类似于 <code>@SkipThrottler()</code>，但基于请求进行判断</td>
+    </tr>
+    <tr>
+      <td><code>throttlers</code></td>
+      <td>限流器集合数组，使用上表定义</td>
+    </tr>
+    <tr>
+      <td><code>errorMessage</code></td>
+      <td>一个 string 类型值，或接收 ExecutionContext 和 ThrottlerLimitDetail 并返回 string 的函数，用于覆盖默认的限流器错误消息</td>
+    </tr>
+    <tr>
+      <td><code>getTracker</code></td>
+      <td>一个接收 Request 并返回 string 的函数，用于覆盖 getTracker 方法的默认逻辑</td>
+    </tr>
+    <tr>
+      <td><code>generateKey</code></td>
+      <td>一个接收 ExecutionContext、追踪器 string 和节流器名称作为 string 参数的函数，返回用于覆盖最终键值（存储速率限制值）的 string。这会覆盖 generateKey 方法的默认逻辑</td>
+    </tr>
+  </tbody>
+</table>
 
 #### 异步配置
 

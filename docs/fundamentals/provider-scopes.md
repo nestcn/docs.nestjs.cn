@@ -8,7 +8,11 @@
 
 一个提供者可以具有以下任意作用域：
 
-<table data-immersive-translate-walked="9c4f0294-21fb-422c-8115-4253d4b29cb9"><tbody data-immersive-translate-walked="9c4f0294-21fb-422c-8115-4253d4b29cb9"><tr data-immersive-translate-walked="9c4f0294-21fb-422c-8115-4253d4b29cb9"><td>DEFAULT</td><td data-immersive-translate-walked="9c4f0294-21fb-422c-8115-4253d4b29cb9" data-immersive-translate-paragraph="1">在整个应用中共享该提供者的单一实例。实例生命周期与应用程序生命周期直接绑定。一旦应用完成启动，所有单例作用域的提供者便完成了实例化。默认使用单例作用域。</td></tr><tr data-immersive-translate-walked="9c4f0294-21fb-422c-8115-4253d4b29cb9"><td>REQUEST</td><td data-immersive-translate-walked="9c4f0294-21fb-422c-8115-4253d4b29cb9" data-immersive-translate-paragraph="1">会为每个传入的请求专属创建新的提供者实例。该实例在请求处理完成后会被垃圾回收。</td></tr><tr data-immersive-translate-walked="9c4f0294-21fb-422c-8115-4253d4b29cb9"><td>TRANSIENT</td><td data-immersive-translate-walked="9c4f0294-21fb-422c-8115-4253d4b29cb9" data-immersive-translate-paragraph="1">瞬时提供者不会在多个消费者之间共享。每个注入瞬时提供者的消费者都会获得一个全新的专属实例。</td></tr></tbody></table>
+| 作用域      | 描述                                                                                                         |
+| ----------- | ------------------------------------------------------------------------------------------------------------ |
+| `DEFAULT`   | 在整个应用中共享该提供者的单一实例。实例生命周期与应用程序生命周期直接绑定。一旦应用完成启动，所有单例作用域的提供者便完成了实例化。默认使用单例作用域。 |
+| `REQUEST`   | 会为每个传入的**请求**专属创建新的提供者实例。该实例在请求处理完成后会被垃圾回收。                         |
+| `TRANSIENT` | 瞬时提供者不会在多个消费者之间共享。每个注入瞬时提供者的消费者都会获得一个全新的专属实例。                 |
 
 > info **提示** 对于大多数使用场景， **推荐**使用单例作用域。在多个消费者和请求之间共享提供者意味着实例可以被缓存，且其初始化仅在应用启动时发生一次。
 

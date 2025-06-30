@@ -43,7 +43,22 @@ export class AppModule {}
 
 `forRoot()` 方法支持 [TypeORM](https://typeorm.io/data-source-options#common-data-source-options) 包中 `DataSource` 构造函数公开的所有配置属性。此外，还支持以下描述的若干额外配置属性。
 
-<table data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59"><tbody data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59"><tr data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59"><td data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59">retryAttempts</td><td data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59" data-immersive-translate-paragraph="1">数据库连接尝试次数（默认：10）</td></tr><tr data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59"><td data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59">retryDelay</td><td data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59" data-immersive-translate-paragraph="1">连接重试间隔时间（毫秒）（默认：3000）</td></tr><tr data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59"><td data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59">autoLoadEntities</td><td data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59" data-immersive-translate-paragraph="1">若为 true，实体将自动加载（默认：false）</td></tr></tbody></table>
+<table>
+  <tbody>
+    <tr>
+      <td><code>retryAttempts</code></td>
+      <td>数据库连接尝试次数（默认：10）</td>
+    </tr>
+    <tr>
+      <td><code>retryDelay</code></td>
+      <td>连接重试间隔时间（毫秒）（默认：3000）</td>
+    </tr>
+    <tr>
+      <td><code>autoLoadEntities</code></td>
+      <td>若为 true，实体将自动加载（默认：false）</td>
+    </tr>
+  </tbody>
+</table>
 
 > info **提示** 了解更多数据源选项请点击[此处](https://typeorm.io/data-source-options) 。
 
@@ -197,7 +212,22 @@ export class UserHttpModule {}
 
 关系分为三种类型：
 
-<table data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59"><tbody data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59"><tr data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59"><td data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59">One-to-one</td><td data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59" data-immersive-translate-paragraph="1">主表中的每一行在外表中有且仅有一行关联数据。使用 @OneToOne() 装饰器定义此类关系。</td></tr><tr data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59"><td data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59">One-to-many / Many-to-one</td><td data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59" data-immersive-translate-paragraph="1">主表中的每一行在外表中有一行或多行关联数据。使用 @OneToMany() 和 @ManyToOne() 装饰器定义此类关系。</td></tr><tr data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59"><td data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59">Many-to-many</td><td data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59" data-immersive-translate-paragraph="1">主表中的每一行在外键表中有多条相关记录，而外键表中的每条记录在主表中也有多条相关记录。使用 @ManyToMany() 装饰器来定义这种关系类型。</td></tr></tbody></table>
+<table>
+  <tbody>
+    <tr>
+      <td><strong>One-to-one</strong></td>
+      <td>主表中的每一行在外表中有且仅有一行关联数据。使用 <code>@OneToOne()</code> 装饰器定义此类关系。</td>
+    </tr>
+    <tr>
+      <td><strong>One-to-many / Many-to-one</strong></td>
+      <td>主表中的每一行在外表中有一行或多行关联数据。使用 <code>@OneToMany()</code> 和 <code>@ManyToOne()</code> 装饰器定义此类关系。</td>
+    </tr>
+    <tr>
+      <td><strong>Many-to-many</strong></td>
+      <td>主表中的每一行在外键表中有多条相关记录，而外键表中的每条记录在主表中也有多条相关记录。使用 <code>@ManyToMany()</code> 装饰器来定义这种关系类型。</td>
+    </tr>
+  </tbody>
+</table>
 
 要在实体中定义关系，请使用相应的**装饰器** 。例如，要定义每个 `User` 可以拥有多张照片，请使用 `@OneToMany()` 装饰器。
 
@@ -681,7 +711,30 @@ export class AppModule {}
 
 `forRoot()` 方法支持 Sequelize 构造函数公开的所有配置属性（ [了解更多](https://sequelize.org/docs/v6/getting-started/#connecting-to-a-database) ）。此外，还有以下几个额外的配置属性将在下文说明。
 
-<table data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59"><tbody data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59"><tr data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59"><td data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59">retryAttempts</td><td data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59" data-immersive-translate-paragraph="1">连接数据库的尝试次数（默认值：10）</td></tr><tr data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59"><td data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59">retryDelay</td><td data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59" data-immersive-translate-paragraph="1">连接重试尝试之间的延迟（毫秒）（默认：3000）</td></tr><tr data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59"><td data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59">autoLoadModels</td><td data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59" data-immersive-translate-paragraph="1">如果为 true，模型将自动加载（默认：false）</td></tr><tr data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59"><td data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59">keepConnectionAlive</td><td data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59" data-immersive-translate-paragraph="1">如果为 true，应用程序关闭时不会断开连接（默认：false）</td></tr><tr data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59"><td data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59">synchronize</td><td data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59" data-immersive-translate-paragraph="1">如果为 true，自动加载的模型将保持同步（默认：true）</td></tr></tbody></table>
+<table>
+  <tbody>
+    <tr>
+      <td><code>retryAttempts</code></td>
+      <td>连接数据库的尝试次数（默认值：10）</td>
+    </tr>
+    <tr>
+      <td><code>retryDelay</code></td>
+      <td>连接重试尝试之间的延迟（毫秒）（默认：3000）</td>
+    </tr>
+    <tr>
+      <td><code>autoLoadModels</code></td>
+      <td>如果为 true，模型将自动加载（默认：false）</td>
+    </tr>
+    <tr>
+      <td><code>keepConnectionAlive</code></td>
+      <td>如果为 true，应用程序关闭时不会断开连接（默认：false）</td>
+    </tr>
+    <tr>
+      <td><code>synchronize</code></td>
+      <td>如果为 true，自动加载的模型将保持同步（默认：true）</td>
+    </tr>
+  </tbody>
+</table>
 
 完成后，`Sequelize` 对象将可被注入到整个项目中（无需导入任何模块），例如：
 
@@ -830,7 +883,22 @@ export class UserHttpModule {}
 
 关系有三种类型：
 
-<table data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59"><tbody data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59"><tr data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59"><td data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59">One-to-one</td><td data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59" data-immersive-translate-paragraph="1">主表中的每一行在外表中都有且仅有一个关联行</td></tr><tr data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59"><td data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59">One-to-many / Many-to-one</td><td data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59" data-immersive-translate-paragraph="1">主表中的每一行在外表中都有一个或多个相关行</td></tr><tr data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59"><td data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59">Many-to-many</td><td data-immersive-translate-walked="57f2a38e-629e-4509-bd73-032304bfce59" data-immersive-translate-paragraph="1">主表中的每一行在外表中都有多条相关记录，而外表中的每条记录在主表中也有多条相关行</td></tr></tbody></table>
+<table>
+  <tbody>
+    <tr>
+      <td><strong>One-to-one</strong></td>
+      <td>主表中的每一行在外表中都有且仅有一个关联行</td>
+    </tr>
+    <tr>
+      <td><strong>One-to-many / Many-to-one</strong></td>
+      <td>主表中的每一行在外表中都有一个或多个相关行</td>
+    </tr>
+    <tr>
+      <td><strong>Many-to-many</strong></td>
+      <td>主表中的每一行在外表中都有多条相关记录，而外表中的每条记录在主表中也有多条相关行</td>
+    </tr>
+  </tbody>
+</table>
 
 要在模型中定义关系，请使用相应的**装饰器** 。例如，要定义每个 `User` 可以拥有多张照片，可使用 `@HasMany()` 装饰器。
 

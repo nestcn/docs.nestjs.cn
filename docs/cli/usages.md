@@ -20,21 +20,21 @@ $ nest n <name> [options]
 
 ##### 参数
 
-| 参数项 | 描述 |
-| --- | --- |
-|  | 新项目名称 |
+| 参数项   | 描述        |
+| -------- | ----------- |
+| `<name>` | 新项目名称  |
 
 ##### 选项
 
-| 选项 | 描述 |
-| --- | --- |
-| \--dry-run | 显示将会做出的更改，但不实际修改文件系统。别名：-d |
-| \--skip-git | 跳过 git 仓库初始化。别名：-g |
-| \--skip-install | 跳过包安装。别名：-s |
-| \--package-manager \[package-manager\] | 指定包管理器。使用 npm、yarn 或 pnpm。包管理器必须全局安装。别名：-p |
-| \--language \[language\] | 指定编程语言（TS 或 JS）。别名：-l |
-| \--collection \[collectionName\] | 指定原理图集合。使用包含原理图的已安装 npm 包的包名称。别名：-c |
-| \--strict | 启动项目时启用以下 TypeScript 编译器标志：strictNullChecks、noImplicitAny、strictBindCallApply、 forceConsistentCasingInFileNames 、noFallthroughCasesInSwitch |
+| 选项                                    | 描述                                                                                                                                                                                                  |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--dry-run`                            | 显示将会做出的更改，但不实际修改文件系统。<br/>别名：`-d`                                                                                                                                                  |
+| `--skip-git`                           | 跳过 git 仓库初始化。<br/>别名：`-g`                                                                                                                                                                      |
+| `--skip-install`                       | 跳过包安装。<br/>别名：`-s`                                                                                                                                                                             |
+| `--package-manager [package-manager]`  | 指定包管理器。使用 `npm`、`yarn` 或 `pnpm`。包管理器必须全局安装。<br/>别名：`-p`                                                                                                                            |
+| `--language [language]`                | 指定编程语言（`TS` 或 `JS`）。<br/>别名：`-l`                                                                                                                                                            |
+| `--collection [collectionName]`        | 指定原理图集合。使用包含原理图的已安装 npm 包的包名称。<br/>别名：`-c`                                                                                                                                      |
+| `--strict`                             | 启动项目时启用以下 TypeScript 编译器标志：`strictNullChecks`、`noImplicitAny`、`strictBindCallApply`、`forceConsistentCasingInFileNames`、`noFallthroughCasesInSwitch`                                 |
 
 #### nest generate
 
@@ -47,10 +47,10 @@ $ nest g <schematic> <name> [options]
 
 ##### 参数
 
-| 参数 | 描述 |
-| --- | --- |
-|  | 要生成的 schematic 或 collection:schematic。可用的 schematic 请参阅下表。 |
-|  | 所生成组件的名称。 |
+| 参数         | 描述                                                                                          |
+| ----------- | --------------------------------------------------------------------------------------------- |
+| `<schematic>` | 要生成的 schematic 或 collection:schematic。可用的 schematic 请参阅下表。                       |
+| `<name>`    | 所生成组件的名称。                                                                            |
 
 ##### 原理图
 
@@ -76,14 +76,14 @@ $ nest g <schematic> <name> [options]
 
 ##### 选项
 
-| 选项 | 描述 |
-| --- | --- |
-| \--dry-run | 报告将进行的更改，但不会实际修改文件系统。别名：-d |
-| \--project \[project\] | 该元素应添加到的项目。别名：-p |
-| \--flat | 不要为该元素生成文件夹。 |
-| \--collection \[collectionName\] | 指定原理图集合。使用包含原理图的已安装 npm 包的包名称。别名：-c |
-| \--spec | 强制生成规范文件（默认） |
-| \--no-spec | 禁用规范文件生成 |
+| 选项                           | 描述                                                                            |
+| ----------------------------- | ------------------------------------------------------------------------------- |
+| `--dry-run`                   | 报告将进行的更改，但不会实际修改文件系统。<br/>别名：`-d`                          |
+| `--project [project]`         | 该元素应添加到的项目。<br/>别名：`-p`                                             |
+| `--flat`                      | 不要为该元素生成文件夹。                                                          |
+| `--collection [collectionName]` | 指定原理图集合。使用包含原理图的已安装 npm 包的包名称。<br/>别名：`-c`               |
+| `--spec`                      | 强制生成规范文件（默认）                                                          |
+| `--no-spec`                   | 禁用规范文件生成                                                                 |
 
 #### nest build
 

@@ -48,7 +48,7 @@ export interface ValidationPipeOptions extends ValidatorOptions {
 | disableErrorMessages    | boolean    | 若设为 true，验证错误将不会返回给客户端。                                          |
 | errorHttpStatusCode     | number     | 此设置允许您指定发生错误时将使用的异常类型，默认情况下会抛出 BadRequestException。 |
 | exceptionFactory        | Function   | 接收验证错误数组并返回要抛出的异常对象。                                           |
-| groups                  | string\[\] | 验证对象时使用的分组。                                                             |
+| groups                  | string[]   | 验证对象时使用的分组。                                                             |
 | always                  | boolean    | 为装饰器的 always 选项设置默认值。该默认值可在装饰器选项中覆盖。                   |
 | strictGroups            | boolean    | 如果未提供 groups 或为空，则忽略至少包含一个组的装饰器。                           |
 | dismissDefaultMessages  | boolean    | 如果设为 true，验证将不使用默认消息。若未显式设置，错误消息将始终为 undefined。    |

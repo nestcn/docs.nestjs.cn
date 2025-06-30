@@ -41,11 +41,57 @@ bootstrap();
 
 `createMicroservice()` 方法的第二个参数是一个 `options` 对象，该对象可能包含两个成员：
 
-<table data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807"><tbody data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807"><tr data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807"><td data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807">transport</td><td data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807" data-immersive-translate-paragraph="1">指定传输器（例如 Transport.NATS）</td></tr><tr data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807"><td data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807">options</td><td data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807" data-immersive-translate-paragraph="1">一个用于配置传输器行为的传输器专属选项对象</td></tr></tbody></table>
+<table>
+  <tbody>
+    <tr>
+      <td><code>transport</code></td>
+      <td>指定传输器（例如 <code>Transport.NATS</code>）</td>
+    </tr>
+    <tr>
+      <td><code>options</code></td>
+      <td>一个用于配置传输器行为的传输器专属选项对象</td>
+    </tr>
+  </tbody>
+</table>
 
 `options` 对象的具体内容取决于所选的传输器类型。**TCP** 传输器暴露的属性如下所述。对于其他传输器（如 Redis、MQTT 等），请参阅相关章节了解可用选项的说明。
 
-<table data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807"><tbody data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807"><tr data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807"><td data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807">host</td><td data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807" data-immersive-translate-paragraph="1">连接主机名</td></tr><tr data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807"><td data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807">port</td><td data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807" data-immersive-translate-paragraph="1">连接端口</td></tr><tr data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807"><td data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807">retryAttempts</td><td data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807" data-immersive-translate-paragraph="1">消息重试次数（默认：0）</td></tr><tr data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807"><td data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807">retryDelay</td><td data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807" data-immersive-translate-paragraph="1">消息重试间隔延迟（毫秒）（默认：0）</td></tr><tr data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807"><td data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807">serializer</td><td data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807" data-immersive-translate-paragraph="1">自定义序列化器用于发送消息</td></tr><tr data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807"><td data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807">deserializer</td><td data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807" data-immersive-translate-paragraph="1">自定义反序列化器用于接收消息</td></tr><tr data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807"><td data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807">socketClass</td><td data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807" data-immersive-translate-paragraph="1">继承 TcpSocket 的自定义 Socket（默认：JsonSocket）</td></tr><tr data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807"><td data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807">tlsOptions</td><td data-immersive-translate-walked="4ab14a0a-46d9-41c1-9503-89f6df3ea807" data-immersive-translate-paragraph="1">配置 tls 协议的选项</td></tr></tbody></table>
+<table>
+  <tbody>
+    <tr>
+      <td><code>host</code></td>
+      <td>连接主机名</td>
+    </tr>
+    <tr>
+      <td><code>port</code></td>
+      <td>连接端口</td>
+    </tr>
+    <tr>
+      <td><code>retryAttempts</code></td>
+      <td>消息重试次数（默认：0）</td>
+    </tr>
+    <tr>
+      <td><code>retryDelay</code></td>
+      <td>消息重试间隔延迟（毫秒）（默认：0）</td>
+    </tr>
+    <tr>
+      <td><code>serializer</code></td>
+      <td>自定义序列化器用于发送消息</td>
+    </tr>
+    <tr>
+      <td><code>deserializer</code></td>
+      <td>自定义反序列化器用于接收消息</td>
+    </tr>
+    <tr>
+      <td><code>socketClass</code></td>
+      <td>继承 TcpSocket 的自定义 Socket（默认：JsonSocket）</td>
+    </tr>
+    <tr>
+      <td><code>tlsOptions</code></td>
+      <td>配置 tls 协议的选项</td>
+    </tr>
+  </tbody>
+</table>
 
 > info **提示** 上述属性为 TCP 传输器特有。如需了解其他传输器的可用选项，请参阅相关章节。
 

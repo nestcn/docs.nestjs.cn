@@ -36,7 +36,7 @@ async function bootstrap() {
 bootstrap();
 ```
 
-info **提示** 工厂方法 `SwaggerModule.createDocument()` 专门用于在请求时生成 Swagger 文档。这种方法有助于节省初始化时间，生成的文档是一个符合 [OpenAPI 文档](https://swagger.io/specification/#openapi-document)规范的可序列化对象。除了通过 HTTP 提供文档外，您还可以将其保存为 JSON 或 YAML 文件以多种方式使用。
+> info **提示** 工厂方法 `SwaggerModule.createDocument()` 专门用于在请求时生成 Swagger 文档。这种方法有助于节省初始化时间，生成的文档是一个符合 [OpenAPI 文档](https://swagger.io/specification/#openapi-document)规范的可序列化对象。除了通过 HTTP 提供文档外，您还可以将其保存为 JSON 或 YAML 文件以多种方式使用。
 
 `DocumentBuilder` 用于构建符合 OpenAPI 规范的基础文档结构。它提供了多种方法用于设置标题、描述、版本等属性。要创建完整文档（包含所有已定义的 HTTP 路由），我们使用 `SwaggerModule` 类的 `createDocument()` 方法。该方法接收两个参数：应用实例和 Swagger 配置对象。此外，我们还可以提供第三个参数，其类型应为 `SwaggerDocumentOptions`。更多细节请参阅[文档配置章节](/openapi/introduction#document-options) 。
 

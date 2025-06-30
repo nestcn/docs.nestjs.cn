@@ -29,7 +29,11 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 
 `options` 对象特定于所选的传输器。**NATS** 传输器公开了[此处](https://github.com/nats-io/node-nats#connection-options)描述的属性以及以下属性：
 
-<table data-immersive-translate-walked="069bdf1a-1875-437d-9a9e-38b07f0ba756"><tbody data-immersive-translate-walked="069bdf1a-1875-437d-9a9e-38b07f0ba756"><tr data-immersive-translate-walked="069bdf1a-1875-437d-9a9e-38b07f0ba756"><td data-immersive-translate-walked="069bdf1a-1875-437d-9a9e-38b07f0ba756">queue</td><td data-immersive-translate-walked="069bdf1a-1875-437d-9a9e-38b07f0ba756" data-immersive-translate-paragraph="1">服务器应订阅的队列（保留 undefined 可忽略此设置）。详细了解 NATS 队列组如下 。</td></tr><tr data-immersive-translate-walked="069bdf1a-1875-437d-9a9e-38b07f0ba756"><td data-immersive-translate-walked="069bdf1a-1875-437d-9a9e-38b07f0ba756">gracefulShutdown</td><td data-immersive-translate-walked="069bdf1a-1875-437d-9a9e-38b07f0ba756" data-immersive-translate-paragraph="1">启用优雅关闭。启用后，服务器在关闭连接前会先取消订阅所有频道。默认为 false。</td></tr><tr data-immersive-translate-walked="069bdf1a-1875-437d-9a9e-38b07f0ba756"><td data-immersive-translate-walked="069bdf1a-1875-437d-9a9e-38b07f0ba756">gracePeriod</td><td data-immersive-translate-walked="069bdf1a-1875-437d-9a9e-38b07f0ba756" data-immersive-translate-paragraph="1">取消订阅所有频道后等待服务器的毫秒数。默认为 10000 毫秒。</td></tr></tbody></table>
+| 选项               | 描述                                                                                  |
+| ----------------- | ------------------------------------------------------------------------------------- |
+| `queue`           | 服务器应订阅的队列（保留 undefined 可忽略此设置）。详细了解 NATS 队列组如下。           |
+| `gracefulShutdown` | 启用优雅关闭。启用后，服务器在关闭连接前会先取消订阅所有频道。默认为 false。            |
+| `gracePeriod`     | 取消订阅所有频道后等待服务器的毫秒数。默认为 10000 毫秒。                               |
 
 #### 客户端
 

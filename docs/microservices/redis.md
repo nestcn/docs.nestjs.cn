@@ -32,13 +32,13 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 
 `options` 属性取决于所选传输器类型。**Redis** 传输器暴露的配置属性如下所述：
 
-|                |                                                                                                |
-| -------------- | ---------------------------------------------------------------------------------------------- |
-| `host`         | 连接 URL                                                                                      |
-| `port`         | 连接端口                                                                                      |
-| `retryAttempts`| 消息重试次数（默认：0）                                                                       |
-| `retryDelay`   | 消息重试尝试之间的延迟（毫秒）（默认：0）                                                      |
-| `wildcards`    | 启用 Redis 通配符订阅功能，指示传输器在底层使用 psubscribe/pmessage（默认：false）            |
+| 选项            | 描述                                                                                          |
+| --------------- | --------------------------------------------------------------------------------------------- |
+| `host`          | 连接 URL                                                                                     |
+| `port`          | 连接端口                                                                                     |
+| `retryAttempts` | 消息重试次数（默认：`0`）                                                                    |
+| `retryDelay`    | 消息重试尝试之间的延迟（毫秒）（默认：`0`）                                                   |
+| `wildcards`     | 启用 Redis 通配符订阅功能，指示传输器在底层使用 `psubscribe`/`pmessage`（默认：`false`）     |
 
 官方 [ioredis](https://redis.github.io/ioredis/index.html#RedisOptions) 客户端支持的所有属性，该传输器同样支持。
 

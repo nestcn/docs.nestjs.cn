@@ -12,8 +12,7 @@
 
 **前向引用**允许 Nest 通过 `forwardRef()` 工具函数引用尚未定义的类。例如，如果 `CatsService` 和 `CommonService` 相互依赖，关系的两侧都可以使用 `@Inject()` 和 `forwardRef()` 工具来解决循环依赖。否则，Nest 将不会实例化它们，因为所有必要的元数据都将不可用。示例如下：
 
-```typescript
-@@filename(cats.service)
+```typescript title="cats.service"
 @Injectable()
 export class CatsService {
   constructor(
@@ -21,36 +20,19 @@ export class CatsService {
     private commonService: CommonService,
   ) {}
 }
-@@switch
-@Injectable()
-@Dependencies(forwardRef(() => CommonService))
-export class CatsService {
-  constructor(commonService) {
-    this.commonService = commonService;
-  }
-}
 ```
 
 > info **提示** `forwardRef()` 函数是从 `@nestjs/common` 包中导入的。
 
 这涵盖了关系的一侧。现在让我们对 `CommonService` 做同样的事情：
 
-```typescript
-@@filename(common.service)
+```typescript title="common.service"
 @Injectable()
 export class CommonService {
   constructor(
     @Inject(forwardRef(() => CatsService))
     private catsService: CatsService,
   ) {}
-}
-@@switch
-@Injectable()
-@Dependencies(forwardRef(() => CatsService))
-export class CommonService {
-  constructor(catsService) {
-    this.catsService = catsService;
-  }
 }
 ```
 
@@ -64,8 +46,7 @@ export class CommonService {
 
 为了解决模块之间的循环依赖，请在模块关联的两侧使用相同的 `forwardRef()` 工具函数。例如：
 
-```typescript
-@@filename(common.module)
+```typescript title="common.module"
 @Module({
   imports: [forwardRef(() => CatsModule)],
 })
@@ -74,8 +55,7 @@ export class CommonModule {}
 
 这涵盖了关系的一侧。现在让我们对 `CatsModule` 做同样的事情：
 
-```typescript
-@@filename(cats.module)
+```typescript title="cats.module"
 @Module({
   imports: [forwardRef(() => CommonModule)],
 })

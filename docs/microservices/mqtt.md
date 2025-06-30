@@ -14,8 +14,7 @@ $ npm i --save mqtt
 
 使用 MQTT 传输器时，请将以下配置对象传入 `createMicroservice()` 方法：
 
-```typescript
-@@filename(main)
+```typescript title="main"
 const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
   transport: Transport.MQTT,
   options: {
@@ -60,7 +59,6 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 在更复杂的场景中，您可能需要访问有关传入请求的额外信息。当使用 MQTT 传输器时，您可以访问 `MqttContext` 对象。
 
 ```typescript
-@@filename()
 @MessagePattern('notifications')
 getNotifications(@Payload() data: number[], @Ctx() context: MqttContext) {
   console.log(`Topic: ${context.getTopic()}`);
@@ -72,7 +70,6 @@ getNotifications(@Payload() data: number[], @Ctx() context: MqttContext) {
 要访问原始的 MQTT [数据包](https://github.com/mqttjs/mqtt-packet) ，请使用 `MqttContext` 对象的 `getPacket()` 方法，如下所示：
 
 ```typescript
-@@filename()
 @MessagePattern('notifications')
 getNotifications(@Payload() data: number[], @Ctx() context: MqttContext) {
   console.log(context.getPacket());
@@ -84,7 +81,6 @@ getNotifications(@Payload() data: number[], @Ctx() context: MqttContext) {
 订阅可以是针对明确主题的，也可以包含通配符。有两种通配符可用：`+` 和 `#`。`+` 是单级通配符，而 `#` 是多级通配符，可覆盖多个主题层级。
 
 ```typescript
-@@filename()
 @MessagePattern('sensors/+/temperature/+')
 getTemperature(@Ctx() context: MqttContext) {
   console.log(`Topic: ${context.getTopic()}`);
@@ -95,8 +91,7 @@ getTemperature(@Ctx() context: MqttContext) {
 
 使用 `@MessagePattern` 或 `@EventPattern` 装饰器创建的任何订阅都将以 QoS 0 级别进行订阅。如需更高 QoS 级别，可在建立连接时通过 `subscribeOptions` 块全局设置，如下所示：
 
-```typescript
-@@filename(main)
+```typescript title="main"
 const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
   transport: Transport.MQTT,
   options: {
@@ -128,7 +123,6 @@ client.send('replace-emoji', record).subscribe(...);
 您也可以通过访问 `MqttContext` 在服务端读取这些选项。
 
 ```typescript
-@@filename()
 @MessagePattern('replace-emoji')
 replaceEmoji(@Payload() data: string, @Ctx() context: MqttContext): string {
   const { properties: { userProperties } } = context.getPacket();

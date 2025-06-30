@@ -52,8 +52,7 @@ $ nest g service users
 
 替换这些生成文件的默认内容，如下所示。在我们的示例应用中，`UsersService` 仅维护一个硬编码的内存用户列表，并通过 find 方法按用户名检索用户。在实际应用中，这里应该使用您选择的库（如 TypeORM、Sequelize、Mongoose 等）构建用户模型和持久层。
 
-```typescript
-@@filename(users/users.service)
+```typescript title="users/users.service"
 import { Injectable } from '@nestjs/common';
 
 // This should be a real class/interface representing a user entity
@@ -82,8 +81,7 @@ export class UsersService {
 
 在 `UsersModule` 中，唯一需要做的改动是将 `UsersService` 添加到 `@Module` 装饰器的 exports 数组中，使其在该模块外部可见（稍后我们将在 `AuthService` 中使用它）。
 
-```typescript
-@@filename(users/users.module)
+```typescript title="users/users.module"
 import { Module } from '@nestjs/common';
 import { UsersService } from './users.service';
 
@@ -96,8 +94,7 @@ export class UsersModule {}
 
 我们的 `AuthService` 负责检索用户并验证密码。为此我们创建了一个 `validateUser()` 方法。在下面的代码中，我们使用便捷的 ES6 扩展运算符在返回用户对象前移除 password 属性。稍后我们将从 Passport 本地策略调用这个 `validateUser()` 方法。
 
-```typescript
-@@filename(auth/auth.service)
+```typescript title="auth/auth.service"
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 
@@ -120,8 +117,7 @@ export class AuthService {
 
 现在，我们更新 `AuthModule` 以导入 `UsersModule`。
 
-```typescript
-@@filename(auth/auth.module)
+```typescript title="auth/auth.module"
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersModule } from '../users/users.module';
@@ -137,8 +133,7 @@ export class AuthModule {}
 
 现在我们可以实现 Passport 的**本地认证策略** 。在 `auth` 文件夹中创建名为 `local.strategy.ts` 的文件，并添加以下代码：
 
-```typescript
-@@filename(auth/local.strategy)
+```typescript title="auth/local.strategy"
 import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
@@ -172,8 +167,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 
 我们需要配置 `AuthModule` 来使用刚定义的 Passport 功能。将 `auth.module.ts` 更新如下：
 
-```typescript
-@@filename(auth/auth.module)
+```typescript title="auth/auth.module"
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersModule } from '../users/users.module';
@@ -209,8 +203,7 @@ export class AuthModule {}
 
 打开 `app.controller.ts` 文件，将其内容替换为以下代码：
 
-```typescript
-@@filename(app.controller)
+```typescript title="app.controller"
 import { Controller, Request, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -238,8 +231,7 @@ $ # result -> {"userId":1,"username":"john"}
 
 虽然这种方式可行，但直接将策略名称传入 `AuthGuard()` 会在代码中引入魔术字符串。我们建议改为创建自定义类，如下所示：
 
-```typescript
-@@filename(auth/local-auth.guard)
+```typescript title="auth/local-auth.guard"
 import { Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -292,8 +284,7 @@ $ npm install --save-dev @types/passport-jwt
 
 考虑到这一点，我们现在可以最终生成一个真实的 JWT，并在此路由中返回它。为了保持服务的模块化整洁，我们将在 `authService` 中处理 JWT 生成。打开 `auth` 文件夹中的 `auth.service.ts` 文件，添加 `login()` 方法，并按所示导入 `JwtService`：
 
-```typescript
-@@filename(auth/auth.service)
+```typescript title="auth/auth.service"
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
@@ -321,7 +312,6 @@ export class AuthService {
     };
   }
 }
-
 ```
 
 我们使用 `@nestjs/jwt` 库，它提供了一个 `sign()` 函数，可以从 `user` 对象属性的子集生成 JWT，然后我们将其作为带有单个 `access_token` 属性的简单对象返回。注意：我们选择 `sub` 属性来保存 `userId` 值以符合 JWT 标准。别忘了将 JwtService 提供者注入到 `AuthService` 中。
@@ -330,8 +320,7 @@ export class AuthService {
 
 首先，在 `auth` 文件夹中创建 `constants.ts`，并添加以下代码：
 
-```typescript
-@@filename(auth/constants)
+```typescript title="auth/constants"
 export const jwtConstants = {
   secret: 'DO NOT USE THIS VALUE. INSTEAD, CREATE A COMPLEX SECRET AND KEEP IT SAFE OUTSIDE OF THE SOURCE CODE.',
 };
@@ -343,8 +332,7 @@ export const jwtConstants = {
 
 现在，打开 `auth` 文件夹中的 `auth.module.ts` 文件，并按如下内容更新：
 
-```typescript
-@@filename(auth/auth.module)
+```typescript title="auth/auth.module"
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalStrategy } from './local.strategy';
@@ -372,8 +360,7 @@ export class AuthModule {}
 
 现在我们可以更新 `/auth/login` 路由以返回 JWT 令牌。
 
-```typescript
-@@filename(app.controller)
+```typescript title="app.controller"
 import { Controller, Request, Post, UseGuards } from '@nestjs/common';
 import { LocalAuthGuard } from './auth/local-auth.guard';
 import { AuthService } from './auth/auth.service';
@@ -403,8 +390,7 @@ $ # Note: above JWT truncated
 
 现在我们可以解决最后的需求：通过要求请求中包含有效的 JWT 来保护端点。Passport 在这方面也能帮助我们。它提供了 [passport-jwt](https://github.com/mikenicholson/passport-jwt) 策略来用 JSON Web Tokens 保护 RESTful 端点。首先在 `auth` 文件夹中创建名为 `jwt.strategy.ts` 的文件，并添加以下代码：
 
-```typescript
-@@filename(auth/jwt.strategy)
+```typescript title="auth/jwt.strategy"
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
@@ -442,8 +428,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
 将新的 `JwtStrategy` 作为提供者添加到 `AuthModule` 中：
 
-```typescript
-@@filename(auth/auth.module)
+```typescript title="auth/auth.module"
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalStrategy } from './local.strategy';
@@ -472,8 +457,7 @@ export class AuthModule {}
 
 最后，我们定义继承内置 `AuthGuard` 的 `JwtAuthGuard` 类：
 
-```typescript
-@@filename(auth/jwt-auth.guard)
+```typescript title="auth/jwt-auth.guard"
 import { Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -487,8 +471,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {}
 
 打开 `app.controller.ts` 文件并按如下所示进行更新：
 
-```typescript
-@@filename(app.controller)
+```typescript title="app.controller"
 import { Controller, Get, Request, Post, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { LocalAuthGuard } from './auth/local-auth.guard';

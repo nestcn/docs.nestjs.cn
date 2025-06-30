@@ -115,6 +115,7 @@ $ npm run start:dev
 ```bash
 # 使用 eslint 进行代码检查和自动修复
 $ npm run lint
+```
 
 # 使用 prettier 进行代码格式化
 $ npm run format
@@ -165,6 +166,7 @@ $ nest new project-name
 ```bash
 # 使用 yarn
 $ nest new project-name --package-manager yarn
+```
 
 # 使用 pnpm
 $ nest new project-name --package-manager pnpm
@@ -178,6 +180,7 @@ $ nest new project-name --skip-install
 ```bash
 # 使用严格模式 TypeScript
 $ nest new project-name --strict
+```
 
 # 指定特定目录
 $ nest new project-name --directory my-app
@@ -201,6 +204,7 @@ $ nest new project-name --skip-git
    $ echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.profile
    $ source ~/.profile
    ```
+```
 
 2. **网络问题**：
    ```bash
@@ -211,12 +215,14 @@ $ nest new project-name --skip-git
    $ npm install -g cnpm --registry=https://registry.npmmirror.com
    $ cnpm i -g @nestjs/cli
    ```
+```
 
 3. **代理设置**：
    ```bash
    $ npm config set proxy http://proxy.company.com:8080
    $ npm config set https-proxy http://proxy.company.com:8080
    ```
+```
 
 将创建 `project-name` 目录，安装 node 模块和一些其他样板文件，并创建 `src/` 目录，其中会生成若干核心文件。
 
@@ -242,8 +248,7 @@ src/
 
 `main.ts` 包含一个异步函数，该函数将**引导启动**我们的应用程序：
 
-```typescript
-@@filename(main)
+```typescript title="main"
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
@@ -310,6 +315,7 @@ For headless environments where an IDE is not relevant (Continuous Integration, 
 ```bash
 # Lint and autofix with eslint
 $ npm run lint
+```
 
 # Format with prettier
 $ npm run format
@@ -356,6 +362,7 @@ $ npm run format
 # 生成新模块
 $ nest generate module cats
 $ nest g mo cats  # 简写
+```
 
 # 生成控制器
 $ nest generate controller cats

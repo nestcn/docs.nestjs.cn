@@ -20,8 +20,7 @@ $ npm i --save @nestjs/microservices
 
 要实例化微服务，请使用 `NestFactory` 类的 `createMicroservice()` 方法：
 
-```typescript
-@@filename(main)
+```typescript title="main"
 import { NestFactory } from '@nestjs/core';
 import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 import { AppModule } from './app.module';
@@ -62,8 +61,7 @@ bootstrap();
 
 要创建基于请求-响应模式的消息处理器，请使用从 `@nestjs/microservices` 包导入的 `@MessagePattern()` 装饰器。该装饰器应仅在[控制器](https://docs.nestjs.com/controllers)类中使用，因为它们是应用程序的入口点。在提供者中使用它将不会产生任何效果，因为它们会被 Nest 运行时忽略。
 
-```typescript
-@@filename(math.controller)
+```typescript title="math.controller"
 import { Controller } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 
@@ -83,7 +81,6 @@ export class MathController {
 消息处理器可以同步或**异步**响应，这意味着支持 `async` 方法。
 
 ```typescript
-@@filename()
 @MessagePattern({ cmd: 'sum' })
 async accumulate(data: number[]): Promise<number> {
   return (data || []).reduce((a, b) => a + b);
@@ -93,7 +90,6 @@ async accumulate(data: number[]): Promise<number> {
 消息处理器也可以返回一个 `Observable`，此时结果值将持续发射直到流完成。
 
 ```typescript
-@@filename()
 @MessagePattern({ cmd: 'sum' })
 accumulate(data: number[]): Observable<number> {
   return from([1, 2, 3]);
@@ -111,7 +107,6 @@ accumulate(data: number[]): Observable<number> {
 要创建事件处理器，您可以使用从 `@nestjs/microservices` 包导入的 `@EventPattern()` 装饰器。
 
 ```typescript
-@@filename()
 @EventPattern('user_created')
 async handleUserCreated(data: Record<string, unknown>) {
   // business logic
@@ -127,7 +122,6 @@ async handleUserCreated(data: Record<string, unknown>) {
 在更高级的场景中，您可能需要访问有关传入请求的额外细节。例如，当使用带有通配符订阅的 NATS 时，您可能希望获取生产者发送消息的原始主题。同样地，对于 Kafka，您可能需要访问消息头。为此，您可以利用如下所示的内置装饰器：
 
 ```typescript
-@@filename()
 @MessagePattern('time.us.*')
 getDate(@Payload() data: number[], @Ctx() context: NatsContext) {
   console.log(`Subject: ${context.getSubject()}`); // e.g. "time.us.east"
@@ -225,7 +219,6 @@ client: ClientProxy;
 `ClientProxy` 具有**延迟初始化**特性，它不会立即建立连接。实际连接会在首次微服务调用前建立，并在后续调用中复用。若希望延迟应用启动流程直至连接建立完成，可以在 `OnApplicationBootstrap` 生命周期钩子中，通过 `ClientProxy` 对象的 `connect()` 方法手动初始化连接。
 
 ```typescript
-@@filename()
 async onApplicationBootstrap() {
   await this.client.connect();
 }
@@ -238,7 +231,6 @@ async onApplicationBootstrap() {
 `ClientProxy` 公开了一个 `send()` 方法。该方法用于调用微服务，并返回一个包含其响应的 `Observable`。因此，我们可以轻松订阅所发出的值。
 
 ```typescript
-@@filename()
 accumulate(): Observable<number> {
   const pattern = { cmd: 'sum' };
   const payload = [1, 2, 3];
@@ -253,7 +245,6 @@ accumulate(): Observable<number> {
 要发送事件，请使用 `ClientProxy` 对象的 `emit()` 方法。该方法将事件发布到消息代理。
 
 ```typescript
-@@filename()
 async publish() {
   this.client.emit<number>('user_created', new UserCreatedEvent());
 }
@@ -356,7 +347,6 @@ const netServer = server.unwrap<Server>();
 要实现此功能，您需要使用 [`rxjs`](https://github.com/ReactiveX/rxjs) 包。只需在管道中使用 `timeout` 操作符即可：
 
 ```typescript
-@@filename()
 this.client
   .send<TResult, TInput>(pattern, data)
   .pipe(timeout(5000));

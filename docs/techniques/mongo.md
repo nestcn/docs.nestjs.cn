@@ -10,8 +10,7 @@ $ npm i @nestjs/mongoose mongoose
 
 安装完成后，我们可以将 `MongooseModule` 导入根模块 `AppModule`。
 
-```typescript
-@@filename(app.module)
+```typescript title="app.module"
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
@@ -31,8 +30,7 @@ export class AppModule {}
 
 我们来定义 `CatSchema`：
 
-```typescript
-@@filename(schemas/cat.schema)
+```typescript title="schemas/cat.schema"
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
@@ -134,8 +132,7 @@ export const CatSchema = new mongoose.Schema({
 
 让我们看看 `CatsModule`：
 
-```typescript
-@@filename(cats.module)
+```typescript title="cats.module"
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CatsController } from './cats.controller';
@@ -154,8 +151,7 @@ export class CatsModule {}
 
 注册完模式后，就可以使用 `@InjectModel()` 装饰器将 `Cat` 模型注入到 `CatsService` 中：
 
-```typescript
-@@filename(cats.service)
+```typescript title="cats.service"
 import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -172,28 +168,6 @@ export class CatsService {
   }
 
   async findAll(): Promise<Cat[]> {
-    return this.catModel.find().exec();
-  }
-}
-@@switch
-import { Model } from 'mongoose';
-import { Injectable, Dependencies } from '@nestjs/common';
-import { getModelToken } from '@nestjs/mongoose';
-import { Cat } from './schemas/cat.schema';
-
-@Injectable()
-@Dependencies(getModelToken(Cat.name))
-export class CatsService {
-  constructor(catModel) {
-    this.catModel = catModel;
-  }
-
-  async create(createCatDto) {
-    const createdCat = new this.catModel(createCatDto);
-    return createdCat.save();
-  }
-
-  async findAll() {
     return this.catModel.find().exec();
   }
 }
@@ -242,8 +216,7 @@ export class CatsService {
 
 某些项目需要连接多个数据库。使用本模块同样可以实现这一需求。要使用多个连接，首先需要创建这些连接。在这种情况下， **必须**为连接命名。
 
-```typescript
-@@filename(app.module)
+```typescript title="app.module"
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
@@ -300,8 +273,7 @@ export class CatsService {
 
 如果仅需从命名数据库注入模型，可将连接名称作为 `@InjectModel()` 装饰器的第二个参数使用。
 
-```typescript
-@@filename(cats.service)
+```typescript title="cats.service"
 @Injectable()
 export class CatsService {
   constructor(@InjectModel(Cat.name, 'cats') private catModel: Model<Cat>) {}
@@ -382,8 +354,7 @@ export class AppModule {}
 
 要一次性为所有模式注册插件，请调用 `Connection` 对象的 `.plugin()` 方法。您应在创建模型前访问连接，为此可使用 `connectionFactory`：
 
-```typescript
-@@filename(app.module)
+```typescript title="app.module"
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
@@ -406,8 +377,7 @@ export class AppModule {}
 
 假设您需要在单个集合中追踪不同类型的事件。每个事件都将包含时间戳。
 
-```typescript
-@@filename(event.schema)
+```typescript title="event.schema"
 @Schema({ discriminatorKey: 'kind' })
 export class Event {
   @Prop({
@@ -430,8 +400,7 @@ export const EventSchema = SchemaFactory.createForClass(Event);
 
 现在，我们来定义 `ClickedLinkEvent` 类，如下所示：
 
-```typescript
-@@filename(click-link-event.schema)
+```typescript title="click-link-event.schema"
 @Schema()
 export class ClickedLinkEvent {
   kind: string;
@@ -446,8 +415,7 @@ export const ClickedLinkEventSchema = SchemaFactory.createForClass(ClickedLinkEv
 
 以及 `SignUpEvent` 类：
 
-```typescript
-@@filename(sign-up-event.schema)
+```typescript title="sign-up-event.schema"
 @Schema()
 export class SignUpEvent {
   kind: string;
@@ -462,8 +430,7 @@ export const SignUpEventSchema = SchemaFactory.createForClass(SignUpEvent);
 
 配置完成后，使用 `discriminators` 选项为指定模式注册鉴别器。该选项同时适用于 `MongooseModule.forFeature` 和 `MongooseModule.forFeatureAsync` ：
 
-```typescript
-@@filename(event.module)
+```typescript title="event.module"
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
@@ -607,8 +574,7 @@ MongooseModule.forRootAsync({
 
 要在父文档中嵌套子文档，您可以按如下方式定义模式：
 
-```typescript
-@@filename(name.schema)
+```typescript title="name.schema"
 @Schema()
 export class Name {
   @Prop()
@@ -623,8 +589,7 @@ export const NameSchema = SchemaFactory.createForClass(Name);
 
 然后在父模式中引用子文档：
 
-```typescript
-@@filename(person.schema)
+```typescript title="person.schema"
 @Schema()
 export class Person {
   @Prop(NameSchema)
@@ -642,8 +607,7 @@ export type PersonDocument = HydratedDocument<Person, PersonDocumentOverride>;
 
 如果需要包含多个子文档，可以使用子文档数组。重要的是要相应地覆盖属性的类型：
 
-```typescript
-@@filename(name.schema)
+```typescript title="name.schema"
 @Schema()
 export class Person {
   @Prop([NameSchema])

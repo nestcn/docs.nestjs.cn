@@ -41,6 +41,7 @@ You can also access properties defined in Front Matter in the body, for example:
 ---
 title: Hello world
 ---
+```
 
 # {frontmatter.title}
 ```
@@ -61,6 +62,7 @@ You can use the `:::` syntax to create custom containers and support custom titl
 :::tip
 This is a `block` of type `tip`
 :::
+```
 
 :::info
 This is a `block` of type `info`
@@ -132,7 +134,6 @@ console.log('Hello World');
 
 ```js title="hello.js"
 console.log('Hello World');
-```
 ````
 
 **Output:**
@@ -188,7 +189,6 @@ console.log(a);
 const b = 2;
 
 console.log(b);
-```
 ````
 
 **Output:**

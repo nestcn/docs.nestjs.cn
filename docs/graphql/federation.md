@@ -132,6 +132,7 @@ import {
 import { Module } from '@nestjs/common';
 import { UsersResolver } from './users.resolver';
 import { UsersService } from './users.service'; // Not included in this example
+```
 
 @Module({
   imports: [
@@ -323,6 +324,7 @@ import { User } from './user.entity';
 import { PostsResolvers } from './posts.resolvers';
 import { UsersResolvers } from './users.resolvers';
 import { PostsService } from './posts.service'; // Not included in example
+```
 
 @Module({
   imports: [
@@ -503,6 +505,7 @@ import {
 import { Module } from '@nestjs/common';
 import { UsersResolver } from './users.resolver';
 import { UsersService } from './users.service'; // Not included in this example
+```
 
 @Module({
   imports: [
@@ -694,6 +697,7 @@ import { User } from './user.entity';
 import { PostsResolvers } from './posts.resolvers';
 import { UsersResolvers } from './users.resolvers';
 import { PostsService } from './posts.service'; // Not included in example
+```
 
 @Module({
   imports: [
@@ -778,6 +782,7 @@ import {
 import { Module } from '@nestjs/common';
 import { UsersResolver } from './users.resolver';
 import { UsersService } from './users.service'; // Not included in this example
+```
 
 @Module({
   imports: [
@@ -850,6 +855,7 @@ import { User } from './user.entity';
 import { PostsResolvers } from './posts.resolvers';
 import { UsersResolvers } from './users.resolvers';
 import { PostsService } from './posts.service'; // Not included in example
+```
 
 @Module({
   imports: [

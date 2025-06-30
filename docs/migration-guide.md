@@ -103,6 +103,7 @@ bootstrap();
 
 ```typescript
 const methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']; // 或逗号分隔的字符串 'GET,POST,PUT,PATH,DELETE'
+```
 
 const app = await NestFactory.create<NestFastifyApplication>(
   AppModule,

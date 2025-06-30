@@ -23,8 +23,7 @@ $ npm i --save-dev @nestjs/testing
 
 在以下示例中，我们测试两个类：`CatsController` 和 `CatsService`。如前所述，[Jest](https://github.com/facebook/jest) 是默认提供的测试框架，它既是测试运行器，又提供了断言函数和测试替身工具，可用于模拟、监视等操作。在这个基础测试中，我们手动实例化这些类，并确保控制器和服务满足它们的 API 约定。
 
-```typescript
-@@filename(cats.controller.spec)
+```typescript title="cats.controller.spec"
 import { CatsController } from './cats.controller';
 import { CatsService } from './cats.service';
 
@@ -56,8 +55,7 @@ describe('CatsController', () => {
 
 `@nestjs/testing` 包提供了一系列实用工具，能够实现更健壮的测试流程。让我们使用内置的 `Test` 类重写之前的示例：
 
-```typescript
-@@filename(cats.controller.spec)
+```typescript title="cats.controller.spec"
 import { Test } from '@nestjs/testing';
 import { CatsController } from './cats.controller';
 import { CatsService } from './cats.service';
@@ -155,8 +153,7 @@ describe('CatsController', () => {
 
 与专注于单个模块和类的单元测试不同，端到端(e2e)测试涵盖了类和模块在更高聚合层级上的交互——更接近最终用户与生产系统的交互方式。随着应用规模增长，手动测试每个 API 端点的端到端行为变得困难。自动化端到端测试帮助我们确保系统的整体行为正确并满足项目需求。执行 e2e 测试时，我们使用与**单元测试**相似的配置。此外，Nest 可以轻松使用 [Supertest](https://github.com/visionmedia/supertest) 库来模拟 HTTP 请求。
 
-```typescript
-@@filename(cats.e2e-spec)
+```typescript title="cats.e2e-spec"
 import * as request from 'supertest';
 import { Test } from '@nestjs/testing';
 import { CatsModule } from '../../src/cats/cats.module';
@@ -224,6 +221,7 @@ describe('Cats', () => {
 >   await app.close();
 > });
 > ```
+```
 
 在本例中，我们基于之前描述的一些概念进行构建。除了之前使用的 `compile()` 方法外，我们现在还使用 `createNestApplication()` 方法来实例化完整的 Nest 运行时环境。
 

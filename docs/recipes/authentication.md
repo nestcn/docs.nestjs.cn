@@ -25,8 +25,7 @@ $ nest g service users
 
 替换这些生成文件的默认内容如下所示。对于我们的示例应用，`UsersService` 仅维护一个硬编码的内存用户列表，以及一个通过用户名检索用户的方法。在实际应用中，这里将构建用户模型和持久层，使用您选择的库（如 TypeORM、Sequelize、Mongoose 等）。
 
-```typescript
-@@filename(users/users.service)
+```typescript title="users/users.service"
 import { Injectable } from '@nestjs/common';
 
 // This should be a real class/interface representing a user entity
@@ -55,8 +54,7 @@ export class UsersService {
 
 在 `UsersModule` 中，唯一需要做的改动是将 `UsersService` 添加到 `@Module` 装饰器的 exports 数组中，以便该服务在此模块外可见（稍后我们将把它用于 `AuthService` 中）。
 
-```typescript
-@@filename(users/users.module)
+```typescript title="users/users.module"
 import { Module } from '@nestjs/common';
 import { UsersService } from './users.service';
 
@@ -71,8 +69,7 @@ export class UsersModule {}
 
 我们的 `AuthService` 负责检索用户并验证密码。为此我们创建了一个 `signIn()` 方法。在下面的代码中，我们使用了便捷的 ES6 扩展运算符，在返回用户对象前移除了 password 属性。这是返回用户对象时的常见做法，因为你不希望暴露密码或其他安全密钥等敏感字段。
 
-```typescript
-@@filename(auth/auth.service)
+```typescript title="auth/auth.service"
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 
@@ -97,8 +94,7 @@ export class AuthService {
 
 现在，我们更新 `AuthModule` 以导入 `UsersModule`。
 
-```typescript
-@@filename(auth/auth.module)
+```typescript title="auth/auth.module"
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
@@ -114,8 +110,7 @@ export class AuthModule {}
 
 完成这些设置后，让我们打开 `AuthController` 并添加一个 `signIn()` 方法。客户端将通过调用此方法来验证用户身份。该方法会接收请求体中的用户名和密码，并在用户验证通过时返回一个 JWT 令牌。
 
-```typescript
-@@filename(auth/auth.controller)
+```typescript title="auth/auth.controller"
 import { Body, Controller, Post, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 
@@ -150,8 +145,7 @@ $ npm install --save @nestjs/jwt
 
 为了保持服务的模块化整洁，我们将在 `authService` 中处理 JWT 生成。打开 `auth` 文件夹中的 `auth.service.ts` 文件，注入 `JwtService`，并更新 `signIn` 方法以生成 JWT 令牌，如下所示：
 
-```typescript
-@@filename(auth/auth.service)
+```typescript title="auth/auth.service"
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
@@ -185,8 +179,7 @@ export class AuthService {
 
 首先，在 `auth` 文件夹中创建 `constants.ts`，并添加以下代码：
 
-```typescript
-@@filename(auth/constants)
+```typescript title="auth/constants"
 export const jwtConstants = {
   secret: 'DO NOT USE THIS VALUE. INSTEAD, CREATE A COMPLEX SECRET AND KEEP IT SAFE OUTSIDE OF THE SOURCE CODE.',
 };
@@ -198,8 +191,7 @@ export const jwtConstants = {
 
 现在，打开 `auth` 文件夹中的 `auth.module.ts` 文件，并按如下内容更新：
 
-```typescript
-@@filename(auth/auth.module)
+```typescript title="auth/auth.module"
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersModule } from '../users/users.module';
@@ -240,8 +232,7 @@ $ # Note: above JWT truncated
 
 现在我们可以解决最后一个需求：通过要求请求中包含有效的 JWT 来保护端点。我们将通过创建一个 `AuthGuard` 来实现，用它来保护我们的路由。
 
-```typescript
-@@filename(auth/auth.guard)
+```typescript title="auth/auth.guard"
 import {
   CanActivate,
   ExecutionContext,
@@ -289,8 +280,7 @@ export class AuthGuard implements CanActivate {
 
 打开 `auth.controller.ts` 文件并按如下所示进行更新：
 
-```typescript
-@@filename(auth.controller)
+```typescript title="auth.controller"
 import {
   Body,
   Controller,

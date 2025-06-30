@@ -162,8 +162,7 @@ app.useGlobalPipes(
 
 通过网络传输的有效载荷是纯 JavaScript 对象。`ValidationPipe` 可以自动将这些有效载荷转换为根据其 DTO 类定义类型的对象。要启用自动转换功能，需将 `transform` 设置为 `true`。这可以在方法级别进行配置：
 
-```typescript
-@@filename(cats.controller)
+```typescript title="cats.controller"
 @Post()
 @UsePipes(new ValidationPipe({ transform: true }))
 async create(@Body() createCatDto: CreateCatDto) {

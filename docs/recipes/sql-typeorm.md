@@ -16,8 +16,7 @@ $ npm install --save typeorm mysql2
 
 第一步需要使用从 `typeorm` 包导入的 `new DataSource().initialize()` 类建立与数据库的连接。`initialize()` 函数返回一个 `Promise`，因此我们需要创建一个[异步提供者](/fundamentals/async-components) 。
 
-```typescript
-@@filename(database.providers)
+```typescript title="database.providers"
 import { DataSource } from 'typeorm';
 
 export const databaseProviders = [
@@ -49,8 +48,7 @@ export const databaseProviders = [
 
 接着，我们需要导出这些提供者，使它们对应用程序的**其他部分可访问** 。
 
-```typescript
-@@filename(database.module)
+```typescript title="database.module"
 import { Module } from '@nestjs/common';
 import { databaseProviders } from './database.providers';
 
@@ -69,8 +67,7 @@ export class DatabaseModule {}
 
 但首先，我们需要至少一个实体。我们将复用官方文档中的 `Photo` 实体。
 
-```typescript
-@@filename(photo.entity)
+```typescript title="photo.entity"
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
@@ -97,8 +94,7 @@ export class Photo {
 
 `Photo` 实体属于 `photo` 目录，该目录代表 `PhotoModule`。现在让我们创建一个 **Repository** 提供者：
 
-```typescript
-@@filename(photo.providers)
+```typescript title="photo.providers"
 import { DataSource } from 'typeorm';
 import { Photo } from './photo.entity';
 
@@ -115,8 +111,7 @@ export const photoProviders = [
 
 现在我们可以使用 `@Inject()` 装饰器将 `Repository<Photo>` 注入到 `PhotoService` 中：
 
-```typescript
-@@filename(photo.service)
+```typescript title="photo.service"
 import { Injectable, Inject } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Photo } from './photo.entity';
@@ -138,8 +133,7 @@ export class PhotoService {
 
 以下是最终的 `PhotoModule`：
 
-```typescript
-@@filename(photo.module)
+```typescript title="photo.module"
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from '../database/database.module';
 import { photoProviders } from './photo.providers';

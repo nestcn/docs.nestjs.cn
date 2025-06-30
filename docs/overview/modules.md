@@ -23,8 +23,7 @@
 
 接下来，我们将创建 `CatsModule` 来演示如何将控制器和服务进行分组。
 
-```typescript
-@@filename(cats/cats.module)
+```typescript title="cats/cats.module"
 import { Module } from '@nestjs/common';
 import { CatsController } from './cats.controller';
 import { CatsService } from './cats.service';
@@ -40,8 +39,7 @@ export class CatsModule {}
 
 如上所述，我们在 `cats.module.ts` 文件中定义了 `CatsModule`，并将与此模块相关的所有内容移至 `cats` 目录。最后需要做的是将此模块导入根模块（即 `AppModule`，定义在 `app.module.ts` 文件中）。
 
-```typescript
-@@filename(app.module)
+```typescript title="app.module"
 import { Module } from '@nestjs/common';
 import { CatsModule } from './cats/cats.module';
 
@@ -83,8 +81,7 @@ export class AppModule {}
 
 每个模块自动成为**共享模块** 。一旦创建，它就可以被任何模块重复使用。假设我们想在多个其他模块之间共享 `CatsService` 的实例。为此，我们首先需要通过将该提供者添加到模块的 `exports` 数组来**导出** `CatsService`，如下所示：
 
-```typescript
-@@filename(cats.module)
+```typescript title="cats.module"
 import { Module } from '@nestjs/common';
 import { CatsController } from './cats.controller';
 import { CatsService } from './cats.service';
@@ -121,8 +118,7 @@ export class CoreModule {}
 
 模块类本身也可以 **注入** 提供者（例如用于配置目的）：
 
-```typescript
-@@filename(cats.module)
+```typescript title="cats.module"
 import { Module } from '@nestjs/common';
 import { CatsController } from './cats.controller';
 import { CatsService } from './cats.service';
@@ -167,7 +163,6 @@ export class CatsModule {}
 Nest 中的动态模块允许创建可在运行时配置的模块。当需要提供灵活、可定制的模块（其提供者能根据特定选项或配置创建时）特别有用。以下是关于**动态模块**运作原理的简要说明。
 
 ```typescript
-@@filename()
 import { Module, DynamicModule } from '@nestjs/common';
 import { createDatabaseProviders } from './database.providers';
 import { Connection } from './connection.provider';

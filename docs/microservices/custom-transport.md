@@ -252,8 +252,7 @@ event to dispatch:  { pattern: 'event', data: 'Hello world!' }
 
 若需在客户端围绕响应序列化添加自定义逻辑，可创建一个继承自 `ClientProxy` 或其子类的自定义类。要修改成功请求，可重写 `serializeResponse` 方法；若要修改经此客户端的所有错误，可重写 `serializeError` 方法。使用此自定义类时，可通过 `customClass` 属性将类本身传入 `ClientsModule.register()` 方法。以下是将每个错误序列化为 `RpcException` 的自定义 `ClientProxy` 示例。
 
-```typescript
-@@filename(error-handling.proxy)
+```typescript title="error-handling.proxy"
 import { ClientTcp, RpcException } from '@nestjs/microservices';
 
 class ErrorHandlingProxy extends ClientTCP {
@@ -265,8 +264,7 @@ class ErrorHandlingProxy extends ClientTCP {
 
 然后在 `ClientsModule` 中这样使用：
 
-```typescript
-@@filename(app.module)
+```typescript title="app.module"
 @Module({
   imports: [
     ClientsModule.register([{

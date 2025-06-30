@@ -52,6 +52,7 @@
 ```bash
 # JWT 认证
 $ npm install --save @nestjs/jwt
+```
 
 # Passport 集成
 $ npm install --save @nestjs/passport passport passport-local

@@ -17,8 +17,7 @@ $ npm install --save-dev @types/sequelize
 
 第一步是创建一个带有选项对象的 **Sequelize** 实例，并将其传入构造函数。此外，我们需要添加所有模型（另一种方法是使用 `modelPaths` 属性）并 `sync()` 我们的数据库表。
 
-```typescript
-@@filename(database.providers)
+```typescript title="database.providers"
 import { Sequelize } from 'sequelize-typescript';
 import { Cat } from '../cats/cat.entity';
 
@@ -63,8 +62,7 @@ export class DatabaseModule {}
 
 在 [Sequelize](https://github.com/sequelize/sequelize) 中，**Model** 定义了数据库中的一张表。该类的实例代表数据库中的一行记录。首先，我们至少需要一个实体：
 
-```typescript
-@@filename(cat.entity)
+```typescript title="cat.entity"
 import { Table, Column, Model } from 'sequelize-typescript';
 
 @Table
@@ -82,8 +80,7 @@ export class Cat extends Model {
 
 `Cat` 实体属于 `cats` 目录，该目录代表 `CatsModule` 模块。现在该创建一个 **Repository** 提供者了：
 
-```typescript
-@@filename(cats.providers)
+```typescript title="cats.providers"
 import { Cat } from './cat.entity';
 
 export const catsProviders = [
@@ -100,8 +97,7 @@ export const catsProviders = [
 
 现在我们可以通过 `@Inject()` 装饰器将 `CATS_REPOSITORY` 注入到 `CatsService` 中：
 
-```typescript
-@@filename(cats.service)
+```typescript title="cats.service"
 import { Injectable, Inject } from '@nestjs/common';
 import { CreateCatDto } from './dto/create-cat.dto';
 import { Cat } from './cat.entity';
@@ -123,8 +119,7 @@ export class CatsService {
 
 以下是最终的 `CatsModule`：
 
-```typescript
-@@filename(cats.module)
+```typescript title="cats.module"
 import { Module } from '@nestjs/common';
 import { CatsController } from './cats.controller';
 import { CatsService } from './cats.service';

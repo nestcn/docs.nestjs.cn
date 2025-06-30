@@ -134,8 +134,7 @@ Nest 提供了通过 `Reflector#createDecorator` 方法创建的装饰器以及�
 
 要使用 `Reflector#createDecorator` 创建强类型装饰器，我们需要指定类型参数。例如，让我们创建一个接受字符串数组作为参数的 `Roles` 装饰器。
 
-```ts
-@@filename(roles.decorator)
+```ts title="roles.decorator"
 import { Reflector } from '@nestjs/core';
 
 export const Roles = Reflector.createDecorator<string[]>();
@@ -145,18 +144,10 @@ export const Roles = Reflector.createDecorator<string[]>();
 
 现在要使用这个装饰器，我们只需用它来注解处理器：
 
-```typescript
-@@filename(cats.controller)
+```typescript title="cats.controller"
 @Post()
 @Roles(['admin'])
 async create(@Body() createCatDto: CreateCatDto) {
-  this.catsService.create(createCatDto);
-}
-@@switch
-@Post()
-@Roles(['admin'])
-@Bind(Body())
-async create(createCatDto) {
   this.catsService.create(createCatDto);
 }
 ```
@@ -165,19 +156,10 @@ async create(createCatDto) {
 
 为了访问路由的角色（自定义元数据），我们将再次使用 `Reflector` 辅助类。`Reflector` 可以通过常规方式注入到类中：
 
-```typescript
-@@filename(roles.guard)
+```typescript title="roles.guard"
 @Injectable()
 export class RolesGuard {
   constructor(private reflector: Reflector) {}
-}
-@@switch
-@Injectable()
-@Dependencies(Reflector)
-export class CatsService {
-  constructor(reflector) {
-    this.reflector = reflector;
-  }
 }
 ```
 
@@ -193,12 +175,7 @@ const roles = this.reflector.get(Roles, context.getHandler());
 
 或者，我们也可以通过将元数据应用到控制器级别来组织控制器，这将应用于控制器类中的所有路由。
 
-```typescript
-@@filename(cats.controller)
-@Roles(['admin'])
-@Controller('cats')
-export class CatsController {}
-@@switch
+```typescript title="cats.controller"
 @Roles(['admin'])
 @Controller('cats')
 export class CatsController {}
@@ -206,8 +183,7 @@ export class CatsController {}
 
 在这种情况下，为了提取控制器元数据，我们传递 `context.getClass()` 作为第二个参数（以提供控制器类作为元数据提取的上下文），而不是 `context.getHandler()`：
 
-```typescript
-@@filename(roles.guard)
+```typescript title="roles.guard"
 const roles = this.reflector.get(Roles, context.getClass());
 ```
 
@@ -215,25 +191,13 @@ const roles = this.reflector.get(Roles, context.getClass());
 
 考虑以下场景，您在这两个级别都提供了 `Roles` 元数据。
 
-```typescript
-@@filename(cats.controller)
+```typescript title="cats.controller"
 @Roles(['user'])
 @Controller('cats')
 export class CatsController {
   @Post()
   @Roles(['admin'])
   async create(@Body() createCatDto: CreateCatDto) {
-    this.catsService.create(createCatDto);
-  }
-}
-@@switch
-@Roles(['user'])
-@Controller('cats')
-export class CatsController {}
-  @Post()
-  @Roles(['admin'])
-  @Bind(Body())
-  async create(createCatDto) {
     this.catsService.create(createCatDto);
   }
 }
@@ -267,18 +231,10 @@ const roles = this.reflector.getAllAndMerge(Roles, [
 
 如前所述，除了使用 `Reflector#createDecorator` 外，您也可以使用内置的 `@SetMetadata()` 装饰器来为处理器附加元数据。
 
-```typescript
-@@filename(cats.controller)
+```typescript title="cats.controller"
 @Post()
 @SetMetadata('roles', ['admin'])
 async create(@Body() createCatDto: CreateCatDto) {
-  this.catsService.create(createCatDto);
-}
-@@switch
-@Post()
-@SetMetadata('roles', ['admin'])
-@Bind(Body())
-async create(createCatDto) {
   this.catsService.create(createCatDto);
 }
 ```
@@ -287,52 +243,30 @@ async create(createCatDto) {
 
 通过上述构建，我们将 `roles` 元数据（`roles` 是元数据键，`['admin']` 是关联值）附加到了 `create()` 方法上。虽然这种方式有效，但直接在路由中使用 `@SetMetadata()` 并不是最佳实践。相反，您可以创建自己的装饰器，如下所示：
 
-```typescript
-@@filename(roles.decorator)
+```typescript title="roles.decorator"
 import { SetMetadata } from '@nestjs/common';
 
 export const Roles = (...roles: string[]) => SetMetadata('roles', roles);
-@@switch
-import { SetMetadata } from '@nestjs/common';
-
-export const Roles = (...roles) => SetMetadata('roles', roles);
 ```
 
 这种方法更加简洁易读，某种程度上类似于 `Reflector#createDecorator` 的实现方式。不同之处在于，使用 `@SetMetadata` 您可以更好地控制元数据的键和值，并且可以创建接受多个参数的装饰器。
 
 现在我们有了自定义的 `@Roles()` 装饰器，就可以用它来装饰 `create()` 方法了。
 
-```typescript
-@@filename(cats.controller)
+```typescript title="cats.controller"
 @Post()
 @Roles('admin')
 async create(@Body() createCatDto: CreateCatDto) {
-  this.catsService.create(createCatDto);
-}
-@@switch
-@Post()
-@Roles('admin')
-@Bind(Body())
-async create(createCatDto) {
   this.catsService.create(createCatDto);
 }
 ```
 
 为了访问路由的角色信息（自定义元数据），我们将再次使用 `Reflector` 辅助类：
 
-```typescript
-@@filename(roles.guard)
+```typescript title="roles.guard"
 @Injectable()
 export class RolesGuard {
   constructor(private reflector: Reflector) {}
-}
-@@switch
-@Injectable()
-@Dependencies(Reflector)
-export class CatsService {
-  constructor(reflector) {
-    this.reflector = reflector;
-  }
 }
 ```
 

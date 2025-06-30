@@ -22,8 +22,7 @@ $ npm install --save @nestjs/bullmq bullmq
 
 安装完成后，我们可以将 `BullModule` 导入根 `AppModule` 中。
 
-```typescript
-@@filename(app.module)
+```typescript title="app.module"
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
 
@@ -363,8 +362,7 @@ await audioQueue.resume();
 - 能显著提高多核 CPU 的利用率。
 - 减少与 Redis 的连接数。
 
-```typescript
-@@filename(app.module)
+```typescript title="app.module"
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
 import { join } from 'path';
@@ -507,8 +505,7 @@ $ npm install --save @nestjs/bull bull
 
 安装过程完成后，我们可以将 `BullModule` 导入根模块 `AppModule` 中。
 
-```typescript
-@@filename(app.module)
+```typescript title="app.module"
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bull';
 
@@ -827,8 +824,7 @@ await audioQueue.resume();
 - 能更充分地利用多核 CPU 资源。
 - 减少与 Redis 的连接。
 
-```ts
-@@filename(app.module)
+```ts title="app.module"
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bull';
 import { join } from 'path';
@@ -846,8 +842,7 @@ export class AppModule {}
 
 请注意，由于您的函数是在分叉进程中执行的，依赖注入（及 IoC 容器）将不可用。这意味着您的处理器函数需要包含（或创建）所需的所有外部依赖实例。
 
-```ts
-@@filename(processor)
+```ts title="processor"
 import { Job, DoneCallback } from 'bull';
 
 export default function (job: Job, cb: DoneCallback) {

@@ -13,6 +13,7 @@
 ```bash
 # For Express and Apollo (default)
 $ npm i @nestjs/graphql @nestjs/apollo @apollo/server graphql
+```
 
 # For Fastify and Apollo
 # npm i @nestjs/graphql @nestjs/apollo @apollo/server @as-integrations/fastify graphql
@@ -38,7 +39,6 @@ Nest 提供了两种构建 GraphQL 应用的方式： **代码优先**和**架�
 安装完相关包后，我们可以导入 `GraphQLModule` 并通过 `forRoot()` 静态方法进行配置。
 
 ```typescript
-@@filename()
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
@@ -58,7 +58,6 @@ export class AppModule {}
 `forRoot()` 方法接收一个配置对象作为参数。这些配置会被传递到底层驱动实例（更多可用设置请参阅：[Apollo](https://www.apollographql.com/docs/apollo-server/api/apollo-server) 和 [Mercurius](https://github.com/mercurius-js/mercurius/blob/master/docs/api/options.md#plugin-options)）。例如，若要禁用 `playground` 并关闭 `debug` 模式（针对 Apollo），可传递如下配置：
 
 ```typescript
-@@filename()
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
@@ -96,6 +95,7 @@ Playground 是一个图形化、交互式的浏览器内 GraphQL IDE，默认情
 > ```
 >
 > 如果您的应用程序使用[订阅](/graphql/subscriptions)功能，请务必使用 `graphql-ws`，因为 GraphiQL 不支持 `subscriptions-transport-ws`。
+```
 
 #### 代码优先
 
@@ -331,7 +331,6 @@ GraphQLModule.forRootAsync<ApolloDriverConfig>({
 Fastify 用户（了解更多[此处](/techniques/performance) ）可以替代 Apollo 使用 `@nestjs/mercurius` 驱动。
 
 ```typescript
-@@filename()
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { MercuriusDriver, MercuriusDriverConfig } from '@nestjs/mercurius';

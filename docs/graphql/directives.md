@@ -107,6 +107,7 @@ GraphQLModule.forRoot({
 
 ```graphql
 directive @upper on FIELD_DEFINITION
+```
 
 type Post {
   id: Int!

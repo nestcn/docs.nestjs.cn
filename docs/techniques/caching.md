@@ -167,7 +167,6 @@ export class AppController {
 您也可以将 `CacheInterceptor` 应用于 WebSocket 订阅者以及微服务模式（无论使用何种传输方式）。
 
 ```typescript
-@@filename()
 @CacheKey('events')
 @UseInterceptors(CacheInterceptor)
 @SubscribeMessage('events')
@@ -181,7 +180,6 @@ handleEvent(client: Client, data: string[]): Observable<string[]> {
 此外，您可以使用 `@CacheTTL()` 装饰器指定缓存过期时间（TTL），这将覆盖全局默认的 TTL 值。
 
 ```typescript
-@@filename()
 @CacheTTL(10)
 @UseInterceptors(CacheInterceptor)
 @SubscribeMessage('events')

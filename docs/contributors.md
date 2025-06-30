@@ -29,6 +29,7 @@
    git clone https://github.com/YOUR_USERNAME/docs.nestjs.cn.git
    cd docs.nestjs.cn
    ```
+```
 
 2. **创建特性分支**
    ```bash
@@ -36,6 +37,7 @@
    # 或者
    git checkout -b fix/some-bug
    ```
+```
 
 3. **进行你的修改**
    - 📝 翻译新内容或改进现有翻译
@@ -49,6 +51,7 @@
    npm run dev
    ```
    在浏览器中查看你的修改效果
+```
 
 5. **提交你的修改**
    ```bash
@@ -57,11 +60,13 @@
    # 或者
    git commit -m "fix: correct translation error"
    ```
+```
 
 6. **推送到你的分支**
    ```bash
    git push origin feature/amazing-feature
    ```
+```
 
 7. **创建 Pull Request**
    - 访问你的 Fork 仓库页面

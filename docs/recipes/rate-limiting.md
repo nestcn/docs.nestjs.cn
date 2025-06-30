@@ -8,8 +8,7 @@ $ npm i --save @nestjs/throttler
 
 安装完成后，`ThrottlerModule` 可以像其他 Nest 包一样通过 `forRoot` 或 `forRootAsync` 方法进行配置。
 
-```typescript
-@@filename(app.module)
+```typescript title="app.module"
 @Module({
   imports: [
      ThrottlerModule.forRoot({
@@ -40,8 +39,7 @@ export class AppModule {}
 
 有时您可能需要设置多重节流规则，例如每秒不超过 3 次调用、10 秒内不超过 20 次调用、以及每分钟不超过 100 次调用。为此，您可以在数组中配置具有命名选项的定义，这些选项后续可通过 `@SkipThrottle()` 和 `@Throttle()` 装饰器再次引用以修改配置。
 
-```typescript
-@@filename(app.module)
+```typescript title="app.module"
 @Module({
   imports: [
     ThrottlerModule.forRoot([
@@ -111,8 +109,7 @@ findAll() {
 
 以下示例展示了如何为 Express 适配器启用 `trust proxy`：
 
-```typescript
-@@filename(main)
+```typescript title="main"
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
@@ -128,8 +125,7 @@ bootstrap();
 
 启用 `trust proxy` 可让你从 `X-Forwarded-For` 头部获取原始 IP 地址。你还可以通过重写 `getTracker()` 方法来自定义应用行为，从此头部提取 IP 地址而非依赖 `req.ip`。以下示例展示了如何在 Express 和 Fastify 中实现：
 
-```typescript
-@@filename(throttler-behind-proxy.guard)
+```typescript title="throttler-behind-proxy.guard"
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { Injectable } from '@nestjs/common';
 

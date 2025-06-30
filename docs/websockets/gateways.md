@@ -203,7 +203,7 @@ namespace: Namespace;
 import { Module } from '@nestjs/common';
 import { EventsGateway } from './events.gateway';
 
-@@filename(events.module)
+```typescript title="events.module"
 @Module({
   providers: [EventsGateway]
 })
@@ -212,8 +212,7 @@ export class EventsModule {}
 
 你也可以向装饰器传入属性键，以便从传入消息体中提取特定属性：
 
-```typescript
-@@filename(events.gateway)
+```typescript title="events.gateway"
 @SubscribeMessage('events')
 handleEvent(@MessageBody('id') id: number): number {
   // id === messageBody.id
@@ -223,8 +222,7 @@ handleEvent(@MessageBody('id') id: number): number {
 
 如果您不想使用装饰器，以下代码在功能上是等效的：
 
-```typescript
-@@filename(events.gateway)
+```typescript title="events.gateway"
 @SubscribeMessage('events')
 handleEvent(client: Socket, data: string): string {
   return data;
@@ -235,8 +233,7 @@ handleEvent(client: Socket, data: string): string {
 
 当接收到 `events` 消息时，处理程序会发送一个包含网络传输数据的确认响应。此外，还可以使用库特定的方式发送消息，例如利用 `client.emit()` 方法。要访问已连接的 socket 实例，请使用 `@ConnectedSocket()` 装饰器。
 
-```typescript
-@@filename(events.gateway)
+```typescript title="events.gateway"
 @SubscribeMessage('events')
 handleEvent(
   @MessageBody() data: string,
@@ -266,8 +263,7 @@ socket.emit('events', { name: 'Nest' }, (data) => console.log(data));
 
 确认通知仅会发送一次。此外，原生 WebSockets 实现并不支持此功能。为解决这一限制，您可以返回一个包含两个属性的对象：`event` 表示触发事件的名称，`data` 则是需要转发给客户端的数据。
 
-```typescript
-@@filename(events.gateway)
+```typescript title="events.gateway"
 @SubscribeMessage('events')
 handleEvent(@MessageBody() data: unknown): WsResponse<unknown> {
   const event = 'events';
@@ -289,8 +285,7 @@ socket.on('events', (data) => console.log(data));
 
 消息处理器能够以**同步**或**异步**方式响应。因此，支持 `async` 方法。消息处理器还能返回一个 `Observable`，在这种情况下，结果值将持续发射直到流完成。
 
-```typescript
-@@filename(events.gateway)
+```typescript title="events.gateway"
 @SubscribeMessage('events')
 onEvent(@MessageBody() data: unknown): Observable<WsResponse<number>> {
   const event = 'events';

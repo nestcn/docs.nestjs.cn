@@ -117,8 +117,7 @@ export class CatsController {
 
 此前，我们定义了一个用于获取猫咪资源的端点（**GET** 路由）。通常我们还需要提供创建新记录的端点。为此，让我们创建 **POST** 处理器：
 
-```typescript
-@@filename(cats.controller)
+```typescript title="cats.controller"
 import { Controller, Get, Post } from '@nestjs/common';
 
 @Controller('cats')
@@ -216,7 +215,6 @@ getDocs(@Query('version') version) {
 > info **注意** 带参数的路由应在所有静态路径之后声明。这样可以防止参数化路径拦截本该由静态路径处理的流量。
 
 ```typescript
-@@filename()
 @Get(':id')
 findOne(@Param() params: any): string {
   console.log(params.id);
@@ -229,7 +227,6 @@ findOne(@Param() params: any): string {
 > info **提示** 从 `@nestjs/common` 包中导入 `Param`。
 
 ```typescript
-@@filename()
 @Get(':id')
 findOne(@Param('id') id: string): string {
   return `This action returns a #${id} cat`;
@@ -274,8 +271,7 @@ export class AccountController {
 
 我们热爱现代 JavaScript，尤其推崇其**异步**数据处理机制。因此 Nest 全面支持 `async` 函数，每个 `async` 函数都必须返回 `Promise`，这使得您可以返回一个延迟值由 Nest 自动解析。示例如下：
 
-```typescript
-@@filename(cats.controller)
+```typescript title="cats.controller"
 @Get()
 async findAll(): Promise<any[]> {
   return [];
@@ -284,8 +280,7 @@ async findAll(): Promise<any[]> {
 
 这段代码完全有效。但 Nest 更进一步，允许路由处理器返回 RxJS 的[可观察流](https://rxjs-dev.firebaseapp.com/guide/observable) ，Nest 会在内部处理订阅并在流完成时解析最终发出的值。
 
-```typescript
-@@filename(cats.controller)
+```typescript title="cats.controller"
 @Get()
 findAll(): Observable<any[]> {
   return of([]);
@@ -302,8 +297,7 @@ findAll(): Observable<any[]> {
 
 我们来创建 `CreateCatDto` 类：
 
-```typescript
-@@filename(create-cat.dto)
+```typescript title="create-cat.dto"
 export class CreateCatDto {
   name: string;
   age: number;
@@ -313,8 +307,7 @@ export class CreateCatDto {
 
 它仅包含三个基本属性。之后我们就可以在 `CatsController` 中使用新创建的 DTO：
 
-```typescript
-@@filename(cats.controller)
+```typescript title="cats.controller"
 @Post()
 async create(@Body() createCatDto: CreateCatDto) {
   return 'This action adds a new cat';
@@ -329,8 +322,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 假设有个路由需要基于 `age` 和 `breed` 等查询参数筛选猫咪列表。首先在 `CatsController` 中定义查询参数：
 
-```typescript
-@@filename(cats.controller)
+```typescript title="cats.controller"
 @Get()
 async findAll(@Query('age') age: number, @Query('breed') breed: string) {
   return `This action returns all cats filtered by age: ${age} and breed: ${breed}`;
@@ -380,8 +372,7 @@ const app = await NestFactory.create<NestFastifyApplication>(
 
 以下示例展示了如何使用多个可用装饰器来创建基础控制器。该控制器提供了一些方法来访问和操作内部数据。
 
-```typescript
-@@filename(cats.controller)
+```typescript title="cats.controller"
 import { Controller, Get, Query, Post, Body, Put, Param, Delete } from '@nestjs/common';
 import { CreateCatDto, UpdateCatDto, ListAllEntities } from './dto';
 
@@ -422,8 +413,7 @@ export class CatsController {
 
 控制器必须始终属于某个模块，这就是为什么我们要在 `@Module()` 装饰器的 `controllers` 数组中包含它们。由于目前除了根模块 `AppModule` 外尚未定义其他模块，我们将用它来注册 `CatsController`：
 
-```typescript
-@@filename(app.module)
+```typescript title="app.module"
 import { Module } from '@nestjs/common';
 import { CatsController } from './cats/cats.controller';
 
@@ -440,7 +430,6 @@ export class AppModule {}
 到目前为止，我们已经介绍了 Nest 操作响应的标准方式。另一种方法是使用库特定的[响应对象](https://expressjs.com/en/api.html#res) 。要注入特定的响应对象，我们可以使用 `@Res()` 装饰器。为了突出差异，让我们像这样重写 `CatsController`：
 
 ```typescript
-@@filename()
 import { Controller, Get, Post, Res, HttpStatus } from '@nestjs/common';
 import { Response } from 'express';
 
@@ -463,7 +452,6 @@ export class CatsController {
 此外，采用这种方法会导致失去与依赖标准响应处理的 Nest 功能的兼容性，例如拦截器和 `@HttpCode()`/`@Header()` 装饰器。为解决这个问题，你可以像这样启用 `passthrough` 选项：
 
 ```typescript
-@@filename()
 @Get()
 findAll(@Res({ passthrough: true }) res: Response) {
   res.status(HttpStatus.OK);

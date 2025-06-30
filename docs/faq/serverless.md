@@ -175,6 +175,7 @@ $ npm i -D @types/aws-lambda serverless-offline
 
 ```yaml
 service: serverless-example
+```
 
 plugins:
   - serverless-offline
@@ -294,8 +295,7 @@ return {
 
 或者，如果您希望保持函数非常轻量级且不需要任何 HTTP 相关功能（路由、守卫、拦截器、管道等），可以仅使用 `NestFactory.createApplicationContext` （如前所述）而不运行整个 HTTP 服务器（以及底层的 `express`），如下所示：
 
-```typescript
-@@filename(main)
+```typescript title="main"
 import { HttpStatus } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { Callback, Context, Handler } from 'aws-lambda';

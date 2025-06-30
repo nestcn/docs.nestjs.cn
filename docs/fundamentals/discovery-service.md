@@ -20,19 +20,10 @@ export class ExampleModule {}
 
 模块设置完成后，`DiscoveryService` 可以被注入到任何需要动态发现的提供者或服务中。
 
-```typescript
-@@filename(example.service)
+```typescript title="example.service"
 @Injectable()
 export class ExampleService {
   constructor(private readonly discoveryService: DiscoveryService) {}
-}
-@@switch
-@Injectable()
-@Dependencies(DiscoveryService)
-export class ExampleService {
-  constructor(discoveryService) {
-    this.discoveryService = discoveryService;
-  }
 }
 ```
 

@@ -12,8 +12,7 @@ $ npm install --save @nestjs/schedule
 
 要激活任务调度功能，请将 `ScheduleModule` 导入根模块 `AppModule`，并运行如下所示的 `forRoot()` 静态方法：
 
-```typescript
-@@filename(app.module)
+```typescript title="app.module"
 import { Module } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
 

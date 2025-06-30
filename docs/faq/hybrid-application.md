@@ -41,7 +41,6 @@ await app.listen(3001);
 要将 `@MessagePattern()` 绑定到混合应用中多个微服务里的单一传输策略（例如 MQTT），我们可以传入类型为 `Transport` 的第二个参数，这是一个包含所有内置传输策略定义的枚举。
 
 ```typescript
-@@filename()
 @MessagePattern('time.us.*', Transport.NATS)
 getDate(@Payload() data: number[], @Ctx() context: NatsContext) {
   console.log(`Subject: ${context.getSubject()}`); // e.g. "time.us.east"

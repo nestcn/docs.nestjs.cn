@@ -12,8 +12,7 @@
 
 让我们从创建一个简单的 `CatsService` 开始。该服务将处理数据存储和检索，并将被 `CatsController` 使用。由于其在管理应用逻辑中的角色，它非常适合被定义为一个提供者。
 
-```typescript
-@@filename(cats.service)
+```typescript title="cats.service"
 import { Injectable } from '@nestjs/common';
 import { Cat } from './interfaces/cat.interface';
 
@@ -37,8 +36,7 @@ export class CatsService {
 
 此外，这个示例使用了 `Cat` 接口，其定义大致如下：
 
-```typescript
-@@filename(interfaces/cat.interface)
+```typescript title="interfaces/cat.interface"
 export interface Cat {
   name: string;
   age: number;
@@ -48,8 +46,7 @@ export interface Cat {
 
 现在我们有了获取猫数据的服务类，让我们在 `CatsController` 中使用它：
 
-```typescript
-@@filename(cats.controller)
+```typescript title="cats.controller"
 import { Controller, Get, Post, Body } from '@nestjs/common';
 import { CreateCatDto } from './dto/create-cat.dto';
 import { CatsService } from './cats.service';
@@ -128,8 +125,7 @@ export class HttpService<T> {
 
 既然我们已经定义了一个提供者（`CatsService`）和一个消费者（`CatsController`），现在需要将该服务注册到 Nest 中以便处理依赖注入。这需要通过编辑模块文件（`app.module.ts`）并将服务添加到 `@Module()` 装饰器的 `providers` 数组来实现。
 
-```typescript
-@@filename(app.module)
+```typescript title="app.module"
 import { Module } from '@nestjs/common';
 import { CatsController } from './cats/cats.controller';
 import { CatsService } from './cats/cats.service';

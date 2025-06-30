@@ -16,8 +16,7 @@ NestJS 本身并未为 `AsyncLocalStorage` 提供任何内置抽象，因此让�
 
 1.  首先，在某个共享源文件中创建一个新的 `AsyncLocalStorage` 实例。由于我们使用 NestJS，让我们也将其转换为带有自定义提供者的模块。
 
-```ts
-@@filename(als.module)
+```ts title="als.module"
 @Module({
   providers: [
     {
@@ -34,8 +33,7 @@ export class AlsModule {}
 
 2.  我们只关注 HTTP，所以让我们使用中间件将 `next` 函数用 `AsyncLocalStorage#run` 包装起来。由于中间件是请求最先到达的地方，这将使得 `store` 在所有增强器和系统其余部分中都可用。
 
-```ts
-@@filename(app.module)
+```ts title="app.module"
 @Module({
   imports: [AlsModule],
   providers: [CatsService],
@@ -67,8 +65,7 @@ export class AppModule implements NestModule {
 
 3.  现在，在请求生命周期的任何地方，我们都可以访问本地存储实例。
 
-```ts
-@@filename(cats.service)
+```ts title="cats.service"
 @Injectable()
 export class CatsService {
   constructor(
@@ -112,8 +109,7 @@ npm i nestjs-cls
 
 1.  在根模块中导入 `ClsModule`。
 
-```ts
-@@filename(app.module)
+```ts title="app.module"
 @Module({
   imports: [
     // Register the ClsModule,
@@ -138,8 +134,7 @@ export class AppModule {}
 
 2.  然后就可以使用 `ClsService` 来访问存储值。
 
-```ts
-@@filename(cats.service)
+```ts title="cats.service"
 @Injectable()
 export class CatsService {
   constructor(
@@ -177,6 +172,7 @@ describe('CatsService', () => {
   let service: CatsService
   let cls: ClsService
   const mockCatsRepository = createMock<CatsRepository>()
+```
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({

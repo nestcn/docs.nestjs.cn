@@ -78,8 +78,7 @@ subscribeToCommentAdded() {
 
 现在，要发布事件，我们使用 `PubSub#publish` 方法。这通常在变更操作中使用，当对象图的部分发生改变时触发客户端更新。例如：
 
-```typescript
-@@filename(posts/posts.resolver)
+```typescript title="posts/posts.resolver"
 @Mutation(() => Comment)
 async addComment(
   @Args('postId', { type: () => Int }) postId: number,
@@ -410,8 +409,7 @@ subscribeToCommentAdded(@Context('pubsub') pubSub: PubSub) {
 
 现在，要发布事件，我们使用 `PubSub#publish` 方法。这通常用于在对象图的某部分发生变更时，通过某个 mutation 触发客户端更新。例如：
 
-```typescript
-@@filename(posts/posts.resolver)
+```typescript title="posts/posts.resolver"
 @Mutation(() => Comment)
 async addComment(
   @Args('postId', { type: () => Int }) postId: number,

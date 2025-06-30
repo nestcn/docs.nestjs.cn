@@ -23,8 +23,7 @@ type Author {
 
 而在代码优先（code first）方法中，我们使用 TypeScript 类和装饰器来定义模式并标注类的字段。上述 SDL 在代码优先中等效于：
 
-```typescript
-@@filename(authors/models/author.model)
+```typescript title="authors/models/author.model"
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { Post } from './post';
 
@@ -100,8 +99,7 @@ posts: Post[];
 
 既然已创建 `Author` 对象类型，现在我们来定义 `Post` 对象类型。
 
-```typescript
-@@filename(posts/models/post.model)
+```typescript title="posts/models/post.model"
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
@@ -131,8 +129,7 @@ type Post {
 
 至此，我们已定义了数据图中可存在的对象（类型定义），但客户端尚无法与这些对象交互。为此，我们需要创建一个解析器类。在代码优先方法中，解析器类既定义解析函数**又**生成 **Query 类型** 。通过下面的示例，这一点将变得清晰：
 
-```typescript
-@@filename(authors/authors.resolver)
+```typescript title="authors/authors.resolver"
 @Resolver(() => Author)
 export class AuthorsResolver {
   constructor(
@@ -194,8 +191,7 @@ type Query {
 
 按照惯例，我们更倾向于解耦这些名称；例如，我们倾向于使用类似 `getAuthor()` 的名称作为查询处理方法，但仍使用 `author` 作为查询类型名称。同样适用于我们的字段解析器。我们可以通过将映射名称作为 `@Query()` 和 `@ResolveField()` 装饰器的参数传递来实现这一点，如下所示：
 
-```typescript
-@@filename(authors/authors.resolver)
+```typescript title="authors/authors.resolver"
 @Resolver(() => Author)
 export class AuthorsResolver {
   constructor(
@@ -281,8 +277,7 @@ getAuthor(
 
 使用 `@ArgsType()` 创建 `GetAuthorArgs` 类，如下所示：
 
-```typescript
-@@filename(authors/dto/get-author.args)
+```typescript title="authors/dto/get-author.args"
 import { MinLength } from 'class-validator';
 import { Field, ArgsType } from '@nestjs/graphql';
 
@@ -491,8 +486,7 @@ type Query {
 
 现在我们来创建一个解析作者查询的 `AuthorsResolver` 类：
 
-```typescript
-@@filename(authors/authors.resolver)
+```typescript title="authors/authors.resolver"
 @Resolver('Author')
 export class AuthorsResolver {
   constructor(
@@ -553,8 +547,7 @@ type Query {
 
 按照惯例，我们更倾向于解耦这些内容，使用诸如 `getAuthor()` 或 `getPosts()` 这样的名称作为解析器方法。我们可以通过将映射名称作为装饰器的参数来实现这一点，如下所示：
 
-```typescript
-@@filename(authors/authors.resolver)
+```typescript title="authors/authors.resolver"
 @Resolver('Author')
 export class AuthorsResolver {
   constructor(
@@ -581,8 +574,7 @@ export class AuthorsResolver {
 
 假设我们采用模式优先（schema first）方法并启用了类型生成功能（如[前一章](/graphql/quick-start)所示，设置 `outputAs: 'class'`），运行应用后将在 `GraphQLModule.forRoot()` 方法指定的位置生成如下文件（例如 `src/graphql.ts`）：
 
-```typescript
-@@filename(graphql)
+```typescript title="graphql"
 export (class Author {
   id: number;
   firstName?: string;
@@ -648,8 +640,7 @@ export class CreatePostInput extends Post {
 
 例如，我们可以在 `AuthorsModule` 中实现这一功能，该模块还能提供此场景下所需的其他服务。请确保在某个位置（如根模块或被根模块导入的其他模块中）导入 `AuthorsModule`。
 
-```typescript
-@@filename(authors/authors.module)
+```typescript title="authors/authors.module"
 @Module({
   imports: [PostsModule],
   providers: [AuthorsService, AuthorsResolver],

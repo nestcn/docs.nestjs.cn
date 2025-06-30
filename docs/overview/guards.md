@@ -14,8 +14,7 @@
 
 如前所述， **授权**是守卫的绝佳应用场景，因为特定路由应当仅在调用者（通常是已认证的特定用户）拥有足够权限时才可用。我们将要构建的 `AuthGuard` 假设用户已通过认证（因此请求头中附带了令牌）。它将提取并验证令牌，利用提取的信息来判断是否允许该请求继续执行。
 
-```typescript
-@@filename(auth.guard)
+```typescript title="auth.guard"
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Observable } from 'rxjs';
 
@@ -49,8 +48,7 @@ export class AuthGuard implements CanActivate {
 
 我们来构建一个功能更完善的守卫，只允许特定角色的用户访问。我们将从一个基本的守卫模板开始，并在接下来的章节中逐步完善它。现在，它允许所有请求通过：
 
-```typescript
-@@filename(roles.guard)
+```typescript title="roles.guard"
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Observable } from 'rxjs';
 
@@ -69,7 +67,6 @@ export class RolesGuard implements CanActivate {
 与管道和异常过滤器类似，守卫可以具有**控制器范围** 、方法范围或全局范围。下面，我们使用 `@UseGuards()` 装饰器设置了一个控制器范围的守卫。该装饰器可以接收单个参数或以逗号分隔的参数列表，这使您能够通过一次声明轻松应用适当的守卫集。
 
 ```typescript
-@@filename()
 @Controller('cats')
 @UseGuards(RolesGuard)
 export class CatsController {}
@@ -80,7 +77,6 @@ export class CatsController {}
 上面，我们传递了 `RolesGuard` 类（而非实例），将实例化的责任交给框架处理，并启用了依赖注入。与管道和异常过滤器类似，我们也可以直接传递一个即时实例：
 
 ```typescript
-@@filename()
 @Controller('cats')
 @UseGuards(new RolesGuard())
 export class CatsController {}
@@ -91,7 +87,6 @@ export class CatsController {}
 要设置全局守卫，请使用 Nest 应用实例的 `useGlobalGuards()` 方法：
 
 ```typescript
-@@filename()
 const app = await NestFactory.create(AppModule);
 app.useGlobalGuards(new RolesGuard());
 ```
@@ -100,8 +95,7 @@ app.useGlobalGuards(new RolesGuard());
 
 全局守卫用于整个应用程序，作用于每个控制器和每个路由处理器。在依赖注入方面，从任何模块外部注册的全局守卫（如上例中使用 `useGlobalGuards()`）无法注入依赖项，因为这发生在任何模块的上下文之外。为解决此问题，您可以直接从任何模块使用以下结构设置守卫：
 
-```typescript
-@@filename(app.module)
+```typescript title="app.module"
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 
@@ -126,8 +120,7 @@ export class AppModule {}
 
 例如，让我们使用 `Reflector.createDecorator` 方法创建一个 `@Roles()` 装饰器，该装饰器会将元数据附加到处理器上。`Reflector` 由框架开箱即用提供，并从 `@nestjs/core` 包中导出。
 
-```ts
-@@filename(roles.decorator)
+```ts title="roles.decorator"
 import { Reflector } from '@nestjs/core';
 
 export const Roles = Reflector.createDecorator<string[]>();
@@ -137,8 +130,7 @@ export const Roles = Reflector.createDecorator<string[]>();
 
 现在要使用这个装饰器，我们只需用它来注解处理器：
 
-```typescript
-@@filename(cats.controller)
+```typescript title="cats.controller"
 @Post()
 @Roles(['admin'])
 async create(@Body() createCatDto: CreateCatDto) {
@@ -154,8 +146,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 现在让我们回到 `RolesGuard` 并将其整合起来。目前它只是简单地返回 `true`，允许所有请求通过。我们希望根据**当前用户分配的角色**与当前处理路由所需实际角色的比较结果来条件化返回值。为了访问路由的角色（自定义元数据），我们将再次使用 `Reflector` 辅助类，如下所示：
 
-```typescript
-@@filename(roles.guard)
+```typescript title="roles.guard"
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Roles } from './roles.decorator';

@@ -21,8 +21,7 @@ throw new RpcException('Invalid credentials.');
 
 微服务异常过滤器的行为与 HTTP 异常过滤器类似，只有一个小区别。`catch()` 方法必须返回一个 `Observable`。
 
-```typescript
-@@filename(rpc-exception.filter)
+```typescript title="rpc-exception.filter"
 import { Catch, RpcExceptionFilter, ArgumentsHost } from '@nestjs/common';
 import { Observable, throwError } from 'rxjs';
 import { RpcException } from '@nestjs/microservices';
@@ -40,7 +39,6 @@ export class ExceptionFilter implements RpcExceptionFilter<RpcException> {
 以下示例使用了手动实例化的方法作用域过滤器。与基于 HTTP 的应用类似，您也可以使用控制器作用域过滤器（即在控制器类前添加 `@UseFilters()` 装饰器）。
 
 ```typescript
-@@filename()
 @UseFilters(new ExceptionFilter())
 @MessagePattern({ cmd: 'sum' })
 accumulate(data: number[]): number {
@@ -55,7 +53,6 @@ accumulate(data: number[]): number {
 要将异常处理委托给基础过滤器，需要扩展 `BaseExceptionFilter` 并调用继承的 `catch()` 方法。
 
 ```typescript
-@@filename()
 import { Catch, ArgumentsHost } from '@nestjs/common';
 import { BaseRpcExceptionFilter } from '@nestjs/microservices';
 

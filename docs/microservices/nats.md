@@ -14,8 +14,7 @@ $ npm i --save nats
 
 使用 NATS 传输器时，请将以下配置对象传入 `createMicroservice()` 方法：
 
-```typescript
-@@filename(main)
+```typescript title="main"
 const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
   transport: Transport.NATS,
   options: {
@@ -69,8 +68,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 
 NATS 提供了一个名为[分布式队列](https://docs.nats.io/nats-concepts/queue)的内置负载均衡功能。要创建队列订阅，请按如下方式使用 `queue` 属性：
 
-```typescript
-@@filename(main)
+```typescript title="main"
 const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
   transport: Transport.NATS,
   options: {
@@ -85,7 +83,6 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 在更复杂的场景中，您可能需要访问有关传入请求的额外信息。使用 NATS 传输器时，您可以访问 `NatsContext` 对象。
 
 ```typescript
-@@filename()
 @MessagePattern('notifications')
 getNotifications(@Payload() data: number[], @Ctx() context: NatsContext) {
   console.log(`Subject: ${context.getSubject()}`);
@@ -99,7 +96,6 @@ getNotifications(@Payload() data: number[], @Ctx() context: NatsContext) {
 订阅可以针对明确的主题，也可以包含通配符。
 
 ```typescript
-@@filename()
 @MessagePattern('time.us.*')
 getDate(@Payload() data: number[], @Ctx() context: NatsContext) {
   console.log(`Subject: ${context.getSubject()}`); // e.g. "time.us.east"
@@ -127,7 +123,6 @@ this.client.send('replace-emoji', record).subscribe(...);
 你也可以在服务器端通过访问 `NatsContext` 来读取这些头部信息，如下所示：
 
 ```typescript
-@@filename()
 @MessagePattern('replace-emoji')
 replaceEmoji(@Payload() data: string, @Ctx() context: NatsContext): string {
   const headers = context.getHeaders();

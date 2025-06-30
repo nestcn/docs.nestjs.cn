@@ -44,6 +44,7 @@ app.use(helmet());
 >   })
 > );
 > ```
+```
 
 #### 与 Fastify 一起使用
 
@@ -92,3 +93,4 @@ await app.register(helmet);
 >   contentSecurityPolicy: false,
 > });
 > ```
+```

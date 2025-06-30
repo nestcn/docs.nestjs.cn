@@ -14,8 +14,7 @@ $ npm install --save @nestjs/swagger
 
 安装过程完成后，打开 `main.ts` 文件并使用 `SwaggerModule` 类初始化 Swagger：
 
-```typescript
-@@filename(main)
+```typescript title="main"
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
@@ -69,6 +68,7 @@ $ npm run start
 > ```
 >
 > 这将在 `http://localhost:3000/swagger/json` 上暴露它
+```
 
 > warning **警告** 当使用 `fastify` 和 `helmet` 时，可能会出现 [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) 问题，要解决此冲突，请按如下方式配置 CSP：
 >
@@ -89,6 +89,7 @@ $ npm run start
 >   contentSecurityPolicy: false,
 > });
 > ```
+```
 
 #### 文档选项
 
@@ -299,6 +300,7 @@ export interface SwaggerCustomOptions {
 > ```
 >
 > 在这种情况下，[http://localhost:3000/api-json](http://localhost:3000/api-json) 仍可访问，但 [http://localhost:3000/api](http://localhost:3000/api)（Swagger UI）将不可用。
+```
 
 #### 示例
 

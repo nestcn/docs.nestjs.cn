@@ -52,6 +52,7 @@ export class AppModule {}
 
 ```typescript
 import config from './mikro-orm.config'; // your ORM config
+```
 
 @Module({
   imports: [

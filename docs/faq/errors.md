@@ -10,6 +10,7 @@
 
 ```bash
 Nest can't resolve dependencies of the <provider> (?). Please make sure that the argument <unknown_token> at index [<index>] is available in the <module> context.
+```
 
 Potential solutions:
 - Is <module> a valid NestJS module?
@@ -71,6 +72,7 @@ Please make sure that the argument ModuleRef at index [<index>] is available in 
 ```bash
 Nest cannot create the <module> instance.
 The module at index [<index>] of the <module> "imports" array is undefined.
+```
 
 Potential causes:
 - A circular dependency between modules. Use forwardRef() to avoid it. Read more: https://docs.nestjs.com/fundamentals/circular-dependency

@@ -403,7 +403,6 @@ export class WsExceptionStatsFilter {
 为了将异常处理委托给基础过滤器，您需要扩展 `BaseWsExceptionFilter` 并调用继承的 `catch()` 方法。
 
 ```typescript
-@@filename()
 import { Catch, ArgumentsHost } from '@nestjs/common';
 import { BaseWsExceptionFilter } from '@nestjs/websockets';
 

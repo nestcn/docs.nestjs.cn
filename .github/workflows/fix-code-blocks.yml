@@ -1,0 +1,77 @@
+name: Fix Code Blocks Daily
+
+on:
+  schedule:
+    # 每天北京时间上午 9:00 执行 (UTC+8 = UTC 01:00)
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+    # 允许手动触发
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/**/*.md'
+      - 'content/**/*.md'
+
+jobs:
+  fix-code-blocks:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+          
+      - name: Install dependencies
+        run: bun install
+        
+      - name: Fix code blocks
+        run: |
+          echo "开始修复代码块..." >> $GITHUB_STEP_SUMMARY
+          bun run fix-code-blocks 2>&1 | tee fix_output.log
+          echo "修复完成，查看详细日志..." >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          tail -20 fix_output.log >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet docs/; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "修改的文件:" >> $GITHUB_STEP_SUMMARY
+            git diff --name-only docs/ >> $GITHUB_STEP_SUMMARY
+          fi
+          
+      - name: Commit and push changes
+        if: steps.changes.outputs.has_changes == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add docs/
+          git commit -m "🔧 自动修复代码块格式 (@@filename 和 @@switch)"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Create summary
+        run: |
+          echo "## 代码块修复结果 🔧" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ steps.changes.outputs.has_changes }}" == "true" ]]; then
+            echo "✅ 发现并修复了代码块格式问题" >> $GITHUB_STEP_SUMMARY
+            echo "- 将 \`@@filename()\` 转换为 rspress 语法" >> $GITHUB_STEP_SUMMARY
+            echo "- 删除了 \`@@switch\` 后的 JavaScript 代码块" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ 所有代码块格式都是正确的，无需修复" >> $GITHUB_STEP_SUMMARY
+          fi

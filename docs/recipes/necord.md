@@ -16,8 +16,7 @@ $ npm install necord discord.js
 
 要在项目中使用 Necord，请导入 `NecordModule` 并使用必要的选项进行配置。
 
-```typescript
-@@filename(app.module)
+```typescript title="app.module"
 import { Module } from '@nestjs/common';
 import { NecordModule } from 'necord';
 import { IntentsBitField } from 'discord.js';
@@ -40,8 +39,7 @@ export class AppModule {}
 
 通过此设置，您可以将 `AppService` 注入到提供者中，轻松注册命令、事件等功能。
 
-```typescript
-@@filename(app.service)
+```typescript title="app.service"
 import { Injectable, Logger } from '@nestjs/common';
 import { Context, On, Once, ContextOf } from 'necord';
 import { Client } from 'discord.js';
@@ -72,8 +70,7 @@ export class AppService {
 
 下面展示如何使用 `@TextCommand` 装饰器为消息创建一个简单的命令处理器。
 
-```typescript
-@@filename(app.commands)
+```typescript title="app.commands"
 import { Injectable } from '@nestjs/common';
 import { Context, TextCommand, TextCommandContext, Arguments } from 'necord';
 
@@ -104,8 +101,7 @@ export class AppCommands {
 
 要使用 Necord 定义斜杠命令，可以使用 `SlashCommand` 装饰器。
 
-```typescript
-@@filename(app.commands)
+```typescript title="app.commands"
 import { Injectable } from '@nestjs/common';
 import { Context, SlashCommand, SlashCommandContext } from 'necord';
 
@@ -127,8 +123,7 @@ export class AppCommands {
 
 你可以使用选项装饰器为斜杠命令定义参数。为此我们创建一个 `TextDto` 类：
 
-```typescript
-@@filename(text.dto)
+```typescript title="text.dto"
 import { StringOption } from 'necord';
 
 export class TextDto {
@@ -143,8 +138,7 @@ export class TextDto {
 
 然后你就可以在 `AppCommands` 类中使用这个 DTO：
 
-```typescript
-@@filename(app.commands)
+```typescript title="app.commands"
 import { Injectable } from '@nestjs/common';
 import { Context, SlashCommand, Options, SlashCommandContext } from 'necord';
 import { TextDto } from './length.dto';
@@ -172,8 +166,7 @@ export class AppCommands {
 
 要为斜杠命令实现自动补全功能，您需要创建一个拦截器。该拦截器将处理用户在自动补全字段中输入时的请求。
 
-```typescript
-@@filename(cats-autocomplete.interceptor)
+```typescript title="cats-autocomplete.interceptor"
 import { Injectable } from '@nestjs/common';
 import { AutocompleteInteraction } from 'discord.js';
 import { AutocompleteInterceptor } from 'necord';
@@ -199,8 +192,7 @@ class CatsAutocompleteInterceptor extends AutocompleteInterceptor {
 
 您还需要用 `autocomplete: true` 标记您的选项类：
 
-```typescript
-@@filename(cat.dto)
+```typescript title="cat.dto"
 import { StringOption } from 'necord';
 
 export class CatDto {
@@ -216,8 +208,7 @@ export class CatDto {
 
 最后，将拦截器应用到您的斜杠命令：
 
-```typescript
-@@filename(cats.commands)
+```typescript title="cats.commands"
 import { Injectable, UseInterceptors } from '@nestjs/common';
 import { Context, SlashCommand, Options, SlashCommandContext } from 'necord';
 import { CatDto } from '/cat.dto';
@@ -245,8 +236,7 @@ export class CatsCommands {
 
 用户命令出现在右击（或点击）用户时显示的上下文菜单中。这些命令提供直接针对用户的快速操作。
 
-```typescript
-@@filename(app.commands)
+```typescript title="app.commands"
 import { Injectable } from '@nestjs/common';
 import { Context, UserCommand, UserCommandContext, TargetUser } from 'necord';
 import { User } from 'discord.js';
@@ -273,8 +263,7 @@ export class AppCommands {
 
 右键点击消息时，上下文菜单中会显示消息命令，可快速执行与该消息相关的操作。
 
-```typescript
-@@filename(app.commands)
+```typescript title="app.commands"
 import { Injectable } from '@nestjs/common';
 import { Context, MessageCommand, MessageCommandContext, TargetMessage } from 'necord';
 import { Message } from 'discord.js';
@@ -295,8 +284,7 @@ export class AppCommands {
 
 [按钮](https://discord.com/developers/docs/interactions/message-components#buttons)是可在消息中包含的交互元素。点击时，它们会向您的应用程序发送一个[交互](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object) 。
 
-```typescript
-@@filename(app.components)
+```typescript title="app.components"
 import { Injectable } from '@nestjs/common';
 import { Context, Button, ButtonContext } from 'necord';
 
@@ -313,8 +301,7 @@ export class AppComponents {
 
 [选择菜单](https://discord.com/developers/docs/interactions/message-components#select-menus)是消息中出现的另一种交互组件，它为用户提供类似下拉框的界面来选择选项。
 
-```typescript
-@@filename(app.components)
+```typescript title="app.components"
 import { Injectable } from '@nestjs/common';
 import { Context, StringSelect, StringSelectContext, SelectedStrings } from 'necord';
 
@@ -336,8 +323,7 @@ export class AppComponents {
 
 模态框是弹出式表单，允许用户提交格式化的输入内容。以下是使用 Necord 创建和处理模态框的方法：
 
-```typescript
-@@filename(app.modals)
+```typescript title="app.modals"
 import { Injectable } from '@nestjs/common';
 import { Context, Modal, ModalContext } from 'necord';
 

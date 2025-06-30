@@ -108,6 +108,7 @@ git push heroku main
 
 ```dockerfile
 FROM node:18-alpine
+```
 
 WORKDIR /usr/src/app
 
@@ -420,6 +421,7 @@ Sentry.init({
 ```bash
 # 启用调试模式
 DEBUG=* npm run start:prod
+```
 
 # 分析内存使用
 node --inspect dist/main.js

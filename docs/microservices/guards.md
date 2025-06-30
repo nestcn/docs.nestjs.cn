@@ -9,7 +9,6 @@
 以下示例使用了一个方法作用域的守卫。与基于 HTTP 的应用一样，你也可以使用控制器作用域的守卫（即在控制器类前添加 `@UseGuards()` 装饰器）。
 
 ```typescript
-@@filename()
 @UseGuards(AuthGuard)
 @MessagePattern({ cmd: 'sum' })
 accumulate(data: number[]): number {

@@ -2,8 +2,7 @@
 
 Nest 提供了 `ModuleRef` 类来导航内部提供者列表，并使用其注入令牌作为查找键获取任何提供者的引用。`ModuleRef` 类还提供了一种动态实例化静态和范围提供者的方法。`ModuleRef` 可以以常规方式注入到类中：
 
-```typescript
-@@filename(cats.service)
+```typescript title="cats.service"
 @Injectable()
 export class CatsService {
   constructor(private moduleRef: ModuleRef) {}
@@ -16,8 +15,7 @@ export class CatsService {
 
 `ModuleRef` 实例（以下简称**模块引用** ）具有一个 `get()` 方法。默认情况下，该方法会返回一个已注册并在*当前模块*中使用其注入令牌/类名实例化的提供者、控制器或可注入对象（如守卫、拦截器等）。如果找不到实例，则会抛出异常。
 
-```typescript
-@@filename(cats.service)
+```typescript title="cats.service"
 @Injectable()
 export class CatsService implements OnModuleInit {
   private service: Service;
@@ -41,8 +39,7 @@ this.moduleRef.get(Service, { strict: false });
 
 要动态解析一个作用域提供者（瞬态或请求作用域），请使用 `resolve()` 方法，并将提供者的注入令牌作为参数传入。
 
-```typescript
-@@filename(cats.service)
+```typescript title="cats.service"
 @Injectable()
 export class CatsService implements OnModuleInit {
   private transientService: TransientService;
@@ -56,8 +53,7 @@ export class CatsService implements OnModuleInit {
 
 `resolve()` 方法会从它自己的**依赖注入容器子树**中返回该提供者的唯一实例。每个子树都有一个唯一的**上下文标识符** 。因此，如果多次调用此方法并比较实例引用，你会发现它们并不相同。
 
-```typescript
-@@filename(cats.service)
+```typescript title="cats.service"
 @Injectable()
 export class CatsService implements OnModuleInit {
   constructor(private moduleRef: ModuleRef) {}
@@ -74,8 +70,7 @@ export class CatsService implements OnModuleInit {
 
 要在多个 `resolve()` 调用间生成单一实例，并确保它们共享相同的依赖注入容器子树，你可以向 `resolve()` 方法传入一个上下文标识符。使用 `ContextIdFactory` 类来生成上下文标识符，该类提供了 `create()` 方法，可返回一个合适的唯一标识符。
 
-```typescript
-@@filename(cats.service)
+```typescript title="cats.service"
 @Injectable()
 export class CatsService implements OnModuleInit {
   constructor(private moduleRef: ModuleRef) {}
@@ -108,8 +103,7 @@ this.moduleRef.registerRequestByContextId(/* YOUR_REQUEST_OBJECT */, contextId);
 
 有时，你可能需要在**请求上下文**中解析一个请求作用域提供者的实例。假设 `CatsService` 是请求作用域的，而你想解析同样标记为请求作用域提供者的 `CatsRepository` 实例。为了共享同一个 DI 容器子树，你必须获取当前上下文标识符，而不是生成新的标识符（例如使用上文所示的 `ContextIdFactory.create()` 函数）。要获取当前上下文标识符，首先使用 `@Inject()` 装饰器注入请求对象。
 
-```typescript
-@@filename(cats.service)
+```typescript title="cats.service"
 @Injectable()
 export class CatsService {
   constructor(
@@ -131,8 +125,7 @@ const catsRepository = await this.moduleRef.resolve(CatsRepository, contextId);
 
 要动态实例化一个**先前未注册**为**提供者**的类，可使用模块引用的 `create()` 方法。
 
-```typescript
-@@filename(cats.service)
+```typescript title="cats.service"
 @Injectable()
 export class CatsService implements OnModuleInit {
   private catsFactory: CatsFactory;

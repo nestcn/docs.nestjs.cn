@@ -17,7 +17,6 @@ $ npm i -D @types/multer
 要上传单个文件，只需将 `FileInterceptor()` 拦截器绑定到路由处理器，并使用 `@UploadedFile()` 装饰器从 `request` 中提取 `file`。
 
 ```typescript
-@@filename()
 @Post('upload')
 @UseInterceptors(FileInterceptor('file'))
 uploadFile(@UploadedFile() file: Express.Multer.File) {
@@ -173,7 +172,6 @@ file: Express.Multer.File,
 使用 `FilesInterceptor()` 时，通过 `@UploadedFiles()` 装饰器从 `request` 中提取文件
 
 ```typescript
-@@filename()
 @Post('upload')
 @UseInterceptors(FilesInterceptor('files'))
 uploadFile(@UploadedFiles() files: Array<Express.Multer.File>) {
@@ -193,7 +191,6 @@ uploadFile(@UploadedFiles() files: Array<Express.Multer.File>) {
 使用 `FileFieldsInterceptor()` 时，需通过 `@UploadedFiles()` 装饰器从 `request` 中提取文件
 
 ```typescript
-@@filename()
 @Post('upload')
 @UseInterceptors(FileFieldsInterceptor([
   { name: 'avatar', maxCount: 1 },
@@ -213,7 +210,6 @@ uploadFile(@UploadedFiles() files: { avatar?: Express.Multer.File[], background?
 使用 `AnyFilesInterceptor()` 时，通过 `@UploadedFiles()` 装饰器从 `request` 中提取文件。
 
 ```typescript
-@@filename()
 @Post('upload')
 @UseInterceptors(AnyFilesInterceptor())
 uploadFile(@UploadedFiles() files: Array<Express.Multer.File>) {

@@ -12,8 +12,7 @@
 
 首先，创建一个表示系统角色的 `Role` 枚举：
 
-```typescript
-@@filename(role.enum)
+```typescript title="role.enum"
 export enum Role {
   User = 'user',
   Admin = 'admin',
@@ -24,8 +23,7 @@ export enum Role {
 
 有了这些基础，我们就可以创建一个 `@Roles()` 装饰器。该装饰器允许指定访问特定资源所需的角色。
 
-```typescript
-@@filename(roles.decorator)
+```typescript title="roles.decorator"
 import { SetMetadata } from '@nestjs/common';
 import { Role } from '../enums/role.enum';
 
@@ -35,8 +33,7 @@ export const Roles = (...roles: Role[]) => SetMetadata(ROLES_KEY, roles);
 
 现在我们有了自定义的 `@Roles()` 装饰器，可以用它来装饰任何路由处理器。
 
-```typescript
-@@filename(cats.controller)
+```typescript title="cats.controller"
 @Post()
 @Roles(Role.Admin)
 create(@Body() createCatDto: CreateCatDto) {
@@ -46,8 +43,7 @@ create(@Body() createCatDto: CreateCatDto) {
 
 最后，我们创建一个 `RolesGuard` 类，它将比较当前用户分配的角色与正在处理的路由实际所需的角色。为了访问路由的角色（自定义元数据），我们将使用框架内置并通过 `@nestjs/core` 包提供的 `Reflector` 辅助类。
 
-```typescript
-@@filename(roles.guard)
+```typescript title="roles.guard"
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
@@ -113,8 +109,7 @@ providers: [
 
 要在 Nest 中实现基于声明的授权，可遵循前述 [RBAC 章节的相同步骤，但存在一个关键差异：不应检查特定角色，而应比较**权限** 。每个用户都会被分配一组权限。同样，每个资源/端点需定义访问所需的权限（例如通过专用的 `@RequirePermissions()` 装饰器）。](/security/authorization#basic-rbac-implementation)
 
-```typescript
-@@filename(cats.controller)
+```typescript title="cats.controller"
 @Post()
 @RequirePermissions(Permission.CREATE_CAT)
 create(@Body() createCatDto: CreateCatDto) {

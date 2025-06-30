@@ -21,8 +21,7 @@ Nest 提供了一个内置的 `HttpException` 类，该类从 `@nestjs/common` �
 
 例如，在 `CatsController` 中，我们有一个 `findAll()` 方法（一个 `GET` 路由处理程序）。假设这个路由处理程序由于某种原因抛出了异常。为了演示这一点，我们将其硬编码如下：
 
-```typescript
-@@filename(cats.controller)
+```typescript title="cats.controller"
 @Get()
 async findAll() {
   throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
@@ -58,8 +57,7 @@ async findAll() {
 
 以下是覆盖整个响应体并提供错误原因的示例：
 
-```typescript
-@@filename(cats.controller)
+```typescript title="cats.controller"
 @Get()
 async findAll() {
   try {
@@ -96,8 +94,7 @@ async findAll() {
 
 多数情况下，您无需编写自定义异常，直接使用内置的 Nest HTTP 异常即可（详见下一节）。如需创建定制化异常，最佳实践是建立**异常层级结构** ，让自定义异常继承基础 `HttpException` 类。通过这种方式，Nest 能识别您的异常并自动处理错误响应。下面我们实现一个自定义异常：
 
-```typescript
-@@filename(forbidden.exception)
+```typescript title="forbidden.exception"
 export class ForbiddenException extends HttpException {
   constructor() {
     super('Forbidden', HttpStatus.FORBIDDEN);
@@ -107,8 +104,7 @@ export class ForbiddenException extends HttpException {
 
 由于 `ForbiddenException` 继承自基础 `HttpException`，它能与内置异常处理器无缝协作，因此我们可在 `findAll()` 方法中直接使用。
 
-```typescript
-@@filename(cats.controller)
+```typescript title="cats.controller"
 @Get()
 async findAll() {
   throw new ForbiddenException();
@@ -165,8 +161,7 @@ throw new BadRequestException('Something bad happened', {
 
 让我们创建一个异常过滤器，负责捕获 `HttpException` 类的实例异常，并为它们实现自定义响应逻辑。为此，我们需要访问底层平台的 `Request` 和 `Response` 对象。我们将访问 `Request` 对象以提取原始 `url` 并将其包含在日志信息中。我们将使用 `Response` 对象通过 `response.json()` 方法直接控制发送的响应。
 
-```typescript
-@@filename(http-exception.filter)
+```typescript title="http-exception.filter"
 import { ExceptionFilter, Catch, ArgumentsHost, HttpException } from '@nestjs/common';
 import { Request, Response } from 'express';
 
@@ -205,8 +200,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
 让我们将新的 `HttpExceptionFilter` 绑定到 `CatsController` 的 `create()` 方法上。
 
-```typescript
-@@filename(cats.controller)
+```typescript title="cats.controller"
 @Post()
 @UseFilters(new HttpExceptionFilter())
 async create(@Body() createCatDto: CreateCatDto) {
@@ -218,8 +212,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 我们在此使用了 `@UseFilters()` 装饰器。与 `@Catch()` 装饰器类似，它可以接收单个过滤器实例或以逗号分隔的过滤器实例列表。这里我们直接创建了 `HttpExceptionFilter` 的实例。或者，你也可以传入类（而非实例），将实例化的责任交给框架，并启用**依赖注入** 。
 
-```typescript
-@@filename(cats.controller)
+```typescript title="cats.controller"
 @Post()
 @UseFilters(HttpExceptionFilter)
 async create(@Body() createCatDto: CreateCatDto) {
@@ -231,8 +224,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 在上面的示例中，`HttpExceptionFilter` 仅应用于单个 `create()` 路由处理器，使其成为方法作用域的。异常过滤器可以具有不同的作用域级别：控制器/解析器/网关的方法作用域、控制器作用域或全局作用域。例如，要将过滤器设置为控制器作用域，可以这样做：
 
-```typescript
-@@filename(cats.controller)
+```typescript title="cats.controller"
 @Controller()
 @UseFilters(new HttpExceptionFilter())
 export class CatsController {}
@@ -242,8 +234,7 @@ export class CatsController {}
 
 要创建全局作用域的过滤器，需执行以下操作：
 
-```typescript
-@@filename(main)
+```typescript title="main"
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalFilters(new HttpExceptionFilter());
@@ -256,8 +247,7 @@ bootstrap();
 
 全局作用域的过滤器用于整个应用程序，作用于每个控制器和每个路由处理器。在依赖注入方面，从任何模块外部注册的全局过滤器（如上述示例中使用 `useGlobalFilters()`）无法注入依赖项，因为这是在模块上下文之外完成的。为解决此问题，您可以使用以下构造**直接从任何模块**注册全局作用域的过滤器：
 
-```typescript
-@@filename(app.module)
+```typescript title="app.module"
 import { Module } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 
@@ -327,8 +317,7 @@ export class CatchEverythingFilter implements ExceptionFilter {
 
 要将异常处理委托给基础过滤器，需要扩展 `BaseExceptionFilter` 并调用继承的 `catch()` 方法。
 
-```typescript
-@@filename(all-exceptions.filter)
+```typescript title="all-exceptions.filter"
 import { Catch, ArgumentsHost } from '@nestjs/common';
 import { BaseExceptionFilter } from '@nestjs/core';
 

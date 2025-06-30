@@ -186,6 +186,7 @@ export class AppModule {}
 
 ```graphql
 scalar JSON
+```
 
 type Foo {
   field: JSON

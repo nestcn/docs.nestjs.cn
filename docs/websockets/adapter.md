@@ -144,8 +144,7 @@ export class NotificationsGateway {}
 
 出于演示目的，我们将手动集成 [ws](https://github.com/websockets/ws) 库。如前所述，该库的适配器已经创建并通过 `@nestjs/platform-ws` 包的 `WsAdapter` 类公开。以下是简化后的实现可能呈现的样子：
 
-```typescript
-@@filename(ws-adapter)
+```typescript title="ws-adapter"
 import * as WebSocket from 'ws';
 import { WebSocketAdapter, INestApplicationContext } from '@nestjs/common';
 import { MessageMappingProperties } from '@nestjs/websockets';
@@ -201,8 +200,7 @@ export class WsAdapter implements WebSocketAdapter {
 
 接着，我们可以通过 `useWebSocketAdapter()` 方法设置自定义适配器：
 
-```typescript
-@@filename(main)
+```typescript title="main"
 const app = await NestFactory.create(AppModule);
 app.useWebSocketAdapter(new WsAdapter(app));
 ```

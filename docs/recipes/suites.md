@@ -22,8 +22,7 @@ $ npm i -D @suites/unit @suites/di.nestjs @suites/doubles.jest
 
 考虑一个为 `CatsService` 设置的模块，它包含 `CatsApiService`、`CatsDAL`、`HttpClient` 和 `Logger`。这将作为本示例的基础：
 
-```typescript
-@@filename(cats.module)
+```typescript title="cats.module"
 import { HttpModule } from '@nestjs/axios';
 import { PrismaModule } from '../prisma.module';
 
@@ -39,8 +38,7 @@ export class CatsModule {}
 
 让我们首先单独测试 `CatsHttpService`。该服务负责从 API 获取猫的数据并记录操作。
 
-```typescript
-@@filename(cats-http.service)
+```typescript title="cats-http.service"
 @Injectable()
 export class CatsHttpService {
   constructor(private httpClient: HttpClient, private logger: Logger) {}
@@ -55,8 +53,7 @@ export class CatsHttpService {
 
 我们希望隔离 `CatsHttpService` 并模拟其依赖项 `HttpClient` 和 `Logger`。Suites 允许我们通过使用 `TestBed` 中的 `.solitary()` 方法轻松实现这一点。
 
-```typescript
-@@filename(cats-http.service.spec)
+```typescript title="cats-http.service.spec"
 import { TestBed, Mocked } from '@suites/unit';
 
 describe('Cats Http Service Unit Test', () => {
@@ -100,8 +97,7 @@ describe('Cats Http Service Unit Test', () => {
 
 在此情况下，我们将不使用 Suites，而是使用 Nest 的 `TestingModule` 来测试 `HttpModule` 的实际配置。我们将利用 `nock` 来模拟 HTTP 请求，而无需在此场景中模拟 `HttpClient`。
 
-```typescript
-@@filename(cats-api.service)
+```typescript title="cats-api.service"
 import { HttpClient } from '@nestjs/axios';
 
 @Injectable()
@@ -117,8 +113,7 @@ export class CatsApiService {
 
 我们需要使用真实的、未经模拟的 `HttpClient` 来测试 `CatsApiService`，以确保 `Axios`（http）的依赖注入和配置正确。这涉及导入 `CatsModule` 并使用 `nock` 进行 HTTP 请求模拟。
 
-```typescript
-@@filename(cats-api.service.integration.test)
+```typescript title="cats-api.service.integration.test"
 import { Test } from '@nestjs/testing';
 import * as nock from 'nock';
 
@@ -154,8 +149,7 @@ describe('Cats Api Service Integration Test', () => {
 
 接下来，让我们测试依赖于 `CatsApiService` 和 `CatsDAL` 的 `CatsService`。我们将模拟 `CatsApiService` 并暴露 `CatsDAL`。
 
-```typescript
-@@filename(cats.dal)
+```typescript title="cats.dal"
 import { PrismaClient } from '@prisma/client';
 
 @Injectable()
@@ -170,8 +164,7 @@ export class CatsDAL {
 
 接下来是 `CatsService`，它依赖于 `CatsApiService` 和 `CatsDAL`：
 
-```typescript
-@@filename(cats.service)
+```typescript title="cats.service"
 @Injectable()
 export class CatsService {
   constructor(
@@ -188,8 +181,7 @@ export class CatsService {
 
 现在，让我们使用 Suites 的可社交测试来测试 `CatsService`：
 
-```typescript
-@@filename(cats.service.spec)
+```typescript title="cats.service.spec"
 import { TestBed, Mocked } from '@suites/unit';
 import { PrismaClient } from '@prisma/client';
 

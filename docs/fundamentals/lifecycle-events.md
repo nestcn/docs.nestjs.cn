@@ -35,7 +35,6 @@ Nest 应用程序以及其中的每个组件都拥有由 Nest 管理的生命周
 每个生命周期钩子都对应一个接口。从技术上讲这些接口是可选的，因为在 TypeScript 编译后它们不会存在。但为了获得强类型和编辑器工具支持，最佳实践仍是使用这些接口。要注册生命周期钩子，只需实现相应接口。例如，若要在特定类（如控制器、提供者或模块）上注册模块初始化时调用的方法，可通过实现 `OnModuleInit` 接口并提供 `onModuleInit()` 方法来完成，如下所示：
 
 ```typescript
-@@filename()
 import { Injectable, OnModuleInit } from '@nestjs/common';
 
 @Injectable()
@@ -51,7 +50,6 @@ export class UsersService implements OnModuleInit {
 `OnModuleInit` 和 `OnApplicationBootstrap` 钩子都允许您延迟应用初始化过程（返回一个 `Promise` 或将方法标记为 `async` 并在方法体内 `await` 异步方法完成）。
 
 ```typescript
-@@filename()
 async onModuleInit(): Promise<void> {
   await this.fetch();
 }
@@ -85,7 +83,6 @@ bootstrap();
 当应用接收到终止信号时，它将按照上述顺序调用所有已注册的 `onModuleDestroy()`、`beforeApplicationShutdown()` 以及 `onApplicationShutdown()` 方法，并将相应信号作为第一个参数传入。如果注册的函数需要等待异步调用（返回 promise），Nest 将在此 promise 被解析或拒绝前暂停执行后续序列。
 
 ```typescript
-@@filename()
 @Injectable()
 class UsersService implements OnApplicationShutdown {
   onApplicationShutdown(signal: string) {

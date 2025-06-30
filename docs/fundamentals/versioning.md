@@ -104,8 +104,7 @@ await app.listen(process.env.PORT ?? 3000);
 
 要为应用启用 **自定义版本控制** ，请创建 `extractor` 函数并按如下方式传入应用：
 
-```typescript
-@@filename(main)
+```typescript title="main"
 // Example extractor that pulls out a list of versions from a custom header and turns it into a sorted array.
 // This example uses Fastify, but Express requests can be processed in a similar way.
 const extractor = (request: FastifyRequest): string | string[] =>
@@ -114,6 +113,7 @@ const extractor = (request: FastifyRequest): string | string[] =>
      .filter(v => !!v)
      .sort()
      .reverse()
+```
 
 const app = await NestFactory.create(AppModule);
 app.enableVersioning({
@@ -200,8 +200,7 @@ export class CatsController {
 
 要添加版本中立的控制器或路由，请执行以下操作：
 
-```typescript
-@@filename(cats.controller)
+```typescript title="cats.controller"
 import { Controller, Get, VERSION_NEUTRAL } from '@nestjs/common';
 
 @Controller({
@@ -219,8 +218,7 @@ export class CatsController {
 
 如果您不想为每个控制器/单独路由提供版本，或者希望为所有未指定版本的控制器/路由设置默认版本，可以按如下方式配置 `defaultVersion`：
 
-```typescript
-@@filename(main)
+```typescript title="main"
 app.enableVersioning({
   // ...
   defaultVersion: '1'
@@ -235,8 +233,7 @@ app.enableVersioning({
 
 [中间件](https://docs.nestjs.com/middleware)同样可以利用版本元数据来为特定路由版本配置中间件。为此，需将版本号作为 `MiddlewareConsumer.forRoutes()` 方法的参数之一：
 
-```typescript
-@@filename(app.module)
+```typescript title="app.module"
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { CatsModule } from './cats/cats.module';

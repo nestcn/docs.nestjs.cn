@@ -6,8 +6,7 @@ REPL 是一种简单的交互式环境，能够接收用户输入的单条命令
 
 要在 REPL 模式下运行 NestJS 应用，请新建 `repl.ts` 文件（与现有的 `main.ts` 文件同级），并在其中添加以下代码：
 
-```typescript
-@@filename(repl)
+```typescript title="repl"
 import { repl } from '@nestjs/core';
 import { AppModule } from './src/app.module';
 
@@ -53,6 +52,7 @@ AppController { appService: AppService {} }
 
 ```typescript
 > methods(AppController)
+```
 
 Methods:
  ◻ getHello
@@ -62,6 +62,7 @@ Methods:
 
 ```typescript
 > debug()
+```
 
 AppModule:
  - controllers:

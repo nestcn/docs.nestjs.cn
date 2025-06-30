@@ -293,18 +293,12 @@ export interface ConfigModuleOptions {
 
 在此基础上，新建一个专用文件（与现有的 `config.module.ts` 文件放在一起）并命名为 `config.module-definition.ts`。在此文件中，我们将使用 `ConfigurableModuleBuilder` 来构建 `ConfigModule` 的定义。
 
-```typescript
-@@filename(config.module-definition)
+```typescript title="config.module-definition"
 import { ConfigurableModuleBuilder } from '@nestjs/common';
 import { ConfigModuleOptions } from './interfaces/config-module-options.interface';
 
 export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
   new ConfigurableModuleBuilder<ConfigModuleOptions>().build();
-@@switch
-import { ConfigurableModuleBuilder } from '@nestjs/common';
-
-export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
-  new ConfigurableModuleBuilder().build();
 ```
 
 现在打开 `config.module.ts` 文件，修改其实现以利用自动生成的 `ConfigurableModuleClass`：
@@ -393,13 +387,9 @@ export class ConfigService {
 
 默认情况下，`ConfigurableModuleClass` 提供 `register` 及其对应方法 `registerAsync`。如需使用不同方法名，可采用 `ConfigurableModuleBuilder#setClassMethodName` 方法，如下所示：
 
-```typescript
-@@filename(config.module-definition)
+```typescript title="config.module-definition"
 export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
   new ConfigurableModuleBuilder<ConfigModuleOptions>().setClassMethodName('forRoot').build();
-@@switch
-export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
-  new ConfigurableModuleBuilder().setClassMethodName('forRoot').build();
 ```
 
 此构造将指示 `ConfigurableModuleBuilder` 生成一个公开 `forRoot` 和 `forRootAsync` 的类。示例：
@@ -439,13 +429,9 @@ export class AppModule {}
 
 默认情况下，该类必须提供 `create()` 方法以返回模块配置对象。但如果您的库遵循不同的命名约定，可以通过 `ConfigurableModuleBuilder#setFactoryMethodName` 方法调整此行为，指示 `ConfigurableModuleBuilder` 改用其他方法（例如 `createConfigOptions`）：
 
-```typescript
-@@filename(config.module-definition)
+```typescript title="config.module-definition"
 export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
   new ConfigurableModuleBuilder<ConfigModuleOptions>().setFactoryMethodName('createConfigOptions').build();
-@@switch
-export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
-  new ConfigurableModuleBuilder().setFactoryMethodName('createConfigOptions').build();
 ```
 
 现在，`ConfigModuleOptionsFactory` 类需要公开 `createConfigOptions` 方法（而非原先的 `create` 方法）：

@@ -77,6 +77,7 @@ Devtools 会为每次构建生成报告**前提是**中央注册表中已存储�
 
 ```yaml
 name: Devtools
+```
 
 on:
   push:
@@ -172,6 +173,7 @@ const publishOptions = {
 
 ```yaml
 image: node:16
+```
 
 stages:
   - build

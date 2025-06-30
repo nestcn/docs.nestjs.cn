@@ -9,7 +9,6 @@
 要从应用上下文外部获取 `HttpAdapter` 的引用，请调用 `getHttpAdapter()` 方法。
 
 ```typescript
-@@filename()
 const app = await NestFactory.create(AppModule);
 const httpAdapter = app.getHttpAdapter();
 ```
@@ -19,7 +18,6 @@ const httpAdapter = app.getHttpAdapter();
 要从应用上下文内部获取 `HttpAdapterHost` 的引用，可使用与其他现有提供者相同的注入技术（例如通过构造函数注入）。
 
 ```typescript
-@@filename()
 export class CatsService {
   constructor(private adapterHost: HttpAdapterHost) {}
 }

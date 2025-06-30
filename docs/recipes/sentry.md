@@ -16,8 +16,7 @@ $ npm install --save @sentry/nestjs @sentry/profiling-node
 
 要开始使用 Sentry，您需要创建一个名为 `instrument.ts` 的文件，该文件应在应用程序中其他模块之前导入：
 
-```typescript
-@@filename(instrument)
+```typescript title="instrument"
 const Sentry = require("@sentry/nestjs");
 const { nodeProfilingIntegration } = require("@sentry/profiling-node");
 
@@ -41,8 +40,7 @@ Sentry.init({
 
 更新您的 `main.ts` 文件，确保在其他导入之前引入 `instrument.ts`：
 
-```typescript
-@@filename(main)
+```typescript title="main"
 // Import this first!
 import "./instrument";
 
@@ -60,8 +58,7 @@ bootstrap();
 
 随后，将 `SentryModule` 作为根模块添加到您的主模块中：
 
-```typescript
-@@filename(app.module)
+```typescript title="app.module"
 import { Module } from "@nestjs/common";
 import { SentryModule } from "@sentry/nestjs/setup";
 import { AppController } from "./app.controller";
@@ -101,8 +98,7 @@ export class YourCatchAllExceptionFilter implements ExceptionFilter {
 
 > warning **警告** 需要在注册其他异常过滤器之前注册 `SentryGlobalFilter`。
 
-```typescript
-@@filename(app.module)
+```typescript title="app.module"
 import { Module } from "@nestjs/common";
 import { APP_FILTER } from "@nestjs/core";
 import { SentryGlobalFilter } from "@sentry/nestjs/setup";

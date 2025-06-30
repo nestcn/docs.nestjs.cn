@@ -14,8 +14,7 @@ $ npm i --save amqplib amqp-connection-manager
 
 要使用 RabbitMQ 传输器，请将以下配置对象传入 `createMicroservice()` 方法：
 
-```typescript
-@@filename(main)
+```typescript title="main"
 const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
   transport: Transport.RMQ,
   options: {
@@ -70,7 +69,6 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 在更复杂的场景中，您可能需要访问有关传入请求的额外信息。使用 RabbitMQ 传输器时，您可以访问 `RmqContext` 对象
 
 ```typescript
-@@filename()
 @MessagePattern('notifications')
 getNotifications(@Payload() data: number[], @Ctx() context: RmqContext) {
   console.log(`Pattern: ${context.getPattern()}`);
@@ -82,7 +80,6 @@ getNotifications(@Payload() data: number[], @Ctx() context: RmqContext) {
 要访问原始的 RabbitMQ 消息（包含 `properties`、`fields` 和 `content`），请使用 `RmqContext` 对象的 `getMessage()` 方法，如下所示：
 
 ```typescript
-@@filename()
 @MessagePattern('notifications')
 getNotifications(@Payload() data: number[], @Ctx() context: RmqContext) {
   console.log(context.getMessage());
@@ -92,7 +89,6 @@ getNotifications(@Payload() data: number[], @Ctx() context: RmqContext) {
 要获取 RabbitMQ [通道](https://www.rabbitmq.com/channels.html)的引用，请使用 `RmqContext` 对象的 `getChannelRef` 方法，如下所示：
 
 ```typescript
-@@filename()
 @MessagePattern('notifications')
 getNotifications(@Payload() data: number[], @Ctx() context: RmqContext) {
   console.log(context.getChannelRef());
@@ -119,7 +115,6 @@ options: {
 当开启手动消费者确认时，我们必须从工作线程发送正确的确认信号来表示已完成任务处理。
 
 ```typescript
-@@filename()
 @MessagePattern('notifications')
 getNotifications(@Payload() data: number[], @Ctx() context: RmqContext) {
   const channel = context.getChannelRef();
@@ -152,7 +147,6 @@ this.client.send('replace-emoji', record).subscribe(...);
 你也可以在服务端通过访问 `RmqContext` 来读取这些值，如下所示：
 
 ```typescript
-@@filename()
 @MessagePattern('replace-emoji')
 replaceEmoji(@Payload() data: string, @Ctx() context: RmqContext): string {
   const { properties: { headers } } = context.getMessage();

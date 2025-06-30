@@ -16,8 +16,7 @@ $ npm i --save ioredis
 
 要使用 Redis 传输器，请将以下配置对象传入 `createMicroservice()` 方法：
 
-```typescript
-@@filename(main)
+```typescript title="main"
 const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
   transport: Transport.REDIS,
   options: {
@@ -74,7 +73,6 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 在更复杂的场景中，您可能需要访问有关传入请求的额外信息。使用 Redis 传输器时，您可以访问 `RedisContext` 对象。
 
 ```typescript
-@@filename()
 @MessagePattern('notifications')
 getNotifications(@Payload() data: number[], @Ctx() context: RedisContext) {
   console.log(`Channel: ${context.getChannel()}`);

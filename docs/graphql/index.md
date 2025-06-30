@@ -33,6 +33,7 @@ NestJS 为 GraphQL 提供了一流的支持，让您能够轻松构建强大、�
 ```bash
 # 使用 Express 和 Apollo（默认）
 $ npm i @nestjs/graphql @nestjs/apollo @apollo/server graphql
+```
 
 # 使用 Fastify 和 Apollo
 # npm i @nestjs/graphql @nestjs/apollo @apollo/server @as-integrations/fastify graphql

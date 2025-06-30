@@ -24,8 +24,7 @@ $ npm i --save @nestjs/config
 
 安装过程完成后，我们可以导入 `ConfigModule`。通常我们会将其导入根模块 `AppModule`，并使用静态方法 `.forRoot()` 来控制其行为。在此步骤中，环境变量的键/值对会被解析和处理。稍后我们将看到在其他功能模块中访问 `ConfigModule` 的 `ConfigService` 类的几种方法。
 
-```typescript
-@@filename(app.module)
+```typescript title="app.module"
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
@@ -96,8 +95,7 @@ ConfigModule.forRoot({
 
 自定义配置文件导出一个返回配置对象的工厂函数。该配置对象可以是任意嵌套的普通 JavaScript 对象。`process.env` 对象将包含完全解析后的环境变量键值对（其中 `.env` 文件及外部定义的变量会按照[上文](techniques/configuration#getting-started)所述方式解析合并）。由于您控制着返回的配置对象，因此可以添加任何必要的逻辑来将值转换为适当类型、设置默认值等。例如：
 
-```typescript
-@@filename(config/configuration)
+```typescript title="config/configuration"
 export default () => ({
   port: parseInt(process.env.PORT, 10) || 3000,
   database: {
@@ -130,6 +128,7 @@ export class AppModule {}
 http:
   host: 'localhost'
   port: 8080
+```
 
 db:
   postgres:
@@ -150,8 +149,7 @@ $ npm i -D @types/js-yaml
 
 安装该包后，使用 `yaml#load` 函数加载我们刚才创建的 YAML 文件。
 
-```typescript
-@@filename(config/configuration)
+```typescript title="config/configuration"
 import { readFileSync } from 'fs';
 import * as yaml from 'js-yaml';
 import { join } from 'path';
@@ -171,8 +169,7 @@ export default () => {
 
 例如，若需确保端口号处于特定范围内，可在工厂函数中添加验证步骤：
 
-```typescript
-@@filename(config/configuration)
+```typescript title="config/configuration"
 export default () => {
   const config = yaml.load(
     readFileSync(join(__dirname, YAML_CONFIG_FILENAME), 'utf8'),
@@ -194,8 +191,7 @@ export default () => {
 
 要从 `ConfigService` 获取配置值，首先需要注入 `ConfigService`。与任何提供程序一样，需将其所属模块——`ConfigModule`——导入到将使用它的模块中（除非在传递给 `ConfigModule.forRoot()` 方法的选项对象中将 `isGlobal` 属性设为 `true`）。如下所示将其导入功能模块。
 
-```typescript
-@@filename(feature.module)
+```typescript title="feature.module"
 @Module({
   imports: [ConfigModule],
   // ...
@@ -289,8 +285,7 @@ constructor(private configService: ConfigService<{ PORT: number }, true>) {
 
 `ConfigModule` 允许您定义并加载多个自定义配置文件，如上方[自定义配置文件](techniques/configuration#custom-configuration-files)所示。您可以通过嵌套配置对象来管理复杂的配置对象层次结构，如该章节所示。或者，您也可以使用 `registerAs()` 函数返回一个"命名空间"配置对象，如下所示：
 
-```typescript
-@@filename(config/database.config)
+```typescript title="config/database.config"
 export default registerAs('database', () => ({
   host: process.env.DATABASE_HOST,
   port: process.env.DATABASE_PORT || 5432
@@ -402,8 +397,7 @@ $ npm install --save joi
 
 现在我们可以定义一个 Joi 验证模式，并通过 `forRoot()` 方法选项对象中的 `validationSchema` 属性传递它，如下所示：
 
-```typescript
-@@filename(app.module)
+```typescript title="app.module"
 import * as Joi from 'joi';
 
 @Module({
@@ -425,8 +419,7 @@ export class AppModule {}
 
 默认情况下，允许未知的环境变量（即键未在模式中定义的环境变量）且不会触发验证异常。默认情况下，所有验证错误都会被报告。您可以通过在 `forRoot()` 配置对象的 `validationOptions` 键中传递选项对象来修改这些行为。该选项对象可以包含任何由 [Joi 验证选项](https://joi.dev/api/?v=17.3.0#anyvalidatevalue-options)提供的标准验证选项属性。例如，要反转上述两个设置，可传递如下选项：
 
-```typescript
-@@filename(app.module)
+```typescript title="app.module"
 import * as Joi from 'joi';
 
 @Module({
@@ -466,8 +459,7 @@ export class AppModule {}
 - 一个带有验证约束的类，
 - 以及一个利用 `plainToInstance` 和 `validateSync` 函数的验证函数。
 
-```typescript
-@@filename(env.validation)
+```typescript title="env.validation"
 import { plainToInstance } from 'class-transformer';
 import { IsEnum, IsNumber, Max, Min, validateSync } from 'class-validator';
 
@@ -505,8 +497,7 @@ export function validate(config: Record<string, unknown>) {
 
 配置完成后，将 `validate` 函数作为 `ConfigModule` 的配置选项使用，如下所示：
 
-```typescript
-@@filename(app.module)
+```typescript title="app.module"
 import { validate } from './env.validation';
 
 @Module({
@@ -524,7 +515,6 @@ export class AppModule {}
 `ConfigService` 定义了一个通用的 `get()` 方法通过键来检索配置值。我们还可以添加 `getter` 函数以实现更自然的编码风格：
 
 ```typescript
-@@filename()
 @Injectable()
 export class ApiConfigService {
   constructor(private configService: ConfigService) {}
@@ -537,8 +527,7 @@ export class ApiConfigService {
 
 现在我们可以如下使用 getter 函数：
 
-```typescript
-@@filename(app.service)
+```typescript title="app.service"
 @Injectable()
 export class AppService {
   constructor(apiConfigService: ApiConfigService) {
@@ -608,8 +597,7 @@ SUPPORT_EMAIL=support@${APP_URL}
 
 要启用环境变量扩展功能，需在传递给 `ConfigModule` 的 `forRoot()` 方法的配置对象中设置 `expandVariables` 属性，如下所示：
 
-```typescript
-@@filename(app.module)
+```typescript title="app.module"
 @Module({
   imports: [
     ConfigModule.forRoot({

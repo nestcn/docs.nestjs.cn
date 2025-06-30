@@ -14,8 +14,7 @@ $ npm install --save mongoose
 
 我们首先需要使用 `connect()` 函数建立与数据库的连接。`connect()` 函数返回一个 `Promise`，因此我们必须创建一个[异步提供者](/fundamentals/async-components) 。
 
-```typescript
-@@filename(database.providers)
+```typescript title="database.providers"
 import * as mongoose from 'mongoose';
 
 export const databaseProviders = [
@@ -31,8 +30,7 @@ export const databaseProviders = [
 
 接下来，我们需要导出这些提供者，使它们对应用程序的其余部分**可访问** 。
 
-```typescript
-@@filename(database.module)
+```typescript title="database.module"
 import { Module } from '@nestjs/common';
 import { databaseProviders } from './database.providers';
 
@@ -49,8 +47,7 @@ export class DatabaseModule {}
 
 在 Mongoose 中，所有内容都源自 [Schema](https://mongoosejs.com/docs/guide.html)。让我们定义 `CatSchema`：
 
-```typescript
-@@filename(schemas/cat.schema)
+```typescript title="schemas/cat.schema"
 import * as mongoose from 'mongoose';
 
 export const CatSchema = new mongoose.Schema({
@@ -64,8 +61,7 @@ export const CatSchema = new mongoose.Schema({
 
 现在是时候创建一个 **Model** 提供者了：
 
-```typescript
-@@filename(cats.providers)
+```typescript title="cats.providers"
 import { Connection } from 'mongoose';
 import { CatSchema } from './schemas/cat.schema';
 
@@ -82,8 +78,7 @@ export const catsProviders = [
 
 现在我们可以通过 `@Inject()` 装饰器将 `CAT_MODEL` 注入到 `CatsService` 中：
 
-```typescript
-@@filename(cats.service)
+```typescript title="cats.service"
 import { Model } from 'mongoose';
 import { Injectable, Inject } from '@nestjs/common';
 import { Cat } from './interfaces/cat.interface';
@@ -123,8 +118,7 @@ export interface Cat extends Document {
 
 以下是最终的 `CatsModule`：
 
-```typescript
-@@filename(cats.module)
+```typescript title="cats.module"
 import { Module } from '@nestjs/common';
 import { CatsController } from './cats.controller';
 import { CatsService } from './cats.service';

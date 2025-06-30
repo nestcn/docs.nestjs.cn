@@ -6,7 +6,8 @@
   "scripts": {
     "build": "rspress build",
     "dev": "rspress dev",
-    "preview": "rspress preview"
+    "preview": "rspress preview",
+    "fix-code-blocks": "node scripts/fix-code-blocks-v2.js"
   },
   "dependencies": {
     "glob": "^11.0.3",

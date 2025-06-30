@@ -20,8 +20,7 @@ $ npm i --save kafkajs
 
 与其他 Nest 微服务传输层实现类似，您可以通过传递给 `createMicroservice()` 方法的选项对象中的 `transport` 属性来选择 Kafka 传输机制，同时还可使用可选的 `options` 属性，如下所示：
 
-```typescript
-@@filename(main)
+```typescript title="main"
 const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
   transport: Transport.KAFKA,
   options: {
@@ -109,8 +108,7 @@ Kafka 微服务消息模式利用两个主题分别处理请求和回复通道�
 
 `ClientKafkaProxy` 类提供了 `subscribeToResponseOf()` 方法。该方法以请求主题名称作为参数，并将派生的回复主题名称添加到回复主题集合中。在实现消息模式时必须调用此方法。
 
-```typescript
-@@filename(heroes.controller)
+```typescript title="heroes.controller"
 onModuleInit() {
   this.client.subscribeToResponseOf('hero.kill.dragon');
 }
@@ -118,8 +116,7 @@ onModuleInit() {
 
 如果 `ClientKafkaProxy` 实例是异步创建的，则必须在调用 `connect()` 方法之前调用 `subscribeToResponseOf()` 方法。
 
-```typescript
-@@filename(heroes.controller)
+```typescript title="heroes.controller"
 async onModuleInit() {
   this.client.subscribeToResponseOf('hero.kill.dragon');
   await this.client.connect();
@@ -134,8 +131,7 @@ Nest 接收传入的 Kafka 消息时，会将其作为一个包含 `key`、`valu
 
 Nest 在发布事件或发送消息时，会通过序列化过程发送传出的 Kafka 消息。该过程会对传入 `ClientKafkaProxy` 的 `emit()` 和 `send()` 方法的参数，或从 `@MessagePattern` 方法返回的值进行序列化。此序列化过程会通过 `JSON.stringify()` 或原型方法 `toString()` 将非字符串或缓冲区的对象"字符串化"。
 
-```typescript
-@@filename(heroes.controller)
+```typescript title="heroes.controller"
 @Controller()
 export class HeroesController {
   @MessagePattern('hero.kill.dragon')
@@ -154,8 +150,7 @@ export class HeroesController {
 
 传出消息也可以通过传递包含 `key` 和 `value` 属性的对象进行键控。消息键控对于满足[共同分区要求](https://docs.confluent.io/current/ksql/docs/developer-guide/partition-data.html#co-partitioning-requirements)非常重要。
 
-```typescript
-@@filename(heroes.controller)
+```typescript title="heroes.controller"
 @Controller()
 export class HeroesController {
   @MessagePattern('hero.kill.dragon')
@@ -182,8 +177,7 @@ export class HeroesController {
 
 此外，以此格式传递的消息还可以包含设置在 `headers` 哈希属性中的自定义标头。标头哈希属性值必须是 `string` 类型或 `Buffer` 类型。
 
-```typescript
-@@filename(heroes.controller)
+```typescript title="heroes.controller"
 @Controller()
 export class HeroesController {
   @MessagePattern('hero.kill.dragon')
@@ -219,7 +213,6 @@ export class HeroesController {
 在更复杂的场景中，您可能需要访问有关传入请求的额外信息。使用 Kafka 传输器时，可以访问 `KafkaContext` 对象。
 
 ```typescript
-@@filename()
 @MessagePattern('hero.kill.dragon')
 killDragon(@Payload() message: KillDragonMessage, @Ctx() context: KafkaContext) {
   console.log(`Topic: ${context.getTopic()}`);
@@ -231,7 +224,6 @@ killDragon(@Payload() message: KillDragonMessage, @Ctx() context: KafkaContext) 
 要访问原始的 Kafka `IncomingMessage` 对象，请使用 `KafkaContext` 对象的 `getMessage()` 方法，如下所示：
 
 ```typescript
-@@filename()
 @MessagePattern('hero.kill.dragon')
 killDragon(@Payload() message: KillDragonMessage, @Ctx() context: KafkaContext) {
   const originalMessage = context.getMessage();
@@ -259,7 +251,6 @@ interface IncomingMessage {
 如果处理程序对每条接收到的消息处理时间较长，应考虑使用 `heartbeat` 回调。要获取 `heartbeat` 函数，请使用 `KafkaContext` 的 `getHeartbeat()` 方法，如下所示：
 
 ```typescript
-@@filename()
 @MessagePattern('hero.kill.dragon')
 async killDragon(@Payload() message: KillDragonMessage, @Ctx() context: KafkaContext) {
   const heartbeat = context.getHeartbeat();
@@ -279,8 +270,7 @@ async killDragon(@Payload() message: KillDragonMessage, @Ctx() context: KafkaCon
 
 Kafka 微服务组件会在 `client.clientId` 和 `consumer.groupId` 选项后附加各自角色描述，以防止 Nest 微服务客户端与服务器组件之间发生冲突。默认情况下，`ClientKafkaProxy` 组件会附加 `-client`，而 `ServerKafka` 组件会附加 `-server` 到这两个选项中。请注意下方提供的值是如何按此方式转换的（如注释所示）。
 
-```typescript
-@@filename(main)
+```typescript title="main"
 const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
   transport: Transport.KAFKA,
   options: {
@@ -297,8 +287,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 
 对于客户端：
 
-```typescript
-@@filename(heroes.controller)
+```typescript title="heroes.controller"
 @Client({
   transport: Transport.KAFKA,
   options: {
@@ -318,8 +307,7 @@ client: ClientKafkaProxy;
 
 由于 Kafka 微服务消息模式使用两个主题分别处理请求和回复通道，回复模式应从请求主题派生。默认情况下，回复主题的名称由请求主题名称与附加的 `.reply` 组合而成。
 
-```typescript
-@@filename(heroes.controller)
+```typescript title="heroes.controller"
 onModuleInit() {
   this.client.subscribeToResponseOf('hero.get'); // hero.get.reply
 }
@@ -448,10 +436,10 @@ export class MyEventHandler {
 在使用 Kafka 时，提交偏移量至关重要。默认情况下，消息会在特定时间后自动提交。更多信息请参阅 [KafkaJS 文档](https://kafka.js.org/docs/consuming#autocommit) 。`KafkaContext` 提供了一种访问活跃消费者以手动提交偏移量的方式。该消费者即为 KafkaJS 消费者，其工作方式与[原生 KafkaJS 实现](https://kafka.js.org/docs/consuming#manual-committing)一致。
 
 ```typescript
-@@filename()
 @EventPattern('user.created')
 async handleUserCreated(@Payload() data: IncomingMessage, @Ctx() context: KafkaContext) {
   // business logic
+```
 
   const { offset } = context.getMessage();
   const partition = context.getPartition();
@@ -463,8 +451,7 @@ async handleUserCreated(@Payload() data: IncomingMessage, @Ctx() context: KafkaC
 
 要禁用消息自动提交，请在 `run` 配置中设置 `autoCommit: false`，如下所示：
 
-```typescript
-@@filename(main)
+```typescript title="main"
 const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
   transport: Transport.KAFKA,
   options: {

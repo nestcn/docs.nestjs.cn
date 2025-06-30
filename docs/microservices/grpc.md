@@ -18,8 +18,7 @@ $ npm i --save @grpc/grpc-js @grpc/proto-loader
 
 与其他 Nest 微服务传输层实现类似，您可以通过传递给 `createMicroservice()` 方法的选项对象中的 `transport` 属性来选择 gRPC 传输机制。在以下示例中，我们将设置一个英雄服务。`options` 属性提供了有关该服务的元数据；其属性描述见[下文](microservices/grpc#options) 。
 
-```typescript
-@@filename(main)
+```typescript title="main"
 const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
   transport: Transport.GRPC,
   options: {
@@ -78,8 +77,7 @@ message Hero {
 
 > info **提示** 在前面的微服务章节中介绍的 `@MessagePattern()` 装饰器（ [了解更多](microservices/basics#request-response) ）不适用于基于 gRPC 的微服务。对于基于 gRPC 的微服务，`@GrpcMethod()` 装饰器有效地取代了它的位置。
 
-```typescript
-@@filename(heroes.controller)
+```typescript title="heroes.controller"
 @Controller()
 export class HeroesController {
   @GrpcMethod('HeroesService', 'FindOne')
@@ -101,8 +99,7 @@ export class HeroesController {
 
 `@GrpcMethod()` 装饰器的两个参数都是可选的。如果调用时不传第二个参数（例如 `'FindOne'`），Nest 会根据处理方法名自动将其转换为大驼峰命名（例如将 `findOne` 处理方法关联到 `FindOne` rpc 调用定义）来关联 `.proto` 文件中的 rpc 方法。如下所示。
 
-```typescript
-@@filename(heroes.controller)
+```typescript title="heroes.controller"
 @Controller()
 export class HeroesController {
   @GrpcMethod('HeroesService')
@@ -118,8 +115,7 @@ export class HeroesController {
 
 你也可以省略第一个 `@GrpcMethod()` 参数。在这种情况下，Nest 会根据定义处理程序的 **class** 名称，自动将该处理程序与 proto 定义文件中的服务定义关联起来。例如，在以下代码中，类 `HeroesService` 会基于名称 `'HeroesService'` 的匹配，将其处理程序方法与 `hero.proto` 文件中的 `HeroesService` 服务定义相关联。
 
-```typescript
-@@filename(heroes.controller)
+```typescript title="heroes.controller"
 @Controller()
 export class HeroesService {
   @GrpcMethod()
@@ -219,8 +215,7 @@ interface HeroesService {
 
 消息处理器也可以返回一个 `Observable`，在这种情况下，结果值将持续发射直到流完成。
 
-```typescript
-@@filename(heroes.controller)
+```typescript title="heroes.controller"
 @Get()
 call(): Observable<any> {
   return this.heroesService.findOne({ id: 1 });
@@ -258,8 +253,7 @@ $ npm i --save @grpc/reflection
 
 然后可以通过 gRPC 服务器选项中的 `onLoadPackageDefinition` 钩子将其集成到 gRPC 服务器，如下所示：
 
-```typescript
-@@filename(main)
+```typescript title="main"
 import { ReflectionService } from '@grpc/reflection';
 
 const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
@@ -424,8 +418,7 @@ $ npm i --save grpc-health-check
 
 随后可通过 gRPC 服务器选项中的 `onLoadPackageDefinition` 钩子将其集成到 gRPC 服务中，如下所示。注意 `protoPath` 需同时包含健康检查与 hero 包的定义。
 
-```typescript
-@@filename(main)
+```typescript title="main"
 import { HealthImplementation, protoPath as healthCheckProtoPath } from 'grpc-health-check';
 
 const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
@@ -456,8 +449,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 
 要从处理程序返回元数据，请使用 `ServerUnaryCall#sendMetadata()` 方法（处理程序的第三个参数）。
 
-```typescript
-@@filename(heroes.controller)
+```typescript title="heroes.controller"
 @Controller()
 export class HeroesService {
   @GrpcMethod()

@@ -8,8 +8,7 @@
 
 首先我们定义一个提供者。`@Injectable()` 装饰器将 `CatsService` 类标记为一个提供者。
 
-```typescript
-@@filename(cats.service)
+```typescript title="cats.service"
 import { Injectable } from '@nestjs/common';
 import { Cat } from './interfaces/cat.interface';
 
@@ -25,8 +24,7 @@ export class CatsService {
 
 然后我们请求 Nest 将这个提供者注入到我们的控制器类中：
 
-```typescript
-@@filename(cats.controller)
+```typescript title="cats.controller"
 import { Controller, Get } from '@nestjs/common';
 import { CatsService } from './cats.service';
 import { Cat } from './interfaces/cat.interface';
@@ -44,8 +42,7 @@ export class CatsController {
 
 最后，我们将提供者注册到 Nest 的控制反转（IoC）容器中：
 
-```typescript
-@@filename(app.module)
+```typescript title="app.module"
 import { Module } from '@nestjs/common';
 import { CatsController } from './cats/cats.controller';
 import { CatsService } from './cats/cats.service';
@@ -160,7 +157,6 @@ export class AppModule {}
 我们之前已经了解了如何使用标准的[基于构造函数的注入](https://docs.nestjs.com/providers#dependency-injection)模式来注入提供者。这种模式**要求**依赖项必须使用类名声明。而 `'CONNECTION'` 自定义提供者使用的是字符串令牌。让我们看看如何注入这样的提供者。为此，我们使用 `@Inject()` 装饰器。这个装饰器接受一个参数——令牌。
 
 ```typescript
-@@filename()
 @Injectable()
 export class CatsRepository {
   constructor(@Inject('CONNECTION') connection: Connection) {}
@@ -202,7 +198,6 @@ export class AppModule {}
 2.  （可选的）`inject` 属性接受一个提供者数组，Nest 会在实例化过程中解析这些提供者并将其作为参数传递给工厂函数。此外，这些提供者可以标记为可选。两个列表应该相互关联：Nest 会按照相同顺序将 `inject` 列表中的实例作为参数传递给工厂函数。下面的示例演示了这一点。
 
 ```typescript
-@@filename()
 const connectionProvider = {
   provide: 'CONNECTION',
   useFactory: (optionsProvider: MyOptionsProvider, optionalProvider?: string) => {
@@ -271,7 +266,6 @@ export class AppModule {}
 以下示例展示了使用令牌导出的方式：
 
 ```typescript
-@@filename()
 const connectionFactory = {
   provide: 'CONNECTION',
   useFactory: (optionsProvider: OptionsProvider) => {
@@ -291,7 +285,6 @@ export class AppModule {}
 或者，使用完整的提供者对象导出：
 
 ```typescript
-@@filename()
 const connectionFactory = {
   provide: 'CONNECTION',
   useFactory: (optionsProvider: OptionsProvider) => {

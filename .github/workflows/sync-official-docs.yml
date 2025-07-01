@@ -218,6 +218,12 @@ jobs:
           📝 Content changes detected and synced"
           fi
           
+          if [ "${{ steps.translate-content.outputs.translation_changed }}" == "true" ]; then
+            COMMIT_MSG="${COMMIT_MSG}
+
+          🌐 Translations updated with Cloudflare Workers AI"
+          fi
+          
           if [ "${{ steps.sync-assets.outputs.assets_changed }}" == "true" ]; then
             COMMIT_MSG="${COMMIT_MSG}
 
@@ -245,6 +251,17 @@ jobs:
             echo "- **Content Synced**: ✅ Yes (changes detected and applied)" >> $GITHUB_STEP_SUMMARY
           else
             echo "- **Content Synced**: ✅ Up to date (no changes needed)" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # 翻译状态
+          if [ "${{ steps.translate-content.outputs.translation_changed }}" == "true" ]; then
+            echo "- **Translation Updated**: ✅ Yes (docs folder updated with Cloudflare Workers AI)" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.translate-content.outputs.translation_changed }}" == "false" ]; then
+            echo "- **Translation Updated**: ✅ Up to date (no translation changes needed)" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.sync-content.outputs.content_changed }}" == "true" ]; then
+            echo "- **Translation Updated**: ⚠️ Content changed but translation skipped" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Translation Updated**: ➖ No content changes to translate" >> $GITHUB_STEP_SUMMARY
           fi
           
           # Assets 同步状态

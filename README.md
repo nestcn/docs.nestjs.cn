@@ -59,7 +59,7 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
 群二维码过期，请添加：    
 
 
-![](https://ghproxy.net/https://raw.githubusercontent.com/zuohuadong/imgbed/main/pic/68747470733a2f2f7069632e646f776e6b2e63632f6974656d2f3566386336633334316364316262623836623732666339612e6a7067.jpg)    
+<img src="https://ghproxy.net/https://raw.githubusercontent.com/zuohuadong/imgbed/main/pic/68747470733a2f2f7069632e646f776e6b2e63632f6974656d2f3566386336633334316364316262623836623732666339612e6a7067.jpg" alt="微信联系人" width="200" height="200" />    
 
 
 
@@ -1304,41 +1304,99 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
   </p>
 </div>
 
-## 赞助商广告：
+## 🤝 支持与赞助
 
-[京东云 产品6折起](https://partner.jdcloud.com/partner/notice/39c68afb71a544e4883b6cd79bb5dffd)    
+<div align="center">
+  <h3>💝 感谢以下服务商对本项目的支持</h3>
+</div>
 
-[京东云 296元3年 先点上方链接绑定](https://www.jdcloud.com/cn/pages/2024618)
+### 🏢 基础设施赞助商
+
+<table align="center">
+  <tr>
+    <td align="center" width="25%">
+      <a href="https://www.cloudflare.com">
+        <img src="https://img.shields.io/badge/Cloudflare-F38020?style=for-the-badge&logo=cloudflare&logoColor=white" />
+      </a>
+      <br>
+      <strong>网站托管</strong>
+      <br>
+      <sub>全球 CDN 加速</sub>
+    </td>
+    <td align="center" width="25%">
+      <a href="https://partner.jdcloud.com/partner/notice/39c68afb71a544e4883b6cd79bb5dffd">
+        <img src="https://img.shields.io/badge/京东云-FF6600?style=for-the-badge" />
+      </a>
+      <br>
+      <strong>云服务器</strong>
+      <br>
+      <sub>产品 6 折起 / 296元3年</sub>
+    </td>
+    <td align="center" width="25%">
+      <a href="https://www.vultr.com/?ref=8967015-8H">
+        <img src="https://img.shields.io/badge/Vultr-007BFC?style=for-the-badge&logo=vultr&logoColor=white" />
+      </a>
+      <br>
+      <strong>VPS 主机</strong>
+      <br>
+      <sub>免费送 $100</sub>
+    </td>
+    <td align="center" width="25%">
+      <a href="https://ssls.sjv.io/e4OKrg">
+        <img src="https://img.shields.io/badge/SSL-28A745?style=for-the-badge&logo=letsencrypt&logoColor=white" />
+      </a>
+      <br>
+      <strong>SSL 证书</strong>
+      <br>
+      <sub>便宜证书服务</sub>
+    </td>
+  </tr>
+</table>
+
+### 🔧 其他服务商
+
+<table align="center">
+  <tr>
+    <td align="center" width="33%">
+      <a href="https://clientarea.ramnode.com/aff.php?aff=3451">
+        <img src="https://img.shields.io/badge/RamNode-3美元100G高防-red?style=for-the-badge" />
+      </a>
+    </td>
+    <td align="center" width="33%">
+      <a href="https://www.onevps.cloud/?aff=12238">
+        <img src="https://img.shields.io/badge/OneVPS-不限流量-green?style=for-the-badge" />
+      </a>
+    </td>
+    <td align="center" width="33%">
+      <a href="https://bbxy.cloud/auth/register?code=GPTR">
+        <img src="https://img.shields.io/badge/BBXY-最低月租5元-blue?style=for-the-badge" />
+      </a>
+    </td>
+  </tr>
+</table>
+
+<div align="center">
+  <p>
+    <a href="https://justmysocks3.net/members/aff.php?aff=6423">
+      <img src="https://img.shields.io/badge/JMS-搬瓦工官方科学上网-orange?style=for-the-badge" />
+    </a>
+  </p>
+</div>   
 
 
-本站托管在： 
-[CloudFlare](https://www.cloudflare.com)   
-[京东云 六折优惠](https://partner.jdcloud.com/partner/notice/39c68afb71a544e4883b6cd79bb5dffd)
-[vultr   （免费送 100 美金）](https://www.vultr.com/?ref=8967015-8H)  
-[RamNode - 3美元-100G 高防](https://clientarea.ramnode.com/aff.php?aff=3451)    
-[Onevps-不限流量](https://www.onevps.cloud/?aff=12238)    
-  
-SSL 证书：    
-[SSLS 便宜证书](https://ssls.sjv.io/e4OKrg)
-
-科学工具：
-
-[BBXY-最低月租5元](https://bbxy.cloud/auth/register?code=GPTR)    
-[JMS 搬瓦工官方的科学上网工具](https://justmysocks3.net/members/aff.php?aff=6423)    
-
-捐赠通道：    
-[【捐赠】](https://gitee.com/notadd/docs.nestjs.cn?donate=true)   
-
-  
 
 
-[![vultr](https://www.vultr.com/media/banner_1.png)](https://www.vultr.com/?ref=7815855-4F)
+## 📺 推荐视频
 
+<div align="center">
 
+| 创作者 | 平台 | 简介 | 观看 |
+|:---:|:---:|:---|:---:|
+| **全栈之巅** | B站 | 专业的全栈开发技术分享，涵盖 NestJS、Node.js 等现代开发技术 | [![](https://img.shields.io/badge/B站-关注-00A1D6?style=for-the-badge&logo=bilibili&logoColor=white)](https://space.bilibili.com/341919508) |
 
-## 推荐视频
+</div>
 
-[全栈之巅](https://space.bilibili.com/341919508)
+> 💡 **提示**: 如果你有优质的 NestJS 视频教程，欢迎通过 [Issue](https://github.com/nestjs/docs.nestjs.cn/issues) 推荐给我们！
 
 ## 相关书籍
 
@@ -1383,7 +1441,7 @@ SSL 证书：
 
 ## 捐赠
 
-![image](https://user-images.githubusercontent.com/11203929/158335069-b51c4493-83f1-4abd-953f-a2e12dfdb8c5.png)
+<img src="https://user-images.githubusercontent.com/11203929/158335069-b51c4493-83f1-4abd-953f-a2e12dfdb8c5.png" alt="捐赠二维码" width="200" height="200" />
 
 
 
@@ -1394,7 +1452,7 @@ SSL 证书：
 ### 支付宝红包
 
 
-<img src="https://ghproxy.com/https://raw.githubusercontent.com/zuohuadong/imgbed/main/pic/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20211213154942.jpg" alt="支付宝" width="260" height="400" align="bottom" />
+<img src="https://ghproxy.net/https://raw.githubusercontent.com/zuohuadong/imgbed/main/pic/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20211213154942.jpg" alt="支付宝" width="260" height="400" align="bottom" />
 
 
 ## 🚀 技术栈

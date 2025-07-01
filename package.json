@@ -9,7 +9,15 @@
     "preview": "rspress preview",
     "fix-code-blocks": "node scripts/fix-code-blocks-v2.js",
     "fix-template-syntax": "node scripts/fix-template-syntax.js",
-    "fix-all": "npm run fix-code-blocks && npm run fix-template-syntax"
+    "fix-all": "npm run fix-code-blocks && npm run fix-template-syntax",
+    "translate-docs": "node scripts/translate-docs.js",
+    "translate-docs:verbose": "node scripts/translate-docs.js --verbose",
+    "translate-docs:no-ai": "node scripts/translate-docs.js --no-ai",
+    "translate-docs:mistral": "node scripts/translate-docs.js --model @cf/mistral/mistral-7b-instruct-v0.1 --verbose",
+    "translate-docs:openchat": "node scripts/translate-docs.js --model @cf/openchat/openchat-3.5-0106 --verbose",
+    "sync-and-translate": "npm run translate-docs && npm run fix-all",
+    "sync-and-translate:no-ai": "npm run translate-docs:no-ai && npm run fix-all",
+    "test-cloudflare": "node test-cloudflare-translate.js"
   },
   "dependencies": {
     "glob": "^11.0.3",

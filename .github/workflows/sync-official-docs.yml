@@ -33,14 +33,13 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
         with:
-          node-version: '18'
-          cache: 'npm'
+          bun-version: latest
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       - name: Clone official NestJS docs repository
         run: |
@@ -151,7 +150,7 @@ jobs:
           # 检查是否有可用的 Cloudflare 配置
           if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
             echo "✅ Cloudflare Workers AI configured, using AI translation"
-            if npm run translate-docs:verbose; then
+            if bun run translate-docs:verbose; then
               echo "✅ Translation completed with changes"
               echo "translation_changed=true" >> $GITHUB_OUTPUT
             else
@@ -167,7 +166,7 @@ jobs:
             fi
           else
             echo "⚠️ Cloudflare API credentials not configured, using format-only mode"
-            if npm run translate-docs:no-ai; then
+            if bun run translate-docs:no-ai; then
               echo "✅ Format processing completed with changes"
               echo "translation_changed=true" >> $GITHUB_OUTPUT
             else
@@ -187,7 +186,7 @@ jobs:
         if: steps.translate-content.outputs.translation_changed == 'true'
         run: |
           echo "🔧 Running code block and template syntax fixes..."
-          npm run fix-all
+          bun run fix-all
           echo "✅ Code formatting completed"
 
       - name: Update README sync time and check for changes

@@ -7,11 +7,11 @@
     <a href="https://docs.nestjs.cn/">
       <img src="https://img.shields.io/badge/📖-查看文档-brightgreen?style=for-the-badge&logo=nestjs&logoColor=white" alt="查看文档">
     </a>
-    <a href="https://github.com/nestjs/docs.nestjs.cn/actions/workflows/sync-official-docs.yml">
-      <img src="https://img.shields.io/github/actions/workflow/status/nestjs/docs.nestjs.cn/sync-official-docs.yml?branch=main&style=for-the-badge&logo=github&label=同步状态" alt="同步状态">
+    <a href="https://github.com/nestcn/docs.nestjs.cn/actions/workflows/sync-official-docs.yml">
+      <img src="https://img.shields.io/github/actions/workflow/status/nestcn/docs.nestjs.cn/sync-official-docs.yml?branch=main&style=for-the-badge&logo=github&label=同步状态" alt="同步状态">
     </a>
-    <a href="https://github.com/nestjs/docs.nestjs.cn/blob/main/LICENSE">
-      <img src="https://img.shields.io/github/license/nestjs/docs.nestjs.cn?style=for-the-badge" alt="License">
+    <a href="https://github.com/nestcn/docs.nestjs.cn/blob/main/LICENSE">
+      <img src="https://img.shields.io/github/license/nestcn/docs.nestjs.cn?style=for-the-badge" alt="License">
     </a>
   </p>
   
@@ -1298,7 +1298,7 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
   <p>
     <strong>📖 详细贡献指南</strong>
     <br>
-    <a href="https://github.com/nestjs/docs.nestjs.cn/blob/main/CONTRIBUTING.md">
+    <a href="https://github.com/nestcn/docs.nestjs.cn/blob/main/CONTRIBUTING.md">
       <img src="https://img.shields.io/badge/📋-查看贡献指南-success?style=for-the-badge" />
     </a>
   </p>
@@ -1369,7 +1369,7 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
     </td>
     <td align="center" width="33%">
       <a href="https://bbxy.cloud/auth/register?code=GPTR">
-        <img src="https://img.shields.io/badge/BBXY-最低月租5元-blue?style=for-the-badge" />
+        <img src="https://img.shields.io/badge/BBXY-VPN-最低月租5元-blue?style=for-the-badge" />
       </a>
     </td>
   </tr>
@@ -1396,7 +1396,7 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
 
 </div>
 
-> 💡 **提示**: 如果你有优质的 NestJS 视频教程，欢迎通过 [Issue](https://github.com/nestjs/docs.nestjs.cn/issues) 推荐给我们！
+> 💡 **提示**: 如果你有优质的 NestJS 视频教程，欢迎通过 [Issue](https://github.com/nestcn/docs.nestjs.cn/issues) 推荐给我们！
 
 ## 相关书籍
 
@@ -1528,8 +1528,8 @@ graph TD
 
 ### 📊 项目状态
 
-[![同步状态](https://github.com/nestjs/docs.nestjs.cn/actions/workflows/sync-official-docs.yml/badge.svg)](https://github.com/nestjs/docs.nestjs.cn/actions/workflows/sync-official-docs.yml)
-[![构建状态](https://github.com/nestjs/docs.nestjs.cn/actions/workflows/deploy.yml/badge.svg)](https://github.com/nestjs/docs.nestjs.cn/actions/workflows/deploy.yml)
+[![同步状态](https://github.com/nestcn/docs.nestjs.cn/actions/workflows/sync-official-docs.yml/badge.svg)](https://github.com/nestcn/docs.nestjs.cn/actions/workflows/sync-official-docs.yml)
+[![构建状态](https://github.com/nestcn/docs.nestjs.cn/actions/workflows/deploy.yml/badge.svg)](https://github.com/nestcn/docs.nestjs.cn/actions/workflows/deploy.yml)
 
 - 🔄 **自动同步**: 每日北京时间 10:00 自动同步官方文档
 - 🤖 **AI 翻译**: 使用 Cloudflare Workers AI 提供高质量翻译
@@ -1542,7 +1542,7 @@ graph TD
 
 ```bash
 # 克隆仓库
-git clone https://github.com/nestjs/docs.nestjs.cn.git
+git clone https://github.com/nestcn/docs.nestjs.cn.git
 cd docs.nestjs.cn
 
 # 安装依赖

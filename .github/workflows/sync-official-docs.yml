@@ -49,11 +49,11 @@ jobs:
         id: sync-content
         run: |
           if [ ! -d "official-docs/content" ]; then
-            echo "❌ Content folder not found in official repository"
+            echo "❌ 官方仓库中未找到 content 文件夹"
             exit 1
           fi
           
-          echo "🔍 Comparing content folder..."
+          echo "🔍 正在比较 content 文件夹..."
           CONTENT_CHANGED=false
           
           # 检查 content 文件夹是否存在差异
@@ -68,27 +68,27 @@ jobs:
               fi
             fi
           else
-            echo "📁 Content folder does not exist locally, will create"
+            echo "📁 本地不存在 content 文件夹，将创建"
             CONTENT_CHANGED=true
           fi
           
           if [ "$CONTENT_CHANGED" = true ]; then
-            echo "📋 Content changes detected:"
-            cat /tmp/content-diff.log || echo "Initial sync - no diff available"
+            echo "📋 检测到内容变更："
+            cat /tmp/content-diff.log || echo "初始同步 - 无差异日志可用"
             
             # 备份现有内容（如果存在）
             if [ -d "content" ]; then
-              echo "💾 Backing up current content..."
+              echo "💾 正在备份当前内容..."
               mv content content-backup-$(date +%Y%m%d-%H%M%S)
             fi
             
             # 同步新内容
-            echo "🔄 Syncing content folder..."
+            echo "🔄 正在同步 content 文件夹..."
             cp -r official-docs/content ./
-            echo "✅ Content folder synced successfully"
+            echo "✅ content 文件夹同步成功"
             echo "content_changed=true" >> $GITHUB_OUTPUT
           else
-            echo "✅ Content folder is up to date, no changes needed"
+            echo "✅ content 文件夹已是最新版本，无需更改"
             echo "content_changed=false" >> $GITHUB_OUTPUT
           fi
 
@@ -98,7 +98,7 @@ jobs:
           ASSETS_CHANGED=false
           
           if [ -d "official-docs/src/assets" ]; then
-            echo "🔍 Comparing assets folder..."
+            echo "🔍 正在比较 assets 文件夹..."
             
             # 创建 public 目录（如果不存在）
             mkdir -p public
@@ -115,25 +115,25 @@ jobs:
                 fi
               fi
             else
-              echo "📁 Assets folder does not exist locally, will create"
+              echo "📁 本地不存在 assets 文件夹，将创建"
               ASSETS_CHANGED=true
             fi
             
             if [ "$ASSETS_CHANGED" = true ]; then
-              echo "📋 Assets changes detected:"
-              cat /tmp/assets-diff.log || echo "Initial sync - no diff available"
+              echo "📋 检测到资源变更："
+              cat /tmp/assets-diff.log || echo "初始同步 - 无差异日志可用"
               
               # 同步新资源
-              echo "🔄 Syncing assets folder..."
+              echo "🔄 正在同步 assets 文件夹..."
               rsync -av --delete official-docs/src/assets/ public/assets/
-              echo "✅ Assets folder synced successfully"
+              echo "✅ assets 文件夹同步成功"
               echo "assets_changed=true" >> $GITHUB_OUTPUT
             else
-              echo "✅ Assets folder is up to date, no changes needed"
+              echo "✅ assets 文件夹已是最新版本，无需更改"
               echo "assets_changed=false" >> $GITHUB_OUTPUT
             fi
           else
-            echo "⚠️ Assets folder not found in official repository, skipping..."
+            echo "⚠️ 官方仓库中未找到 assets 文件夹，跳过..."
             echo "assets_changed=false" >> $GITHUB_OUTPUT
           fi
 
@@ -145,37 +145,37 @@ jobs:
         id: translate-content
         if: steps.sync-content.outputs.content_changed == 'true'
         run: |
-          echo "🔄 Processing content changes for translation..."
+          echo "🔄 正在处理内容变更并进行翻译..."
           
           # 检查是否有可用的 Cloudflare 配置
           if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
-            echo "✅ Cloudflare Workers AI configured, using AI translation"
+            echo "✅ Cloudflare Workers AI 已配置，使用 AI 翻译"
             if bun run translate-docs:verbose; then
-              echo "✅ Translation completed with changes"
+              echo "✅ 翻译完成，有内容更新"
               echo "translation_changed=true" >> $GITHUB_OUTPUT
             else
               TRANSLATION_EXIT_CODE=$?
               if [ $TRANSLATION_EXIT_CODE -eq 1 ]; then
-                echo "✅ Translation completed but no changes needed"
+                echo "✅ 翻译完成，但无需更新"
                 echo "translation_changed=false" >> $GITHUB_OUTPUT
               else
-                echo "❌ Translation failed with exit code $TRANSLATION_EXIT_CODE"
+                echo "❌ 翻译失败，退出代码 $TRANSLATION_EXIT_CODE"
                 echo "translation_changed=error" >> $GITHUB_OUTPUT
                 exit 1
               fi
             fi
           else
-            echo "⚠️ Cloudflare API credentials not configured, using format-only mode"
+            echo "⚠️ 未配置 Cloudflare API 凭据，使用仅格式化模式"
             if bun run translate-docs:no-ai; then
-              echo "✅ Format processing completed with changes"
+              echo "✅ 格式处理完成，有内容更新"
               echo "translation_changed=true" >> $GITHUB_OUTPUT
             else
               TRANSLATION_EXIT_CODE=$?
               if [ $TRANSLATION_EXIT_CODE -eq 1 ]; then
-                echo "✅ Format processing completed but no changes needed"
+                echo "✅ 格式处理完成，但无需更新"
                 echo "translation_changed=false" >> $GITHUB_OUTPUT
               else
-                echo "❌ Format processing failed with exit code $TRANSLATION_EXIT_CODE"
+                echo "❌ 格式处理失败，退出代码 $TRANSLATION_EXIT_CODE"
                 echo "translation_changed=error" >> $GITHUB_OUTPUT
                 exit 1
               fi
@@ -185,16 +185,16 @@ jobs:
       - name: Fix code blocks and template syntax
         if: steps.translate-content.outputs.translation_changed == 'true'
         run: |
-          echo "🔧 Running code block and template syntax fixes..."
+          echo "🔧 正在运行代码块和模板语法修复..."
           bun run fix-all
-          echo "✅ Code formatting completed"
+          echo "✅ 代码格式化完成"
 
       - name: Update README sync time and check for changes
         id: changes
         run: |
           # 如果有内容同步或翻译更新，更新 README 中的同步时间
           if [ "${{ steps.sync-content.outputs.content_changed }}" == "true" ] || [ "${{ steps.translate-content.outputs.translation_changed }}" == "true" ] || [ "${{ steps.sync-assets.outputs.assets_changed }}" == "true" ]; then
-            echo "📅 Updating sync time in README.md..."
+            echo "📅 正在更新 README.md 中的同步时间..."
             
             # 获取当前时间（北京时间）- 格式: 2025年07月01日 17:48
             SYNC_TIME=$(TZ='Asia/Shanghai' date '+%Y年%m月%d日 %H:%M')
@@ -202,20 +202,20 @@ jobs:
             # 更新 README.md 中的同步时间标记
             sed -i "s|<!-- LAST_SYNC_TIME -->.*<!-- /LAST_SYNC_TIME -->|<!-- LAST_SYNC_TIME --> $SYNC_TIME <!-- /LAST_SYNC_TIME -->|g" README.md
             
-            echo "✅ Sync time updated to: $SYNC_TIME"
+            echo "✅ 同步时间已更新为: $SYNC_TIME"
           fi
           
           # 检查是否有变更需要提交
           git add .
           if git diff --cached --quiet; then
-            echo "No changes detected"
+            echo "未检测到变更"
             echo "has_changes=false" >> $GITHUB_OUTPUT
           else
-            echo "Changes detected"
+            echo "检测到变更"
             echo "has_changes=true" >> $GITHUB_OUTPUT
             
             # 输出变更的文件列表
-            echo "📋 Changed files:"
+            echo "📋 变更的文件："
             git diff --cached --name-status
           fi
 
@@ -254,49 +254,49 @@ jobs:
 
       - name: Create summary
         run: |
-          echo "## 📋 Sync Summary" >> $GITHUB_STEP_SUMMARY
+          echo "## 📋 同步摘要" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Sync Date**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
-          echo "- **Source Repository**: https://github.com/nestjs/docs.nestjs.com" >> $GITHUB_STEP_SUMMARY
+          echo "- **同步日期**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "- **源仓库**: https://github.com/nestjs/docs.nestjs.com" >> $GITHUB_STEP_SUMMARY
           
           # Content 同步状态
           if [ "${{ steps.sync-content.outputs.content_changed }}" == "true" ]; then
-            echo "- **Content Synced**: ✅ Yes (changes detected and applied)" >> $GITHUB_STEP_SUMMARY
+            echo "- **内容同步**: ✅ 是（检测到变更并应用）" >> $GITHUB_STEP_SUMMARY
           else
-            echo "- **Content Synced**: ✅ Up to date (no changes needed)" >> $GITHUB_STEP_SUMMARY
+            echo "- **内容同步**: ✅ 已是最新（无需更改）" >> $GITHUB_STEP_SUMMARY
           fi
           
           # 翻译状态
           if [ "${{ steps.translate-content.outputs.translation_changed }}" == "true" ]; then
-            echo "- **Translation Updated**: ✅ Yes (docs folder updated with Cloudflare Workers AI)" >> $GITHUB_STEP_SUMMARY
+            echo "- **翻译更新**: ✅ 是（使用 Cloudflare Workers AI 更新了 docs 文件夹）" >> $GITHUB_STEP_SUMMARY
           elif [ "${{ steps.translate-content.outputs.translation_changed }}" == "false" ]; then
-            echo "- **Translation Updated**: ✅ Up to date (no translation changes needed)" >> $GITHUB_STEP_SUMMARY
+            echo "- **翻译更新**: ✅ 已是最新（无需翻译更改）" >> $GITHUB_STEP_SUMMARY
           elif [ "${{ steps.sync-content.outputs.content_changed }}" == "true" ]; then
-            echo "- **Translation Updated**: ⚠️ Content changed but translation skipped" >> $GITHUB_STEP_SUMMARY
+            echo "- **翻译更新**: ⚠️ 内容已变更但跳过了翻译" >> $GITHUB_STEP_SUMMARY
           else
-            echo "- **Translation Updated**: ➖ No content changes to translate" >> $GITHUB_STEP_SUMMARY
+            echo "- **翻译更新**: ➖ 无内容变更需要翻译" >> $GITHUB_STEP_SUMMARY
           fi
           
           # Assets 同步状态
           if [ "${{ steps.sync-assets.outputs.assets_changed }}" == "true" ]; then
-            echo "- **Assets Synced**: ✅ Yes (changes detected and applied)" >> $GITHUB_STEP_SUMMARY
+            echo "- **资源同步**: ✅ 是（检测到变更并应用）" >> $GITHUB_STEP_SUMMARY
           elif [ -d "public/assets" ]; then
-            echo "- **Assets Synced**: ✅ Up to date (no changes needed)" >> $GITHUB_STEP_SUMMARY
+            echo "- **资源同步**: ✅ 已是最新（无需更改）" >> $GITHUB_STEP_SUMMARY
           else
-            echo "- **Assets Synced**: ⚠️ Not found in source" >> $GITHUB_STEP_SUMMARY
+            echo "- **资源同步**: ⚠️ 源中未找到" >> $GITHUB_STEP_SUMMARY
           fi
           
           # Git 提交状态
           if [ "${{ steps.changes.outputs.has_changes }}" == "true" ]; then
-            echo "- **Changes Committed**: ✅ Yes, changes committed and pushed" >> $GITHUB_STEP_SUMMARY
+            echo "- **变更提交**: ✅ 是，变更已提交并推送" >> $GITHUB_STEP_SUMMARY
           else
-            echo "- **Changes Committed**: ❌ No changes to commit" >> $GITHUB_STEP_SUMMARY
+            echo "- **变更提交**: ❌ 无变更需要提交" >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: Notify on failure
         if: failure()
         run: |
-          echo "## ❌ Sync Failed" >> $GITHUB_STEP_SUMMARY
+          echo "## ❌ 同步失败" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "The sync operation failed. Please check the logs for details." >> $GITHUB_STEP_SUMMARY
-          echo "You can manually trigger this workflow again or investigate the issue." >> $GITHUB_STEP_SUMMARY
+          echo "同步操作失败。请检查日志了解详细信息。" >> $GITHUB_STEP_SUMMARY
+          echo "您可以手动重新触发此工作流或调查问题。" >> $GITHUB_STEP_SUMMARY

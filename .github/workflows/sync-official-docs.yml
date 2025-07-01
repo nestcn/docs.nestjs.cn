@@ -190,9 +190,23 @@ jobs:
           npm run fix-all
           echo "✅ Code formatting completed"
 
-      - name: Check for changes
+      - name: Update README sync time and check for changes
         id: changes
         run: |
+          # 如果有内容同步或翻译更新，更新 README 中的同步时间
+          if [ "${{ steps.sync-content.outputs.content_changed }}" == "true" ] || [ "${{ steps.translate-content.outputs.translation_changed }}" == "true" ] || [ "${{ steps.sync-assets.outputs.assets_changed }}" == "true" ]; then
+            echo "📅 Updating sync time in README.md..."
+            
+            # 获取当前时间（北京时间）- 格式: 2025年07月01日 17:48
+            SYNC_TIME=$(TZ='Asia/Shanghai' date '+%Y年%m月%d日 %H:%M')
+            
+            # 更新 README.md 中的同步时间标记
+            sed -i "s|<!-- LAST_SYNC_TIME -->.*<!-- /LAST_SYNC_TIME -->|<!-- LAST_SYNC_TIME --> $SYNC_TIME <!-- /LAST_SYNC_TIME -->|g" README.md
+            
+            echo "✅ Sync time updated to: $SYNC_TIME"
+          fi
+          
+          # 检查是否有变更需要提交
           git add .
           if git diff --cached --quiet; then
             echo "No changes detected"

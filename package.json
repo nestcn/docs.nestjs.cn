@@ -17,6 +17,7 @@
     "translate-docs:openchat": "node scripts/translate-docs.js --model @cf/openchat/openchat-3.5-0106 --verbose",
     "sync-and-translate": "npm run translate-docs && npm run fix-all",
     "sync-and-translate:no-ai": "npm run translate-docs:no-ai && npm run fix-all",
+    "update-sync-time": "node scripts/update-sync-time.js",
     "test-cloudflare": "node test-cloudflare-translate.js"
   },
   "dependencies": {

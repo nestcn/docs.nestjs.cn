@@ -1,4 +1,30 @@
-# 介绍
+<div align="center">
+  <h1>🎯 NestJS 中文文档</h1>
+  <p>
+    <strong>构建高效、可扩展的 Node.js Web 应用程序框架</strong>
+  </p>
+  <p>
+    <a href="https://docs.nestjs.cn/">
+      <img src="https://img.shields.io/badge/📖-查看文档-brightgreen?style=for-the-badge&logo=nestjs&logoColor=white" alt="查看文档">
+    </a>
+    <a href="https://github.com/nestjs/docs.nestjs.cn/actions/workflows/sync-official-docs.yml">
+      <img src="https://img.shields.io/github/actions/workflow/status/nestjs/docs.nestjs.cn/sync-official-docs.yml?branch=main&style=for-the-badge&logo=github&label=同步状态" alt="同步状态">
+    </a>
+    <a href="https://github.com/nestjs/docs.nestjs.cn/blob/main/LICENSE">
+      <img src="https://img.shields.io/github/license/nestjs/docs.nestjs.cn?style=for-the-badge" alt="License">
+    </a>
+  </p>
+  
+  <blockquote>
+    <p>
+      📅 <strong>最近同步时间:</strong> <!-- LAST_SYNC_TIME --> 2025年07月01日 09:48 <!-- /LAST_SYNC_TIME -->
+      <br>
+      <em>文档每日自动同步并翻译，确保与官方保持同步</em>
+    </p>
+  </blockquote>
+</div>
+
+---
 
 Nest是构建高效，可扩展的 Node.js Web 应用程序的框架。 它使用现代的 JavaScript 或 TypeScript（保留与纯 JavaScript 的兼容性），并结合 OOP（面向对象编程），FP（函数式编程）和FRP（函数响应式编程）的元素。。
 
@@ -9,6 +35,10 @@ Nest是构建高效，可扩展的 Node.js Web 应用程序的框架。 它使�
 Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创建高度可测试，可扩展，松散耦合且易于维护的应用程序。
 
 ## [查看文档](https://docs.nestjs.cn/)
+
+
+
+## 💬 社区交流
 
 ### 中文交流QQ群：     
 
@@ -25,11 +55,8 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
 
 ### 微信群：
 
-微信三群：    
-
-<img src="https://ghproxy.net/https://raw.githubusercontent.com/zuohuadong/imgbed/main/pic/siqun.jpg" alt="加微信" width="260" height="260" align="bottom" />
-
-如果二维码过期，请添加：
+微信一群、微信二群、微信三群、微信四群        
+群二维码过期，请添加：    
 
 
 ![](https://ghproxy.net/https://raw.githubusercontent.com/zuohuadong/imgbed/main/pic/68747470733a2f2f7069632e646f776e6b2e63632f6974656d2f3566386336633334316364316262623836623732666339612e6a7067.jpg)    
@@ -37,6 +64,7 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
 
 
 微信一二群，目前只接受 开源项目作者、nestjs 文档贡献者、捐赠者。
+
 
 ## 贡献者
 <!-- readme: collaborators,contributors -start -->
@@ -1214,6 +1242,68 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
 <!-- readme: collaborators,contributors -end -->
 
 
+## 🤝 如何贡献
+
+<div align="center">
+  <h3>🌟 欢迎各种形式的贡献！</h3>
+  <p>让我们一起让 NestJS 中文文档变得更好</p>
+</div>
+
+<table>
+  <tr>
+    <td align="center" width="25%">
+      <img src="https://img.shields.io/badge/📝-文档改进-brightgreen?style=flat-square" />
+      <br>
+      <strong>📝 文档改进</strong>
+      <ul>
+        <li>发现翻译错误或不准确的地方</li>
+        <li>改进文档的表达和可读性</li>
+        <li>补充遗漏的内容或示例</li>
+      </ul>
+    </td>
+    <td align="center" width="25%">
+      <img src="https://img.shields.io/badge/🔧-技术贡献-blue?style=flat-square" />
+      <br>
+      <strong>🔧 技术贡献</strong>
+      <ul>
+        <li>优化 AI 翻译脚本</li>
+        <li>改进构建和部署流程</li>
+        <li>修复 Bug 或添加新功能</li>
+      </ul>
+    </td>
+    <td align="center" width="25%">
+      <img src="https://img.shields.io/badge/🎯-翻译贡献-orange?style=flat-square" />
+      <br>
+      <strong>🎯 翻译贡献</strong>
+      <ul>
+        <li>参与 AI 翻译结果的人工校对</li>
+        <li>为翻译系统提供术语对照表</li>
+        <li>优化翻译质量和一致性</li>
+      </ul>
+    </td>
+    <td align="center" width="25%">
+      <img src="https://img.shields.io/badge/💡-建议反馈-purple?style=flat-square" />
+      <br>
+      <strong>💡 建议反馈</strong>
+      <ul>
+        <li>提出改进建议</li>
+        <li>报告问题和 Bug</li>
+        <li>分享使用体验</li>
+      </ul>
+    </td>
+  </tr>
+</table>
+
+<div align="center">
+  <p>
+    <strong>📖 详细贡献指南</strong>
+    <br>
+    <a href="https://github.com/nestjs/docs.nestjs.cn/blob/main/CONTRIBUTING.md">
+      <img src="https://img.shields.io/badge/📋-查看贡献指南-success?style=for-the-badge" />
+    </a>
+  </p>
+</div>
+
 ## 赞助商广告：
 
 [京东云 产品6折起](https://partner.jdcloud.com/partner/notice/39c68afb71a544e4883b6cd79bb5dffd)    
@@ -1307,65 +1397,117 @@ SSL 证书：
 <img src="https://ghproxy.com/https://raw.githubusercontent.com/zuohuadong/imgbed/main/pic/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20211213154942.jpg" alt="支付宝" width="260" height="400" align="bottom" />
 
 
+## 🚀 技术栈
 
-# NestJS 中文文档站点
+本项目使用现代化的技术栈构建，为用户提供优秀的阅读体验：
 
-这是基于 [Next.js](https://nextjs.org) 和 [Nextra](https://nextra.site) 构建的 NestJS 中文文档站点，使用 Turbopack 进行优化。
+### 📖 文档构建
+
+- **[Rspress](https://rspress.dev/)** - 基于 Rspack 的静态站点生成器
+  - ⚡ 极速构建：基于 Rust 的 Rspack 打包器
+  - 🎨 现代界面：支持暗黑模式，响应式设计
+  - 🔍 全文搜索：内置搜索功能，快速定位内容
+  - 📱 移动友好：完美适配移动设备
+
+### 🤖 AI 翻译
+
+- **[Cloudflare Workers AI](https://ai.cloudflare.com/)** - 免费的 AI 翻译服务
+  - 💰 完全免费：无需付费即可使用
+  - 🌍 全球加速：Cloudflare 全球 CDN 网络
+  - 🔒 数据安全：不存储用户数据
+  - ⚡ 响应迅速：毫秒级响应时间
+  - 🎯 专业翻译：针对技术文档优化的翻译效果
+
+### 🔧 开发工具链
+
+- **Bun** - 现代化的 JavaScript 运行时和包管理器
+
+- **GitHub Actions** - 自动化 CI/CD 工作流
+- **TypeScript** - 类型安全的开发体验
+- **Tailwind CSS** - 实用优先的 CSS 框架
 
 
+##  AI 自动同步翻译系统
 
-## 开始使用
+本项目实现了完全自动化的文档同步和翻译流程：
 
-首先，运行开发服务器：
+### ✨ 核心特性
 
-```bash
-# 使用 Turbopack（推荐）
-bun run dev
-# 或者
-bun run dev:turbo
+- **📚 智能同步**: 每日自动检测官方文档更新
+- **🤖 AI 翻译**: 使用 Cloudflare Workers AI 智能翻译新增内容
+- **🔒 代码保护**: 自动保护代码块、链接、HTML 标签不被翻译
+- **📈 增量更新**: 只翻译变更的部分，提高效率
+- **💾 智能缓存**: 避免重复翻译，节省资源
+- **🔧 格式修复**: 自动处理官方文档的特殊标记和格式
 
-# 或使用其他包管理器
-npm run dev
-yarn dev
-pnpm dev
+### 🎯 工作流程
+
+```mermaid
+graph TD
+    A[官方 NestJS 文档更新] --> B[GitHub Actions 自动检测]
+    B --> C[同步英文内容到 content 目录]
+    C --> D[Cloudflare Workers AI 翻译]
+    D --> E[格式处理和修复]
+    E --> F[更新到 docs 目录]
+    F --> G[自动提交到仓库]
+    G --> H[触发网站重新构建]
 ```
 
-打开 [http://localhost:3000](http://localhost:3000) 在浏览器中查看结果。
+### 📋 配置指南
 
-## Turbopack 支持
+- 📚 [Cloudflare Workers AI 配置指南](CLOUDFLARE_AI_SETUP.md)
+- ⚙️ [GitHub Actions 自动翻译配置](GITHUB_ACTIONS_SETUP.md)
+- 🛠️ [翻译脚本使用说明](scripts/README.md)
 
-本项目已配置为使用 Next.js 的 Turbopack 打包工具，提供：
+### 🎉 翻译质量
 
-- 🚀 更快的开发服务器启动
-- ⚡ 更快的热重载
-- 📦 优化的 MDX 文件处理
-- 🔄 增量编译
+我们的 AI 翻译系统专门针对 NestJS 技术文档进行了优化：
 
-### 可用脚本
+- ✅ **术语一致性**: 保持 Controller、Service、Module 等技术术语的一致性
+- ✅ **代码完整性**: 确保代码示例和变量名保持原样
+- ✅ **格式准确性**: 维护 Markdown 格式和链接的完整性
+- ✅ **上下文理解**: 基于 NestJS 生态系统的专业翻译
 
-- `bun run dev` - 启动开发服务器（已启用 Turbopack）
-- `bun run dev:turbo` - 明确使用 Turbopack 启动开发服务器
-- `bun run build` - 构建生产版本
-- `bun run build:turbo` - 使用实验性编译模式构建
-- `bun run start` - 启动生产服务器
-- `bun run lint` - 运行代码检查
+### 📊 项目状态
 
-## 功能特性
+[![同步状态](https://github.com/nestjs/docs.nestjs.cn/actions/workflows/sync-official-docs.yml/badge.svg)](https://github.com/nestjs/docs.nestjs.cn/actions/workflows/sync-official-docs.yml)
+[![构建状态](https://github.com/nestjs/docs.nestjs.cn/actions/workflows/deploy.yml/badge.svg)](https://github.com/nestjs/docs.nestjs.cn/actions/workflows/deploy.yml)
 
-- 📚 完整的 NestJS 中文文档
-- 🔍 全文搜索支持（中文优化）
-- 🌙 深色/浅色主题切换
-- 📱 响应式设计
-- ⚡ Turbopack 性能优化
-- 🎨 NestJS 官方主题样式
+- 🔄 **自动同步**: 每日北京时间 10:00 自动同步官方文档
+- 🤖 **AI 翻译**: 使用 Cloudflare Workers AI 提供高质量翻译
+- 📈 **实时更新**: 文档更新后自动部署到生产环境
+- 🚀 **快速访问**: 基于 Rspress 的极速加载体验
 
-## 技术栈
+### 🚀 快速开始
 
-- **Next.js 15** - React 框架
-- **Nextra** - 文档站点生成器
-- **Turbopack** - 下一代打包工具
-- **TypeScript** - 类型安全
-- **Tailwind CSS** - 样式框架
-- **Flexsearch** - 全文搜索
+如果你想在本地运行此项目或贡献翻译：
 
+```bash
+# 克隆仓库
+git clone https://github.com/nestjs/docs.nestjs.cn.git
+cd docs.nestjs.cn
 
+# 安装依赖
+npm install
+
+# 本地开发
+npm run dev
+
+# 构建生产版本
+npm run build
+```
+
+#### 配置 AI 翻译（可选）
+
+如果你想使用 AI 翻译功能：
+
+1. 获取 [Cloudflare Workers AI](CLOUDFLARE_AI_SETUP.md) 凭据
+2. 设置环境变量：
+   ```bash
+   export CLOUDFLARE_API_TOKEN="your-token"
+   export CLOUDFLARE_ACCOUNT_ID="your-account-id"
+   ```
+3. 运行翻译：
+   ```bash
+   npm run translate-docs:verbose
+   ```

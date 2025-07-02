@@ -1531,8 +1531,8 @@ graph TD
 
 ### 📊 项目状态
 
-[![同步状态](https://github.com/nestcn/docs.nestjs.cn/actions/workflows/sync-official-docs.yml/badge.svg)](https://github.com/nestcn/docs.nestjs.cn/actions/workflows/sync-official-docs.yml)
-[![构建状态](https://github.com/nestcn/docs.nestjs.cn/actions/workflows/deploy.yml/badge.svg)](https://github.com/nestcn/docs.nestjs.cn/actions/workflows/deploy.yml)
+[![同步状态](https://img.shields.io/github/actions/workflow/status/nestcn/docs.nestjs.cn/sync-official-docs.yml?style=for-the-badge&logo=github&label=同步状态)](https://github.com/nestcn/docs.nestjs.cn/actions/workflows/sync-official-docs.yml)
+[![文档校验](https://img.shields.io/github/actions/workflow/status/nestcn/docs.nestjs.cn/fix-code-blocks.yml?style=for-the-badge&logo=github&label=文档校验)](https://github.com/nestcn/docs.nestjs.cn/actions/workflows/fix-code-blocks.yml)
 
 - 🔄 **自动同步**: 每日北京时间 10:00 自动同步官方文档
 - 🤖 **AI 翻译**: 使用 Cloudflare Workers AI 提供高质量翻译

@@ -209,11 +209,12 @@ if (require.main === module) {
   const fixer = new CodeBlocksFixer(options);
   fixer.run()
     .then(hasChanges => {
-      process.exit(hasChanges ? 0 : 1);
+      // 总是以成功状态退出，无论是否有修改
+      process.exit(0);
     })
     .catch(error => {
       console.error('修复失败:', error);
-      process.exit(2);
+      process.exit(1);
     });
 }
 

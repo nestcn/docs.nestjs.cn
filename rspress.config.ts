@@ -271,4 +271,7 @@ export default defineConfig({
       ],
     },
   },
+  mediumZoom: {
+    selector: '.rspress-doc img',
+  },
 });

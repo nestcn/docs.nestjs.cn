@@ -1372,7 +1372,7 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
     </td>
     <td align="center" width="33%">
       <a href="https://bbxy.cloud/auth/register?code=GPTR">
-        <img src="https://img.shields.io/badge/BBXY-VPN-最低月租5元-blue?style=for-the-badge" />
+        <img src="https://img.shields.io/badge/BBXY-VPN-From%205%20CNY-blue?style=for-the-badge" />
       </a>
     </td>
   </tr>

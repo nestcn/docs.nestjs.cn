@@ -169,7 +169,7 @@ export interface SwaggerCustomOptions {
   /**
    * If `true`, Swagger resources paths will be prefixed by the global prefix set through `setGlobalPrefix()`.
    * Default: `false`.
-   * @see https://docs.nestjs.com/faq/global-prefix
+   * @see ../faq/global-prefix
    */
   useGlobalPrefix?: boolean;
 

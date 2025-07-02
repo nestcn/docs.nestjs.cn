@@ -28,7 +28,7 @@ async upvotePost(@Args('postId') postId: number) {
 
 #### 执行上下文
 
-由于 GraphQL 接收的请求数据类型不同，守卫和拦截器获取的[执行上下文](https://docs.nestjs.com/fundamentals/execution-context)与 REST 存在差异。GraphQL 解析器具有一组独特参数：`root`、`args`、`context` 和 `info`。因此守卫和拦截器需要将通用 `ExecutionContext` 转换为 `GqlExecutionContext`，转换过程非常简单：
+由于 GraphQL 接收的请求数据类型不同，守卫和拦截器获取的[执行上下文](../fundamentals/execution-context)与 REST 存在差异。GraphQL 解析器具有一组独特参数：`root`、`args`、`context` 和 `info`。因此守卫和拦截器需要将通用 `ExecutionContext` 转换为 `GqlExecutionContext`，转换过程非常简单：
 
 ```typescript
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';

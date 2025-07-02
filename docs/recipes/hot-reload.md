@@ -6,7 +6,7 @@
 
 ### 使用 CLI
 
-若您使用 [Nest CLI](https://docs.nestjs.com/cli/overview)，配置过程相当简单。该 CLI 封装了 `webpack`，因此可以使用 `HotModuleReplacementPlugin`。
+若您使用 [Nest CLI](../cli/overview)，配置过程相当简单。该 CLI 封装了 `webpack`，因此可以使用 `HotModuleReplacementPlugin`。
 
 #### 安装
 
@@ -87,7 +87,7 @@ $ npm run start:dev
 
 ### 无命令行界面
 
-如果不使用 [Nest CLI](https://docs.nestjs.com/cli/overview)，配置会稍显复杂（需要更多手动步骤）。
+如果不使用 [Nest CLI](../cli/overview)，配置会稍显复杂（需要更多手动步骤）。
 
 #### 安装
 

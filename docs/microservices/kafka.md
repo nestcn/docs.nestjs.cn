@@ -52,9 +52,9 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 
 Kafka 与其他微服务传输器有个小区别。我们不使用 `ClientProxy` 类，而是使用 `ClientKafkaProxy` 类。
 
-与其他微服务传输器类似，创建 `ClientKafkaProxy` 实例有[多种方式](https://docs.nestjs.com/microservices/basics#client) 。
+与其他微服务传输器类似，创建 `ClientKafkaProxy` 实例有[多种方式](../microservices/basics#client) 。
 
-一种创建实例的方法是使用 `ClientsModule`。要通过 `ClientsModule` 创建客户端实例，需先导入该模块，然后使用 `register()` 方法传入一个选项对象（包含与上文 `createMicroservice()` 方法相同的属性），以及用作注入令牌的 `name` 属性。更多关于 `ClientsModule` 的信息请参阅[此处](https://docs.nestjs.com/microservices/basics#client) 。
+一种创建实例的方法是使用 `ClientsModule`。要通过 `ClientsModule` 创建客户端实例，需先导入该模块，然后使用 `register()` 方法传入一个选项对象（包含与上文 `createMicroservice()` 方法相同的属性），以及用作注入令牌的 `name` 属性。更多关于 `ClientsModule` 的信息请参阅[此处](../microservices/basics#client) 。
 
 ```typescript
 @Module({
@@ -79,7 +79,7 @@ Kafka 与其他微服务传输器有个小区别。我们不使用 `ClientProxy`
 })
 ```
 
-也可以使用其他方式创建客户端（`ClientProxyFactory` 或 `@Client()`）。相关说明请查看[此文档](https://docs.nestjs.com/microservices/basics#client) 。
+也可以使用其他方式创建客户端（`ClientProxyFactory` 或 `@Client()`）。相关说明请查看[此文档](../microservices/basics#client) 。
 
 按如下方式使用 `@Client()` 装饰器：
 

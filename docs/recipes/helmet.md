@@ -20,7 +20,7 @@ import helmet from 'helmet';
 app.use(helmet());
 ```
 
-> warning **警告** 当同时使用 `helmet`、`@apollo/server` (4.x) 和 [Apollo Sandbox](https://docs.nestjs.com/graphql/quick-start#apollo-sandbox) 时，Apollo Sandbox 的 [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) 可能会出现问题。要解决此问题，请按如下方式配置 CSP：
+> warning **警告** 当同时使用 `helmet`、`@apollo/server` (4.x) 和 [Apollo Sandbox](../graphql/quick-start#apollo-sandbox) 时，Apollo Sandbox 的 [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) 可能会出现问题。要解决此问题，请按如下方式配置 CSP：
 >
 > ```typescript
 > app.use(

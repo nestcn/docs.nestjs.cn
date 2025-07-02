@@ -2,7 +2,7 @@
 
 [GraphQL](https://graphql.org/) 是一种强大的 API 查询语言，也是一个运行时环境，用于使用现有数据满足这些查询需求。它采用优雅的方式解决了 REST API 常见的诸多问题。作为背景知识，我们建议阅读这篇关于 GraphQL 与 REST 的[对比分析](https://www.apollographql.com/blog/graphql-vs-rest) 。将 GraphQL 与 [TypeScript](https://www.typescriptlang.org/) 结合使用，可为您的 GraphQL 查询提供更好的类型安全，实现端到端的类型检查。
 
-本章假设您已掌握 GraphQL 基础知识，重点介绍如何使用内置的 `@nestjs/graphql` 模块。`GraphQLModule` 可配置为使用 [Apollo](https://www.apollographql.com/) 服务器（通过 `@nestjs/apollo` 驱动）或 [Mercurius](https://github.com/mercurius-js/mercurius)（通过 `@nestjs/mercurius` 驱动）。我们为这些成熟的 GraphQL 包提供官方集成方案，使在 Nest 中使用 GraphQL 更加简便（更多集成方案请见[此处](https://docs.nestjs.com/graphql/quick-start#third-party-integrations) ）。
+本章假设您已掌握 GraphQL 基础知识，重点介绍如何使用内置的 `@nestjs/graphql` 模块。`GraphQLModule` 可配置为使用 [Apollo](https://www.apollographql.com/) 服务器（通过 `@nestjs/apollo` 驱动）或 [Mercurius](https://github.com/mercurius-js/mercurius)（通过 `@nestjs/mercurius` 驱动）。我们为这些成熟的 GraphQL 包提供官方集成方案，使在 Nest 中使用 GraphQL 更加简便（更多集成方案请见[此处](../graphql/quick-start#third-party-integrations) ）。
 
 您也可以构建自己的专用驱动（ [此处](/graphql/other-features#creating-a-custom-driver)了解更多详情）。
 
@@ -282,7 +282,7 @@ const { schema } = app.get(GraphQLSchemaHost);
 }),
 ```
 
-与其他工厂提供程序类似，我们的工厂函数可以是[异步的](https://docs.nestjs.com/fundamentals/custom-providers#factory-providers-usefactory) ，并且可以通过 `inject` 注入依赖项。
+与其他工厂提供程序类似，我们的工厂函数可以是[异步的](../fundamentals/dependency-injection#factory-providers-usefactory) ，并且可以通过 `inject` 注入依赖项。
 
 ```typescript
 GraphQLModule.forRootAsync<ApolloDriverConfig>({

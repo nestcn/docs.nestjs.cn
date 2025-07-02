@@ -579,7 +579,7 @@ TypeOrmModule.forRootAsync({
 });
 ```
 
-我们的工厂行为与任何其他[异步提供者](https://docs.nestjs.com/fundamentals/async-providers)一样（例如，它可以被声明为 `async`，并且能够通过 `inject` 注入依赖项）。
+我们的工厂行为与任何其他[异步提供者](../fundamentals/async-components)一样（例如，它可以被声明为 `async`，并且能够通过 `inject` 注入依赖项）。
 
 ```typescript
 TypeOrmModule.forRootAsync({
@@ -1115,7 +1115,7 @@ SequelizeModule.forRootAsync({
 });
 ```
 
-我们的工厂与任何其他[异步提供者](https://docs.nestjs.com/fundamentals/async-providers)行为一致（例如，它可以被声明为 `async`，并且能够通过 `inject` 注入依赖项）。
+我们的工厂与任何其他[异步提供者](../fundamentals/async-components)行为一致（例如，它可以被声明为 `async`，并且能够通过 `inject` 注入依赖项）。
 
 ```typescript
 SequelizeModule.forRootAsync({

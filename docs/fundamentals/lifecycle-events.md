@@ -10,7 +10,7 @@ Nest 应用程序以及其中的每个组件都拥有由 Nest 管理的生命周
 
 #### 生命周期事件
 
-生命周期事件发生在应用程序启动和关闭过程中。Nest 会在以下每个生命周期事件中调用模块、提供者和控制器上已注册的生命周期钩子方法（需先启用**关闭钩子** ，具体说明见[下文](https://docs.nestjs.com/fundamentals/lifecycle-events#application-shutdown) ）。如上图所示，Nest 还会调用适当的底层方法来开始监听连接和停止监听连接。
+生命周期事件发生在应用程序启动和关闭过程中。Nest 会在以下每个生命周期事件中调用模块、提供者和控制器上已注册的生命周期钩子方法（需先启用**关闭钩子** ，具体说明见[下文](../fundamentals/lifecycle-events#application-shutdown) ）。如上图所示，Nest 还会调用适当的底层方法来开始监听连接和停止监听连接。
 
 在下表中，`onModuleInit` 和 `onApplicationBootstrap` 仅在你显式调用 `app.init()` 或 `app.listen()` 时触发。
 

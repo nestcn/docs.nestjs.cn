@@ -93,7 +93,7 @@ import { HealthController } from './health.controller';
 export class HealthModule {}
 ```
 
-我们的健康检查将向 `https://docs.nestjs.com` 地址发送一个 _GET_ 请求。如果从该地址获得健康响应，我们在 `http://localhost:3000/health` 的路由将返回以下对象，状态码为 200。
+我们的健康检查将向 `../ 地址发送一个 _GET_ 请求。如果从该地址获得健康响应，我们在 `http://localhost:3000/health` 的路由将返回以下对象，状态码为 200。
 
 ```json
 {

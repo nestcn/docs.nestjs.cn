@@ -685,7 +685,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'myjwt')
 
 #### GraphQL
 
-要在 [GraphQL](https://docs.nestjs.com/graphql/quick-start) 中使用 AuthGuard，需继承内置的 `AuthGuard` 类并重写 `getRequest()` 方法。
+要在 [GraphQL](../graphql/quick-start) 中使用 AuthGuard，需继承内置的 `AuthGuard` 类并重写 `getRequest()` 方法。
 
 ```typescript
 @Injectable()

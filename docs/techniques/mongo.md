@@ -304,7 +304,7 @@ export class CatsService {
 export class AppModule {}
 ```
 
-与其他[工厂提供者](https://docs.nestjs.com/fundamentals/custom-providers#factory-providers-usefactory)类似，我们的工厂函数可以是 `async` 异步的，并能通过 `inject` 注入依赖项。
+与其他[工厂提供者](../fundamentals/dependency-injection#factory-providers-usefactory)类似，我们的工厂函数可以是 `async` 异步的，并能通过 `inject` 注入依赖项。
 
 ```typescript
 @Module({
@@ -455,7 +455,7 @@ export class EventsModule {}
 
 在进行应用程序单元测试时，我们通常希望避免任何数据库连接，从而使测试套件更易于设置且执行更快。但我们的类可能依赖于从连接实例获取的模型。如何解析这些类？解决方案是创建模拟模型。
 
-为简化此过程，`@nestjs/mongoose` 包提供了 `getModelToken()` 函数，该函数会基于模型名称返回预制的[注入令牌](https://docs.nestjs.com/fundamentals/custom-providers#di-fundamentals) 。使用此令牌，您可以通过标准[自定义提供者](/fundamentals/custom-providers)技术（包括 `useClass`、`useValue` 和 `useFactory`）轻松提供模拟实现。例如：
+为简化此过程，`@nestjs/mongoose` 包提供了 `getModelToken()` 函数，该函数会基于模型名称返回预制的[注入令牌](../fundamentals/dependency-injection#di-fundamentals) 。使用此令牌，您可以通过标准[自定义提供者](../fundamentals/dependency-injection)技术（包括 `useClass`、`useValue` 和 `useFactory`）轻松提供模拟实现。例如：
 
 ```typescript
 @Module({
@@ -486,7 +486,7 @@ MongooseModule.forRootAsync({
 });
 ```
 
-与其他[工厂提供者](https://docs.nestjs.com/fundamentals/custom-providers#factory-providers-usefactory)类似，我们的工厂函数可以是 `async` 异步的，并能通过 `inject` 注入依赖项。
+与其他[工厂提供者](../fundamentals/dependency-injection#factory-providers-usefactory)类似，我们的工厂函数可以是 `async` 异步的，并能通过 `inject` 注入依赖项。
 
 ```typescript
 MongooseModule.forRootAsync({

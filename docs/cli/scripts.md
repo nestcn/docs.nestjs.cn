@@ -16,15 +16,15 @@ Nest 应用是一个**标准**的 TypeScript 应用，需要先编译为 JavaScr
 
 #### 构建
 
-`nest build` 是对标准 `tsc` 编译器或 `swc` 编译器（用于[标准项目](https://docs.nestjs.com/cli/overview#project-structure) ）的封装，对于 [monorepo 项目](https://docs.nestjs.com/cli/overview#project-structure)则使用 `ts-loader` 的 webpack 打包器。除了开箱即用地处理 `tsconfig-paths` 外，它不会添加任何其他编译特性或步骤。其存在的原因是大多数开发者（尤其是刚接触 Nest 时）不需要调整编译器选项（如 `tsconfig.json` 文件），这些配置有时可能较为复杂。
+`nest build` 是对标准 `tsc` 编译器或 `swc` 编译器（用于[标准项目](../cli/overview#project-structure) ）的封装，对于 [monorepo 项目](../cli/overview#project-structure)则使用 `ts-loader` 的 webpack 打包器。除了开箱即用地处理 `tsconfig-paths` 外，它不会添加任何其他编译特性或步骤。其存在的原因是大多数开发者（尤其是刚接触 Nest 时）不需要调整编译器选项（如 `tsconfig.json` 文件），这些配置有时可能较为复杂。
 
-更多详情请参阅 [nest build](https://docs.nestjs.com/cli/usages#nest-build) 文档。
+更多详情请参阅 [nest build](../cli/usages#nest-build) 文档。
 
 #### 执行
 
 `nest start` 命令主要确保项目已完成构建（等同于 `nest build`），随后以便携、简易的方式调用 `node` 命令来运行编译后的应用。与构建过程类似，您可以根据需求自由定制此流程，既可以通过 `nest start` 命令及其选项实现，也可以完全替换该流程。整个过程属于标准的 TypeScript 应用程序构建与执行流水线，您可以自主管理这一流程。
 
-更多详情请参阅 [nest start](https://docs.nestjs.com/cli/usages#nest-start) 文档。
+更多详情请参阅 [nest start](../cli/usages#nest-start) 文档。
 
 #### 生成
 

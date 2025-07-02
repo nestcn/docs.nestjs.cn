@@ -425,7 +425,7 @@ bootstrap();
 ### 实用资源
 
 - **[官方示例](https://github.com/nestjs/nest/tree/master/sample)** - 各种功能的示例代码
-- **[NestJS 教程](https://docs.nestjs.com/first-steps)** - 官方教程
+- **[NestJS 教程](../overview/first-steps)** - 官方教程
 - **[社区资源](/awesome)** - 社区贡献的资源和工具
 - **[常见问题](/faq)** - 常见问题解答
 

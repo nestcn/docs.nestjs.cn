@@ -26,7 +26,7 @@ export class AppModule {}
 
 上述配置将为应用程序中受保护的路由设置全局选项，包括 `ttl`(生存时间，以毫秒为单位)和 `limit`(在 ttl 时间内的最大请求数)。
 
-导入该模块后，您可以选择如何绑定 `ThrottlerGuard`。如[守卫](https://docs.nestjs.com/guards)章节所述，任何类型的绑定方式都适用。例如，若需全局绑定该守卫，可通过在任何模块中添加以下提供者来实现：
+导入该模块后，您可以选择如何绑定 `ThrottlerGuard`。如[守卫](../overview/guards)章节所述，任何类型的绑定方式都适用。例如，若需全局绑定该守卫，可通过在任何模块中添加以下提供者来实现：
 
 ```typescript
 {

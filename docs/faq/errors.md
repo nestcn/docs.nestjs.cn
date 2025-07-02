@@ -67,7 +67,7 @@ Nest 无法解析 <provider> 的依赖项（?）。
 
 #### "循环依赖"错误
 
-有时您会发现应用中难以避免[循环依赖](https://docs.nestjs.com/fundamentals/circular-dependency)问题。您需要采取一些措施帮助 Nest 解决这些问题。由循环依赖引发的错误通常如下所示：
+有时您会发现应用中难以避免[循环依赖](../fundamentals/circular-dependency)问题。您需要采取一些措施帮助 Nest 解决这些问题。由循环依赖引发的错误通常如下所示：
 
 ```bash
 Nest cannot create the <module> instance.
@@ -75,7 +75,7 @@ The module at index [<index>] of the <module> "imports" array is undefined.
 ```
 
 Potential causes:
-- A circular dependency between modules. Use forwardRef() to avoid it. Read more: https://docs.nestjs.com/fundamentals/circular-dependency
+- A circular dependency between modules. Use forwardRef() to avoid it. Read more: ../fundamentals/circular-dependency
 - The module at index [<index>] is of type "undefined". Check your import statements and the type of the module.
 
 Scope [<module_import_chain>]

@@ -1,68 +1,95 @@
-# NestJS 中文文档自动翻译系统
+# NestJS 中文文档自动化工具
 
-这个项目包含了使用 Cloudflare Workers AI 自动翻译 NestJS 官方文档的脚本和工作流。
+这个目录包含了 NestJS 中文文档项目的各种自动化脚本和工具。
 
-## 🌟 特性
+## 🌟 主要功能
 
-- **🤖 AI 翻译**: 使用 Cloudflare Workers AI 进行智能翻译
-- **💰 完全免费**: Cloudflare Workers AI 免费使用
+- **🤖 AI 自动翻译**: 使用 Cloudflare Workers AI 进行智能翻译
+- **� 链接处理**: 批量替换内部链接为相对路径
+- **�💰 完全免费**: Cloudflare Workers AI 免费使用
 - **📚 智能缓存**: 自动缓存翻译结果，避免重复翻译
 - **🔒 代码保护**: 保护代码块、内联代码、HTML 标签和链接不被翻译
 - **⚡ 增量更新**: 只翻译变更的文件
-- **🔄 格式修复**: 自动处理 `@@filename` 和 `@@switch` 标记
-- **📊 详细统计**: 显示翻译进度和结果统计
+- ** 详细统计**: 显示处理进度和结果统计
 
 ## 📁 项目结构
 
 ```
 .
-├── content/          # 从官方仓库同步的英文原文
-├── docs/            # 处理后的中文文档
+├── content/          # 从官方仓库同步的英文原文（不处理）
+├── docs/            # 处理后的中文文档（主要处理目录）
 ├── public/assets/   # 从官方仓库同步的资源文件
-├── scripts/         # 自动化脚本
+├── scripts/         # 自动化脚本（本目录）
 └── .github/workflows/ # GitHub Actions 工作流
 ```
 
-## 🛠️ 可用脚本
+## 🛠️ 核心脚本
+
+### 🔗 链接处理工具
+
+```bash
+# 统一的链接处理工具 - 批量替换 docs.nestjs.com 链接为相对路径
+bun scripts/final-link-processor.js
+
+# 或使用 Node.js
+node scripts/final-link-processor.js
+```
+
+**特性：**
+- ✅ 只处理 `docs/` 目录，忽略 `content/` 英文原文
+- ✅ 自动忽略 `awesome.md` 和 `index.md` 文件
+- ✅ 智能跳过示例代码中的链接
+- ✅ 自动检测目标文件是否存在
+- ✅ 详细的处理报告和统计
 
 ### AI 翻译和文档处理
 
 ```bash
 # 🤖 使用 Cloudflare Workers AI 翻译文档
-npm run translate-docs
+bun translate-docs
 
 # 🤖 详细输出模式
-npm run translate-docs:verbose
+bun translate-docs:verbose
 
 # 🔄 仅格式处理（不使用 AI 翻译）
-npm run translate-docs:no-ai
+bun translate-docs:no-ai
 
 # 🤖 使用不同模型翻译
-npm run translate-docs:mistral     # 使用 Mistral 7B 模型
-npm run translate-docs:openchat    # 使用 OpenChat 3.5 模型
+bun translate-docs:mistral     # 使用 Mistral 7B 模型
+bun translate-docs:openchat    # 使用 OpenChat 3.5 模型
 
 # 🔧 修复代码块格式
-npm run fix-code-blocks
+bun fix-code-blocks
 
 # 🔧 修复模板语法
-npm run fix-template-syntax
+bun fix-template-syntax
 
 # 🔧 运行所有修复
-npm run fix-all
+bun fix-all
 
 # 🚀 完整的翻译和修复流程
-npm run sync-and-translate
+bun sync-and-translate
 
 # 🚀 完整的翻译和修复流程（不使用 AI）
-npm run sync-and-translate:no-ai
+bun sync-and-translate:no-ai
 
 # 🧪 测试 Cloudflare Workers AI 功能
-npm run test-cloudflare
+bun test-cloudflare
 ```
 
 ## 🚀 快速开始
 
-### 1. 配置 Cloudflare Workers AI
+### 1. 安装依赖
+
+```bash
+# 使用 bun (推荐)
+bun install
+
+# 或使用 npm
+npm install
+```
+
+### 2. 配置 Cloudflare Workers AI
 
 首先需要获取 Cloudflare 的 API 凭据：
 
@@ -70,7 +97,7 @@ npm run test-cloudflare
 2. 获取 Account ID（在右侧边栏）
 3. 创建 API Token（需要 Workers:Edit 权限）
 
-### 2. 设置环境变量
+### 3. 设置环境变量
 
 ```bash
 # Windows PowerShell
@@ -82,14 +109,17 @@ export CLOUDFLARE_API_TOKEN="your-api-token"
 export CLOUDFLARE_ACCOUNT_ID="your-account-id"
 ```
 
-### 3. 运行翻译
+### 4. 运行工具
 
 ```bash
-# 基本翻译
-npm run translate-docs:verbose
+# 链接处理
+bun scripts/final-link-processor.js
+
+# AI 翻译
+bun translate-docs:verbose
 
 # 测试功能
-npm run test-cloudflare
+bun test-cloudflare
 ```
 
 ## 🤖 支持的 AI 模型
@@ -104,18 +134,44 @@ npm run test-cloudflare
 ## 📝 直接运行脚本
 
 ```bash
-# 基本使用
-node scripts/translate-docs.js --verbose
+# 链接处理工具
+bun scripts/final-link-processor.js
+
+# AI 翻译（基本使用）
+bun scripts/translate-docs.js --verbose
 
 # 指定不同模型
-node scripts/translate-docs.js --model "@cf/mistral/mistral-7b-instruct-v0.1"
+bun scripts/translate-docs.js --model "@cf/mistral/mistral-7b-instruct-v0.1"
 
 # 直接指定 API 配置
-node scripts/translate-docs.js --api-token your-token --account-id your-account-id
+bun scripts/translate-docs.js --api-token your-token --account-id your-account-id
 
 # 查看所有选项
-node scripts/translate-docs.js --help
+bun scripts/translate-docs.js --help
 ```
+
+## 🔧 脚本详情
+
+### final-link-processor.js
+
+统一的链接处理工具，负责将 `docs.nestjs.com` 和 `docs.nestjs.cn` 链接转换为相对路径。
+
+**运行方式：**
+```bash
+bun scripts/final-link-processor.js
+```
+
+**处理规则：**
+- ✅ 只处理 `docs/` 目录的 Markdown 文件
+- ✅ 自动忽略 `awesome.md` 和 `index.md`
+- ✅ 智能识别示例代码中的链接并跳过
+- ✅ 检测目标文件是否存在
+- ✅ 生成详细的处理报告
+
+**路径映射示例：**
+- `https://docs.nestjs.com/introduction` → `../introduction`
+- `https://docs.nestjs.com/first-steps` → `../overview/first-steps`
+- `https://docs.nestjs.com/controllers` → `../overview/controllers`
 
 ## 🔄 自动化工作流
 
@@ -142,26 +198,37 @@ GitHub Actions 会自动：
 🧠 Model: @cf/meta/llama-2-7b-chat-int8
 📚 Loaded 15 cached translations
 
-🤖 Translating: overview/controllers.md
-  🔒 Protecting 8 code blocks...
-  🤖 AI translated: overview/controllers.md
-✅ Translated: overview/controllers.md
+## ⚠️ 重要注意事项
 
-📊 Translation Summary:
-✅ Processed: 25 files
-🔄 Translated: 5 files  
-⏭️ Skipped: 20 files
-❌ Errors: 0 files
-📚 Cache entries: 20
-```
+### 文件处理规则
 
-## ⚠️ 注意事项
+1. **目录处理范围**: 
+   - ✅ `docs/` - 中文文档目录，主要处理对象
+   - ❌ `content/` - 英文原文，按规则不处理任何链接
 
-1. **环境配置**: 确保正确配置 Cloudflare API 凭据
-2. **免费限制**: Cloudflare Workers AI 有使用限制，脚本会自动处理
-3. **缓存机制**: 翻译结果会自动缓存，避免重复翻译
-4. **文件同步**: 脚本会保持文件修改时间同步
-5. **错误处理**: 翻译失败时会回退到原文，不会中断流程
+2. **文件忽略规则**:
+   - `awesome.md` - 外部资源集合，保持原链接
+   - `index.md` - 主页文件，保持原链接  
+
+3. **链接处理规则**:
+   - 仅处理 `https://docs.nestjs.com` 和 `https://docs.nestjs.cn` 域名
+   - 自动跳过示例代码中的链接
+   - 自动检测目标文件是否存在
+   - 静态资源链接（图片、CSS、JS）保持不变
+
+### 环境要求
+
+1. **运行环境**: 
+   - Node.js 或 Bun（推荐）
+   - Windows PowerShell 环境兼容
+
+2. **API 配置**: 
+   - Cloudflare API Token
+   - Cloudflare Account ID
+
+3. **权限要求**:
+   - 文件读写权限
+   - 网络访问权限（AI 翻译）
 
 ## 🐛 故障排除
 
@@ -187,8 +254,29 @@ GitHub Actions 会自动：
    - 使用支持的模型名称
    - 参考模型列表
 
+4. **Windows 命令兼容性**
+   ```
+   标记"&&"不是此版本中的有效语句分隔符
+   ```
+   - 使用分步命令或改用 bun
+
 ## 📚 相关文档
 
 - [Cloudflare Workers AI 配置指南](../CLOUDFLARE_AI_SETUP.md)
 - [Cloudflare Workers AI 文档](https://developers.cloudflare.com/workers-ai/)
 - [Cloudflare Dashboard](https://dash.cloudflare.com)
+- [NestJS 官方文档](https://docs.nestjs.com)
+
+---
+
+*本工具集专为 NestJS 中文文档项目设计，遵循项目的编码规范和处理规则。*
+
+3. **`advanced-link-replacer.mjs`** (特殊情况处理)
+   ```bash
+   bun scripts/advanced-link-replacer.mjs
+   ```
+
+4. **`validate-links.mjs`** (链接验证工具)
+---
+
+*本工具集专为 NestJS 中文文档项目设计，遵循项目的编码规范和处理规则。*

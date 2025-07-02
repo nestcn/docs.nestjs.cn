@@ -35,7 +35,7 @@ uploadFile(@UploadedFile() file: Express.Multer.File) {
 
 #### 文件验证
 
-验证传入的文件元数据（如文件大小或文件 MIME 类型）通常很有用。为此，您可以创建自己的[管道](https://docs.nestjs.com/pipes)并将其绑定到用 `UploadedFile` 装饰器注解的参数上。以下示例演示了如何实现一个基本的文件大小验证器管道：
+验证传入的文件元数据（如文件大小或文件 MIME 类型）通常很有用。为此，您可以创建自己的[管道](../overview/pipes)并将其绑定到用 `UploadedFile` 装饰器注解的参数上。以下示例演示了如何实现一个基本的文件大小验证器管道：
 
 ```typescript
 import { PipeTransform, Injectable, ArgumentMetadata } from '@nestjs/common';
@@ -237,4 +237,4 @@ MulterModule.register({
 
 #### Fastify
 
-使用 `FastifyAdapter` 时，你需要一个不同的文件拦截器。它不是基于 `multer`，而是使用了 `@fastify/multipart` 包。你可以在[这里](https://docs.nestjs.com/techniques/fastify#file-upload)找到相关文档。
+使用 `FastifyAdapter` 时，你需要一个不同的文件拦截器。它不是基于 `multer`，而是使用了 `@fastify/multipart` 包。你可以在[这里](../techniques/fastify#file-upload)找到相关文档。

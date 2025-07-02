@@ -8,7 +8,7 @@
 
 要创建基本控制器，我们使用类和**装饰器**。装饰器将类与必要的元数据关联起来，使 Nest 能够创建将请求连接到相应控制器的路由映射。
 
-> info **提示** 要快速创建带有内置[验证](https://docs.nestjs.com/techniques/validation)功能的 CRUD 控制器，可以使用 CLI 的 [CRUD 生成器](https://docs.nestjs.com/recipes/crud-generator#crud-generator)：`nest g resource [name]`。
+> info **提示** 要快速创建带有内置[验证](../techniques/validation)功能的 CRUD 控制器，可以使用 CLI 的 [CRUD 生成器](../recipes/crud-generator#crud-generator)：`nest g resource [name]`。
 
 #### 路由
 
@@ -320,7 +320,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 }
 ```
 
-> info **提示** 我们的 `ValidationPipe` 可以过滤掉不应被方法处理器接收的属性。在这种情况下，我们可以将可接受的属性加入白名单，任何未包含在白名单中的属性都会自动从结果对象中剔除。在 `CreateCatDto` 示例中，我们的白名单包含 `name`、`age` 和 `breed` 属性。了解更多 [请点击这里](https://docs.nestjs.com/techniques/validation#stripping-properties) 。
+> info **提示** 我们的 `ValidationPipe` 可以过滤掉不应被方法处理器接收的属性。在这种情况下，我们可以将可接受的属性加入白名单，任何未包含在白名单中的属性都会自动从结果对象中剔除。在 `CreateCatDto` 示例中，我们的白名单包含 `name`、`age` 和 `breed` 属性。了解更多 [请点击这里](../techniques/validation#stripping-properties) 。
 
 #### 查询参数
 

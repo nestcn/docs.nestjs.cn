@@ -56,7 +56,7 @@ export class CreateUserDto {
 
 因此，如果您打算依赖自动注解生成文档，同时仍希望进行运行时验证，那么 class-validator 装饰器仍然是必需的。
 
-> info **提示** 在 DTO 中使用[映射类型工具](https://docs.nestjs.com/openapi/mapped-types) （如 `PartialType`）时，请从 `@nestjs/swagger` 而非 `@nestjs/mapped-types` 导入它们，以便插件能够识别模式。
+> info **提示** 在 DTO 中使用[映射类型工具](../openapi/mapped-types) （如 `PartialType`）时，请从 `@nestjs/swagger` 而非 `@nestjs/mapped-types` 导入它们，以便插件能够识别模式。
 
 该插件基于**抽象语法树**动态添加适当的装饰器。因此您无需为分散在代码中的 `@ApiProperty` 装饰器而烦恼。
 

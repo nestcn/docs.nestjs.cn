@@ -23,7 +23,7 @@ $ npm install -g @nestjs/cli
 $ nest new hello-prisma
 ```
 
-查看[入门指南](https://docs.nestjs.com/first-steps)页面以了解此命令创建的项目文件详情。请注意，你现在可以运行 `npm start` 来启动应用程序。运行在 `http://localhost:3000/` 的 REST API 当前仅实现了一个路由，该路由定义在 `src/app.controller.ts` 文件中。在本指南后续内容中，你将实现更多路由来存储和检索关于*用户*和*帖子*的数据。
+查看[入门指南](../overview/first-steps)页面以了解此命令创建的项目文件详情。请注意，你现在可以运行 `npm start` 来启动应用程序。运行在 `http://localhost:3000/` 的 REST API 当前仅实现了一个路由，该路由定义在 `src/app.controller.ts` 文件中。在本指南后续内容中，你将实现更多路由来存储和检索关于*用户*和*帖子*的数据。
 
 #### 配置 Prisma
 
@@ -86,7 +86,7 @@ generator client {
 DATABASE_URL="file:./dev.db"
 ```
 
-请确保已配置 [ConfigModule](https://docs.nestjs.com/techniques/configuration)，否则 `DATABASE_URL` 变量将无法从 `.env` 中读取。
+请确保已配置 [ConfigModule](../techniques/configuration)，否则 `DATABASE_URL` 变量将无法从 `.env` 中读取。
 
 SQLite 数据库是简单的文件；使用 SQLite 数据库无需服务器。因此，无需配置包含*主机*和*端口*的连接 URL，只需指向本地文件即可，本例中该文件名为 `dev.db`。此文件将在下一步创建。
 

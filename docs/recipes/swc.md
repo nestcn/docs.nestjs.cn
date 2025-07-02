@@ -22,7 +22,7 @@ $ nest start -b swc
 # OR nest start --builder swc
 ```
 
-> **提示** 如果你的代码库是 monorepo，请查阅 [本节内容](/recipes/swc#monorepo) 。
+> **提示** 如果你的代码库是 monorepo，请查阅 [本节内容](../recipes/swc#monorepo) 。
 
 除了使用 `-b` 标志外，你也可以直接在 `nest-cli.json` 文件中将 `compilerOptions.builder` 属性设置为 `"swc"`，如下所示：
 
@@ -253,7 +253,7 @@ $ npm i --save-dev jest @swc/core @swc/jest
 }
 ```
 
-如果你的项目中使用了 NestJS CLI 插件，你需要手动运行 `PluginMetadataGenerator`。请参阅 [本节内容](/recipes/swc#monorepo-and-cli-plugins)了解更多信息。
+如果你的项目中使用了 NestJS CLI 插件，你需要手动运行 `PluginMetadataGenerator`。请参阅 [本节内容](/recipes/swc#monorepo-和-cli-插件)了解更多信息。
 
 ### Vitest
 

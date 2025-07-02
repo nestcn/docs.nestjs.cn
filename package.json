@@ -15,6 +15,8 @@
     "translate-docs:no-ai": "node scripts/translate-docs.js --no-ai",
     "translate-docs:mistral": "node scripts/translate-docs.js --model @cf/mistral/mistral-7b-instruct-v0.1 --verbose",
     "translate-docs:openchat": "node scripts/translate-docs.js --model @cf/openchat/openchat-3.5-0106 --verbose",
+    "post-translate": "node scripts/post-translate-processor.js",
+    "post-translate:verbose": "node scripts/post-translate-processor.js --verbose",
     "sync-and-translate": "npm run translate-docs && npm run fix-all",
     "sync-and-translate:no-ai": "npm run translate-docs:no-ai && npm run fix-all",
     "update-sync-time": "node scripts/update-sync-time.js",

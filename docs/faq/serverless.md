@@ -226,7 +226,7 @@ export const handler: Handler = async (
 };
 ```
 
-> info **提示** 如需创建多个无服务器函数并在它们之间共享公共模块，我们推荐使用 [CLI 单仓库模式](/cli/monorepo#monorepo-mode) 。
+> info **提示** 如需创建多个无服务器函数并在它们之间共享公共模块，我们推荐使用 [CLI 单仓库模式](/cli/monorepo#monorepo-模式) 。
 
 > warning **警告** 如果使用 `@nestjs/swagger` 包，需要执行几个额外步骤才能使其在无服务器函数环境中正常工作。查看此 [讨论帖](https://github.com/nestjs/swagger/issues/199) 获取更多信息。
 

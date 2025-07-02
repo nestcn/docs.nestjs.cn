@@ -4,7 +4,7 @@
 
 #### 代码优先
 
-要定义 GraphQL 联合类型，我们必须定义组成该联合的类。根据 Apollo 文档中的[示例](https://www.apollographql.com/docs/apollo-server/schema/unions-interfaces/#union-type) ，我们将创建两个类。首先是 `Book`：
+要定义 GraphQL 联合类型，我们必须定义组成该联合的类。根据 Apollo 文档中的[示例](https://www.apollographql.com/docs/apollo-server/schema/unions-interfaces/#联合类型) ，我们将创建两个类。首先是 `Book`：
 
 ```typescript
 import { Field, ObjectType } from '@nestjs/graphql';

@@ -19,7 +19,7 @@
 
 您可以在函数中或在带有 `@Injectable()` 装饰器的类中实现自定义 Nest 中间件。该类应该实现 `NestMiddleware` 接口，而函数没有任何特殊要求。让我们首先使用类方法实现一个简单的中间件功能。
 
-> warning **警告** `Express` 和 `fastify` 处理中间件的方式不同，并提供不同的方法签名，更多信息请阅读[此处](/techniques/performance#middleware)。
+> warning **警告** `Express` 和 `fastify` 处理中间件的方式不同，并提供不同的方法签名，更多信息请阅读[此处](/techniques/performance#中间件)。
 
 ```typescript title="logger.middleware"
 import { Injectable, NestMiddleware } from '@nestjs/common';
@@ -126,7 +126,7 @@ export class AppModule implements NestModule {
 }
 ```
 
-> **提示** `apply()` 方法既可接收单个中间件，也可通过多个参数指定[多个中间件](/middleware#multiple-middleware) 。
+> **提示** `apply()` 方法既可接收单个中间件，也可通过多个参数指定[多个中间件](/overview/middlewares#多个中间件) 。
 
 #### 排除路由
 
@@ -192,4 +192,4 @@ app.use(logger);
 await app.listen(process.env.PORT ?? 3000);
 ```
 
-> info **注意** 在全局中间件中无法访问 DI 容器。使用 `app.use()` 时，可以改用[函数式中间件](middleware#functional-middleware) 。或者，也可以使用类中间件并通过 `AppModule`（或其他模块）中的 `.forRoutes('*')` 来消费它。
+> info **注意** 在全局中间件中无法访问 DI 容器。使用 `app.use()` 时，可以改用[函数式中间件](middleware#函数式中间件) 。或者，也可以使用类中间件并通过 `AppModule`（或其他模块）中的 `.forRoutes('*')` 来消费它。

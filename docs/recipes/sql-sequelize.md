@@ -2,7 +2,7 @@
 
 ##### 本章仅适用于 TypeScript
 
-> **警告** 本文中，您将学习如何基于 **Sequelize** 包使用自定义组件从零开始创建 `DatabaseModule`。因此，该技术包含许多额外工作，您可以通过使用开箱即用的专用 `@nestjs/sequelize` 包来避免。了解更多信息，请参阅[此处](/techniques/database#sequelize-integration) 。
+> **警告** 本文中，您将学习如何基于 **Sequelize** 包使用自定义组件从零开始创建 `DatabaseModule`。因此，该技术包含许多额外工作，您可以通过使用开箱即用的专用 `@nestjs/sequelize` 包来避免。了解更多信息，请参阅[此处](/techniques/sql#sequelize-集成) 。
 
 [Sequelize](https://github.com/sequelize/sequelize) 是一个用原生 JavaScript 编写的流行对象关系映射器(ORM)，但有一个 [sequelize-typescript](https://github.com/RobinBuschmann/sequelize-typescript) TypeScript 包装器，为基础 sequelize 提供了一系列装饰器和其他附加功能。
 

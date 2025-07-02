@@ -97,7 +97,7 @@ export class AppController {
 }
 ```
 
-> warning **警告** 只有 `GET` 端点会被缓存。此外，注入原生响应对象(`@Res()`)的 HTTP 服务器路由无法使用缓存拦截器。详情请参阅 [响应映射](../overview/interceptors#response-mapping) 。
+> warning **警告** 只有 `GET` 端点会被缓存。此外，注入原生响应对象(`@Res()`)的 HTTP 服务器路由无法使用缓存拦截器。详情请参阅 [响应映射](../overview/interceptors#响应映射) 。
 
 为了减少所需的样板代码，你可以将 `CacheInterceptor` 全局绑定到所有端点：
 
@@ -132,7 +132,7 @@ CacheModule.register({
 
 #### 全局使用模块
 
-当您需要在其他模块中使用 `CacheModule` 时，需要先导入它（这是 Nest 模块的标准用法）。或者，通过将选项对象的 `isGlobal` 属性设置为 `true` 将其声明为[全局模块](../overview/modules#global-modules) ，如下所示。在这种情况下，一旦在根模块（如 `AppModule`）中加载后，就无需在其他模块中导入 `CacheModule`。
+当您需要在其他模块中使用 `CacheModule` 时，需要先导入它（这是 Nest 模块的标准用法）。或者，通过将选项对象的 `isGlobal` 属性设置为 `true` 将其声明为[全局模块](../overview/modules#全局模块) ，如下所示。在这种情况下，一旦在根模块（如 `AppModule`）中加载后，就无需在其他模块中导入 `CacheModule`。
 
 ```typescript
 CacheModule.register({

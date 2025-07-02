@@ -194,7 +194,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
 让我们看看 `catch()` 方法的参数。`exception` 参数是当前正在处理的异常对象。`host` 参数是一个 `ArgumentsHost` 对象。`ArgumentsHost` 是一个强大的工具对象，我们将在[执行上下文章节](/fundamentals/execution-context) \*中进一步研究。在此代码示例中，我们使用它来获取对原始请求处理程序（异常发生的控制器）中传递的 `Request` 和 `Response` 对象的引用。本示例中，我们使用了 `ArgumentsHost` 上的一些辅助方法来获取所需的 `Request` 和 `Response` 对象。了解更多关于 `ArgumentsHost` 的信息[请点击这里](/fundamentals/execution-context) 。
 
-采用这种抽象层级的原因是 `ArgumentsHost` 能在所有上下文中运作（例如我们当前使用的 HTTP 服务器上下文，还包括微服务和 WebSockets）。在执行上下文章节中，我们将看到如何利用 `ArgumentsHost` 及其辅助函数的能力，为**任何**执行上下文获取对应的[底层参数](../fundamentals/execution-context#host-methods) 。这将使我们能够编写适用于所有上下文的通用异常过滤器。
+采用这种抽象层级的原因是 `ArgumentsHost` 能在所有上下文中运作（例如我们当前使用的 HTTP 服务器上下文，还包括微服务和 WebSockets）。在执行上下文章节中，我们将看到如何利用 `ArgumentsHost` 及其辅助函数的能力，为**任何**执行上下文获取对应的[底层参数](../fundamentals/execution-context#主机方法) 。这将使我们能够编写适用于所有上下文的通用异常过滤器。
 
 #### 绑定过滤器
 
@@ -347,4 +347,4 @@ async function bootstrap() {
 bootstrap();
 ```
 
-第二种方法是使用 `APP_FILTER` 令牌[如图所示](exception-filters#binding-filters) 。
+第二种方法是使用 `APP_FILTER` 令牌[如图所示](exception-filters#绑定过滤器) 。

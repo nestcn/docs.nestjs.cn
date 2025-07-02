@@ -41,7 +41,7 @@ export class CreateUserDto {
 
 对于中型项目虽不算大问题，但一旦类数量庞大时就会变得冗长且难以维护。
 
-通过[启用 Swagger 插件](/openapi/cli-plugin#using-the-cli-plugin) ，上述类定义可以简化为：
+通过[启用 Swagger 插件](/openapi/cli-plugin#使用-cli-插件) ，上述类定义可以简化为：
 
 ```typescript
 export class CreateUserDto {
@@ -197,13 +197,13 @@ getCustomTransformers: (program: any) => ({
 
 #### SWC 构建器
 
-对于标准设置（非 monorepo），要在 SWC 构建器中使用 CLI 插件，您需要按照[此处](/recipes/swc#type-checking)所述启用类型检查。
+对于标准设置（非 monorepo），要在 SWC 构建器中使用 CLI 插件，您需要按照[此处](/recipes/swc#类型检查)所述启用类型检查。
 
 ```bash
 $ nest start -b swc --type-check
 ```
 
-对于 monorepo 设置，请按照[此处](/recipes/swc#monorepo-and-cli-plugins)的说明操作。
+对于 monorepo 设置，请按照[此处](/recipes/swc#monorepo-和-cli-插件)的说明操作。
 
 ```bash
 $ npx ts-node src/generate-metadata.ts

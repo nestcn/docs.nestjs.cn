@@ -65,7 +65,7 @@ export class RolesGuard implements CanActivate {
 }
 ```
 
-> info **提示** 有关如何在上下文敏感的方式中使用 `Reflector` 的更多细节，请参考执行上下文章节中的[反射与元数据](/fundamentals/execution-context#reflection-and-metadata)部分。
+> info **提示** 有关如何在上下文敏感的方式中使用 `Reflector` 的更多细节，请参考执行上下文章节中的[反射与元数据](/fundamentals/execution-context#反射与元数据)部分。
 
 > warning **注意** 此示例命名为"**basic**"，因为我们仅在路由处理程序层级检查角色存在性。在实际应用中，您可能会遇到包含多个操作的端点/处理器，其中每个操作都需要特定的权限集合。这种情况下，您必须在业务逻辑中的某处提供角色检查机制，这使得维护变得稍显困难，因为将没有集中化的地方来关联权限与特定操作。
 
@@ -107,7 +107,7 @@ providers: [
 
 身份创建时可能会被分配一个或多个由受信任方颁发的声明。声明是表示主体能做什么（而非主体是什么）的名称-值对。
 
-要在 Nest 中实现基于声明的授权，可遵循前述 [RBAC 章节的相同步骤，但存在一个关键差异：不应检查特定角色，而应比较**权限** 。每个用户都会被分配一组权限。同样，每个资源/端点需定义访问所需的权限（例如通过专用的 `@RequirePermissions()` 装饰器）。](/security/authorization#basic-rbac-implementation)
+要在 Nest 中实现基于声明的授权，可遵循前述 [RBAC 章节的相同步骤，但存在一个关键差异：不应检查特定角色，而应比较**权限** 。每个用户都会被分配一组权限。同样，每个资源/端点需定义访问所需的权限（例如通过专用的 `@RequirePermissions()` 装饰器）。](/security/authorization#基本-rbac-实现)
 
 ```typescript title="cats.controller"
 @Post()

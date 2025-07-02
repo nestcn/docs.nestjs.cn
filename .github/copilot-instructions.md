@@ -1,5 +1,13 @@
 # Copilot 工作指令
-
+    * 对于内部内容跳转，请将"docs.nestjs.com" 和 "docs.nestjs.cn" 改为使用相对路径，并需要并修正该真实路径，   例如 `./guide/introduction`。
+    * 对于含有 "#" 的链接，如果后面是英文，请寻找对应的中文翻译链接。
+    * 锚点链接修正：确保所有内部锚点链接指向正确的中文章节标题，常见映射包括：
+      - `#provider-scope` → `#提供者作用域`
+      - `#library-specific-approach` → `#库特定方法`
+      - `#binding-guards` → `#绑定守卫`
+      - `#declarative-cron-jobs` → `#声明式-cron-任务`
+      - `#dependency-injection` → `#依赖注入`
+      等等。
 ## 核心规则
 1.  **运行环境**: 所有脚本和命令优先使用 `bun` 运行。
 2.  **命令兼容性**: 在生成终端命令时，请注意 Windows 环境下不支持使用 `&&` 连接多个命令。应提供分步命令或使用兼容的替代方案。
@@ -12,7 +20,6 @@
     * awesome.md 和 index.md的 “docs.nestjs.com” 不要替换为 “docs.nestjs.cn”。
     * 网站的最终链接地址为 `https://docs.nestjs.cn`。
     * 对于内部内容跳转，请将“docs.nestjs.com” 和 “docs.nestjs.cn” 改为使用相对路径，并需要并修正该真实路径，   例如 `./guide/introduction`。
-    * 对于含有 "#" 的链接，如果后面是英文，请寻找对应的中文翻译链接。
 4. **内容完整性**: 严格按照原文进行校对，不要添加任何未经请求的额外内容或个人解释。
 5.  **文档处理**: 
         * 使用脚本需要防止文件乱码。

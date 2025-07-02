@@ -4,7 +4,7 @@
 
 #### "无法解析依赖项"错误
 
-> info **提示** 查看 [NestJS Devtools](/devtools/overview#investigating-the-cannot-resolve-dependency-error) 可以帮助您轻松解决"无法解析依赖项"错误。
+> info **提示** 查看 [NestJS Devtools](/devtools/overview#调查无法解析依赖项错误) 可以帮助您轻松解决"无法解析依赖项"错误。
 
 最常见的错误消息是关于 Nest 无法解析提供者的依赖项。错误消息通常如下所示：
 
@@ -21,13 +21,13 @@ Nest 无法解析 <provider> 的依赖项（?）。请确保索引 [<index>] 处
   })
 ```
 
-导致此错误最常见的原因是没有将 `<provider>` 放入模块的 `providers` 数组中。请确保该提供者确实位于 `providers` 数组中，并遵循[标准 NestJS 提供者实践](/fundamentals/custom-providers#di-fundamentals) 。
+导致此错误最常见的原因是没有将 `<provider>` 放入模块的 `providers` 数组中。请确保该提供者确实位于 `providers` 数组中，并遵循[标准 NestJS 提供者实践](/fundamentals/custom-providers#di-基础) 。
 
 有几个常见的陷阱需要注意。其中之一是将提供者放入了 `imports` 数组中。如果是这种情况，错误消息中会在 `<module>` 应该出现的位置显示提供者的名称。
 
 在开发过程中遇到此错误时，请查看错误信息中提到的模块及其 `providers` 配置。对于 `providers` 数组中的每个提供者，请确保该模块能访问所有依赖项。常见情况是 `providers` 在"功能模块"和"根模块"中被重复声明，导致 Nest 会尝试实例化两次提供者。大多数情况下，包含重复 `<provider>` 的模块应该被添加到"根模块"的 `imports` 数组中。
 
-如果上文的 `<unknown_token>` 是 `dependency`，可能存在循环文件导入。这与下文[循环依赖](/faq/common-errors#circular-dependency-error)不同——不是指提供者在其构造函数中相互依赖，而是两个文件最终相互导入。典型场景是：模块文件声明令牌时导入提供者，而提供者又从模块文件导入令牌常量。如果使用桶文件，请确保桶文件导入不会形成此类循环导入关系。
+如果上文的 `<unknown_token>` 是 `dependency`，可能存在循环文件导入。这与下文[循环依赖](/faq/common-errors#循环依赖错误)不同——不是指提供者在其构造函数中相互依赖，而是两个文件最终相互导入。典型场景是：模块文件声明令牌时导入提供者，而提供者又从模块文件导入令牌常量。如果使用桶文件，请确保桶文件导入不会形成此类循环导入关系。
 
 如果上方的 `<unknown_token>` 显示为 `Object`，说明您正在使用没有提供者令牌的类型/接口进行注入。要解决此问题，请确保：
 

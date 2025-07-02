@@ -81,7 +81,7 @@ ConfigModule.forRoot({
 
 #### 全局使用模块
 
-当您需要在其他模块中使用 `ConfigModule` 时，需像标准 Nest 模块一样导入它。或者，通过将选项对象的 `isGlobal` 属性设为 `true` 将其声明为[全局模块](../overview/modules#global-modules) （如下所示）。这种情况下，一旦在根模块（如 `AppModule`）中加载后，就无需在其他模块中重复导入 `ConfigModule`。
+当您需要在其他模块中使用 `ConfigModule` 时，需像标准 Nest 模块一样导入它。或者，通过将选项对象的 `isGlobal` 属性设为 `true` 将其声明为[全局模块](../overview/modules#全局模块) （如下所示）。这种情况下，一旦在根模块（如 `AppModule`）中加载后，就无需在其他模块中重复导入 `ConfigModule`。
 
 ```typescript
 ConfigModule.forRoot({
@@ -93,7 +93,7 @@ ConfigModule.forRoot({
 
 对于更复杂的项目，您可以使用自定义配置文件返回嵌套配置对象。这允许您按功能（例如数据库相关设置）对配置设置进行分组，并将相关设置存储在单独文件中以便独立管理。
 
-自定义配置文件导出一个返回配置对象的工厂函数。该配置对象可以是任意嵌套的普通 JavaScript 对象。`process.env` 对象将包含完全解析后的环境变量键值对（其中 `.env` 文件及外部定义的变量会按照[上文](techniques/configuration#getting-started)所述方式解析合并）。由于您控制着返回的配置对象，因此可以添加任何必要的逻辑来将值转换为适当类型、设置默认值等。例如：
+自定义配置文件导出一个返回配置对象的工厂函数。该配置对象可以是任意嵌套的普通 JavaScript 对象。`process.env` 对象将包含完全解析后的环境变量键值对（其中 `.env` 文件及外部定义的变量会按照[上文](techniques/configuration#入门)所述方式解析合并）。由于您控制着返回的配置对象，因此可以添加任何必要的逻辑来将值转换为适当类型、设置默认值等。例如：
 
 ```typescript title="config/configuration"
 export default () => ({
@@ -163,7 +163,7 @@ export default () => {
 };
 ```
 
-> warning **注意** Nest CLI 在构建过程中不会自动将"assets"（非 TS 文件）移动到 `dist` 文件夹。为确保 YAML 文件被复制，您需要在 `nest-cli.json` 文件的 `compilerOptions#assets` 对象中进行指定。例如，如果 `config` 文件夹与 `src` 文件夹位于同一层级，则添加值为 `"assets": [{"include": "../config/*.yaml", "outDir": "./dist/config"}]` 的 `compilerOptions#assets`。了解更多[此处](/cli/monorepo#assets) 。
+> warning **注意** Nest CLI 在构建过程中不会自动将"assets"（非 TS 文件）移动到 `dist` 文件夹。为确保 YAML 文件被复制，您需要在 `nest-cli.json` 文件的 `compilerOptions#资源` 对象中进行指定。例如，如果 `config` 文件夹与 `src` 文件夹位于同一层级，则添加值为 `"assets": [{"include": "../config/*.yaml", "outDir": "./dist/config"}]` 的 `compilerOptions#资源`。了解更多[此处](/cli/monorepo#资源) 。
 
 快速提示 - 即使您在 NestJS 的 `ConfigModule` 中使用 `validationSchema` 选项，配置文件也不会自动验证。如果您需要验证或想应用任何转换，必须在工厂函数中处理这些操作，因为在那里您可以完全控制配置对象。这使您能够根据需要实现任何自定义验证逻辑。
 
@@ -216,7 +216,7 @@ const dbUser = this.configService.get<string>('DATABASE_USER');
 const dbHost = this.configService.get<string>('database.host');
 ```
 
-如上所示，使用 `configService.get()` 方法通过传递变量名来获取简单的环境变量。您可以通过传递类型来进行 TypeScript 类型提示，如上所示（例如 `get<string>(...)`）。`get()` 方法还可以遍历嵌套的自定义配置对象（通过 [自定义配置文件](techniques/configuration#custom-configuration-files) 创建），如上文第二个示例所示。
+如上所示，使用 `configService.get()` 方法通过传递变量名来获取简单的环境变量。您可以通过传递类型来进行 TypeScript 类型提示，如上所示（例如 `get<string>(...)`）。`get()` 方法还可以遍历嵌套的自定义配置对象（通过 [自定义配置文件](techniques/configuration#自定义配置文件) 创建），如上文第二个示例所示。
 
 你也可以使用接口作为类型提示来获取整个嵌套的自定义配置对象：
 
@@ -283,7 +283,7 @@ constructor(private configService: ConfigService<{ PORT: number }, true>) {
 
 #### 配置命名空间
 
-`ConfigModule` 允许您定义并加载多个自定义配置文件，如上方[自定义配置文件](techniques/configuration#custom-configuration-files)所示。您可以通过嵌套配置对象来管理复杂的配置对象层次结构，如该章节所示。或者，您也可以使用 `registerAs()` 函数返回一个"命名空间"配置对象，如下所示：
+`ConfigModule` 允许您定义并加载多个自定义配置文件，如上方[自定义配置文件](techniques/configuration#自定义配置文件)所示。您可以通过嵌套配置对象来管理复杂的配置对象层次结构，如该章节所示。或者，您也可以使用 `registerAs()` 函数返回一个"命名空间"配置对象，如下所示：
 
 ```typescript title="config/database.config"
 export default registerAs('database', () => ({
@@ -292,7 +292,7 @@ export default registerAs('database', () => ({
 }));
 ```
 
-与自定义配置文件相同，在 `registerAs()` 工厂函数内部，`process.env` 对象将包含完全解析的环境变量键值对（其中 `.env` 文件和外部定义的变量会按照[上文](techniques/configuration#getting-started)所述进行解析和合并）。
+与自定义配置文件相同，在 `registerAs()` 工厂函数内部，`process.env` 对象将包含完全解析的环境变量键值对（其中 `.env` 文件和外部定义的变量会按照[上文](techniques/configuration#入门)所述进行解析和合并）。
 
 > info **提示** `registerAs` 函数是从 `@nestjs/config` 包中导出的。
 
@@ -415,7 +415,7 @@ import * as Joi from 'joi';
 export class AppModule {}
 ```
 
-默认情况下，所有模式键都被视为可选的。这里我们为 `NODE_ENV` 和 `PORT` 设置了默认值，如果我们在环境（`.env` 文件或进程环境）中没有提供这些变量，就会使用这些默认值。或者，我们可以使用 `required()` 验证方法来要求必须在环境（`.env` 文件或进程环境）中定义值。在这种情况下，如果我们没有在环境中提供变量，验证步骤将抛出异常。有关如何构建验证模式的更多信息，请参阅 [Joi 验证方法](https://joi.dev/api/?v=17.3.0#example) 。
+默认情况下，所有模式键都被视为可选的。这里我们为 `NODE_ENV` 和 `PORT` 设置了默认值，如果我们在环境（`.env` 文件或进程环境）中没有提供这些变量，就会使用这些默认值。或者，我们可以使用 `required()` 验证方法来要求必须在环境（`.env` 文件或进程环境）中定义值。在这种情况下，如果我们没有在环境中提供变量，验证步骤将抛出异常。有关如何构建验证模式的更多信息，请参阅 [Joi 验证方法](https://joi.dev/api/?v=17.3.0#示例) 。
 
 默认情况下，允许未知的环境变量（即键未在模式中定义的环境变量）且不会触发验证异常。默认情况下，所有验证错误都会被报告。您可以通过在 `forRoot()` 配置对象的 `validationOptions` 键中传递选项对象来修改这些行为。该选项对象可以包含任何由 [Joi 验证选项](https://joi.dev/api/?v=17.3.0#anyvalidatevalue-options)提供的标准验证选项属性。例如，要反转上述两个设置，可传递如下选项：
 

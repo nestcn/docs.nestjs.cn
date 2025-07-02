@@ -217,7 +217,7 @@ export class AuthModule {}
 
 > info **提示** 我们将 `JwtModule` 注册为全局模块以简化操作。这意味着我们无需在应用程序的其他位置导入 `JwtModule`。
 
-我们使用 `register()` 方法配置 `JwtModule`，并传入配置对象。有关 Nest 框架 `JwtModule` 的更多信息请参阅[此处](https://github.com/nestjs/jwt/blob/master/README.md) ，可用配置选项的详细信息请参见[此处](https://github.com/auth0/node-jsonwebtoken#usage) 。
+我们使用 `register()` 方法配置 `JwtModule`，并传入配置对象。有关 Nest 框架 `JwtModule` 的更多信息请参阅[此处](https://github.com/nestjs/jwt/blob/master/README.md) ，可用配置选项的详细信息请参见[此处](https://github.com/auth0/node-jsonwebtoken#用法) 。
 
 我们继续使用 cURL 来测试路由。你可以用 `UsersService` 中硬编码的任意 `user` 对象进行测试。
 
@@ -336,7 +336,7 @@ $ curl http://localhost:3000/auth/profile -H "Authorization: Bearer eyJhbGciOiJI
 
 #### 全局启用认证
 
-若您希望默认保护绝大多数端点，可将认证守卫注册为[全局守卫](/guards#binding-guards) ，这样就不必在每个控制器顶部使用 `@UseGuards()` 装饰器，只需标记哪些路由应公开即可。
+若您希望默认保护绝大多数端点，可将认证守卫注册为[全局守卫](/overview/guards#绑定守卫) ，这样就不必在每个控制器顶部使用 `@UseGuards()` 装饰器，只需标记哪些路由应公开即可。
 
 首先，使用以下结构（在任何模块中，例如 `AuthModule`）将 `AuthGuard` 注册为全局守卫：
 
@@ -372,7 +372,7 @@ findAll() {
 }
 ```
 
-最后，我们需要当找到 `AuthGuard` 的 `"isPublic"` 元数据时让它返回 `true`。为此，我们将使用 `Reflector` 类（更多信息请参阅[此处](/guards#putting-it-all-together) ）。
+最后，我们需要当找到 `AuthGuard` 的 `"isPublic"` 元数据时让它返回 `true`。为此，我们将使用 `Reflector` 类（更多信息请参阅[此处](/overview/guards#把所有内容放在一起) ）。
 
 ```typescript
 @Injectable()

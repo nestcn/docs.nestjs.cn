@@ -6,7 +6,7 @@ Nest 提供了多个实用工具类，帮助开发者轻松编写能在多种应
 
 #### ArgumentsHost 类
 
-`ArgumentsHost` 类提供了检索传递给处理程序参数的方法。它允许选择合适的上下文（如 HTTP、RPC（微服务）或 WebSockets）来获取参数。框架会在需要访问参数的地方提供 `ArgumentsHost` 的实例，通常以 `host` 参数的形式引用。例如， [异常过滤器](../overview/exception-filters#arguments-host)的 `catch()` 方法在被调用时会传入一个 `ArgumentsHost` 实例。
+`ArgumentsHost` 类提供了检索传递给处理程序参数的方法。它允许选择合适的上下文（如 HTTP、RPC（微服务）或 WebSockets）来获取参数。框架会在需要访问参数的地方提供 `ArgumentsHost` 的实例，通常以 `host` 参数的形式引用。例如， [异常过滤器](../overview/exception-filters#参数主机)的 `catch()` 方法在被调用时会传入一个 `ArgumentsHost` 实例。
 
 `ArgumentsHost` 本质上是对处理器参数的一层抽象封装。例如，在 HTTP 服务器应用中（使用 `@nestjs/platform-express` 时），`host` 对象封装了 Express 的 `[request, response, next]` 数组，其中 `request` 是请求对象，`response` 是响应对象，`next` 是控制应用请求-响应周期的函数。而对于 [GraphQL](/graphql/quick-start) 应用，`host` 对象则包含 `[root, args, context, info]` 数组。
 
@@ -101,7 +101,7 @@ export interface RpcArgumentsHost {
 
 #### ExecutionContext 类
 
-`ExecutionContext` 继承自 `ArgumentsHost`，提供了关于当前执行过程的额外细节。与 `ArgumentsHost` 类似，Nest 会在你可能需要的地方提供 `ExecutionContext` 实例，例如在 [守卫](../overview/guards#execution-context) 的 `canActivate()` 方法和 [拦截器](../overview/interceptors#execution-context) 的 `intercept()` 方法中。它提供了以下方法：
+`ExecutionContext` 继承自 `ArgumentsHost`，提供了关于当前执行过程的额外细节。与 `ArgumentsHost` 类似，Nest 会在你可能需要的地方提供 `ExecutionContext` 实例，例如在 [守卫](../overview/guards#执行上下文) 的 `canActivate()` 方法和 [拦截器](../overview/interceptors#执行上下文) 的 `intercept()` 方法中。它提供了以下方法：
 
 ```typescript
 export interface ExecutionContext extends ArgumentsHost {

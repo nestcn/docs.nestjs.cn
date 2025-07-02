@@ -16,7 +16,7 @@ Nest 应用是一个**标准**的 TypeScript 应用，需要先编译为 JavaScr
 
 #### 构建
 
-`nest build` 是对标准 `tsc` 编译器或 `swc` 编译器（用于[标准项目](../cli/overview#project-structure) ）的封装，对于 [monorepo 项目](../cli/overview#project-structure)则使用 `ts-loader` 的 webpack 打包器。除了开箱即用地处理 `tsconfig-paths` 外，它不会添加任何其他编译特性或步骤。其存在的原因是大多数开发者（尤其是刚接触 Nest 时）不需要调整编译器选项（如 `tsconfig.json` 文件），这些配置有时可能较为复杂。
+`nest build` 是对标准 `tsc` 编译器或 `swc` 编译器（用于[标准项目](../cli/overview#项目结构) ）的封装，对于 [monorepo 项目](../cli/overview#项目结构)则使用 `ts-loader` 的 webpack 打包器。除了开箱即用地处理 `tsconfig-paths` 外，它不会添加任何其他编译特性或步骤。其存在的原因是大多数开发者（尤其是刚接触 Nest 时）不需要调整编译器选项（如 `tsconfig.json` 文件），这些配置有时可能较为复杂。
 
 更多详情请参阅 [nest build](../cli/usages#nest-build) 文档。
 

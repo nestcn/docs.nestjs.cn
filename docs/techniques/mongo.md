@@ -53,7 +53,7 @@ export const CatSchema = SchemaFactory.createForClass(Cat);
 
 > info **提示** 请注意，你也可以使用 `DefinitionsFactory` 类（来自 `nestjs/mongoose`）生成原始模式定义。这允许你手动修改基于所提供元数据生成的模式定义。对于某些难以完全用装饰器表示的边缘情况，这非常有用。
 
-`@Schema()` 装饰器将一个类标记为模式定义。它将我们的 `Cat` 类映射到同名的 MongoDB 集合，但末尾会添加一个"s"——因此最终的 Mongo 集合名称将是 `cats`。该装饰器接受一个可选参数，即模式选项对象。可以将其视为通常作为 `mongoose.Schema` 类构造函数的第二个参数传递的对象（例如 `new mongoose.Schema(_, options)` ）。要了解有关可用模式选项的更多信息，请参阅[本章](https://mongoosejs.com/docs/guide.html#options) 。
+`@Schema()` 装饰器将一个类标记为模式定义。它将我们的 `Cat` 类映射到同名的 MongoDB 集合，但末尾会添加一个"s"——因此最终的 Mongo 集合名称将是 `cats`。该装饰器接受一个可选参数，即模式选项对象。可以将其视为通常作为 `mongoose.Schema` 类构造函数的第二个参数传递的对象（例如 `new mongoose.Schema(_, options)` ）。要了解有关可用模式选项的更多信息，请参阅[本章](https://mongoosejs.com/docs/guide.html#选项) 。
 
 `@Prop()` 装饰器用于在文档中定义属性。例如在上述模式定义中，我们定义了三个属性：`name`、`age` 和 `breed`。得益于 TypeScript 的元数据（和反射）能力，这些属性的[模式类型](https://mongoosejs.com/docs/schematypes.html)会被自动推断。但在更复杂的场景中（例如数组或嵌套对象结构），当类型无法被隐式反射时，就必须显式指明类型，如下所示：
 
@@ -304,7 +304,7 @@ export class CatsService {
 export class AppModule {}
 ```
 
-与其他[工厂提供者](../fundamentals/dependency-injection#factory-providers-usefactory)类似，我们的工厂函数可以是 `async` 异步的，并能通过 `inject` 注入依赖项。
+与其他[工厂提供者](../fundamentals/dependency-injection#工厂提供者-usefactory)类似，我们的工厂函数可以是 `async` 异步的，并能通过 `inject` 注入依赖项。
 
 ```typescript
 @Module({
@@ -455,7 +455,7 @@ export class EventsModule {}
 
 在进行应用程序单元测试时，我们通常希望避免任何数据库连接，从而使测试套件更易于设置且执行更快。但我们的类可能依赖于从连接实例获取的模型。如何解析这些类？解决方案是创建模拟模型。
 
-为简化此过程，`@nestjs/mongoose` 包提供了 `getModelToken()` 函数，该函数会基于模型名称返回预制的[注入令牌](../fundamentals/dependency-injection#di-fundamentals) 。使用此令牌，您可以通过标准[自定义提供者](../fundamentals/dependency-injection)技术（包括 `useClass`、`useValue` 和 `useFactory`）轻松提供模拟实现。例如：
+为简化此过程，`@nestjs/mongoose` 包提供了 `getModelToken()` 函数，该函数会基于模型名称返回预制的[注入令牌](../fundamentals/dependency-injection#di-基础) 。使用此令牌，您可以通过标准[自定义提供者](../fundamentals/dependency-injection)技术（包括 `useClass`、`useValue` 和 `useFactory`）轻松提供模拟实现。例如：
 
 ```typescript
 @Module({
@@ -486,7 +486,7 @@ MongooseModule.forRootAsync({
 });
 ```
 
-与其他[工厂提供者](../fundamentals/dependency-injection#factory-providers-usefactory)类似，我们的工厂函数可以是 `async` 异步的，并能通过 `inject` 注入依赖项。
+与其他[工厂提供者](../fundamentals/dependency-injection#工厂提供者-usefactory)类似，我们的工厂函数可以是 `async` 异步的，并能通过 `inject` 注入依赖项。
 
 ```typescript
 MongooseModule.forRootAsync({

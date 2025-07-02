@@ -105,7 +105,7 @@ npm i nestjs-cls
 
 #### 使用方法
 
-可以使用 `nestjs-cls` 实现与[上文](recipes/async-local-storage#custom-implementation)描述的类似功能，如下所示：
+可以使用 `nestjs-cls` 实现与[上文](recipes/async-local-storage#自定义实现)描述的类似功能，如下所示：
 
 1.  在根模块中导入 `ClsModule`。
 
@@ -176,7 +176,7 @@ describe('CatsService', () => {
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      // Set up most of the testing module as we normally would.
+      // 设置 up most of the testing module as we normally would.
       providers: [
         CatsService,
         {
@@ -185,7 +185,7 @@ describe('CatsService', () => {
         }
       ],
       imports: [
-        // Import the static version of ClsModule which only provides
+        // 导入 the static version of ClsModule which only provides
         // the ClsService, but does not set up the store in any way.
         ClsModule
       ],

@@ -173,14 +173,35 @@ class DocumentTranslator {
               content: `You are a professional technical documentation translator specializing in translating NestJS-related English technical documentation to Chinese.
 
 Translation Requirements:
-1. Maintain accuracy of technical terms, keep common terms in English (such as Controller, Service, Module, Pipe, Guard, Interceptor, Decorator, etc.)
-2. Keep code examples, variable names, function names unchanged
-3. Maintain Markdown formatting unchanged
-4. Maintain professionalism and readability
-5. Keep content that is already in Chinese unchanged
-6. Maintain links, images, tables and other formats unchanged
+1. **Technical Terms**: Keep common terms in English/Chinese mapping:
+   - Provider → 提供者, Controller → 控制器, Service → 服务
+   - Module → 模块, Pipe → 管道, Guard → 守卫, Interceptor → 拦截器
+   - Decorator → 装饰器, Middleware → 中间件, Filter → 过滤器
+   - Dependency Injection → 依赖注入, Request → 请求, Response → 响应
 
-Please translate the following English technical documentation to Chinese:`
+2. **Code and Format Preservation**:
+   - Keep code examples, variable names, function names unchanged
+   - Maintain Markdown formatting, links, images, tables unchanged
+   - Translate code comments from English to Chinese
+   - Keep relative links unchanged (will be processed later)
+
+3. **Special Syntax Processing**:
+   - Remove all @@switch blocks and content after them
+   - Convert @@filename(xxx) to rspress syntax: \`\`\`typescript title="xxx"
+   - Keep internal anchors unchanged (will be mapped later)
+
+4. **Content Guidelines**:
+   - Maintain professionalism and readability
+   - Keep content that is already in Chinese unchanged
+   - Don't add extra content not in the original
+   - Appropriate Chinese localization improvements are welcome
+
+5. **Link Handling**:
+   - Keep relative paths unchanged (e.g., ./guide/introduction)
+   - Keep docs.nestjs.com links unchanged (will be processed later)
+   - Maintain anchor links as-is (e.g., #provider-scope)
+
+Please translate the following English technical documentation to Chinese following these rules:`
             },
             {
               role: 'user',
@@ -467,7 +488,27 @@ Please translate the following English technical documentation to Chinese:`
         });
       }
 
+      // 运行翻译后处理器
       if (hasChanges) {
+        console.log('\n🔄 Running post-translation processing...');
+        try {
+          const PostTranslateProcessor = require('./post-translate-processor.js');
+          const processor = new PostTranslateProcessor({
+            docsDir: this.docsDir,
+            verbose: this.verbose
+          });
+          
+          const postProcessChanged = await processor.run();
+          if (postProcessChanged) {
+            console.log('✅ Post-processing completed with changes');
+          } else {
+            console.log('✅ Post-processing completed - no changes needed');
+          }
+        } catch (error) {
+          console.warn('⚠️ Post-processing failed:', error.message);
+          // 不要因为后处理失败而终止整个翻译流程
+        }
+        
         console.log('\n✅ Translation completed with changes');
       } else {
         console.log('\n✅ Translation completed - all files up to date');

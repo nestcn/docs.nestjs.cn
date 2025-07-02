@@ -101,7 +101,7 @@ bootstrap();
 
 #### 请求-响应
 
-请求-响应消息模式在需要与各种外部服务**交换**消息时非常有用。这种范式能确保服务确实收到了消息（无需手动实现确认协议）。然而，请求-响应方式并非总是最佳选择。例如，采用日志持久化的流式传输器（如 [Kafka](https://docs.confluent.io/3.0.0/streams/) 或 [NATS 流](https://github.com/nats-io/node-nats-streaming) ），其优化方向更侧重于解决另一类挑战，与事件消息范式更为契合（详见[基于事件的消息传递](../microservices/basics#event-based) ）。
+请求-响应消息模式在需要与各种外部服务**交换**消息时非常有用。这种范式能确保服务确实收到了消息（无需手动实现确认协议）。然而，请求-响应方式并非总是最佳选择。例如，采用日志持久化的流式传输器（如 [Kafka](https://docs.confluent.io/3.0.0/streams/) 或 [NATS 流](https://github.com/nats-io/node-nats-streaming) ），其优化方向更侧重于解决另一类挑战，与事件消息范式更为契合（详见[基于事件的消息传递](../microservices/basics#基于事件) ）。
 
 为实现请求-响应消息类型，Nest 会创建两个逻辑通道：一个用于传输数据，另一个用于等待响应。对于某些底层传输（如 [NATS](https://nats.io/)），这种双通道支持是开箱即用的。对于其他传输，Nest 会通过手动创建独立通道来补偿。虽然这种方式有效，但可能带来额外开销。因此，如果不需要请求-响应消息模式，建议考虑使用基于事件的方法。
 
@@ -185,7 +185,7 @@ getDate(@Payload() data: number[], @Ctx() context: NatsContext) {
 
 一种方法是导入 `ClientsModule`，该模块暴露了静态方法 `register()`。此方法接收一个表示微服务传输器的对象数组。每个对象必须包含 `name` 属性，以及可选的 `transport` 属性（默认为 `Transport.TCP`），还可以包含可选的 `options` 属性。
 
-`name` 属性作为 **注入令牌** ，可用于在需要的地方注入 `ClientProxy` 实例。该 `name` 属性的值可以是任意字符串或 JavaScript 符号，具体说明见 [此处](../fundamentals/dependency-injection#non-class-based-provider-tokens) 。
+`name` 属性作为 **注入令牌** ，可用于在需要的地方注入 `ClientProxy` 实例。该 `name` 属性的值可以是任意字符串或 JavaScript 符号，具体说明见 [此处](../fundamentals/dependency-injection#非基于类的提供者令牌) 。
 
 `options` 属性是一个对象，包含我们之前在 `createMicroservice()` 方法中看到的相同属性。
 

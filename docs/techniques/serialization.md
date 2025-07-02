@@ -58,7 +58,7 @@ findOne(): UserEntity {
 }
 ```
 
-请注意拦截器可以应用于整个应用程序（如[此处](../overview/interceptors#binding-interceptors)所述）。拦截器与实体类声明的组合确保**任何**返回 `UserEntity` 的方法都会移除 `password` 属性。这为您提供了集中执行业务规则的保障。
+请注意拦截器可以应用于整个应用程序（如[此处](../overview/interceptors#绑定拦截器)所述）。拦截器与实体类声明的组合确保**任何**返回 `UserEntity` 的方法都会移除 `password` 属性。这为您提供了集中执行业务规则的保障。
 
 #### 暴露属性
 

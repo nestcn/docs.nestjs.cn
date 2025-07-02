@@ -33,7 +33,7 @@ app.use(
 
 同样地，启用 `saveUninitialized` 选项会强制将"未初始化"的会话保存到存储中。当会话是新建但未被修改时即为未初始化状态。选择 `false` 有助于实现登录会话、减少服务器存储使用，或符合设置 cookie 前需获得许可的法律要求。选择 `false` 还能解决客户端在没有会话时发出多个并行请求导致的竞态条件问题( [来源](https://github.com/expressjs/session#saveuninitialized) )。
 
-你可以向 `session` 中间件传递其他多个选项，更多信息请参阅 [API 文档](https://github.com/expressjs/session#options) 。
+你可以向 `session` 中间件传递其他多个选项，更多信息请参阅 [API 文档](https://github.com/expressjs/session#选项) 。
 
 > info **注意** 请注意 `secure: true` 是一个推荐选项。但这要求网站启用 HTTPS，即安全 cookie 需要 HTTPS 协议。如果设置了 secure 选项却通过 HTTP 访问站点，cookie 将不会被设置。如果你的 node.js 部署在代理后方且使用 `secure: true`，则需要在 express 中设置 `"trust proxy"`。
 

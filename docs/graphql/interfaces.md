@@ -81,7 +81,7 @@ export class CharacterInterfaceResolver {
     @Info() { parentType }, // Type of the object that implements Character
     @Args('search', { type: () => String }) searchTerm: string
   ) {
-    // Get character's friends
+    // 获取 character's friends
     return [];
   }
 }

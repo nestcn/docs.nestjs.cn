@@ -117,7 +117,7 @@ $ npm run start
 
 要在资源管理器栏的下拉菜单中启用多规范支持，您需要设置 `explorer: true` 并在 `SwaggerCustomOptions` 中配置 `swaggerOptions.urls`。
 
-info **注意** 请确保 `swaggerOptions.urls` 指向您的 Swagger 文档的 JSON 格式！要指定 JSON 文档，请在 `SwaggerCustomOptions` 中使用 `jsonDocumentUrl`。更多设置选项请查看[此处](/openapi/introduction#setup-options) 。
+info **注意** 请确保 `swaggerOptions.urls` 指向您的 Swagger 文档的 JSON 格式！要指定 JSON 文档，请在 `SwaggerCustomOptions` 中使用 `jsonDocumentUrl`。更多设置选项请查看[此处](/openapi/introduction#设置选项) 。
 
 以下是设置资源管理器栏下拉菜单中多个规格的方法：
 
@@ -138,10 +138,10 @@ async function bootstrap() {
     .setVersion('1.0')
     .build();
 
-  // Create main API document
+  // 创建 main API document
   const document = SwaggerModule.createDocument(app, options);
 
-  // Setup main API Swagger UI with dropdown support
+  // 设置up main API Swagger UI with dropdown support
   SwaggerModule.setup('api', app, document, {
     explorer: true,
     swaggerOptions: {
@@ -171,12 +171,12 @@ async function bootstrap() {
     .addTag('cats')
     .build();
 
-  // Create Cats API document
+  // 创建 Cats API document
   const catDocument = SwaggerModule.createDocument(app, catOptions, {
     include: [CatsModule],
   });
 
-  // Setup Cats API Swagger UI
+  // 设置up Cats API Swagger UI
   SwaggerModule.setup('api/cats', app, catDocument, {
     jsonDocumentUrl: '/api/cats/swagger.json',
   });
@@ -189,12 +189,12 @@ async function bootstrap() {
     .addTag('dogs')
     .build();
 
-  // Create Dogs API document
+  // 创建 Dogs API document
   const dogDocument = SwaggerModule.createDocument(app, dogOptions, {
     include: [DogsModule],
   });
 
-  // Setup Dogs API Swagger UI
+  // 设置up Dogs API Swagger UI
   SwaggerModule.setup('api/dogs', app, dogDocument, {
     jsonDocumentUrl: '/api/dogs/swagger.json',
   });

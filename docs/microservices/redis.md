@@ -44,9 +44,9 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 
 #### 客户端
 
-与其他微服务传输器类似，创建 Redis `ClientProxy` 实例时您有 [多种选择](./basics#client) 。
+与其他微服务传输器类似，创建 Redis `ClientProxy` 实例时您有 [多种选择](./basics#客户端) 。
 
-一种创建实例的方法是使用 `ClientsModule`。要通过 `ClientsModule` 创建客户端实例，需先导入该模块，然后使用 `register()` 方法传入一个选项对象（包含与上文 `createMicroservice()` 方法相同的属性），以及用作注入令牌的 `name` 属性。更多关于 `ClientsModule` 的信息请参阅[此处](./basics#client) 。
+一种创建实例的方法是使用 `ClientsModule`。要通过 `ClientsModule` 创建客户端实例，需先导入该模块，然后使用 `register()` 方法传入一个选项对象（包含与上文 `createMicroservice()` 方法相同的属性），以及用作注入令牌的 `name` 属性。更多关于 `ClientsModule` 的信息请参阅[此处](./basics#客户端) 。
 
 ```typescript
 @Module({
@@ -66,7 +66,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 })
 ```
 
-也可以使用其他方式创建客户端（`ClientProxyFactory` 或 `@Client()`）。相关说明请查看[此文档](./basics#client) 。
+也可以使用其他方式创建客户端（`ClientProxyFactory` 或 `@Client()`）。相关说明请查看[此文档](./basics#客户端) 。
 
 #### 上下文
 

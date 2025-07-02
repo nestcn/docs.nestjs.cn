@@ -47,7 +47,7 @@ export class HealthModule {}
 $ nest g controller health
 ```
 
-> info **信息** 强烈建议在应用程序中启用关闭钩子。如果启用，Terminus 集成会利用此生命周期事件。了解更多关于关闭钩子的信息 [请点击这里](fundamentals/lifecycle-events#application-shutdown) 。
+> info **信息** 强烈建议在应用程序中启用关闭钩子。如果启用，Terminus 集成会利用此生命周期事件。了解更多关于关闭钩子的信息 [请点击这里](fundamentals/lifecycle-events#应用程序关闭) 。
 
 #### HTTP 健康检查
 
@@ -76,7 +76,7 @@ export class HealthController {
   @HealthCheck()
   check() {
     return this.health.check([
-      () => this.http.pingCheck('nestjs-docs', 'https://docs.nestjs.com'),
+      () => this.http.pingCheck('nestjs-docs', './'),
     ]);
   }
 }
@@ -188,7 +188,7 @@ export class HealthController {
 }
 ```
 
-如果您的应用使用[多个数据库](techniques/database#multiple-databases) ，需要将每个连接注入到 `HealthController` 中。然后就可以直接将连接引用传递给 `TypeOrmHealthIndicator`。
+如果您的应用使用[多个数据库](techniques/database#多个数据库) ，需要将每个连接注入到 `HealthController` 中。然后就可以直接将连接引用传递给 `TypeOrmHealthIndicator`。
 
 ```typescript title="health.controller"
 @Controller('health')
@@ -381,7 +381,7 @@ Terminus 仅记录错误消息，例如当健康检查失败时。通过 `Termin
 
 在本节中，我们将指导您如何创建自定义日志记录器 `TerminusLogger`。该日志记录器扩展了内置日志功能，因此您可以选择性地覆盖日志记录器的特定部分
 
-> **提示** 如需了解更多关于 NestJS 中自定义日志记录器的信息， [请点击此处阅读更多内容](/techniques/logger#injecting-a-custom-logger) 。
+> **提示** 如需了解更多关于 NestJS 中自定义日志记录器的信息， [请点击此处阅读更多内容](/techniques/logger#注入自定义日志记录器) 。
 
 ```typescript title="terminus-logger.service"
 import { Injectable, Scope, ConsoleLogger } from '@nestjs/common';

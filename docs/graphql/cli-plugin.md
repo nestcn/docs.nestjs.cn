@@ -139,13 +139,13 @@ getCustomTransformers: (program: any) => ({
 
 #### SWC 构建器
 
-对于标准设置（非 monorepo），要在 SWC 构建器中使用 CLI 插件，您需要启用类型检查，具体方法如[此处](/recipes/swc#type-checking)所述。
+对于标准设置（非 monorepo），要在 SWC 构建器中使用 CLI 插件，您需要启用类型检查，具体方法如[此处](/recipes/swc#类型检查)所述。
 
 ```bash
 $ nest start -b swc --type-check
 ```
 
-对于 monorepo 设置，请按照[此处](/recipes/swc#monorepo-and-cli-plugins)的说明操作。
+对于 monorepo 设置，请按照[此处](/recipes/swc#monorepo-和-cli-插件)的说明操作。
 
 ```bash
 $ npx ts-node src/generate-metadata.ts

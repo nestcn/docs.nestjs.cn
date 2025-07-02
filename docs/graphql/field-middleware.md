@@ -41,7 +41,7 @@ export class Recipe {
 
 现在每当我们请求 `Recipe` 对象类型的 `title` 字段时，原始字段值将被记录到控制台。
 
-> **提示** 要了解如何通过 [extensions](/graphql/extensions) 功能实现字段级权限系统，请查看此[章节](/graphql/extensions#using-custom-metadata) 。
+> **提示** 要了解如何通过 [extensions](/graphql/extensions) 功能实现字段级权限系统，请查看此[章节](/graphql/extensions#使用自定义元数据) 。
 
 > warning **警告** 字段中间件只能应用于 `ObjectType` 类。更多详情请查看此 [问题](https://github.com/nestjs/graphql/issues/2446) 。
 
@@ -63,7 +63,7 @@ title() {
 }
 ```
 
-> warning **警告** 如果在字段解析器级别启用了增强器( [了解更多](/graphql/other-features#execute-enhancers-at-the-field-resolver-level) )，字段中间件函数将在任何拦截器、守卫等**绑定到方法**之前运行(但在为查询或变更处理程序注册的根级别增强器之后)。
+> warning **警告** 如果在字段解析器级别启用了增强器( [了解更多](/graphql/other-features#在字段解析器级别执行增强器) )，字段中间件函数将在任何拦截器、守卫等**绑定到方法**之前运行(但在为查询或变更处理程序注册的根级别增强器之后)。
 
 #### 全局字段中间件
 

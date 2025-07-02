@@ -2,7 +2,7 @@
 
 Nest 与数据库无关，可轻松集成任何 SQL 或 NoSQL 数据库。根据您的偏好，有多种选择可用。在最基本的层面上，将 Nest 连接到数据库只需加载适用于该数据库的 Node.js 驱动程序，就像使用 [Express](https://expressjs.com/en/guide/database-integration.html) 或 Fastify 一样简单。
 
-您还可以直接使用任何通用的 Node.js 数据库集成 **库** 或 ORM，例如 [MikroORM](https://mikro-orm.io/)（参见 [MikroORM 指南](/recipes/mikroorm) ）、[Sequelize](https://sequelize.org/)（参见 [Sequelize 集成](/techniques/database#sequelize-integration) ）、[Knex.js](https://knexjs.org/)（参见 [Knex.js 教程](https://dev.to/nestjs/build-a-nestjs-module-for-knex-js-or-other-resource-based-libraries-in-5-minutes-12an) ）、[TypeORM](https://github.com/typeorm/typeorm) 和 [Prisma](https://www.github.com/prisma/prisma)（参见 [Prisma 指南](/recipes/prisma) ），在更高抽象层次上进行操作。
+您还可以直接使用任何通用的 Node.js 数据库集成 **库** 或 ORM，例如 [MikroORM](https://mikro-orm.io/)（参见 [MikroORM 指南](/recipes/mikroorm) ）、[Sequelize](https://sequelize.org/)（参见 [Sequelize 集成](/techniques/sql#sequelize-集成) ）、[Knex.js](https://knexjs.org/)（参见 [Knex.js 教程](https://dev.to/nestjs/build-a-nestjs-module-for-knex-js-or-other-resource-based-libraries-in-5-minutes-12an) ）、[TypeORM](https://github.com/typeorm/typeorm) 和 [Prisma](https://www.github.com/prisma/prisma)（参见 [Prisma 指南](/recipes/prisma) ），在更高抽象层次上进行操作。
 
 为方便使用，Nest 原生提供了与 TypeORM 和 Sequelize 的深度集成，分别通过 `@nestjs/typeorm` 和 `@nestjs/sequelize` 包实现（本章将介绍这些内容），以及与 Mongoose 的集成通过 `@nestjs/mongoose` 包（详见[本章](/techniques/mongodb) ）。这些集成提供了额外的 NestJS 专属特性，如模型/仓库注入、可测试性和异步配置，使访问所选数据库更加便捷。
 

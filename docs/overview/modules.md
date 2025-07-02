@@ -229,4 +229,4 @@ export class AppModule {}
 
 [动态模块](/fundamentals/dynamic-modules)章节对此主题有更详细讲解，并包含一个[实际示例](https://github.com/nestjs/nest/tree/master/sample/25-dynamic-modules) 。
 
-> info **提示** 通过[本章节](/fundamentals/dynamic-modules#configurable-module-builder)学习如何使用 `ConfigurableModuleBuilder` 构建高度可定制的动态模块。
+> info **提示** 通过[本章节](/fundamentals/dynamic-modules#可配置模块构建器)学习如何使用 `ConfigurableModuleBuilder` 构建高度可定制的动态模块。

@@ -351,7 +351,7 @@ NestJS 提供专业的认证和授权课程：
 - 官方认证证书
 - 深度学习会话
 
-[购买认证课程](https://courses.nestjs.com/#authentication)
+[购买认证课程](https://courses.nestjs.com/#认证)
 
 ## 示例应用
 

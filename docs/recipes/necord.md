@@ -160,7 +160,7 @@ export class AppCommands {
 }
 ```
 
-要查看完整的内置选项装饰器列表，请查阅[此文档](https://necord.org/interactions/slash-commands#options) 。
+要查看完整的内置选项装饰器列表，请查阅[此文档](https://necord.org/interactions/slash-commands#选项) 。
 
 ##### 自动补全
 

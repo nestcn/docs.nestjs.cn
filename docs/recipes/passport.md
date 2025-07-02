@@ -356,7 +356,7 @@ import { jwtConstants } from './constants';
 export class AuthModule {}
 ```
 
-我们使用 `register()` 方法配置 `JwtModule`，并传入配置对象。有关 Nest 框架 `JwtModule` 的更多信息请参阅[此处](https://github.com/nestjs/jwt/blob/master/README.md) ，可用配置选项的详细信息请查看[这里](https://github.com/auth0/node-jsonwebtoken#usage) 。
+我们使用 `register()` 方法配置 `JwtModule`，并传入配置对象。有关 Nest 框架 `JwtModule` 的更多信息请参阅[此处](https://github.com/nestjs/jwt/blob/master/README.md) ，可用配置选项的详细信息请查看[这里](https://github.com/auth0/node-jsonwebtoken#用法) 。
 
 现在我们可以更新 `/auth/login` 路由以返回 JWT 令牌。
 
@@ -555,7 +555,7 @@ export class JwtAuthGuard extends AuthGuard(['strategy_jwt_1', 'strategy_jwt_2',
 
 #### 全局启用认证
 
-如果默认情况下绝大多数端点都应受到保护，您可以将认证守卫注册为[全局守卫](/guards#binding-guards) ，而不必在每个控制器顶部使用 `@UseGuards()` 装饰器，只需标记哪些路由应该是公开的即可。
+如果默认情况下绝大多数端点都应受到保护，您可以将认证守卫注册为[全局守卫](/overview/guards#绑定守卫) ，而不必在每个控制器顶部使用 `@UseGuards()` 装饰器，只需标记哪些路由应该是公开的即可。
 
 首先，使用以下构造方法（在任何模块中）将 `JwtAuthGuard` 注册为全局守卫：
 
@@ -591,7 +591,7 @@ findAll() {
 }
 ```
 
-最后，我们需要让 `JwtAuthGuard` 在发现 `"isPublic"` 元数据时返回 `true`。为此，我们将使用 `Reflector` 类（更多信息请参阅[此处](/guards#putting-it-all-together) ）。
+最后，我们需要让 `JwtAuthGuard` 在发现 `"isPublic"` 元数据时返回 `true`。为此，我们将使用 `Reflector` 类（更多信息请参阅[此处](/overview/guards#把所有内容放在一起) ）。
 
 ```typescript
 @Injectable()
@@ -633,7 +633,7 @@ constructor(private moduleRef: ModuleRef) {
 
 请确保将 `passReqToCallback` 配置属性设置为 `true`，如上所示。
 
-在下一步中，将使用请求实例来获取当前上下文标识符，而不是生成新的标识符（了解更多关于请求上下文的信息请[点击此处](/fundamentals/module-ref#getting-current-sub-tree) ）。
+在下一步中，将使用请求实例来获取当前上下文标识符，而不是生成新的标识符（了解更多关于请求上下文的信息请[点击此处](/fundamentals/module-ref#获取当前子树) ）。
 
 现在，在 `LocalStrategy` 类的 `validate()` 方法内部，使用 `ContextIdFactory` 类的 `getByRequest()` 方法基于请求对象创建上下文 ID，并将其传递给 `resolve()` 调用：
 

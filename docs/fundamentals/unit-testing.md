@@ -313,7 +313,7 @@ const moduleRef = await Test.createTestingModule({
 
 [请求作用域](/fundamentals/injection-scopes)的提供者会为每个传入的**请求**单独创建。实例会在请求处理完成后被垃圾回收。这带来了一个问题，因为我们无法访问专门为测试请求生成的依赖注入子树。
 
-根据前文所述，我们知道可以使用 `resolve()` 方法来获取动态实例化的类。同时，如[此处](../fundamentals/module-reference#resolving-scoped-providers)所描述的，我们知道可以传递唯一的上下文标识符来控制 DI 容器子树的生命周期。那么如何在测试环境中利用这一点呢？
+根据前文所述，我们知道可以使用 `resolve()` 方法来获取动态实例化的类。同时，如[此处](../fundamentals/module-reference#解析作用域提供者)所描述的，我们知道可以传递唯一的上下文标识符来控制 DI 容器子树的生命周期。那么如何在测试环境中利用这一点呢？
 
 该策略是预先生成一个上下文标识符，并强制 Nest 使用此特定 ID 为所有传入请求创建子树。通过这种方式，我们将能够检索为测试请求创建的实例。
 

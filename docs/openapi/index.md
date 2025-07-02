@@ -153,7 +153,7 @@ const documentFactory = () => SwaggerModule.createDocument(app, config, options)
 
 ## 设置选项
 
-您可以通过传递满足 `SwaggerCustomOptions` 接口的选项对象作为 `SwaggerModule#setup` 方法的第四个参数来配置 Swagger UI。
+您可以通过传递满足 `SwaggerCustomOptions` 接口的选项对象作为 `SwaggerModule#设置` 方法的第四个参数来配置 Swagger UI。
 
 主要设置选项包括：
 

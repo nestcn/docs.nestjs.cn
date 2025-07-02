@@ -253,7 +253,7 @@ export class HeroKilledDragonHandler implements IEventHandler<HeroKilledDragonEv
 > **提示** 请注意，当你开始使用事件处理器时，你将脱离传统的 HTTP 网络上下文。
 >
 > - `命令处理器`中的错误仍可被内置的[异常过滤器](/exception-filters)捕获。
-> - `事件处理器`中的错误无法被异常过滤器捕获：你必须手动处理它们。可以通过简单的 `try/catch`，使用 [Sagas](/recipes/cqrs#sagas) 触发补偿事件，或选择其他任何解决方案。
+> - `事件处理器`中的错误无法被异常过滤器捕获：你必须手动处理它们。可以通过简单的 `try/catch`，使用 [Sagas](../recipes/cqrs#sagas) 触发补偿事件，或选择其他任何解决方案。
 > - 在 `CommandHandlers` 中的 HTTP 响应仍可返回给客户端。
 > - 而在 `EventHandlers` 中则无法返回 HTTP 响应。如需向客户端发送信息，可采用 [WebSocket](/websockets/gateways)、[SSE](/techniques/server-sent-events) 或其他自选方案。
 
@@ -286,7 +286,8 @@ export class HeroesGameSagas {
 
 > info **提示** `ofType` 操作符和 `@Saga()` 装饰器是从 `@nestjs/cqrs` 包中导出的。
 
-`@Saga()` 装饰器将方法标记为一个 saga。`events$` 参数是一个包含所有事件的 Observable 流。`ofType` 操作符通过指定的事件类型过滤该流。`map` 操作符将事件映射为一个新的命令实例。
+`@Saga()` 装饰器将方法标记为一个 saga。`events```
+ 参数是一个包含所有事件的 Observable 流。`ofType` 操作符通过指定的事件类型过滤该流。`map` 操作符将事件映射为一个新的命令实例。
 
 在这个示例中，我们将 `HeroKilledDragonEvent` 映射为 `DropAncientItemCommand` 命令。随后 `DropAncientItemCommand` 命令会被 `CommandBus` 自动派发。
 

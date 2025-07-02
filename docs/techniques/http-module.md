@@ -75,7 +75,7 @@ HttpModule.registerAsync({
 });
 ```
 
-与其他工厂提供程序类似，我们的工厂函数可以是[异步的](../fundamentals/dependency-injection#factory-providers-usefactory) ，并且可以通过 `inject` 注入依赖项。
+与其他工厂提供程序类似，我们的工厂函数可以是[异步的](../fundamentals/dependency-injection#工厂提供者-usefactory) ，并且可以通过 `inject` 注入依赖项。
 
 ```typescript
 HttpModule.registerAsync({

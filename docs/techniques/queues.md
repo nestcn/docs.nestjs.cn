@@ -797,7 +797,7 @@ async onGlobalCompleted(jobId: number, result: any) {
 
 > **提示** 要访问 `Queue` 对象（以进行 `getJob()` 调用），当然需要先注入它。此外，Queue 必须在你执行注入的模块中完成注册。
 
-除了特定的事件监听器装饰器外，你还可以使用通用的 `@OnQueueEvent()` 装饰器，配合 `BullQueueEvents` 或 `BullQueueGlobalEvents` 枚举使用。了解更多关于事件的信息[请点击这里](https://github.com/OptimalBits/bull/blob/master/REFERENCE.md#events) 。
+除了特定的事件监听器装饰器外，你还可以使用通用的 `@OnQueueEvent()` 装饰器，配合 `BullQueueEvents` 或 `BullQueueGlobalEvents` 枚举使用。了解更多关于事件的信息[请点击这里](https://github.com/OptimalBits/bull/blob/master/REFERENCE.md#事件) 。
 
 #### 队列管理
 
@@ -817,7 +817,7 @@ await audioQueue.resume();
 
 #### 独立进程
 
-作业处理器也可以在独立的（forked）进程中运行（ [来源](https://github.com/OptimalBits/bull#separate-processes) ）。这具有以下几个优势：
+作业处理器也可以在独立的（forked）进程中运行（ [来源](https://github.com/OptimalBits/bull#独立进程) ）。这具有以下几个优势：
 
 - 该进程处于沙箱环境中，因此即使崩溃也不会影响工作线程。
 - 可以运行阻塞代码而不影响队列（任务不会停滞）。

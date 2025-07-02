@@ -40,7 +40,7 @@ export class AuthGuard implements CanActivate {
 
 #### 执行上下文
 
-`canActivate()` 函数接收一个参数，即 `ExecutionContext` 实例。`ExecutionContext` 继承自 `ArgumentsHost`。我们之前在异常过滤器章节中已经见过 `ArgumentsHost`。在上面的示例中，我们只是使用了之前定义在 `ArgumentsHost` 上的相同辅助方法，来获取对 `Request` 对象的引用。您可以回顾[异常过滤器](./exception-filters#arguments-host)章节中的 **Arguments host** 部分以获取更多相关信息。
+`canActivate()` 函数接收一个参数，即 `ExecutionContext` 实例。`ExecutionContext` 继承自 `ArgumentsHost`。我们之前在异常过滤器章节中已经见过 `ArgumentsHost`。在上面的示例中，我们只是使用了之前定义在 `ArgumentsHost` 上的相同辅助方法，来获取对 `Request` 对象的引用。您可以回顾[异常过滤器](./exception-filters#参数主机)章节中的 **Arguments host** 部分以获取更多相关信息。
 
 通过扩展 `ArgumentsHost`，`ExecutionContext` 还添加了几个新的辅助方法，这些方法提供了有关当前执行过程的额外详细信息。这些细节有助于构建更通用的守卫，使其能够跨多种控制器、方法和执行上下文工作。了解更多关于 `ExecutionContext` 的信息[请点击此处](/fundamentals/execution-context) 。
 
@@ -116,7 +116,7 @@ export class AppModule {}
 
 我们的 `RolesGuard` 已经可以工作，但还不够智能。我们尚未利用最重要的守卫特性—— [执行上下文](/fundamentals/execution-context) 。它目前还不了解角色信息，也不知道每个处理器允许哪些角色。例如，`CatsController` 可以为不同路由设置不同的权限方案。某些路由可能仅对管理员用户开放，而其他路由则可能允许所有人访问。我们如何才能以灵活且可重用的方式将角色与路由匹配起来？
 
-这正是**自定义元数据**发挥作用的地方（了解更多[此处](../fundamentals/execution-context#reflection-and-metadata) ）。Nest 提供了通过两种方式为路由处理器附加自定义**元数据**的能力：一种是使用 `Reflector.createDecorator` 静态方法创建的装饰器，另一种是内置的 `@SetMetadata()` 装饰器。
+这正是**自定义元数据**发挥作用的地方（了解更多[此处](../fundamentals/execution-context#反射与元数据) ）。Nest 提供了通过两种方式为路由处理器附加自定义**元数据**的能力：一种是使用 `Reflector.createDecorator` 静态方法创建的装饰器，另一种是内置的 `@SetMetadata()` 装饰器。
 
 例如，让我们使用 `Reflector.createDecorator` 方法创建一个 `@Roles()` 装饰器，该装饰器会将元数据附加到处理器上。`Reflector` 由框架开箱即用提供，并从 `@nestjs/core` 包中导出。
 
@@ -140,7 +140,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 这里我们将 `Roles` 装饰器元数据附加到 `create()` 方法上，表明只有具有 `admin` 角色的用户才被允许访问此路由。
 
-或者，不使用 `Reflector.createDecorator` 方法，我们可以使用内置的 `@SetMetadata()` 装饰器。了解更多请点击[此处](/fundamentals/execution-context#low-level-approach) 。
+或者，不使用 `Reflector.createDecorator` 方法，我们可以使用内置的 `@SetMetadata()` 装饰器。了解更多请点击[此处](/fundamentals/execution-context#低级方法) 。
 
 #### 整合所有内容
 
@@ -171,7 +171,7 @@ export class RolesGuard implements CanActivate {
 
 > warning **警告** `matchRoles()` 函数内部的逻辑可以根据需要简单或复杂。本示例的主要目的是展示守卫如何融入请求/响应周期。
 
-有关在上下文敏感方式中使用 `Reflector` 的更多细节，请参阅 **执行上下文** 章节中的 [反射与元数据](../fundamentals/execution-context#reflection-and-metadata) 部分。
+有关在上下文敏感方式中使用 `Reflector` 的更多细节，请参阅 **执行上下文** 章节中的 [反射与元数据](../fundamentals/execution-context#反射与元数据) 部分。
 
 当权限不足的用户请求端点时，Nest 会自动返回以下响应：
 

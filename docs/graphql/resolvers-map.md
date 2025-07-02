@@ -152,7 +152,7 @@ export class AuthorsResolver {
 
 > info **提示** 所有装饰器（例如 `@Resolver`、`@ResolveField`、`@Args` 等）均从 `@nestjs/graphql` 包中导出。
 
-您可以定义多个解析器类。Nest 将在运行时将它们组合起来。有关代码组织的更多信息，请参阅下面的[模块](/graphql/resolvers#module)部分。
+您可以定义多个解析器类。Nest 将在运行时将它们组合起来。有关代码组织的更多信息，请参阅下面的[模块](/graphql/resolvers#模块)部分。
 
 > warning **注意** `AuthorsService` 和 `PostsService` 类中的逻辑可以根据需要简单或复杂。本示例的主要目的是展示如何构建解析器以及它们如何与其他提供者交互。
 
@@ -231,7 +231,7 @@ type Query {
 
 #### Args 装饰器选项
 
-使用 `@Args()` 装饰器从请求中提取参数以供方法处理器使用，其工作方式与 [REST 路由参数提取](/controllers#route-parameters)非常相似。
+使用 `@Args()` 装饰器从请求中提取参数以供方法处理器使用，其工作方式与 [REST 路由参数提取](/overview/controllers#路由参数)非常相似。
 
 通常情况下，您的 `@Args()` 装饰器会很简单，不需要像上面 `getAuthor()` 方法那样使用对象参数。例如，如果标识符的类型是字符串，以下结构就足够了，它只是从传入的 GraphQL 请求中提取命名字段作为方法参数使用。
 

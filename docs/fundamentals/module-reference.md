@@ -27,7 +27,7 @@ export class CatsService implements OnModuleInit {
 }
 ```
 
-> warning **警告** 无法通过 `get()` 方法检索作用域提供者（瞬时或请求作用域）。请改用下文[所述技术](../fundamentals/module-reference#resolving-scoped-providers) 。了解如何控制作用域请参阅[此处](/fundamentals/injection-scopes) 。
+> warning **警告** 无法通过 `get()` 方法检索作用域提供者（瞬时或请求作用域）。请改用下文[所述技术](../fundamentals/module-reference#解析作用域提供者) 。了解如何控制作用域请参阅[此处](/fundamentals/injection-scopes) 。
 
 要从全局上下文中检索提供者（例如，如果该提供者已注入到其他模块中），请将 `{ strict: false }` 选项作为第二个参数传递给 `get()`。
 
@@ -112,7 +112,7 @@ export class CatsService {
 }
 ```
 
-> info **了解**请求提供者的更多信息，请点击[此处](../fundamentals/injection-scopes#request-provider) 。
+> info **了解**请求提供者的更多信息，请点击[此处](../fundamentals/injection-scopes#请求提供者) 。
 
 现在，使用 `ContextIdFactory` 类的 `getByRequest()` 方法基于请求对象创建上下文 ID，并将其传递给 `resolve()` 调用：
 

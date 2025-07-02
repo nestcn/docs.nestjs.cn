@@ -1,6 +1,6 @@
 ### 动态模块
 
-[模块章节](/modules)介绍了 Nest 模块的基础知识，并简要提及了[动态模块](../overview/modules#dynamic-modules) 。本章将深入探讨动态模块的主题。学习完成后，您将充分理解它们的概念、使用方法及适用场景。
+[模块章节](/modules)介绍了 Nest 模块的基础知识，并简要提及了[动态模块](../overview/modules#动态模块) 。本章将深入探讨动态模块的主题。学习完成后，您将充分理解它们的概念、使用方法及适用场景。
 
 #### 介绍
 
@@ -71,7 +71,7 @@ Nest 框架中的一个典型示例是**配置模块** 。许多应用程序发�
 
 #### 配置模块示例
 
-我们将使用[配置章节](../techniques/configuration#service)中示例代码的基础版本作为本节内容。本章节完成后的最终版本可在此处获取[完整示例](https://github.com/nestjs/nest/tree/master/sample/25-dynamic-modules) 。
+我们将使用[配置章节](../techniques/configuration#服务)中示例代码的基础版本作为本节内容。本章节完成后的最终版本可在此处获取[完整示例](https://github.com/nestjs/nest/tree/master/sample/25-dynamic-modules) 。
 
 我们的需求是让 `ConfigModule` 能够接收一个 `options` 对象来实现自定义功能。以下是我们要支持的特性：基础示例中将 `.env` 文件的位置硬编码为项目根目录。假设我们希望使其可配置，这样您就可以将 `.env` 文件存放在任意选择的文件夹中。例如，您可能希望将各种 `.env` 文件存储在项目根目录下名为 `config` 的文件夹中（即与 `src` 文件夹同级）。您希望在不同项目中使用 `ConfigModule` 时能够选择不同的文件夹。
 
@@ -206,7 +206,7 @@ export class ConfigService {
 
 现在我们的 `ConfigService` 已经知道如何在 `options` 中指定的文件夹里找到 `.env` 文件。
 
-我们剩下的任务是如何将 `register()` 步骤中的 `options` 对象注入到 `ConfigService` 中。当然，我们会使用*依赖注入*来实现这一点。这是关键点，请务必理解。我们的 `ConfigModule` 提供了 `ConfigService`，而 `ConfigService` 又依赖于仅在运行时提供的 `options` 对象。因此，在运行时，我们需要先将 `options` 对象绑定到 Nest IoC 容器，然后让 Nest 将其注入到 `ConfigService` 中。记得在**自定义提供者**章节中提到的，提供者可以[包含任何值](../fundamentals/dependency-injection#non-service-based-providers) ，而不仅仅是服务，所以我们可以放心使用依赖注入来处理简单的 `options` 对象。
+我们剩下的任务是如何将 `register()` 步骤中的 `options` 对象注入到 `ConfigService` 中。当然，我们会使用*依赖注入*来实现这一点。这是关键点，请务必理解。我们的 `ConfigModule` 提供了 `ConfigService`，而 `ConfigService` 又依赖于仅在运行时提供的 `options` 对象。因此，在运行时，我们需要先将 `options` 对象绑定到 Nest IoC 容器，然后让 Nest 将其注入到 `ConfigService` 中。记得在**自定义提供者**章节中提到的，提供者可以[包含任何值](../fundamentals/dependency-injection#非基于服务的提供者) ，而不仅仅是服务，所以我们可以放心使用依赖注入来处理简单的 `options` 对象。
 
 我们先解决将选项对象绑定到 IoC 容器的问题。这需要在静态的 `register()` 方法中完成。注意我们正在动态构建一个模块，而模块的属性之一就是它的提供者列表。因此我们需要将选项对象定义为一个提供者，这样它就能被注入到 `ConfigService` 中（下一步会用到这个特性）。在下面代码中，请特别注意 `providers` 数组：
 
@@ -232,7 +232,7 @@ export class ConfigModule {
 }
 ```
 
-现在我们可以通过向 `ConfigService` 注入 `'CONFIG_OPTIONS'` 提供者来完成整个过程。注意当使用非类令牌定义提供者时，需要按照[这里的说明](../fundamentals/dependency-injection#non-class-based-provider-tokens)使用 `@Inject()` 装饰器。
+现在我们可以通过向 `ConfigService` 注入 `'CONFIG_OPTIONS'` 提供者来完成整个过程。注意当使用非类令牌定义提供者时，需要按照[这里的说明](../fundamentals/dependency-injection#非基于类的提供者令牌)使用 `@Inject()` 装饰器。
 
 ```typescript
 import * as dotenv from 'dotenv';
@@ -369,8 +369,8 @@ export class AppModule {}
 
 - `useFactory` - 一个返回配置对象的工厂函数，可以是同步或异步的。要注入依赖到该工厂函数中，需使用 `inject` 属性。我们在前文示例中采用了这种形式。
 - `inject` - 将被注入工厂函数的依赖项数组。依赖项的顺序必须与工厂函数参数的顺序保持一致。
-- `useClass` - 将被实例化为提供者的类，该类必须实现相应接口。通常这是一个提供 `create()` 方法的类，该方法返回配置对象。更多细节请参阅下文[自定义方法键](/fundamentals/dynamic-modules#custom-method-key)章节。
-- `useExisting` - `useClass` 的变体，允许使用现有提供者而非指示 Nest 创建类的新实例。当需要使用已在模块中注册的提供者时，这非常有用。请注意，该类必须实现与 `useClass` 相同的接口（因此必须提供 `create()` 方法，除非重写默认方法名称，参见下方的[自定义方法键](/fundamentals/dynamic-modules#custom-method-key)部分）。
+- `useClass` - 将被实例化为提供者的类，该类必须实现相应接口。通常这是一个提供 `create()` 方法的类，该方法返回配置对象。更多细节请参阅下文[自定义方法键](/fundamentals/dynamic-modules#自定义方法键)章节。
+- `useExisting` - `useClass` 的变体，允许使用现有提供者而非指示 Nest 创建类的新实例。当需要使用已在模块中注册的提供者时，这非常有用。请注意，该类必须实现与 `useClass` 相同的接口（因此必须提供 `create()` 方法，除非重写默认方法名称，参见下方的[自定义方法键](/fundamentals/dynamic-modules#自定义方法键)部分）。
 
 请务必从上述选项（`useFactory`、`useClass` 或 `useExisting`）中选择其一，因为它们互斥。
 
@@ -468,7 +468,7 @@ export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
     .build();
 ```
 
-上述示例中，传入 `setExtras` 方法的第一个参数是包含"extra"属性默认值的对象。第二个参数是一个函数，该函数接收自动生成的模块定义（包含 `provider`、`exports` 等）和表示额外属性的 `extras` 对象（可能是使用者指定的值或默认值）。该函数的返回值是修改后的模块定义。在这个具体示例中，我们获取 `extras.isGlobal` 属性并将其赋值给模块定义的 `global` 属性（该属性继而决定模块是否为全局模块，更多信息请参阅[此处](/modules#dynamic-modules) ）。
+上述示例中，传入 `setExtras` 方法的第一个参数是包含"extra"属性默认值的对象。第二个参数是一个函数，该函数接收自动生成的模块定义（包含 `provider`、`exports` 等）和表示额外属性的 `extras` 对象（可能是使用者指定的值或默认值）。该函数的返回值是修改后的模块定义。在这个具体示例中，我们获取 `extras.isGlobal` 属性并将其赋值给模块定义的 `global` 属性（该属性继而决定模块是否为全局模块，更多信息请参阅[此处](/modules#动态模块) ）。
 
 现在当使用此模块时，可以传入额外的 `isGlobal` 标志，如下所示：
 

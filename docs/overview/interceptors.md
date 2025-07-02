@@ -14,7 +14,7 @@
 
 #### 基础概念
 
-每个拦截器都实现了 `intercept()` 方法，该方法接收两个参数。第一个是 `ExecutionContext` 实例（与[守卫](./guards)中的对象完全相同）。`ExecutionContext` 继承自 `ArgumentsHost`。我们在异常过滤器章节中见过 `ArgumentsHost`，它是对原始处理程序参数的包装器，根据应用程序类型包含不同的参数数组。更多内容可以参考[异常过滤器](./exception-filters#arguments-host)章节。
+每个拦截器都实现了 `intercept()` 方法，该方法接收两个参数。第一个是 `ExecutionContext` 实例（与[守卫](./guards)中的对象完全相同）。`ExecutionContext` 继承自 `ArgumentsHost`。我们在异常过滤器章节中见过 `ArgumentsHost`，它是对原始处理程序参数的包装器，根据应用程序类型包含不同的参数数组。更多内容可以参考[异常过滤器](./exception-filters#参数主机)章节。
 
 #### 执行上下文
 

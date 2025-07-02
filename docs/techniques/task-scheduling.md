@@ -24,7 +24,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 export class AppModule {}
 ```
 
-`.forRoot()` 调用会初始化调度器并注册应用中所有声明式的 [cron 任务](techniques/task-scheduling#declarative-cron-jobs) 、 [超时任务](techniques/task-scheduling#declarative-timeouts) 和 [间隔任务](techniques/task-scheduling#declarative-intervals) 。注册过程发生在 `onApplicationBootstrap` 生命周期钩子触发时，确保所有模块都已加载并声明了计划任务。
+`.forRoot()` 调用会初始化调度器并注册应用中所有声明式的 [cron 任务](techniques/task-scheduling#声明式-cron-任务) 、 [超时任务](techniques/task-scheduling#声明式超时) 和 [间隔任务](techniques/task-scheduling#声明式间隔任务) 。注册过程发生在 `onApplicationBootstrap` 生命周期钩子触发时，确保所有模块都已加载并声明了计划任务。
 
 #### 声明式 cron 任务
 
@@ -146,7 +146,7 @@ export class NotificationService {
 }
 ```
 
-您可以在声明后访问和控制 cron 任务，或者通过[动态 API](/techniques/task-scheduling#dynamic-schedule-module-api) 动态创建 cron 任务（其 cron 模式在运行时定义）。要通过 API 访问声明式 cron 任务，您必须通过装饰器的第二个可选参数对象中的 `name` 属性为任务关联名称。
+您可以在声明后访问和控制 cron 任务，或者通过[动态 API](/techniques/task-scheduling#动态调度模块-api) 动态创建 cron 任务（其 cron 模式在运行时定义）。要通过 API 访问声明式 cron 任务，您必须通过装饰器的第二个可选参数对象中的 `name` 属性为任务关联名称。
 
 #### 声明式间隔任务
 
@@ -161,7 +161,7 @@ handleInterval() {
 
 > **提示** 此机制底层使用 JavaScript 的 `setInterval()` 函数。您也可以使用 cron 任务来安排重复作业。
 
-若要通过[动态 API](/techniques/task-scheduling#dynamic-schedule-module-api) 在声明类外部控制声明式间隔，请使用以下构造将间隔与名称关联：
+若要通过[动态 API](/techniques/task-scheduling#动态调度模块-api) 在声明类外部控制声明式间隔，请使用以下构造将间隔与名称关联：
 
 ```typescript
 @Interval('notifications', 2500)
@@ -170,7 +170,7 @@ handleInterval() {}
 
 如果发生异常，它将被记录到控制台，因为每个用 `@Interval()` 注解的方法都会自动包裹在 `try-catch` 代码块中。
 
-[动态 API](techniques/task-scheduling#dynamic-intervals) 还支持**创建**动态间隔（其属性在运行时定义），以及**列出和删除**这些间隔。
+[动态 API](techniques/task-scheduling#动态间隔) 还支持**创建**动态间隔（其属性在运行时定义），以及**列出和删除**这些间隔。
 
 #### 声明式超时
 
@@ -187,18 +187,18 @@ handleTimeout() {
 
 如果发生异常，它将被记录到控制台，因为每个用 `@Timeout()` 注解的方法都会自动被包裹在 `try-catch` 代码块中。
 
-若要通过[动态 API](/techniques/task-scheduling#dynamic-schedule-module-api) 在声明类外部控制声明式超时，请使用以下构造将超时与名称关联：
+若要通过[动态 API](/techniques/task-scheduling#动态调度模块-api) 在声明类外部控制声明式超时，请使用以下构造将超时与名称关联：
 
 ```typescript
 @Timeout('notifications', 2500)
 handleTimeout() {}
 ```
 
-[动态 API](techniques/task-scheduling#dynamic-timeouts) 还支持**创建**动态超时，其属性在运行时定义，并能**列出和删除**这些超时。
+[动态 API](techniques/task-scheduling#动态超时) 还支持**创建**动态超时，其属性在运行时定义，并能**列出和删除**这些超时。
 
 #### 动态调度模块 API
 
-`@nestjs/schedule` 模块提供的动态 API 可管理声明式[定时任务](techniques/task-scheduling#declarative-cron-jobs) 、 [超时](techniques/task-scheduling#declarative-timeouts)和[间隔](techniques/task-scheduling#declarative-intervals) 。该 API 还支持创建和管理**动态**定时任务、超时及间隔，这些元素的属性均在运行时定义。
+`@nestjs/schedule` 模块提供的动态 API 可管理声明式[定时任务](techniques/task-scheduling#声明式-cron-任务) 、 [超时](techniques/task-scheduling#声明式超时)和[间隔](techniques/task-scheduling#声明式间隔任务) 。该 API 还支持创建和管理**动态**定时任务、超时及间隔，这些元素的属性均在运行时定义。
 
 #### 动态定时任务
 
@@ -256,7 +256,7 @@ addCronJob(name: string, seconds: string) {
 }
 ```
 
-在这段代码中，我们使用 `CronJob` 对象（来自 `cron` 包）来创建定时任务。`CronJob` 构造函数接收两个参数：第一个是 cron 表达式（与 `@Cron()` [装饰器](techniques/task-scheduling#declarative-cron-jobs)的格式相同），第二个是定时触发器触发时执行的回调函数。`SchedulerRegistry#addCronJob` 方法同样接收两个参数：定时任务的名称和 `CronJob` 对象本身。
+在这段代码中，我们使用 `CronJob` 对象（来自 `cron` 包）来创建定时任务。`CronJob` 构造函数接收两个参数：第一个是 cron 表达式（与 `@Cron()` [装饰器](techniques/task-scheduling#声明式-cron-任务)的格式相同），第二个是定时触发器触发时执行的回调函数。`SchedulerRegistry#addCronJob` 方法同样接收两个参数：定时任务的名称和 `CronJob` 对象本身。
 
 > **警告** 请记得在使用前先注入 `SchedulerRegistry`。同时需要从 `cron` 包中导入 `CronJob`。
 

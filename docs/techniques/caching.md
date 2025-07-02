@@ -142,7 +142,7 @@ CacheModule.register({
 
 #### 全局缓存覆盖
 
-当启用全局缓存时，缓存条目会存储在基于路由路径自动生成的 `CacheKey` 下。您可以在每个方法基础上覆盖特定的缓存设置（`@CacheKey()` 和 `@CacheTTL()`），从而为单个控制器方法定制缓存策略。这在需要使用[不同缓存存储](./caching#different-stores)时可能最为相关。
+当启用全局缓存时，缓存条目会存储在基于路由路径自动生成的 `CacheKey` 下。您可以在每个方法基础上覆盖特定的缓存设置（`@CacheKey()` 和 `@CacheTTL()`），从而为单个控制器方法定制缓存策略。这在需要使用[不同缓存存储](./caching#使用其他缓存存储方案)时可能最为相关。
 
 您可以在控制器级别应用 `@CacheTTL()` 装饰器，为整个控制器设置缓存 TTL。当同时定义了控制器级别和方法级别的缓存 TTL 设置时，方法级别指定的缓存 TTL 设置将优先于控制器级别的设置。
 
@@ -160,7 +160,7 @@ export class AppController {
 
 > info **提示** `@CacheKey()` 和 `@CacheTTL()` 装饰器是从 `@nestjs/cache-manager` 包导入的。
 
-`@CacheKey()` 装饰器可以单独使用，也可以与 `@CacheTTL()` 装饰器配合使用，反之亦然。开发者可以选择仅覆盖 `@CacheKey()` 或仅覆盖 `@CacheTTL()`。未被装饰器覆盖的配置将使用全局注册的默认值（参见[自定义缓存](./caching#customize-caching) ）。
+`@CacheKey()` 装饰器可以单独使用，也可以与 `@CacheTTL()` 装饰器配合使用，反之亦然。开发者可以选择仅覆盖 `@CacheKey()` 或仅覆盖 `@CacheTTL()`。未被装饰器覆盖的配置将使用全局注册的默认值（参见[自定义缓存](./caching) ）。
 
 #### WebSocket 与微服务
 

@@ -46,7 +46,7 @@ export class FileController {
 }
 ```
 
-默认的内容类型（即 HTTP 响应头 `Content-Type` 的值）是 `application/octet-stream`。如需自定义该值，您可以使用 `StreamableFile` 的 `type` 选项，或使用 `res.set` 方法以及 [`@Header()`](/controllers#response-headers) 装饰器，如下所示：
+默认的内容类型（即 HTTP 响应头 `Content-Type` 的值）是 `application/octet-stream`。如需自定义该值，您可以使用 `StreamableFile` 的 `type` 选项，或使用 `res.set` 方法以及 [`@Header()`](/overview/controllers#响应头) 装饰器，如下所示：
 
 ```ts
 import { Controller, Get, StreamableFile, Res } from '@nestjs/common';

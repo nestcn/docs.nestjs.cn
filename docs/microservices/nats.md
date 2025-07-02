@@ -37,9 +37,9 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 
 #### 客户端
 
-与其他微服务传输器类似，创建 NATS `ClientProxy` 实例时您有[多种选择](../microservices/basics#client) 。
+与其他微服务传输器类似，创建 NATS `ClientProxy` 实例时您有[多种选择](../microservices/basics#客户端生产者类) 。
 
-一种创建实例的方法是使用 `ClientsModule`。要通过 `ClientsModule` 创建客户端实例，需先导入该模块，然后使用 `register()` 方法传入一个选项对象，该对象包含与上述 `createMicroservice()` 方法相同的属性，以及用作注入令牌的 `name` 属性。更多关于 `ClientsModule` 的信息请参阅[此处](../microservices/basics#client) 。
+一种创建实例的方法是使用 `ClientsModule`。要通过 `ClientsModule` 创建客户端实例，需先导入该模块，然后使用 `register()` 方法传入一个选项对象，该对象包含与上述 `createMicroservice()` 方法相同的属性，以及用作注入令牌的 `name` 属性。更多关于 `ClientsModule` 的信息请参阅[此处](../microservices/basics#客户端生产者类) 。
 
 ```typescript
 @Module({
@@ -58,15 +58,15 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 })
 ```
 
-也可以使用其他创建客户端的方法（`ClientProxyFactory` 或 `@Client()`）。相关说明可查看[此文档](../microservices/basics#client) 。
+也可以使用其他创建客户端的方法（`ClientProxyFactory` 或 `@Client()`）。相关说明可查看[此文档](../microservices/basics#客户端生产者类) 。
 
 #### 请求-响应模式
 
-对于**请求-响应**消息模式（ [了解更多](../microservices/basics#request-response) ），NATS 传输器不使用 NATS 内置的[请求-应答](https://docs.nats.io/nats-concepts/reqreply)机制。相反，"请求"通过带有唯一回复主题名称的 `publish()` 方法在给定主题上发布，响应者监听该主题并将响应发送至回复主题。无论双方位置如何，回复主题都会动态定向回请求方。
+对于**请求-响应**消息模式（ [了解更多](../microservices/basics#请求-响应) ），NATS 传输器不使用 NATS 内置的[请求-应答](https://docs.nats.io/nats-concepts/reqreply)机制。相反，"请求"通过带有唯一回复主题名称的 `publish()` 方法在给定主题上发布，响应者监听该主题并将响应发送至回复主题。无论双方位置如何，回复主题都会动态定向回请求方。
 
 #### 基于事件
 
-对于**基于事件**的消息模式（ [了解更多](../microservices/basics#event-based) ），NATS 传输器使用 NATS 内置的[发布-订阅](https://docs.nats.io/nats-concepts/pubsub)机制。发布者在主题上发送消息，任何监听该主题的活跃订阅者都会收到消息。订阅者还可以注册对通配符主题的兴趣，这些通配符主题的工作方式有点像正则表达式。这种一对多模式有时被称为扇出。
+对于**基于事件**的消息模式（ [了解更多](../microservices/basics#基于事件) ），NATS 传输器使用 NATS 内置的[发布-订阅](https://docs.nats.io/nats-concepts/pubsub)机制。发布者在主题上发送消息，任何监听该主题的活跃订阅者都会收到消息。订阅者还可以注册对通配符主题的兴趣，这些通配符主题的工作方式有点像正则表达式。这种一对多模式有时被称为扇出。
 
 #### 队列组
 

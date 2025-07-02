@@ -355,4 +355,4 @@ $ npm install -g @nestjs/mau
 $ mau deploy
 ```
 
-您可以在[本章节](./deployment.md#使用-mau-轻松部署)中了解更多关于 Mau 的信息。
+您可以在[部署指南](./deployment.md)中了解更多关于部署的信息。

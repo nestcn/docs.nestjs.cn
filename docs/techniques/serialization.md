@@ -6,7 +6,7 @@
 
 Nest 提供了内置功能来帮助确保这些操作能够以简单直接的方式完成。`ClassSerializerInterceptor` 拦截器利用强大的 [class-transformer](https://github.com/typestack/class-transformer) 包，提供了一种声明式且可扩展的对象转换方式。其基本操作是获取方法处理程序返回的值，并应用 [class-transformer](https://github.com/typestack/class-transformer) 中的 `instanceToPlain()` 函数。在此过程中，它可以应用实体/DTO 类上由 `class-transformer` 装饰器表达的规则，如下所述。
 
-> info **提示** 序列化不适用于 [StreamableFile](./streaming-files#streamable-file-class) 响应。
+> info **提示** 序列化不适用于 [StreamableFile](./streaming-files) 响应。
 
 #### 排除属性
 

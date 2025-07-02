@@ -241,11 +241,11 @@ export class MyLogger extends ConsoleLogger {
 }
 ```
 
-您可以在功能模块中使用这种扩展的日志记录器，具体方法如下文[使用日志记录器进行应用日志记录](techniques/logger#using-the-logger-for-application-logging)部分所述。
+您可以在功能模块中使用这种扩展的日志记录器，具体方法如下文[使用日志记录器进行应用程序日志记录](techniques/logger#使用日志记录器进行应用程序日志记录)部分所述。
 
-您可以通过以下两种方式让 Nest 使用您扩展的日志记录器进行系统日志记录：1) 将其实例通过应用程序选项对象的 `logger` 属性传递（如上方[自定义实现](techniques/logger#custom-logger-implementation)部分所示）；2) 使用下文[依赖注入](techniques/logger#dependency-injection)部分展示的技术。如果这样做，请注意如示例代码所示调用 `super`，将特定的日志方法调用委托给父类（内置类），以确保 Nest 能够依赖其预期的内置功能。
+您可以通过以下两种方式让 Nest 使用您扩展的日志记录器进行系统日志记录：1) 将其实例通过应用程序选项对象的 `logger` 属性传递（如上方[自定义实现](techniques/logger#自定义实现)部分所示）；2) 使用下文[依赖注入](techniques/logger#依赖注入)部分展示的技术。如果这样做，请注意如示例代码所示调用 `super`，将特定的日志方法调用委托给父类（内置类），以确保 Nest 能够依赖其预期的内置功能。
 
-#### Dependency injection
+#### 依赖注入
 
 要实现更高级的日志功能，您需要利用依赖注入。例如，您可能希望将 `ConfigService` 注入到日志记录器中以进行自定义配置，然后再将这个自定义日志记录器注入到其他控制器和/或提供程序中。要使自定义日志记录器支持依赖注入，需要创建一个实现 `LoggerService` 的类，并将该类作为提供程序注册到某个模块中。例如，您可以
 
@@ -281,7 +281,7 @@ await app.listen(process.env.PORT ?? 3000);
 
 这里我们在 `NestApplication` 实例上使用 `get()` 方法来获取 `MyLogger` 对象的单例实例。这种技术本质上是一种为 Nest "注入"日志记录器实例以供使用的方式。`app.get()` 调用会获取 `MyLogger` 的单例实例，并依赖于该实例首先在另一个模块中被注入，如上所述。
 
-您也可以在功能类中注入这个 `MyLogger` 提供者，从而确保 Nest 系统日志和应用日志记录行为的一致性。更多信息请参阅下方的[使用日志记录器进行应用日志记录](techniques/logger#using-the-logger-for-application-logging)和[注入自定义日志记录器](techniques/logger#injecting-a-custom-logger) 。
+您也可以在功能类中注入这个 `MyLogger` 提供者，从而确保 Nest 系统日志和应用日志记录行为的一致性。更多信息请参阅下方的[使用日志记录器进行应用程序日志记录](techniques/logger#使用日志记录器进行应用程序日志记录)和[注入自定义日志记录器](techniques/logger#注入自定义日志记录器) 。
 
 #### 注入自定义日志记录器
 

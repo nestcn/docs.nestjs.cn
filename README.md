@@ -8,7 +8,10 @@
       <img src="https://img.shields.io/badge/📖-查看文档-brightgreen?style=for-the-badge&logo=nestjs&logoColor=white" alt="查看文档">
     </a>
     <a href="https://github.com/nestcn/docs.nestjs.cn/actions/workflows/sync-official-docs.yml">
-      <img src="https://img.shields.io/github/actions/workflow/status/nestcn/docs.nestjs.cn/sync-official-docs.yml?branch=main&style=for-the-badge&logo=github&label=同步状态" alt="同步状态">
+      <img src="https://img.shields.io/github/actions/workflow/status/nestcn/docs.nestjs.cn/sync-official-docs.yml?style=for-the-badge&logo=github&label=同步状态" alt="同步状态">
+    </a>
+    <a href="https://docs.nestjs.cn/">
+      <img src="https://img.shields.io/badge/Cloudflare%20Pages-部署状态-orange?style=for-the-badge&logo=cloudflare&logoColor=white" alt="部署状态">
     </a>
     <a href="https://github.com/nestcn/docs.nestjs.cn/blob/main/LICENSE">
       <img src="https://img.shields.io/github/license/nestcn/docs.nestjs.cn?style=for-the-badge" alt="License">

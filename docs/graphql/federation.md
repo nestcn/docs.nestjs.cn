@@ -132,8 +132,7 @@ import {
 import { Module } from '@nestjs/common';
 import { UsersResolver } from './users.resolver';
 import { UsersService } from './users.service'; // Not included in this example
-```
-
+```typescript
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({
@@ -324,8 +323,7 @@ import { User } from './user.entity';
 import { PostsResolvers } from './posts.resolvers';
 import { UsersResolvers } from './users.resolvers';
 import { PostsService } from './posts.service'; // Not included in example
-```
-
+```typescript
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({
@@ -505,8 +503,7 @@ import {
 import { Module } from '@nestjs/common';
 import { UsersResolver } from './users.resolver';
 import { UsersService } from './users.service'; // Not included in this example
-```
-
+```typescript
 @Module({
   imports: [
     GraphQLModule.forRoot<MercuriusFederationDriverConfig>({
@@ -697,8 +694,7 @@ import { User } from './user.entity';
 import { PostsResolvers } from './posts.resolvers';
 import { UsersResolvers } from './users.resolvers';
 import { PostsService } from './posts.service'; // Not included in example
-```
-
+```typescript
 @Module({
   imports: [
     GraphQLModule.forRoot<MercuriusFederationDriverConfig>({
@@ -782,8 +778,7 @@ import {
 import { Module } from '@nestjs/common';
 import { UsersResolver } from './users.resolver';
 import { UsersService } from './users.service'; // Not included in this example
-```
-
+```typescript
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({
@@ -855,8 +850,7 @@ import { User } from './user.entity';
 import { PostsResolvers } from './posts.resolvers';
 import { UsersResolvers } from './users.resolvers';
 import { PostsService } from './posts.service'; // Not included in example
-```
-
+```typescript
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({

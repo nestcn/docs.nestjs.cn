@@ -87,8 +87,7 @@ AppModule:
 > $.help
 Retrieves an instance of either injectable or controller, otherwise, throws exception.
 Interface: $(token: InjectionToken) => any
-```
-
+```typescript
 > **提示** 这些函数接口是用 [TypeScript 函数类型表达式语法](https://www.typescriptlang.org/docs/handbook/2/functions.html#function-type-expressions)编写的。
 
 | 功能     | 描述                                                         | 签名                                                      |

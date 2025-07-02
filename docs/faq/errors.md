@@ -10,8 +10,7 @@
 
 ```bash
 Nest 无法解析 <provider> 的依赖项（?）。请确保索引 [<index>] 处的参数 <unknown_token> 在 <module> 上下文中可用。
-```
-
+```typescript
 可能的解决方案：
 - <module> 是一个有效的 NestJS 模块吗？
 - 如果 <unknown_token> 是一个提供者，它是当前 <module> 的一部分吗？
@@ -72,8 +71,7 @@ Nest 无法解析 <provider> 的依赖项（?）。
 ```bash
 Nest cannot create the <module> instance.
 The module at index [<index>] of the <module> "imports" array is undefined.
-```
-
+```typescript
 Potential causes:
 - A circular dependency between modules. Use forwardRef() to avoid it. Read more: ../fundamentals/circular-dependency
 - The module at index [<index>] is of type "undefined". Check your import statements and the type of the module.

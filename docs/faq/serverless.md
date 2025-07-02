@@ -175,8 +175,7 @@ $ npm i -D @types/aws-lambda serverless-offline
 
 ```yaml
 service: serverless-example
-```
-
+```typescript
 plugins:
   - serverless-offline
 

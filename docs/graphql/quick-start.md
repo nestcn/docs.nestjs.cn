@@ -1,10 +1,10 @@
 ## 充分发挥 TypeScript 与 GraphQL 的强大能力
 
-[GraphQL](https://graphql.org/) 是一种强大的 API 查询语言，也是一个运行时环境，用于使用现有数据满足这些查询需求。它采用优雅的方式解决了 REST API 常见的诸多问题。作为背景知识，我们建议阅读这篇关于 GraphQL 与 REST 的[对比分析](https://www.apollographql.com/blog/graphql-vs-rest) 。将 GraphQL 与 [TypeScript](https://www.typescriptlang.org/) 结合使用，可为您的 GraphQL 查询提供更好的类型安全，实现端到端的类型检查。
+[GraphQL](https://graphql.org/) 是一种强大的 API 查询语言，也是一个运行时环境，用于使用现有数据满足这些查询需求。它采用优雅的方式解决了 REST API 常见的诸多问题。作为背景知识，我们建议阅读这篇关于 GraphQL 与 REST 的[对比分析](https://www.apollographql.com/blog/graphql-vs-rest)。将 GraphQL 与 [TypeScript](https://www.typescriptlang.org/) 结合使用，可为您的 GraphQL 查询提供更好的类型安全，实现端到端的类型检查。
 
-本章假设您已掌握 GraphQL 基础知识，重点介绍如何使用内置的 `@nestjs/graphql` 模块。`GraphQLModule` 可配置为使用 [Apollo](https://www.apollographql.com/) 服务器（通过 `@nestjs/apollo` 驱动）或 [Mercurius](https://github.com/mercurius-js/mercurius)（通过 `@nestjs/mercurius` 驱动）。我们为这些成熟的 GraphQL 包提供官方集成方案，使在 Nest 中使用 GraphQL 更加简便（更多集成方案请见[此处](../graphql/quick-start#第三方集成) ）。
+本章假设您已掌握 GraphQL 基础知识，重点介绍如何使用内置的 `@nestjs/graphql` 模块。`GraphQLModule` 可配置为使用 [Apollo](https://www.apollographql.com/) 服务器（通过 `@nestjs/apollo` 驱动）和 [Mercurius](https://github.com/mercurius-js/mercurius)（通过 `@nestjs/mercurius` 驱动）。我们为这些成熟的 GraphQL 包提供官方集成方案，使在 Nest 中使用 GraphQL 更加简便（更多集成方案请见[此处](#第三方集成)）。
 
-您也可以构建自己的专用驱动（ [此处](/graphql/other-features#创建自定义驱动程序)了解更多详情）。
+您也可以构建自己的专用驱动（[此处](./other-features#创建自定义驱动程序)了解更多详情）。
 
 #### 安装
 
@@ -13,7 +13,6 @@
 ```bash
 # For Express and Apollo (default)
 $ npm i @nestjs/graphql @nestjs/apollo @apollo/server graphql
-```
 
 # For Fastify and Apollo
 # npm i @nestjs/graphql @nestjs/apollo @apollo/server @as-integrations/fastify graphql
@@ -22,19 +21,19 @@ $ npm i @nestjs/graphql @nestjs/apollo @apollo/server graphql
 # npm i @nestjs/graphql @nestjs/mercurius graphql mercurius
 ```
 
-> warning： **注意** ，`@nestjs/graphql@>=9` 和 `@nestjs/apollo^10` 包仅兼容 **Apollo v3**（详情请参阅 Apollo Server 3 的[迁移指南](https://www.apollographql.com/docs/apollo-server/migration/) ），而 `@nestjs/graphql@^8` 仅支持 **Apollo v2**（例如 `apollo-server-express@2.x.x` 包）。
+> **警告** `@nestjs/graphql@>=9` 和 `@nestjs/apollo^10` 包仅兼容 **Apollo v3**（详情请参阅 Apollo Server 3 的[迁移指南](https://www.apollographql.com/docs/apollo-server/migration/)），而 `@nestjs/graphql@^8` 仅支持 **Apollo v2**（例如 `apollo-server-express@2.x.x` 包）。
 
 #### 概述
 
-Nest 提供了两种构建 GraphQL 应用的方式： **代码优先**和**架构优先**方法。您应选择最适合自己的方式。本 GraphQL 章节的大部分内容分为两个主要部分：如果您采用**代码优先** ，则遵循第一部分；如果采用**架构优先** ，则遵循第二部分。
+Nest 提供了两种构建 GraphQL 应用的方式：**代码优先**和**模式优先**方法。您应选择最适合自己的方式。本 GraphQL 章节的大部分内容分为两个主要部分：如果您采用**代码优先**，则遵循第一部分；如果采用**模式优先**，则遵循第二部分。
 
-在**代码优先**方法中，您可以使用装饰器和 TypeScript 类来生成相应的 GraphQL 架构。如果您希望仅使用 TypeScript 工作，避免在不同语言语法之间切换，这种方法非常有用。
+在**代码优先**方法中，您可以使用装饰器和 TypeScript 类来生成相应的 GraphQL 模式。如果您希望仅使用 TypeScript 工作，避免在不同语言语法之间切换，这种方法非常有用。
 
 在**模式优先**方法中，唯一可信源是 GraphQL SDL（模式定义语言）文件。SDL 是一种与平台无关的语言，用于在不同平台间共享模式文件。Nest 会根据 GraphQL 模式自动生成 TypeScript 定义（使用类或接口），从而减少编写冗余样板代码的需求。
 
 #### GraphQL 与 TypeScript 入门指南
 
-> **提示** 在接下来的章节中，我们将集成 `@nestjs/apollo` 包。如需改用 `mercurius` 包，请跳转至[此章节](/graphql/quick-start#mercurius-集成) 。
+> **提示** 在接下来的章节中，我们将集成 `@nestjs/apollo` 包。如需改用 `mercurius` 包，请跳转至[此章节](#mercurius-集成)。
 
 安装完相关包后，我们可以导入 `GraphQLModule` 并通过 `forRoot()` 静态方法进行配置。
 
@@ -53,7 +52,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 export class AppModule {}
 ```
 
-> info：对于 `mercurius` 集成，您应当使用 `MercuriusDriver` 和 `MercuriusDriverConfig`，两者均从 `@nestjs/mercurius` 包导出。
+> **提示** 对于 `mercurius` 集成，您应当使用 `MercuriusDriver` 和 `MercuriusDriverConfig`，两者均从 `@nestjs/mercurius` 包导出。
 
 `forRoot()` 方法接收一个配置对象作为参数。这些配置会被传递到底层驱动实例（更多可用设置请参阅：[Apollo](https://www.apollographql.com/docs/apollo-server/api/apollo-server) 和 [Mercurius](https://github.com/mercurius-js/mercurius/blob/master/docs/api/options.md#plugin-options)）。例如，若要禁用 `playground` 并关闭 `debug` 模式（针对 Apollo），可传递如下配置：
 
@@ -77,15 +76,17 @@ export class AppModule {}
 
 #### GraphQL 交互式开发环境
 
-Playground 是一个图形化、交互式的浏览器内 GraphQL IDE，默认情况下可通过与 GraphQL 服务器相同的 URL 访问。要使用 Playground，您需要配置并运行一个基础的 GraphQL 服务器。现在您可以通过安装并构建[这里的示例项目](https://github.com/nestjs/nest/tree/master/sample/23-graphql-code-first)来查看它。或者，如果您正在跟随这些代码示例操作，完成[解析器章节](/graphql/resolvers-map)的步骤后即可访问 Playground。
+Playground 是一个图形化、交互式的浏览器内 GraphQL IDE，默认情况下可通过与 GraphQL 服务器相同的 URL 访问。要使用 Playground，您需要配置并运行一个基础的 GraphQL 服务器。现在您可以通过安装并构建[这里的示例项目](https://github.com/nestjs/nest/tree/master/sample/23-graphql-code-first)来查看它。或者，如果您正在跟随这些代码示例操作，完成[解析器章节](./resolvers-map)的步骤后即可访问 Playground。
 
 完成上述配置并在后台运行应用程序后，您可以在浏览器中访问 `http://localhost:3000/graphql`（主机和端口可能因配置而异）。随后您将看到如下所示的 GraphQL Playground 界面。
 
-![](/assets/playground.png)
+<figure>
+  <img src="/assets/playground.png" alt="" />
+</figure>
 
-> info **注意** ：`@nestjs/mercurius` 集成不包含内置的 GraphQL Playground 功能。作为替代，您可以使用 [GraphiQL](https://github.com/graphql/graphiql)（设置 `graphiql: true` 参数）。
+> **注意** `@nestjs/mercurius` 集成不包含内置的 GraphQL Playground 功能。作为替代，您可以使用 [GraphiQL](https://github.com/graphql/graphiql)（设置 `graphiql: true` 参数）。
 
-> warning **警告** 更新（2025 年 4 月 14 日）：默认的 Apollo playground 已被弃用，并将在下一个主要版本中移除。作为替代，您可以使用 [GraphiQL](https://github.com/graphql/graphiql)，只需在 `GraphQLModule` 配置中设置 `graphiql: true`，如下所示：
+> **警告** 更新（2025 年 4 月 14 日）：默认的 Apollo playground 已被弃用，并将在下一个主要版本中移除。作为替代，您可以使用 [GraphiQL](https://github.com/graphql/graphiql)，只需在 `GraphQLModule` 配置中设置 `graphiql: true`，如下所示：
 >
 > ```typescript
 > GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -94,9 +95,7 @@ Playground 是一个图形化、交互式的浏览器内 GraphQL IDE，默认情
 > }),
 > ```
 >
-> 如果您的应用程序使用[订阅](/graphql/subscriptions)功能，请务必使用 `graphql-ws`，因为 GraphiQL 不支持 `subscriptions-transport-ws`。
-```
-
+> 如果您的应用程序使用[订阅](./subscriptions)功能，请务必使用 `graphql-ws`，因为 GraphiQL 不支持 `subscriptions-transport-ws`。
 #### 代码优先
 
 在**代码优先**方法中，您可以使用装饰器和 TypeScript 类来生成相应的 GraphQL 模式。
@@ -131,7 +130,7 @@ GraphQLModule.forRoot<ApolloDriverConfig>({
 
 #### 示例
 
-完整可用的代码优先示例参见[此处](https://github.com/nestjs/nest/tree/master/sample/23-graphql-code-first) 。
+完整可用的代码优先示例参见[此处](https://github.com/nestjs/nest/tree/master/sample/23-graphql-code-first)。
 
 #### 模式优先
 
@@ -251,21 +250,21 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
 export class AppModule {}
 ```
 
-#### 示例
+#### 访问生成的模式
 
-这里提供了一个完整可用的 schema first 示例 [here](https://github.com/nestjs/nest/tree/master/sample/12-graphql-schema-first)。
+在某些情况下（例如端到端测试），您可能需要获取对生成的模式对象的引用。在端到端测试中，您可以直接使用 `graphql` 对象运行查询，而无需使用任何 HTTP 监听器。
 
-#### 访问生成的架构
-
-在某些情况下（例如端到端测试），您可能需要获取对生成的架构对象的引用。在端到端测试中，您可以直接使用 `graphql` 对象运行查询，而无需使用任何 HTTP 监听器。
-
-您可以通过 `GraphQLSchemaHost` 类访问生成的架构（无论是代码优先还是架构优先方法）：
+您可以通过 `GraphQLSchemaHost` 类访问生成的模式（无论是代码优先还是模式优先方法）：
 
 ```typescript
 const { schema } = app.get(GraphQLSchemaHost);
 ```
 
 > **提示** 您必须在应用程序初始化完成后（即在 `app.listen()` 或 `app.init()` 方法触发 `onModuleInit` 钩子之后）调用 `GraphQLSchemaHost#schema` 的 getter 方法。
+
+#### 示例
+
+这里提供了一个完整可用的模式优先示例 [here](https://github.com/nestjs/nest/tree/master/sample/12-graphql-schema-first)。
 
 #### 异步配置
 
@@ -328,7 +327,7 @@ GraphQLModule.forRootAsync<ApolloDriverConfig>({
 
 #### Mercurius 集成
 
-Fastify 用户（了解更多[此处](/techniques/performance) ）可以替代 Apollo 使用 `@nestjs/mercurius` 驱动。
+Fastify 用户（了解更多[此处](../techniques/performance)）可以替代 Apollo 使用 `@nestjs/mercurius` 驱动。
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -346,9 +345,9 @@ import { MercuriusDriver, MercuriusDriverConfig } from '@nestjs/mercurius';
 export class AppModule {}
 ```
 
-> info **提示** 应用运行后，在浏览器中访问 `http://localhost:3000/graphiql` ，您将看到 [GraphQL 集成开发环境](https://github.com/graphql/graphiql) 。
+> **提示** 应用运行后，在浏览器中访问 `http://localhost:3000/graphiql` ，您将看到 [GraphQL 集成开发环境](https://github.com/graphql/graphiql) 。
 
-`forRoot()` 方法接收一个配置对象作为参数，这些配置会被传递给底层驱动实例。更多可用设置请参阅[此处](https://github.com/mercurius-js/mercurius/blob/master/docs/api/options.md#plugin-options) 。
+`forRoot()` 方法接收一个配置对象作为参数，这些配置会被传递给底层驱动实例。更多可用设置请参阅[此处](https://github.com/mercurius-js/mercurius/blob/master/docs/api/options.md#plugin-options)。
 
 #### 多端点
 

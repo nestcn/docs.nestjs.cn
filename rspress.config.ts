@@ -140,7 +140,6 @@ export default defineConfig({
           collapsible: true,
           collapsed: true,
           items: [
-            { text: '基础', link: '/websockets/index' },
             { text: '网关', link: '/websockets/gateways' },
             { text: '守卫', link: '/websockets/guards' },
             { text: '管道', link: '/websockets/pipes' },

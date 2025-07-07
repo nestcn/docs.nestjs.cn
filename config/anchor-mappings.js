@@ -332,6 +332,47 @@ const anchorMappings = {
   'basic-usage': '基本用法',
   'customization': '自定义',
   
+  // Security - Authentication (认证)
+  'creating-an-authentication-module': '创建认证模块',
+  'jwt-token': 'jwt-令牌',
+  'implementing-the-authentication-endpoint': '实现认证端点',
+  'implementing-the-authentication-guard': '实现认证守卫',
+  'enable-authentication-globally': '启用全局认证',
+  'passport-integration': 'passport-集成',
+  'example': '示例',
+  
+  // Security - Authorization (授权)
+  'basic-rbac-implementation': '基本-rbac-实现',
+  'claims-based-authorization': 'claims-based-authorization',
+  'integrating-casl': '集成-casl',
+  
+  // Security - CORS (跨域)
+  'getting-started': '入门',
+  
+  // Security - CSRF (跨站请求伪造)
+  'use-with-express-default': '与-express-一起使用（默认）',
+  'use-with-fastify': '与-fastify-一起使用',
+  
+  // Security - Encryption & Hashing (加密和哈希)
+  'encryption': '加密',
+  'hashing': '哈希',
+  
+  // Security - Helmet (头部安全)
+  'use-with-express-default': '与-express-一起使用（默认）',
+  'use-with-fastify': '与-fastify-一起使用',
+  
+  // Security - Rate Limiting (速率限制)
+  'multiple-throttler-definitions': '多重限流器定义',
+  'customization': '自定义配置',
+  'proxies': '代理',
+  'websockets': 'websockets',
+  'graphql': 'graphql',
+  'configuration': '配置',
+  'async-configuration': '异步配置',
+  'storages': '存储',
+  'time-helpers': '时间助手',
+  'migration-guide': '迁移指南',
+  
   // CLI (命令行接口)
   'basic-workflow': '基本工作流程',
   'project-structure': '项目结构',
@@ -452,7 +493,16 @@ const pathMappings = {
   '/interceptors': '/overview/interceptors',
   '/exception-filters': '/overview/exception-filters',
   '/fundamentals/injection-scopes': '/fundamentals/provider-scopes',
-  '/techniques/database': '/techniques/sql'
+  '/techniques/database': '/techniques/sql',
+  
+  // Security 路径映射
+  '/security/authentication': '/security/authentication',
+  '/security/authorization': '/security/authorization',
+  '/security/cors': '/security/cors',
+  '/security/csrf': '/security/csrf',
+  '/security/encryption-hashing': '/security/encryption-hashing',
+  '/security/helmet': '/security/helmet',
+  '/security/rate-limiting': '/security/rate-limiting'
 };
 
 // 导出配置（CommonJS）

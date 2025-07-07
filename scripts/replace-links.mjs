@@ -113,6 +113,15 @@ function urlPathToLocalPath(urlPath, currentFileDir) {
     'recipes/cors': '../recipes/cors',
     'recipes/mvc': '../recipes/mvc',
     
+    // Security 相关
+    'security/authentication': '../security/authentication',
+    'security/authorization': '../security/authorization',
+    'security/cors': '../security/cors',
+    'security/csrf': '../security/csrf',
+    'security/encryption-hashing': '../security/encryption-hashing',
+    'security/helmet': '../security/helmet',
+    'security/rate-limiting': '../security/rate-limiting',
+    
     // GraphQL 相关
     'graphql/quick-start': '../graphql/quick-start',
     'graphql/resolvers-map': '../graphql/resolvers-map',

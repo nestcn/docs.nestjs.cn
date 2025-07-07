@@ -1,1 +1,1 @@
-["index", "async-local-storage", "authentication", "authorization", "cors", "cqrs", "crud-generator", "csrf", "documentation"]
+["index", "async-local-storage", "cqrs", "crud-generator", "documentation", "hot-reload", "mikroorm", "mongodb", "necord", "nest-commander", "passport", "prisma", "repl", "router-module", "sentry", "serve-static", "sql-sequelize", "sql-typeorm", "suites", "swc", "terminus"]

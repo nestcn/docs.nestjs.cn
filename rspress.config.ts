@@ -231,6 +231,8 @@ export default defineConfig({
           collapsed: true,
           items: [
             { text: '安全', link: '/security/index' },
+            { text: '认证', link: '/security/authentication' },
+            { text: '授权', link: '/security/authorization' },
           ],
         },
         {

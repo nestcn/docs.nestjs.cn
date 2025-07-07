@@ -1,10 +1,10 @@
-### CLI 插件
+## CLI 插件
 
-> warning **注意** 本章仅适用于代码优先（code first）方法。
+> **警告** 本章仅适用于代码优先（code first）方法。
 
 TypeScript 的元数据反射系统存在若干限制，例如无法确定类包含哪些属性，或者识别某个属性是可选的还是必需的。不过，其中部分限制可以在编译时得到解决。Nest 提供了一个插件来增强 TypeScript 编译过程，从而减少所需的样板代码量。
 
-> info **须知** 此插件为**可选项** 。如果你愿意，可以手动声明所有装饰器，或者仅在需要的地方声明特定装饰器。
+> **提示** 此插件为**可选项**。如果你愿意，可以手动声明所有装饰器，或者仅在需要的地方声明特定装饰器。
 
 #### 概述
 
@@ -15,11 +15,11 @@ GraphQL 插件将自动：
 - 根据类型设置 `type` 属性（同时支持数组类型）
 - 根据注释生成属性描述（当 `introspectComments` 设置为 `true` 时）
 
-请注意，您的文件名**必须包含**以下后缀之一才能被插件分析： `['.input.ts', '.args.ts', '.entity.ts', '.model.ts']` （例如 `author.entity.ts`）。如果使用不同后缀，您可以通过指定 `typeFileNameSuffix` 选项来调整插件行为（见下文）。
+请注意，您的文件名**必须包含**以下后缀之一才能被插件分析：`['.input.ts', '.args.ts', '.entity.ts', '.model.ts']`（例如 `author.entity.ts`）。如果使用不同后缀，您可以通过指定 `typeFileNameSuffix` 选项来调整插件行为（见下文）。
 
 根据目前所学，您需要重复大量代码来让包知道您的类型应如何在 GraphQL 中声明。例如，您可以如下定义一个简单的 `Author` 类：
 
-```typescript title="authors/models/author.model"
+```typescript title="authors/models/author.model.ts"
 @ObjectType()
 export class Author {
   @Field(type => ID)
@@ -40,7 +40,7 @@ export class Author {
 
 通过启用 GraphQL 插件，上述类定义可以简化为：
 
-```typescript title="authors/models/author.model"
+```typescript title="authors/models/author.model.ts"
 @ObjectType()
 export class Author {
   @Field(type => ID)
@@ -48,6 +48,7 @@ export class Author {
   firstName?: string;
   lastName?: string;
   posts: Post[];
+}
 }
 ```
 

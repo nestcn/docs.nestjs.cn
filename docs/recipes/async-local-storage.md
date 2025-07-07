@@ -1,4 +1,4 @@
-### 异步本地存储(Async Local Storage)
+## 异步本地存储 (Async Local Storage)
 
 `AsyncLocalStorage` 是一个 [Node.js API](https://nodejs.org/api/async_context.html#async_context_class_asynclocalstorage)（基于 `async_hooks` API），它提供了一种无需显式传递函数参数就能在应用中传播本地状态的替代方案。这类似于其他语言中的线程本地存储。
 
@@ -12,11 +12,11 @@
 
 NestJS 本身并未为 `AsyncLocalStorage` 提供任何内置抽象，因此让我们通过最简单的 HTTP 案例来了解如何自行实现，以便更好地理解整个概念：
 
-> **提示** 如需使用现成的[专用包](recipes/async-local-storage#nestjs-cls) ，请继续阅读下文。
+> **提示** 如需使用现成的[专用包](#nestjs-cls)，请继续阅读下文。
 
-1.  首先，在某个共享源文件中创建一个新的 `AsyncLocalStorage` 实例。由于我们使用 NestJS，让我们也将其转换为带有自定义提供者的模块。
+1. 首先，在某个共享源文件中创建一个新的 `AsyncLocalStorage` 实例。由于我们使用 NestJS，让我们也将其转换为带有自定义提供者的模块。
 
-```ts title="als.module"
+```typescript title="als.module.ts"
 @Module({
   providers: [
     {
@@ -29,11 +29,11 @@ NestJS 本身并未为 `AsyncLocalStorage` 提供任何内置抽象，因此让�
 export class AlsModule {}
 ```
 
-> info **提示**`AsyncLocalStorage` 是从 `async_hooks` 导入的。
+> **提示** `AsyncLocalStorage` 是从 `async_hooks` 导入的。
 
-2.  我们只关注 HTTP，所以让我们使用中间件将 `next` 函数用 `AsyncLocalStorage#run` 包装起来。由于中间件是请求最先到达的地方，这将使得 `store` 在所有增强器和系统其余部分中都可用。
+2. 我们只关注 HTTP，所以让我们使用中间件将 `next` 函数用 `AsyncLocalStorage#run` 包装起来。由于中间件是请求最先到达的地方，这将使得 `store` 在所有增强器和系统其余部分中都可用。
 
-```ts title="app.module"
+```typescript title="app.module.ts"
 @Module({
   imports: [AlsModule],
   providers: [CatsService],

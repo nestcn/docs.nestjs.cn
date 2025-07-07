@@ -9,14 +9,14 @@
 最常见的错误消息是关于 Nest 无法解析提供者的依赖项。错误消息通常如下所示：
 
 ```bash
-Nest 无法解析 <provider> 的依赖项（?）。请确保索引 [<index>] 处的参数 <unknown_token> 在 <module> 上下文中可用。
-```typescript
-可能的解决方案：
-- <module> 是一个有效的 NestJS 模块吗？
-- 如果 <unknown_token> 是一个提供者，它是当前 <module> 的一部分吗？
-- 如果 <unknown_token> 是从单独的 @Module 导出的，该模块是否已导入到 <module> 中？
+Nest can't resolve dependencies of the <provider> (?). Please make sure that the argument <unknown_token> at index [<index>] is available in the <module> context.
+
+Potential solutions:
+- Is <module> a valid NestJS module?
+- If <unknown_token> is a provider, is it part of the current <module>?
+- If <unknown_token> is exported from a separate @Module, is that module imported within <module>?
   @Module({
-    imports: [ /* 包含 <unknown_token> 的模块 */ ]
+    imports: [ /* the Module containing <unknown_token> */ ]
   })
 ```
 
@@ -71,9 +71,9 @@ Nest 无法解析 <provider> 的依赖项（?）。
 ```bash
 Nest cannot create the <module> instance.
 The module at index [<index>] of the <module> "imports" array is undefined.
-```typescript
+
 Potential causes:
-- A circular dependency between modules. Use forwardRef() to avoid it. Read more: ../fundamentals/circular-dependency
+- A circular dependency between modules. Use forwardRef() to avoid it. Read more: https://docs.nestjs.com/fundamentals/circular-dependency
 - The module at index [<index>] is of type "undefined". Check your import statements and the type of the module.
 
 Scope [<module_import_chain>]
@@ -101,7 +101,7 @@ XX:XX:XX AM - Found 0 errors. Watching for file changes.
 
 当您使用 NestJS CLI 以监视模式启动应用程序时，实际上是通过调用 `tsc --watch` 实现的。从 TypeScript 4.9 版本开始，采用了一种 [新的策略](https://devblogs.microsoft.com/typescript/announcing-typescript-4-9/#file-watching-now-uses-file-system-events) 来检测文件变更，这很可能是导致此问题的原因。要解决此问题，您需要在 tsconfig.json 文件的 `"compilerOptions"` 选项后添加如下设置：
 
-```bash
+```json
   "watchOptions": {
     "watchFile": "fixedPollingInterval"
   }

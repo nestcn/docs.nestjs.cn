@@ -52,7 +52,6 @@ AppController { appService: AppService {} }
 
 ```typescript
 > methods(AppController)
-```
 
 Methods:
  ◻ getHello
@@ -62,7 +61,6 @@ Methods:
 
 ```typescript
 > debug()
-```
 
 AppModule:
  - controllers:
@@ -73,7 +71,7 @@ AppModule:
 
 快速演示：
 
-![REPL example](/assets/repl.gif)
+<figure><img src="/assets/repl.gif" alt="REPL example" /></figure>
 
 您可以在下方章节中找到有关现有预定义原生方法的更多信息。
 
@@ -87,16 +85,17 @@ AppModule:
 > $.help
 Retrieves an instance of either injectable or controller, otherwise, throws exception.
 Interface: $(token: InjectionToken) => any
-```typescript
+```
+
 > **提示** 这些函数接口是用 [TypeScript 函数类型表达式语法](https://www.typescriptlang.org/docs/handbook/2/functions.html#function-type-expressions)编写的。
 
-| 功能     | 描述                                                         | 签名                                                      |
-| -------- | ------------------------------------------------------------ | --------------------------------------------------------- | ------------------------------------ |
-| debug    | 以列表形式打印所有已注册模块及其控制器和提供程序。           | debug(moduleCls?: ClassRef                                | string) => void                      |
-| get 或 $ | 获取可注入对象或控制器的实例，否则抛出异常。                 | get(token: InjectionToken) => any                         |
-| methods  | 显示给定提供者或控制器上所有可用的公共方法。                 | methods(token: ClassRef                                   | string) => void                      |
-| resolve  | 解析可注入对象或控制器的临时或请求作用域实例，否则抛出异常。 | resolve(token: InjectionToken, contextId: any) => Promise |
-| select   | 允许在模块树中进行导航，例如从选定的模块中提取特定实例。     | select(token: DynamicModule                               | ClassRef) => INestApplicationContext |
+| 功能     | 描述                                                         | 签名                                                            |
+| -------- | ------------------------------------------------------------ | --------------------------------------------------------------- |
+| `debug`  | 以列表形式打印所有已注册模块及其控制器和提供程序。           | `debug(moduleCls?: ClassRef \| string) => void`                |
+| `get` 或 `$` | 获取可注入对象或控制器的实例，否则抛出异常。                 | `get(token: InjectionToken) => any`                            |
+| `methods` | 显示给定提供者或控制器上所有可用的公共方法。                 | `methods(token: ClassRef \| string) => void`                   |
+| `resolve` | 解析可注入对象或控制器的临时或请求作用域实例，否则抛出异常。 | `resolve(token: InjectionToken, contextId: any) => Promise<any>` |
+| `select` | 允许在模块树中进行导航，例如从选定的模块中提取特定实例。     | `select(token: DynamicModule \| ClassRef) => INestApplicationContext` |
 
 #### 监视模式
 

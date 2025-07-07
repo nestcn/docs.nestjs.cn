@@ -6,6 +6,18 @@ CI/CD 集成功能适用于**[企业版](/settings)**计划的用户。
 
 您可以通过观看此视频了解 CI/CD 集成如何帮助您及其原因：
 
+<figure>
+  <iframe
+    width="1000"
+    height="565"
+    src="https://www.youtube.com/embed/r5RXcBrnEQ8"
+    title="YouTube video player"
+    frameBorder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowFullScreen
+  ></iframe>
+</figure>
+
 #### 发布图表
 
 首先配置应用程序的启动文件(`main.ts`)以使用 `GraphPublisher` 类（从 `@nestjs/devtools-integration` 导出 - 详见前一章节），如下所示：
@@ -39,11 +51,11 @@ async function bootstrap() {
 
 当图表成功发布后，您将在工作流视图中看到以下输出：
 
-![](/assets/devtools/graph-published-terminal.png)
+<figure><img src="/assets/devtools/graph-published-terminal.png" /></figure>
 
 每次我们的图表发布时，都应在项目的对应页面看到新的条目：
 
-![](/assets/devtools/project.png)
+<figure><img src="/assets/devtools/project.png" /></figure>
 
 #### 报告
 
@@ -51,7 +63,7 @@ Devtools 会为每次构建生成报告**前提是**中央注册表中已存储�
 
 要查看报告，请导航至项目的对应页面（参见组织架构）。
 
-![](/assets/devtools/report.png)
+<figure><img src="/assets/devtools/report.png" /></figure>
 
 这对于识别代码审查中可能被忽略的变更特别有帮助。例如，假设有人修改了**深层嵌套 provider** 的作用域，这种变更可能不会立即引起审查者的注意，但通过 Devtools，我们可以轻松发现这类变更并确认它们是有意为之。又或者，如果我们移除了特定端点的防护措施，报告中会显示该端点受到影响。若此时我们没有为该路由配置集成测试或端到端测试，就可能无法注意到它已失去保护，等到发现时可能为时已晚。
 
@@ -67,7 +79,7 @@ Devtools 会为每次构建生成报告**前提是**中央注册表中已存储�
 
 请看下面的截图：
 
-![](/assets/devtools/nodes-selection.png)
+<figure><img src="/assets/devtools/nodes-selection.png" /></figure>
 
 时光回溯功能允许您通过比较当前图表与前一个图表来调查和解决问题。根据您的设置，每个拉取请求（甚至每次提交）都将在注册表中有一个对应的快照，因此您可以轻松回溯时间查看变更内容。将开发者工具视为具备理解 Nest 如何构建应用图表能力的 Git 工具，并且能够**可视化**展示这个过程。
 
@@ -77,7 +89,6 @@ Devtools 会为每次构建生成报告**前提是**中央注册表中已存储�
 
 ```yaml
 name: Devtools
-```
 
 on:
   push:
@@ -101,12 +112,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Setup Environment (PR)
-        if: ${{ github.event_name == 'pull_request' }}
+        if: {{ '${{' }} github.event_name == 'pull_request' {{ '}}' }}
         shell: bash
         run: |
-          echo "COMMIT_SHA=${{ github.event.pull_request.head.sha }}" >>${GITHUB_ENV}
+          echo "COMMIT_SHA={{ '${{' }} github.event.pull_request.head.sha {{ '}}' }}" >>${GITHUB_ENV}
       - name: Setup Environment (Push)
-        if: ${{ github.event_name == 'push' }}
+        if: {{ '${{' }} github.event_name == 'push' {{ '}}' }}
         shell: bash
         run: |
           echo "COMMIT_SHA=${GITHUB_SHA}" >> ${GITHUB_ENV}
@@ -114,9 +125,9 @@ jobs:
         run: PUBLISH_GRAPH=true npm run start
         env:
           DEVTOOLS_API_KEY: CHANGE_THIS_TO_YOUR_API_KEY
-          REPOSITORY_NAME: ${{ github.event.repository.name }}
-          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
-          TARGET_SHA: ${{ github.event.pull_request.base.sha }}
+          REPOSITORY_NAME: {{ '${{' }} github.event.repository.name {{ '}}' }}
+          BRANCH_NAME: {{ '${{' }} github.head_ref || github.ref_name {{ '}}' }}
+          TARGET_SHA: {{ '${{' }} github.event.pull_request.base.sha {{ '}}' }}
 ```
 
 理想情况下，`DEVTOOLS_API_KEY` 环境变量应从 GitHub Secrets 中获取，更多信息请参阅[此处](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository) 。
@@ -141,11 +152,11 @@ const publishOptions = {
 
 为了获得最佳开发者体验，请确保通过点击"集成 GitHub 应用"按钮（见下方截图）为项目集成 **GitHub 应用程序** 。注意——此步骤非必需。
 
-![](/assets/devtools/integrate-github-app.png)
+<figure><img src="/assets/devtools/integrate-github-app.png" /></figure>
 
 完成此集成后，您将能在拉取请求中直接查看预览/报告生成过程的状态：
 
-![](/assets/devtools/actions-preview.png)
+<figure><img src="/assets/devtools/actions-preview.png" /></figure>
 
 #### 集成：Gitlab 流水线
 
@@ -173,7 +184,6 @@ const publishOptions = {
 
 ```yaml
 image: node:16
-```
 
 stages:
   - build
@@ -222,9 +232,7 @@ const publishOptions = {
   sha: process.env.CI_COMMIT_SHA,
   target: process.env.CI_MERGE_REQUEST_DIFF_BASE_SHA,
   trigger: process.env.CI_MERGE_REQUEST_DIFF_BASE_SHA ? 'pull' : 'push',
-  branch:
-    process.env.CI_COMMIT_BRANCH ??
-    process.env.CI_MERGE_REQUEST_SOURCE_BRANCH_NAME,
+  branch: process.env.CI_COMMIT_BRANCH ?? process.env.CI_MERGE_REQUEST_SOURCE_BRANCH_NAME,
 };
 ```
 

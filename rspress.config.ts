@@ -230,9 +230,13 @@ export default defineConfig({
           collapsible: true,
           collapsed: true,
           items: [
-            { text: '安全', link: '/security/index' },
             { text: '认证', link: '/security/authentication' },
             { text: '授权', link: '/security/authorization' },
+            { text: 'CORS', link: '/security/cors' },
+            { text: 'CSRF', link: '/security/csrf' },
+            { text: '加密与哈希', link: '/security/encryption-hashing' },
+            { text: 'Helmet', link: '/security/helmet' },
+            { text: '速率限制', link: '/security/rate-limiting' },
           ],
         },
         {

@@ -1,1 +1,1 @@
-["index", "authentication", "authorization"]
+["authentication", "authorization", "cors", "csrf", "encryption-hashing", "helmet", "rate-limiting"]

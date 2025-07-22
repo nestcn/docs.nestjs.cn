@@ -1,22 +1,3 @@
-      - name: Update sync time badge JSON (Gist)
-        if: steps.sync-content.outputs.content_changed == 'true' || steps.translate-content.outputs.translation_changed == 'true' || steps.sync-assets.outputs.assets_changed == 'true'
-        env:
-          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
-        run: |
-          SYNC_TIME=$(date -u '+%Y-%m-%d')
-          cat > sync-summary.json <<EOF
-          {
-            "schemaVersion": 1,
-            "label": "sync-docs",
-            "message": "$SYNC_TIME",
-            "color": "brightgreen"
-          }
-          EOF
-          gist_id="b3a004684a48178741a9ab9e1a90ab3e"
-          file_name="nestjscn-sync-time.json"
-          curl -X PATCH "https://api.github.com/gists/$gist_id" \
-            -H "Authorization: token $GIST_TOKEN" \
-            -d "{\"files\": {\"$file_name\": {\"content\": $(jq -Rs . < sync-summary.json)}}}"
 name: Sync Official NestJS Docs
 
 on:
@@ -59,6 +40,26 @@ jobs:
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
+
+      - name: Update sync time badge JSON (Gist)
+        if: steps.sync-content.outputs.content_changed == 'true' || steps.translate-content.outputs.translation_changed == 'true' || steps.sync-assets.outputs.assets_changed == 'true'
+        env:
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+        run: |
+          SYNC_TIME=$(date -u '+%Y-%m-%d')
+          cat > sync-summary.json <<EOF
+          {
+            "schemaVersion": 1,
+            "label": "sync-docs",
+            "message": "$SYNC_TIME",
+            "color": "brightgreen"
+          }
+          EOF
+          gist_id="b3a004684a48178741a9ab9e1a90ab3e"
+          file_name="nestjscn-sync-time.json"
+          curl -X PATCH "https://api.github.com/gists/$gist_id" \
+            -H "Authorization: token $GIST_TOKEN" \
+            -d "{\"files\": {\"$file_name\": {\"content\": $(jq -Rs . < sync-summary.json)}}}"
 
       - name: Clone official NestJS docs repository
         run: |

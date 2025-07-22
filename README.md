@@ -20,9 +20,11 @@
   
   <blockquote>
     <p>
-      📅 <strong>最近同步时间:</strong> <!-- LAST_SYNC_TIME --> 2025年07月01日 09:48 <!-- /LAST_SYNC_TIME -->
+      📅 <strong>最近翻译时间:</strong> <!-- LAST_SYNC_TIME --> 2025年07月01日 09:48 <!-- /LAST_SYNC_TIME -->
       <br>
       <em>文档每日自动同步并翻译，确保与官方保持同步</em>
+      <br>
+      <img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/zuohuadong/b3a004684a48178741a9ab9e1a90ab3e/raw/nestjscn-sync-time.json" alt="同步时间" />
     </p>
   </blockquote>
 </div>

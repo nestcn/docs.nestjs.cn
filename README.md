@@ -10,9 +10,6 @@
     <a href="https://github.com/nestcn/docs.nestjs.cn/actions/workflows/sync-official-docs.yml">
       <img src="https://img.shields.io/github/actions/workflow/status/nestcn/docs.nestjs.cn/sync-official-docs.yml?style=for-the-badge&logo=github&label=同步状态" alt="同步状态">
     </a>
-    <a href="https://docs.nestjs.cn/">
-      <img src="https://img.shields.io/badge/Cloudflare%20Pages-部署状态-orange?style=for-the-badge&logo=cloudflare&logoColor=white" alt="部署状态">
-    </a>
     <a href="https://github.com/nestcn/docs.nestjs.cn/blob/main/LICENSE">
       <img src="https://img.shields.io/github/license/nestcn/docs.nestjs.cn?style=for-the-badge" alt="License">
     </a>
@@ -24,7 +21,7 @@
       <br>
       <em>文档每日自动同步并翻译，确保与官方保持同步</em>
       <br>
-      <img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/zuohuadong/b3a004684a48178741a9ab9e1a90ab3e/raw/nestjscn-sync-time.json" alt="同步时间" />
+      <img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/zuohuadong/b3a004684a48178741a9ab9e1a90ab3e/raw/nestjscn-sync-time.json&style=for-the-badge" alt="同步时间" />
     </p>
   </blockquote>
 </div>

@@ -1,5 +1,8 @@
 import * as path from 'node:path';
 import { defineConfig } from 'rspress/config';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+import rehypeSlug from 'rehype-slug';
 
 export default defineConfig({
   root: path.join(__dirname, 'docs'),
@@ -10,6 +13,27 @@ export default defineConfig({
     light: '/rspress-light-logo.png',
     dark: '/rspress-dark-logo.png',
   },
+  markdown: {
+    remarkPlugins: [
+      remarkGfm
+    ],
+    rehypePlugins: [
+      rehypeSlug,
+      rehypeRaw
+    ]
+  },
+  route: {
+    cleanUrls: true,
+  },
+  head: [
+    [
+      'meta',
+      {
+        name: 'theme-color',
+        content: '#ffffff',
+      },
+    ],
+  ],
   themeConfig: {
     nav: [
       {
@@ -24,6 +48,12 @@ export default defineConfig({
         content: 'https://github.com/nestjs/nest',
       },
     ],
+    outlineTitle: '目录',
+    lastUpdated: true,
+    lastUpdatedText: '最后更新于',
+    prevPageText: '上一页',
+    nextPageText: '下一页',
+    enableContentAnimation: true,
     sidebar: {
       '/': [
         {

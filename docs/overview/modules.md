@@ -116,7 +116,7 @@ export class CoreModule {}
 
 #### 依赖注入
 
-模块类本身也可以被 **注入** 提供者（例如用于配置目的）：
+模块类本身也可以 **注入** 提供者（例如用于配置目的）：
 
 ```typescript title="cats.module"
 import { Module } from '@nestjs/common';

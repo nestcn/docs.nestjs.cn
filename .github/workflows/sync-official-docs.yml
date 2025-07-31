@@ -220,19 +220,28 @@ jobs:
             git diff --cached --name-status
           fi
 
-      - name: Update sync time badge JSON (Gist)
-        if: steps.sync-content.outputs.content_changed == 'true' || steps.translate-content.outputs.translation_changed == 'true' || steps.sync-assets.outputs.assets_changed == 'true'
+      - name: Update sync time badge JSON (Gist) - Always run
         env:
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
         run: |
           echo "🔄 正在更新 Gist 同步时间徽章..."
           SYNC_TIME=$(TZ='Asia/Shanghai' date '+%Y年%m月%d日')
+          
+          # 根据是否有内容变更设置不同颜色
+          if [ "${{ steps.sync-content.outputs.content_changed }}" == "true" ] || [ "${{ steps.translate-content.outputs.translation_changed }}" == "true" ] || [ "${{ steps.sync-assets.outputs.assets_changed }}" == "true" ]; then
+            COLOR="brightgreen"
+            echo "📋 检测到内容变更，使用绿色徽章"
+          else
+            COLOR="blue" 
+            echo "📋 无内容变更，使用蓝色徽章"
+          fi
+          
           cat > sync-summary.json <<EOF
           {
             "schemaVersion": 1,
             "label": "同步时间",
             "message": "$SYNC_TIME",
-            "color": "brightgreen"
+            "color": "$COLOR"
           }
           EOF
           gist_id="b3a004684a48178741a9ab9e1a90ab3e"
@@ -244,6 +253,12 @@ jobs:
             sudo apt-get update && sudo apt-get install -y jq
           fi
           
+          # 检查是否有 GIST_TOKEN
+          if [ -z "$GIST_TOKEN" ]; then
+            echo "⚠️ 未配置 GIST_TOKEN，跳过 Gist 更新"
+            exit 0
+          fi
+          
           # 更新 Gist
           response=$(curl -s -X PATCH "https://api.github.com/gists/$gist_id" \
             -H "Authorization: token $GIST_TOKEN" \
@@ -251,48 +266,12 @@ jobs:
             -d "{\"files\": {\"$file_name\": {\"content\": $(jq -Rs . < sync-summary.json)}}}")
           
           if echo "$response" | jq -e '.files' > /dev/null 2>&1; then
-            echo "✅ Gist 同步时间徽章更新成功: $SYNC_TIME"
+            echo "✅ Gist 同步时间徽章更新成功: $SYNC_TIME (颜色: $COLOR)"
           else
             echo "❌ Gist 更新失败:"
             echo "$response"
-            exit 1
-          fi
-
-      - name: Update sync time badge for daily runs (even without changes)
-        if: github.event_name == 'schedule' && steps.sync-content.outputs.content_changed == 'false' && steps.translate-content.outputs.translation_changed == 'false' && steps.sync-assets.outputs.assets_changed == 'false'
-        env:
-          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
-        run: |
-          echo "🔄 定期更新 Gist 同步时间徽章（无内容变更）..."
-          SYNC_TIME=$(TZ='Asia/Shanghai' date '+%Y年%m月%d日')
-          cat > sync-summary.json <<EOF
-          {
-            "schemaVersion": 1,
-            "label": "同步时间",
-            "message": "$SYNC_TIME",
-            "color": "blue"
-          }
-          EOF
-          gist_id="b3a004684a48178741a9ab9e1a90ab3e"
-          file_name="nestjscn-sync-time.json"
-          
-          # 确保 jq 可用
-          if ! command -v jq &> /dev/null; then
-            echo "安装 jq..."
-            sudo apt-get update && sudo apt-get install -y jq
-          fi
-          
-          # 更新 Gist
-          response=$(curl -s -X PATCH "https://api.github.com/gists/$gist_id" \
-            -H "Authorization: token $GIST_TOKEN" \
-            -H "Accept: application/vnd.github.v3+json" \
-            -d "{\"files\": {\"$file_name\": {\"content\": $(jq -Rs . < sync-summary.json)}}}")
-          
-          if echo "$response" | jq -e '.files' > /dev/null 2>&1; then
-            echo "✅ Gist 同步时间徽章定期更新成功: $SYNC_TIME"
-          else
-            echo "❌ Gist 定期更新失败:"
-            echo "$response"
+            # 不让失败中断整个工作流
+            echo "继续执行后续步骤..."
           fi
 
       - name: Commit and push changes

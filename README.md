@@ -21,7 +21,7 @@
       <br>
       <em>文档每日自动同步并翻译，确保与官方保持同步，同步时间：</em>
       <br>
-      <img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/zuohuadong/b3a004684a48178741a9ab9e1a90ab3e/raw/nestjscn-sync-time.json&style=for-the-badge" alt="同步时间" />
+      <img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/zuohuadong/b3a004684a48178741a9ab9e1a90ab3e/raw/nestjscn-sync-time.json&style=for-the-badge&cache=300" alt="同步时间" />
     </p>
   </blockquote>
 </div>
@@ -1378,7 +1378,7 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
     </td>
     <td align="center" width="33%">
       <a href="https://bbxy.cloud/auth/register?code=GPTR">
-        <img src="https://img.shields.io/badge/BBXY-VPN-From%205%20CNY-blue?style=for-the-badge" />
+        <img src="https://img.shields.io/badge/BBXY-VPN--From--5--CNY-blue?style=for-the-badge" alt="BBXY VPN" />
       </a>
     </td>
   </tr>

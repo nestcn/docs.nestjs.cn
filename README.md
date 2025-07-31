@@ -21,7 +21,7 @@
       <br>
       <em>文档每日自动同步并翻译，确保与官方保持同步，同步时间：</em>
       <br>
-      <img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/zuohuadong/b3a004684a48178741a9ab9e1a90ab3e/raw/nestjscn-sync-time.json&style=for-the-badge&cache=300" alt="同步时间" />
+      <img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/zuohuadong/b3a004684a48178741a9ab9e1a90ab3e/raw/nestjscn-sync-time.json&style=for-the-badge&cache=300&t=1753933214" alt="同步时间" />
     </p>
   </blockquote>
 </div>

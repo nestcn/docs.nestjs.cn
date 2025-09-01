@@ -6,6 +6,20 @@ import rehypeSlug from 'rehype-slug';
 
 export default defineConfig({
   root: path.join(__dirname, 'docs'),
+  // @ts-ignore
+  publicDir: path.join(__dirname, 'public'),
+  outDir: path.join(__dirname, 'doc_build'),
+  builderConfig: {
+    dev: {
+      assetPrefix: '/',
+    },
+    output: {
+      assetPrefix: '/',
+      distPath: {
+        root: path.join(__dirname, 'doc_build'),
+      },
+    }
+  },
   title: 'NestJS 中文文档',
   description: 'NestJS 是一个用于构建高效、可扩展的 Node.js 服务器端应用程序的开发框架',
   icon: '/favicon.ico',

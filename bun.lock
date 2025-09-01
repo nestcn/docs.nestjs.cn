@@ -5,7 +5,7 @@
       "name": "nestjsdocs",
       "dependencies": {
         "glob": "^11.0.3",
-        "rspress": "2.0.0-beta.21",
+        "rspress": "^2.0.0-beta.21",
       },
       "devDependencies": {
         "@mdx-js/mdx": "^3.1.0",

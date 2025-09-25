@@ -172,7 +172,6 @@ describe('CatsService', () => {
   let service: CatsService
   let cls: ClsService
   const mockCatsRepository = createMock<CatsRepository>()
-```
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({

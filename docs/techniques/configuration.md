@@ -128,8 +128,7 @@ export class AppModule {}
 http:
   host: 'localhost'
   port: 8080
-```
-
+  
 db:
   postgres:
     url: 'localhost'

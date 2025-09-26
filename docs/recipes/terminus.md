@@ -80,6 +80,8 @@ export class HealthController {
     ]);
   }
 }
+```
+
 ```typescript title="health.module"
 import { Module } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
@@ -114,9 +116,9 @@ export class HealthModule {}
 
 该响应对象的接口可通过 `@nestjs/terminus` 包中的 `HealthCheckResult` 接口访问。
 
-|         |                                                                                                                              |         |
-| ------- | ---------------------------------------------------------------------------------------------------------------------------- | ------- | ---- | --------------- |
-| status  | 若任何健康指标检查失败，状态将显示为 'error'。当 NestJS 应用正在关闭但仍接受 HTTP 请求时，健康检查状态将为 'shutting_down'。 | 'error' | 'ok' | 'shutting_down' |
+|           |                                                                                                                                                                                             |                                      |
+|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------|
+| status  | 若任何健康指标检查失败，状态将显示为 'error'。当 NestJS 应用正在关闭但仍接受 HTTP 请求时，健康检查状态将为 'shutting_down'。 | `'error' \| 'ok' \| 'shutting_down'` |
 | info    | 包含所有状态为 'up'（即"健康"）的健康指标信息的对象。                                                                        | object  |
 | error   | 包含所有状态为 'down'（即"不健康"）的健康指标信息的对象。                                                                    | object  |
 | details | 包含每个健康指标所有信息的对象                                                                                               | object  |
@@ -129,7 +131,6 @@ export class HealthModule {}
 
 ```typescript title="health.controller"
 // Within the `HealthController`-class
-```
 
 @Get()
 @HealthCheck()
@@ -239,7 +240,6 @@ export class HealthController {
 
 ```typescript title="health.controller"
 // Within the `HealthController`-class
-```
 
 @Get()
 @HealthCheck()
@@ -283,7 +283,6 @@ export class HealthController {
 
 ```typescript title="health.controller"
 // Within the `HealthController`-class
-```
 
 @Get()
 @HealthCheck()

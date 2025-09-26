@@ -47,7 +47,6 @@ const moduleRef = await this.lazyModuleLoader.load(() => LazyModule);
 > ```
 >
 > 此外，"懒加载"模块与应用启动时急切加载的模块以及后续在应用中注册的其他懒加载模块共享相同的模块关系图。
-```
 
 其中 `lazy.module.ts` 是一个导出**常规 Nest 模块**的 TypeScript 文件（无需额外修改）。
 
@@ -76,7 +75,7 @@ const lazyService = moduleRef.get(LazyService);
 ```
 
 > warning **警告** 如果使用 **Webpack**，请确保更新您的 `tsconfig.json` 文件 - 将 `compilerOptions.module` 设置为 `"esnext"` 并添加值为 `"node"` 的 `compilerOptions.moduleResolution` 属性：
-> 
+>
 > ```json
 > {
 >   "compilerOptions": {
@@ -86,7 +85,7 @@ const lazyService = moduleRef.get(LazyService);
 >   }
 > }
 > ```
-> 
+>
 > 设置这些选项后，您就能利用[代码分割](https://webpack.js.org/guides/code-splitting/)功能。
 
 #### 懒加载控制器、网关和解析器

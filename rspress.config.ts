@@ -72,9 +72,7 @@ export default defineConfig({
       '/': [
         {
           text: '开始',
-          items: [
-            { text: '介绍', link: '/introduction' },
-          ],
+          link: '/introduction'
         },
         {
           text: '概述',
@@ -193,6 +191,14 @@ export default defineConfig({
           ],
         },
         {
+          text: '部署',
+          link: '/deployment'
+        },
+        {
+          text: '独立应用程序',
+          link: '/standalone-applications'
+        },
+        {
           text: 'OpenAPI',
           collapsible: true,
           collapsed: true,
@@ -284,6 +290,10 @@ export default defineConfig({
             { text: '概述', link: '/devtools/overview' },
             { text: 'CI/CD', link: '/devtools/ci-cd' },
           ],
+        },
+        {
+          text: '迁移指南',
+          link: '/migration-guide'
         },
         {
           text: '生态与案例',

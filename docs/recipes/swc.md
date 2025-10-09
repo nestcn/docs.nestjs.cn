@@ -18,7 +18,6 @@ $ npm i --save-dev @swc/cli @swc/core
 
 ```bash
 $ nest start -b swc
-```
 # OR nest start --builder swc
 ```
 
@@ -53,7 +52,6 @@ $ nest start -b swc
 
 ```bash
 $ nest start -b swc -w
-```
 # OR nest start --builder swc --watch
 ```
 
@@ -169,7 +167,6 @@ generator.generate({
 
 ```bash
 $ npx ts-node src/generate-metadata.ts
-```
 # OR npx ts-node apps/{YOUR_APP}/src/generate-metadata.ts
 ```
 

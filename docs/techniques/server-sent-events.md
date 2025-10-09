@@ -13,9 +13,14 @@ sse(): Observable<MessageEvent> {
 }
 ```
 
-> info **注意** `@Sse()` 装饰器和 `MessageEvent` 接口从 `@nestjs/common` 导入，而 `Observable`、`interval` 和 `map` 则从 `rxjs` 包导入。
+:::info 注意
+`@Sse()` 装饰器和 `MessageEvent` 接口从 `@nestjs/common` 导入，而 `Observable`、`interval` 和 `map` 则从 `rxjs` 包导入。
+:::
 
-> warning **警告** Server-Sent Events 路由必须返回一个 `Observable` 流。
+
+:::warning 警告
+Server-Sent Events 路由必须返回一个 `Observable` 流。
+:::
 
 在上面的示例中，我们定义了一个名为 `sse` 的路由，它将允许我们传播实时更新。这些事件可以使用 [EventSource API](https://developer.mozilla.org/en-US/docs/Web/API/EventSource) 进行监听。
 

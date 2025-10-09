@@ -4,7 +4,9 @@
 
 #### "无法解析依赖项"错误
 
-> info **提示** 查看 [NestJS Devtools](./devtools/overview#调查无法解析依赖项错误) 可以帮助您轻松解决"无法解析依赖项"错误。
+:::info 提示
+查看 [NestJS Devtools](./devtools/overview#调查无法解析依赖项错误) 可以帮助您轻松解决"无法解析依赖项"错误。
+:::
 
 最常见的错误消息是关于 Nest 无法解析提供者的依赖项。错误消息通常如下所示：
 

@@ -14,7 +14,7 @@ $ npm i --save mqtt
 
 使用 MQTT 传输器时，请将以下配置对象传入 `createMicroservice()` 方法：
 
-```typescript title="main"
+ ```typescript title="main.ts"
 const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
   transport: Transport.MQTT,
   options: {
@@ -23,7 +23,10 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 });
 ```
 
-> info **注意** `Transport` 枚举是从 `@nestjs/microservices` 包中导入的。
+:::info 注意
+`Transport` 枚举是从 `@nestjs/microservices` 包中导入的。
+:::
+
 
 #### 选项
 
@@ -65,7 +68,11 @@ getNotifications(@Payload() data: number[], @Ctx() context: MqttContext) {
 }
 ```
 
-> **提示** `@Payload()`、`@Ctx()` 和 `MqttContext` 均从 `@nestjs/microservices` 包导入。
+:::info 提示
+`@Payload()`、`@Ctx()` 和 `MqttContext` 均从 `@nestjs/microservices` 包导入。
+:::
+
+
 
 要访问原始的 MQTT [数据包](https://github.com/mqttjs/mqtt-packet) ，请使用 `MqttContext` 对象的 `getPacket()` 方法，如下所示：
 
@@ -91,7 +98,7 @@ getTemperature(@Ctx() context: MqttContext) {
 
 使用 `@MessagePattern` 或 `@EventPattern` 装饰器创建的任何订阅都将以 QoS 0 级别进行订阅。如需更高 QoS 级别，可在建立连接时通过 `subscribeOptions` 块全局设置，如下所示：
 
-```typescript title="main"
+ ```typescript title="main.ts"
 const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
   transport: Transport.MQTT,
   options: {
@@ -118,7 +125,9 @@ const record = new MqttRecordBuilder(':cat:')
 client.send('replace-emoji', record).subscribe(...);
 ```
 
-> info **提示** `MqttRecordBuilder` 类是从 `@nestjs/microservices` 包导出的。
+:::info 提示
+`MqttRecordBuilder` 类是从 `@nestjs/microservices` 包导出的。
+:::
 
 您也可以通过访问 `MqttContext` 在服务端读取这些选项。
 
@@ -164,7 +173,9 @@ this.client.status.subscribe((status: MqttStatus) => {
 });
 ```
 
-> info **提示** `MqttStatus` 类型是从 `@nestjs/microservices` 包导入的。
+:::info 提示
+`MqttStatus` 类型是从 `@nestjs/microservices` 包导入的。
+:::
 
 同样地，您可以订阅服务器的 `status` 流来接收有关服务器状态的通知。
 
@@ -193,7 +204,9 @@ server.on<MqttEvents>('error', (err) => {
 });
 ```
 
-> info **提示** `MqttEvents` 类型是从 `@nestjs/microservices` 包导入的。
+:::info 提示
+`MqttEvents` 类型是从 `@nestjs/microservices` 包导入的。
+:::
 
 #### 底层驱动访问
 

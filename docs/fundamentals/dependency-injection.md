@@ -8,7 +8,7 @@
 
 首先我们定义一个提供者。`@Injectable()` 装饰器将 `CatsService` 类标记为一个提供者。
 
-```typescript title="cats.service"
+ ```typescript title="cats.service.ts"
 import { Injectable } from '@nestjs/common';
 import { Cat } from './interfaces/cat.interface';
 
@@ -24,7 +24,7 @@ export class CatsService {
 
 然后我们请求 Nest 将这个提供者注入到我们的控制器类中：
 
-```typescript title="cats.controller"
+ ```typescript title="cats.controller.ts"
 import { Controller, Get } from '@nestjs/common';
 import { CatsService } from './cats.service';
 import { Cat } from './interfaces/cat.interface';
@@ -42,7 +42,7 @@ export class CatsController {
 
 最后，我们将提供者注册到 Nest 的控制反转（IoC）容器中：
 
-```typescript title="app.module"
+ ```typescript title="app.module.ts"
 import { Module } from '@nestjs/common';
 import { CatsController } from './cats/cats.controller';
 import { CatsService } from './cats/cats.service';
@@ -103,7 +103,9 @@ providers: [
 
 Nest 允许你定义自定义提供者来处理这些情况。它提供了多种定义自定义提供者的方式，下面我们来逐一了解。
 
-> info **提示** 如果遇到依赖解析问题，可以设置 `NEST_DEBUG` 环境变量，这样在启动时就能获取额外的依赖解析日志。
+:::info 提示
+如果遇到依赖解析问题，可以设置 `NEST_DEBUG` 环境变量，这样在启动时就能获取额外的依赖解析日志。
+:::
 
 #### 值提供者：`useValue`
 
@@ -152,7 +154,9 @@ export class AppModule {}
 
 在这个例子中，我们将一个字符串值令牌（`'CONNECTION'`）与从外部文件导入的现有 `connection` 对象关联起来。
 
-> warning **注意** 除了使用字符串作为令牌值外，还可以使用 JavaScript 的 [symbols](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol) 或 TypeScript 的 [enums](https://www.typescriptlang.org/docs/handbook/enums.html)。
+:::warning 注意
+ 除了使用字符串作为令牌值外，还可以使用 JavaScript 的 [symbols](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol) 或 TypeScript 的 [enums](https://www.typescriptlang.org/docs/handbook/enums.html)。
+:::
 
 我们之前已经了解了如何使用标准的[基于构造函数的注入](../overview/providers#依赖注入)模式来注入提供者。这种模式**要求**依赖项必须使用类名声明。而 `'CONNECTION'` 自定义提供者使用的是字符串令牌。让我们看看如何注入这样的提供者。为此，我们使用 `@Inject()` 装饰器。这个装饰器接受一个参数——令牌。
 
@@ -163,7 +167,9 @@ export class CatsRepository {
 }
 ```
 
-> info **提示** `@Inject()` 装饰器是从 `@nestjs/common` 包中导入的。
+:::info 提示
+`@Inject()` 装饰器是从 `@nestjs/common` 包中导入的。
+:::
 
 虽然我们在上面的示例中直接使用字符串 `'CONNECTION'` 是为了说明目的，但为了代码整洁的组织，最佳实践是在单独的文件中定义令牌，例如 `constants.ts`。就像对待符号或枚举一样，在它们自己的文件中定义并在需要时导入。
 

@@ -68,7 +68,9 @@ GraphQLModule.forRoot({
 title: string;
 ```
 
-> info **提示** `@Directive()` 装饰器是从 `@nestjs/graphql` 包中导出的。
+:::info 提示
+`@Directive()` 装饰器是从 `@nestjs/graphql` 包中导出的。
+:::
 
 指令可以应用于字段、字段解析器、输入和对象类型，以及查询、变更和订阅操作。以下是将指令应用于查询处理器层级的示例：
 
@@ -80,7 +82,9 @@ async getAuthor(@Args({ name: 'id', type: () => Int }) id: number) {
 }
 ```
 
-> warning **警告** 通过 `@Directive()` 装饰器应用的指令不会反映在生成的模式定义文件中。
+:::warning 警告
+ 通过 `@Directive()` 装饰器应用的指令不会反映在生成的模式定义文件中。
+:::
 
 最后，请确保在 `GraphQLModule` 中声明指令，如下所示：
 
@@ -99,7 +103,9 @@ GraphQLModule.forRoot({
 }),
 ```
 
-> info **提示** `GraphQLDirective` 和 `DirectiveLocation` 均从 `graphql` 包中导出。
+:::info 提示
+`GraphQLDirective` 和 `DirectiveLocation` 均从 `graphql` 包中导出。
+:::
 
 #### 模式优先
 

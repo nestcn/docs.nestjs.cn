@@ -59,7 +59,10 @@ export class HttpExceptionFilter implements GqlExceptionFilter {
 }
 ```
 
-> info **注意** `GqlExceptionFilter` 和 `GqlArgumentsHost` 都是从 `@nestjs/graphql` 包导入的。
+:::info 注意
+`GqlExceptionFilter` 和 `GqlArgumentsHost` 都是从 `@nestjs/graphql` 包导入的。
+:::
+
 
 请注意与 REST 不同，这里不使用原生的 `response` 对象来生成响应。
 
@@ -84,7 +87,11 @@ async upvotePost(
 ) {}
 ```
 
-> **提示** 在上例中，我们假设 `user` 对象已分配给你的 GraphQL 应用程序上下文。
+:::info 提示
+在上例中，我们假设 `user` 对象已分配给你的 GraphQL 应用程序上下文。
+:::
+
+
 
 #### 在字段解析器级别执行增强器
 
@@ -96,7 +103,11 @@ GraphQLModule.forRoot({
 }),
 ```
 
-> **警告** 为字段解析器启用增强器可能导致性能问题，特别是当您返回大量记录且字段解析器被执行数千次时。因此，当启用 `fieldResolverEnhancers` 时，建议跳过对字段解析器非严格必需的增强器执行。您可以使用以下辅助函数实现：
+:::warning 警告
+为字段解析器启用增强器可能导致性能问题，特别是当您返回大量记录且字段解析器被执行数千次时。因此，当启用 `fieldResolverEnhancers` 时，建议跳过对字段解析器非严格必需的增强器执行。您可以使用以下辅助函数实现：
+:::
+
+
 
 ```typescript
 export function isResolvingGraphQLField(context: ExecutionContext): boolean {

@@ -9,7 +9,11 @@
 - 图形结构应便于客户端使用。通过联合服务，可以构建出完整的产品导向型图形结构，准确反映客户端实际消费方式。
 - 这只是使用标准规范的 **GraphQL** 功能。任何编程语言（不仅是 JavaScript）都能实现联邦查询。
 
-> **警告** 联邦当前不支持订阅。
+:::warning 警告
+联邦当前不支持订阅。
+:::
+
+
 
 在接下来的章节中，我们将搭建一个包含网关和两个联邦端点的演示应用：用户服务和帖子服务。
 
@@ -391,7 +395,11 @@ export class AppModule {}
 $ npm install --save @apollo/subgraph @nestjs/mercurius
 ```
 
-> **提示** 需要 `@apollo/subgraph` 包来构建子图模式（`buildSubgraphSchema`、`printSubgraphSchema` 函数）。
+:::info 提示
+需要 `@apollo/subgraph` 包来构建子图模式（`buildSubgraphSchema`、`printSubgraphSchema` 函数）。
+:::
+
+
 
 #### 模式优先
 
@@ -747,7 +755,11 @@ export class AppModule {}
 
 引用 [Apollo 文档](https://www.apollographql.com/docs/federation/federation-2/new-in-federation-2)的说法，联邦 2 改进了原始 Apollo 联邦（在本文档中称为联邦 1）的开发者体验，与大多数原始超级图向后兼容。
 
-> **警告** Mercurius 不完全支持联邦 2。您可以在[此处](https://www.apollographql.com/docs/federation/supported-subgraphs#javascript--typescript)查看支持联邦 2 的库列表。
+:::warning 警告
+Mercurius 不完全支持联邦 2。您可以在[此处](https://www.apollographql.com/docs/federation/supported-subgraphs#javascript--typescript)查看支持联邦 2 的库列表。
+:::
+
+
 
 在接下来的章节中，我们将把之前的示例升级到联邦 2。
 

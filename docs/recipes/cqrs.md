@@ -51,7 +51,7 @@ export class AppModule {}
 
 命令用于改变应用程序状态。它们应基于任务而非以数据为中心。当命令被分派时，将由对应的**命令处理器**进行处理。该处理器负责更新应用程序状态。
 
-```typescript title="heroes-game.service"
+ ```typescript title="heroes-game.service.ts"
 @Injectable()
 export class HeroesGameService {
   constructor(private commandBus: CommandBus) {}
@@ -66,7 +66,7 @@ export class HeroesGameService {
 
 在上述代码片段中，我们实例化了 `KillDragonCommand` 类并将其传递给 `CommandBus` 的 `execute()` 方法。以下是演示的命令类：
 
-```typescript title="kill-dragon.command"
+ ```typescript title="kill-dragon.command.ts"
 export class KillDragonCommand extends Command<{
   actionId: string // This type represents the command execution result
 }> {
@@ -79,13 +79,15 @@ export class KillDragonCommand extends Command<{
 
 如你所见，`KillDragonCommand` 类继承自 `Command` 类。`Command` 是从 `@nestjs/cqrs` 包导出的简单工具类，可用于定义命令的返回类型。本例中返回类型是一个包含 `actionId` 属性的对象。现在每当 `KillDragonCommand` 命令被派发时，`CommandBus#execute()` 方法的返回类型将被推断为 `Promise<{ actionId: string }>` 。这在需要从命令处理器返回数据时非常有用。
 
-> info **提示** 继承 `Command` 类是可选的，仅当需要定义命令返回类型时才必须使用。
+:::info 提示
+继承 `Command` 类是可选的，仅当需要定义命令返回类型时才必须使用。
+:::
 
 `CommandBus` 表示一个命令**流** ，负责将命令分派给相应的处理程序。`execute()` 方法返回一个 Promise，该 Promise 会解析为处理程序返回的值。
 
 让我们为 `KillDragonCommand` 命令创建一个处理程序。
 
-```typescript title="kill-dragon.handler"
+ ```typescript title="kill-dragon.handler.ts"
 @CommandHandler(KillDragonCommand)
 export class KillDragonHandler implements ICommandHandler<KillDragonCommand> {
   constructor(private repository: HeroesRepository) {}
@@ -131,7 +133,7 @@ export class GetHeroQuery extends Query<Hero> {
 
 要获取英雄数据，我们需要创建一个查询处理器：
 
-```typescript title="get-hero.handler"
+ ```typescript title="get-hero.handler.ts"
 @QueryHandler(GetHeroQuery)
 export class GetHeroHandler implements IQueryHandler<GetHeroQuery> {
   constructor(private repository: HeroesRepository) {}
@@ -162,7 +164,7 @@ const hero = await this.queryBus.execute(new GetHeroQuery(heroId)); // "hero" wi
 
 出于演示目的，让我们创建一个事件类：
 
-```typescript title="hero-killed-dragon.event"
+ ```typescript title="hero-killed-dragon.event.ts"
 export class HeroKilledDragonEvent {
   constructor(
     public readonly heroId: string,
@@ -173,7 +175,7 @@ export class HeroKilledDragonEvent {
 
 虽然可以直接使用 `EventBus.publish()` 方法派发事件，但我们也可以从模型中进行派发。让我们更新 `Hero` 模型，使其在调用 `killEnemy()` 方法时派发 `HeroKilledDragonEvent` 事件。
 
-```typescript title="hero.model"
+ ```typescript title="hero.model.ts"
 export class Hero extends AggregateRoot {
   constructor(private id: string) {
     super();
@@ -188,7 +190,7 @@ export class Hero extends AggregateRoot {
 
 `apply()` 方法用于派发事件，它接受一个事件对象作为参数。但由于我们的模型并不知道 `EventBus` 的存在，我们需要将其与模型关联。这可以通过使用 `EventPublisher` 类来实现。
 
-```typescript title="kill-dragon.handler"
+ ```typescript title="kill-dragon.handler.ts"
 @CommandHandler(KillDragonCommand)
 export class KillDragonHandler implements ICommandHandler<KillDragonCommand> {
   constructor(
@@ -235,11 +237,13 @@ const hero = new HeroModel('id'); // <-- HeroModel is a class
 this.eventBus.publish(new HeroKilledDragonEvent());
 ```
 
-> info **提示** `EventBus` 是一个可注入的类。
+:::info 提示
+`EventBus` 是一个可注入的类。
+:::
 
 每个事件可以包含多个**事件处理器** 。
 
-```typescript title="hero-killed-dragon.handler"
+ ```typescript title="hero-killed-dragon.handler.ts"
 @EventsHandler(HeroKilledDragonEvent)
 export class HeroKilledDragonHandler implements IEventHandler<HeroKilledDragonEvent> {
   constructor(private repository: HeroesRepository) {}
@@ -250,7 +254,11 @@ export class HeroKilledDragonHandler implements IEventHandler<HeroKilledDragonEv
 }
 ```
 
-> **提示** 请注意，当你开始使用事件处理器时，你将脱离传统的 HTTP 网络上下文。
+:::info 提示
+请注意，当你开始使用事件处理器时，你将脱离传统的 HTTP 网络上下文。
+:::
+
+
 >
 > - `命令处理器`中的错误仍可被内置的[异常过滤器](/exception-filters)捕获。
 > - `事件处理器`中的错误无法被异常过滤器捕获：你必须手动处理它们。可以通过简单的 `try/catch`，使用 [Sagas](../recipes/cqrs#sagas) 触发补偿事件，或选择其他任何解决方案。
@@ -271,7 +279,7 @@ Saga 是一个极其强大的功能。单个 saga 可以监听 1..\* 个事件�
 
 让我们创建一个 saga，它监听 `HeroKilledDragonEvent` 并分发 `DropAncientItemCommand` 命令。
 
-```typescript title="heroes-game.saga"
+ ```typescript title="heroes-game.saga.ts"
 @Injectable()
 export class HeroesGameSagas {
   @Saga()
@@ -284,7 +292,9 @@ export class HeroesGameSagas {
 }
 ```
 
-> info **提示** `ofType` 操作符和 `@Saga()` 装饰器是从 `@nestjs/cqrs` 包中导出的。
+:::info 提示
+`ofType` 操作符和 `@Saga()` 装饰器是从 `@nestjs/cqrs` 包中导出的。
+:::
 
 `@Saga()` 装饰器将方法标记为一个 saga。`events```
  参数是一个包含所有事件的 Observable 流。`ofType` 操作符通过指定的事件类型过滤该流。`map` 操作符将事件映射为一个新的命令实例。

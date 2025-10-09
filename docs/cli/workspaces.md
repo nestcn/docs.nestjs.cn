@@ -31,25 +31,20 @@ $ nest new my-project
 
 我们已经构建了一个*标准模式*结构，其文件夹结构如下所示：
 
-node_modules
-
-src
-
-app.controller.ts
-
-app.module.ts
-
-app.service.ts
-
-main.ts
-
-nest-cli.json
-
-package.json
-
-tsconfig.json
-
-eslint.config.mjs
+<div class="file-tree">
+    <div class="item">node_modules</div>
+    <div class="item">src</div>
+    <div class="children">
+        <div class="item">app.controller.ts</div>
+        <div class="item">app.module.ts</div>
+        <div class="item">app.service.ts</div>
+        <div class="item">main.ts</div>
+    </div>
+    <div class="item">nest-cli.json</div>
+    <div class="item">package.json</div>
+    <div class="item">tsconfig.json</div>
+    <div class="item">eslint.config.mjs</div>
+</div>
 
 我们可以将其转换为如下所示的 monorepo 模式结构：
 
@@ -60,47 +55,43 @@ $ nest generate app my-app
 
 此时，`nest` 将现有结构转换为 **monorepo 模式**结构。这会导致几项重要变化。现在的文件夹结构如下所示：
 
-apps
-
-my-app
-
-src
-
-app.controller.ts
-
-app.module.ts
-
-app.service.ts
-
-main.ts
-
-tsconfig.app.json
-
-my-project
-
-src
-
-app.controller.ts
-
-app.module.ts
-
-app.service.ts
-
-main.ts
-
-tsconfig.app.json
-
-nest-cli.json
-
-package.json
-
-tsconfig.json
-
-eslint.config.mjs
+<div class="file-tree">
+  <div class="item">apps</div>
+    <div class="children">
+      <div class="item">my-app</div>
+      <div class="children">
+        <div class="item">src</div>
+        <div class="children">
+          <div class="item">app.controller.ts</div>
+          <div class="item">app.module.ts</div>
+          <div class="item">app.service.ts</div>
+          <div class="item">main.ts</div>
+        </div>
+        <div class="item">tsconfig.app.json</div>
+      </div>
+      <div class="item">my-project</div>
+      <div class="children">
+        <div class="item">src</div>
+        <div class="children">
+          <div class="item">app.controller.ts</div>
+          <div class="item">app.module.ts</div>
+          <div class="item">app.service.ts</div>
+          <div class="item">main.ts</div>
+        </div>
+        <div class="item">tsconfig.app.json</div>
+      </div>
+    </div>
+  <div class="item">nest-cli.json</div>
+  <div class="item">package.json</div>
+  <div class="item">tsconfig.json</div>
+  <div class="item">eslint.config.mjs</div>
+</div>
 
 `generate app` 原理图已重新组织代码 - 将每个**应用**项目移至 `apps` 文件夹下，并在每个项目的根目录中添加项目特定的 `tsconfig.app.json` 文件。我们原来的 `my-project` 应用已成为该 monorepo 的**默认项目** ，现在与刚添加的 `my-app` 并列位于 `apps` 文件夹下。我们将在下文讨论默认项目。
 
-> error **警告** 将标准模式结构转换为 monorepo 仅适用于遵循标准 Nest 项目结构的项目。具体来说，在转换过程中，原理图会尝试将 `src` 和 `test` 文件夹重新定位到根目录下 `apps` 文件夹内的项目文件夹中。如果项目未使用此结构，转换将失败或产生不可靠的结果。
+:::warning 警告
+将标准模式结构转换为 monorepo 仅适用于遵循标准 Nest 项目结构的项目。具体来说，在转换过程中，原理图会尝试将 `src` 和 `test` 文件夹重新定位到根目录下 `apps` 文件夹内的项目文件夹中。如果项目未使用此结构，转换将失败或产生不可靠的结果。
+:::
 
 #### 工作区项目
 
@@ -250,19 +241,21 @@ Nest 将组织和构建标准项目及 monorepo 结构项目所需的元数据�
 }
 ```
 
-> warning **警告** 当将 `spec` 指定为对象时，生成原理图的键目前不支持自动别名处理。这意味着如果将键指定为例如 `service: false` 并尝试通过别名 `s` 生成服务，规范文件仍会被生成。为确保正常原理图名称和别名都能按预期工作，请同时指定常规命令名称和别名，如下所示。
->
-> ```javascript
-> {
->   "generateOptions": {
->     "spec": {
->       "service": false,
->       "s": false
->     }
->   },
->   ...
-> }
-> ```
+:::warning 警告
+当将 `spec` 指定为对象时，生成原理图的键目前不支持自动别名处理。这意味着如果将键指定为例如 `service: false` 并尝试通过别名 `s` 生成服务，规范文件仍会被生成。为确保正常原理图名称和别名都能按预期工作，请同时指定常规命令名称和别名，如下所示。
+:::
+
+
+```javascript
+{
+  "generateOptions": {
+    "spec": {
+      "service": false,
+      "s": false
+    }
+  },
+  ...
+}
 ```
 
 #### 项目专属生成选项
@@ -287,7 +280,9 @@ Nest 将组织和构建标准项目及 monorepo 结构项目所需的元数据�
 }
 ```
 
-> warning **注意** 生成选项的优先级顺序如下：命令行界面(CLI)指定的选项优先于项目专属选项，项目专属选项会覆盖全局选项。
+:::warning 注意
+生成选项的优先级顺序如下：命令行界面(CLI)指定的选项优先于项目专属选项，项目专属选项会覆盖全局选项。
+:::
 
 #### 指定编译器
 
@@ -340,7 +335,11 @@ TypeScript 编译会自动将编译器输出（`.js` 和 `.d.ts` 文件）分发
 ]
 ```
 
-> **警告** 在顶层 `compilerOptions` 属性中设置 `watchAssets` 将覆盖 `assets` 属性内的所有 `watchAssets` 配置
+:::warning 警告
+在顶层 `compilerOptions` 属性中设置 `watchAssets` 将覆盖 `assets` 属性内的所有 `watchAssets` 配置
+:::
+
+
 
 #### 项目属性
 

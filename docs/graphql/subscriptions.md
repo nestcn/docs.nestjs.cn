@@ -15,7 +15,9 @@ GraphQLModule.forRoot<ApolloDriverConfig>({
 }),
 ```
 
-> warning **注意** `installSubscriptionHandlers` 配置选项已在最新版 Apollo 服务器中移除，并即将在本包中弃用。默认情况下，`installSubscriptionHandlers` 会回退使用 `subscriptions-transport-ws`( [了解更多](https://github.com/apollographql/subscriptions-transport-ws) )，但我们强烈建议改用 `graphql-ws`( [了解更多](https://github.com/enisdenjo/graphql-ws) )库。
+:::warning 注意
+`installSubscriptionHandlers` 配置选项已在最新版 Apollo 服务器中移除，并即将在本包中弃用。默认情况下，`installSubscriptionHandlers` 会回退使用 `subscriptions-transport-ws`( [了解更多](https://github.com/apollographql/subscriptions-transport-ws) )，但我们强烈建议改用 `graphql-ws`( [了解更多](https://github.com/enisdenjo/graphql-ws) )库。
+:::
 
 要切换使用 `graphql-ws` 包，请使用以下配置：
 
@@ -28,7 +30,9 @@ GraphQLModule.forRoot<ApolloDriverConfig>({
 }),
 ```
 
-> info **说明** 您也可以同时使用两个包（`subscriptions-transport-ws` 和 `graphql-ws`），例如为了保持向后兼容性。
+:::info 说明
+ 您也可以同时使用两个包（`subscriptions-transport-ws` 和 `graphql-ws`），例如为了保持向后兼容性。
+:::
 
 #### 代码优先
 
@@ -49,9 +53,15 @@ export class AuthorResolver {
 }
 ```
 
-> **提示** 所有装饰器都从 `@nestjs/graphql` 包导出，而 `PubSub` 类则从 `graphql-subscriptions` 包导出。
+:::info 提示
+所有装饰器都从 `@nestjs/graphql` 包导出，而 `PubSub` 类则从 `graphql-subscriptions` 包导出。
+:::
 
-> warning **注意** `PubSub` 是一个提供简单 `发布` 和 `订阅 API` 的类。了解更多信息请点击 [此处](https://www.apollographql.com/docs/graphql-subscriptions/setup.html) 。请注意 Apollo 文档警告默认实现不适合生产环境（详见 [此处](https://github.com/apollographql/graphql-subscriptions#getting-started-with-your-first-subscription) ）。生产环境应用应使用由外部存储支持的 `PubSub` 实现（详见 [此处](https://github.com/apollographql/graphql-subscriptions#pubsub-implementations) ）。
+
+
+:::warning 注意
+ `PubSub` 是一个提供简单 `发布` 和 `订阅 API` 的类。了解更多信息请点击 [此处](https://www.apollographql.com/docs/graphql-subscriptions/setup.html) 。请注意 Apollo 文档警告默认实现不适合生产环境（详见 [此处](https://github.com/apollographql/graphql-subscriptions#getting-started-with-your-first-subscription) ）。生产环境应用应使用由外部存储支持的 `PubSub` 实现（详见 [此处](https://github.com/apollographql/graphql-subscriptions#pubsub-implementations) ）。
+:::
 
 这将生成以下 GraphQL 模式定义语言(SDL)部分：
 
@@ -78,7 +88,7 @@ subscribeToCommentAdded() {
 
 现在，要发布事件，我们使用 `PubSub#publish` 方法。这通常在变更操作中使用，当对象图的部分发生改变时触发客户端更新。例如：
 
-```typescript title="posts/posts.resolver"
+ ```typescript title="posts/posts.resolver.ts"
 @Mutation(() => Comment)
 async addComment(
   @Args('postId', { type: () => Int }) postId: number,
@@ -127,7 +137,9 @@ commentAdded() {
 }
 ```
 
-> warning **注意** 如果使用 `resolve` 选项，应当返回未经包装的有效载荷（例如在我们的示例中，直接返回 `newComment` 对象，而非 `{ commentAdded: newComment }` 对象）。
+:::warning 注意
+ 如果使用 `resolve` 选项，应当返回未经包装的有效载荷（例如在我们的示例中，直接返回 `newComment` 对象，而非 `{ commentAdded: newComment }` 对象）。
+:::
 
 如需访问注入的提供程序（例如使用外部服务验证数据），请采用以下构造方式。
 
@@ -327,7 +339,9 @@ GraphQLModule.forRoot<ApolloDriverConfig>({
 
 本例中的 `authToken` 仅在连接首次建立时由客户端发送一次。使用此连接进行的所有订阅都将具有相同的 `authToken`，因此也具有相同的用户信息。
 
-> warning **注意** `subscriptions-transport-ws` 中存在一个漏洞，允许连接跳过 `onConnect` 阶段（ [了解更多](https://github.com/apollographql/subscriptions-transport-ws/issues/349) ）。不应假设用户开始订阅时已调用 `onConnect`，而应始终检查 `context` 是否已填充。
+:::warning 注意
+ `subscriptions-transport-ws` 中存在一个漏洞，允许连接跳过 `onConnect` 阶段（ [了解更多](https://github.com/apollographql/subscriptions-transport-ws/issues/349) ）。不应假设用户开始订阅时已调用 `onConnect`，而应始终检查 `context` 是否已填充。
+:::
 
 如果你使用的是 `graphql-ws` 包，`onConnect` 回调函数的签名会略有不同：
 
@@ -361,7 +375,11 @@ GraphQLModule.forRoot<MercuriusDriverConfig>({
 }),
 ```
 
-> **提示** 你也可以传递选项对象来设置自定义发射器、验证传入连接等。更多信息请参阅 [此处](https://github.com/mercurius-js/mercurius/blob/master/docs/api/options.md#plugin-options) （参见 `subscription`）。
+:::info 提示
+你也可以传递选项对象来设置自定义发射器、验证传入连接等。更多信息请参阅 [此处](https://github.com/mercurius-js/mercurius/blob/master/docs/api/options.md#plugin-options) （参见 `subscription`）。
+:::
+
+
 
 #### 代码优先
 
@@ -380,9 +398,14 @@ export class AuthorResolver {
 }
 ```
 
-> info **注意** 上例中使用的所有装饰器都从 `@nestjs/graphql` 包导出，而 `PubSub` 类则从 `mercurius` 包导出。
+:::info 注意
+上例中使用的所有装饰器都从 `@nestjs/graphql` 包导出，而 `PubSub` 类则从 `mercurius` 包导出。
+:::
 
-> warning **注意** `PubSub` 是一个暴露简单 `publish` 和 `subscribe` API 的类。查看[本节](https://github.com/mercurius-js/mercurius/blob/master/docs/subscriptions.md#subscriptions-with-custom-pubsub)了解如何注册自定义 `PubSub` 类。
+
+:::warning 注意
+ `PubSub` 是一个暴露简单 `publish` 和 `subscribe` API 的类。查看[本节](https://github.com/mercurius-js/mercurius/blob/master/docs/subscriptions.md#subscriptions-with-custom-pubsub)了解如何注册自定义 `PubSub` 类。
+:::
 
 这将生成以下 GraphQL 模式定义语言(SDL)部分：
 
@@ -409,7 +432,7 @@ subscribeToCommentAdded(@Context('pubsub') pubSub: PubSub) {
 
 现在，要发布事件，我们使用 `PubSub#publish` 方法。这通常用于在对象图的某部分发生变更时，通过某个 mutation 触发客户端更新。例如：
 
-```typescript title="posts/posts.resolver"
+ ```typescript title="posts/posts.resolver.ts"
 @Mutation(() => Comment)
 async addComment(
   @Args('postId', { type: () => Int }) postId: number,

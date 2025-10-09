@@ -25,7 +25,7 @@ $ nest g service users
 
 将这些生成文件的默认内容替换为如下所示。对于我们的示例应用程序，`UsersService` 只是维护一个硬编码的内存中用户列表，以及一个根据用户名检索用户的 find 方法。在真实的应用程序中，这是您构建用户模型和持久化层的地方，使用您选择的库（例如 TypeORM、Sequelize、Mongoose 等）。
 
-```typescript title="users/users.service"
+ ```typescript title="users/users.service.ts"
 import { Injectable } from '@nestjs/common';
 
 // 这应该是一个表示用户实体的真实类/接口
@@ -54,7 +54,7 @@ export class UsersService {
 
 现在，更新 `UsersModule` 以导出 `UsersService`，以便在模块外部可用（我们很快就会在 `AuthService` 中使用它）：
 
-```typescript title="users/users.module"
+ ```typescript title="users/users.module.ts"
 import { Module } from '@nestjs/common';
 import { UsersService } from './users.service';
 
@@ -67,7 +67,7 @@ export class UsersModule {}
 
 我们的 `AuthService` 的工作是检索用户并验证密码。我们为此创建一个 `signIn()` 方法。在下面的代码中，我们使用方便的 ES6 展开运算符从 user 对象中剥离密码属性，然后返回它。这是一种常见做法，当从用户对象返回时，您希望避免包含敏感字段，如密码。
 
-```typescript title="auth/auth.service"
+ ```typescript title="auth/auth.service.ts"
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 
@@ -88,11 +88,13 @@ export class AuthService {
 }
 ```
 
-> **警告** 当然，在真实的应用程序中，您不会以明文形式存储密码。您会使用加了盐的单向哈希算法，如 bcrypt。通过这种方法，您只会存储哈希密码，然后将存储的哈希与传入密码的哈希版本进行比较，因此您永远不会以明文形式存储或暴露用户密码。为了保持我们的示例应用程序的简单性，我们违反了这个绝对要求并使用明文。**不要在真实应用程序中这样做！**
+:::warning 警告
+当然，在真实的应用程序中，您不会以明文形式存储密码。您会使用加了盐的单向哈希算法，如 bcrypt。通过这种方法，您只会存储哈希密码，然后将存储的哈希与传入密码的哈希版本进行比较，因此您永远不会以明文形式存储或暴露用户密码。为了保持我们的示例应用程序的简单性，我们违反了这个绝对要求并使用明文。**不要在真实应用程序中这样做！** 现在，我们需要更新 `AuthModule` 以导入 `UsersModule`：
+:::
 
-现在，我们需要更新 `AuthModule` 以导入 `UsersModule`：
 
-```typescript title="auth/auth.module"
+
+ ```typescript title="auth/auth.module.ts"
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersModule } from '../users/users.module';
@@ -117,11 +119,15 @@ export class AuthModule {}
 $ npm install --save @nestjs/jwt
 ```
 
-> **提示** `@nestjs/jwt` 包（见[这里](https://github.com/nestjs/jwt)）是一个实用程序包，有助于 JWT 操作。
+:::info 提示
+`@nestjs/jwt` 包（见[这里](https://github.com/nestjs/jwt)）是一个实用程序包，有助于 JWT 操作。
+:::
+
+
 
 为了保持我们的服务清洁和模块化，我们将在 `authService` 中处理 JWT 生成。打开 `auth/auth.service.ts` 文件，注入 `JwtService`，并更新 `signIn` 方法以生成 JWT 令牌，如下所示：
 
-```typescript title="auth/auth.service"
+ ```typescript title="auth/auth.service.ts"
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
@@ -152,7 +158,7 @@ export class AuthService {
 
 首先，在 `auth` 文件夹中创建 `constants.ts`，并添加以下代码：
 
-```typescript title="auth/constants"
+ ```typescript title="auth/constants.ts"
 export const jwtConstants = {
   secret: 'DO NOT USE THIS VALUE. INSTEAD, CREATE A COMPLEX SECRET AND KEEP IT SAFE OUTSIDE OF THE SOURCE CODE.',
 };
@@ -160,11 +166,15 @@ export const jwtConstants = {
 
 我们将使用它在 JWT 签名和验证步骤之间共享我们的密钥。
 
-> **警告** **不要在生产代码中公开暴露此密钥**。我们在这里这样做是为了清楚地说明代码在做什么，但在生产系统中，您必须使用适当的措施来保护此密钥，如机密库、环境变量或配置服务。
+:::warning 警告
+**不要在生产代码中公开暴露此密钥**。我们在这里这样做是为了清楚地说明代码在做什么，但在生产系统中，您必须使用适当的措施来保护此密钥，如机密库、环境变量或配置服务。
+:::
+
+
 
 现在，打开 `auth` 文件夹中的 `auth.module.ts` 并更新它，如下所示：
 
-```typescript title="auth/auth.module"
+ ```typescript title="auth/auth.module.ts"
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersModule } from '../users/users.module';
@@ -186,7 +196,11 @@ import { jwtConstants } from './constants';
 export class AuthModule {}
 ```
 
-> **提示** 我们使用 `global: true` 注册 `JwtModule` 以便简化。这意味着我们不需要在任何其他地方导入 `JwtModule`。
+:::info 提示
+我们使用 `global: true` 注册 `JwtModule` 以便简化。这意味着我们不需要在任何其他地方导入 `JwtModule`。
+:::
+
+
 
 我们使用 `register()` 配置 `JwtModule`，传入一个配置对象。查看[这里](https://github.com/nestjs/jwt/blob/master/README.md)了解更多关于 Nest `JwtModule` 的信息，[这里](https://github.com/auth0/node-jsonwebtoken#usage)了解更多关于可用配置选项的信息。
 
@@ -194,7 +208,7 @@ export class AuthModule {}
 
 现在我们可以实现一个简单的 `/auth/login` 路由，该路由会 POST 用户的凭据以获取 JWT。打开 `auth/auth.controller.ts` 文件并添加以下代码：
 
-```typescript title="auth/auth.controller"
+ ```typescript title="auth/auth.controller.ts"
 import {
   Body,
   Controller,
@@ -216,11 +230,15 @@ export class AuthController {
 }
 ```
 
-> **提示** 理想情况下，不要使用 `Record<string, any>` 类型。相反，应该创建一个 DTO 类来定义 body 的形状。查看[验证](../techniques/validation)章节了解更多信息。
+:::info 提示
+理想情况下，不要使用 `Record<string, any>` 类型。相反，应该创建一个 DTO 类来定义 body 的形状。查看[验证](../techniques/validation)章节了解更多信息。
+:::
+
+
 
 不要忘记将 `AuthController` 添加到 `AuthModule`：
 
-```typescript title="auth/auth.module"
+ ```typescript title="auth/auth.module.ts"
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersModule } from '../users/users.module';
@@ -257,7 +275,7 @@ $ # Note: above JWT truncated
 
 我们现在可以处理最后的要求：通过要求请求中存在有效的 JWT 来保护端点。我们将通过创建一个 `AuthGuard` 来实现，该守卫可用于保护我们的路由。
 
-```typescript title="auth/auth.guard"
+ ```typescript title="auth/auth.guard.ts"
 import {
   CanActivate,
   ExecutionContext,
@@ -303,7 +321,7 @@ export class AuthGuard implements CanActivate {
 
 我们现在可以实现一个受保护的路由和一个用于测试我们守卫的注册装饰器。打开 `auth/auth.controller.ts` 文件并更新它，如下所示：
 
-```typescript title="auth/auth.controller"
+ ```typescript title="auth/auth.controller.ts"
 import {
   Body,
   Controller,
@@ -376,7 +394,7 @@ providers: [
 
 现在我们必须提供一种机制来声明路由为公共的。为此，我们可以使用 `SetMetadata` 装饰器工厂函数创建自定义装饰器。
 
-```typescript title="auth/decorators/public.decorator"
+ ```typescript title="auth/decorators/public.decorator.ts"
 import { SetMetadata } from '@nestjs/common';
 
 export const IS_PUBLIC_KEY = 'isPublic';

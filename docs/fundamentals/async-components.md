@@ -14,7 +14,9 @@
 }
 ```
 
-> info **提示** 了解更多关于自定义提供者语法的信息，请点击[此处](/fundamentals/custom-providers) 。
+:::info 提示
+了解更多关于自定义提供者语法的信息，请点击[此处](/fundamentals/custom-providers) 。
+:::
 
 #### 注入
 

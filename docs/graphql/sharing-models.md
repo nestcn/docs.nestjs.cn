@@ -1,6 +1,8 @@
 ### 共享模型
 
-> warning **警告** 本章仅适用于代码优先方法。
+:::warning 警告
+本章仅适用于代码优先方法。
+:::
 
 在项目后端使用 TypeScript 的最大优势之一，是能够通过共享 TypeScript 包，在基于 TypeScript 的前端应用中复用相同的模型。
 
@@ -20,4 +22,7 @@ resolve: { // see: https://webpack.js.org/configuration/resolve/
 }
 ```
 
-> info **注意** [TypeORM](/techniques/sql) 包也有类似的垫片，可在此处[查看](https://github.com/typeorm/typeorm/blob/master/extra/typeorm-model-shim.js) 。
+:::info 注意
+[TypeORM](/techniques/sql) 包也有类似的垫片，可在此处[查看](https://github.com/typeorm/typeorm/blob/master/extra/typeorm-model-shim.js) 。
+:::
+

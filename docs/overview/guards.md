@@ -8,13 +8,15 @@
 
 但中间件本质上是"哑"的，它不知道调用 `next()` 函数后会执行哪个处理程序。而**守卫**则能访问 `ExecutionContext` 实例，因此确切知道接下来要执行什么。与异常过滤器、管道和拦截器类似，守卫的设计让你能在请求/响应周期的精确时点介入处理逻辑，并以声明式方式实现。这有助于保持代码的 DRY 原则和声明式风格。
 
-> info **提示** 守卫在所有中间件**之后**执行，但在任何拦截器或管道**之前**执行。
+:::info 提示
+守卫在所有中间件**之后**执行，但在任何拦截器或管道**之前**执行。
+:::
 
 #### 授权守卫
 
 如前所述， **授权**是守卫的绝佳应用场景，因为特定路由应当仅在调用者（通常是已认证的特定用户）拥有足够权限时才可用。我们将要构建的 `AuthGuard` 假设用户已通过认证（因此请求头中附带了令牌）。它将提取并验证令牌，利用提取的信息来判断是否允许该请求继续执行。
 
-```typescript title="auth.guard"
+ ```typescript title="auth.guard.ts"
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Observable } from 'rxjs';
 
@@ -29,7 +31,9 @@ export class AuthGuard implements CanActivate {
 }
 ```
 
-> info **提示** 若需查看如何在应用中实现认证机制的实际案例，请访问[本章节](/security/authentication) 。同样地，如需更复杂的授权示例，请参阅[此页面](/security/authorization) 。
+:::info 提示
+若需查看如何在应用中实现认证机制的实际案例，请访问[本章节](/security/authentication) 。同样地，如需更复杂的授权示例，请参阅[此页面](/security/authorization) 。
+:::
 
 `validateRequest()` 函数内部的逻辑可根据需求简单或复杂处理。本示例的核心在于展示守卫如何融入请求/响应周期。
 
@@ -48,7 +52,7 @@ export class AuthGuard implements CanActivate {
 
 我们来构建一个功能更完善的守卫，只允许特定角色的用户访问。我们将从一个基本的守卫模板开始，并在接下来的章节中逐步完善它。现在，它允许所有请求通过：
 
-```typescript title="roles.guard"
+ ```typescript title="roles.guard.ts"
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Observable } from 'rxjs';
 
@@ -72,7 +76,10 @@ export class RolesGuard implements CanActivate {
 export class CatsController {}
 ```
 
-> info **注意** `@UseGuards()` 装饰器是从 `@nestjs/common` 包导入的。
+:::info 注意
+`@UseGuards()` 装饰器是从 `@nestjs/common` 包导入的。
+:::
+
 
 上面，我们传递了 `RolesGuard` 类（而非实例），将实例化的责任交给框架处理，并启用了依赖注入。与管道和异常过滤器类似，我们也可以直接传递一个即时实例：
 
@@ -91,11 +98,13 @@ const app = await NestFactory.create(AppModule);
 app.useGlobalGuards(new RolesGuard());
 ```
 
-> warning **注意** 对于混合应用，`useGlobalGuards()` 方法默认不会为网关和微服务设置守卫（有关如何更改此行为的信息，请参阅[混合应用](/faq/hybrid-application) ）。对于"标准"（非混合）微服务应用，`useGlobalGuards()` 会全局挂载守卫。
+:::warning 注意
+对于混合应用，`useGlobalGuards()` 方法默认不会为网关和微服务设置守卫（有关如何更改此行为的信息，请参阅[混合应用](/faq/hybrid-application) ）。对于"标准"（非混合）微服务应用，`useGlobalGuards()` 会全局挂载守卫。
+:::
 
 全局守卫用于整个应用程序，作用于每个控制器和每个路由处理器。在依赖注入方面，从任何模块外部注册的全局守卫（如上例中使用 `useGlobalGuards()`）无法注入依赖项，因为这发生在任何模块的上下文之外。为解决此问题，您可以直接从任何模块使用以下结构设置守卫：
 
-```typescript title="app.module"
+ ```typescript title="app.module.ts"
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 
@@ -110,7 +119,10 @@ import { APP_GUARD } from '@nestjs/core';
 export class AppModule {}
 ```
 
-> info **注意** 当使用此方法为守卫执行依赖注入时，请注意无论该结构应用于哪个模块，该守卫实际上是全局的。应在何处进行此操作？选择定义守卫的模块（如上例中的 `RolesGuard`）。此外，`useClass` 并非处理自定义提供程序注册的唯一方式。了解更多[此处](/fundamentals/custom-providers) 。
+:::info 注意
+当使用此方法为守卫执行依赖注入时，请注意无论该结构应用于哪个模块，该守卫实际上是全局的。应在何处进行此操作？选择定义守卫的模块（如上例中的 `RolesGuard`）。此外，`useClass` 并非处理自定义提供程序注册的唯一方式。了解更多[此处](/fundamentals/custom-providers) 。
+:::
+
 
 #### 为每个处理器设置角色
 
@@ -130,7 +142,7 @@ export const Roles = Reflector.createDecorator<string[]>();
 
 现在要使用这个装饰器，我们只需用它来注解处理器：
 
-```typescript title="cats.controller"
+ ```typescript title="cats.controller.ts"
 @Post()
 @Roles(['admin'])
 async create(@Body() createCatDto: CreateCatDto) {
@@ -146,7 +158,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 现在让我们回到 `RolesGuard` 并将其整合起来。目前它只是简单地返回 `true`，允许所有请求通过。我们希望根据**当前用户分配的角色**与当前处理路由所需实际角色的比较结果来条件化返回值。为了访问路由的角色（自定义元数据），我们将再次使用 `Reflector` 辅助类，如下所示：
 
-```typescript title="roles.guard"
+ ```typescript title="roles.guard.ts"
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Roles } from './roles.decorator';
@@ -167,9 +179,13 @@ export class RolesGuard implements CanActivate {
 }
 ```
 
-> info **提示** 在 Node.js 环境中，通常会将授权用户附加到 `request` 对象上。因此，在上述示例代码中，我们假设 `request.user` 包含用户实例及其允许的角色。在您的应用中，您可能会在自定义的**认证守卫** （或中间件）中建立这种关联。有关此主题的更多信息，请参阅[本章节](/security/authentication) 。
+:::info 提示
+在 Node.js 环境中，通常会将授权用户附加到 `request` 对象上。因此，在上述示例代码中，我们假设 `request.user` 包含用户实例及其允许的角色。在您的应用中，您可能会在自定义的**认证守卫** （或中间件）中建立这种关联。有关此主题的更多信息，请参阅[本章节](/security/authentication) 。
+:::
 
-> warning **警告** `matchRoles()` 函数内部的逻辑可以根据需要简单或复杂。本示例的主要目的是展示守卫如何融入请求/响应周期。
+:::warning 警告
+ `matchRoles()` 函数内部的逻辑可以根据需要简单或复杂。本示例的主要目的是展示守卫如何融入请求/响应周期。
+:::
 
 有关在上下文敏感方式中使用 `Reflector` 的更多细节，请参阅 **执行上下文** 章节中的 [反射与元数据](../fundamentals/execution-context#反射与元数据) 部分。
 
@@ -191,4 +207,8 @@ throw new UnauthorizedException();
 
 守卫抛出的任何异常都将由[异常处理层](/exception-filters) （全局异常过滤器及应用于当前上下文的任何异常过滤器）处理。
 
-> **提示** 如果您正在寻找如何实现授权的实际示例，请查看[本章节](/security/authorization) 。
+:::info 提示
+如果您正在寻找如何实现授权的实际示例，请查看[本章节](/security/authorization) 。
+:::
+
+

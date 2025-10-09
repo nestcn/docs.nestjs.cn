@@ -12,7 +12,7 @@ $ npm install --save @nestjs/schedule
 
 要激活任务调度功能，请将 `ScheduleModule` 导入根模块 `AppModule`，并运行如下所示的 `forRoot()` 静态方法：
 
-```typescript title="app.module"
+ ```typescript title="app.module.ts"
 import { Module } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
 
@@ -120,7 +120,11 @@ export class TasksService {
 
 或者，你也可以向 `@Cron()` 装饰器传入一个 JavaScript 的 `Date` 对象。这样做会使任务在指定日期精确执行一次。
 
-> **提示** 使用 JavaScript 日期运算来安排相对于当前日期的任务。例如， `@Cron(new Date(Date.now() + 10 * 1000))` 可以让任务在应用启动 10 秒后运行。
+:::info 提示
+使用 JavaScript 日期运算来安排相对于当前日期的任务。例如， `@Cron(new Date(Date.now() + 10 * 1000))` 可以让任务在应用启动 10 秒后运行。
+:::
+
+
 
 此外，你还可以将额外选项作为第二个参数传给 `@Cron()` 装饰器。
 
@@ -159,7 +163,11 @@ handleInterval() {
 }
 ```
 
-> **提示** 此机制底层使用 JavaScript 的 `setInterval()` 函数。您也可以使用 cron 任务来安排重复作业。
+:::info 提示
+此机制底层使用 JavaScript 的 `setInterval()` 函数。您也可以使用 cron 任务来安排重复作业。
+:::
+
+
 
 若要通过[动态 API](/techniques/task-scheduling#动态调度模块-api) 在声明类外部控制声明式间隔，请使用以下构造将间隔与名称关联：
 
@@ -183,7 +191,11 @@ handleTimeout() {
 }
 ```
 
-> **提示** 该机制底层使用了 JavaScript 的 `setTimeout()` 函数。
+:::info 提示
+该机制底层使用了 JavaScript 的 `setTimeout()` 函数。
+:::
+
+
 
 如果发生异常，它将被记录到控制台，因为每个用 `@Timeout()` 注解的方法都会自动被包裹在 `try-catch` 代码块中。
 
@@ -208,7 +220,11 @@ handleTimeout() {}
 constructor(private schedulerRegistry: SchedulerRegistry) {}
 ```
 
-> **提示** 从 `@nestjs/schedule` 包中导入 `SchedulerRegistry`。
+:::info 提示
+从 `@nestjs/schedule` 包中导入 `SchedulerRegistry`。
+:::
+
+
 
 然后在类中按如下方式使用。假设已通过以下声明创建了一个 cron job：
 
@@ -237,7 +253,9 @@ console.log(job.lastDate());
 - `nextDate()` - 返回作业下一次计划执行日期的 `DateTime` 表示形式。
 - `nextDates(count: number)` - 提供一组（大小为 `count`）`DateTime` 表示形式，包含接下来会触发作业执行的日期集合。`count` 默认为 0，此时返回空数组。
 
-> info **提示** 在 `DateTime` 对象上使用 `toJSDate()` 可将其渲染为与此 DateTime 等效的 JavaScript Date 对象。
+:::info 提示
+在 `DateTime` 对象上使用 `toJSDate()` 可将其渲染为与此 DateTime 等效的 JavaScript Date 对象。
+:::
 
 **创建**一个新的定时任务，可通过动态调用 `SchedulerRegistry#addCronJob` 方法实现，如下所示：
 
@@ -258,7 +276,11 @@ addCronJob(name: string, seconds: string) {
 
 在这段代码中，我们使用 `CronJob` 对象（来自 `cron` 包）来创建定时任务。`CronJob` 构造函数接收两个参数：第一个是 cron 表达式（与 `@Cron()` [装饰器](techniques/task-scheduling#声明式-cron-任务)的格式相同），第二个是定时触发器触发时执行的回调函数。`SchedulerRegistry#addCronJob` 方法同样接收两个参数：定时任务的名称和 `CronJob` 对象本身。
 
-> **警告** 请记得在使用前先注入 `SchedulerRegistry`。同时需要从 `cron` 包中导入 `CronJob`。
+:::warning 警告
+请记得在使用前先注入 `SchedulerRegistry`。同时需要从 `cron` 包中导入 `CronJob`。
+:::
+
+
 
 **删除**指定名称的定时任务可通过 `SchedulerRegistry#deleteCronJob` 方法实现，如下所示：
 

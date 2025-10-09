@@ -20,7 +20,7 @@ $ npm i --save @nestjs/microservices
 
 要实例化微服务，请使用 `NestFactory` 类的 `createMicroservice()` 方法：
 
-```typescript title="main"
+ ```typescript title="main.ts"
 import { NestFactory } from '@nestjs/core';
 import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 import { AppModule } from './app.module';
@@ -37,7 +37,10 @@ async function bootstrap() {
 bootstrap();
 ```
 
-> info **注意** 微服务默认使用 **TCP** 传输层。
+:::info 注意
+微服务默认使用 **TCP** 传输层。
+:::
+
 
 `createMicroservice()` 方法的第二个参数是一个 `options` 对象，该对象可能包含两个成员：
 
@@ -93,7 +96,9 @@ bootstrap();
   </tbody>
 </table>
 
-> info **提示** 上述属性为 TCP 传输器特有。如需了解其他传输器的可用选项，请参阅相关章节。
+:::info 提示
+上述属性为 TCP 传输器特有。如需了解其他传输器的可用选项，请参阅相关章节。
+:::
 
 #### 消息与事件模式
 
@@ -107,7 +112,7 @@ bootstrap();
 
 要创建基于请求-响应模式的消息处理器，请使用从 `@nestjs/microservices` 包导入的 `@MessagePattern()` 装饰器。该装饰器应仅在[控制器](../overview/controllers)类中使用，因为它们是应用程序的入口点。在提供者中使用它将不会产生任何效果，因为它们会被 Nest 运行时忽略。
 
-```typescript title="math.controller"
+ ```typescript title="math.controller.ts"
 import { Controller } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 
@@ -159,7 +164,11 @@ async handleUserCreated(data: Record<string, unknown>) {
 }
 ```
 
-> **提示** 您可以为**同一个**事件模式注册多个事件处理器，它们都将被自动并行触发。
+:::info 提示
+您可以为**同一个**事件模式注册多个事件处理器，它们都将被自动并行触发。
+:::
+
+
 
 `handleUserCreated()` **事件处理器**监听 `'user_created'` 事件。该处理器接收单个参数——来自客户端的`数据` （本例中是通过网络发送的事件载荷）。
 
@@ -175,9 +184,13 @@ getDate(@Payload() data: number[], @Ctx() context: NatsContext) {
 }
 ```
 
-> info **提示**`@Payload()`、`@Ctx()` 和 `NatsContext` 是从 `@nestjs/microservices` 导入的。
+:::info 提示
+`@Payload()`、`@Ctx()` 和 `NatsContext` 是从 `@nestjs/microservices` 导入的。
+:::
 
-> info **提示** 您还可以向 `@Payload()` 装饰器传入一个属性键，以从传入的负载对象中提取特定属性，例如 `@Payload('id')`。
+:::info 提示
+您还可以向 `@Payload()` 装饰器传入一个属性键，以从传入的负载对象中提取特定属性，例如 `@Payload('id')`。
+:::
 
 #### 客户端（生产者类）
 
@@ -229,7 +242,9 @@ constructor(
 ) {}
 ```
 
-> info **提示** `ClientsModule` 和 `ClientProxy` 类是从 `@nestjs/microservices` 包中导入的。
+:::info 提示
+`ClientsModule` 和 `ClientProxy` 类是从 `@nestjs/microservices` 包中导入的。
+:::
 
 有时，您可能需要从其他服务（如 `ConfigService`）获取传输器配置，而不是在客户端应用中硬编码。为此，您可以使用 `ClientProxyFactory` 类注册[自定义提供者](/fundamentals/custom-providers) 。该类提供了静态方法 `create()`，该方法接收传输器选项对象并返回一个定制化的 `ClientProxy` 实例。
 
@@ -249,7 +264,9 @@ constructor(
 })
 ```
 
-> info **提示** `ClientProxyFactory` 是从 `@nestjs/microservices` 包导入的。
+:::info 提示
+`ClientProxyFactory` 是从 `@nestjs/microservices` 包导入的。
+:::
 
 另一种选择是使用 `@Client()` 属性装饰器。
 
@@ -258,7 +275,9 @@ constructor(
 client: ClientProxy;
 ```
 
-> info **提示** `@Client()` 装饰器是从 `@nestjs/microservices` 包导入的。
+:::info 提示
+`@Client()` 装饰器是从 `@nestjs/microservices` 包导入的。
+:::
 
 使用 `@Client()` 装饰器并非首选技术方案，因为这会增加测试难度且难以共享客户端实例。
 
@@ -337,7 +356,11 @@ this.client.status.subscribe((status: TcpStatus) => {
 });
 ```
 
-> **提示** `TcpStatus` 类型是从 `@nestjs/microservices` 包导入的。
+:::info 提示
+`TcpStatus` 类型是从 `@nestjs/microservices` 包导入的。
+:::
+
+
 
 同样地，您可以订阅服务器的 `status` 流来接收有关服务器状态的通知。
 
@@ -366,7 +389,11 @@ server.on<TcpEvents>('error', (err) => {
 });
 ```
 
-> **提示** `TcpEvents` 类型是从 `@nestjs/microservices` 包中导入的。
+:::info 提示
+`TcpEvents` 类型是从 `@nestjs/microservices` 包中导入的。
+:::
+
+
 
 #### 底层驱动访问
 
@@ -398,7 +425,9 @@ this.client
   .pipe(timeout(5000));
 ```
 
-> info **提示** `timeout` 操作符是从 `rxjs/operators` 包中导入的。
+:::info 提示
+`timeout` 操作符是从 `rxjs/operators` 包中导入的。
+:::
 
 如果微服务在 5 秒内未响应，将抛出错误。
 

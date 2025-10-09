@@ -126,7 +126,10 @@ export class AppModule {}
 
 动态模块必须返回一个具有完全相同接口的对象，外加一个名为 `module` 的附加属性。`module` 属性用作模块名称，应与模块的类名相同，如下例所示。
 
-> info **注意** 对于动态模块，模块选项对象的所有属性都是可选的**除了** `module`。
+:::info 注意
+对于动态模块，模块选项对象的所有属性都是可选的**除了** `module`。
+:::
+
 
 那么静态的 `register()` 方法呢？我们现在可以明白，它的作用是返回一个具有 `DynamicModule` 接口的对象。当我们调用它时，实际上是在向 `imports` 列表提供一个模块，这与我们在静态情况下通过列出模块类名（如 `imports: [UsersModule]`）的做法类似。换句话说，动态模块 API 只是返回一个模块，但我们不是通过 `@Module` 装饰器固定属性，而是以编程方式指定它们。
 
@@ -155,7 +158,9 @@ export class ConfigModule {
 
 现在应该很清楚这些部分是如何结合在一起的。调用 `ConfigModule.register(...)` 会返回一个 `DynamicModule` 对象，其属性本质上与我们之前通过 `@Module()` 装饰器提供的元数据相同。
 
-> info **提示** 从 `@nestjs/common` 导入 `DynamicModule`。
+:::info 提示
+从 `@nestjs/common` 导入 `DynamicModule`。
+:::
 
 我们的动态模块目前还不太有趣，因为我们尚未实现之前提到的**配置**功能。接下来我们就来解决这个问题。
 
@@ -293,7 +298,7 @@ export interface ConfigModuleOptions {
 
 在此基础上，新建一个专用文件（与现有的 `config.module.ts` 文件放在一起）并命名为 `config.module-definition.ts`。在此文件中，我们将使用 `ConfigurableModuleBuilder` 来构建 `ConfigModule` 的定义。
 
-```typescript title="config.module-definition"
+ ```typescript title="config.module-definition.ts"
 import { ConfigurableModuleBuilder } from '@nestjs/common';
 import { ConfigModuleOptions } from './interfaces/config-module-options.interface';
 
@@ -387,7 +392,7 @@ export class ConfigService {
 
 默认情况下，`ConfigurableModuleClass` 提供 `register` 及其对应方法 `registerAsync`。如需使用不同方法名，可采用 `ConfigurableModuleBuilder#setClassMethodName` 方法，如下所示：
 
-```typescript title="config.module-definition"
+ ```typescript title="config.module-definition.ts"
 export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
   new ConfigurableModuleBuilder<ConfigModuleOptions>().setClassMethodName('forRoot').build();
 ```
@@ -429,7 +434,7 @@ export class AppModule {}
 
 默认情况下，该类必须提供 `create()` 方法以返回模块配置对象。但如果您的库遵循不同的命名约定，可以通过 `ConfigurableModuleBuilder#setFactoryMethodName` 方法调整此行为，指示 `ConfigurableModuleBuilder` 改用其他方法（例如 `createConfigOptions`）：
 
-```typescript title="config.module-definition"
+ ```typescript title="config.module-definition.ts"
 export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
   new ConfigurableModuleBuilder<ConfigModuleOptions>().setFactoryMethodName('createConfigOptions').build();
 ```

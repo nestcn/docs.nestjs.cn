@@ -93,7 +93,11 @@ const app = await NestFactory.create(AppModule, {
 
 此外，如果您使用 [NestJS Mau](https://mau.nestjs.com)，JSON 日志记录可以简化查看日志的过程，使其以结构化的格式良好组织，这对于调试和性能监控特别有用。
 
-> **注意** 当 `json` 设置为 `true` 时，`ConsoleLogger` 会自动通过将 `colors` 属性设为 `false` 来禁用文本着色。这确保输出保持为有效的 JSON 格式，不包含格式化痕迹。不过，出于开发目的，您可以通过显式将 `colors` 设为 `true` 来覆盖此行为。这会添加带颜色的 JSON 日志，使本地调试时的日志条目更易读。
+:::info 注意
+当 `json` 设置为 `true` 时，`ConsoleLogger` 会自动通过将 `colors` 属性设为 `false` 来禁用文本着色。这确保输出保持为有效的 JSON 格式，不包含格式化痕迹。不过，出于开发目的，您可以通过显式将 `colors` 设为 `true` 来覆盖此行为。这会添加带颜色的 JSON 日志，使本地调试时的日志条目更易读。
+:::
+
+
 
 启用 JSON 日志记录后，日志输出将如下所示（单行形式）：
 
@@ -277,7 +281,10 @@ app.useLogger(app.get(MyLogger));
 await app.listen(process.env.PORT ?? 3000);
 ```
 
-> info **注意** 在上面的示例中，我们将 `bufferLogs` 设置为 `true` 以确保所有日志都会被缓冲，直到附加了自定义日志记录器（本例中的 `MyLogger`）且应用程序初始化过程完成或失败。如果初始化过程失败，Nest 将回退到原始的 `ConsoleLogger` 来打印所有报告的错误消息。此外，您可以将 `autoFlushLogs` 设置为 `false`（默认为 `true`）以手动刷新日志（使用 `Logger.flush()` 方法）。
+:::info 注意
+在上面的示例中，我们将 `bufferLogs` 设置为 `true` 以确保所有日志都会被缓冲，直到附加了自定义日志记录器（本例中的 `MyLogger`）且应用程序初始化过程完成或失败。如果初始化过程失败，Nest 将回退到原始的 `ConsoleLogger` 来打印所有报告的错误消息。此外，您可以将 `autoFlushLogs` 设置为 `false`（默认为 `true`）以手动刷新日志（使用 `Logger.flush()` 方法）。
+:::
+
 
 这里我们在 `NestApplication` 实例上使用 `get()` 方法来获取 `MyLogger` 对象的单例实例。这种技术本质上是一种为 Nest "注入"日志记录器实例以供使用的方式。`app.get()` 调用会获取 `MyLogger` 的单例实例，并依赖于该实例首先在另一个模块中被注入，如上所述。
 
@@ -347,7 +354,9 @@ app.useLogger(new MyLogger());
 await app.listen(process.env.PORT ?? 3000);
 ```
 
-> info **提示** 除了将 `bufferLogs` 设为 `true` 之外，您还可以通过 `logger: false` 指令临时禁用日志记录器。请注意，如果您向 `NestFactory.create` 传递 `logger: false` 参数，在调用 `useLogger` 之前将不会记录任何日志，因此可能会错过一些重要的初始化错误。如果您不介意部分初始消息会使用默认日志记录器进行记录，可以直接省略 `logger: false` 选项。
+:::info 提示
+除了将 `bufferLogs` 设为 `true` 之外，您还可以通过 `logger: false` 指令临时禁用日志记录器。请注意，如果您向 `NestFactory.create` 传递 `logger: false` 参数，在调用 `useLogger` 之前将不会记录任何日志，因此可能会错过一些重要的初始化错误。如果您不介意部分初始消息会使用默认日志记录器进行记录，可以直接省略 `logger: false` 选项。
+:::
 
 #### 使用外部日志记录器
 

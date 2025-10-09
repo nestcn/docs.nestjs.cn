@@ -19,7 +19,9 @@ export abstract class Character {
 }
 ```
 
-> warning **注意** TypeScript 接口不能用于定义 GraphQL 接口。
+:::warning 注意
+TypeScript 接口不能用于定义 GraphQL 接口。
+:::
 
 这将生成以下 GraphQL 模式定义语言(SDL)部分：
 
@@ -42,7 +44,11 @@ export class Human implements Character {
 }
 ```
 
-> **提示** `@ObjectType()` 装饰器是从 `@nestjs/graphql` 包导出的。
+:::info 提示
+`@ObjectType()` 装饰器是从 `@nestjs/graphql` 包导出的。
+:::
+
+
 
 该库生成的默认 `resolveType()` 函数会根据解析器方法返回的值提取类型。这意味着你必须返回类实例（不能返回字面量 JavaScript 对象）。
 
@@ -89,7 +95,9 @@ export class CharacterInterfaceResolver {
 
 现在 `friends` 字段解析器会自动为所有实现 `Character` 接口的对象类型注册。
 
-> warning **警告** 这需要将 `inheritResolversFromInterfaces` 属性设置为 true 并配置在 `GraphQLModule` 中。
+:::warning 警告
+ 这需要将 `inheritResolversFromInterfaces` 属性设置为 true 并配置在 `GraphQLModule` 中。
+:::
 
 #### Schema first
 
@@ -126,4 +134,6 @@ export class CharactersResolver {
 }
 ```
 
-> info 所有装饰器均从 `@nestjs/graphql` 包中导出。
+:::info 
+所有装饰器均从 `@nestjs/graphql` 包中导出。
+:::

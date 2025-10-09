@@ -57,7 +57,9 @@ EventEmitterModule.forRoot({
 constructor(private eventEmitter: EventEmitter2) {}
 ```
 
-> info **提示** 从 `@nestjs/event-emitter` 包中导入 `EventEmitter2`。
+:::info 提示
+从 `@nestjs/event-emitter` 包中导入 `EventEmitter2`。
+:::
 
 然后在类中按如下方式使用：
 
@@ -82,7 +84,9 @@ handleOrderCreatedEvent(payload: OrderCreatedEvent) {
 }
 ```
 
-> warning **警告** 事件订阅者不能是请求作用域的。
+:::warning 警告
+事件订阅者不能是请求作用域的。
+:::
 
 第一个参数可以是简单事件发射器的 `string` 或 `symbol`，在通配符发射器情况下则是 `string | symbol | Array<string | symbol>` 。
 
@@ -108,7 +112,9 @@ export type OnEventOptions = OnOptions & {
 };
 ```
 
-> info **提示** 了解更多关于 `OnOptions` 选项对象的信息，请参阅 [`eventemitter2`](https://github.com/EventEmitter2/EventEmitter2#emitteronevent-listener-options-objectboolean)。
+:::info 提示
+了解更多关于 `OnOptions` 选项对象的信息，请参阅 [`eventemitter2`](https://github.com/EventEmitter2/EventEmitter2#emitteronevent-listener-options-objectboolean)。
+:::
 
 ```typescript
 @OnEvent('order.created', { async: true })
@@ -137,7 +143,9 @@ handleEverything(payload: any) {
 }
 ```
 
-> info **提示** `EventEmitter2` 类提供了多个实用方法来处理事件，例如 `waitFor` 和 `onAny`。您可以点击[此处](https://github.com/EventEmitter2/EventEmitter2)了解更多信息。
+:::info 提示
+`EventEmitter2` 类提供了多个实用方法来处理事件，例如 `waitFor` 和 `onAny`。您可以点击[此处](https://github.com/EventEmitter2/EventEmitter2)了解更多信息。
+:::
 
 #### 防止事件丢失
 
@@ -153,7 +161,10 @@ this.eventEmitter.emit(
 );
 ```
 
-> info **注意** 这仅适用于在 `onApplicationBootstrap` 生命周期钩子完成之前发出的事件。
+:::info 注意
+这仅适用于在 `onApplicationBootstrap` 生命周期钩子完成之前发出的事件。
+:::
+
 
 #### 示例
 

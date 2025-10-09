@@ -1,6 +1,8 @@
 ### 生成 SDL
 
-> warning **警告** 本章仅适用于代码优先方法。
+:::warning 警告
+本章仅适用于代码优先方法。
+:::
 
 要手动生成 GraphQL SDL 模式（即无需运行应用程序、连接数据库、配置解析器等操作），请使用 `GraphQLSchemaBuilderModule`。
 
@@ -15,7 +17,9 @@ async function generateSchema() {
 }
 ```
 
-> info **提示** `GraphQLSchemaBuilderModule` 和 `GraphQLSchemaFactory` 从 `@nestjs/graphql` 包导入。`printSchema` 函数从 `graphql` 包导入。
+:::info 提示
+`GraphQLSchemaBuilderModule` 和 `GraphQLSchemaFactory` 从 `@nestjs/graphql` 包导入。`printSchema` 函数从 `graphql` 包导入。
+:::
 
 #### 使用方法
 

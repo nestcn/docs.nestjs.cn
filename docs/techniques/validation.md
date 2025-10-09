@@ -22,7 +22,9 @@
 $ npm i --save class-validator class-transformer
 ```
 
-> info **提示** `ValidationPipe` 是从 `@nestjs/common` 包中导出的。
+:::info 提示
+`ValidationPipe` 是从 `@nestjs/common` 包中导出的。
+:::
 
 由于该管道使用了 [`class-validator`](https://github.com/typestack/class-validator) 和 [`class-transformer`](https://github.com/typestack/class-transformer) 库，因此有许多可用选项。您可以通过传递给管道的配置对象来配置这些设置。以下是内置选项：
 
@@ -56,7 +58,10 @@ export interface ValidationPipeOptions extends ValidatorOptions {
 | validationError.value   | boolean    | 指示是否应将验证值暴露在 ValidationError 中。                                      |
 | stopAtFirstError        | boolean    | 当设置为 true 时，给定属性的验证将在遇到第一个错误后停止。默认为 false。           |
 
-> info **注意** 更多关于 `class-validator` 包的信息请参阅其[代码库](https://github.com/typestack/class-validator) 。
+:::info 注意
+更多关于 `class-validator` 包的信息请参阅其[代码库](https://github.com/typestack/class-validator) 。
+:::
+
 
 #### 自动验证
 
@@ -80,9 +85,13 @@ create(@Body() createUserDto: CreateUserDto) {
 }
 ```
 
-> info **提示** 由于 TypeScript 不会存储关于**泛型或接口**的元数据，当你在 DTO 中使用它们时，`ValidationPipe` 可能无法正确验证传入数据。因此，请考虑在 DTO 中使用具体类。
+:::info 提示
+由于 TypeScript 不会存储关于**泛型或接口**的元数据，当你在 DTO 中使用它们时，`ValidationPipe` 可能无法正确验证传入数据。因此，请考虑在 DTO 中使用具体类。
+:::
 
-> info **提示** 导入 DTO 时，不能使用仅类型导入，因为这在运行时会被擦除，即记得使用 `import { CreateUserDto }` 而不是 `import type { CreateUserDto }` 。
+:::info 提示
+导入 DTO 时，不能使用仅类型导入，因为这在运行时会被擦除，即记得使用 `import { CreateUserDto }` 而不是 `import type { CreateUserDto }` 。
+:::
 
 现在我们可以在 `CreateUserDto` 中添加一些验证规则。我们使用 `class-validator` 包提供的装饰器来实现这一点，具体描述见[此处](https://github.com/typestack/class-validator#validation-decorators) 。通过这种方式，任何使用 `CreateUserDto` 的路由都会自动执行这些验证规则。
 
@@ -162,7 +171,7 @@ app.useGlobalPipes(
 
 通过网络传输的有效载荷是纯 JavaScript 对象。`ValidationPipe` 可以自动将这些有效载荷转换为根据其 DTO 类定义类型的对象。要启用自动转换功能，需将 `transform` 设置为 `true`。这可以在方法级别进行配置：
 
-```typescript title="cats.controller"
+ ```typescript title="cats.controller.ts"
 @Post()
 @UsePipes(new ValidationPipe({ transform: true }))
 async create(@Body() createCatDto: CreateCatDto) {
@@ -210,13 +219,19 @@ findOne(
 }
 ```
 
-> info **提示** `ParseIntPipe` 和 `ParseBoolPipe` 是从 `@nestjs/common` 包导出的。
+:::info 提示
+`ParseIntPipe` 和 `ParseBoolPipe` 是从 `@nestjs/common` 包导出的。
+:::
 
 #### 映射类型
 
 在构建 **CRUD**（创建/读取/更新/删除）等功能时，基于基础实体类型创建变体通常很有用。Nest 提供了几个实用函数来执行类型转换，使这项任务更加便捷。
 
-> **警告** 如果您的应用使用了 `@nestjs/swagger` 包，请参阅[本章节](/openapi/mapped-types)了解有关 Mapped Types 的更多信息。同样地，如果使用 `@nestjs/graphql` 包，请查看[本章节](/graphql/mapped-types) 。这两个包都重度依赖类型系统，因此需要采用不同的导入方式。如果您错误地使用了 `@nestjs/mapped-types`（而非根据应用类型选择正确的 `@nestjs/swagger` 或 `@nestjs/graphql`），可能会遇到各种未记录的副作用。
+:::warning 警告
+如果您的应用使用了 `@nestjs/swagger` 包，请参阅[本章节](/openapi/mapped-types)了解有关 Mapped Types 的更多信息。同样地，如果使用 `@nestjs/graphql` 包，请查看[本章节](/graphql/mapped-types) 。这两个包都重度依赖类型系统，因此需要采用不同的导入方式。如果您错误地使用了 `@nestjs/mapped-types`（而非根据应用类型选择正确的 `@nestjs/swagger` 或 `@nestjs/graphql`），可能会遇到各种未记录的副作用。
+:::
+
+
 
 构建输入验证类型（也称为 DTO）时，通常需要在同一类型上创建 **create**（创建）和 **update**（更新）变体。例如，**create** 变体可能需要所有字段，而 **update** 变体则可能将所有字段设为可选。
 
@@ -238,7 +253,10 @@ export class CreateCatDto {
 export class UpdateCatDto extends PartialType(CreateCatDto) {}
 ```
 
-> info **注意** `PartialType()` 函数是从 `@nestjs/mapped-types` 包导入的。
+:::info 注意
+`PartialType()` 函数是从 `@nestjs/mapped-types` 包导入的。
+:::
+
 
 `PickType()` 函数通过从输入类型中选择一组属性来构造新类型（类）。例如，假设我们从以下类型开始：
 
@@ -256,7 +274,10 @@ export class CreateCatDto {
 export class UpdateCatAgeDto extends PickType(CreateCatDto, ['age'] as const) {}
 ```
 
-> info **注意** `PickType()` 函数是从 `@nestjs/mapped-types` 包导入的。
+:::info 注意
+`PickType()` 函数是从 `@nestjs/mapped-types` 包导入的。
+:::
+
 
 `OmitType()` 函数通过从输入类型中选取所有属性，然后移除特定键集合来构造一个类型。例如，假设我们从以下类型开始：
 
@@ -274,7 +295,10 @@ export class CreateCatDto {
 export class UpdateCatDto extends OmitType(CreateCatDto, ['name'] as const) {}
 ```
 
-> info **注意** `OmitType()` 函数是从 `@nestjs/mapped-types` 包导入的。
+:::info 注意
+`OmitType()` 函数是从 `@nestjs/mapped-types` 包导入的。
+:::
+
 
 `IntersectionType()` 函数将两种类型合并为一个新类型（类）。例如，假设我们有以下两种类型：
 
@@ -298,7 +322,9 @@ export class UpdateCatDto extends IntersectionType(
 ) {}
 ```
 
-> info **提示** `IntersectionType()` 函数是从 `@nestjs/mapped-types` 包中导入的。
+:::info 提示
+`IntersectionType()` 函数是从 `@nestjs/mapped-types` 包中导入的。
+:::
 
 类型映射工具函数是可组合的。例如，以下代码将生成一个类型（类），该类型包含除 `name` 之外 `CreateCatDto` 类型的所有属性，并且这些属性将被设置为可选：
 

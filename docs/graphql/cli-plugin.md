@@ -1,10 +1,18 @@
 ## CLI 插件
 
-> **警告** 本章仅适用于代码优先（code first）方法。
+:::warning 警告
+本章仅适用于代码优先（code first）方法。
+:::
+
+
 
 TypeScript 的元数据反射系统存在若干限制，例如无法确定类包含哪些属性，或者识别某个属性是可选的还是必需的。不过，其中部分限制可以在编译时得到解决。Nest 提供了一个插件来增强 TypeScript 编译过程，从而减少所需的样板代码量。
 
-> **提示** 此插件为**可选项**。如果你愿意，可以手动声明所有装饰器，或者仅在需要的地方声明特定装饰器。
+:::info 提示
+此插件为**可选项**。如果你愿意，可以手动声明所有装饰器，或者仅在需要的地方声明特定装饰器。
+:::
+
+
 
 #### 概述
 
@@ -19,7 +27,7 @@ GraphQL 插件将自动：
 
 根据目前所学，您需要重复大量代码来让包知道您的类型应如何在 GraphQL 中声明。例如，您可以如下定义一个简单的 `Author` 类：
 
-```typescript title="authors/models/author.model.ts"
+ ```typescript title="authors/models/author.model.ts"
 @ObjectType()
 export class Author {
   @Field(type => ID)
@@ -40,7 +48,7 @@ export class Author {
 
 通过启用 GraphQL 插件，上述类定义可以简化为：
 
-```typescript title="authors/models/author.model.ts"
+ ```typescript title="authors/models/author.model.ts"
 @ObjectType()
 export class Author {
   @Field(type => ID)
@@ -54,7 +62,10 @@ export class Author {
 
 该插件会基于**抽象语法树**动态添加适当的装饰器。因此，您无需再为散落在代码各处的 `@Field` 装饰器而烦恼。
 
-> info **注意** 插件会自动生成所有缺失的 GraphQL 属性，但如需覆盖它们，只需通过 `@Field()` 显式设置即可。
+:::info 注意
+插件会自动生成所有缺失的 GraphQL 属性，但如需覆盖它们，只需通过 `@Field()` 显式设置即可。
+:::
+
 
 #### 注释内省
 

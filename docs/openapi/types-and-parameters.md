@@ -9,7 +9,9 @@ async create(@Body() createCatDto: CreateCatDto) {
 }
 ```
 
-> info **提示** 要显式设置请求体定义，请使用 `@ApiBody()` 装饰器（从 `@nestjs/swagger` 包导入）。
+:::info 提示
+要显式设置请求体定义，请使用 `@ApiBody()` 装饰器（从 `@nestjs/swagger` 包导入）。
+:::
 
 基于 `CreateCatDto`，Swagger UI 将创建以下模型定义：
 
@@ -32,7 +34,11 @@ export class CreateCatDto {
 }
 ```
 
-> **提示** 与其手动标注每个属性，建议使用 Swagger 插件（参见[插件](/openapi/cli-plugin)章节）来自动完成此操作。
+:::info 提示
+与其手动标注每个属性，建议使用 Swagger 插件（参见[插件](/openapi/cli-plugin)章节）来自动完成此操作。
+:::
+
+
 
 让我们打开浏览器验证生成的 `CreateCatDto` 模型：
 
@@ -49,7 +55,9 @@ export class CreateCatDto {
 age: number;
 ```
 
-> info：无需显式输入 `{{"@ApiProperty({ required: false })"}}` ，您可以使用 `@ApiPropertyOptional()` 快捷装饰器。
+:::info 提示
+无需显式输入 `{{"@ApiProperty({ required: false })"}}` ，您可以使用 `@ApiPropertyOptional()` 快捷装饰器。
+:::
 
 如需显式设置属性类型，请使用 `type` 键：
 
@@ -69,7 +77,9 @@ age: number;
 names: string[];
 ```
 
-> info **提示** 考虑使用 Swagger 插件（参见 [插件](/openapi/cli-plugin) 部分），它将自动检测数组。
+:::info 提示
+考虑使用 Swagger 插件（参见 [插件](/openapi/cli-plugin) 部分），它将自动检测数组。
+:::
 
 要么将类型作为数组的第一个元素包含（如上所示），要么将 `isArray` 属性设置为 `true`。
 
@@ -82,7 +92,9 @@ names: string[];
 node: Node;
 ```
 
-> info **提示** 考虑使用 Swagger 插件（参见[插件](/openapi/cli-plugin)部分），该插件将自动检测循环依赖。
+:::info 提示
+考虑使用 Swagger 插件（参见[插件](/openapi/cli-plugin)部分），该插件将自动检测循环依赖。
+:::
 
 #### 泛型与接口
 
@@ -169,7 +181,9 @@ export enum CatInformationEnum {
 }
 ```
 
-> info **提示** 上述代码片段是使用名为 [NSwag](https://github.com/RicoSuter/NSwag) 的工具生成的。
+:::info 提示
+上述代码片段是使用名为 [NSwag](https://github.com/RicoSuter/NSwag) 的工具生成的。
+:::
 
 可以看到现在有两个完全相同的`枚举` 。为了解决这个问题，你可以在装饰器中同时传入 `enumName` 和 `enum` 属性。
 
@@ -198,7 +212,10 @@ CatBreed:
     - Siamese
 ```
 
-> info **注意** 任何接受 `enum` 作为属性的**装饰器**也都支持 `enumName` 参数。
+:::info 注意
+任何接受 `enum` 作为属性的**装饰器**也都支持 `enumName` 参数。
+:::
+
 
 #### 属性值示例
 
@@ -288,7 +305,10 @@ async create(@Body() coords: number[][]) {}
 export class CreateCatDto {}
 ```
 
-> info **注意** 对于特定模型类，您只需使用一次 `@ApiExtraModels()`。
+:::info 注意
+对于特定模型类，您只需使用一次 `@ApiExtraModels()`。
+:::
+
 
 或者，您也可以向 `SwaggerModule.createDocument()` 方法传递一个包含 `extraModels` 属性的选项对象，如下所示：
 
@@ -338,7 +358,9 @@ type Pet = Cat | Dog;
 pets: Pet[];
 ```
 
-> info **提示** `getSchemaPath()` 函数是从 `@nestjs/swagger` 导入的。
+:::info 提示
+`getSchemaPath()` 函数是从 `@nestjs/swagger` 导入的。
+:::
 
 `Cat` 和 `Dog` 都必须使用 `@ApiExtraModels()` 装饰器（在类级别）定义为额外模型。
 

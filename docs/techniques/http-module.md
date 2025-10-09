@@ -2,7 +2,9 @@
 
 [Axios](https://github.com/axios/axios) 是一个功能丰富的 HTTP 客户端包，被广泛使用。Nest 封装了 Axios 并通过内置的 `HttpModule` 暴露它。`HttpModule` 导出了 `HttpService` 类，该类提供了基于 Axios 的方法来执行 HTTP 请求。该库还将生成的 HTTP 响应转换为 `Observables`。
 
-> info **提示** 你也可以直接使用任何通用的 Node.js HTTP 客户端库，包括 [got](https://github.com/sindresorhus/got) 或 [undici](https://github.com/nodejs/undici)。
+:::info 提示
+你也可以直接使用任何通用的 Node.js HTTP 客户端库，包括 [got](https://github.com/sindresorhus/got) 或 [undici](https://github.com/nodejs/undici)。
+:::
 
 #### 安装
 
@@ -26,7 +28,9 @@ export class CatsModule {}
 
 接下来，通过常规的构造函数注入方式注入 `HttpService`。
 
-> info **提示**`HttpModule` 和 `HttpService` 是从 `@nestjs/axios` 包中导入的。
+:::info 提示
+`HttpModule` 和 `HttpService` 是从 `@nestjs/axios` 包中导入的。
+:::
 
 ```typescript
 @Injectable()
@@ -39,7 +43,9 @@ export class CatsService {
 }
 ```
 
-> info **提示**`AxiosResponse` 是从 `axios` 包(`$ npm i axios`)导出的接口。
+:::info 提示
+`AxiosResponse` 是从 `axios` 包(`$ npm i axios`)导出的接口。
+:::
 
 所有 `HttpService` 方法都会返回一个封装在 `Observable` 对象中的 `AxiosResponse`。
 
@@ -173,4 +179,7 @@ export class CatsService {
 }
 ```
 
-> info **提示** 请访问 RxJS 关于 [`firstValueFrom`](https://rxjs.dev/api/index/function/firstValueFrom) 和 [`lastValueFrom`](https://rxjs.dev/api/index/function/lastValueFrom) 的文档，以了解它们之间的区别。
+:::info 提示
+ 请访问 RxJS 关于 [`firstValueFrom`](https://rxjs.dev/api/index/function/firstValueFrom) 和 [`lastValueFrom`](https://rxjs.dev/api/index/function/lastValueFrom) 的文档，以了解它们之间的区别。
+:::
+

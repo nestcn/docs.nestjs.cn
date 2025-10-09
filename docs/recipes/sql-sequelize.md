@@ -2,7 +2,11 @@
 
 ##### 本章仅适用于 TypeScript
 
-> **警告** 本文中，您将学习如何基于 **Sequelize** 包使用自定义组件从零开始创建 `DatabaseModule`。因此，该技术包含许多额外工作，您可以通过使用开箱即用的专用 `@nestjs/sequelize` 包来避免。了解更多信息，请参阅[此处](/techniques/sql#sequelize-集成) 。
+:::warning 警告
+本文中，您将学习如何基于 **Sequelize** 包使用自定义组件从零开始创建 `DatabaseModule`。因此，该技术包含许多额外工作，您可以通过使用开箱即用的专用 `@nestjs/sequelize` 包来避免。了解更多信息，请参阅[此处](/techniques/sql#sequelize-集成) 。
+:::
+
+
 
 [Sequelize](https://github.com/sequelize/sequelize) 是一个用原生 JavaScript 编写的流行对象关系映射器(ORM)，但有一个 [sequelize-typescript](https://github.com/RobinBuschmann/sequelize-typescript) TypeScript 包装器，为基础 sequelize 提供了一系列装饰器和其他附加功能。
 
@@ -17,7 +21,7 @@ $ npm install --save-dev @types/sequelize
 
 第一步是创建一个带有选项对象的 **Sequelize** 实例，并将其传入构造函数。此外，我们需要添加所有模型（另一种方法是使用 `modelPaths` 属性）并 `sync()` 我们的数据库表。
 
-```typescript title="database.providers"
+ ```typescript title="database.providers.ts"
 import { Sequelize } from 'sequelize-typescript';
 import { Cat } from '../cats/cat.entity';
 
@@ -41,7 +45,11 @@ export const databaseProviders = [
 ];
 ```
 
-> **提示** 遵循最佳实践，我们在单独的文件中声明了自定义提供者，该文件具有 `*.providers.ts` 后缀。
+:::info 提示
+遵循最佳实践，我们在单独的文件中声明了自定义提供者，该文件具有 `*.providers.ts` 后缀。
+:::
+
+
 
 然后，我们需要导出这些提供者，使它们对应用程序的其余部分**可访问** 。
 
@@ -62,7 +70,7 @@ export class DatabaseModule {}
 
 在 [Sequelize](https://github.com/sequelize/sequelize) 中，**Model** 定义了数据库中的一张表。该类的实例代表数据库中的一行记录。首先，我们至少需要一个实体：
 
-```typescript title="cat.entity"
+ ```typescript title="cat.entity.ts"
 import { Table, Column, Model } from 'sequelize-typescript';
 
 @Table
@@ -80,7 +88,7 @@ export class Cat extends Model {
 
 `Cat` 实体属于 `cats` 目录，该目录代表 `CatsModule` 模块。现在该创建一个 **Repository** 提供者了：
 
-```typescript title="cats.providers"
+ ```typescript title="cats.providers.ts"
 import { Cat } from './cat.entity';
 
 export const catsProviders = [
@@ -91,13 +99,15 @@ export const catsProviders = [
 ];
 ```
 
-> warning **注意** 在实际应用中应避免使用 **魔法字符串** 。建议将 `CATS_REPOSITORY` 和 `SEQUELIZE` 都存放在独立的 `constants.ts` 文件中。
+:::warning 注意
+在实际应用中应避免使用 **魔法字符串** 。建议将 `CATS_REPOSITORY` 和 `SEQUELIZE` 都存放在独立的 `constants.ts` 文件中。
+:::
 
 在 Sequelize 中，我们使用静态方法来操作数据，因此这里创建了一个**别名** 。
 
 现在我们可以通过 `@Inject()` 装饰器将 `CATS_REPOSITORY` 注入到 `CatsService` 中：
 
-```typescript title="cats.service"
+ ```typescript title="cats.service.ts"
 import { Injectable, Inject } from '@nestjs/common';
 import { CreateCatDto } from './dto/create-cat.dto';
 import { Cat } from './cat.entity';
@@ -119,7 +129,7 @@ export class CatsService {
 
 以下是最终的 `CatsModule`：
 
-```typescript title="cats.module"
+ ```typescript title="cats.module.ts"
 import { Module } from '@nestjs/common';
 import { CatsController } from './cats.controller';
 import { CatsService } from './cats.service';
@@ -137,4 +147,8 @@ import { DatabaseModule } from '../database/database.module';
 export class CatsModule {}
 ```
 
-> **提示** 不要忘记将 `CatsModule` 导入根模块 `AppModule`。
+:::info 提示
+不要忘记将 `CatsModule` 导入根模块 `AppModule`。
+:::
+
+

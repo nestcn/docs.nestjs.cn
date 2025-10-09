@@ -2,11 +2,16 @@
 
 Nest 提供了多种开箱即用的**传输器** ，同时提供了允许开发者构建新自定义传输策略的 API。传输器让你能够通过可插拔的通信层和非常简单的应用级消息协议（阅读完整[文章](https://dev.to/nestjs/integrate-nestjs-with-external-services-using-microservice-transporters-part-1-p3) ）在网络中连接组件。
 
-> info **注意** 使用 Nest 构建微服务并不一定意味着你必须使用 `@nestjs/microservices` 包。例如，如果你需要与外部服务通信（比如用其他语言编写的微服务），可能并不需要 `@nestjs/microservice` 库提供的所有功能。实际上，如果你不需要通过装饰器（`@EventPattern` 或 `@MessagePattern`）来声明式定义订阅者，运行一个[独立应用](/application-context)并手动维护连接/订阅通道对大多数用例来说已经足够，还能提供更大的灵活性。
+:::info 注意
+使用 Nest 构建微服务并不一定意味着你必须使用 `@nestjs/microservices` 包。例如，如果你需要与外部服务通信（比如用其他语言编写的微服务），可能并不需要 `@nestjs/microservice` 库提供的所有功能。实际上，如果你不需要通过装饰器（`@EventPattern` 或 `@MessagePattern`）来声明式定义订阅者，运行一个[独立应用](/application-context)并手动维护连接/订阅通道对大多数用例来说已经足够，还能提供更大的灵活性。
+:::
+
 
 通过自定义传输器，您可以集成任何消息系统/协议（包括 Google Cloud Pub/Sub、Amazon Kinesis 等），或在现有基础上扩展功能（例如为 MQTT 添加 [QoS](https://github.com/mqttjs/MQTT.js/blob/master/README.md#qos)）。
 
-> info **建议** 为了更好地理解 Nest 微服务的工作原理以及如何扩展现有传输器的功能，我们推荐阅读 [《NestJS 微服务实战》](https://dev.to/johnbiundo/series/4724) 和 [《NestJS 高级微服务》](https://dev.to/nestjs/part-1-introduction-and-setup-1a2l) 系列文章。
+:::info 建议
+ 为了更好地理解 Nest 微服务的工作原理以及如何扩展现有传输器的功能，我们推荐阅读 [《NestJS 微服务实战》](https://dev.to/johnbiundo/series/4724) 和 [《NestJS 高级微服务》](https://dev.to/nestjs/part-1-introduction-and-setup-1a2l) 系列文章。
+:::
 
 #### 创建策略
 
@@ -51,7 +56,9 @@ class GoogleCloudPubSubServer
 }
 ```
 
-> warning **注意** 请注意，本章节不会实现一个功能完整的 Google Cloud Pub/Sub 服务器，因为这需要深入探讨传输器相关的技术细节。
+:::warning 注意
+ 请注意，本章节不会实现一个功能完整的 Google Cloud Pub/Sub 服务器，因为这需要深入探讨传输器相关的技术细节。
+:::
 
 在上述示例中，我们声明了 `GoogleCloudPubSubServer` 类，并提供了由 `CustomTransportStrategy` 接口强制要求的 `listen()` 和 `close()` 方法。此外，我们的类继承自 `@nestjs/microservices` 包导入的 `Server` 类，该类提供了一些实用方法，例如 Nest 运行时用于注册消息处理器的方法。或者，如果您想扩展现有传输策略的功能，可以继承对应的服务器类，例如 `ServerRedis`。按照惯例，我们为类添加了 `"Server"` 后缀，因为它将负责订阅消息/事件（并在必要时响应它们）。
 
@@ -94,7 +101,9 @@ listen(callback: () => void) {
 Map { 'echo' => [AsyncFunction] { isEventHandler: false } }
 ```
 
-> info **提示** 如果我们使用 `@EventPattern` 装饰器，您会看到相同的输出，但 `isEventHandler` 属性会被设置为 `true`。
+:::info 提示
+如果我们使用 `@EventPattern` 装饰器，您会看到相同的输出，但 `isEventHandler` 属性会被设置为 `true`。
+:::
 
 如您所见，`messageHandlers` 属性是一个包含所有消息（和事件）处理器的 `Map` 集合，其中模式被用作键。现在，您可以使用键（例如 `"echo"`）来获取消息处理器的引用：
 
@@ -133,7 +142,11 @@ async listen(callback: () => void) {
 
 正如我们在第一节中提到的，您不一定需要使用 `@nestjs/microservices` 包来创建微服务，但如果决定这样做且需要集成自定义策略，您还需要提供一个"客户端"类。
 
-> **提示** 再次说明，要实现一个与所有 `@nestjs/microservices` 功能（例如流式传输）兼容的全功能客户端类，需要深入理解框架使用的通信技术。了解更多信息，请查看这篇[文章](https://dev.to/nestjs/part-4-basic-client-component-16f9) 。
+:::info 提示
+再次说明，要实现一个与所有 `@nestjs/microservices` 功能（例如流式传输）兼容的全功能客户端类，需要深入理解框架使用的通信技术。了解更多信息，请查看这篇[文章](https://dev.to/nestjs/part-4-basic-client-component-16f9) 。
+:::
+
+
 
 要与外部服务通信/发送和发布消息（或事件），您可以使用特定库的 SDK 包，或者实现一个继承自 `ClientProxy` 的自定义客户端类，如下所示：
 
@@ -154,7 +167,9 @@ class GoogleCloudPubSubClient extends ClientProxy {
 }
 ```
 
-> warning **注意** 请注意，本章节不会实现一个功能完整的 Google Cloud Pub/Sub 客户端，因为这需要深入探讨传输器相关的技术细节。
+:::warning 注意
+ 请注意，本章节不会实现一个功能完整的 Google Cloud Pub/Sub 客户端，因为这需要深入探讨传输器相关的技术细节。
+:::
 
 如你所见，`ClientProxy` 类要求我们提供多个方法用于建立和关闭连接、发布消息(`publish`)和事件(`dispatchEvent`)。注意，如果不需要请求-响应式的通信风格支持，可以将 `publish()` 方法留空。同样地，如果不需要支持基于事件的通信，可以跳过 `dispatchEvent()` 方法。
 
@@ -224,7 +239,9 @@ googlePubSubClient
   );
 ```
 
-> info **提示** `timeout` 操作符是从 `rxjs/operators` 包中导入的。
+:::info 提示
+`timeout` 操作符是从 `rxjs/operators` 包中导入的。
+:::
 
 应用 `timeout` 操作符后，您的终端输出应如下所示：
 
@@ -252,7 +269,7 @@ event to dispatch:  { pattern: 'event', data: 'Hello world!' }
 
 若需在客户端围绕响应序列化添加自定义逻辑，可创建一个继承自 `ClientProxy` 或其子类的自定义类。要修改成功请求，可重写 `serializeResponse` 方法；若要修改经此客户端的所有错误，可重写 `serializeError` 方法。使用此自定义类时，可通过 `customClass` 属性将类本身传入 `ClientsModule.register()` 方法。以下是将每个错误序列化为 `RpcException` 的自定义 `ClientProxy` 示例。
 
-```typescript title="error-handling.proxy"
+ ```typescript title="error-handling.proxy.ts"
 import { ClientTcp, RpcException } from '@nestjs/microservices';
 
 class ErrorHandlingProxy extends ClientTCP {
@@ -264,7 +281,7 @@ class ErrorHandlingProxy extends ClientTCP {
 
 然后在 `ClientsModule` 中这样使用：
 
-```typescript title="app.module"
+ ```typescript title="app.module.ts"
 @Module({
   imports: [
     ClientsModule.register([{
@@ -276,4 +293,7 @@ class ErrorHandlingProxy extends ClientTCP {
 export class AppModule
 ```
 
-> info **注意** 这里传入 `customClass` 的是类本身而非类的实例。Nest 会在底层自动创建实例，并将提供给 `options` 属性的所有配置传递给新建的 `ClientProxy`。
+:::info 注意
+这里传入 `customClass` 的是类本身而非类的实例。Nest 会在底层自动创建实例，并将提供给 `options` 属性的所有配置传递给新建的 `ClientProxy`。
+:::
+

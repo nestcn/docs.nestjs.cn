@@ -13,7 +13,9 @@
 
 Nest 内置了多种开箱即用的管道。您也可以构建自定义管道。本章将介绍内置管道及其与路由处理器的绑定方式，随后通过几个自定义管道示例展示如何从零开始构建管道。
 
-> info **提示** 管道在异常区域内运行。这意味着当管道抛出异常时，该异常将由异常层处理（全局异常过滤器以及应用于当前上下文的任何[异常过滤器](/exception-filters) ）。鉴于上述情况，应当明确的是：当管道中抛出异常时，后续不会执行任何控制器方法。这为你在系统边界验证来自外部源输入应用程序的数据提供了一种最佳实践技术。
+:::info 提示
+管道在异常区域内运行。这意味着当管道抛出异常时，该异常将由异常层处理（全局异常过滤器以及应用于当前上下文的任何[异常过滤器](/exception-filters) ）。鉴于上述情况，应当明确的是：当管道中抛出异常时，后续不会执行任何控制器方法。这为你在系统边界验证来自外部源输入应用程序的数据提供了一种最佳实践技术。
+:::
 
 #### 内置管道
 
@@ -97,11 +99,17 @@ async findOne(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
 }
 ```
 
-> info **注意** 使用 `ParseUUIDPipe()` 时会解析版本 3、4 或 5 的 UUID，若只需特定版本的 UUID，可在管道选项中传入版本号。
+:::info 注意
+使用 `ParseUUIDPipe()` 时会解析版本 3、4 或 5 的 UUID，若只需特定版本的 UUID，可在管道选项中传入版本号。
+:::
+
 
 上文我们已了解如何绑定各类内置的 `Parse*` 解析管道。绑定验证管道略有不同，我们将在下一节详细讨论。
 
-> info **注意** 另请参阅[验证技术](/techniques/validation)章节获取验证管道的详细示例。
+:::info 注意
+另请参阅[验证技术](/techniques/validation)章节获取验证管道的详细示例。
+:::
+
 
 #### 自定义管道
 
@@ -109,7 +117,7 @@ async findOne(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
 
 我们从简单的 `ValidationPipe` 开始。最初，我们让它简单地接收一个输入值并立即返回相同的值，表现得像一个恒等函数。
 
-```typescript title="validation.pipe"
+ ```typescript title="validation.pipe.ts"
 import { PipeTransform, Injectable, ArgumentMetadata } from '@nestjs/common';
 
 @Injectable()
@@ -120,7 +128,9 @@ export class ValidationPipe implements PipeTransform {
 }
 ```
 
-> info **提示**`PipeTransform<T, R>` 是一个必须由所有管道实现的泛型接口。该泛型接口使用 `T` 表示输入 `value` 的类型，`R` 表示 `transform()` 方法的返回类型。
+:::info 提示
+`PipeTransform<T, R>` 是一个必须由所有管道实现的泛型接口。该泛型接口使用 `T` 表示输入 `value` 的类型，`R` 表示 `transform()` 方法的返回类型。
+:::
 
 每个管道都必须实现 `transform()` 方法来满足 `PipeTransform` 接口契约。该方法有两个参数：
 
@@ -145,7 +155,11 @@ export interface ArgumentMetadata {
 | `metatype` | 提供参数的元类型，例如 `String`。注意：该值为 `undefined`，如果您在路由处理方法签名中省略类型声明，或使用原生 JavaScript。  |
 | `data`     | 传递给装饰器的字符串，例如 `@Body('string')`。如果装饰器括号留空，则为 `undefined`。                              |
 
-> **警告** TypeScript 接口在转译过程中会被移除。因此，如果方法参数的类型声明为接口而非类，`metatype` 的值将会是 `Object`。
+:::warning 警告
+TypeScript 接口在转译过程中会被移除。因此，如果方法参数的类型声明为接口而非类，`metatype` 的值将会是 `Object`。
+:::
+
+
 
 #### 基于模式的验证
 
@@ -160,7 +174,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 让我们重点关注 `createCatDto` 这个 body 参数。它的类型是 `CreateCatDto`：
 
-```typescript title="create-cat.dto"
+ ```typescript title="create-cat.dto.ts"
 export class CreateCatDto {
   name: string;
   age: number;
@@ -242,7 +256,7 @@ export type CreateCatDto = z.infer<typeof createCatSchema>;
 
 我们通过使用如下所示的 `@UsePipes()` 装饰器来实现：
 
-```typescript title="cats.controller"
+ ```typescript title="cats.controller.ts"
 @Post()
 @UsePipes(new ZodValidationPipe(createCatSchema))
 async create(@Body() createCatDto: CreateCatDto) {
@@ -250,13 +264,19 @@ async create(@Body() createCatDto: CreateCatDto) {
 }
 ```
 
-> info **提示** `@UsePipes()` 装饰器需要从 `@nestjs/common` 包中导入。
+:::info 提示
+`@UsePipes()` 装饰器需要从 `@nestjs/common` 包中导入。
+:::
 
-> warning **注意** `zod` 库要求在你的 `tsconfig.json` 文件中启用 `strictNullChecks` 配置。
+:::warning 注意
+ `zod` 库要求在你的 `tsconfig.json` 文件中启用 `strictNullChecks` 配置。
+:::
 
 #### 类验证器
 
-> warning **警告** 本节中的技术需要使用 TypeScript，如果你的应用使用原生 JavaScript 编写则无法使用。
+:::warning 警告
+ 本节中的技术需要使用 TypeScript，如果你的应用使用原生 JavaScript 编写则无法使用。
+:::
 
 让我们来看另一种验证技术的实现方案。
 
@@ -268,7 +288,7 @@ $ npm i --save class-validator class-transformer
 
 安装完成后，我们就可以给 `CreateCatDto` 类添加一些装饰器了。这里我们可以看到这项技术的一个显著优势：`CreateCatDto` 类仍然是 Post 请求体对象的唯一真实来源（而不需要创建单独的验证类）。
 
-```typescript title="create-cat.dto"
+ ```typescript title="create-cat.dto.ts"
 import { IsString, IsInt } from 'class-validator';
 
 export class CreateCatDto {
@@ -283,11 +303,13 @@ export class CreateCatDto {
 }
 ```
 
-> info **提示** 了解更多关于 class-validator 装饰器的信息，请点击[此处](https://github.com/typestack/class-validator#用法) 。
+:::info 提示
+了解更多关于 class-validator 装饰器的信息，请点击[此处](https://github.com/typestack/class-validator#用法) 。
+:::
 
 现在我们可以创建一个使用这些注解的 `ValidationPipe` 类。
 
-```typescript title="validation.pipe"
+ ```typescript title="validation.pipe.ts"
 import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException } from '@nestjs/common';
 import { validate } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
@@ -313,9 +335,13 @@ export class ValidationPipe implements PipeTransform<any> {
 }
 ```
 
-> info **提示** 需要提醒的是，您不必自己构建通用验证管道，因为 Nest 已经内置提供了 `ValidationPipe`。内置的 `ValidationPipe` 比本章构建的示例提供了更多选项，本章示例保持基础性是为了说明自定义管道的机制。您可以[在此处](/techniques/validation)找到完整细节及大量示例。
+:::info 提示
+需要提醒的是，您不必自己构建通用验证管道，因为 Nest 已经内置提供了 `ValidationPipe`。内置的 `ValidationPipe` 比本章构建的示例提供了更多选项，本章示例保持基础性是为了说明自定义管道的机制。您可以[在此处](/techniques/validation)找到完整细节及大量示例。
+:::
 
-> warning **注意** 我们上面使用了 [class-transformer](https://github.com/typestack/class-transformer) 库，它与 **class-validator** 库由同一作者开发，因此它们能完美协同工作。
+:::warning 注意
+ 我们上面使用了 [class-transformer](https://github.com/typestack/class-transformer) 库，它与 **class-validator** 库由同一作者开发，因此它们能完美协同工作。
+:::
 
 让我们来看这段代码。首先注意 `transform()` 方法被标记为 `async`，这是因为 Nest 同时支持同步和**异步**管道。我们将这个方法设为 `async` 是因为某些 class-validator 验证[可能是异步的](https://github.com/typestack/class-validator#custom-validation-classes) （使用了 Promise）。
 
@@ -329,7 +355,7 @@ export class ValidationPipe implements PipeTransform<any> {
 
 最后一步是绑定 `ValidationPipe`。管道可以作用于参数范围、方法范围、控制器范围或全局范围。之前在使用基于 Zod 的验证管道时，我们看到了在方法级别绑定管道的示例。在下面的示例中，我们将把管道实例绑定到路由处理器的 `@Body()` 装饰器上，这样就会调用我们的管道来验证 post body。
 
-```typescript title="cats.controller"
+ ```typescript title="cats.controller.ts"
 @Post()
 async create(
   @Body(new ValidationPipe()) createCatDto: CreateCatDto,
@@ -344,7 +370,7 @@ async create(
 
 由于 `ValidationPipe` 被设计为尽可能通用，我们可以通过将其设置为**全局作用域**管道来充分发挥其效用，这样它就会应用到整个应用程序的每个路由处理器上。
 
-```typescript title="main"
+ ```typescript title="main.ts"
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
@@ -359,7 +385,7 @@ warning **注意** 对于[混合应用](faq/hybrid-application) ，`useGlobalPip
 
 请注意，在依赖注入方面，从任何模块外部注册的全局管道（如上例中使用 `useGlobalPipes()`）无法注入依赖项，因为绑定是在任何模块上下文之外完成的。为解决此问题，您可以使用以下构造**直接从任何模块**设置全局管道：
 
-```typescript title="app.module"
+ ```typescript title="app.module.ts"
 import { Module } from '@nestjs/common';
 import { APP_PIPE } from '@nestjs/core';
 
@@ -374,7 +400,9 @@ import { APP_PIPE } from '@nestjs/core';
 export class AppModule {}
 ```
 
-> info **提示** 当使用这种方法为管道执行依赖注入时，请注意无论该构造应用于哪个模块，该管道实际上都是全局的。应该在何处进行此操作？选择定义管道（上例中的 `ValidationPipe`）的模块。此外，`useClass` 并非处理自定义提供程序注册的唯一方式。了解更多[此处](/fundamentals/custom-providers) 。
+:::info 提示
+当使用这种方法为管道执行依赖注入时，请注意无论该构造应用于哪个模块，该管道实际上都是全局的。应该在何处进行此操作？选择定义管道（上例中的 `ValidationPipe`）的模块。此外，`useClass` 并非处理自定义提供程序注册的唯一方式。了解更多[此处](/fundamentals/custom-providers) 。
+:::
 
 #### 内置的 ValidationPipe
 
@@ -388,7 +416,7 @@ export class AppModule {}
 
 这里有一个简单的 `ParseIntPipe`，负责将字符串解析为整数值。（如前所述，Nest 框架内置了一个更复杂的 `ParseIntPipe`；我们在此展示这个自定义转换管道的简单示例）。
 
-```typescript title="parse-int.pipe"
+ ```typescript title="parse-int.pipe.ts"
 import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException } from '@nestjs/common';
 
 @Injectable()

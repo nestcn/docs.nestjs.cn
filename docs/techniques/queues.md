@@ -22,7 +22,7 @@ $ npm install --save @nestjs/bullmq bullmq
 
 安装完成后，我们可以将 `BullModule` 导入根 `AppModule` 中。
 
-```typescript title="app.module"
+ ```typescript title="app.module.ts"
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
 
@@ -57,7 +57,9 @@ BullModule.registerQueue({
 });
 ```
 
-> info **提示** 通过向 `registerQueue()` 方法传递多个以逗号分隔的配置对象，可以创建多个队列。
+:::info 提示
+通过向 `registerQueue()` 方法传递多个以逗号分隔的配置对象，可以创建多个队列。
+:::
 
 `registerQueue()` 方法用于实例化和/或注册队列。队列在连接到具有相同凭证的同一底层 Redis 数据库的模块和进程之间共享。每个队列通过其 name 属性保持唯一性。队列名称既用作注入令牌（用于将队列注入控制器/提供者），也用作装饰器的参数，以将消费者类和监听器与队列关联起来。
 
@@ -126,7 +128,9 @@ export class AudioService {
 }
 ```
 
-> info **提示** `@InjectQueue()` 装饰器通过队列名称来标识队列，该名称在 `registerQueue()` 方法调用中提供（例如 `'audio'`）。
+:::info 提示
+`@InjectQueue()` 装饰器通过队列名称来标识队列，该名称在 `registerQueue()` 方法调用中提供（例如 `'audio'`）。
+:::
 
 现在，通过调用队列的 `add()` 方法来添加任务，传入一个用户自定义的任务对象。任务以可序列化的 JavaScript 对象形式表示（因为它们会存储在 Redis 数据库中）。传入的任务对象结构可以自由定义，用于体现任务对象的语义。同时需要为任务指定名称，这样就能创建专门的[消费者](techniques/queues#消费者)来仅处理特定名称的任务。
 
@@ -202,7 +206,9 @@ import { Processor } from '@nestjs/bullmq';
 export class AudioConsumer {}
 ```
 
-> info **提示** 消费者必须注册为 `providers`，这样 `@nestjs/bullmq` 包才能识别它们。
+:::info 提示
+消费者必须注册为 `providers`，这样 `@nestjs/bullmq` 包才能识别它们。
+:::
 
 装饰器的字符串参数（例如 `'audio'`）表示要与类方法关联的队列名称。
 
@@ -230,7 +236,9 @@ export class AudioConsumer extends WorkerHost {
 
 在旧版本 Bull 中，您可以通过将特定 `name` 传递给 `@Process()` 装饰器来指定某个任务处理方法**仅**处理特定类型的任务（具有特定 `name` 的任务），如下所示。
 
-> warning **注意** 这在 BullMQ 中无效，请继续阅读。
+:::warning 注意
+这在 BullMQ 中无效，请继续阅读。
+:::
 
 ```typescript
 @Process('transcode')
@@ -286,7 +294,9 @@ constructor(@Inject(JOB_REF) jobRef: Job) {
 }
 ```
 
-> info **提示** `JOB_REF` 令牌是从 `@nestjs/bullmq` 包导入的。
+:::info 提示
+`JOB_REF` 令牌是从 `@nestjs/bullmq` 包导入的。
+:::
 
 #### 事件监听器
 
@@ -333,7 +343,11 @@ export class AudioEventsListener extends QueueEventsHost {
 }
 ```
 
-> **提示** 队列事件监听器必须注册为 `providers`，这样 `@nestjs/bullmq` 包才能识别它们。
+:::info 提示
+队列事件监听器必须注册为 `providers`，这样 `@nestjs/bullmq` 包才能识别它们。
+:::
+
+
 
 完整事件列表及其参数可作为 QueueEventsListener 的属性[在此查看](https://api.docs.bullmq.io/interfaces/v4.QueueEventsListener.html) 。
 
@@ -362,7 +376,7 @@ await audioQueue.resume();
 - 能显著提高多核 CPU 的利用率。
 - 减少与 Redis 的连接数。
 
-```typescript title="app.module"
+ ```typescript title="app.module.ts"
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
 import { join } from 'path';
@@ -378,7 +392,9 @@ import { join } from 'path';
 export class AppModule {}
 ```
 
-> warning **警告** 请注意，由于您的函数在分叉进程中执行，依赖注入（及 IoC 容器）将不可用。这意味着您的处理器函数需要包含（或创建）其所依赖的所有外部实例。
+:::warning 警告
+ 请注意，由于您的函数在分叉进程中执行，依赖注入（及 IoC 容器）将不可用。这意味着您的处理器函数需要包含（或创建）其所依赖的所有外部实例。
+:::
 
 #### 异步配置
 
@@ -495,7 +511,11 @@ export class AudioService implements OnModuleInit {
 
 #### Bull 安装
 
-> **注意** 如果决定使用 BullMQ，请跳过本节及后续章节。
+:::info 注意
+如果决定使用 BullMQ，请跳过本节及后续章节。
+:::
+
+
 
 要开始使用 Bull，我们首先需要安装所需的依赖项。
 
@@ -505,7 +525,7 @@ $ npm install --save @nestjs/bull bull
 
 安装过程完成后，我们可以将 `BullModule` 导入根模块 `AppModule` 中。
 
-```typescript title="app.module"
+ ```typescript title="app.module.ts"
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bull';
 
@@ -540,7 +560,9 @@ BullModule.registerQueue({
 });
 ```
 
-> info **提示** 通过向 `registerQueue()` 方法传入多个逗号分隔的配置对象，可以创建多个队列。
+:::info 提示
+通过向 `registerQueue()` 方法传入多个逗号分隔的配置对象，可以创建多个队列。
+:::
 
 `registerQueue()` 方法用于实例化或注册队列。队列会被共享给连接到同一 Redis 底层数据库且使用相同凭证的模块和进程。每个队列通过其名称属性保持唯一性。队列名称既作为注入令牌（用于将队列注入控制器/提供者），也作为装饰器的参数来将消费者类与监听器同队列关联起来。
 
@@ -599,7 +621,11 @@ export class AudioService {
 }
 ```
 
-> **提示** `@InjectQueue()` 装饰器通过队列名称进行标识，该名称需与 `registerQueue()` 方法调用时提供的名称一致（例如 `'audio'`）。
+:::info 提示
+`@InjectQueue()` 装饰器通过队列名称进行标识，该名称需与 `registerQueue()` 方法调用时提供的名称一致（例如 `'audio'`）。
+:::
+
+
 
 通过调用队列的 `add()` 方法并传入用户自定义的任务对象即可添加任务。任务以可序列化的 JavaScript 对象形式表示（因为它们将存储在 Redis 数据库中）。传入的任务对象结构可自定义，用于体现任务语义。
 
@@ -683,7 +709,10 @@ import { Processor } from '@nestjs/bull';
 export class AudioConsumer {}
 ```
 
-> info **注意** 消费者必须注册为 `providers`，这样 `@nestjs/bull` 包才能识别它们。
+:::info 注意
+消费者必须注册为 `providers`，这样 `@nestjs/bull` 包才能识别它们。
+:::
+
 
 其中装饰器的字符串参数（例如 `'audio'`）是与类方法关联的队列名称。
 
@@ -719,7 +748,9 @@ export class AudioConsumer {
 async transcode(job: Job<unknown>) { ... }
 ```
 
-> warning **注意** 当为同一队列定义多个消费者时， `@Process({ concurrency: 1 })` 中的 `concurrency` 选项将不会生效。最低 `concurrency` 值将与定义的消费者数量匹配。即使 `@Process()` 处理器使用不同的`名称`来处理命名任务，此规则同样适用。
+:::warning 注意
+ 当为同一队列定义多个消费者时， `@Process({ concurrency: 1 })` 中的 `concurrency` 选项将不会生效。最低 `concurrency` 值将与定义的消费者数量匹配。即使 `@Process()` 处理器使用不同的`名称`来处理命名任务，此规则同样适用。
+:::
 
 #### 请求作用域的消费者
 
@@ -740,7 +771,9 @@ constructor(@Inject(JOB_REF) jobRef: Job) {
 }
 ```
 
-> info **提示** `JOB_REF` 令牌是从 `@nestjs/bull` 包导入的。
+:::info 提示
+`JOB_REF` 令牌是从 `@nestjs/bull` 包导入的。
+:::
 
 #### 事件监听器
 
@@ -795,7 +828,11 @@ async onGlobalCompleted(jobId: number, result: any) {
 }
 ```
 
-> **提示** 要访问 `Queue` 对象（以进行 `getJob()` 调用），当然需要先注入它。此外，Queue 必须在你执行注入的模块中完成注册。
+:::info 提示
+要访问 `Queue` 对象（以进行 `getJob()` 调用），当然需要先注入它。此外，Queue 必须在你执行注入的模块中完成注册。
+:::
+
+
 
 除了特定的事件监听器装饰器外，你还可以使用通用的 `@OnQueueEvent()` 装饰器，配合 `BullQueueEvents` 或 `BullQueueGlobalEvents` 枚举使用。了解更多关于事件的信息[请点击这里](https://github.com/OptimalBits/bull/blob/master/REFERENCE.md#事件) 。
 

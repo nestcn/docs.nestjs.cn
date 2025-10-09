@@ -15,7 +15,9 @@ async upvotePost(@Args({ name: 'postId', type: () => Int }) postId: number) {
 }
 ```
 
-> info **提示** 所有装饰器（例如 `@Resolver`、`@ResolveField`、`@Args` 等）均从 `@nestjs/graphql` 包中导出。
+:::info 提示
+所有装饰器（例如 `@Resolver`、`@ResolveField`、`@Args` 等）均从 `@nestjs/graphql` 包中导出。
+:::
 
 这将生成以下 GraphQL 模式定义语言(SDL)部分：
 
@@ -39,7 +41,9 @@ export class UpvotePostInput {
 }
 ```
 
-> info **提示** `@InputType()` 装饰器接收一个选项对象作为参数，因此您可以指定输入类型的描述等信息。请注意，由于 TypeScript 元数据反射系统的限制，您必须使用 `@Field` 装饰器手动指定类型，或者使用 [CLI 插件](/graphql/cli-plugin) 。
+:::info 提示
+`@InputType()` 装饰器接收一个选项对象作为参数，因此您可以指定输入类型的描述等信息。请注意，由于 TypeScript 元数据反射系统的限制，您必须使用 `@Field` 装饰器手动指定类型，或者使用 [CLI 插件](/graphql/cli-plugin) 。
+:::
 
 我们可以在解析器类中使用此类型：
 

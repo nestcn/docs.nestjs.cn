@@ -8,7 +8,9 @@
 
 要创建基本控制器，我们使用类和**装饰器**。装饰器将类与必要的元数据关联起来，使 Nest 能够创建将请求连接到相应控制器的路由映射。
 
-> info **提示** 要快速创建带有内置[验证](../techniques/validation)功能的 CRUD 控制器，可以使用 CLI 的 [CRUD 生成器](../recipes/crud-generator#crud-生成器)：`nest g resource [name]`。
+:::info 提示
+要快速创建带有内置[验证](../techniques/validation)功能的 CRUD 控制器，可以使用 CLI 的 [CRUD 生成器](../recipes/crud-generator#crud-生成器)：`nest g resource [name]`。
+:::
 
 #### 路由
 
@@ -26,7 +28,9 @@ export class CatsController {
 }
 ```
 
-> info **提示** 要使用 CLI 创建控制器，只需执行 `$ nest g controller [name]` 命令。
+:::info 提示
+要使用 CLI 创建控制器，只需执行 `$ nest g controller [name]` 命令。
+:::
 
 `@Get()` HTTP 请求方法装饰器放置在 `findAll()` 方法前，告知 Nest 为 HTTP 请求创建特定端点的处理器。该端点由 HTTP 请求方法（本例中为 GET）和路由路径共同定义。那么什么是路由路径？处理器的路由路径由控制器声明的（可选）前缀与方法装饰器中指定的路径组合而成。由于我们为所有路由设置了 `cats` 前缀且未在方法装饰器中添加具体路径，Nest 会将 `GET /cats` 请求映射到该处理器。
 
@@ -50,7 +54,9 @@ export class CatsController {
   </tr>
 </table>
 
-> warning **警告** 当 Nest 检测到处理程序使用了 `@Res()` 或 `@Next()` 时，表明您选择了特定库实现方式。如果同时使用两种方式，标准方式将针对该路由**自动禁用**且不再按预期工作。若要同时使用两种方式（例如通过注入响应对象仅设置 cookies/headers 但仍将剩余工作交给框架处理），必须在 `@Res({ passthrough: true })` 装饰器中将 `passthrough` 选项设为 `true`。
+:::warning 警告
+当 Nest 检测到处理程序使用了 `@Res()` 或 `@Next()` 时，表明您选择了特定库实现方式。如果同时使用两种方式，标准方式将针对该路由**自动禁用**且不再按预期工作。若要同时使用两种方式（例如通过注入响应对象仅设置 cookies/headers 但仍将剩余工作交给框架处理），必须在 `@Res({ passthrough: true })` 装饰器中将 `passthrough` 选项设为 `true`。
+:::
 
 #### 请求对象
 
@@ -68,7 +74,9 @@ export class CatsController {
 }
 ```
 
-> info **提示** 要充分利用 `express` 的类型定义（如上面 `request: Request` 参数示例所示），请确保安装 `@types/express` 包。
+:::info 提示
+要充分利用 `express` 的类型定义（如上面 `request: Request` 参数示例所示），请确保安装 `@types/express` 包。
+:::
 
 请求对象代表 HTTP 请求，包含查询字符串、参数、HTTP 标头和正文等属性（更多信息请参阅[此处](https://expressjs.com/en/api.html#req) ）。在大多数情况下，您不需要手动访问这些属性。相反，可以直接使用开箱即用的专用装饰器，如 `@Body()` 或 `@Query()`。以下是提供的装饰器及其对应平台特定对象的列表。
 
@@ -117,13 +125,15 @@ export class CatsController {
 
 \* 为兼容底层 HTTP 平台（如 Express 和 Fastify）的类型定义，Nest 提供了 `@Res()` 和 `@Response()` 装饰器。`@Res()` 是 `@Response()` 的别名。两者都直接暴露底层原生平台的 `response` 对象接口。使用时还需导入相应底层库的类型定义（如 `@types/express`）以获得完整支持。注意：在方法处理程序中注入 `@Res()` 或 `@Response()` 时，该处理程序将进入**库特定模式** ，此时需手动管理响应。必须通过调用 `response` 对象方法（如 `res.json(...)` 或 `res.send(...)`）返回响应，否则 HTTP 服务器会挂起。
 
-> info **提示** 要了解如何创建自定义装饰器，请参阅[本章节](/custom-decorators) 。
+:::info 提示
+要了解如何创建自定义装饰器，请参阅[本章节](/custom-decorators) 。
+:::
 
 #### 资源
 
 此前，我们定义了一个用于获取猫咪资源的端点（**GET** 路由）。通常我们还需要提供创建新记录的端点。为此，让我们创建 **POST** 处理器：
 
-```typescript title="cats.controller"
+ ```typescript title="cats.controller.ts"
 import { Controller, Get, Post } from '@nestjs/common';
 
 @Controller('cats')
@@ -171,7 +181,9 @@ create() {
 }
 ```
 
-> info **提示** 从 `@nestjs/common` 包中导入 `HttpCode`。
+:::info 提示
+从 `@nestjs/common` 包中导入 `HttpCode`。
+:::
 
 通常，您的状态码并非静态，而是取决于多种因素。在这种情况下，您可以使用库特定的**响应**对象（通过 `@Res()` 注入），或者在出错时抛出异常。
 
@@ -187,7 +199,9 @@ create() {
 }
 ```
 
-> info **提示** 从 `@nestjs/common` 包中导入 `Header`。
+:::info 提示
+从 `@nestjs/common` 包中导入 `Header`。
+:::
 
 #### 重定向
 
@@ -200,7 +214,9 @@ create() {
 @Redirect('https://nestjs.com', 301)
 ```
 
-> info **提示** 有时您可能需要动态决定 HTTP 状态码或重定向 URL。可通过返回遵循 `HttpRedirectResponse` 接口（来自 `@nestjs/common`）的对象来实现。
+:::info 提示
+有时您可能需要动态决定 HTTP 状态码或重定向 URL。可通过返回遵循 `HttpRedirectResponse` 接口（来自 `@nestjs/common`）的对象来实现。
+:::
 
 返回值将覆盖传递给 `@Redirect()` 装饰器的任何参数。例如：
 
@@ -218,7 +234,10 @@ getDocs(@Query('version') version) {
 
 当需要接收**动态数据**作为请求的一部分时（例如通过 `GET /cats/1` 获取 ID 为 `1` 的猫），静态路径路由将无法工作。要定义带参数的路由，您可以在路由路径中添加路由参数**标记**来捕获 URL 中的动态值。下面 `@Get()` 装饰器示例中的路由参数标记展示了这种方法。然后可以使用 `@Param()` 装饰器来访问这些路由参数，该装饰器应添加到方法签名中。
 
-> info **注意** 带参数的路由应在所有静态路径之后声明。这样可以防止参数化路径拦截本该由静态路径处理的流量。
+:::info 注意
+带参数的路由应在所有静态路径之后声明。这样可以防止参数化路径拦截本该由静态路径处理的流量。
+:::
+
 
 ```typescript
 @Get(':id')
@@ -230,7 +249,9 @@ findOne(@Param() params: any): string {
 
 `@Param()` 装饰器用于修饰方法参数（如上例中的 `params`），使得**路由**参数可以在方法内部通过该装饰参数的属性进行访问。如代码所示，你可以通过 `params.id` 来访问 `id` 参数。或者，你也可以向装饰器传递特定的参数标记，直接在方法体中按名称引用路由参数。
 
-> info **提示** 从 `@nestjs/common` 包中导入 `Param`。
+:::info 提示
+从 `@nestjs/common` 包中导入 `Param`。
+:::
 
 ```typescript
 @Get(':id')
@@ -253,7 +274,9 @@ export class AdminController {
 }
 ```
 
-> warning **警告** 由于 **Fastify** 不支持嵌套路由器，如果您正在使用子域名路由，建议改用默认的 Express 适配器。
+:::warning 警告
+ 由于 **Fastify** 不支持嵌套路由器，如果您正在使用子域名路由，建议改用默认的 Express 适配器。
+:::
 
 与路由 `path` 类似，`host` 选项可以使用令牌来捕获主机名中该位置的动态值。下面 `@Controller()` 装饰器示例中的主机参数令牌演示了这种用法。通过这种方式声明的主机参数可以使用 `@HostParam()` 装饰器访问，该装饰器应添加到方法签名中。
 
@@ -277,7 +300,7 @@ export class AccountController {
 
 我们热爱现代 JavaScript，尤其推崇其**异步**数据处理机制。因此 Nest 全面支持 `async` 函数，每个 `async` 函数都必须返回 `Promise`，这使得您可以返回一个延迟值由 Nest 自动解析。示例如下：
 
-```typescript title="cats.controller"
+ ```typescript title="cats.controller.ts"
 @Get()
 async findAll(): Promise<any[]> {
   return [];
@@ -286,7 +309,7 @@ async findAll(): Promise<any[]> {
 
 这段代码完全有效。但 Nest 更进一步，允许路由处理器返回 RxJS 的[可观察流](https://rxjs-dev.firebaseapp.com/guide/observable) ，Nest 会在内部处理订阅并在流完成时解析最终发出的值。
 
-```typescript title="cats.controller"
+ ```typescript title="cats.controller.ts"
 @Get()
 findAll(): Observable<any[]> {
   return of([]);
@@ -303,7 +326,7 @@ findAll(): Observable<any[]> {
 
 我们来创建 `CreateCatDto` 类：
 
-```typescript title="create-cat.dto"
+ ```typescript title="create-cat.dto.ts"
 export class CreateCatDto {
   name: string;
   age: number;
@@ -313,14 +336,16 @@ export class CreateCatDto {
 
 它仅包含三个基本属性。之后我们就可以在 `CatsController` 中使用新创建的 DTO：
 
-```typescript title="cats.controller"
+ ```typescript title="cats.controller.ts"
 @Post()
 async create(@Body() createCatDto: CreateCatDto) {
   return 'This action adds a new cat';
 }
 ```
 
-> info **提示** 我们的 `ValidationPipe` 可以过滤掉不应被方法处理器接收的属性。在这种情况下，我们可以将可接受的属性加入白名单，任何未包含在白名单中的属性都会自动从结果对象中剔除。在 `CreateCatDto` 示例中，我们的白名单包含 `name`、`age` 和 `breed` 属性。了解更多 [请点击这里](../techniques/validation#剥离属性) 。
+:::info 提示
+我们的 `ValidationPipe` 可以过滤掉不应被方法处理器接收的属性。在这种情况下，我们可以将可接受的属性加入白名单，任何未包含在白名单中的属性都会自动从结果对象中剔除。在 `CreateCatDto` 示例中，我们的白名单包含 `name`、`age` 和 `breed` 属性。了解更多 [请点击这里](../techniques/validation#剥离属性) 。
+:::
 
 #### 查询参数
 
@@ -328,7 +353,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 假设有个路由需要基于 `age` 和 `breed` 等查询参数筛选猫咪列表。首先在 `CatsController` 中定义查询参数：
 
-```typescript title="cats.controller"
+ ```typescript title="cats.controller.ts"
 @Get()
 async findAll(@Query('age') age: number, @Query('breed') breed: string) {
   return `This action returns all cats filtered by age: ${age} and breed: ${breed}`;
@@ -368,7 +393,9 @@ const app = await NestFactory.create<NestFastifyApplication>(
 );
 ```
 
-> info **提示**`qs` 是一个支持嵌套和数组的查询字符串解析器。您可以通过 `npm install qs` 命令安装它。
+:::info 提示
+`qs` 是一个支持嵌套和数组的查询字符串解析器。您可以通过 `npm install qs` 命令安装它。
+:::
 
 #### 错误处理
 
@@ -378,7 +405,7 @@ const app = await NestFactory.create<NestFastifyApplication>(
 
 以下示例展示了如何使用多个可用装饰器来创建基础控制器。该控制器提供了一些方法来访问和操作内部数据。
 
-```typescript title="cats.controller"
+ ```typescript title="cats.controller.ts"
 import { Controller, Get, Query, Post, Body, Put, Param, Delete } from '@nestjs/common';
 import { CreateCatDto, UpdateCatDto, ListAllEntities } from './dto';
 
@@ -411,7 +438,9 @@ export class CatsController {
 }
 ```
 
-> info **Nest CLI** 提供了一个生成器（schematic），可自动创建**所有样板代码** ，省去手动操作并提升开发体验。详细了解此功能请点击[此处](/recipes/crud-generator) 。
+:::info Nest
+ CLI** 提供了一个生成器（schematic），可自动创建**所有样板代码** ，省去手动操作并提升开发体验。详细了解此功能请点击[此处](/recipes/crud-generator) 。
+:::
 
 #### 快速开始
 
@@ -419,7 +448,7 @@ export class CatsController {
 
 控制器必须始终属于某个模块，这就是为什么我们要在 `@Module()` 装饰器的 `controllers` 数组中包含它们。由于目前除了根模块 `AppModule` 外尚未定义其他模块，我们将用它来注册 `CatsController`：
 
-```typescript title="app.module"
+ ```typescript title="app.module.ts"
 import { Module } from '@nestjs/common';
 import { CatsController } from './cats/cats.controller';
 

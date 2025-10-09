@@ -2,7 +2,10 @@
 
 常规管道与微服务管道之间没有本质区别。唯一的区别在于，你应该使用 `RpcException` 而不是抛出 `HttpException`。
 
-> info **注意** `RpcException` 类是从 `@nestjs/microservices` 包中导出的。
+:::info 注意
+`RpcException` 类是从 `@nestjs/microservices` 包中导出的。
+:::
+
 
 #### 绑定管道
 

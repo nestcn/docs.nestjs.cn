@@ -1,6 +1,8 @@
 ### 概述
 
-> info **提示** 本章介绍 Nest Devtools 与 Nest 框架的集成。如需了解 Devtools 应用程序，请访问 [Devtools](https://devtools.nestjs.com) 官网。
+:::info 提示
+本章介绍 Nest Devtools 与 Nest 框架的集成。如需了解 Devtools 应用程序，请访问 [Devtools](https://devtools.nestjs.com) 官网。
+:::
 
 要开始调试本地应用程序，请打开 `main.ts` 文件，并确保在应用程序选项对象中将 `snapshot` 属性设置为 `true`，如下所示：
 
@@ -21,7 +23,9 @@ async function bootstrap() {
 $ npm i @nestjs/devtools-integration
 ```
 
-> warning **注意** 如果您的应用中使用了 `@nestjs/graphql` 包，请确保安装最新版本（`npm i @nestjs/graphql@11`）。
+:::warning 注意
+如果您的应用中使用了 `@nestjs/graphql` 包，请确保安装最新版本（`npm i @nestjs/graphql@11`）。
+:::
 
 有了这个依赖项后，让我们打开 `app.module.ts` 文件并导入刚刚安装的 `DevtoolsModule`：
 
@@ -38,13 +42,17 @@ $ npm i @nestjs/devtools-integration
 export class AppModule {}
 ```
 
-> warning **注意** 此处检查 `NODE_ENV` 环境变量的原因是——切勿在生产环境使用此模块！
+:::warning 注意
+ 此处检查 `NODE_ENV` 环境变量的原因是——切勿在生产环境使用此模块！
+:::
 
 当 `DevtoolsModule` 导入完成且应用启动运行后（`npm run start:dev`），您应当能够访问 [Devtools](https://devtools.nestjs.com) 网址并查看自省生成的图谱。
 
 ![](/assets/devtools/modules-graph.png)
 
-> info **提示** 如上方截图所示，每个模块都连接到 `InternalCoreModule`。`InternalCoreModule` 是一个始终被导入根模块的全局模块。由于它被注册为全局节点，Nest 会自动在所有模块与 `InternalCoreModule` 节点之间创建连接边。现在，若要从图中隐藏全局模块，可以使用侧边栏中的" **隐藏全局模块** "复选框。
+:::info 提示
+如上方截图所示，每个模块都连接到 `InternalCoreModule`。`InternalCoreModule` 是一个始终被导入根模块的全局模块。由于它被注册为全局节点，Nest 会自动在所有模块与 `InternalCoreModule` 节点之间创建连接边。现在，若要从图中隐藏全局模块，可以使用侧边栏中的" **隐藏全局模块** "复选框。
+:::
 
 由此可见，`DevtoolsModule` 会让你的应用暴露一个额外的 HTTP 服务器（运行在 8000 端口），Devtools 应用将通过该端口来内省你的应用程序。
 
@@ -54,11 +62,15 @@ export class AppModule {}
 
 要聚焦特定节点，点击矩形框后图形界面会弹出包含 **"聚焦"** 按钮的窗口。您也可以使用侧边栏的搜索栏来定位特定节点。
 
-> info **提示** 如果点击**检查**按钮，应用程序将带您进入 `/debug` 页面并自动选中该特定节点。
+:::info 提示
+如果点击**检查**按钮，应用程序将带您进入 `/debug` 页面并自动选中该特定节点。
+:::
 
 ![](/assets/devtools/node-popup.png)
 
-> info **提示** 要将图表导出为图片，请点击图表右上角的**导出为 PNG** 按钮。
+:::info 提示
+要将图表导出为图片，请点击图表右上角的**导出为 PNG** 按钮。
+:::
 
 使用位于侧边栏（左侧）的表单控件，您可以控制边的接近度，例如可视化特定的应用程序子树：
 
@@ -70,7 +82,11 @@ export class AppModule {}
 
 #### 排查"无法解析依赖项"错误
 
-> **注意** 此功能支持 `@nestjs/core` 版本 ≥`v9.3.10`。
+:::info 注意
+此功能支持 `@nestjs/core` 版本 ≥`v9.3.10`。
+:::
+
+
 
 您可能遇到的最常见错误消息是关于 Nest 无法解析提供者依赖项的问题。使用 Nest Devtools，您可以轻松识别问题并学习如何解决它。
 
@@ -114,7 +130,9 @@ const app = await NestFactory.create(AppModule, {
 
 ![](/assets/devtools/routes.png)
 
-> info **提示** 此页面不仅显示 HTTP 路由，还包括所有其他类型的入口点（例如 WebSockets、gRPC、GraphQL 解析器等）。
+:::info 提示
+此页面不仅显示 HTTP 路由，还包括所有其他类型的入口点（例如 WebSockets、gRPC、GraphQL 解析器等）。
+:::
 
 入口点按其宿主控制器分组显示。您也可以使用搜索栏查找特定入口点。
 
@@ -134,7 +152,11 @@ const app = await NestFactory.create(AppModule, {
 
 ![](/assets/devtools/sandbox-table.png)
 
-> **提示** ：要美观地显示对象数组，可使用 `console.table()`（或直接使用 `table()`）函数。
+:::info 提示
+要美观地显示对象数组，可使用 `console.table()`（或直接使用 `table()`）函数。
+:::
+
+
 
 您可以通过这个视频查看**交互式演练场（Interactive Playground）** 功能的实际应用：
 
@@ -152,7 +174,9 @@ const app = await NestFactory.create(AppModule, {
 
 ![](/assets/devtools/audit.png)
 
-> info **提示** 上面的截图并未显示所有可用的审计规则。
+:::info 提示
+上面的截图并未显示所有可用的审计规则。
+:::
 
 当您需要识别应用程序中的潜在问题时，本页面非常有用。
 
@@ -165,7 +189,9 @@ await app.listen(process.env.PORT ?? 3000); // OR await app.init()
 fs.writeFileSync('./graph.json', app.get(SerializedGraph).toString());
 ```
 
-> info **提示**`SerializedGraph` 是从 `@nestjs/core` 包中导出的。
+:::info 提示
+`SerializedGraph` 是从 `@nestjs/core` 包中导出的。
+:::
 
 然后你可以拖放/上传这个文件：
 

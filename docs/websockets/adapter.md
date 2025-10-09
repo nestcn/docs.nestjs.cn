@@ -14,7 +14,9 @@ WebSockets 模块是平台无关的，因此你可以通过使用 `WebSocketAdap
 
 [socket.io](https://github.com/socketio/socket.io) 包被封装在 `IoAdapter` 类中。如果您想增强适配器的基础功能该怎么办？例如，您的技术要求需要具备跨多个负载均衡的 Web 服务实例广播事件的能力。为此，您可以扩展 `IoAdapter` 并重写一个负责实例化新 socket.io 服务器的方法。但首先，我们需要安装所需的包。
 
-> warning **警告** 要在多个负载均衡实例中使用 socket.io，您要么必须在客户端 socket.io 配置中通过设置 `transports: ['websocket']` 来禁用轮询，要么必须在负载均衡器中启用基于 cookie 的路由。仅 Redis 是不够的。更多信息请参阅[此处](https://socket.io/docs/v4/using-multiple-nodes/#enabling-sticky-session) 。
+:::warning 警告
+要在多个负载均衡实例中使用 socket.io，您要么必须在客户端 socket.io 配置中通过设置 `transports: ['websocket']` 来禁用轮询，要么必须在负载均衡器中启用基于 cookie 的路由。仅 Redis 是不够的。更多信息请参阅[此处](https://socket.io/docs/v4/using-multiple-nodes/#enabling-sticky-session) 。
+:::
 
 ```bash
 $ npm i --save redis socket.io @socket.io/redis-adapter
@@ -62,7 +64,9 @@ app.useWebSocketAdapter(redisIoAdapter);
 
 另一个可用的适配器是 `WsAdapter`，它充当框架与集成的极速且经过全面测试的 [ws](https://github.com/websockets/ws) 库之间的代理。该适配器完全兼容原生浏览器 WebSocket，且比 socket.io 包快得多。遗憾的是，它开箱即用的功能要少得多。不过在有些情况下，您可能并不需要这些功能。
 
-> info： **注意** `ws` 库不支持命名空间（由 `socket.io` 推广的通信通道）。但为了模拟这一特性，您可以在不同路径上挂载多个 `ws` 服务器（示例： `@WebSocketGateway({ path: '/users' })` ）。
+:::info 注意
+`ws` 库不支持命名空间（由 `socket.io` 推广的通信通道）。但为了模拟这一特性，您可以在不同路径上挂载多个 `ws` 服务器（示例： `@WebSocketGateway({ path: '/users' })` ）。
+:::
 
 要使用 `ws`，我们首先需要安装这个必需的包：
 
@@ -77,7 +81,11 @@ const app = await NestFactory.create(AppModule);
 app.useWebSocketAdapter(new WsAdapter(app));
 ```
 
-> **提示** `WsAdapter` 是从 `@nestjs/platform-ws` 导入的。
+:::info 提示
+`WsAdapter` 是从 `@nestjs/platform-ws` 导入的。
+:::
+
+
 
 `wsAdapter` 设计用于处理 `{ event: string, data: any }` 格式的消息。如果需要接收和处理其他格式的消息，需配置消息解析器将其转换为所需格式。
 
@@ -129,7 +137,7 @@ export class NotificationsGateway {}
 
 出于演示目的，我们将手动集成 [ws](https://github.com/websockets/ws) 库。如前所述，该库的适配器已经创建并通过 `@nestjs/platform-ws` 包的 `WsAdapter` 类公开。以下是简化后的实现可能呈现的样子：
 
-```typescript title="ws-adapter"
+ ```typescript title="ws-adapter.ts"
 import * as WebSocket from 'ws';
 import { WebSocketAdapter, INestApplicationContext } from '@nestjs/common';
 import { MessageMappingProperties } from '@nestjs/websockets';
@@ -181,11 +189,14 @@ export class WsAdapter implements WebSocketAdapter {
 }
 ```
 
-> info **注意** 当你需要使用 [ws](https://github.com/websockets/ws) 库时，请使用内置的 `WsAdapter` 而不是自己创建。
+:::info 注意
+当你需要使用 [ws](https://github.com/websockets/ws) 库时，请使用内置的 `WsAdapter` 而不是自己创建。
+:::
+
 
 接着，我们可以通过 `useWebSocketAdapter()` 方法设置自定义适配器：
 
-```typescript title="main"
+ ```typescript title="main.ts"
 const app = await NestFactory.create(AppModule);
 app.useWebSocketAdapter(new WsAdapter(app));
 ```

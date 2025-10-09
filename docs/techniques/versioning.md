@@ -1,6 +1,8 @@
 # 版本控制
 
-> info **提示** 本章节仅适用于基于 HTTP 的应用程序。
+:::info 提示
+本章节仅适用于基于 HTTP 的应用程序。
+:::
 
 版本控制允许你在同一应用程序中运行**不同版本**的控制器或独立路由。应用程序经常发生变化，在需要支持旧版本的同时进行破坏性变更的情况并不罕见。
 
@@ -29,11 +31,13 @@
 
 URI 版本控制使用请求 URI 中传递的版本号，例如 `https://example.com/v1/route` 和 `https://example.com/v2/route`。
 
-> warning **注意** 使用 URI 版本控制时，版本号会自动添加到 URI 中，位于<a href="faq/global-prefix">全局路径前缀</a>（如果存在）之后，任何控制器或路由路径之前。
+:::warning 注意
+使用 URI 版本控制时，版本号会自动添加到 URI 中，位于<a href="faq/global-prefix">全局路径前缀</a>（如果存在）之后，任何控制器或路由路径之前。
+:::
 
 要为您的应用程序启用 URI 版本控制，请执行以下操作：
 
-```typescript title="main"
+ ```typescript title="main.ts"
 const app = await NestFactory.create(AppModule);
 // or "app.enableVersioning()"
 app.enableVersioning({
@@ -42,9 +46,13 @@ app.enableVersioning({
 await app.listen(process.env.PORT ?? 3000);
 ```
 
-> warning **注意** URI 中的版本号默认会自动添加前缀 `v`，但您可以通过设置 `prefix` 键来自定义前缀值，或设为 `false` 来禁用该功能。
+:::warning 注意
+ URI 中的版本号默认会自动添加前缀 `v`，但您可以通过设置 `prefix` 键来自定义前缀值，或设为 `false` 来禁用该功能。
+:::
 
-> info **提示** `VersioningType` 枚举可用于 `type` 属性，它从 `@nestjs/common` 包中导入。
+:::info 提示
+`VersioningType` 枚举可用于 `type` 属性，它从 `@nestjs/common` 包中导入。
+:::
 
 #### 头部版本控制类型
 
@@ -54,7 +62,7 @@ await app.listen(process.env.PORT ?? 3000);
 
 要为您的应用程序启用**头部版本控制** ，请执行以下操作：
 
-```typescript title="main"
+ ```typescript title="main.ts"
 const app = await NestFactory.create(AppModule);
 app.enableVersioning({
   type: VersioningType.HEADER,
@@ -65,7 +73,9 @@ await app.listen(process.env.PORT ?? 3000);
 
 `header` 属性应为包含请求版本的头部名称。
 
-> info **提示** `VersioningType` 枚举可用于 `type` 属性，该枚举从 `@nestjs/common` 包导入。
+:::info 提示
+`VersioningType` 枚举可用于 `type` 属性，该枚举从 `@nestjs/common` 包导入。
+:::
 
 #### 媒体类型版本控制类型
 
@@ -75,7 +85,7 @@ await app.listen(process.env.PORT ?? 3000);
 
 要为应用程序启用**媒体类型版本控制** ，请执行以下操作：
 
-```typescript title="main"
+ ```typescript title="main.ts"
 const app = await NestFactory.create(AppModule);
 app.enableVersioning({
   type: VersioningType.MEDIA_TYPE,
@@ -86,7 +96,9 @@ await app.listen(process.env.PORT ?? 3000);
 
 `key` 属性应作为包含版本信息的键值对的键名和分隔符。例如 `Accept: application/json;v=2` 中，`key` 属性应设置为 `v=`。
 
-> info **提示** `VersioningType` 枚举可用于 `type` 属性，该枚举从 `@nestjs/common` 包导入。
+:::info 提示
+`VersioningType` 枚举可用于 `type` 属性，该枚举从 `@nestjs/common` 包导入。
+:::
 
 #### 自定义版本控制类型
 
@@ -100,11 +112,13 @@ await app.listen(process.env.PORT ?? 3000);
 
 如果提取的版本是 `[3, 2, 1]`，但仅存在版本 `2` 和 `1` 的路由，则会选中匹配版本 `2` 的路由（版本 `3` 会被自动忽略）。
 
-> warning **注意** 由于设计限制，基于 `extractor` 返回的数组选择最高匹配版本**在 Express 适配器中无法可靠工作**。单一版本（字符串或单元素数组）在 Express 中可正常工作。Fastify 则能正确支持最高匹配版本选择和单一版本选择。
+:::warning 注意
+ 由于设计限制，基于 `extractor` 返回的数组选择最高匹配版本**在 Express 适配器中无法可靠工作**。单一版本（字符串或单元素数组）在 Express 中可正常工作。Fastify 则能正确支持最高匹配版本选择和单一版本选择。
+:::
 
 要为应用启用 **自定义版本控制** ，请创建 `extractor` 函数并按如下方式传入应用：
 
-```typescript title="main"
+ ```typescript title="main.ts"
 // 从自定义头部提取版本列表并转换为排序数组的示例提取器。
 // 此示例使用 Fastify，但 Express 请求也可以类似处理。
 const extractor = (request: FastifyRequest): string | string[] =>
@@ -113,7 +127,6 @@ const extractor = (request: FastifyRequest): string | string[] =>
      .filter(v => !!v)
      .sort()
      .reverse()
-```
 
 const app = await NestFactory.create(AppModule);
 app.enableVersioning({
@@ -127,7 +140,9 @@ await app.listen(process.env.PORT ?? 3000);
 
 版本控制功能允许您对控制器、单个路由进行版本管理，同时也为某些资源提供了退出版本控制的选项。无论应用使用何种版本控制类型，其使用方式都保持一致。
 
-> warning **注意** 如果应用程序启用了版本控制，但控制器或路由未指定版本，对该控制器/路由的任何请求都将返回 `404` 响应状态。同样，如果收到的请求包含没有对应控制器或路由的版本，也将返回 `404` 响应状态。
+:::warning 注意
+ 如果应用程序启用了版本控制，但控制器或路由未指定版本，对该控制器/路由的任何请求都将返回 `404` 响应状态。同样，如果收到的请求包含没有对应控制器或路由的版本，也将返回 `404` 响应状态。
+:::
 
 #### 控制器版本
 
@@ -135,7 +150,7 @@ await app.listen(process.env.PORT ?? 3000);
 
 要为控制器添加版本，请执行以下操作：
 
-```typescript title="cats.controller"
+ ```typescript title="cats.controller.ts"
 @Controller({
   version: '1',
 })
@@ -153,7 +168,7 @@ export class CatsControllerV1 {
 
 要为单个路由添加版本，请执行以下操作：
 
-```typescript title="cats.controller"
+ ```typescript title="cats.controller.ts"
 import { Controller, Get, Version } from '@nestjs/common';
 
 @Controller()
@@ -178,7 +193,7 @@ export class CatsController {
 
 添加多个版本的操作如下：
 
-```typescript title="cats.controller"
+ ```typescript title="cats.controller.ts"
 @Controller({
   version: ['1', '2'],
 })
@@ -196,11 +211,15 @@ export class CatsController {
 
 无论请求中是否包含版本号，传入的请求都将被映射到 `VERSION_NEUTRAL` 控制器或路由。
 
-> **注意** 对于 URI 版本控制，`VERSION_NEUTRAL` 资源不会在 URI 中包含版本号。
+:::info 注意
+对于 URI 版本控制，`VERSION_NEUTRAL` 资源不会在 URI 中包含版本号。
+:::
+
+
 
 要添加版本中立的控制器或路由，请执行以下操作：
 
-```typescript title="cats.controller"
+ ```typescript title="cats.controller.ts"
 import { Controller, Get, VERSION_NEUTRAL } from '@nestjs/common';
 
 @Controller({
@@ -218,7 +237,7 @@ export class CatsController {
 
 如果您不想为每个控制器/单独路由提供版本，或者希望为所有未指定版本的控制器/路由设置默认版本，可以按如下方式配置 `defaultVersion`：
 
-```typescript title="main"
+ ```typescript title="main.ts"
 app.enableVersioning({
   // ...
   defaultVersion: '1'
@@ -233,7 +252,7 @@ app.enableVersioning({
 
 [中间件](../overview/middlewares)同样可以利用版本元数据来为特定路由版本配置中间件。为此，需将版本号作为 `MiddlewareConsumer.forRoutes()` 方法的参数之一：
 
-```typescript title="app.module"
+ ```typescript title="app.module.ts"
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { CatsModule } from './cats/cats.module';
@@ -253,4 +272,7 @@ export class AppModule implements NestModule {
 
 通过上述代码，`LoggerMiddleware` 将仅应用于'2'版本的 `/cats` 端点。
 
-> info **提示** 中间件适用于本节描述的任何版本控制类型：`URI`、`Header`、`Media Type` 或 `Custom`。
+:::info 提示
+ 中间件适用于本节描述的任何版本控制类型：`URI`、`Header`、`Media Type` 或 `Custom`。
+:::
+

@@ -32,7 +32,7 @@
 
 我们将探讨的第一个用例是使用拦截器记录用户交互（例如存储用户调用、异步派发事件或计算时间戳）。下面展示一个简单的 `LoggingInterceptor` 实现：
 
-```typescript title="logging.interceptor"
+ ```typescript title="logging.interceptor.ts"
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
@@ -52,9 +52,13 @@ export class LoggingInterceptor implements NestInterceptor {
 }
 ```
 
-> info **提示** `NestInterceptor<T, R>` 是一个泛型接口，其中 `T` 表示 `Observable<T>` 的类型（支持响应流），而 `R` 是 `Observable<R>` 所包装值的类型。
+:::info 提示
+`NestInterceptor<T, R>` 是一个泛型接口，其中 `T` 表示 `Observable<T>` 的类型（支持响应流），而 `R` 是 `Observable<R>` 所包装值的类型。
+:::
 
-> warning **注意** 拦截器与控制器、提供者、守卫等一样，可以通过它们的 `constructor` 来**注入依赖** 。
+:::warning 注意
+拦截器与控制器、提供者、守卫等一样，可以通过它们的 `constructor` 来**注入依赖** 。
+:::
 
 由于 `handle()` 返回一个 RxJS `Observable`，我们可以使用多种操作符来操作流。在上面的示例中，我们使用了 `tap()` 操作符，它会在可观察流正常或异常终止时调用我们的匿名日志记录函数，但不会干扰响应周期。
 
@@ -62,12 +66,14 @@ export class LoggingInterceptor implements NestInterceptor {
 
 要设置拦截器，我们需要使用从 `@nestjs/common` 包导入的 `@UseInterceptors()` 装饰器。与[管道](/pipes)和[守卫](/guards)类似，拦截器可以作用于控制器范围、方法范围或全局范围。
 
-```typescript title="cats.controller"
+ ```typescript title="cats.controller.ts"
 @UseInterceptors(LoggingInterceptor)
 export class CatsController {}
 ```
 
-> info **提示** `@UseInterceptors()` 装饰器是从 `@nestjs/common` 包导入的。
+:::info 提示
+`@UseInterceptors()` 装饰器是从 `@nestjs/common` 包导入的。
+:::
 
 通过上述设置，`CatsController` 中定义的每个路由处理器都将使用 `LoggingInterceptor`。当有人调用 `GET /cats` 端点时，您将在标准输出中看到以下内容：
 
@@ -78,7 +84,7 @@ After... 1ms
 
 请注意，我们传入的是 `LoggingInterceptor` 类（而不是实例），将实例化的责任交给框架并启用依赖注入。与管道、守卫和异常过滤器一样，我们也可以直接传入一个实例：
 
-```typescript title="cats.controller"
+ ```typescript title="cats.controller.ts"
 @UseInterceptors(new LoggingInterceptor())
 export class CatsController {}
 ```
@@ -94,7 +100,7 @@ app.useGlobalInterceptors(new LoggingInterceptor());
 
 全局拦截器会作用于整个应用程序中的每个控制器和每个路由处理程序。在依赖注入方面，从任何模块外部注册的全局拦截器（如上述示例中使用 `useGlobalInterceptors()`）无法注入依赖项，因为这是在模块上下文之外完成的。为解决此问题，您可以使用以下构造**直接从任何模块中**设置拦截器：
 
-```typescript title="app.module"
+ ```typescript title="app.module.ts"
 import { Module } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 
@@ -109,17 +115,21 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 export class AppModule {}
 ```
 
-> info **提示** 使用此方法为拦截器执行依赖注入时，请注意无论该构造应用于哪个模块，拦截器实际上是全局的。应在何处进行此操作？选择定义拦截器的模块（如上例中的 `LoggingInterceptor`）。此外，`useClass` 并非处理自定义提供程序注册的唯一方式。了解更多[此处](/fundamentals/custom-providers) 。
+:::info 提示
+使用此方法为拦截器执行依赖注入时，请注意无论该构造应用于哪个模块，拦截器实际上是全局的。应在何处进行此操作？选择定义拦截器的模块（如上例中的 `LoggingInterceptor`）。此外，`useClass` 并非处理自定义提供程序注册的唯一方式。了解更多[此处](/fundamentals/custom-providers) 。
+:::
 
 #### 响应映射
 
 我们已经知道 `handle()` 返回一个 `Observable`。该流包含从路由处理程序**返回**的值，因此我们可以轻松使用 RxJS 的 `map()` 操作符来改变它。
 
-> warning **警告** 响应映射功能不适用于库特定的响应策略（直接使用 `@Res()` 对象是被禁止的）。
+:::warning 警告
+ 响应映射功能不适用于库特定的响应策略（直接使用 `@Res()` 对象是被禁止的）。
+:::
 
 我们来创建 `TransformInterceptor`，它将通过简单修改每个响应来演示这个过程。它将使用 RxJS 的 `map()` 操作符，将响应对象赋值给新创建对象的 `data` 属性，然后将新对象返回给客户端。
 
-```typescript title="transform.interceptor"
+ ```typescript title="transform.interceptor.ts"
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -136,7 +146,9 @@ export class TransformInterceptor<T> implements NestInterceptor<T, Response<T>> 
 }
 ```
 
-> info **提示** Nest 拦截器同时支持同步和异步的 `intercept()` 方法。如果需要，你可以简单地将方法切换为 `async`。
+:::info 提示
+Nest 拦截器同时支持同步和异步的 `intercept()` 方法。如果需要，你可以简单地将方法切换为 `async`。
+:::
 
 通过上述实现，当有人调用 `GET /cats` 端点时，响应将如下所示（假设路由处理程序返回一个空数组 `[]`）：
 
@@ -167,7 +179,7 @@ export class ExcludeNullInterceptor implements NestInterceptor {
 
 另一个有趣的用例是利用 RxJS 的 `catchError()` 操作符来覆盖抛出的异常：
 
-```typescript title="errors.interceptor"
+ ```typescript title="errors.interceptor.ts"
 import {
   Injectable,
   NestInterceptor,
@@ -194,7 +206,7 @@ export class ErrorsInterceptor implements NestInterceptor {
 
 有时我们可能希望完全阻止调用处理程序并返回不同的值，这有几个原因。一个明显的例子是实现缓存以提高响应时间。让我们看一个简单的**缓存拦截器** ，它从缓存中返回响应。在实际应用中，我们还需要考虑 TTL、缓存失效、缓存大小等其他因素，但这超出了本次讨论的范围。这里我们将提供一个展示核心概念的基础示例。
 
-```typescript title="cache.interceptor"
+ ```typescript title="cache.interceptor.ts"
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 import { Observable, of } from 'rxjs';
 
@@ -216,7 +228,7 @@ export class CacheInterceptor implements NestInterceptor {
 
 使用 RxJS 操作符操作流的能力为我们提供了许多可能性。让我们考虑另一个常见用例。假设你想处理路由请求的**超时**问题。当你的端点在一段时间后没有返回任何内容时，你希望以错误响应终止。以下结构实现了这一功能：
 
-```typescript title="timeout.interceptor"
+ ```typescript title="timeout.interceptor.ts"
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler, RequestTimeoutException } from '@nestjs/common';
 import { Observable, throwError, TimeoutError } from 'rxjs';
 import { catchError, timeout } from 'rxjs/operators';

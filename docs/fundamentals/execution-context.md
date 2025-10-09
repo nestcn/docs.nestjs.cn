@@ -24,7 +24,11 @@ if (host.getType() === 'http') {
 }
 ```
 
-> **提示** `GqlContextType` 需从 `@nestjs/graphql` 包导入。
+:::info 提示
+`GqlContextType` 需从 `@nestjs/graphql` 包导入。
+:::
+
+
 
 有了应用类型后，我们可以编写更通用的组件，如下所示。
 
@@ -144,7 +148,7 @@ export const Roles = Reflector.createDecorator<string[]>();
 
 现在要使用这个装饰器，我们只需用它来注解处理器：
 
-```typescript title="cats.controller"
+ ```typescript title="cats.controller.ts"
 @Post()
 @Roles(['admin'])
 async create(@Body() createCatDto: CreateCatDto) {
@@ -156,14 +160,16 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 为了访问路由的角色（自定义元数据），我们将再次使用 `Reflector` 辅助类。`Reflector` 可以通过常规方式注入到类中：
 
-```typescript title="roles.guard"
+ ```typescript title="roles.guard.ts"
 @Injectable()
 export class RolesGuard {
   constructor(private reflector: Reflector) {}
 }
 ```
 
-> info **提示** `Reflector` 类是从 `@nestjs/core` 包导入的。
+:::info 提示
+`Reflector` 类是从 `@nestjs/core` 包导入的。
+:::
 
 现在，要读取处理程序的元数据，请使用 `get()` 方法：
 
@@ -175,7 +181,7 @@ const roles = this.reflector.get(Roles, context.getHandler());
 
 或者，我们也可以通过将元数据应用到控制器级别来组织控制器，这将应用于控制器类中的所有路由。
 
-```typescript title="cats.controller"
+ ```typescript title="cats.controller.ts"
 @Roles(['admin'])
 @Controller('cats')
 export class CatsController {}
@@ -183,7 +189,7 @@ export class CatsController {}
 
 在这种情况下，为了提取控制器元数据，我们传递 `context.getClass()` 作为第二个参数（以提供控制器类作为元数据提取的上下文），而不是 `context.getHandler()`：
 
-```typescript title="roles.guard"
+ ```typescript title="roles.guard.ts"
 const roles = this.reflector.get(Roles, context.getClass());
 ```
 
@@ -191,7 +197,7 @@ const roles = this.reflector.get(Roles, context.getClass());
 
 考虑以下场景，您在这两个级别都提供了 `Roles` 元数据。
 
-```typescript title="cats.controller"
+ ```typescript title="cats.controller.ts"
 @Roles(['user'])
 @Controller('cats')
 export class CatsController {
@@ -231,7 +237,7 @@ const roles = this.reflector.getAllAndMerge(Roles, [
 
 如前所述，除了使用 `Reflector#createDecorator` 外，您也可以使用内置的 `@SetMetadata()` 装饰器来为处理器附加元数据。
 
-```typescript title="cats.controller"
+ ```typescript title="cats.controller.ts"
 @Post()
 @SetMetadata('roles', ['admin'])
 async create(@Body() createCatDto: CreateCatDto) {
@@ -239,11 +245,14 @@ async create(@Body() createCatDto: CreateCatDto) {
 }
 ```
 
-> info **注意** `@SetMetadata()` 装饰器是从 `@nestjs/common` 包中导入的。
+:::info 注意
+`@SetMetadata()` 装饰器是从 `@nestjs/common` 包中导入的。
+:::
+
 
 通过上述构建，我们将 `roles` 元数据（`roles` 是元数据键，`['admin']` 是关联值）附加到了 `create()` 方法上。虽然这种方式有效，但直接在路由中使用 `@SetMetadata()` 并不是最佳实践。相反，您可以创建自己的装饰器，如下所示：
 
-```typescript title="roles.decorator"
+ ```typescript title="roles.decorator.ts"
 import { SetMetadata } from '@nestjs/common';
 
 export const Roles = (...roles: string[]) => SetMetadata('roles', roles);
@@ -253,7 +262,7 @@ export const Roles = (...roles: string[]) => SetMetadata('roles', roles);
 
 现在我们有了自定义的 `@Roles()` 装饰器，就可以用它来装饰 `create()` 方法了。
 
-```typescript title="cats.controller"
+ ```typescript title="cats.controller.ts"
 @Post()
 @Roles('admin')
 async create(@Body() createCatDto: CreateCatDto) {
@@ -263,14 +272,16 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 为了访问路由的角色信息（自定义元数据），我们将再次使用 `Reflector` 辅助类：
 
-```typescript title="roles.guard"
+ ```typescript title="roles.guard.ts"
 @Injectable()
 export class RolesGuard {
   constructor(private reflector: Reflector) {}
 }
 ```
 
-> info **提示** `Reflector` 类是从 `@nestjs/core` 包中导入的。
+:::info 提示
+`Reflector` 类是从 `@nestjs/core` 包中导入的。
+:::
 
 现在，要读取处理程序的元数据，请使用 `get()` 方法。
 

@@ -38,7 +38,9 @@ export class AppModule {}
 constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 ```
 
-> info **提示** `Cache` 类是从 `cache-manager` 导入的，而 `CACHE_MANAGER` 令牌则来自 `@nestjs/cache-manager` 包。
+:::info 提示
+`Cache` 类是从 `cache-manager` 导入的，而 `CACHE_MANAGER` 令牌则来自 `@nestjs/cache-manager` 包。
+:::
 
 `Cache` 实例（来自 `cache-manager` 包）上的 `get` 方法用于从缓存中检索项目。如果缓存中不存在该项目，将返回 `null`。
 
@@ -52,7 +54,9 @@ const value = await this.cacheManager.get('key');
 await this.cacheManager.set('key', 'value');
 ```
 
-> warning **注意** 内存缓存存储仅能保存[结构化克隆算法](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm#javascript_types)支持类型的值。
+:::warning 注意
+内存缓存存储仅能保存[结构化克隆算法](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm#javascript_types)支持类型的值。
+:::
 
 您可以为该特定键手动指定 TTL（过期时间，以毫秒为单位），如下所示：
 
@@ -82,7 +86,9 @@ await this.cacheManager.clear();
 
 #### 自动缓存响应
 
-> warning **警告** 在 [GraphQL](/graphql/quick-start) 应用中，拦截器会针对每个字段解析器单独执行。因此，`CacheModule`（使用拦截器来缓存响应）将无法正常工作。
+:::warning 警告
+ 在 [GraphQL](/graphql/quick-start) 应用中，拦截器会针对每个字段解析器单独执行。因此，`CacheModule`（使用拦截器来缓存响应）将无法正常工作。
+:::
 
 要启用自动缓存响应，只需在你想要缓存数据的地方绑定 `CacheInterceptor`。
 
@@ -97,7 +103,9 @@ export class AppController {
 }
 ```
 
-> warning **警告** 只有 `GET` 端点会被缓存。此外，注入原生响应对象(`@Res()`)的 HTTP 服务器路由无法使用缓存拦截器。详情请参阅 [响应映射](../overview/interceptors#响应映射) 。
+:::warning 警告
+ 只有 `GET` 端点会被缓存。此外，注入原生响应对象(`@Res()`)的 HTTP 服务器路由无法使用缓存拦截器。详情请参阅 [响应映射](../overview/interceptors#响应映射) 。
+:::
 
 为了减少所需的样板代码，你可以将 `CacheInterceptor` 全局绑定到所有端点：
 
@@ -158,7 +166,9 @@ export class AppController {
 }
 ```
 
-> info **提示** `@CacheKey()` 和 `@CacheTTL()` 装饰器是从 `@nestjs/cache-manager` 包导入的。
+:::info 提示
+`@CacheKey()` 和 `@CacheTTL()` 装饰器是从 `@nestjs/cache-manager` 包导入的。
+:::
 
 `@CacheKey()` 装饰器可以单独使用，也可以与 `@CacheTTL()` 装饰器配合使用，反之亦然。开发者可以选择仅覆盖 `@CacheKey()` 或仅覆盖 `@CacheTTL()`。未被装饰器覆盖的配置将使用全局注册的默认值（参见[自定义缓存](./caching) ）。
 
@@ -188,7 +198,9 @@ handleEvent(client: Client, data: string[]): Observable<string[]> {
 }
 ```
 
-> info **提示** `@CacheTTL()` 装饰器可以单独使用，也可以与对应的 `@CacheKey()` 装饰器配合使用。
+:::info 提示
+`@CacheTTL()` 装饰器可以单独使用，也可以与对应的 `@CacheKey()` 装饰器配合使用。
+:::
 
 #### 调整追踪方式
 
@@ -305,7 +317,9 @@ CacheModule.registerAsync({
 
 其工作原理与 `useClass` 相同，但存在一个关键区别——`CacheModule` 会查找已导入的模块以复用任何已创建的 `ConfigService`，而非实例化自身的副本。
 
-> info **提示**：`CacheModule#register`、`CacheModule#registerAsync` 和 `CacheOptionsFactory` 具有可选的泛型（类型参数），用于收窄存储特定的配置选项，从而确保类型安全。
+:::info 提示
+ `CacheModule#register`、`CacheModule#registerAsync` 和 `CacheOptionsFactory` 具有可选的泛型（类型参数），用于收窄存储特定的配置选项，从而确保类型安全。
+:::
 
 您还可以向 `registerAsync()` 方法传递所谓的 `extraProviders`。这些提供程序将与模块提供程序合并。
 

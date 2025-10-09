@@ -6,7 +6,7 @@ REPL 是一种简单的交互式环境，能够接收用户输入的单条命令
 
 要在 REPL 模式下运行 NestJS 应用，请新建 `repl.ts` 文件（与现有的 `main.ts` 文件同级），并在其中添加以下代码：
 
-```typescript title="repl"
+ ```typescript title="repl.ts"
 import { repl } from '@nestjs/core';
 import { AppModule } from './src/app.module';
 
@@ -22,7 +22,9 @@ bootstrap();
 $ npm run start -- --entryFile repl
 ```
 
-> info **提示** `repl` 返回一个 [Node.js REPL 服务器](https://nodejs.org/api/repl.html)对象。
+:::info 提示
+`repl` 返回一个 [Node.js REPL 服务器](https://nodejs.org/api/repl.html)对象。
+:::
 
 当它启动并运行后，你将在控制台中看到以下消息：
 
@@ -87,7 +89,11 @@ Retrieves an instance of either injectable or controller, otherwise, throws exce
 Interface: $(token: InjectionToken) => any
 ```
 
-> **提示** 这些函数接口是用 [TypeScript 函数类型表达式语法](https://www.typescriptlang.org/docs/handbook/2/functions.html#function-type-expressions)编写的。
+:::info 提示
+这些函数接口是用 [TypeScript 函数类型表达式语法](https://www.typescriptlang.org/docs/handbook/2/functions.html#function-type-expressions)编写的。
+:::
+
+
 
 | 功能     | 描述                                                         | 签名                                                            |
 | -------- | ------------------------------------------------------------ | --------------------------------------------------------------- |

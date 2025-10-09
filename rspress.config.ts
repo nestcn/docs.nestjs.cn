@@ -106,7 +106,7 @@ export default defineConfig({
             { text: '生命周期事件', link: '/fundamentals/lifecycle-events' },
             { text: '平台无关', link: '/fundamentals/platform-agnosticism' },
             { text: '单元测试', link: '/fundamentals/unit-testing' },
-            { text: 'Provider 作用域', link: '/fundamentals/provider-scopes' },
+            { text: '注入作用域', link: '/fundamentals/provider-scopes' },
             { text: '发现服务', link: '/fundamentals/discovery-service' },
           ],
         },
@@ -326,4 +326,5 @@ export default defineConfig({
   mediumZoom: {
     selector: '.rspress-doc img',
   },
+  globalStyles: path.join(__dirname, 'styles/styles.css')
 });

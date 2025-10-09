@@ -15,9 +15,9 @@
 ```typescript
 resolve: { // see: https://webpack.js.org/configuration/resolve/
   alias: {
-      "@nestjs/graphql": path.resolve(__dirname, "../node_modules/@nestjs/graphql/dist/extra/graphql-model-shim")
+    "@nestjs/graphql": path.resolve(__dirname, "../node_modules/@nestjs/graphql/dist/extra/graphql-model-shim")
   }
 }
 ```
 
-> info **注意** [TypeORM](/techniques/database) 包也有类似的垫片，可在此处[查看](https://github.com/typeorm/typeorm/blob/master/extra/typeorm-model-shim.js) 。
+> info **注意** [TypeORM](/techniques/sql) 包也有类似的垫片，可在此处[查看](https://github.com/typeorm/typeorm/blob/master/extra/typeorm-model-shim.js) 。

@@ -417,7 +417,7 @@ export class UserSubscriber implements EntitySubscriberInterface<User> {
 }
 ```
 
-> error **警告** 事件订阅器不能是[请求作用域](/fundamentals/injection-scopes)的。
+> error **警告** 事件订阅器不能是[请求作用域](/fundamentals/provider-scopes)的。
 
 现在，将 `UserSubscriber` 类添加到 `providers` 数组中：
 

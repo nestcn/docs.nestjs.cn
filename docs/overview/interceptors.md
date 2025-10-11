@@ -116,7 +116,7 @@ export class AppModule {}
 ```
 
 :::info 提示
-使用此方法为拦截器执行依赖注入时，请注意无论该构造应用于哪个模块，拦截器实际上是全局的。应在何处进行此操作？选择定义拦截器的模块（如上例中的 `LoggingInterceptor`）。此外，`useClass` 并非处理自定义提供程序注册的唯一方式。了解更多[此处](/fundamentals/custom-providers) 。
+使用此方法为拦截器执行依赖注入时，请注意无论该构造应用于哪个模块，拦截器实际上是全局的。应在何处进行此操作？选择定义拦截器的模块（如上例中的 `LoggingInterceptor`）。此外，`useClass` 并非处理自定义提供程序注册的唯一方式。了解更多[此处](/fundamentals/dependency-injection) 。
 :::
 
 #### 响应映射

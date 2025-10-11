@@ -1,4 +1,4 @@
-### 自定义提供程序
+# 自定义提供程序
 
 在前面的章节中，我们简要介绍了**依赖注入(DI)** 及其在 Nest 中的应用。其中一个例子就是通过[基于构造器](../overview/providers#依赖注入)的方式将实例（通常是服务提供者）注入到类中。您应该不会感到意外，依赖注入实际上是 Nest 核心功能的基石。目前为止我们只探讨了其中一种主要模式。随着应用程序日益复杂，您可能需要充分利用 DI 系统的全部功能，下面让我们深入探索这些特性。
 
@@ -63,7 +63,7 @@ export class AppModule {}
   constructor(private catsService: CatsService)
 ```
 
-3.  在 `app.module.ts` 中，我们将 `CatsService` 令牌与来自 `cats.service.ts` 文件的 `CatsService` 类进行关联。我们将在[下文](/fundamentals/custom-providers#标准提供者)看到这种关联（也称为*注册* ）具体是如何发生的。
+3.  在 `app.module.ts` 中，我们将 `CatsService` 令牌与来自 `cats.service.ts` 文件的 `CatsService` 类进行关联。我们将在[下文](/fundamentals/dependency-injection#标准提供者)看到这种关联（也称为*注册* ）具体是如何发生的。
 
 当 Nest IoC 容器实例化 `CatsController` 时，它首先查找所有依赖项\*。当找到 `CatsService` 依赖项时，容器会对 `CatsService` 令牌执行查找操作，根据注册步骤（上面的#3 步骤）返回 `CatsService` 类。假设是 `SINGLETON` 作用域（默认行为），Nest 将创建 `CatsService` 实例并缓存后返回，或者如果已有缓存实例则直接返回现有实例。
 
@@ -136,7 +136,7 @@ export class AppModule {}
 
 #### 基于非类的提供者令牌
 
-到目前为止，我们一直使用类名作为提供者令牌（即 `providers` 数组中列出的提供者里 `provide` 属性的值）。这与[基于构造函数的注入](../overview/providers#依赖注入)使用的标准模式相匹配，其中令牌也是类名。（如果这个概念不完全清楚，请回顾 [DI 基础](/fundamentals/custom-providers#di-基础)以复习令牌相关知识）。有时，我们可能需要使用字符串或符号作为 DI 令牌的灵活性。例如：
+到目前为止，我们一直使用类名作为提供者令牌（即 `providers` 数组中列出的提供者里 `provide` 属性的值）。这与[基于构造函数的注入](../overview/providers#依赖注入)使用的标准模式相匹配，其中令牌也是类名。（如果这个概念不完全清楚，请回顾 [DI 基础](/fundamentals/dependency-injection#di-基础概念)以复习令牌相关知识）。有时，我们可能需要使用字符串或符号作为 DI 令牌的灵活性。例如：
 
 ```typescript
 import { connection } from './connection';

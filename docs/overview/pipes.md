@@ -401,7 +401,7 @@ export class AppModule {}
 ```
 
 :::info 提示
-当使用这种方法为管道执行依赖注入时，请注意无论该构造应用于哪个模块，该管道实际上都是全局的。应该在何处进行此操作？选择定义管道（上例中的 `ValidationPipe`）的模块。此外，`useClass` 并非处理自定义提供程序注册的唯一方式。了解更多[此处](/fundamentals/custom-providers) 。
+当使用这种方法为管道执行依赖注入时，请注意无论该构造应用于哪个模块，该管道实际上都是全局的。应该在何处进行此操作？选择定义管道（上例中的 `ValidationPipe`）的模块。此外，`useClass` 并非处理自定义提供程序注册的唯一方式。了解更多[此处](/fundamentals/dependency-injection) 。
 :::
 
 #### 内置的 ValidationPipe

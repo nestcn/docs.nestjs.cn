@@ -571,7 +571,7 @@ export class AlbumsModule {}
 
 #### 测试
 
-在进行应用程序单元测试时，我们通常希望避免建立数据库连接，以保持测试套件的独立性并尽可能加快执行速度。但我们的类可能依赖于从数据源（连接）实例获取的存储库。如何处理这种情况？解决方案是创建模拟存储库。为此，我们需要设置[自定义提供者](/fundamentals/custom-providers) 。每个已注册的存储库都会自动以 `<EntityName>Repository` 令牌表示，其中 `EntityName` 是您的实体类名称。
+在进行应用程序单元测试时，我们通常希望避免建立数据库连接，以保持测试套件的独立性并尽可能加快执行速度。但我们的类可能依赖于从数据源（连接）实例获取的存储库。如何处理这种情况？解决方案是创建模拟存储库。为此，我们需要设置[自定义提供者](/fundamentals/dependency-injection) 。每个已注册的存储库都会自动以 `<EntityName>Repository` 令牌表示，其中 `EntityName` 是您的实体类名称。
 
 `@nestjs/typeorm` 包提供了 `getRepositoryToken()` 函数，该函数会根据给定实体返回一个预生成的令牌。
 
@@ -1133,7 +1133,7 @@ export class AlbumsModule {}
 
 #### 测试
 
-在进行应用程序单元测试时，我们通常希望避免建立数据库连接，以保持测试套件的独立性并尽可能加快执行速度。但我们的类可能依赖于从连接实例获取的模型。如何处理这种情况？解决方案是创建模拟模型。为此，我们需要设置[自定义提供者](/fundamentals/custom-providers) 。每个注册的模型都会自动对应一个 `<ModelName>Model` 令牌，其中 `ModelName` 是模型类的名称。
+在进行应用程序单元测试时，我们通常希望避免建立数据库连接，以保持测试套件的独立性并尽可能加快执行速度。但我们的类可能依赖于从连接实例获取的模型。如何处理这种情况？解决方案是创建模拟模型。为此，我们需要设置[自定义提供者](/fundamentals/dependency-injection) 。每个注册的模型都会自动对应一个 `<ModelName>Model` 令牌，其中 `ModelName` 是模型类的名称。
 
 `@nestjs/sequelize` 包公开了 `getModelToken()` 函数，该函数会根据给定模型返回一个预处理的令牌。
 

@@ -96,7 +96,7 @@ export default defineConfig({
           collapsible: true,
           collapsed: true,
           items: [
-            { text: '依赖注入', link: '/fundamentals/dependency-injection' },
+            { text: '自定义提供程序', link: '/fundamentals/dependency-injection' },
             { text: '异步提供者', link: '/fundamentals/async-components' },
             { text: '动态模块', link: '/fundamentals/dynamic-modules' },
             { text: '注入作用域', link: '/fundamentals/provider-scopes' },

@@ -29,7 +29,7 @@ import { Injectable, Scope } from '@nestjs/common';
 export class CatsService {}
 ```
 
-同样地，对于[自定义提供者](/fundamentals/custom-providers) ，在提供者注册的长格式中设置 `scope` 属性：
+同样地，对于[自定义提供者](/fundamentals/dependency-injection) ，在提供者注册的长格式中设置 `scope` 属性：
 
 ```typescript
 {
@@ -240,7 +240,7 @@ import { Injectable, Scope } from '@nestjs/common';
 export class CatsService {}
 ```
 
-同理，对于[自定义提供者](/fundamentals/custom-providers) ，需要在提供者注册的长格式中设置 `durable` 属性：
+同理，对于[自定义提供者](/fundamentals/dependency-injection) ，需要在提供者注册的长格式中设置 `durable` 属性：
 
 ```typescript
 {

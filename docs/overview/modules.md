@@ -102,8 +102,6 @@ export class CatsModule {}
 
 通过将 `CatsService` 封装在模块中（例如 `CatsModule`）并将其导出，我们确保导入 `CatsModule` 的所有模块都重用同一个 `CatsService` 实例。这不仅减少了内存消耗，还带来了更可预测的行为，因为所有模块共享同一实例，使得管理共享状态或资源更加容易。这是 NestJS 等框架中模块化和依赖注入的关键优势之一——允许服务在整个应用程序中高效共享。
 
-<app-banner-devtools></app-banner-devtools>
-
 #### 模块再导出
 
 如上所示，模块可以导出其内部提供者。此外，它们还能重新导出所导入的模块。在以下示例中，`CommonModule` 既被导入到 **又** 从 `CoreModule` 中导出，使得导入该模块的其他模块也能使用它。

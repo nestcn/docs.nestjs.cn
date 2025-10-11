@@ -114,7 +114,7 @@ catsService = await moduleRef.resolve(CatsService);
 了解更多模块引用特性请[点击此处](/fundamentals/module-ref) 。
 :::
 
-您可以用[自定义提供者](/fundamentals/custom-providers)覆盖任何生产环境的提供者实现来进行测试。例如，可以模拟数据库服务而非连接真实数据库。我们将在下一节讨论覆盖机制，该功能同样适用于单元测试场景。
+您可以用[自定义提供者](/fundamentals/dependency-injection)覆盖任何生产环境的提供者实现来进行测试。例如，可以模拟数据库服务而非连接真实数据库。我们将在下一节讨论覆盖机制，该功能同样适用于单元测试场景。
 
 #### 自动模拟
 

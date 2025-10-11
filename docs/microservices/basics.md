@@ -246,7 +246,7 @@ constructor(
 `ClientsModule` 和 `ClientProxy` 类是从 `@nestjs/microservices` 包中导入的。
 :::
 
-有时，您可能需要从其他服务（如 `ConfigService`）获取传输器配置，而不是在客户端应用中硬编码。为此，您可以使用 `ClientProxyFactory` 类注册[自定义提供者](/fundamentals/custom-providers) 。该类提供了静态方法 `create()`，该方法接收传输器选项对象并返回一个定制化的 `ClientProxy` 实例。
+有时，您可能需要从其他服务（如 `ConfigService`）获取传输器配置，而不是在客户端应用中硬编码。为此，您可以使用 `ClientProxyFactory` 类注册[自定义提供者](/fundamentals/dependency-injection) 。该类提供了静态方法 `create()`，该方法接收传输器选项对象并返回一个定制化的 `ClientProxy` 实例。
 
 ```typescript
 @Module({

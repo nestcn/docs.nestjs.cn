@@ -279,7 +279,7 @@ export class AppModule {}
 ```
 
 :::info 注意
-使用此方法执行过滤器依赖注入时，需注意无论在哪一个模块中使用该构造，过滤器实际上是全局性的。应该在哪里进行操作呢？应选择过滤器（如上例中的 `HttpExceptionFilter`）被定义的模块。同时，`useClass` 并非处理自定义提供者注册的唯一方式。了解更多[请点击此处](/fundamentals/custom-providers) 。
+使用此方法执行过滤器依赖注入时，需注意无论在哪一个模块中使用该构造，过滤器实际上是全局性的。应该在哪里进行操作呢？应选择过滤器（如上例中的 `HttpExceptionFilter`）被定义的模块。同时，`useClass` 并非处理自定义提供者注册的唯一方式。了解更多[请点击此处](/fundamentals/dependency-injection) 。
 :::
 
 

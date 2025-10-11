@@ -55,15 +55,15 @@ Nest 提供了一组实用的**参数装饰器** ，可与 HTTP 路由处理程�
   </tbody>
 </table>
 
-Additionally, you can create your own **custom decorators**. Why is this useful?
+此外，你可以创建自己的**自定义装饰器**。为什么这很有用？
 
-In the node.js world, it's common practice to attach properties to the **request** object. Then you manually extract them in each route handler, using code like the following:
+在 node.js 领域，通常的做法是将属性附加到 **request** 对象上。然后在每个路由处理程序中手动提取它们，使用如下代码
 
 ```typescript
 const user = req.user;
 ```
 
-In order to make your code more readable and transparent, you can create a `@User()` decorator and reuse it across all of your controllers.
+为了让您的代码更具可读性和透明性，您可以创建一个 `@User()` 装饰器，并在所有控制器中重复使用它。
 
  ```typescript title="user.decorator.ts"
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
@@ -165,7 +165,7 @@ export function Auth(...roles: Role[]) {
 }
 ```
 
-You can then use this custom `@Auth()` decorator as follows:
+然后您可以按如下方式使用这个自定义的 `@Auth()` 装饰器:
 
 ```typescript
 @Get('users')
@@ -173,9 +173,9 @@ You can then use this custom `@Auth()` decorator as follows:
 findAllUsers() {}
 ```
 
-This has the effect of applying all four decorators with a single declaration.
+这样就可以通过声明一个装饰器从而包含四个装饰器的效果。
 
 :::warning 警告
-The `@ApiHideProperty()` decorator from the `@nestjs/swagger` package is not composable and won't work properly with the `applyDecorators` function.
+从 `@nestjs/swagger` 包引入的 `@ApiHideProperty()` 装饰器不可组合，并且无法与 `applyDecorators` 函数一起使用。
 :::
 

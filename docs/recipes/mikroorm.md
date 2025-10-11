@@ -2,7 +2,10 @@
 
 本指南旨在帮助用户在 Nest 中快速上手 MikroORM。MikroORM 是基于数据映射器、工作单元和身份映射模式的 Node.js TypeScript ORM，是 TypeORM 的优秀替代方案，从 TypeORM 迁移也相当容易。完整文档可查阅[此处](https://mikro-orm.io/docs) 。
 
-> info **注意** `@mikro-orm/nestjs` 是第三方包，不由 NestJS 核心团队维护。发现任何问题请提交至[对应代码库](https://github.com/mikro-orm/nestjs) 。
+:::info 注意
+`@mikro-orm/nestjs` 是第三方包，不由 NestJS 核心团队维护。发现任何问题请提交至[对应代码库](https://github.com/mikro-orm/nestjs) 。
+:::
+
 
 #### 安装
 
@@ -77,13 +80,19 @@ export class MyService {
 }
 ```
 
-> **注意** ：请注意 `EntityManager` 是从 `@mikro-orm/driver` 包导入的，其中 driver 可以是 `mysql`、`sqlite`、`postgres` 或您正在使用的其他驱动。如果您安装了 `@mikro-orm/knex` 作为依赖项，也可以从那里导入 `EntityManager`。
+:::info 注意
+请注意 `EntityManager` 是从 `@mikro-orm/driver` 包导入的，其中 driver 可以是 `mysql`、`sqlite`、`postgres` 或您正在使用的其他驱动。如果您安装了 `@mikro-orm/knex` 作为依赖项，也可以从那里导入 `EntityManager`。
+:::
+
+
 
 #### 存储库
 
 MikroORM 支持仓储设计模式。我们可以为每个实体创建仓储库。完整的仓储库文档请参阅[此处](https://mikro-orm.io/docs/repositories) 。要定义当前作用域中应注册哪些仓储库，可以使用 `forFeature()` 方法。例如：
 
-> info **提示** 您**不应**通过 `forFeature()` 注册基础实体，因为这些实体没有对应的仓储库。另一方面，基础实体需要包含在 `forRoot()` 的列表中（或包含在 ORM 配置中）。
+:::info 提示
+您**不应**通过 `forFeature()` 注册基础实体，因为这些实体没有对应的仓储库。另一方面，基础实体需要包含在 `forRoot()` 的列表中（或包含在 ORM 配置中）。
+:::
 
 ```typescript
 // photo.module.ts
@@ -164,13 +173,21 @@ export class AppModule {}
 
 指定该选项后，通过 `forFeature()` 注册的每个实体 该方法将自动添加到配置的实体数组中 对象。
 
-> info **注意** 未通过 `forFeature()` 方法注册，而仅通过关系从实体引用的实体不会通过 `autoLoadEntities` 设置被包含。
+:::info 注意
+未通过 `forFeature()` 方法注册，而仅通过关系从实体引用的实体不会通过 `autoLoadEntities` 设置被包含。
+:::
 
-> info **注意** 使用 `autoLoadEntities` 对 MikroORM CLI 也没有影响 - 我们仍然需要包含完整实体列表的 CLI 配置。另一方面，我们可以在 CLI 中使用通配符，因为 CLI 不会经过 webpack 处理。
+
+:::info 注意
+使用 `autoLoadEntities` 对 MikroORM CLI 也没有影响 - 我们仍然需要包含完整实体列表的 CLI 配置。另一方面，我们可以在 CLI 中使用通配符，因为 CLI 不会经过 webpack 处理。
+:::
+
 
 #### 序列化
 
-> warning **注意** MikroORM 将每个实体关系都包装在 `Reference<T>` 或 `Collection<T>` 对象中，以提供更好的类型安全性。这将导致 [Nest 内置的序列化器](/techniques/serialization) 无法识别任何被包装的关系。换句话说，如果你从 HTTP 或 WebSocket 处理器返回 MikroORM 实体，它们的所有关系都将不会被序列化。
+:::warning 注意
+MikroORM 将每个实体关系都包装在 `Reference<T>` 或 `Collection<T>` 对象中，以提供更好的类型安全性。这将导致 [Nest 内置的序列化器](/techniques/serialization) 无法识别任何被包装的关系。换句话说，如果你从 HTTP 或 WebSocket 处理器返回 MikroORM 实体，它们的所有关系都将不会被序列化。
+:::
 
 幸运的是，MikroORM 提供了一个[序列化 API](https://mikro-orm.io/docs/serializing)，可以用来替代 `ClassSerializerInterceptor`。
 
@@ -211,7 +228,9 @@ export class MyService {
 }
 ```
 
-> warning **注意** 顾名思义，该装饰器总是会创建新的上下文，这与替代方案 `@EnsureRequestContext` 不同——后者仅在尚未处于其他上下文时才会创建。
+:::warning 注意
+ 顾名思义，该装饰器总是会创建新的上下文，这与替代方案 `@EnsureRequestContext` 不同——后者仅在尚未处于其他上下文时才会创建。
+:::
 
 #### 测试
 

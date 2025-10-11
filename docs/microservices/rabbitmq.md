@@ -14,7 +14,7 @@ $ npm i --save amqplib amqp-connection-manager
 
 要使用 RabbitMQ 传输器，请将以下配置对象传入 `createMicroservice()` 方法：
 
-```typescript title="main"
+ ```typescript title="main.ts"
 const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
   transport: Transport.RMQ,
   options: {
@@ -27,7 +27,11 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 });
 ```
 
-> **提示** `Transport` 枚举是从 `@nestjs/microservices` 包中导入的。
+:::info 提示
+`Transport` 枚举是从 `@nestjs/microservices` 包中导入的。
+:::
+
+
 
 #### 选项
 
@@ -93,7 +97,9 @@ getNotifications(@Payload() data: number[], @Ctx() context: RmqContext) {
 }
 ```
 
-> info **提示**`@Payload()`、`@Ctx()` 和 `RmqContext` 均从 `@nestjs/microservices` 包导入
+:::info 提示
+`@Payload()`、`@Ctx()` 和 `RmqContext` 均从 `@nestjs/microservices` 包导入
+:::
 
 要访问原始的 RabbitMQ 消息（包含 `properties`、`fields` 和 `content`），请使用 `RmqContext` 对象的 `getMessage()` 方法，如下所示：
 
@@ -160,7 +166,9 @@ const record = new RmqRecordBuilder(message)
 this.client.send('replace-emoji', record).subscribe(...);
 ```
 
-> info：**提示**`RmqRecordBuilder` 类是从 `@nestjs/microservices` 包中导出的。
+:::info 提示
+`RmqRecordBuilder` 类是从 `@nestjs/microservices` 包中导出的。
+:::
 
 你也可以在服务端通过访问 `RmqContext` 来读取这些值，如下所示：
 
@@ -182,7 +190,10 @@ this.client.status.subscribe((status: RmqStatus) => {
 });
 ```
 
-> info **注意** `RmqStatus` 类型是从 `@nestjs/microservices` 包中导入的。
+:::info 注意
+`RmqStatus` 类型是从 `@nestjs/microservices` 包中导入的。
+:::
+
 
 同样地，您可以订阅服务器的 `status` 流来接收有关服务器状态的通知。
 
@@ -211,7 +222,10 @@ server.on<RmqEvents>('error', (err) => {
 });
 ```
 
-> info **注意** `RmqEvents` 类型是从 `@nestjs/microservices` 包中导入的。
+:::info 注意
+`RmqEvents` 类型是从 `@nestjs/microservices` 包中导入的。
+:::
+
 
 #### 底层驱动访问
 

@@ -256,7 +256,11 @@ definitionsFactory.generate({
 });
 ```
 
-> **提示** 或者，你也可以使用类型引用，例如：`DateTime: Date`。这种情况下，`GraphQLDefinitionsFactory` 将提取指定类型的名称属性（`Date.name`）来生成 TS 定义。注意：对于非内置类型（自定义类型），需要添加对应的导入语句。
+:::info 提示
+或者，你也可以使用类型引用，例如：`DateTime: Date`。这种情况下，`GraphQLDefinitionsFactory` 将提取指定类型的名称属性（`Date.name`）来生成 TS 定义。注意：对于非内置类型（自定义类型），需要添加对应的导入语句。
+:::
+
+
 
 现在，给定以下 GraphQL 自定义标量类型：
 
@@ -278,4 +282,7 @@ export type Payload = unknown;
 
 在此，我们使用了 `customScalarTypeMapping` 属性来提供我们希望为自定义标量声明的类型映射。我们还提供了一个 `additionalHeader` 属性，以便添加这些类型定义所需的任何导入项。最后，我们添加了一个默认标量类型 `defaultScalarType`，其值为 `'unknown'`，这样任何未在 `customScalarTypeMapping` 中指定的自定义标量都将被别名化为 `unknown` 而非 `any`（自 TypeScript 3.0 起[官方推荐](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-0.html#new-unknown-top-type)使用前者以增强类型安全性）。
 
-> info **注意** 我们已从 `bignumber.js` 导入了 `_BigNumber`；这是为了避免[循环类型引用](https://github.com/Microsoft/TypeScript/issues/12525#issuecomment-263166239) 。
+:::info 注意
+我们已从 `bignumber.js` 导入了 `_BigNumber`；这是为了避免[循环类型引用](https://github.com/Microsoft/TypeScript/issues/12525#issuecomment-263166239) 。
+:::
+

@@ -4,7 +4,11 @@
 
 虽然 Prisma 可以用于原生 JavaScript 项目，但它深度整合 TypeScript 并提供超越 TypeScript 生态中其他 ORM 的类型安全保障。您可以通过[此链接](https://www.prisma.io/docs/concepts/more/comparisons/prisma-and-typeorm#type-safety)查看 Prisma 与 TypeORM 在类型安全方面的详细对比。
 
-> **注意** 如需快速了解 Prisma 的工作原理，可按照[快速入门](https://www.prisma.io/docs/getting-started/quickstart)指南操作，或阅读[官方文档](https://www.prisma.io/docs/)中的[介绍章节](https://www.prisma.io/docs/understand-prisma/introduction) 。[`prisma-examples`](https://github.com/prisma/prisma-examples/) 代码库中还提供了 [REST](https://github.com/prisma/prisma-examples/tree/b53fad046a6d55f0090ddce9fd17ec3f9b95cab3/orm/nest) 和 [GraphQL](https://github.com/prisma/prisma-examples/tree/b53fad046a6d55f0090ddce9fd17ec3f9b95cab3/orm/nest-graphql) 的即用型示例。
+:::info 注意
+如需快速了解 Prisma 的工作原理，可按照[快速入门](https://www.prisma.io/docs/getting-started/quickstart)指南操作，或阅读[官方文档](https://www.prisma.io/docs/)中的[介绍章节](https://www.prisma.io/docs/understand-prisma/introduction) 。[`prisma-examples`](https://github.com/prisma/prisma-examples/) 代码库中还提供了 [REST](https://github.com/prisma/prisma-examples/tree/b53fad046a6d55f0090ddce9fd17ec3f9b95cab3/orm/nest) 和 [GraphQL](https://github.com/prisma/prisma-examples/tree/b53fad046a6d55f0090ddce9fd17ec3f9b95cab3/orm/nest-graphql) 的即用型示例。
+:::
+
+
 
 #### 快速开始
 
@@ -12,7 +16,11 @@
 
 本指南将使用 [SQLite](https://sqlite.org/) 数据库以避免搭建数据库服务器的开销。请注意，即使您使用 PostgreSQL 或 MySQL，仍可遵循本指南——在适当位置会提供针对这些数据库的额外说明。
 
-> **注意** 如果您已有现有项目并考虑迁移至 Prisma，可参考[将 Prisma 添加到现有项目](https://www.prisma.io/docs/getting-started/setup-prisma/add-to-existing-project-typescript-postgres)的指南。若需从 TypeORM 迁移，请阅读[从 TypeORM 迁移到 Prisma](https://www.prisma.io/docs/guides/migrate-to-prisma/migrate-from-typeorm) 指南。
+:::info 注意
+如果您已有现有项目并考虑迁移至 Prisma，可参考[将 Prisma 添加到现有项目](https://www.prisma.io/docs/getting-started/setup-prisma/add-to-existing-project-typescript-postgres)的指南。若需从 TypeORM 迁移，请阅读[从 TypeORM 迁移到 Prisma](https://www.prisma.io/docs/guides/migrate-to-prisma/migrate-from-typeorm) 指南。
+:::
+
+
 
 #### 创建您的 NestJS 项目
 
@@ -256,7 +264,10 @@ $ npm install @prisma/client
 
 请注意，安装过程中 Prisma 会自动为您调用 `prisma generate` 命令。今后，每次修改 Prisma 模型后，您都需要运行此命令以更新生成的 Prisma Client。
 
-> info **注意** ：`prisma generate` 命令会读取您的 Prisma 架构，并更新位于 `node_modules/@prisma/client` 中的生成 Prisma 客户端库。
+:::info 注意
+`prisma generate` 命令会读取您的 Prisma 架构，并更新位于 `node_modules/@prisma/client` 中的生成 Prisma 客户端库。
+:::
+
 
 #### 在 NestJS 服务中使用 Prisma 客户端
 
@@ -278,7 +289,11 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
 }
 ```
 
-> **注意** `onModuleInit` 是可选的——如果省略它，Prisma 将在首次调用数据库时延迟连接。
+:::info 注意
+`onModuleInit` 是可选的——如果省略它，Prisma 将在首次调用数据库时延迟连接。
+:::
+
+
 
 接下来，你可以编写服务来为 Prisma 模式中的 `User` 和 `Post` 模型进行数据库调用。
 

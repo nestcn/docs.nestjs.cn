@@ -42,7 +42,11 @@ $ npm i @nestjs/graphql @nestjs/apollo @apollo/server graphql
 # npm i @nestjs/graphql @nestjs/mercurius graphql mercurius
 ```
 
-> **警告** `@nestjs/graphql@>=9` 和 `@nestjs/apollo^10` 包与 Apollo v3 兼容，而 `@nestjs/graphql@^8` 仅支持 Apollo v2。
+:::warning 警告
+`@nestjs/graphql@>=9` 和 `@nestjs/apollo^10` 包与 Apollo v3 兼容，而 `@nestjs/graphql@^8` 仅支持 Apollo v2。
+:::
+
+
 
 ## 快速开始
 
@@ -69,7 +73,11 @@ Playground 是一个图形化、交互式、浏览器内的 GraphQL IDE，默认
 
 应用程序运行后，打开浏览器并导航到 `http://localhost:3000/graphql`（主机和端口可能因配置而异）。
 
-> **注意** 默认的 Apollo playground 已被弃用，将在下一个主要版本中删除。建议使用 [GraphiQL](https://github.com/graphql/graphiql)，只需在 `GraphQLModule` 配置中设置 `graphiql: true`：
+:::info 注意
+默认的 Apollo playground 已被弃用，将在下一个主要版本中删除。建议使用 [GraphiQL](https://github.com/graphql/graphiql)，只需在 `GraphQLModule` 配置中设置 `graphiql: true`：
+:::
+
+
 
 ```typescript
 GraphQLModule.forRoot<ApolloDriverConfig>({

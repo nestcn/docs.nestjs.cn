@@ -26,9 +26,13 @@ Nest 应用程序以及其中的每个组件都拥有由 Nest 管理的生命周
 
 \* 对于这些事件，若未显式调用 `app.close()`，则需手动启用才能使其在系统信号（如 `SIGTERM`）下生效。详见下方[应用关闭](fundamentals/lifecycle-events#应用程序关闭)章节。
 
-> warning **注意** 上述生命周期钩子不会在**请求作用域**类中触发。请求作用域类与应用程序生命周期无关，其生存周期不可预测。它们专为每个请求创建，并在响应发送后自动进行垃圾回收。
+:::warning 注意
+上述生命周期钩子不会在**请求作用域**类中触发。请求作用域类与应用程序生命周期无关，其生存周期不可预测。它们专为每个请求创建，并在响应发送后自动进行垃圾回收。
+:::
 
-> info **说明** `onModuleInit()` 和 `onApplicationBootstrap()` 的执行顺序直接取决于模块导入顺序，会等待前一个钩子完成。
+:::info 说明
+ `onModuleInit()` 和 `onApplicationBootstrap()` 的执行顺序直接取决于模块导入顺序，会等待前一个钩子完成。
+:::
 
 #### 使用说明
 
@@ -76,9 +80,13 @@ async function bootstrap() {
 bootstrap();
 ```
 
-> warning **警告** 由于平台固有局限性，NestJS 在 Windows 系统上对应用关机钩子的支持有限。您可以预期 `SIGINT` 能正常工作，`SIGBREAK` 以及在一定程度上 `SIGHUP` 也能工作 - [了解更多](https://nodejs.org/api/process.html#process_signal_events) 。但 `SIGTERM` 在 Windows 上永远不会生效，因为通过任务管理器终止进程是无条件的，"即应用程序无法检测或阻止此操作"。以下是 libuv 提供的[相关文档](https://docs.libuv.org/en/v1.x/signal.html) ，可了解更多关于 `SIGINT`、`SIGBREAK` 等信号在 Windows 上的处理方式。另请参阅 Node.js 的[进程信号事件](https://nodejs.org/api/process.html#process_signal_events)文档。
+:::warning 警告
+ 由于平台固有局限性，NestJS 在 Windows 系统上对应用关机钩子的支持有限。您可以预期 `SIGINT` 能正常工作，`SIGBREAK` 以及在一定程度上 `SIGHUP` 也能工作 - [了解更多](https://nodejs.org/api/process.html#process_signal_events) 。但 `SIGTERM` 在 Windows 上永远不会生效，因为通过任务管理器终止进程是无条件的，"即应用程序无法检测或阻止此操作"。以下是 libuv 提供的[相关文档](https://docs.libuv.org/en/v1.x/signal.html) ，可了解更多关于 `SIGINT`、`SIGBREAK` 等信号在 Windows 上的处理方式。另请参阅 Node.js 的[进程信号事件](https://nodejs.org/api/process.html#process_signal_events)文档。
+:::
 
-> info **提示** `enableShutdownHooks` 会通过启动监听器消耗内存。当您在单个 Node 进程中运行多个 Nest 应用时（例如使用 Jest 运行并行测试），Node 可能会因过多的监听器进程而报错。因此，`enableShutdownHooks` 默认处于禁用状态。在单个 Node 进程中运行多个实例时请注意这一情况。
+:::info 提示
+`enableShutdownHooks` 会通过启动监听器消耗内存。当您在单个 Node 进程中运行多个 Nest 应用时（例如使用 Jest 运行并行测试），Node 可能会因过多的监听器进程而报错。因此，`enableShutdownHooks` 默认处于禁用状态。在单个 Node 进程中运行多个实例时请注意这一情况。
+:::
 
 当应用接收到终止信号时，它将按照上述顺序调用所有已注册的 `onModuleDestroy()`、`beforeApplicationShutdown()` 以及 `onApplicationShutdown()` 方法，并将相应信号作为第一个参数传入。如果注册的函数需要等待异步调用（返回 promise），Nest 将在此 promise 被解析或拒绝前暂停执行后续序列。
 
@@ -91,4 +99,7 @@ class UsersService implements OnApplicationShutdown {
 }
 ```
 
-> info **提示** 调用 `app.close()` 不会终止 Node 进程，只会触发 `onModuleDestroy()` 和 `onApplicationShutdown()` 钩子函数，因此如果存在定时器、长时间运行的后台任务等情况，进程不会自动终止。
+:::info 提示
+ 调用 `app.close()` 不会终止 Node 进程，只会触发 `onModuleDestroy()` 和 `onApplicationShutdown()` 钩子函数，因此如果存在定时器、长时间运行的后台任务等情况，进程不会自动终止。
+:::
+

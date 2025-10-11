@@ -8,7 +8,7 @@ $ npm i --save @nestjs/throttler
 
 安装完成后，可以像配置其他 Nest 包一样，使用 `forRoot` 或 `forRootAsync` 方法配置 `ThrottlerModule`。
 
-```typescript title="app.module.ts"
+ ```typescript title="app.module.ts"
 @Module({
   imports: [
      ThrottlerModule.forRoot({
@@ -39,7 +39,7 @@ export class AppModule {}
 
 有时您可能需要设置多个限流定义，比如每秒不超过 3 次调用，10 秒内不超过 20 次调用，以及一分钟内不超过 100 次调用。为此，您可以在数组中设置带有命名选项的定义，这些选项稍后可以在 `@SkipThrottle()` 和 `@Throttle()` 装饰器中引用以再次更改选项。
 
-```typescript title="app.module.ts"
+ ```typescript title="app.module.ts"
 @Module({
   imports: [
     ThrottlerModule.forRoot([
@@ -109,7 +109,7 @@ findAll() {
 
 以下示例演示如何为 Express 适配器启用 `trust proxy`：
 
-```typescript title="main.ts"
+ ```typescript title="main.ts"
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
@@ -125,7 +125,7 @@ bootstrap();
 
 启用 `trust proxy` 允许您从 `X-Forwarded-For` 头部检索原始 IP 地址。您还可以通过覆盖 `getTracker()` 方法来自定义应用程序的行为，从此头部提取 IP 地址而不是依赖 `req.ip`。以下示例演示如何为 Express 和 Fastify 实现这一点：
 
-```typescript title="throttler-behind-proxy.guard.ts"
+ ```typescript title="throttler-behind-proxy.guard.ts"
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { Injectable } from '@nestjs/common';
 
@@ -137,7 +137,11 @@ export class ThrottlerBehindProxyGuard extends ThrottlerGuard {
 }
 ```
 
-> **提示** 您可以在 [这里](https://expressjs.com/en/api.html#req.ips) 找到 express 的 `req` 请求对象 API，在 [这里](https://www.fastify.io/docs/latest/Reference/Request/) 找到 fastify 的 API。
+:::info 提示
+您可以在 [这里](https://expressjs.com/en/api.html#req.ips) 找到 express 的 `req` 请求对象 API，在 [这里](https://www.fastify.io/docs/latest/Reference/Request/) 找到 fastify 的 API。
+:::
+
+
 
 ## WebSockets
 
@@ -191,14 +195,22 @@ export class WsThrottlerGuard extends ThrottlerGuard {
 }
 ```
 
-> **提示** 如果您使用 ws，需要将 `_socket` 替换为 `conn`。
+:::info 提示
+如果您使用 ws，需要将 `_socket` 替换为 `conn`。
+:::
+
+
 
 使用 WebSockets 时需要记住几点：
 
 - 守卫不能使用 `APP_GUARD` 或 `app.useGlobalGuards()` 注册
 - 当达到限制时，Nest 将发出 `exception` 事件，因此确保有监听器准备好处理此事件
 
-> **提示** 如果您使用 `@nestjs/platform-ws` 包，可以使用 `client._socket.remoteAddress` 代替。
+:::info 提示
+如果您使用 `@nestjs/platform-ws` 包，可以使用 `client._socket.remoteAddress` 代替。
+:::
+
+
 
 ## GraphQL
 
@@ -325,7 +337,11 @@ export class AppModule {}
 
 对于分布式服务器，您可以使用社区存储提供程序 [Redis](https://github.com/jmcdo29/nest-lab/tree/main/packages/throttler-storage-redis) 以获得单一事实来源。
 
-> **注意** `ThrottlerStorage` 可以从 `@nestjs/throttler` 导入。
+:::info 注意
+`ThrottlerStorage` 可以从 `@nestjs/throttler` 导入。
+:::
+
+
 
 ## 时间助手
 
@@ -341,6 +357,10 @@ export class AppModule {}
 
 任何 `@Throttle()` 装饰器现在也应该接受一个具有字符串键的对象，关联到限流器上下文的名称（如果没有名称，则为 `'default'`），以及具有 `limit` 和 `ttl` 键的对象值。
 
-> **重要** `ttl` 现在以**毫秒**为单位。如果您想要保持 ttl 以秒为单位以提高可读性，请使用此包中的 `seconds` 助手。它只是将 ttl 乘以 1000 使其以毫秒为单位。
+:::info 重要
+`ttl` 现在以 **毫秒** 为单位。如果您想要保持 ttl 以秒为单位以提高可读性，请使用此包中的 `seconds` 助手。它只是将 ttl 乘以 1000 使其以毫秒为单位。
+:::
+
+
 
 更多信息请参见 [变更日志](https://github.com/nestjs/throttler/blob/master/CHANGELOG.md#500)。

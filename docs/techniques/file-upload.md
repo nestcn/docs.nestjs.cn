@@ -2,7 +2,9 @@
 
 为处理文件上传，Nest 提供了一个基于 Express 的 [multer](https://github.com/expressjs/multer) 中间件包的内置模块。Multer 处理以 `multipart/form-data` 格式发布的数据，该格式主要用于通过 HTTP `POST` 请求上传文件。该模块完全可配置，您可以根据应用程序需求调整其行为。
 
-> warning **警告** Multer 无法处理不支持的多部分格式(`multipart/form-data`)数据。另请注意，该包与 `FastifyAdapter` 不兼容。
+:::warning 警告
+Multer 无法处理不支持的多部分格式(`multipart/form-data`)数据。另请注意，该包与 `FastifyAdapter` 不兼容。
+:::
 
 为了获得更好的类型安全性，让我们安装 Multer 类型定义包：
 
@@ -24,14 +26,18 @@ uploadFile(@UploadedFile() file: Express.Multer.File) {
 }
 ```
 
-> info **提示** `FileInterceptor()` 装饰器从 `@nestjs/platform-express` 包导出。`@UploadedFile()` 装饰器从 `@nestjs/common` 导出。
+:::info 提示
+`FileInterceptor()` 装饰器从 `@nestjs/platform-express` 包导出。`@UploadedFile()` 装饰器从 `@nestjs/common` 导出。
+:::
 
 `FileInterceptor()` 装饰器接收两个参数：
 
 - `fieldName`：字符串类型，提供 HTML 表单中包含文件的字段名称
 - `options`：可选参数，类型为 `MulterOptions` 的对象。该对象与 multer 构造函数使用的对象相同（更多详情[参见此处](https://github.com/expressjs/multer#multeropts) ）。
 
-> warning **警告**`FileInterceptor()` 可能与 Google Firebase 等第三方云服务提供商不兼容。
+:::warning 警告
+`FileInterceptor()` 可能与 Google Firebase 等第三方云服务提供商不兼容。
+:::
 
 #### 文件验证
 
@@ -118,7 +124,9 @@ export abstract class FileValidator<TValidationOptions = Record<string, any>> {
 }
 ```
 
-> info **提示** `FileValidator` 接口通过其 `isValid` 函数支持异步验证。为了利用类型安全，如果您使用 express（默认）作为驱动，还可以将 `file` 参数类型指定为 `Express.Multer.File`。
+:::info 提示
+`FileValidator` 接口通过其 `isValid` 函数支持异步验证。为了利用类型安全，如果您使用 express（默认）作为驱动，还可以将 `file` 参数类型指定为 `Express.Multer.File`。
+:::
 
 `FileValidator` 是一个常规类，可以访问文件对象并根据客户端提供的选项对其进行验证。Nest 提供了两个内置的 `FileValidator` 实现供您在项目中使用：
 
@@ -139,7 +147,9 @@ export abstract class FileValidator<TValidationOptions = Record<string, any>> {
 file: Express.Multer.File,
 ```
 
-> info **提示** 如果验证器数量大幅增加或其选项使文件变得杂乱，可以将此数组定义在单独的文件中，并作为命名常量（如 `fileValidators`）导入此处。
+:::info 提示
+如果验证器数量大幅增加或其选项使文件变得杂乱，可以将此数组定义在单独的文件中，并作为命名常量（如 `fileValidators`）导入此处。
+:::
 
 最后，您可以使用特殊的 `ParseFilePipeBuilder` 类来组合和构建验证器。如下所示使用它，可以避免手动实例化每个验证器，直接传递它们的选项即可：
 
@@ -159,7 +169,9 @@ file: Express.Multer.File,
 file: Express.Multer.File,
 ```
 
-> info **提示** 默认情况下文件是必传的，但您可以通过在 `build` 函数选项中（与 `errorHttpStatusCode` 同级）添加 `fileIsRequired: false` 参数来使其变为可选。
+:::info 提示
+默认情况下文件是必传的，但您可以通过在 `build` 函数选项中（与 `errorHttpStatusCode` 同级）添加 `fileIsRequired: false` 参数来使其变为可选。
+:::
 
 #### 文件数组
 
@@ -179,7 +191,9 @@ uploadFile(@UploadedFiles() files: Array<Express.Multer.File>) {
 }
 ```
 
-> info **提示** `FilesInterceptor()` 装饰器从 `@nestjs/platform-express` 包导出。`@UploadedFiles()` 装饰器从 `@nestjs/common` 导出
+:::info 提示
+`FilesInterceptor()` 装饰器从 `@nestjs/platform-express` 包导出。`@UploadedFiles()` 装饰器从 `@nestjs/common` 导出
+:::
 
 #### 多个文件
 
@@ -201,7 +215,9 @@ uploadFile(@UploadedFiles() files: { avatar?: Express.Multer.File[], background?
 }
 ```
 
-> info **提示** `FileFieldsInterceptor()` 装饰器从 `@nestjs/platform-express` 包导出。`@UploadedFiles()` 装饰器从 `@nestjs/common` 导出。
+:::info 提示
+`FileFieldsInterceptor()` 装饰器从 `@nestjs/platform-express` 包导出。`@UploadedFiles()` 装饰器从 `@nestjs/common` 导出。
+:::
 
 #### 任意文件
 
@@ -217,7 +233,9 @@ uploadFile(@UploadedFiles() files: Array<Express.Multer.File>) {
 }
 ```
 
-> info **提示** `AnyFilesInterceptor()` 装饰器从 `@nestjs/platform-express` 包导出。`@UploadedFiles()` 装饰器从 `@nestjs/common` 导出。
+:::info 提示
+`AnyFilesInterceptor()` 装饰器从 `@nestjs/platform-express` 包导出。`@UploadedFiles()` 装饰器从 `@nestjs/common` 导出。
+:::
 
 #### 默认选项
 
@@ -229,7 +247,9 @@ MulterModule.register({
 });
 ```
 
-> info **提示** `MulterModule` 模块从 `@nestjs/platform-express` 包导出。
+:::info 提示
+`MulterModule` 模块从 `@nestjs/platform-express` 包导出。
+:::
 
 #### Azure 存储及其他云提供商
 

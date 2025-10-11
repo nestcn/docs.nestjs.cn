@@ -6,7 +6,9 @@ HTTP [异常过滤器](/exception-filters) 层和相应的 web sockets 层之间
 throw new WsException('Invalid credentials.');
 ```
 
-> info **提示** `WsException` 类从 `@nestjs/websockets` 包导入。
+:::info 提示
+`WsException` 类从 `@nestjs/websockets` 包导入。
+:::
 
 使用上面的示例，Nest 将处理抛出的异常并发出具有以下结构的 `exception` 消息：
 
@@ -36,7 +38,7 @@ onEvent(client, data: any): WsResponse<any> {
 
 为了将异常处理委托给基础过滤器，您需要扩展 `BaseWsExceptionFilter` 并调用继承的 `catch()` 方法。
 
-```typescript title="all-exceptions.filter.ts"
+ ```typescript title="all-exceptions.filter.ts"
 import { Catch, ArgumentsHost } from '@nestjs/common';
 import { BaseWsExceptionFilter } from '@nestjs/websockets';
 

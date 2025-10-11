@@ -58,7 +58,9 @@ $ npm i -g @nestjs/cli
 $ nest new project-name
 ```
 
-> 提示 要使用 TypeScript 的[更严格](https://www.typescriptlang.org/tsconfig#strict)功能集创建新项目，请在 `nest new` 命令中传递 `--strict` 标志。
+:::info 提示
+要使用 TypeScript 的[更严格](https://www.typescriptlang.org/tsconfig#strict)功能集创建新项目，请在 `nest new` 命令中传递 `--strict` 标志。
+:::
 
 `project-name` 目录将被创建，node 模块和一些其他样板文件将被安装，`src/` 目录将被创建并填充几个核心文件。
 
@@ -100,7 +102,9 @@ bootstrap();
 
 请注意，使用 Nest CLI 搭建的项目会创建一个初始项目结构，鼓励开发者遵循将每个模块保存在其自己的专用目录中的约定。
 
-> 提示 默认情况下，如果在创建应用程序时发生任何错误，你的应用程序将以代码 `1` 退出。如果你希望它抛出错误，请禁用 `abortOnError` 选项（例如，`NestFactory.create(AppModule, { abortOnError: false })`）。
+:::info 提示
+ 默认情况下，如果在创建应用程序时发生任何错误，你的应用程序将以代码 `1` 退出。如果你希望它抛出错误，请禁用 `abortOnError` 选项（例如，`NestFactory.create(AppModule, { abortOnError: false })`）。
+:::
 
 ## 平台
 

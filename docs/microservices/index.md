@@ -75,7 +75,11 @@ async function bootstrap() {
 bootstrap();
 ```
 
-> **提示** 微服务默认使用 TCP 传输层。
+:::info 提示
+微服务默认使用 TCP 传输层。
+:::
+
+
 
 ### 消息处理器
 

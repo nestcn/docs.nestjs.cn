@@ -20,7 +20,7 @@ $ npm i --save kafkajs
 
 与其他 Nest 微服务传输层实现类似，您可以通过传递给 `createMicroservice()` 方法的选项对象中的 `transport` 属性来选择 Kafka 传输机制，同时还可使用可选的 `options` 属性，如下所示：
 
-```typescript title="main"
+ ```typescript title="main.ts"
 const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
   transport: Transport.KAFKA,
   options: {
@@ -31,7 +31,11 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 });
 ```
 
-> **提示** `Transport` 枚举是从 `@nestjs/microservices` 包中导入的。
+:::info 提示
+`Transport` 枚举是从 `@nestjs/microservices` 包中导入的。
+:::
+
+
 
 #### 选项
 
@@ -113,11 +117,13 @@ Kafka 微服务消息模式利用两个主题分别处理请求和回复通道�
 
 #### 消息响应订阅
 
-> warning **注意** 本节仅适用于使用[请求-响应](/microservices/basics#请求-响应)消息模式的情况（配合 `@MessagePattern` 装饰器和 `ClientKafkaProxy#send` 方法）。对于[基于事件](/microservices/basics#基于事件)的通信方式（使用 `@EventPattern` 装饰器和 `ClientKafkaProxy#emit` 方法），则无需订阅响应主题。
+:::warning 注意
+本节仅适用于使用[请求-响应](/microservices/basics#请求-响应)消息模式的情况（配合 `@MessagePattern` 装饰器和 `ClientKafkaProxy#send` 方法）。对于[基于事件](/microservices/basics#基于事件)的通信方式（使用 `@EventPattern` 装饰器和 `ClientKafkaProxy#emit` 方法），则无需订阅响应主题。
+:::
 
 `ClientKafkaProxy` 类提供了 `subscribeToResponseOf()` 方法。该方法以请求主题名称作为参数，并将派生的回复主题名称添加到回复主题集合中。在实现消息模式时必须调用此方法。
 
-```typescript title="heroes.controller"
+ ```typescript title="heroes.controller.ts"
 onModuleInit() {
   this.client.subscribeToResponseOf('hero.kill.dragon');
 }
@@ -125,7 +131,7 @@ onModuleInit() {
 
 如果 `ClientKafkaProxy` 实例是异步创建的，则必须在调用 `connect()` 方法之前调用 `subscribeToResponseOf()` 方法。
 
-```typescript title="heroes.controller"
+ ```typescript title="heroes.controller.ts"
 async onModuleInit() {
   this.client.subscribeToResponseOf('hero.kill.dragon');
   await this.client.connect();
@@ -140,7 +146,7 @@ Nest 接收传入的 Kafka 消息时，会将其作为一个包含 `key`、`valu
 
 Nest 在发布事件或发送消息时，会通过序列化过程发送传出的 Kafka 消息。该过程会对传入 `ClientKafkaProxy` 的 `emit()` 和 `send()` 方法的参数，或从 `@MessagePattern` 方法返回的值进行序列化。此序列化过程会通过 `JSON.stringify()` 或原型方法 `toString()` 将非字符串或缓冲区的对象"字符串化"。
 
-```typescript title="heroes.controller"
+ ```typescript title="heroes.controller.ts"
 @Controller()
 export class HeroesController {
   @MessagePattern('hero.kill.dragon')
@@ -155,11 +161,14 @@ export class HeroesController {
 }
 ```
 
-> info **注意** `@Payload()` 需从 `@nestjs/microservices` 包中导入。
+:::info 注意
+`@Payload()` 需从 `@nestjs/microservices` 包中导入。
+:::
+
 
 传出消息也可以通过传递包含 `key` 和 `value` 属性的对象进行键控。消息键控对于满足[共同分区要求](https://docs.confluent.io/current/ksql/docs/developer-guide/partition-data.html#co-partitioning-requirements)非常重要。
 
-```typescript title="heroes.controller"
+ ```typescript title="heroes.controller.ts"
 @Controller()
 export class HeroesController {
   @MessagePattern('hero.kill.dragon')
@@ -186,7 +195,7 @@ export class HeroesController {
 
 此外，以此格式传递的消息还可以包含设置在 `headers` 哈希属性中的自定义标头。标头哈希属性值必须是 `string` 类型或 `Buffer` 类型。
 
-```typescript title="heroes.controller"
+ ```typescript title="heroes.controller.ts"
 @Controller()
 export class HeroesController {
   @MessagePattern('hero.kill.dragon')
@@ -228,7 +237,9 @@ killDragon(@Payload() message: KillDragonMessage, @Ctx() context: KafkaContext) 
 }
 ```
 
-> info **提示**`@Payload()`、`@Ctx()` 和 `KafkaContext` 都是从 `@nestjs/microservices` 包导入的。
+:::info 提示
+`@Payload()`、`@Ctx()` 和 `KafkaContext` 都是从 `@nestjs/microservices` 包导入的。
+:::
 
 要访问原始的 Kafka `IncomingMessage` 对象，请使用 `KafkaContext` 对象的 `getMessage()` 方法，如下所示：
 
@@ -279,7 +290,7 @@ async killDragon(@Payload() message: KillDragonMessage, @Ctx() context: KafkaCon
 
 Kafka 微服务组件会在 `client.clientId` 和 `consumer.groupId` 选项后附加各自角色描述，以防止 Nest 微服务客户端与服务器组件之间发生冲突。默认情况下，`ClientKafkaProxy` 组件会附加 `-client`，而 `ServerKafka` 组件会附加 `-server` 到这两个选项中。请注意下方提供的值是如何按此方式转换的（如注释所示）。
 
-```typescript title="main"
+ ```typescript title="main.ts"
 const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
   transport: Transport.KAFKA,
   options: {
@@ -296,7 +307,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 
 对于客户端：
 
-```typescript title="heroes.controller"
+ ```typescript title="heroes.controller.ts"
 @Client({
   transport: Transport.KAFKA,
   options: {
@@ -312,23 +323,29 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 client: ClientKafkaProxy;
 ```
 
-> info **提示** Kafka 客户端和消费者的命名规则可以通过在自定义提供程序中扩展 `ClientKafkaProxy` 和 `KafkaServer` 并重写构造函数来自定义。
+:::info 提示
+Kafka 客户端和消费者的命名规则可以通过在自定义提供程序中扩展 `ClientKafkaProxy` 和 `KafkaServer` 并重写构造函数来自定义。
+:::
 
 由于 Kafka 微服务消息模式使用两个主题分别处理请求和回复通道，回复模式应从请求主题派生。默认情况下，回复主题的名称由请求主题名称与附加的 `.reply` 组合而成。
 
-```typescript title="heroes.controller"
+ ```typescript title="heroes.controller.ts"
 onModuleInit() {
   this.client.subscribeToResponseOf('hero.get'); // hero.get.reply
 }
 ```
 
-> info **提示** Kafka 回复主题的命名规则可以通过在自定义提供程序中扩展 `ClientKafkaProxy` 并重写 `getResponsePatternName` 方法来自定义。
+:::info 提示
+Kafka 回复主题的命名规则可以通过在自定义提供程序中扩展 `ClientKafkaProxy` 并重写 `getResponsePatternName` 方法来自定义。
+:::
 
 #### 可重试异常
 
 与其他传输器类似，所有未处理的异常都会被自动包装成 `RpcException` 并转换为"用户友好"格式。但在某些边缘情况下，您可能希望绕过此机制，让异常由 `kafkajs` 驱动程序直接处理。在处理消息时抛出异常会指示 `kafkajs` **重试**该消息（重新投递），这意味着即使消息（或事件）处理程序已被触发，偏移量也不会提交到 Kafka。
 
-> warning **注意** 对于事件处理程序（基于事件的通信），默认情况下所有未处理异常都被视为**可重试异常** 。
+:::warning 注意
+ 对于事件处理程序（基于事件的通信），默认情况下所有未处理异常都被视为**可重试异常** 。
+:::
 
 为此，您可以使用名为 `KafkaRetriableException` 的专用类，如下所示：
 
@@ -336,7 +353,10 @@ onModuleInit() {
 throw new KafkaRetriableException('...');
 ```
 
-> info：**KafkaRetriableException** 类是从 `@nestjs/microservices` 包中导出的。
+:::info 提示
+**KafkaRetriableException** 类是从 `@nestjs/microservices` 包中导出的。
+:::
+
 
 ### 自定义异常处理
 
@@ -460,7 +480,7 @@ async handleUserCreated(@Payload() data: IncomingMessage, @Ctx() context: KafkaC
 
 要禁用消息自动提交，请在 `run` 配置中设置 `autoCommit: false`，如下所示：
 
-```typescript title="main"
+ ```typescript title="main.ts"
 const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
   transport: Transport.KAFKA,
   options: {
@@ -484,7 +504,11 @@ this.client.status.subscribe((status: KafkaStatus) => {
 });
 ```
 
-> **提示** `KafkaStatus` 类型是从 `@nestjs/microservices` 包导入的。
+:::info 提示
+`KafkaStatus` 类型是从 `@nestjs/microservices` 包导入的。
+:::
+
+
 
 同样地，您可以订阅服务器的 `status` 流来接收有关服务器状态的通知。
 

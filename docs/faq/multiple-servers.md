@@ -74,6 +74,13 @@ shutdownObserver.addHttpServer(httpServer);
 shutdownObserver.addHttpServer(httpsServer);
 ```
 
-> info **注意** `ExpressAdapter` 是从 `@nestjs/platform-express` 包导入的。`http` 和 `https` 是 Node.js 原生包。
+:::info 注意
+注意
+:::
 
-> **警告** 此方案不适用于 [GraphQL 订阅](/graphql/subscriptions) 。
+
+:::warning 警告
+此方案不适用于 [GraphQL 订阅](/graphql/subscriptions) 。
+:::
+
+

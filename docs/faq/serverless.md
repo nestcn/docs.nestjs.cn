@@ -4,7 +4,10 @@
 
 采用**无服务器架构**时，您只需专注于应用程序代码中的各个函数。诸如 AWS Lambda、Google Cloud Functions 和 Microsoft Azure Functions 等服务会负责所有物理硬件、虚拟机操作系统及 Web 服务器软件的管理。
 
-> info **注意** 本章节不讨论无服务器函数的优缺点，也不会深入探讨任何云提供商的具体实现细节。
+:::info 注意
+本章节不讨论无服务器函数的优缺点，也不会深入探讨任何云提供商的具体实现细节。
+:::
+
 
 #### 冷启动
 
@@ -68,7 +71,10 @@ bootstrap();
 | Nest（独立应用）                           | 0.1117 秒（111.7 毫秒） |
 | 原始 Node.js 脚本                          | 0.0071 秒（7.1 毫秒）   |
 
-> info **注意** 设备：MacBook Pro 2014 年中款，2.5 GHz 四核 Intel Core i7 处理器，16 GB 1600 MHz DDR3 内存，固态硬盘。
+:::info 注意
+设备：MacBook Pro 2014 年中款，2.5 GHz 四核 Intel Core i7 处理器，16 GB 1600 MHz DDR3 内存，固态硬盘。
+:::
+
 
 现在，让我们重复所有基准测试，但这次使用 `webpack`（如果已安装 [Nest CLI](/cli/overview)，可以运行 `nest build --webpack`）将我们的应用程序打包成单个可执行 JavaScript 文件。不过，我们将确保将所有依赖项（`node_modules`）一起打包，而不是使用 Nest CLI 自带的默认 `webpack` 配置，具体如下：
 
@@ -101,7 +107,9 @@ module.exports = (options, webpack) => {
 };
 ```
 
-> info **提示** 要指示 Nest CLI 使用此配置，请在项目根目录中创建一个新的 `webpack.config.js` 文件。
+:::info 提示
+要指示 Nest CLI 使用此配置，请在项目根目录中创建一个新的 `webpack.config.js` 文件。
+:::
 
 使用此配置后，我们得到了以下结果：
 
@@ -112,9 +120,14 @@ module.exports = (options, webpack) => {
 | Nest（独立应用）                           | 0.0319 秒（31.9 毫秒） |
 | 原始 Node.js 脚本                          | 0.0066 秒（6.6 毫秒）  |
 
-> info **注意** 机器配置：MacBook Pro 2014 年中款，2.5 GHz 四核 Intel Core i7 处理器，16 GB 1600 MHz DDR3 内存，固态硬盘。
+:::info 注意
+机器配置：MacBook Pro 2014 年中款，2.5 GHz 四核 Intel Core i7 处理器，16 GB 1600 MHz DDR3 内存，固态硬盘。
+:::
 
-> info **提示** 您可以通过应用额外的代码压缩与优化技术（如使用 `webpack` 插件等）进一步优化。
+
+:::info 提示
+您可以通过应用额外的代码压缩与优化技术（如使用 `webpack` 插件等）进一步优化。
+:::
 
 如您所见，编译方式（以及是否打包代码）至关重要，对整体启动时间有显著影响。使用 `webpack` 时，独立 Nest 应用（包含一个模块、控制器和服务的初始项目）的平均引导时间可降至约 32 毫秒，基于 Express 的常规 HTTP NestJS 应用则可降至约 81.5 毫秒。
 
@@ -169,13 +182,15 @@ $ npm i @codegenie/serverless-express aws-lambda
 $ npm i -D @types/aws-lambda serverless-offline
 ```
 
-> info **提示** 为了加快开发周期，我们安装了 `serverless-offline` 插件来模拟 AWS λ 和 API Gateway。
+:::info 提示
+为了加快开发周期，我们安装了 `serverless-offline` 插件来模拟 AWS λ 和 API Gateway。
+:::
 
 安装过程完成后，让我们创建 `serverless.yml` 文件来配置 Serverless 框架：
 
 ```yaml
 service: serverless-example
-```typescript
+
 plugins:
   - serverless-offline
 
@@ -195,7 +210,9 @@ functions:
           path: '{proxy+}'
 ```
 
-> info **提示** 要了解更多关于 Serverless 框架的信息，请访问 [官方文档](https://www.serverless.com/framework/docs/) 。
+:::info 提示
+要了解更多关于 Serverless 框架的信息，请访问 [官方文档](https://www.serverless.com/framework/docs/) 。
+:::
 
 完成这些设置后，我们现在可以转到 `main.ts` 文件，用所需的样板代码更新我们的引导代码：
 
@@ -225,9 +242,13 @@ export const handler: Handler = async (
 };
 ```
 
-> info **提示** 如需创建多个无服务器函数并在它们之间共享公共模块，我们推荐使用 [CLI 单仓库模式](/cli/monorepo#monorepo-模式) 。
+:::info 提示
+如需创建多个无服务器函数并在它们之间共享公共模块，我们推荐使用 [CLI 单仓库模式](/cli/monorepo#monorepo-模式) 。
+:::
 
-> warning **警告** 如果使用 `@nestjs/swagger` 包，需要执行几个额外步骤才能使其在无服务器函数环境中正常工作。查看此 [讨论帖](https://github.com/nestjs/swagger/issues/199) 获取更多信息。
+:::warning 警告
+如果使用 `@nestjs/swagger` 包，需要执行几个额外步骤才能使其在无服务器函数环境中正常工作。查看此 [讨论帖](https://github.com/nestjs/swagger/issues/199) 获取更多信息。
+:::
 
 接下来，打开 `tsconfig.json` 文件并确保启用 `esModuleInterop` 选项，以使 `@codegenie/serverless-express` 包能正确加载。
 
@@ -294,7 +315,7 @@ return {
 
 或者，如果您希望保持函数非常轻量级且不需要任何 HTTP 相关功能（路由、守卫、拦截器、管道等），可以仅使用 `NestFactory.createApplicationContext` （如前所述）而不运行整个 HTTP 服务器（以及底层的 `express`），如下所示：
 
-```typescript title="main"
+ ```typescript title="main.ts"
 import { HttpStatus } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { Callback, Context, Handler } from 'aws-lambda';
@@ -316,7 +337,10 @@ export const handler: Handler = async (
 };
 ```
 
-> info **注意** 请注意 `NestFactory.createApplicationContext` 不会用增强器（守卫、拦截器等）包装控制器方法。为此，您必须使用 `NestFactory.create` 方法。
+:::info 注意
+请注意 `NestFactory.createApplicationContext` 不会用增强器（守卫、拦截器等）包装控制器方法。为此，您必须使用 `NestFactory.create` 方法。
+:::
+
 
 您还可以将 `event` 对象传递给例如 `EventsService` 提供者，该提供者可以处理它并返回相应的值（取决于输入值和业务逻辑）。
 

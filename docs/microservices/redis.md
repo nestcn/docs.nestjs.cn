@@ -16,7 +16,7 @@ $ npm i --save ioredis
 
 要使用 Redis 传输器，请将以下配置对象传入 `createMicroservice()` 方法：
 
-```typescript title="main"
+ ```typescript title="main.ts"
 const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
   transport: Transport.REDIS,
   options: {
@@ -26,7 +26,11 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 });
 ```
 
-> **提示** `Transport` 枚举是从 `@nestjs/microservices` 包中导入的。
+:::info 提示
+`Transport` 枚举是从 `@nestjs/microservices` 包中导入的。
+:::
+
+
 
 #### 选项
 
@@ -79,7 +83,9 @@ getNotifications(@Payload() data: number[], @Ctx() context: RedisContext) {
 }
 ```
 
-> info **提示**`@Payload()`、`@Ctx()` 和 `RedisContext` 均从 `@nestjs/microservices` 包导入。
+:::info 提示
+`@Payload()`、`@Ctx()` 和 `RedisContext` 均从 `@nestjs/microservices` 包导入。
+:::
 
 #### 通配符
 
@@ -113,7 +119,9 @@ this.client.status.subscribe((status: RedisStatus) => {
 });
 ```
 
-> info **提示** `RedisStatus` 类型是从 `@nestjs/microservices` 包导入的。
+:::info 提示
+`RedisStatus` 类型是从 `@nestjs/microservices` 包导入的。
+:::
 
 同样地，您可以订阅服务器的 `status` 流来接收有关服务器状态的通知。
 
@@ -142,7 +150,10 @@ server.on<RedisEvents>('error', (err) => {
 });
 ```
 
-> info **注意** `RedisEvents` 类型是从 `@nestjs/microservices` 包中导入的。
+:::info 注意
+`RedisEvents` 类型是从 `@nestjs/microservices` 包中导入的。
+:::
+
 
 #### 底层驱动访问
 

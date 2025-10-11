@@ -31,7 +31,9 @@ export class CreateCatDto {
 export class UpdateCatDto extends PartialType(CreateCatDto) {}
 ```
 
-> info **提示** `PartialType()` 函数是从 `@nestjs/swagger` 包中导入的。
+:::info 提示
+`PartialType()` 函数是从 `@nestjs/swagger` 包中导入的。
+:::
 
 #### Pick
 
@@ -58,7 +60,9 @@ export class CreateCatDto {
 export class UpdateCatAgeDto extends PickType(CreateCatDto, ['age'] as const) {}
 ```
 
-> info **提示** `PickType()` 函数是从 `@nestjs/swagger` 包中导入的。
+:::info 提示
+`PickType()` 函数是从 `@nestjs/swagger` 包中导入的。
+:::
 
 #### Omit
 
@@ -85,7 +89,9 @@ export class CreateCatDto {
 export class UpdateCatDto extends OmitType(CreateCatDto, ['name'] as const) {}
 ```
 
-> info **提示** `OmitType()` 函数是从 `@nestjs/swagger` 包中导入的。
+:::info 提示
+`OmitType()` 函数是从 `@nestjs/swagger` 包中导入的。
+:::
 
 #### 交叉类型
 
@@ -117,7 +123,9 @@ export class UpdateCatDto extends IntersectionType(
 ) {}
 ```
 
-> info **提示** `IntersectionType()` 函数是从 `@nestjs/swagger` 包中导入的。
+:::info 提示
+`IntersectionType()` 函数是从 `@nestjs/swagger` 包中导入的。
+:::
 
 #### 组合
 

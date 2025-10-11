@@ -8,11 +8,11 @@
 
 `@Module()` 装饰器接收一个带有描述模块属性的对象：
 
-|             |                                                                                                                 |
-| ----------- | --------------------------------------------------------------------------------------------------------------- |
-| providers   | 将由 Nest 注入器实例化,且至少可在本模块内共享的提供者                                                            |
-| controllers | 本模块中定义的需要实例化的控制器集合                                                                            |
-| imports     | 导入模块的列表，这些模块导出了本模块所需的提供者                                                                |
+| 属性          |                                                                   |
+|-------------|-------------------------------------------------------------------|
+| providers   | 将由 Nest 注入器实例化,且至少可在本模块内共享的提供者                                    |
+| controllers | 本模块中定义的需要实例化的控制器集合                                                |
+| imports     | 导入模块的列表，这些模块导出了本模块所需的提供者                                          |
 | exports     | 本模块提供的 providers 子集，这些提供者应可供导入本模块的其他模块使用。可以使用提供者本身或其令牌（provide 值） |
 
 默认情况下，模块**封装**了提供者，这意味着您只能注入属于当前模块或从其他导入模块显式导出的提供者。模块导出的提供者本质上充当了该模块的公共接口或 API。
@@ -23,7 +23,7 @@
 
 接下来，我们将创建 `CatsModule` 来演示如何将控制器和服务进行分组。
 
-```typescript title="cats/cats.module"
+ ```typescript title="cats/cats.module.ts"
 import { Module } from '@nestjs/common';
 import { CatsController } from './cats.controller';
 import { CatsService } from './cats.service';
@@ -35,11 +35,13 @@ import { CatsService } from './cats.service';
 export class CatsModule {}
 ```
 
-> info **提示** 要使用 CLI 创建模块，只需执行 `$ nest g module cats` 命令。
+:::info 提示
+要使用 CLI 创建模块，只需执行 `$ nest g module cats` 命令。
+:::
 
 如上所述，我们在 `cats.module.ts` 文件中定义了 `CatsModule`，并将与此模块相关的所有内容移至 `cats` 目录。最后需要做的是将此模块导入根模块（即 `AppModule`，定义在 `app.module.ts` 文件中）。
 
-```typescript title="app.module"
+ ```typescript title="app.module.ts"
 import { Module } from '@nestjs/common';
 import { CatsModule } from './cats/cats.module';
 
@@ -81,7 +83,7 @@ export class AppModule {}
 
 每个模块自动成为**共享模块** 。一旦创建，它就可以被任何模块重复使用。假设我们想在多个其他模块之间共享 `CatsService` 的实例。为此，我们首先需要通过将该提供者添加到模块的 `exports` 数组来**导出** `CatsService`，如下所示：
 
-```typescript title="cats.module"
+ ```typescript title="cats.module.ts"
 import { Module } from '@nestjs/common';
 import { CatsController } from './cats.controller';
 import { CatsService } from './cats.service';
@@ -118,7 +120,7 @@ export class CoreModule {}
 
 模块类本身也可以 **注入** 提供者（例如用于配置目的）：
 
-```typescript title="cats.module"
+ ```typescript title="cats.module.ts"
 import { Module } from '@nestjs/common';
 import { CatsController } from './cats.controller';
 import { CatsService } from './cats.service';
@@ -156,7 +158,9 @@ export class CatsModule {}
 
 `@Global()` 装饰器使模块具有全局作用域。全局模块通常应由根模块或核心模块**仅注册一次**。在上例中，`CatsService` 提供者将无处不在，希望注入该服务的模块无需在其 imports 数组中导入 `CatsModule`。
 
-> info **提示** 从设计实践角度不推荐将所有内容全局化。虽然全局模块能减少样板代码，但通常更好的做法是使用 `imports` 数组来可控且清晰地暴露模块 API 给其他模块。这种方式能提供更好的结构和可维护性，确保只共享模块的必要部分，同时避免应用无关部分之间产生不必要的耦合。
+:::info 提示
+从设计实践角度不推荐将所有内容全局化。虽然全局模块能减少样板代码，但通常更好的做法是使用 `imports` 数组来可控且清晰地暴露模块 API 给其他模块。这种方式能提供更好的结构和可维护性，确保只共享模块的必要部分，同时避免应用无关部分之间产生不必要的耦合。
+:::
 
 #### 动态模块
 
@@ -183,7 +187,9 @@ export class DatabaseModule {
 }
 ```
 
-> info **提示** `forRoot()` 方法可以同步或异步（例如通过 `Promise`）返回动态模块。
+:::info 提示
+`forRoot()` 方法可以同步或异步（例如通过 `Promise`）返回动态模块。
+:::
 
 该模块默认定义了 `Connection` 提供者（在 `@Module()` 装饰器元数据中），此外根据传入 `forRoot()` 方法的 `entities` 和 `options` 对象，还会暴露一系列提供者，例如存储库。请注意动态模块返回的属性会**扩展** （而非覆盖）`@Module()` 装饰器中定义的基础模块元数据。这样既保留了静态声明的 `Connection` 提供者**又**能导出动态生成的存储库提供者。
 
@@ -198,7 +204,9 @@ export class DatabaseModule {
 }
 ```
 
-> warning **警告** 如前所述，将所有内容全局化**并非良好的设计决策**。
+:::warning 警告
+如前所述，将所有内容全局化**并非良好的设计决策**。
+:::
 
 可按以下方式导入并配置 `DatabaseModule`：
 
@@ -229,4 +237,7 @@ export class AppModule {}
 
 [动态模块](/fundamentals/dynamic-modules)章节对此主题有更详细讲解，并包含一个[实际示例](https://github.com/nestjs/nest/tree/master/sample/25-dynamic-modules) 。
 
-> info **提示** 通过[本章节](/fundamentals/dynamic-modules#可配置模块构建器)学习如何使用 `ConfigurableModuleBuilder` 构建高度可定制的动态模块。
+:::info 提示
+ 通过[本章节](/fundamentals/dynamic-modules#可配置模块构建器)学习如何使用 `ConfigurableModuleBuilder` 构建高度可定制的动态模块。
+:::
+

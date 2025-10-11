@@ -21,4 +21,7 @@ app.setGlobalPrefix('v1', {
 app.setGlobalPrefix('v1', { exclude: ['cats'] });
 ```
 
-> info **提示** `path` 属性支持使用 [path-to-regexp](https://github.com/pillarjs/path-to-regexp#parameters) 包进行通配参数匹配。注意：这里不接受星号通配符 `*`，而必须使用参数形式（`:param`）或命名通配符（`*splat`）。
+:::info 提示
+`path` 属性支持使用 [path-to-regexp](https://github.com/pillarjs/path-to-regexp#parameters) 包进行通配参数匹配。注意：这里不接受星号通配符 `*`，而必须使用参数形式（`:param`）或命名通配符（`*splat`）。
+:::
+

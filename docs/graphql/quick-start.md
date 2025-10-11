@@ -21,7 +21,11 @@ $ npm i @nestjs/graphql @nestjs/apollo @apollo/server graphql
 # npm i @nestjs/graphql @nestjs/mercurius graphql mercurius
 ```
 
-> **警告** `@nestjs/graphql@>=9` 和 `@nestjs/apollo^10` 包仅兼容 **Apollo v3**（详情请参阅 Apollo Server 3 的[迁移指南](https://www.apollographql.com/docs/apollo-server/migration/)），而 `@nestjs/graphql@^8` 仅支持 **Apollo v2**（例如 `apollo-server-express@2.x.x` 包）。
+:::warning 警告
+`@nestjs/graphql@>=9` 和 `@nestjs/apollo^10` 包仅兼容 **Apollo v3**（详情请参阅 Apollo Server 3 的[迁移指南](https://www.apollographql.com/docs/apollo-server/migration/)），而 `@nestjs/graphql@^8` 仅支持 **Apollo v2（例如 `apollo-server-express@2.x.x` 包）。
+:::
+
+
 
 #### 概述
 
@@ -33,7 +37,11 @@ Nest 提供了两种构建 GraphQL 应用的方式：**代码优先**和**模式
 
 #### GraphQL 与 TypeScript 入门指南
 
-> **提示** 在接下来的章节中，我们将集成 `@nestjs/apollo` 包。如需改用 `mercurius` 包，请跳转至[此章节](#mercurius-集成)。
+:::info 提示
+在接下来的章节中，我们将集成 `@nestjs/apollo` 包。如需改用 `mercurius` 包，请跳转至[此章节](#mercurius-集成)。
+:::
+
+
 
 安装完相关包后，我们可以导入 `GraphQLModule` 并通过 `forRoot()` 静态方法进行配置。
 
@@ -52,7 +60,11 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 export class AppModule {}
 ```
 
-> **提示** 对于 `mercurius` 集成，您应当使用 `MercuriusDriver` 和 `MercuriusDriverConfig`，两者均从 `@nestjs/mercurius` 包导出。
+:::info 提示
+对于 `mercurius` 集成，您应当使用 `MercuriusDriver` 和 `MercuriusDriverConfig`，两者均从 `@nestjs/mercurius` 包导出。
+:::
+
+
 
 `forRoot()` 方法接收一个配置对象作为参数。这些配置会被传递到底层驱动实例（更多可用设置请参阅：[Apollo](https://www.apollographql.com/docs/apollo-server/api/apollo-server) 和 [Mercurius](https://github.com/mercurius-js/mercurius/blob/master/docs/api/options.md#plugin-options)）。例如，若要禁用 `playground` 并关闭 `debug` 模式（针对 Apollo），可传递如下配置：
 
@@ -84,9 +96,17 @@ Playground 是一个图形化、交互式的浏览器内 GraphQL IDE，默认情
   <img src="/assets/playground.png" alt="" />
 </figure>
 
-> **注意** `@nestjs/mercurius` 集成不包含内置的 GraphQL Playground 功能。作为替代，您可以使用 [GraphiQL](https://github.com/graphql/graphiql)（设置 `graphiql: true` 参数）。
+:::info 注意
+`@nestjs/mercurius` 集成不包含内置的 GraphQL Playground 功能。作为替代，您可以使用 [GraphiQL](https://github.com/graphql/graphiql)（设置 `graphiql: true` 参数）。
+:::
 
-> **警告** 更新（2025 年 4 月 14 日）：默认的 Apollo playground 已被弃用，并将在下一个主要版本中移除。作为替代，您可以使用 [GraphiQL](https://github.com/graphql/graphiql)，只需在 `GraphQLModule` 配置中设置 `graphiql: true`，如下所示：
+
+
+:::warning 警告
+更新（2025 年 4 月 14 日）：默认的 Apollo playground 已被弃用，并将在下一个主要版本中移除。作为替代，您可以使用 [GraphiQL](https://github.com/graphql/graphiql)，只需在 `GraphQLModule` 配置中设置 `graphiql: true`，如下所示：
+:::
+
+
 >
 > ```typescript
 > GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -96,6 +116,7 @@ Playground 是一个图形化、交互式的浏览器内 GraphQL IDE，默认情
 > ```
 >
 > 如果您的应用程序使用[订阅](./subscriptions)功能，请务必使用 `graphql-ws`，因为 GraphiQL 不支持 `subscriptions-transport-ws`。
+
 #### 代码优先
 
 在**代码优先**方法中，您可以使用装饰器和 TypeScript 类来生成相应的 GraphQL 模式。
@@ -188,7 +209,11 @@ definitionsFactory.generate({
 $ ts-node generate-typings
 ```
 
-> **提示** 你可以预先编译该脚本（例如使用 `tsc`），然后通过 `node` 来执行它。
+:::info 提示
+你可以预先编译该脚本（例如使用 `tsc`），然后通过 `node` 来执行它。
+:::
+
+
 
 要为脚本启用监视模式（在任意 `.graphql` 文件变更时自动生成类型定义），请向 `generate()` 方法传入 `watch` 选项。
 
@@ -260,7 +285,11 @@ export class AppModule {}
 const { schema } = app.get(GraphQLSchemaHost);
 ```
 
-> **提示** 您必须在应用程序初始化完成后（即在 `app.listen()` 或 `app.init()` 方法触发 `onModuleInit` 钩子之后）调用 `GraphQLSchemaHost#schema` 的 getter 方法。
+:::info 提示
+您必须在应用程序初始化完成后（即在 `app.listen()` 或 `app.init()` 方法触发 `onModuleInit` 钩子之后）调用 `GraphQLSchemaHost#schema` 的 getter 方法。
+:::
+
+
 
 #### 示例
 
@@ -345,7 +374,11 @@ import { MercuriusDriver, MercuriusDriverConfig } from '@nestjs/mercurius';
 export class AppModule {}
 ```
 
-> **提示** 应用运行后，在浏览器中访问 `http://localhost:3000/graphiql` ，您将看到 [GraphQL 集成开发环境](https://github.com/graphql/graphiql) 。
+:::info 提示
+应用运行后，在浏览器中访问 `http://localhost:3000/graphiql` ，您将看到 [GraphQL 集成开发环境](https://github.com/graphql/graphiql) 。
+:::
+
+
 
 `forRoot()` 方法接收一个配置对象作为参数，这些配置会被传递给底层驱动实例。更多可用设置请参阅[此处](https://github.com/mercurius-js/mercurius/blob/master/docs/api/options.md#plugin-options)。
 
@@ -359,7 +392,11 @@ GraphQLModule.forRoot({
 }),
 ```
 
-> **警告** 如果在单个应用中使用 `@apollo/server` 和 `@as-integrations/fastify` 包配置多个 GraphQL 端点，请确保在 `GraphQLModule` 配置中启用 `disableHealthCheck` 设置。
+:::warning 警告
+如果在单个应用中使用 `@apollo/server` 和 `@as-integrations/fastify` 包配置多个 GraphQL 端点，请确保在 `GraphQLModule` 配置中启用 `disableHealthCheck` 设置。
+:::
+
+
 
 #### 第三方集成
 

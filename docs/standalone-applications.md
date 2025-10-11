@@ -49,7 +49,9 @@ const tasksService = app.select(TasksModule).get(TasksService, { strict: true })
   </tr>
 </table>
 
-> info **提示** 在非严格模式下，默认选择根模块。要选择任何其他模块，您需要手动导航模块图，逐步进行。
+:::info 提示
+在非严格模式下，默认选择根模块。要选择任何其他模块，您需要手动导航模块图，逐步进行。
+:::
 
 请记住，独立应用程序没有任何网络监听器，因此任何与 HTTP 相关的 Nest 功能（例如，中间件、拦截器、管道、守卫等）在此上下文中都不可用。
 

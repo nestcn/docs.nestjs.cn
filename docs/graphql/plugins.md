@@ -45,13 +45,17 @@ GraphQLModule.forRoot({
 }),
 ```
 
-> info **提示** `ApolloServerOperationRegistry` 插件是从 `@apollo/server-plugin-operation-registry` 包导出的。
+:::info 提示
+`ApolloServerOperationRegistry` 插件是从 `@apollo/server-plugin-operation-registry` 包导出的。
+:::
 
 #### 与 Mercurius 搭配使用的插件
 
 部分现有的 mercurius 专属 Fastify 插件必须在 mercurius 插件之后加载（详见插件树[此处](https://mercurius.dev/#/docs/plugins) ）。
 
-> warning **注意** [mercurius-upload](https://github.com/mercurius-js/mercurius-upload) 是个例外，应在主文件中注册。
+:::warning 注意
+[mercurius-upload](https://github.com/mercurius-js/mercurius-upload) 是个例外，应在主文件中注册。
+:::
 
 为此，`MercuriusDriver` 提供了一个可选的 `plugins` 配置项。它表示一个由对象组成的数组，每个对象包含两个属性：`plugin` 及其对应的 `options`。因此，注册 [缓存插件](https://github.com/mercurius-js/cache) 的示例如下：
 

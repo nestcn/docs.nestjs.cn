@@ -2,7 +2,9 @@
 
 访问原始请求体最常见的用途之一是执行 Webhook 签名验证。通常，为了进行 Webhook 签名验证，需要未序列化的请求体来计算 HMAC 哈希值。
 
-> warning **注意** 该功能仅在启用了内置全局 body 解析器中间件时可用，即在创建应用时不能传递 `bodyParser: false` 参数。
+:::warning 注意
+该功能仅在启用了内置全局 body 解析器中间件时可用，即在创建应用时不能传递 `bodyParser: false` 参数。
+:::
 
 #### 与 Express 配合使用
 
@@ -45,7 +47,9 @@ class CatsController {
 app.useBodyParser('text');
 ```
 
-> warning **警告** 请确保向 `NestFactory.create` 调用提供了正确的应用程序类型。对于 Express 应用，正确的类型是 `NestExpressApplication`，否则将找不到 `.useBodyParser` 方法。
+:::warning 警告
+ 请确保向 `NestFactory.create` 调用提供了正确的应用程序类型。对于 Express 应用，正确的类型是 `NestExpressApplication`，否则将找不到 `.useBodyParser` 方法。
+:::
 
 #### 请求体解析器大小限制
 

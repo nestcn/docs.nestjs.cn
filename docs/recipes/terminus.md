@@ -29,9 +29,11 @@ $ npm install --save @nestjs/terminus
 
 要开始我们的第一个健康检查，让我们创建 `HealthModule` 模块，并在其 imports 数组中导入 `TerminusModule`。
 
-> info **提示** 要使用 [Nest CLI](cli/overview) 创建该模块，只需执行 `$ nest g module health` 命令。
+:::info 提示
+要使用 [Nest CLI](cli/overview) 创建该模块，只需执行 `$ nest g module health` 命令。
+:::
 
-```typescript title="health.module"
+ ```typescript title="health.module.ts"
 import { Module } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
 
@@ -47,7 +49,9 @@ export class HealthModule {}
 $ nest g controller health
 ```
 
-> info **信息** 强烈建议在应用程序中启用关闭钩子。如果启用，Terminus 集成会利用此生命周期事件。了解更多关于关闭钩子的信息 [请点击这里](fundamentals/lifecycle-events#应用程序关闭) 。
+:::info 信息
+强烈建议在应用程序中启用关闭钩子。如果启用，Terminus 集成会利用此生命周期事件。了解更多关于关闭钩子的信息 [请点击这里](fundamentals/lifecycle-events#应用程序关闭) 。
+:::
 
 #### HTTP 健康检查
 
@@ -61,7 +65,7 @@ $ npm i --save @nestjs/axios axios
 
 现在我们可以设置 `HealthController` 了：
 
-```typescript title="health.controller"
+ ```typescript title="health.controller.ts"
 import { Controller, Get } from '@nestjs/common';
 import { HealthCheckService, HttpHealthIndicator, HealthCheck } from '@nestjs/terminus';
 
@@ -82,7 +86,7 @@ export class HealthController {
 }
 ```
 
-```typescript title="health.module"
+ ```typescript title="health.module.ts"
 import { Module } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
 import { HttpModule } from '@nestjs/axios';
@@ -129,7 +133,7 @@ export class HealthModule {}
 
 若返回的响应代码不是 `204`，则以下示例将被视为不健康。第三个参数要求提供一个（同步或异步）函数，该函数返回布尔值以判断响应是否健康（`true`）或不健康（`false`）。
 
-```typescript title="health.controller"
+ ```typescript title="health.controller.ts"
 // Within the `HealthController`-class
 
 @Get()
@@ -150,9 +154,13 @@ check() {
 
 Terminus 提供了将数据库检查添加到健康检查的能力。要开始使用此健康指标，您应查阅[数据库章节](/techniques/sql)并确保应用程序中的数据库连接已建立。
 
-> **提示** 在底层，`TypeOrmHealthIndicator` 仅执行一条常用于验证数据库是否存活的 `SELECT 1` SQL 命令。若使用 Oracle 数据库，则会执行 `SELECT 1 FROM DUAL`。
+:::info 提示
+在底层，`TypeOrmHealthIndicator` 仅执行一条常用于验证数据库是否存活的 `SELECT 1` SQL 命令。若使用 Oracle 数据库，则会执行 `SELECT 1 FROM DUAL`。
+:::
 
-```typescript title="health.controller"
+
+
+ ```typescript title="health.controller.ts"
 @Controller('health')
 export class HealthController {
   constructor(
@@ -191,7 +199,7 @@ export class HealthController {
 
 如果您的应用使用[多个数据库](techniques/database#多个数据库) ，需要将每个连接注入到 `HealthController` 中。然后就可以直接将连接引用传递给 `TypeOrmHealthIndicator`。
 
-```typescript title="health.controller"
+ ```typescript title="health.controller.ts"
 @Controller('health')
 export class HealthController {
   constructor(
@@ -218,7 +226,7 @@ export class HealthController {
 
 通过 `DiskHealthIndicator` 我们可以检查存储空间的使用情况。要开始使用，请确保注入 `DiskHealthIndicator` 将以下代码添加到你的 `HealthController` 中。以下示例检查路径 `/`（在 Windows 上可以使用 `C:\\`）的存储使用情况。如果使用量超过总存储空间的 50%，健康检查将返回不健康状态。
 
-```typescript title="health.controller"
+ ```typescript title="health.controller.ts"
 @Controller('health')
 export class HealthController {
   constructor(
@@ -238,7 +246,7 @@ export class HealthController {
 
 通过 `DiskHealthIndicator.checkStorage` 函数，你还可以检查固定大小的存储空间。以下示例中，如果路径 `/my-app/` 超过 250GB，健康状态将变为不健康。
 
-```typescript title="health.controller"
+ ```typescript title="health.controller.ts"
 // Within the `HealthController`-class
 
 @Get()
@@ -254,12 +262,15 @@ check() {
 
 为确保你的进程不超过特定内存限制，可以使用 `MemoryHealthIndicator`。以下示例可用于检查进程的堆内存使用情况。
 
-> info **提示** 堆是内存中动态分配内存（即通过 malloc 分配的内存）所在的区域。从堆中分配的内存将保持分配状态，直到发生以下情况之一：
+:::info 提示
+ 堆是内存中动态分配内存（即通过 malloc 分配的内存）所在的区域。从堆中分配的内存将保持分配状态，直到发生以下情况之一：
+:::
+
 >
 > - 内存被*释放*
 > - 程序终止
 
-```typescript title="health.controller"
+ ```typescript title="health.controller.ts"
 @Controller('health')
 export class HealthController {
   constructor(
@@ -279,9 +290,11 @@ export class HealthController {
 
 您还可以使用 `MemoryHealthIndicator.checkRSS` 来验证进程的内存 RSS。如果您的进程确实分配了超过 150MB 的内存，此示例将返回一个异常响应码。
 
-> info **提示** RSS（常驻内存集）用于显示分配给该进程且驻留在 RAM 中的内存量。它不包括被交换出去的内存，但包含来自共享库的内存（只要这些库的页面实际存在于内存中），同时包含所有栈和堆内存。
+:::info 提示
+RSS（常驻内存集）用于显示分配给该进程且驻留在 RAM 中的内存量。它不包括被交换出去的内存，但包含来自共享库的内存（只要这些库的页面实际存在于内存中），同时包含所有栈和堆内存。
+:::
 
-```typescript title="health.controller"
+ ```typescript title="health.controller.ts"
 // Within the `HealthController`-class
 
 @Get()
@@ -299,7 +312,7 @@ check() {
 
 让我们从创建一个代表自定义指标的服务开始。为了基本了解指标的结构，我们将创建一个示例 `DogHealthIndicator`。当每个 `Dog` 对象的类型为 `'goodboy'` 时，该服务应处于 `'up'` 状态。如果条件不满足，则应抛出错误。
 
-```typescript title="dog.health"
+ ```typescript title="dog.health.ts"
 import { Injectable } from '@nestjs/common';
 import { HealthIndicatorService } from '@nestjs/terminus';
 
@@ -335,7 +348,7 @@ export class DogHealthIndicator {
 
 接下来我们需要将健康指标注册为提供者。
 
-```typescript title="health.module"
+ ```typescript title="health.module.ts"
 import { Module } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
 import { DogHealthIndicator } from './dog.health';
@@ -348,11 +361,13 @@ import { DogHealthIndicator } from './dog.health';
 export class HealthModule { }
 ```
 
-> info **提示** 在实际应用中，`DogHealthIndicator` 应该在一个单独的模块中提供，例如 `DogModule`，然后由 `HealthModule` 导入。
+:::info 提示
+在实际应用中，`DogHealthIndicator` 应该在一个单独的模块中提供，例如 `DogModule`，然后由 `HealthModule` 导入。
+:::
 
 最后一步是将现已可用的健康指标添加到所需的健康检查端点。为此，我们回到 `HealthController` 并将其添加到我们的 `check` 函数中。
 
-```typescript title="health.controller"
+ ```typescript title="health.controller.ts"
 import { HealthCheckService, HealthCheck } from '@nestjs/terminus';
 import { Injectable, Dependencies, Get } from '@nestjs/common';
 import { DogHealthIndicator } from './dog.health';
@@ -380,9 +395,13 @@ Terminus 仅记录错误消息，例如当健康检查失败时。通过 `Termin
 
 在本节中，我们将指导您如何创建自定义日志记录器 `TerminusLogger`。该日志记录器扩展了内置日志功能，因此您可以选择性地覆盖日志记录器的特定部分
 
-> **提示** 如需了解更多关于 NestJS 中自定义日志记录器的信息， [请点击此处阅读更多内容](/techniques/logger#注入自定义日志记录器) 。
+:::info 提示
+如需了解更多关于 NestJS 中自定义日志记录器的信息， [请点击此处阅读更多内容](/techniques/logger#注入自定义日志记录器) 。
+:::
 
-```typescript title="terminus-logger.service"
+
+
+ ```typescript title="terminus-logger.service.ts"
 import { Injectable, Scope, ConsoleLogger } from '@nestjs/common';
 
 @Injectable({ scope: Scope.TRANSIENT })
@@ -402,7 +421,7 @@ export class TerminusLogger extends ConsoleLogger {
 
 创建自定义日志记录器后，您只需将其传入 `TerminusModule.forRoot()` 即可，如下所示。
 
-```typescript title="health.module"
+ ```typescript title="health.module.ts"
 @Module({
 imports: [
   TerminusModule.forRoot({
@@ -415,7 +434,7 @@ export class HealthModule {}
 
 若要完全抑制来自 Terminus 的所有日志消息（包括错误消息），请按如下方式配置 Terminus。
 
-```typescript title="health.module"
+ ```typescript title="health.module.ts"
 @Module({
 imports: [
   TerminusModule.forRoot({
@@ -435,7 +454,7 @@ Terminus 允许您配置健康检查错误在日志中的显示方式。
 
 您可以通过如下代码片段所示的 `errorLogStyle` 配置选项来更改日志样式
 
-```typescript title="health.module"
+ ```typescript title="health.module.ts"
 @Module({
   imports: [
     TerminusModule.forRoot({
@@ -450,7 +469,7 @@ export class HealthModule {}
 
 如果您的应用程序需要延迟关闭过程，Terminus 可以为您处理。这一设置在配合 Kubernetes 等编排器使用时尤为有益。通过将延迟时间设置为略长于就绪检查间隔，您可以在关闭容器时实现零停机。
 
-```typescript title="health.module"
+ ```typescript title="health.module.ts"
 @Module({
   imports: [
     TerminusModule.forRoot({

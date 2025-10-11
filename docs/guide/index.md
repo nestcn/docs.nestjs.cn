@@ -59,7 +59,7 @@ You can use the `:::` syntax to create custom containers and support custom titl
 **Input:**
 
 ```markdown
-:::tip
+:::info
 This is a `block` of type `tip`
 :::
 ```
@@ -80,18 +80,18 @@ This is a `block` of type `danger`
 This is a `block` of type `details`
 :::
 
-:::tip Custom Title
+:::info Custom Title
 This is a `block` of `Custom Title`
 :::
 
-:::tip{title="Custom Title"}
+:::info "Custom Title"
 This is a `block` of `Custom Title`
 :::
 ```
 
 **Output:**
 
-:::tip
+:::info
 This is a `block` of type `tip`
 :::
 
@@ -111,11 +111,11 @@ This is a `block` of type `danger`
 This is a `block` of type `details`
 :::
 
-:::tip Custom Title
+:::info Custom Title
 This is a `block` of `Custom Title`
 :::
 
-:::tip{title="Custom Title"}
+:::info "Custom Title"
 This is a `block` of `Custom Title`
 :::
 

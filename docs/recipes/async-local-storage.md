@@ -12,11 +12,15 @@
 
 NestJS 本身并未为 `AsyncLocalStorage` 提供任何内置抽象，因此让我们通过最简单的 HTTP 案例来了解如何自行实现，以便更好地理解整个概念：
 
-> **提示** 如需使用现成的[专用包](#nestjs-cls)，请继续阅读下文。
+:::info 提示
+如需使用现成的[专用包](#nestjs-cls)，请继续阅读下文。
+:::
+
+
 
 1. 首先，在某个共享源文件中创建一个新的 `AsyncLocalStorage` 实例。由于我们使用 NestJS，让我们也将其转换为带有自定义提供者的模块。
 
-```typescript title="als.module.ts"
+ ```typescript title="als.module.ts"
 @Module({
   providers: [
     {
@@ -29,11 +33,15 @@ NestJS 本身并未为 `AsyncLocalStorage` 提供任何内置抽象，因此让�
 export class AlsModule {}
 ```
 
-> **提示** `AsyncLocalStorage` 是从 `async_hooks` 导入的。
+:::info 提示
+`AsyncLocalStorage` 是从 `async_hooks` 导入的。
+:::
+
+
 
 2. 我们只关注 HTTP，所以让我们使用中间件将 `next` 函数用 `AsyncLocalStorage#run` 包装起来。由于中间件是请求最先到达的地方，这将使得 `store` 在所有增强器和系统其余部分中都可用。
 
-```typescript title="app.module.ts"
+ ```typescript title="app.module.ts"
 @Module({
   imports: [AlsModule],
   providers: [CatsService],
@@ -85,7 +93,11 @@ export class CatsService {
 
 4.  就这样，我们现在有了无需注入整个 `REQUEST` 对象就能共享请求相关状态的方法。
 
-> **警告** 请注意，虽然该技术在许多用例中很有用，但它本质上会使代码流程变得晦涩（创建隐式上下文），因此请负责任地使用它，尤其要避免创建上下文式的" [上帝对象](https://en.wikipedia.org/wiki/God_object) "。
+:::warning 警告
+请注意，虽然该技术在许多用例中很有用，但它本质上会使代码流程变得晦涩（创建隐式上下文），因此请负责任地使用它，尤其要避免创建上下文式的" [上帝对象](https://en.wikipedia.org/wiki/God_object) "。
+:::
+
+
 
 ### NestJS CLS
 
@@ -93,7 +105,9 @@ export class CatsService {
 
 然后可以通过可注入的 `ClsService` 访问存储，或者通过使用[代理提供者](https://www.npmjs.com/package/nestjs-cls#proxy-providers)将其完全从业务逻辑中抽象出来。
 
-> info **nestjs-cls**`nestjs-cls` 是第三方包，不由 NestJS 核心团队维护。如发现该库的任何问题，请在[相应仓库](https://github.com/Papooch/nestjs-cls/issues)中报告。
+:::info nestjs-cls
+`nestjs-cls` 是第三方包，不由 NestJS 核心团队维护。如发现该库的任何问题，请在[相应仓库](https://github.com/Papooch/nestjs-cls/issues)中报告。
+:::
 
 #### 安装
 
@@ -159,7 +173,9 @@ export interface MyClsStore extends ClsStore {
 }
 ```
 
-> info **提示** 也可以让包自动生成一个请求 ID，稍后通过 `cls.getId()` 访问它，或者使用 `cls.get(CLS_REQ)` 获取整个请求对象。
+:::info 提示
+也可以让包自动生成一个请求 ID，稍后通过 `cls.getId()` 访问它，或者使用 `cls.get(CLS_REQ)` 获取整个请求对象。
+:::
 
 #### 测试
 

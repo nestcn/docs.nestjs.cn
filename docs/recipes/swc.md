@@ -2,7 +2,10 @@
 
 [SWC](https://swc.rs/)（Speedy Web Compiler）是一个基于 Rust 的可扩展平台，可用于编译和打包。将 SWC 与 Nest CLI 结合使用是显著加速开发流程的绝佳且简单的方式。
 
-> info **注意** SWC 的编译速度比默认 TypeScript 编译器快约 **20 倍** 。
+:::info 注意
+SWC 的编译速度比默认 TypeScript 编译器快约 **20 倍** 。
+:::
+
 
 #### 安装
 
@@ -18,11 +21,14 @@ $ npm i --save-dev @swc/cli @swc/core
 
 ```bash
 $ nest start -b swc
-```
 # OR nest start --builder swc
 ```
 
-> **提示** 如果你的代码库是 monorepo，请查阅 [本节内容](../recipes/swc#monorepo) 。
+:::info 提示
+如果你的代码库是 monorepo，请查阅 [本节内容](../recipes/swc#monorepo) 。
+:::
+
+
 
 除了使用 `-b` 标志外，你也可以直接在 `nest-cli.json` 文件中将 `compilerOptions.builder` 属性设置为 `"swc"`，如下所示：
 
@@ -53,7 +59,6 @@ $ nest start -b swc
 
 ```bash
 $ nest start -b swc -w
-```
 # OR nest start --builder swc --watch
 ```
 
@@ -152,7 +157,9 @@ generator.generate({
 });
 ```
 
-> info **提示** 本示例中我们使用了 `@nestjs/swagger` 插件，但您可以选择使用任何插件。
+:::info 提示
+本示例中我们使用了 `@nestjs/swagger` 插件，但您可以选择使用任何插件。
+:::
 
 `generate()` 方法接受以下选项：
 
@@ -169,7 +176,6 @@ generator.generate({
 
 ```bash
 $ npx ts-node src/generate-metadata.ts
-```
 # OR npx ts-node apps/{YOUR_APP}/src/generate-metadata.ts
 ```
 
@@ -185,7 +191,9 @@ export class User {
 }
 ```
 
-> info：**Relation** `类型`是从 `typeorm` 包中导出的。
+:::info 提示
+**Relation** `类型`是从 `typeorm` 包中导出的。
+:::
 
 这样做可以避免属性类型被保存在转译代码的属性元数据中，从而防止循环依赖问题。
 
@@ -378,4 +386,7 @@ export default defineConfig({
 
 通过此配置，您现在可以在 NestJS 项目中享受使用 Vitest 带来的优势，包括更快的测试执行速度和更现代化的测试体验。
 
-> info **提示** 您可以在该 [代码库](https://github.com/TrilonIO/nest-vitest) 中查看实际示例
+:::info 提示
+您可以在该 [代码库](https://github.com/TrilonIO/nest-vitest) 中查看实际示例
+:::
+

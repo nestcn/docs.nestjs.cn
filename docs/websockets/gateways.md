@@ -6,7 +6,9 @@
 
 ![](/assets/Gateways_1.png)
 
-> info **提示** 网关可以被视为[提供者](/providers) ；这意味着它们可以通过类构造函数注入依赖项。同时，网关也可以被其他类（提供者和控制器）注入。
+:::info 提示
+网关可以被视为[提供者](/providers) ；这意味着它们可以通过类构造函数注入依赖项。同时，网关也可以被其他类（提供者和控制器）注入。
+:::
 
 #### 安装
 
@@ -24,7 +26,9 @@ $ npm i --save @nestjs/websockets @nestjs/platform-socket.io
 @WebSocketGateway(80, { namespace: 'events' })
 ```
 
-> warning **注意** 网关在被现有模块的 providers 数组引用之前不会被实例化。
+:::warning 注意
+网关在被现有模块的 providers 数组引用之前不会被实例化。
+:::
 
 您可以通过 `@WebSocketGateway()` 装饰器的第二个参数，向 socket 构造函数传递任何受支持的[选项](https://socket.io/docs/v4/server-options/) ，如下所示：
 
@@ -41,7 +45,9 @@ handleEvent(@MessageBody() data: string): string {
 }
 ```
 
-> info **提示** `@SubscribeMessage()` 和 `@MessageBody()` 装饰器是从 `@nestjs/websockets` 包导入的。
+:::info 提示
+`@SubscribeMessage()` 和 `@MessageBody()` 装饰器是从 `@nestjs/websockets` 包导入的。
+:::
 
 网关创建完成后，我们可以在模块中注册它。
 
@@ -88,7 +94,9 @@ handleEvent(
 }
 ```
 
-> info **提示** `@ConnectedSocket()` 装饰器是从 `@nestjs/websockets` 包导入的。
+:::info 提示
+`@ConnectedSocket()` 装饰器是从 `@nestjs/websockets` 包导入的。
+:::
 
 但是，在这种情况下，您将无法利用拦截器。如果您不想向用户回应，可以简单地跳过 `return` 语句（或明确返回"虚假"值，例如 `undefined`）。
 
@@ -116,9 +124,13 @@ handleEvent(@MessageBody() data: unknown): WsResponse<unknown> {
 }
 ```
 
-> info **提示** `WsResponse` 接口是从 `@nestjs/websockets` 包中导入的。
+:::info 提示
+`WsResponse` 接口是从 `@nestjs/websockets` 包中导入的。
+:::
 
-> warning **注意** 如果您的 `data` 字段依赖于 `ClassSerializerInterceptor`，则应返回实现 `WsResponse` 的类实例，因为该拦截器会忽略普通的 JavaScript 对象响应。
+:::warning 注意
+ 如果您的 `data` 字段依赖于 `ClassSerializerInterceptor`，则应返回实现 `WsResponse` 的类实例，因为该拦截器会忽略普通的 JavaScript 对象响应。
+:::
 
 客户端需要添加另一个事件监听器才能接收传入的响应。
 
@@ -175,7 +187,9 @@ onEvent(@MessageBody() data: unknown): Observable<WsResponse<number>> {
   </tr>
 </table>
 
-> info **提示** 每个生命周期接口都从 `@nestjs/websockets` 包中导出。
+:::info 提示
+每个生命周期接口都从 `@nestjs/websockets` 包中导出。
+:::
 
 #### 服务器与命名空间
 
@@ -193,7 +207,9 @@ server: Server;
 namespace: Namespace;
 ```
 
-> warning **注意** `@WebSocketServer()` 装饰器需要从 `@nestjs/websockets` 包中导入。
+:::warning 注意
+ `@WebSocketServer()` 装饰器需要从 `@nestjs/websockets` 包中导入。
+:::
 
 一旦服务器实例准备就绪，Nest 会自动将其分配给该属性。
 
@@ -203,7 +219,7 @@ namespace: Namespace;
 import { Module } from '@nestjs/common';
 import { EventsGateway } from './events.gateway';
 
-```typescript title="events.module"
+ ```typescript title="events.module.ts"
 @Module({
   providers: [EventsGateway]
 })
@@ -212,7 +228,7 @@ export class EventsModule {}
 
 你也可以向装饰器传入属性键，以便从传入消息体中提取特定属性：
 
-```typescript title="events.gateway"
+ ```typescript title="events.gateway.ts"
 @SubscribeMessage('events')
 handleEvent(@MessageBody('id') id: number): number {
   // id === messageBody.id
@@ -222,7 +238,7 @@ handleEvent(@MessageBody('id') id: number): number {
 
 如果您不想使用装饰器，以下代码在功能上是等效的：
 
-```typescript title="events.gateway"
+ ```typescript title="events.gateway.ts"
 @SubscribeMessage('events')
 handleEvent(client: Socket, data: string): string {
   return data;
@@ -233,7 +249,7 @@ handleEvent(client: Socket, data: string): string {
 
 当接收到 `events` 消息时，处理程序会发送一个包含网络传输数据的确认响应。此外，还可以使用库特定的方式发送消息，例如利用 `client.emit()` 方法。要访问已连接的 socket 实例，请使用 `@ConnectedSocket()` 装饰器。
 
-```typescript title="events.gateway"
+ ```typescript title="events.gateway.ts"
 @SubscribeMessage('events')
 handleEvent(
   @MessageBody() data: string,
@@ -243,7 +259,9 @@ handleEvent(
 }
 ```
 
-> info **提示**`@ConnectedSocket()` 装饰器是从 `@nestjs/websockets` 包中导入的。
+:::info 提示
+`@ConnectedSocket()` 装饰器是从 `@nestjs/websockets` 包中导入的。
+:::
 
 然而，在这种情况下，您将无法利用拦截器。若不想对用户作出响应，可直接跳过 `return` 语句（或显式返回"falsy"值，例如 `undefined`）。
 
@@ -263,7 +281,7 @@ socket.emit('events', { name: 'Nest' }, (data) => console.log(data));
 
 确认通知仅会发送一次。此外，原生 WebSockets 实现并不支持此功能。为解决这一限制，您可以返回一个包含两个属性的对象：`event` 表示触发事件的名称，`data` 则是需要转发给客户端的数据。
 
-```typescript title="events.gateway"
+ ```typescript title="events.gateway.ts"
 @SubscribeMessage('events')
 handleEvent(@MessageBody() data: unknown): WsResponse<unknown> {
   const event = 'events';
@@ -271,9 +289,13 @@ handleEvent(@MessageBody() data: unknown): WsResponse<unknown> {
 }
 ```
 
-> info **提示** `WsResponse` 接口是从 `@nestjs/websockets` 包中导入的。
+:::info 提示
+`WsResponse` 接口是从 `@nestjs/websockets` 包中导入的。
+:::
 
-> warning **注意** 如果您的 `data` 字段依赖于 `ClassSerializerInterceptor`，则应返回实现 `WsResponse` 的类实例，因为该拦截器会忽略普通的 JavaScript 对象响应。
+:::warning 注意
+ 如果您的 `data` 字段依赖于 `ClassSerializerInterceptor`，则应返回实现 `WsResponse` 的类实例，因为该拦截器会忽略普通的 JavaScript 对象响应。
+:::
 
 客户端需要添加另一个事件监听器才能接收传入的响应。
 
@@ -285,7 +307,7 @@ socket.on('events', (data) => console.log(data));
 
 消息处理器能够以**同步**或**异步**方式响应。因此，支持 `async` 方法。消息处理器还能返回一个 `Observable`，在这种情况下，结果值将持续发射直到流完成。
 
-```typescript title="events.gateway"
+ ```typescript title="events.gateway.ts"
 @SubscribeMessage('events')
 onEvent(@MessageBody() data: unknown): Observable<WsResponse<number>> {
   const event = 'events';
@@ -309,7 +331,11 @@ onEvent(@MessageBody() data: unknown): Observable<WsResponse<number>> {
 | `OnGatewayConnection`   | 强制实现 `handleConnection()` 方法。接收特定库的客户端套接字实例作为参数 |
 | `OnGatewayDisconnect`   | 强制实现 `handleDisconnect()` 方法。接收特定库的客户端套接字实例作为参数 |
 
-> **提示** 每个生命周期接口都从 `@nestjs/websockets` 包中导出。
+:::info 提示
+每个生命周期接口都从 `@nestjs/websockets` 包中导出。
+:::
+
+
 
 以下是实现这些生命周期钩子的完整示例：
 
@@ -363,7 +389,9 @@ server: Server;
 namespace: Namespace;
 ```
 
-> warning **注意** `@WebSocketServer()` 装饰器需要从 `@nestjs/websockets` 包中导入。
+:::warning 注意
+ `@WebSocketServer()` 装饰器需要从 `@nestjs/websockets` 包中导入。
+:::
 
 一旦服务器实例准备就绪，Nest 会自动将其分配给该属性。
 

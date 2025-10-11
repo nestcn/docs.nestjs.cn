@@ -25,7 +25,9 @@ app.use(
 );
 ```
 
-> warning **注意** 默认的服务器端会话存储特意未设计用于生产环境。在大多数情况下会出现内存泄漏，无法扩展到单个进程之外，仅适用于调试和开发。更多信息请参阅[官方仓库](https://github.com/expressjs/session) 。
+:::warning 注意
+默认的服务器端会话存储特意未设计用于生产环境。在大多数情况下会出现内存泄漏，无法扩展到单个进程之外，仅适用于调试和开发。更多信息请参阅[官方仓库](https://github.com/expressjs/session) 。
+:::
 
 `secret` 用于签署会话 ID cookie。可以是单个密钥的字符串，也可以是多个密钥的数组。如果提供了密钥数组，则只有第一个元素会用于签署会话 ID cookie，而在验证请求中的签名时将考虑所有元素。密钥本身不应容易被人工解析，最好是一组随机字符。
 
@@ -35,7 +37,10 @@ app.use(
 
 你可以向 `session` 中间件传递其他多个选项，更多信息请参阅 [API 文档](https://github.com/expressjs/session#选项) 。
 
-> info **注意** 请注意 `secure: true` 是一个推荐选项。但这要求网站启用 HTTPS，即安全 cookie 需要 HTTPS 协议。如果设置了 secure 选项却通过 HTTP 访问站点，cookie 将不会被设置。如果你的 node.js 部署在代理后方且使用 `secure: true`，则需要在 express 中设置 `"trust proxy"`。
+:::info 注意
+请注意 `secure: true` 是一个推荐选项。但这要求网站启用 HTTPS，即安全 cookie 需要 HTTPS 协议。如果设置了 secure 选项却通过 HTTP 访问站点，cookie 将不会被设置。如果你的 node.js 部署在代理后方且使用 `secure: true`，则需要在 express 中设置 `"trust proxy"`。
+:::
+
 
 完成上述配置后，你现在可以像下面这样在路由处理程序中设置和读取会话值：
 
@@ -46,7 +51,9 @@ findAll(@Req() request: Request) {
 }
 ```
 
-> info **提示** `@Req()` 装饰器是从 `@nestjs/common` 导入的，而 `Request` 则来自 `express` 包。
+:::info 提示
+`@Req()` 装饰器是从 `@nestjs/common` 导入的，而 `Request` 则来自 `express` 包。
+:::
 
 或者，您也可以使用 `@Session()` 装饰器从请求中提取会话对象，如下所示：
 
@@ -57,7 +64,9 @@ findAll(@Session() session: Record<string, any>) {
 }
 ```
 
-> info **提示** `@Session()` 装饰器是从 `@nestjs/common` 包导入的。
+:::info 提示
+`@Session()` 装饰器是从 `@nestjs/common` 包导入的。
+:::
 
 #### 与 Fastify 一起使用
 
@@ -83,7 +92,9 @@ await app.register(secureSession, {
 });
 ```
 
-> info **您也可以预生成密钥** （ [查看说明](https://github.com/fastify/fastify-secure-session) ）或使用[密钥轮换](https://github.com/fastify/fastify-secure-session#using-keys-with-key-rotation) 。
+:::info 您也可以预生成密钥
+ （ [查看说明](https://github.com/fastify/fastify-secure-session) ）或使用[密钥轮换](https://github.com/fastify/fastify-secure-session#using-keys-with-key-rotation) 。
+:::
 
 更多可用选项请参阅[官方仓库](https://github.com/fastify/fastify-secure-session) 。
 
@@ -107,4 +118,7 @@ findAll(@Session() session: secureSession.Session) {
 }
 ```
 
-> info **提示** `@Session()` 装饰器是从 `@nestjs/common` 导入的，而 `secureSession.Session` 则来自 `@fastify/secure-session` 包（导入语句： `import * as secureSession from '@fastify/secure-session'` ）。
+:::info 提示
+ `@Session()` 装饰器是从 `@nestjs/common` 导入的，而 `secureSession.Session` 则来自 `@fastify/secure-session` 包（导入语句： `import * as secureSession from '@fastify/secure-session'` ）。
+:::
+

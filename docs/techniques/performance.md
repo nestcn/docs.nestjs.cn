@@ -2,7 +2,10 @@
 
 默认情况下，Nest 使用 [Express](https://expressjs.com/) 框架。如前所述，Nest 也兼容其他库，例如 [Fastify](https://github.com/fastify/fastify)。Nest 通过实现框架适配器来达成这种框架无关性，该适配器的主要功能是将中间件和处理器代理到相应库的特定实现。
 
-> info **注意** 要实现框架适配器，目标库必须提供与 Express 类似的请求/响应管道处理机制。
+:::info 注意
+要实现框架适配器，目标库必须提供与 Express 类似的请求/响应管道处理机制。
+:::
+
 
 [Fastify](https://github.com/fastify/fastify) 是 Nest 的绝佳替代框架，因为它以类似 Express 的方式解决设计问题。但 fastify 比 Express **快得多** ，基准测试结果几乎快两倍。一个合理的问题是：为什么 Nest 默认使用 Express 作为 HTTP 提供者？原因是 Express 使用广泛、知名度高，并拥有大量兼容中间件，这些都可以被 Nest 用户直接使用。
 
@@ -20,7 +23,7 @@ $ npm i --save @nestjs/platform-fastify
 
 安装 Fastify 平台后，我们就可以使用 `FastifyAdapter` 了。
 
-```typescript title="main"
+ ```typescript title="main.ts"
 import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,
@@ -77,7 +80,7 @@ new FastifyAdapter({ logger: true });
 
 中间件函数获取的是原始的 `req` 和 `res` 对象，而非 Fastify 的封装对象。这是底层使用的 `middie` 包以及 `fastify` 的工作机制 - 更多信息请参阅此[页面](https://www.fastify.io/docs/latest/Reference/Middleware/)
 
-```typescript title="logger.middleware"
+ ```typescript title="logger.middleware.ts"
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { FastifyRequest, FastifyReply } from 'fastify';
 
@@ -113,7 +116,9 @@ newFeature() {
 }
 ```
 
-> info **提示**`@RouteConfig()` 和 `@RouteConstraints` 是从 `@nestjs/platform-fastify` 导入的。
+:::info 提示
+`@RouteConfig()` 和 `@RouteConstraints` 是从 `@nestjs/platform-fastify` 导入的。
+:::
 
 #### 示例
 

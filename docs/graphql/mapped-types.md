@@ -1,6 +1,8 @@
 ### 映射类型
 
-> warning **警告** 本章仅适用于代码优先方法。
+:::warning 警告
+本章仅适用于代码优先方法。
+:::
 
 在构建 CRUD（创建/读取/更新/删除）等功能时，基于基础实体类型构造变体通常很有用。Nest 提供了几个实用函数来执行类型转换，使这一任务更加便捷。
 
@@ -33,7 +35,9 @@ class CreateUserInput {
 export class UpdateUserInput extends PartialType(CreateUserInput) {}
 ```
 
-> info **提示** `PartialType()` 函数是从 `@nestjs/graphql` 包中导入的。
+:::info 提示
+`PartialType()` 函数是从 `@nestjs/graphql` 包中导入的。
+:::
 
 `PartialType()` 函数接受一个可选的第二个参数，该参数是对装饰器工厂的引用。此参数可用于更改应用于结果（子）类的装饰器函数。如果未指定，子类实际上会使用与**父**类（第一个参数引用的类）相同的装饰器。在上面的示例中，我们正在扩展用 `@InputType()` 装饰器注解的 `CreateUserInput`。由于我们希望 `UpdateUserInput` 也被视为使用 `@InputType()` 装饰，因此无需将 `InputType` 作为第二个参数传递。如果父类型和子类型不同（例如父类用 `@ObjectType` 装饰），我们会将 `InputType` 作为第二个参数传递。例如：
 
@@ -69,7 +73,9 @@ export class UpdateEmailInput extends PickType(CreateUserInput, [
 ] as const) {}
 ```
 
-> info **提示** `PickType()` 函数是从 `@nestjs/graphql` 包中导入的。
+:::info 提示
+`PickType()` 函数是从 `@nestjs/graphql` 包中导入的。
+:::
 
 #### 省略
 
@@ -98,7 +104,9 @@ export class UpdateUserInput extends OmitType(CreateUserInput, [
 ] as const) {}
 ```
 
-> info **提示** `OmitType()` 函数是从 `@nestjs/graphql` 包中导入的。
+:::info 提示
+`OmitType()` 函数是从 `@nestjs/graphql` 包中导入的。
+:::
 
 #### 交叉类型
 
@@ -134,7 +142,9 @@ export class UpdateUserInput extends IntersectionType(
 ) {}
 ```
 
-> info **提示** `IntersectionType()` 函数是从 `@nestjs/graphql` 包中导入的。
+:::info 提示
+`IntersectionType()` 函数是从 `@nestjs/graphql` 包中导入的。
+:::
 
 #### 组合
 

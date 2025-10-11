@@ -6,7 +6,9 @@
 
 Nest 提供了内置功能来帮助确保这些操作能够以简单直接的方式完成。`ClassSerializerInterceptor` 拦截器利用强大的 [class-transformer](https://github.com/typestack/class-transformer) 包，提供了一种声明式且可扩展的对象转换方式。其基本操作是获取方法处理程序返回的值，并应用 [class-transformer](https://github.com/typestack/class-transformer) 中的 `instanceToPlain()` 函数。在此过程中，它可以应用实体/DTO 类上由 `class-transformer` 装饰器表达的规则，如下所述。
 
-> info **提示** 序列化不适用于 [StreamableFile](./streaming-files) 响应。
+:::info 提示
+序列化不适用于 [StreamableFile](./streaming-files) 响应。
+:::
 
 #### 排除属性
 
@@ -44,9 +46,15 @@ findOne(): UserEntity {
 }
 ```
 
-> **警告** 注意必须返回类的实例。如果返回普通的 JavaScript 对象（例如 `{ user: new UserEntity() }` ），该对象将无法被正确序列化。
+:::warning 警告
+注意必须返回类的实例。如果返回普通的 JavaScript 对象（例如 `{ user: new UserEntity() }` ），该对象将无法被正确序列化。
+:::
 
-> info **提示** `ClassSerializerInterceptor` 是从 `@nestjs/common` 导入的。
+
+
+:::info 提示
+`ClassSerializerInterceptor` 是从 `@nestjs/common` 导入的。
+:::
 
 当请求此端点时，客户端会收到以下响应：
 
@@ -94,7 +102,9 @@ findOne(): UserEntity {
 }
 ```
 
-> info **提示** `@SerializeOptions()` 装饰器是从 `@nestjs/common` 导入的。
+:::info 提示
+`@SerializeOptions()` 装饰器是从 `@nestjs/common` 导入的。
+:::
 
 通过 `@SerializeOptions()` 传递的选项会作为底层 `instanceToPlain()` 函数的第二个参数传递。在这个示例中，我们会自动排除所有以 `_` 前缀开头的属性。
 
@@ -127,7 +137,9 @@ findOne(@Query() { id }: { id: number }): UserEntity {
 }
 ```
 
-> info **提示** 通过为控制器指定预期的返回类型，你可以利用 TypeScript 的类型检查功能来确保返回的普通对象符合 DTO 或实体的结构。`plainToInstance` 函数不提供这种级别的类型提示，如果普通对象与预期的 DTO 或实体结构不匹配，可能会导致潜在错误。
+:::info 提示
+通过为控制器指定预期的返回类型，你可以利用 TypeScript 的类型检查功能来确保返回的普通对象符合 DTO 或实体的结构。`plainToInstance` 函数不提供这种级别的类型提示，如果普通对象与预期的 DTO 或实体结构不匹配，可能会导致潜在错误。
+:::
 
 #### 示例
 

@@ -14,7 +14,7 @@ $ npm i --save nats
 
 使用 NATS 传输器时，请将以下配置对象传入 `createMicroservice()` 方法：
 
-```typescript title="main"
+ ```typescript title="main.ts"
 const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
   transport: Transport.NATS,
   options: {
@@ -23,7 +23,9 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 });
 ```
 
-> info **提示** `Transport` 枚举是从 `@nestjs/microservices` 包中导入的。
+:::info 提示
+`Transport` 枚举是从 `@nestjs/microservices` 包中导入的。
+:::
 
 #### 选项
 
@@ -72,7 +74,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 
 NATS 提供了一个名为[分布式队列](https://docs.nats.io/nats-concepts/queue)的内置负载均衡功能。要创建队列订阅，请按如下方式使用 `queue` 属性：
 
-```typescript title="main"
+ ```typescript title="main.ts"
 const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
   transport: Transport.NATS,
   options: {
@@ -93,7 +95,9 @@ getNotifications(@Payload() data: number[], @Ctx() context: NatsContext) {
 }
 ```
 
-> info：**提示**`@Payload()`、`@Ctx()` 和 `NatsContext` 均从 `@nestjs/microservices` 包导入。
+:::info 提示
+`@Payload()`、`@Ctx()` 和 `NatsContext` 均从 `@nestjs/microservices` 包导入。
+:::
 
 #### 通配符
 
@@ -122,7 +126,9 @@ const record = new NatsRecordBuilder(':cat:').setHeaders(headers).build();
 this.client.send('replace-emoji', record).subscribe(...);
 ```
 
-> info **提示**`NatsRecordBuilder` 类是从 `@nestjs/microservices` 包中导出的。
+:::info 提示
+`NatsRecordBuilder` 类是从 `@nestjs/microservices` 包中导出的。
+:::
 
 你也可以在服务器端通过访问 `NatsContext` 来读取这些头部信息，如下所示：
 
@@ -168,7 +174,9 @@ this.client.status.subscribe((status: NatsStatus) => {
 });
 ```
 
-> info **提示** `NatsStatus` 类型是从 `@nestjs/microservices` 包中导入的。
+:::info 提示
+`NatsStatus` 类型是从 `@nestjs/microservices` 包中导入的。
+:::
 
 同样地，您可以订阅服务器的 `status` 流来接收有关服务器状态的通知。
 
@@ -197,7 +205,9 @@ server.on<NatsEvents>('error', (err) => {
 });
 ```
 
-> info **提示** `NatsEvents` 类型是从 `@nestjs/microservices` 包中导入的。
+:::info 提示
+`NatsEvents` 类型是从 `@nestjs/microservices` 包中导入的。
+:::
 
 #### 底层驱动访问
 

@@ -23,7 +23,7 @@ $ npm i --save-dev @nestjs/testing
 
 在以下示例中，我们测试两个类：`CatsController` 和 `CatsService`。如前所述，[Jest](https://github.com/facebook/jest) 是默认提供的测试框架，它既是测试运行器，又提供了断言函数和测试替身工具，可用于模拟、监视等操作。在这个基础测试中，我们手动实例化这些类，并确保控制器和服务满足它们的 API 约定。
 
-```typescript title="cats.controller.spec"
+ ```typescript title="cats.controller.spec.ts"
 import { CatsController } from './cats.controller';
 import { CatsService } from './cats.service';
 
@@ -47,7 +47,9 @@ describe('CatsController', () => {
 });
 ```
 
-> info **提示** 将测试文件保存在它们所测试的类附近。测试文件应带有 `.spec` 或 `.test` 后缀。
+:::info 提示
+将测试文件保存在它们所测试的类附近。测试文件应带有 `.spec` 或 `.test` 后缀。
+:::
 
 由于上述示例过于简单，我们并未真正测试任何 Nest 特有的功能。实际上，我们甚至没有使用依赖注入（注意我们是直接将 `CatsService` 实例传递给 `catsController`）。这种手动实例化待测类的测试形式通常被称为**隔离测试** ，因为它独立于框架运行。接下来我们将介绍一些更高级的功能，帮助您测试那些更充分利用 Nest 特性的应用程序。
 
@@ -55,7 +57,7 @@ describe('CatsController', () => {
 
 `@nestjs/testing` 包提供了一系列实用工具，能够实现更健壮的测试流程。让我们使用内置的 `Test` 类重写之前的示例：
 
-```typescript title="cats.controller.spec"
+ ```typescript title="cats.controller.spec.ts"
 import { Test } from '@nestjs/testing';
 import { CatsController } from './cats.controller';
 import { CatsService } from './cats.service';
@@ -87,7 +89,11 @@ describe('CatsController', () => {
 
 `Test` 类为应用提供了执行上下文，它本质上模拟了完整的 Nest 运行时环境，同时提供了便于管理类实例的钩子，包括模拟和重写功能。该类的 `createTestingModule()` 方法接收一个模块元数据对象作为参数（与传入 `@Module()` 装饰器的对象相同），返回一个 `TestingModule` 实例，该实例又提供了若干方法。对于单元测试而言，关键方法是 `compile()`，它会引导模块及其依赖项（类似于传统 `main.ts` 文件中使用 `NestFactory.create()` 引导应用的方式），并返回一个准备就绪的测试模块。
 
-> **提示** `compile()` 方法是**异步的** ，因此需要使用 await。模块编译完成后，可通过 `get()` 方法获取其声明的任何**静态**实例（控制器和提供者）。
+:::info 提示
+`compile()` 方法是**异步的** ，因此需要使用 await。模块编译完成后，可通过 `get()` 方法获取其声明的任何**静态实例（控制器和提供者）。
+:::
+
+
 
 `TestingModule` 继承自[模块引用](/fundamentals/module-ref)类，因此具备动态解析作用域提供者（瞬时或请求作用域）的能力。可通过 `resolve()` 方法实现（而 `get()` 方法仅能获取静态实例）。
 
@@ -100,9 +106,13 @@ const moduleRef = await Test.createTestingModule({
 catsService = await moduleRef.resolve(CatsService);
 ```
 
-> warning **警告** `resolve()` 方法会从自身的 **DI 容器子树**返回提供者的唯一实例。每个子树都有唯一的上下文标识符。因此，若多次调用此方法并比较实例引用，会发现它们并不相同。
+:::warning 警告
+`resolve()` 方法会从自身的 **DI 容器子树**返回提供者的唯一实例。每个子树都有唯一的上下文标识符。因此，若多次调用此方法并比较实例引用，会发现它们并不相同。
+:::
 
-> info **提示** 了解更多模块引用特性请[点击此处](/fundamentals/module-ref) 。
+:::info 提示
+了解更多模块引用特性请[点击此处](/fundamentals/module-ref) 。
+:::
 
 您可以用[自定义提供者](/fundamentals/custom-providers)覆盖任何生产环境的提供者实现来进行测试。例如，可以模拟数据库服务而非连接真实数据库。我们将在下一节讨论覆盖机制，该功能同样适用于单元测试场景。
 
@@ -145,15 +155,19 @@ describe('CatsController', () => {
 
 您也可以像通常获取自定义提供者那样从测试容器中检索这些模拟对象，例如 `moduleRef.get(CatsService)`。
 
-> info **提示** 通用模拟工厂（如 [`@golevelup/ts-jest`](https://github.com/golevelup/nestjs/tree/master/packages/testing) 中的 `createMock`）也可以直接传入使用。
+:::info 提示
+通用模拟工厂（如 [`@golevelup/ts-jest`](https://github.com/golevelup/nestjs/tree/master/packages/testing) 中的 `createMock`）也可以直接传入使用。
+:::
 
-> info **提示** `REQUEST` 和 `INQUIRER` 提供者无法被自动模拟，因为它们已在上下文中预定义。但可以通过自定义提供者语法或使用 `.overrideProvider` 方法进行*覆盖* 。
+:::info 提示
+`REQUEST` 和 `INQUIRER` 提供者无法被自动模拟，因为它们已在上下文中预定义。但可以通过自定义提供者语法或使用 `.overrideProvider` 方法进行*覆盖* 。
+:::
 
 #### 端到端测试
 
 与专注于单个模块和类的单元测试不同，端到端(e2e)测试涵盖了类和模块在更高聚合层级上的交互——更接近最终用户与生产系统的交互方式。随着应用规模增长，手动测试每个 API 端点的端到端行为变得困难。自动化端到端测试帮助我们确保系统的整体行为正确并满足项目需求。执行 e2e 测试时，我们使用与**单元测试**相似的配置。此外，Nest 可以轻松使用 [Supertest](https://github.com/visionmedia/supertest) 库来模拟 HTTP 请求。
 
-```typescript title="cats.e2e-spec"
+ ```typescript title="cats.e2e-spec.ts"
 import * as request from 'supertest';
 import { Test } from '@nestjs/testing';
 import { CatsModule } from '../../src/cats/cats.module';
@@ -191,7 +205,10 @@ describe('Cats', () => {
 });
 ```
 
-> info **提示** 如果您使用 [Fastify](/techniques/performance) 作为 HTTP 适配器，它需要稍有不同的配置，并具有内置的测试能力：
+:::info 提示
+ 如果您使用 [Fastify](/techniques/performance) 作为 HTTP 适配器，它需要稍有不同的配置，并具有内置的测试能力：
+:::
+
 >
 > ```ts
 > let app: NestFastifyApplication;
@@ -266,7 +283,9 @@ const moduleRef = await Test.createTestingModule({
 | `resolve()`                | 获取应用程序上下文中可用的控制器或提供者（包括守卫、过滤器等）的动态创建作用域实例（请求或瞬态）。继承自模块引用类。        |
 | `select()`                 | 遍历模块的依赖关系图；可用于从选定模块中检索特定实例（与 `get()` 方法中的严格模式 `strict: true` 一起使用）。              |
 
-> info **提示** 将端到端测试文件保存在 `test` 目录中。测试文件应使用 `.e2e-spec` 后缀。
+:::info 提示
+将端到端测试文件保存在 `test` 目录中。测试文件应使用 `.e2e-spec` 后缀。
+:::
 
 #### 覆盖全局注册的增强器
 
@@ -294,7 +313,10 @@ providers: [
 ],
 ```
 
-> info **注意** 将 `useClass` 改为 `useExisting` 以引用已注册的提供者，而不是让 Nest 在令牌背后实例化它。
+:::info 注意
+将 `useClass` 改为 `useExisting` 以引用已注册的提供者，而不是让 Nest 在令牌背后实例化它。
+:::
+
 
 现在 `JwtAuthGuard` 对 Nest 而言是一个常规提供者，在创建 `TestingModule` 时可被覆盖：
 
@@ -311,7 +333,7 @@ const moduleRef = await Test.createTestingModule({
 
 #### 测试请求作用域实例
 
-[请求作用域](/fundamentals/injection-scopes)的提供者会为每个传入的**请求**单独创建。实例会在请求处理完成后被垃圾回收。这带来了一个问题，因为我们无法访问专门为测试请求生成的依赖注入子树。
+[请求作用域](/fundamentals/provider-scopes)的提供者会为每个传入的**请求**单独创建。实例会在请求处理完成后被垃圾回收。这带来了一个问题，因为我们无法访问专门为测试请求生成的依赖注入子树。
 
 根据前文所述，我们知道可以使用 `resolve()` 方法来获取动态实例化的类。同时，如[此处](../fundamentals/module-reference#解析作用域提供者)所描述的，我们知道可以传递唯一的上下文标识符来控制 DI 容器子树的生命周期。那么如何在测试环境中利用这一点呢？
 

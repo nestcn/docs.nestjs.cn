@@ -1,6 +1,8 @@
 ### CI/CD 集成
 
-> info **提示** 本章介绍 Nest Devtools 与 Nest 框架的集成。如需了解 Devtools 应用程序，请访问 [Devtools](https://devtools.nestjs.com) 官网。
+:::info 提示
+本章介绍 Nest Devtools 与 Nest 框架的集成。如需了解 Devtools 应用程序，请访问 [Devtools](https://devtools.nestjs.com) 官网。
+:::
 
 CI/CD 集成功能适用于**[企业版](/settings)**计划的用户。
 
@@ -174,7 +176,11 @@ const publishOptions = {
 };
 ```
 
-> **提示** 理想情况下，`DEVTOOLS_API_KEY` 环境变量应从机密信息中获取。
+:::info 提示
+理想情况下，`DEVTOOLS_API_KEY` 环境变量应从机密信息中获取。
+:::
+
+
 
 该工作流将在每个针对 `master` 分支的拉取请求时运行，或者当有代码直接提交到 `master` 分支时触发。您可以根据项目需求自由调整此配置。关键在于我们需要为 `GraphPublisher` 类提供必要的环境变量（以便运行）。
 

@@ -46,7 +46,11 @@ async function bootstrap() {
 bootstrap();
 ```
 
-> **提示** 工厂方法 `SwaggerModule.createDocument()` 专门用于在您请求时生成 Swagger 文档。这种方法有助于节省一些初始化时间，结果文档是符合 [OpenAPI 文档](https://swagger.io/specification/#openapi-document)规范的可序列化对象。
+:::info 提示
+工厂方法 `SwaggerModule.createDocument()` 专门用于在您请求时生成 Swagger 文档。这种方法有助于节省一些初始化时间，结果文档是符合 [OpenAPI 文档](https://swagger.io/specification/#openapi-document)规范的可序列化对象。
+:::
+
+
 
 `DocumentBuilder` 帮助构建符合 OpenAPI 规范的基础文档。它提供了几种方法，允许设置标题、描述、版本等属性。为了创建完整的文档（包含所有定义的 HTTP 路由），我们使用 `SwaggerModule` 类的 `createDocument()` 方法。此方法接受两个参数：应用程序实例和 Swagger 选项对象。
 
@@ -67,7 +71,11 @@ $ npm run start
 
 如您所见，`SwaggerModule` 自动反映了您的所有端点。
 
-> **提示** 要生成和下载 Swagger JSON 文件，请导航到 `http://localhost:3000/api-json`（假设您的 Swagger 文档在 `http://localhost:3000/api` 下可用）。也可以使用来自 `@nestjs/swagger` 的 setup 方法将其暴露在您选择的路由上：
+:::info 提示
+要生成和下载 Swagger JSON 文件，请导航到 `http://localhost:3000/api-json`（假设您的 Swagger 文档在 `http://localhost:3000/api` 下可用）。也可以使用来自 `@nestjs/swagger` 的 setup 方法将其暴露在您选择的路由上：
+:::
+
+
 
 ```typescript
 SwaggerModule.setup('swagger', app, documentFactory, {
@@ -77,7 +85,11 @@ SwaggerModule.setup('swagger', app, documentFactory, {
 
 这将在 `http://localhost:3000/swagger/json` 处暴露它。
 
-> **警告** 当使用 `fastify` 和 `helmet` 时，可能会出现 [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) 问题，要解决此冲突，请按如下所示配置 CSP：
+:::warning 警告
+当使用 `fastify` 和 `helmet` 时，可能会出现 [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) 问题，要解决此冲突，请按如下所示配置 CSP：
+:::
+
+
 
 ```typescript
 app.register(helmet, {

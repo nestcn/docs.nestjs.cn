@@ -27,8 +27,7 @@ Nest 有两种代码组织模式：
 
 ```bash
 $ nest new my-project
-```
-
+```typescript
 我们已经构建了一个*标准模式*结构，其文件夹结构如下所示：
 
 <div class="file-tree">

@@ -27,7 +27,7 @@ Nest 有两种代码组织模式：
 
 ```bash
 $ nest new my-project
-```typescript
+```
 我们已经构建了一个*标准模式*结构，其文件夹结构如下所示：
 
 <div class="file-tree">
@@ -202,8 +202,8 @@ Nest 将组织和构建标准项目及 monorepo 结构项目所需的元数据�
 
 | 属性名称 | 属性值类型                      | 描述                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | -------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| spec     | boolean or object 重试 错误原因 | If the value is boolean, a value of true enables spec generation by default and a value of false disables it. A flag passed on the CLI command line overrides this setting, as does a project-specific generateOptions setting (more below). If the value is an object, each key represents a schematic name, and the boolean value determines whether the default spec generation is enabled / disabled for that specific schematic. 重试 错误原因 |
-| flat     | boolean 重试 错误原因           | If true, all generate commands will generate a flat structure 重试 错误原因                                                                                                                                                                                                                                                                                                                                                                         |
+| spec     | boolean or object | If the value is boolean, a value of true enables spec generation by default and a value of false disables it. A flag passed on the CLI command line overrides this setting, as does a project-specific generateOptions setting (more below). If the value is an object, each key represents a schematic name, and the boolean value determines whether the default spec generation is enabled / disabled for that specific schematic. |
+| flat     | boolean           | If true, all generate commands will generate a flat structure |
 
 以下示例使用布尔值指定默认情况下应为所有项目禁用规范文件生成：
 

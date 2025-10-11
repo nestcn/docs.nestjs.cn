@@ -32,20 +32,21 @@ class CodeBlocksFixer {
       return `\`\`\`${lang}\n${code}\n\`\`\``;
     });
 
-    // 2. 修复缺少语言标识的代码块
-    fixed = fixed.replace(/```\s*\n([^`]+)\n```/g, (match, code) => {
-      // 如果代码看起来像 TypeScript/JavaScript，添加语言标识
-      if (code.includes('export') || code.includes('import') || code.includes('class') || code.includes('function')) {
-        changeCount++;
-        return `\`\`\`typescript\n${code}\n\`\`\``;
-      }
-      // 如果代码看起来像 JSON，添加 json 标识
-      if (code.trim().startsWith('{') && code.trim().endsWith('}')) {
-        changeCount++;
-        return `\`\`\`json\n${code}\n\`\`\``;
-      }
-      return match;
-    });
+    // 2. 修复缺少语言标识的代码块 (已禁用 - 过于激进，容易误匹配)
+    // 该regex容易将正常文本误认为代码块，特别是当文本中包含class等关键字时
+    // fixed = fixed.replace(/```\s*\n([^`]+)\n```/g, (match, code) => {
+    //   // 如果代码看起来像 TypeScript/JavaScript，添加语言标识
+    //   if (code.includes('export') || code.includes('import') || code.includes('class') || code.includes('function')) {
+    //     changeCount++;
+    //     return `\`\`\`typescript\n${code}\n\`\`\``;
+    //   }
+    //   // 如果代码看起来像 JSON，添加 json 标识
+    //   if (code.trim().startsWith('{') && code.trim().endsWith('}')) {
+    //     changeCount++;
+    //     return `\`\`\`json\n${code}\n\`\`\``;
+    //   }
+    //   return match;
+    // });
 
     // 3. 修复内联代码块中的特殊字符
     fixed = fixed.replace(/`([^`]*)`/g, (match, code) => {

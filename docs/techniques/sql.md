@@ -524,7 +524,6 @@ export class AppModule {}
 > ```
 >
 > 更多详情请参阅[此问题](https://github.com/nestjs/typeorm/issues/86) 。
-```
 
 此时，您已注册了带有各自数据源的 `User` 和 `Album` 实体。在此配置下，您需要告知 `TypeOrmModule.forFeature()` 方法和 `@InjectRepository()` 装饰器应使用哪个数据源。若未传递任何数据源名称，则将使用 `default` 默认数据源。
 

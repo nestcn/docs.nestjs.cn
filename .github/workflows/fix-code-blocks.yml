@@ -26,18 +26,19 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          bun-version: latest
-          
+          node-version: '20'
+          cache: 'npm'
+
       - name: Install dependencies
-        run: bun install
+        run: npm ci
         
       - name: Fix code blocks
         run: |
           echo "开始修复代码块..." >> $GITHUB_STEP_SUMMARY
-          bun run fix-code-blocks 2>&1 | tee fix_output.log
+          npm run fix-code-blocks 2>&1 | tee fix_output.log
           echo "修复完成，查看详细日志..." >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           tail -20 fix_output.log >> $GITHUB_STEP_SUMMARY

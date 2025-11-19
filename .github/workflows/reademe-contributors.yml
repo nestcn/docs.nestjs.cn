@@ -23,7 +23,7 @@ jobs:
         with:
           readme_path: 'README.md'
           use_username: true
-          max_columns: 6
+          columns_per_row: 6
           image_size: 100
           commit_message: 'docs: update README contributors'
         env:
@@ -34,7 +34,7 @@ jobs:
         with:
           readme_path: 'docs/contributors.md'
           use_username: true
-          max_columns: 6
+          columns_per_row: 6
           image_size: 100
           commit_message: 'docs: update contributors page'
         env:

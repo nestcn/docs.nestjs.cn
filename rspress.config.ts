@@ -47,6 +47,14 @@ export default defineConfig({
         content: '#ffffff',
       },
     ],
+    [
+      'script',
+      {
+        async: '',
+        src: 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3319999205844901',
+        crossorigin: 'anonymous',
+      },
+    ],
   ],
   themeConfig: {
     nav: [

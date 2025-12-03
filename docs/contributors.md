@@ -431,13 +431,20 @@ docs/
         </a>
     </td>
     <td align="center">
+        <a href="https://github.com/meepobrother">
+            <img src="https://avatars.githubusercontent.com/u/8385261?v=4" width="100;" alt="meepobrother"/>
+            <br />
+            <sub><b>meepobrother</b></sub>
+        </a>
+    </td></tr>
+<tr>
+    <td align="center">
         <a href="https://github.com/ZhangLinkang">
             <img src="https://avatars.githubusercontent.com/u/39427729?v=4" width="100;" alt="ZhangLinkang"/>
             <br />
             <sub><b>ZhangLinkang</b></sub>
         </a>
-    </td></tr>
-<tr>
+    </td>
     <td align="center">
         <a href="https://github.com/baby7305">
             <img src="https://avatars.githubusercontent.com/u/25588905?v=4" width="100;" alt="baby7305"/>
@@ -472,15 +479,15 @@ docs/
             <br />
             <sub><b>rookie-luochao</b></sub>
         </a>
-    </td>
+    </td></tr>
+<tr>
     <td align="center">
         <a href="https://github.com/mecoepcoo">
             <img src="https://avatars.githubusercontent.com/u/12879491?v=4" width="100;" alt="mecoepcoo"/>
             <br />
             <sub><b>mecoepcoo</b></sub>
         </a>
-    </td></tr>
-<tr>
+    </td>
     <td align="center">
         <a href="https://github.com/zhysky">
             <img src="https://avatars.githubusercontent.com/u/43907589?v=4" width="100;" alt="zhysky"/>
@@ -515,15 +522,15 @@ docs/
             <br />
             <sub><b>yuntian001</b></sub>
         </a>
-    </td>
+    </td></tr>
+<tr>
     <td align="center">
         <a href="https://github.com/zhixiangyao">
             <img src="https://avatars.githubusercontent.com/u/49728521?v=4" width="100;" alt="zhixiangyao"/>
             <br />
             <sub><b>zhixiangyao</b></sub>
         </a>
-    </td></tr>
-<tr>
+    </td>
     <td align="center">
         <a href="https://github.com/toimc">
             <img src="https://avatars.githubusercontent.com/u/51934415?v=4" width="100;" alt="toimc"/>
@@ -543,13 +550,6 @@ docs/
             <img src="https://avatars.githubusercontent.com/u/510080?v=4" width="100;" alt="wuwb"/>
             <br />
             <sub><b>wuwb</b></sub>
-        </a>
-    </td>
-    <td align="center">
-        <a href="https://github.com/meepobrother">
-            <img src="https://avatars.githubusercontent.com/u/8385261?v=4" width="100;" alt="meepobrother"/>
-            <br />
-            <sub><b>meepobrother</b></sub>
         </a>
     </td>
     <td align="center">

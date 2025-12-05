@@ -237,10 +237,10 @@ Nest 旨在提供一个开箱即用的应用程序体系结构，允许轻松创
         </a>
     </td>
     <td align="center">
-        <a href="https://github.com/Znonymous29">
-            <img src="https://avatars.githubusercontent.com/u/19743142?v=4" width="100;" alt="Znonymous29"/>
+        <a href="https://github.com/znonymous29">
+            <img src="https://avatars.githubusercontent.com/u/19743142?v=4" width="100;" alt="znonymous29"/>
             <br />
-            <sub><b>Znonymous29</b></sub>
+            <sub><b>znonymous29</b></sub>
         </a>
     </td></tr>
 <tr>

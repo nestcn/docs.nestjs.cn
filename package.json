@@ -20,10 +20,12 @@
     "sync-and-translate": "npm run translate-docs && npm run fix-all",
     "sync-and-translate:no-ai": "npm run translate-docs:no-ai && npm run fix-all",
     "update-sync-time": "node scripts/update-sync-time.js",
-    "test-cloudflare": "node test-cloudflare-translate.js"
+    "test-cloudflare": "node test-cloudflare-translate.js",
+    "check-links": "node scripts/check-internal-links.js"
   },
   "dependencies": {
     "glob": "^11.1.0",
+    "p-limit": "^7.2.0",
     "rspress": "^2.0.0-beta.21"
   },
   "devDependencies": {
@@ -31,6 +33,7 @@
     "@mdx-js/react": "^3.1.1",
     "@types/mdx": "^2.0.13",
     "@types/node": "^24.9.2",
+    "markdown-link-check": "^3.14.2",
     "rehype-raw": "^7.0.0",
     "rehype-slug": "^6.0.0",
     "remark-gfm": "^4.0.1"

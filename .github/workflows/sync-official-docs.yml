@@ -94,6 +94,34 @@ jobs:
             echo "content_changed=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Snapshot original content to upstream-sync branch
+        if: steps.sync-content.outputs.content_changed == 'true'
+        continue-on-error: true
+        run: |
+          echo "📸 Creating snapshot of original content..."
+          
+          # Config git user
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          
+          # Create/switch to temp branch for snapshot
+          git checkout --orphan upstream-sync-temp
+          git rm -rf .
+          
+          # Copy fresh content from official-docs
+          cp -r official-docs/content ./content
+          
+          # Add and commit
+          git add content
+          git commit -m "📸 Snapshot upstream content: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          
+          # Push to upstream-sync branch (force update)
+          git push origin upstream-sync-temp:upstream-sync --force
+          
+          echo "✅ Snapshot pushed to upstream-sync"
+          
+          # Switch back to main to continue workflow
+          git checkout main
       - name: Compare and sync assets folder
         id: sync-assets
         run: |
@@ -190,6 +218,14 @@ jobs:
           echo "🔧 正在运行代码块和模板语法修复..."
           npm run fix-all
           echo "✅ 代码格式化完成"
+
+      - name: Check internal links
+        # Run check even if translation failed, but maybe good to run after fix-all
+        if: always() 
+        run: |
+          echo "🔗 正在检查内部链接..."
+          # Continue on error so we don't block the sync, but report it
+          npm run check-links || echo "⚠️ Found broken links"
 
       - name: Update README sync time and check for changes
         id: changes

@@ -289,7 +289,7 @@ export class AppModule {}
 
 为了捕获**每一个**未处理的异常（无论异常类型如何），只需让 `@Catch()` 装饰器的参数列表为空即可，例如 `@Catch()`。
 
-在以下示例中，我们有一段与平台无关的代码，因为它使用 [HTTP 适配器](./faq/http-adapter)来传递响应，而没有直接使用任何平台特定对象（`Request` 和 `Response`）：
+在以下示例中，我们有一段与平台无关的代码，因为它使用 [HTTP 适配器](../faq/http-adapter)来传递响应，而没有直接使用任何平台特定对象（`Request` 和 `Response`）：
 
 ```typescript
 import {

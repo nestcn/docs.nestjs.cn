@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { glob } = require('glob');
 const crypto = require('crypto');
+const pLimit = require('p-limit');
 
 // 确保 fetch 可用 (Node.js 18+ 内置，旧版本需要 polyfill)
 let fetch;
@@ -24,7 +25,7 @@ if (typeof globalThis.fetch === 'undefined') {
  * 
  * 功能：
  * 1. 检测 content 目录中的变更
- * 2. 使用 AI 翻译服务进行翻译
+ * 2. 使用 AI 翻译服务进行翻译 (支持术语表、Llama-3、并发)
  * 3. 处理格式（清理 @@filename, @@switch 等）
  * 4. 将翻译后的内容更新到 docs 目录
  * 5. 支持增量更新（只处理变更的文件）
@@ -39,20 +40,26 @@ class DocumentTranslator {
     this.skippedFiles = 0;
     this.errors = [];
     this.verbose = options.verbose || false;
-    
+    this.concurrency = options.concurrency || 5;
+
     // AI 翻译配置 - 仅支持 Cloudflare Workers AI
     this.useAI = options.useAI !== false; // 默认启用
     this.aiProvider = 'cloudflare'; // 只支持 cloudflare
     this.apiToken = options.apiToken || process.env.CLOUDFLARE_API_TOKEN;
     this.accountId = options.accountId || process.env.CLOUDFLARE_ACCOUNT_ID;
-    this.model = options.model || '@cf/meta/llama-2-7b-chat-int8';
+    this.model = options.model || '@cf/meta/llama-3-8b-instruct'; // 默认升级到 Llama 3
     this.maxTokens = options.maxTokens || 4000;
-    
+
+    // 术语表配置
+    this.glossaryFile = path.resolve(__dirname, '../config/glossary.json');
+    this.glossary = {};
+    this.loadGlossary();
+
     // 翻译缓存
     this.translationCache = new Map();
     this.cacheFile = path.join(__dirname, '.translation-cache.json');
     this.loadTranslationCache();
-    
+
     // 代码块保护
     this.codeBlockPlaceholders = new Map();
     this.placeholderCounter = 0;
@@ -75,6 +82,36 @@ class DocumentTranslator {
       console.warn('⚠️ Failed to load translation cache:', error.message);
       this.translationCache = new Map();
     }
+  }
+
+  /**
+   * 加载术语表
+   */
+  loadGlossary() {
+    try {
+      if (fs.existsSync(this.glossaryFile)) {
+        const data = fs.readFileSync(this.glossaryFile, 'utf8');
+        this.glossary = JSON.parse(data);
+        if (this.verbose) {
+          console.log(`📚 Loaded glossary with ${Object.keys(this.glossary).length} terms`);
+        }
+      }
+    } catch (error) {
+      console.warn('⚠️ Failed to load glossary:', error.message);
+    }
+  }
+
+  /**
+   * 生成术语表提示词
+   */
+  getGlossaryPrompt() {
+    if (Object.keys(this.glossary).length === 0) return '';
+
+    let prompt = '\nTerminology / Glossary (Must Follow):\n';
+    for (const [key, value] of Object.entries(this.glossary)) {
+      prompt += `- ${key}: ${value}\n`;
+    }
+    return prompt;
   }
 
   /**
@@ -158,26 +195,13 @@ class DocumentTranslator {
       throw new Error('Cloudflare API token and Account ID not configured');
     }
 
-    const response = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${this.accountId}/ai/run/${this.model}`,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.apiToken}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          messages: [
-            {
-              role: 'system',
-              content: `You are a professional technical documentation translator specializing in translating NestJS-related English technical documentation to Chinese.
+    const glossaryPrompt = this.getGlossaryPrompt();
+
+    const systemPrompt = `You are a professional technical documentation translator specializing in translating NestJS-related English technical documentation to Chinese.
 
 Translation Requirements:
-1. **Technical Terms**: Keep common terms in English/Chinese mapping:
-   - Provider → 提供者, Controller → 控制器, Service → 服务
-   - Module → 模块, Pipe → 管道, Guard → 守卫, Interceptor → 拦截器
-   - Decorator → 装饰器, Middleware → 中间件, Filter → 过滤器
-   - Dependency Injection → 依赖注入, Request → 请求, Response → 响应
+1. **Technical Terms**: Strict adherence to the provided glossary is required.${glossaryPrompt}
+   - Other common terms: Provider -> 提供者, Controller -> 控制器, Middleware -> 中间件.
 
 2. **Code and Format Preservation**:
    - Keep code examples, variable names, function names unchanged
@@ -191,7 +215,7 @@ Translation Requirements:
    - Keep internal anchors unchanged (will be mapped later)
 
 4. **Content Guidelines**:
-   - Maintain professionalism and readability
+   - Maintain professionalism and readability. Use natural, fluent Chinese.
    - Keep content that is already in Chinese unchanged
    - Don't add extra content not in the original
    - Appropriate Chinese localization improvements are welcome
@@ -201,7 +225,21 @@ Translation Requirements:
    - Keep docs.nestjs.com links unchanged (will be processed later)
    - Maintain anchor links as-is (e.g., #provider-scope)
 
-Please translate the following English technical documentation to Chinese following these rules:`
+Please translate the following English technical documentation to Chinese following these rules:`;
+
+    const response = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${this.accountId}/ai/run/${this.model}`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.apiToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: 'system',
+              content: systemPrompt
             },
             {
               role: 'user',
@@ -219,7 +257,7 @@ Please translate the following English technical documentation to Chinese follow
     }
 
     const result = await response.json();
-    
+
     // Cloudflare Workers AI 返回格式可能不同，需要适配
     if (result.success && result.result) {
       // 处理可能的响应格式
@@ -231,7 +269,7 @@ Please translate the following English technical documentation to Chinese follow
         return result.result;
       }
     }
-    
+
     return text;
   }
 
@@ -246,7 +284,7 @@ Please translate the following English technical documentation to Chinese follow
     // 检查缓存
     const contentHash = this.generateContentHash(text);
     const cacheKey = `${filePath}:${contentHash}`;
-    
+
     if (this.translationCache.has(cacheKey)) {
       if (this.verbose) {
         console.log(`  📚 Using cached translation for ${filePath}`);
@@ -257,20 +295,20 @@ Please translate the following English technical documentation to Chinese follow
     try {
       // 保护代码块
       const protectedText = this.protectCodeBlocks(text);
-      
+
       // 使用 Cloudflare Workers AI 翻译
       const translatedText = await this.translateWithCloudflare(protectedText);
-      
+
       // 恢复代码块
       const finalText = this.restoreCodeBlocks(translatedText);
-      
+
       // 缓存翻译结果
       this.translationCache.set(cacheKey, finalText);
-      
+
       if (this.verbose) {
         console.log(`  🤖 AI translated: ${filePath}`);
       }
-      
+
       return finalText;
     } catch (error) {
       console.warn(`⚠️ AI translation failed for ${filePath}: ${error.message}`);
@@ -288,7 +326,7 @@ Please translate the following English technical documentation to Chinese follow
 
     const sourceStats = fs.statSync(sourcePath);
     const targetStats = fs.statSync(targetPath);
-    
+
     // 如果源文件更新时间更新，则需要更新
     return sourceStats.mtime > targetStats.mtime;
   }
@@ -300,7 +338,7 @@ Please translate the following English technical documentation to Chinese follow
     try {
       const relativePath = path.relative(this.contentDir, contentPath);
       const outputPath = path.join(this.docsDir, relativePath);
-      
+
       this.processedFiles++;
 
       // 检查是否需要更新
@@ -313,7 +351,7 @@ Please translate the following English technical documentation to Chinese follow
       }
 
       const content = fs.readFileSync(contentPath, 'utf8');
-      
+
       // 确保输出目录存在
       const outputDir = path.dirname(outputPath);
       if (!fs.existsSync(outputDir)) {
@@ -329,14 +367,14 @@ Please translate the following English technical documentation to Chinese follow
 
       // 处理内容格式
       const processedContent = this.processContent(translatedContent, relativePath);
-      
+
       // 写入文件
       fs.writeFileSync(outputPath, processedContent, 'utf8');
-      
+
       // 保持修改时间同步
       const sourceStats = fs.statSync(contentPath);
       fs.utimesSync(outputPath, sourceStats.atime, sourceStats.mtime);
-      
+
       console.log(`✅ Translated: ${relativePath}`);
       this.translatedFiles++;
       return true;
@@ -352,25 +390,25 @@ Please translate the following English technical documentation to Chinese follow
    */
   processContent(content, filePath) {
     let processed = content;
-    
+
     // 1. 处理标准的 @@filename 模式
     processed = processed.replace(/```(\w+)\s*\n@@filename\(([^)]*)\)([\s\S]*?)(?=\n```|@@switch|\n*$)/g, (match, lang, filename, codeContent) => {
       if (this.verbose) {
         console.log(`  Processing @@filename: ${filename} (${lang})`);
       }
-      
+
       // 查找 @@switch 位置
       const switchIndex = codeContent.indexOf('\n@@switch\n');
       let finalCodeContent = codeContent;
-      
+
       if (switchIndex !== -1) {
         // 如果有 @@switch，只保留 @@switch 之前的代码
         finalCodeContent = codeContent.substring(0, switchIndex);
       }
-      
+
       // 清理代码开头和结尾的多余换行符
       finalCodeContent = finalCodeContent.replace(/^\n+/, '').replace(/\n+$/, '');
-      
+
       // 使用 rspress 格式
       if (filename.trim()) {
         return `\`\`\`${lang} title="${filename}"\n${finalCodeContent}\n\`\`\``;
@@ -384,16 +422,16 @@ Please translate the following English technical documentation to Chinese follow
       if (this.verbose) {
         console.log(`  Processing standalone @@filename: ${filename}`);
       }
-      
+
       const switchIndex = codeContent.indexOf('\n@@switch\n');
       let finalCodeContent = codeContent;
-      
+
       if (switchIndex !== -1) {
         finalCodeContent = codeContent.substring(0, switchIndex);
       }
-      
+
       finalCodeContent = finalCodeContent.replace(/^\n+/, '').replace(/\n+$/, '');
-      
+
       if (filename.trim()) {
         return `${prefix}\`\`\`typescript title="${filename}"\n${finalCodeContent}\n\`\`\``;
       } else {
@@ -434,10 +472,11 @@ Please translate the following English technical documentation to Chinese follow
     console.log('🔍 Starting document translation process...');
     console.log(`📁 Source: ${path.resolve(this.contentDir)}`);
     console.log(`📁 Target: ${path.resolve(this.docsDir)}`);
-    
+
     if (this.useAI) {
       console.log(`🤖 AI Provider: Cloudflare Workers AI`);
       console.log(`🧠 Model: ${this.model}`);
+      console.log(`🚀 Concurrency: ${this.concurrency}`);
     } else {
       console.log('🔄 AI translation disabled - only format processing');
     }
@@ -449,9 +488,9 @@ Please translate the following English technical documentation to Chinese follow
       }
 
       // 查找所有 Markdown 文件
-      const pattern = path.join(this.contentDir, '**', '*.md');
+      const pattern = path.join(this.contentDir, '**', '*.md').replace(/\\/g, '/');
       const files = await glob(pattern);
-      
+
       console.log(`📄 Found ${files.length} markdown files to process`);
 
       if (files.length === 0) {
@@ -459,14 +498,19 @@ Please translate the following English technical documentation to Chinese follow
         return false;
       }
 
-      // 处理每个文件
+      // 并发处理文件
       let hasChanges = false;
-      for (const file of files) {
+      const limit = pLimit(this.concurrency);
+
+      // 创建任务队列
+      const tasks = files.map(file => limit(async () => {
         const changed = await this.translateFile(file);
-        if (changed) {
-          hasChanges = true;
-        }
-      }
+        if (changed) hasChanges = true;
+        return changed;
+      }));
+
+      // 等待所有任务完成
+      await Promise.all(tasks);
 
       // 保存翻译缓存
       if (this.translationCache.size > 0) {
@@ -497,7 +541,7 @@ Please translate the following English technical documentation to Chinese follow
             docsDir: this.docsDir,
             verbose: this.verbose
           });
-          
+
           const postProcessChanged = await processor.run();
           if (postProcessChanged) {
             console.log('✅ Post-processing completed with changes');
@@ -508,7 +552,7 @@ Please translate the following English technical documentation to Chinese follow
           console.warn('⚠️ Post-processing failed:', error.message);
           // 不要因为后处理失败而终止整个翻译流程
         }
-        
+
         console.log('\n✅ Translation completed with changes');
       } else {
         console.log('\n✅ Translation completed - all files up to date');
@@ -530,7 +574,8 @@ if (require.main === module) {
     contentDir: 'content',
     docsDir: 'docs',
     useAI: !args.includes('--no-ai'),
-    model: '@cf/meta/llama-2-7b-chat-int8'
+    model: '@cf/meta/llama-3-8b-instruct', // Updated default
+    concurrency: 5
   };
 
   // 解析命令行参数
@@ -559,6 +604,11 @@ if (require.main === module) {
     options.accountId = args[accountIdIndex + 1];
   }
 
+  const concurrencyIndex = args.indexOf('--concurrency');
+  if (concurrencyIndex !== -1 && args[concurrencyIndex + 1]) {
+    options.concurrency = parseInt(args[concurrencyIndex + 1], 10) || 5;
+  }
+
   // 显示帮助信息
   if (args.includes('--help') || args.includes('-h')) {
     console.log(`
@@ -567,7 +617,8 @@ if (require.main === module) {
 选项:
   --content-dir <dir>     源文件目录 (默认: content)
   --docs-dir <dir>        目标文件目录 (默认: docs)
-  --model <model>         Cloudflare Workers AI 模型 (默认: @cf/meta/llama-2-7b-chat-int8)
+  --model <model>         Cloudflare Workers AI 模型 (默认: @cf/meta/llama-3-8b-instruct)
+  --concurrency <num>     并发请求数 (默认: 5)
   --api-token <token>     Cloudflare API 令牌 (或使用环境变量)
   --account-id <id>       Cloudflare Account ID (或使用环境变量)
   --no-ai                 禁用 AI 翻译，仅处理格式
@@ -579,8 +630,8 @@ if (require.main === module) {
   CLOUDFLARE_ACCOUNT_ID   Cloudflare Account ID
 
 可用模型:
-  @cf/meta/llama-2-7b-chat-int8        Llama 2 7B (默认，推荐)
-  @cf/meta/llama-2-7b-chat-fp16        Llama 2 7B 高精度版本
+  @cf/meta/llama-3-8b-instruct         Llama 3 8B (默认，推荐)
+  @cf/meta/llama-2-7b-chat-int8        Llama 2 7B
   @cf/mistral/mistral-7b-instruct-v0.1 Mistral 7B
   @cf/openchat/openchat-3.5-0106       OpenChat 3.5
 
@@ -590,6 +641,9 @@ if (require.main === module) {
   
   # 指定不同模型
   node translate-docs.js --model "@cf/mistral/mistral-7b-instruct-v0.1"
+  
+  # 指定并发数
+  node translate-docs.js --concurrency 10
   
   # 直接指定 API 配置
   node translate-docs.js --api-token your-token --account-id your-account-id

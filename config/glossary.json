@@ -1,0 +1,20 @@
+{
+    "Provider": "提供者",
+    "Controller": "控制器",
+    "Service": "服务",
+    "Module": "模块",
+    "Pipe": "管道",
+    "Guard": "守卫",
+    "Interceptor": "拦截器",
+    "Decorator": "装饰器",
+    "Middleware": "中间件",
+    "Filter": "过滤器",
+    "Dependency Injection": "依赖注入",
+    "Request": "请求",
+    "Response": "响应",
+    "Exception Filter": "异常过滤器",
+    "Execution Context": "执行上下文",
+    "Scope": "作用域",
+    "Dynamic Module": "动态模块",
+    "Circular Dependency": "循环依赖"
+}

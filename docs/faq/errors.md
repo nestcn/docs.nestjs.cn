@@ -11,14 +11,14 @@
 最常见的错误消息是关于 Nest 无法解析提供者的依赖项。错误消息通常如下所示：
 
 ```bash
-Nest 无法解析 <provider> 的依赖项（?）。请确保索引 [<index>] 处的参数 <unknown_token> 在 <module> 上下文中可用。
+Nest can't resolve dependencies of the <provider> (?). Please make sure that the argument <unknown_token> at index [<index>] is available in the <module> context.
 
-可能的解决方案：
-- <module> 是否为有效的 NestJS 模块？
-- 如果 <unknown_token> 是提供者，它是否属于当前 <module>？
-- 如果 <unknown_token> 从单独的 @Module 导出，该模块是否已在 <module> 中导入？
+Potential solutions:
+- Is <module> a valid NestJS module?
+- If <unknown_token> is a provider, is it part of the current <module>?
+- If <unknown_token> is exported from a separate @Module, is that module imported within <module>?
   @Module({
-    imports: [ /* 包含 <unknown_token> 的模块 */ ]
+    imports: [ /* the Module containing <unknown_token> */ ]
   })
 ```
 
@@ -40,8 +40,8 @@ Nest 无法解析 <provider> 的依赖项（?）。请确保索引 [<index>] 处
 如果你处于 **monorepo 设置**中，可能会遇到与上述相同的错误，但核心提供者 `ModuleRef` 会显示为 `<unknown_token>`：
 
 ```bash
-Nest 无法解析 <provider> 的依赖项（?）。
-请确保索引 [<index>] 处的参数 ModuleRef 在 <module> 上下文中可用。
+Nest can't resolve dependencies of the <provider> (?).
+Please make sure that the argument ModuleRef at index [<index>] is available in the <module> context.
 ...
 ```
 
@@ -71,15 +71,15 @@ Nest 无法解析 <provider> 的依赖项（?）。
 有时您会发现应用中难以避免[循环依赖](./fundamentals/circular-dependency)问题。您需要采取一些措施帮助 Nest 解决这些问题。由循环依赖引发的错误通常如下所示：
 
 ```bash
-Nest 无法创建 <module> 实例。
-<module> "imports" 数组中索引 [<index>] 处的模块未定义。
+Nest cannot create the <module> instance.
+The module at index [<index>] of the <module> "imports" array is undefined.
 
-可能的原因：
-- 模块间存在循环依赖。使用 forwardRef() 避免此问题。了解更多：./fundamentals/circular-dependency
-- 索引 [<index>] 处的模块类型为 "undefined"。检查您的导入语句和模块类型。
+Potential causes:
+- A circular dependency between modules. Use forwardRef() to avoid it. Read more: https://docs.nestjs.com/fundamentals/circular-dependency
+- The module at index [<index>] is of type "undefined". Check your import statements and the type of the module.
 
-作用域 [<module_import_chain>]
-# 示例链：AppModule -> FooModule
+Scope [<module_import_chain>]
+# example chain AppModule -> FooModule
 ```
 
 循环依赖可能源于提供者之间相互依赖，或是 TypeScript 文件间因常量而相互依赖（例如从模块文件导出常量并在服务文件中导入）。对于后者，建议为常量创建单独的文件。对于前者，请遵循循环依赖指南，确保模块**和**提供者都使用 `forwardRef` 进行标记。
@@ -97,8 +97,8 @@ Nest 无法创建 <module> 实例。
 使用 TypeScript 4.9 及以上版本的 Windows 用户可能会遇到此问题。当您尝试以监视模式运行应用程序时（例如 `npm run start:dev`），会出现日志消息的无限循环：
 
 ```bash
-XX:XX:XX AM - 检测到文件变更。开始增量编译...
-XX:XX:XX AM - 发现 0 个错误。正在监视文件变更。
+XX:XX:XX AM - File change detected. Starting incremental compilation...
+XX:XX:XX AM - Found 0 errors. Watching for file changes.
 ```
 
 当您使用 NestJS CLI 以监视模式启动应用程序时，实际上是通过调用 `tsc --watch` 实现的。从 TypeScript 4.9 版本开始，采用了一种 [新的策略](https://devblogs.microsoft.com/typescript/announcing-typescript-4-9/#file-watching-now-uses-file-system-events) 来检测文件变更，这很可能是导致此问题的原因。要解决此问题，您需要在 tsconfig.json 文件的 `"compilerOptions"` 选项后添加如下设置：

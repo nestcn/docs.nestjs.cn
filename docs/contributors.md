@@ -310,6 +310,13 @@ docs/
     </td></tr>
 <tr>
     <td align="center">
+        <a href="https://github.com/Jimmysh">
+            <img src="https://avatars.githubusercontent.com/u/230652?v=4" width="100;" alt="Jimmysh"/>
+            <br />
+            <sub><b>Jimmysh</b></sub>
+        </a>
+    </td>
+    <td align="center">
         <a href="https://github.com/WShiBin">
             <img src="https://avatars.githubusercontent.com/u/18117928?v=4" width="100;" alt="WShiBin"/>
             <br />
@@ -328,13 +335,6 @@ docs/
             <img src="https://avatars.githubusercontent.com/u/19743142?v=4" width="100;" alt="znonymous29"/>
             <br />
             <sub><b>znonymous29</b></sub>
-        </a>
-    </td>
-    <td align="center">
-        <a href="https://github.com/Jimmysh">
-            <img src="https://avatars.githubusercontent.com/u/230652?v=4" width="100;" alt="Jimmysh"/>
-            <br />
-            <sub><b>Jimmysh</b></sub>
         </a>
     </td>
     <td align="center">

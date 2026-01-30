@@ -150,7 +150,7 @@ export class NotificationService {
 }
 ```
 
-您可以在声明后访问和控制 cron 任务，或者通过[动态 API](/techniques/task-scheduling#动态调度模块-api) 动态创建 cron 任务（其 cron 模式在运行时定义）。要通过 API 访问声明式 cron 任务，您必须通过装饰器的第二个可选参数对象中的 `name` 属性为任务关联名称。
+您可以在声明后访问和控制 cron 任务，或者通过[动态 API](./task-scheduling#动态调度模块-api) 动态创建 cron 任务（其 cron 模式在运行时定义）。要通过 API 访问声明式 cron 任务，您必须通过装饰器的第二个可选参数对象中的 `name` 属性为任务关联名称。
 
 #### 声明式间隔任务
 
@@ -169,7 +169,7 @@ handleInterval() {
 
 
 
-若要通过[动态 API](/techniques/task-scheduling#动态调度模块-api) 在声明类外部控制声明式间隔，请使用以下构造将间隔与名称关联：
+若要通过[动态 API](./task-scheduling#动态调度模块-api) 在声明类外部控制声明式间隔，请使用以下构造将间隔与名称关联：
 
 ```typescript
 @Interval('notifications', 2500)
@@ -178,7 +178,7 @@ handleInterval() {}
 
 如果发生异常，它将被记录到控制台，因为每个用 `@Interval()` 注解的方法都会自动包裹在 `try-catch` 代码块中。
 
-[动态 API](techniques/task-scheduling#动态间隔) 还支持**创建**动态间隔（其属性在运行时定义），以及**列出和删除**这些间隔。
+[动态 API](./task-scheduling#动态间隔) 还支持**创建**动态间隔（其属性在运行时定义），以及**列出和删除**这些间隔。
 
 #### 声明式超时
 
@@ -199,14 +199,14 @@ handleTimeout() {
 
 如果发生异常，它将被记录到控制台，因为每个用 `@Timeout()` 注解的方法都会自动被包裹在 `try-catch` 代码块中。
 
-若要通过[动态 API](/techniques/task-scheduling#动态调度模块-api) 在声明类外部控制声明式超时，请使用以下构造将超时与名称关联：
+若要通过[动态 API](./task-scheduling#动态调度模块-api) 在声明类外部控制声明式超时，请使用以下构造将超时与名称关联：
 
 ```typescript
 @Timeout('notifications', 2500)
 handleTimeout() {}
 ```
 
-[动态 API](techniques/task-scheduling#动态超时) 还支持**创建**动态超时，其属性在运行时定义，并能**列出和删除**这些超时。
+[动态 API](./task-scheduling#动态超时) 还支持**创建**动态超时，其属性在运行时定义，并能**列出和删除**这些超时。
 
 #### 动态调度模块 API
 

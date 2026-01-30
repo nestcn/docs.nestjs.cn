@@ -274,7 +274,7 @@ addCronJob(name: string, seconds: string) {
 }
 ```
 
-在这段代码中，我们使用 `CronJob` 对象（来自 `cron` 包）来创建定时任务。`CronJob` 构造函数接收两个参数：第一个是 cron 表达式（与 `@Cron()` [装饰器](techniques/task-scheduling#声明式-cron-任务)的格式相同），第二个是定时触发器触发时执行的回调函数。`SchedulerRegistry#addCronJob` 方法同样接收两个参数：定时任务的名称和 `CronJob` 对象本身。
+在这段代码中，我们使用 `CronJob` 对象（来自 `cron` 包）来创建定时任务。`CronJob` 构造函数接收两个参数：第一个是 cron 表达式（与 `@Cron()` [装饰器](./task-scheduling#声明式-cron-任务)的格式相同），第二个是定时触发器触发时执行的回调函数。`SchedulerRegistry#addCronJob` 方法同样接收两个参数：定时任务的名称和 `CronJob` 对象本身。
 
 :::warning 警告
 请记得在使用前先注入 `SchedulerRegistry`。同时需要从 `cron` 包中导入 `CronJob`。

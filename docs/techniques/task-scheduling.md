@@ -24,7 +24,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 export class AppModule {}
 ```
 
-`.forRoot()` 调用会初始化调度器并注册应用中所有声明式的 [cron 任务](techniques/task-scheduling#声明式-cron-任务) 、 [超时任务](techniques/task-scheduling#声明式超时) 和 [间隔任务](techniques/task-scheduling#声明式间隔任务) 。注册过程发生在 `onApplicationBootstrap` 生命周期钩子触发时，确保所有模块都已加载并声明了计划任务。
+`.forRoot()` 调用会初始化调度器并注册应用中所有声明式的 [cron 任务](./task-scheduling#声明式-cron-任务) 、 [超时任务](./task-scheduling#声明式超时) 和 [间隔任务](./task-scheduling#声明式间隔任务) 。注册过程发生在 `onApplicationBootstrap` 生命周期钩子触发时，确保所有模块都已加载并声明了计划任务。
 
 #### 声明式 cron 任务
 

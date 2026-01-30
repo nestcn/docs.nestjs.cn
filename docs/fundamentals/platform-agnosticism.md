@@ -8,6 +8,6 @@ Nest 是一个平台无关的框架。这意味着您可以开发**可复用的�
 
 此外，Nest 还配备了专用的 [GraphQL](/graphql/quick-start) 模块。您可以将 GraphQL 作为 API 层与 REST API 互换使用。
 
-此外， [应用上下文](/application-context)功能有助于在 Nest 之上创建任何类型的 Node.js 应用——包括 CRON 作业和 CLI 应用等。
+此外， [应用上下文](/standalone-applications)功能有助于在 Nest 之上创建任何类型的 Node.js 应用——包括 CRON 作业和 CLI 应用等。
 
 Nest 致力于成为 Node.js 应用的成熟平台，为您的应用程序带来更高层次的模块化和可重用性。一次构建，随处使用！

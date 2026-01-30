@@ -6,7 +6,7 @@
 
 #### 代码优先
 
-让我们在前一节使用的 `AuthorResolver` 中添加另一个方法（参见[解析器](/graphql/resolvers) ）。
+让我们在前一节使用的 `AuthorResolver` 中添加另一个方法（参见[解析器](/graphql/resolvers-map) ）。
 
 ```typescript
 @Mutation(() => Post)

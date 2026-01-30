@@ -4,7 +4,7 @@
 
 本章假设您已掌握 GraphQL 基础知识，重点介绍如何使用内置的 `@nestjs/graphql` 模块。`GraphQLModule` 可配置为使用 [Apollo](https://www.apollographql.com/) 服务器（通过 `@nestjs/apollo` 驱动）和 [Mercurius](https://github.com/mercurius-js/mercurius)（通过 `@nestjs/mercurius` 驱动）。我们为这些成熟的 GraphQL 包提供官方集成方案，使在 Nest 中使用 GraphQL 更加简便（更多集成方案请见[此处](#第三方集成)）。
 
-您也可以构建自己的专用驱动（[此处](./other-features#创建自定义驱动程序)了解更多详情）。
+您也可以构建自己的专用驱动（[此处](./guards-interceptors#创建自定义驱动程序)了解更多详情）。
 
 #### 安装
 

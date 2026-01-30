@@ -372,4 +372,4 @@ async function bootstrap() {
 bootstrap();
 ```
 
-第二种方法是使用 `APP_FILTER` 令牌[如图所示](exception-filters#绑定过滤器) 。
+第二种方法是使用[这里所示](exception-filters#绑定过滤器) 的 `APP_FILTER` 令牌。

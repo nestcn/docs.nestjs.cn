@@ -210,7 +210,7 @@ handleTimeout() {}
 
 #### 动态调度模块 API
 
-`@nestjs/schedule` 模块提供的动态 API 可管理声明式[定时任务](techniques/task-scheduling#声明式-cron-任务) 、 [超时](techniques/task-scheduling#声明式超时)和[间隔](techniques/task-scheduling#声明式间隔任务) 。该 API 还支持创建和管理**动态**定时任务、超时及间隔，这些元素的属性均在运行时定义。
+`@nestjs/schedule` 模块提供了一套动态 API，支持对声明式[定时任务（Cron Jobs）](./task-scheduling#声明式-cron-任务)、[超时任务（Timeouts）](./task-scheduling#声明式超时)及[间隔任务（Intervals）](./task-scheduling#声明式间隔任务)进行统一管理。此外，该 API 还支持在 **运行时（Runtime）** 动态地创建并配置这些任务及其属性。
 
 #### 动态定时任务
 

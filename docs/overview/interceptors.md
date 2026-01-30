@@ -64,7 +64,7 @@ export class LoggingInterceptor implements NestInterceptor {
 
 #### 绑定拦截器
 
-要设置拦截器，我们需要使用从 `@nestjs/common` 包导入的 `@UseInterceptors()` 装饰器。与[管道](/pipes)和[守卫](/guards)类似，拦截器可以作用于控制器范围、方法范围或全局范围。
+要设置拦截器，我们需要使用从 `@nestjs/common` 包导入的 `@UseInterceptors()` 装饰器。与[管道](./pipes)和[守卫](./guards)类似，拦截器可以作用于控制器范围、方法范围或全局范围。
 
  ```typescript title="cats.controller.ts"
 @UseInterceptors(LoggingInterceptor)
@@ -222,7 +222,7 @@ export class CacheInterceptor implements NestInterceptor {
 }
 ```
 
-我们的 `CacheInterceptor` 有一个硬编码的 `isCached` 变量和一个同样硬编码的响应 `[]`。关键要注意的是，我们在这里返回了一个由 RxJS 的 `of()` 操作符创建的新流，因此路由处理程序**根本不会被调用** 。当有人调用使用 `CacheInterceptor` 的端点时，响应（一个硬编码的空数组）会立即返回。为了创建一个通用解决方案，你可以利用 `Reflector` 并创建一个自定义装饰器。`Reflector` 在[守卫](/guards)章节中有详细描述。
+我们的 `CacheInterceptor` 有一个硬编码的 `isCached` 变量和一个同样硬编码的响应 `[]`。关键要注意的是，我们在这里返回了一个由 RxJS 的 `of()` 操作符创建的新流，因此路由处理程序**根本不会被调用** 。当有人调用使用 `CacheInterceptor` 的端点时，响应（一个硬编码的空数组）会立即返回。为了创建一个通用解决方案，你可以利用 `Reflector` 并创建一个自定义装饰器。`Reflector` 在[守卫](./guards)章节中有详细描述。
 
 #### 更多操作符
 

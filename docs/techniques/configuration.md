@@ -97,7 +97,7 @@ ConfigModule.forRoot({
 
 对于更复杂的项目，您可以使用自定义配置文件返回嵌套配置对象。这允许您按功能（例如数据库相关设置）对配置设置进行分组，并将相关设置存储在单独文件中以便独立管理。
 
-自定义配置文件导出一个返回配置对象的工厂函数。该配置对象可以是任意嵌套的普通 JavaScript 对象。`process.env` 对象将包含完全解析后的环境变量键值对（其中 `.env` 文件及外部定义的变量会按照[上文](techniques/configuration#入门)所述方式解析合并）。由于您控制着返回的配置对象，因此可以添加任何必要的逻辑来将值转换为适当类型、设置默认值等。例如：
+自定义配置文件导出一个返回配置对象的工厂函数。该配置对象可以是任意嵌套的普通 JavaScript 对象。`process.env` 对象将包含完全解析后的环境变量键值对（其中 `.env` 文件及外部定义的变量会按照[上文](./configuration#快速开始)所述方式解析合并）。由于您控制着返回的配置对象，因此可以添加任何必要的逻辑来将值转换为适当类型、设置默认值等。例如：
 
  ```typescript title="config/configuration.ts"
 export default () => ({
@@ -224,7 +224,7 @@ const dbUser = this.configService.get<string>('DATABASE_USER');
 const dbHost = this.configService.get<string>('database.host');
 ```
 
-如上所示，使用 `configService.get()` 方法通过传递变量名来获取简单的环境变量。您可以通过传递类型来进行 TypeScript 类型提示，如上所示（例如 `get<string>(...)`）。`get()` 方法还可以遍历嵌套的自定义配置对象（通过 [自定义配置文件](techniques/configuration#自定义配置文件) 创建），如上文第二个示例所示。
+如上所示，使用 `configService.get()` 方法通过传递变量名来获取简单的环境变量。您可以通过传递类型来进行 TypeScript 类型提示，如上所示（例如 `get<string>(...)`）。`get()` 方法还可以遍历嵌套的自定义配置对象（通过 [自定义配置文件](./configuration#自定义配置文件) 创建），如上文第二个示例所示。
 
 你也可以使用接口作为类型提示来获取整个嵌套的自定义配置对象：
 
@@ -302,7 +302,7 @@ export default registerAs('database', () => ({
 }));
 ```
 
-与自定义配置文件相同，在 `registerAs()` 工厂函数内部，`process.env` 对象将包含完全解析的环境变量键值对（其中 `.env` 文件和外部定义的变量会按照[上文](techniques/configuration#入门)所述进行解析和合并）。
+与自定义配置文件相同，在 `registerAs()` 工厂函数内部，`process.env` 对象将包含完全解析的环境变量键值对（其中 `.env` 文件和外部定义的变量会按照[上文](./configuration#快速开始)所述进行解析和合并）。
 
 :::info 提示
 `registerAs` 函数是从 `@nestjs/config` 包中导出的。

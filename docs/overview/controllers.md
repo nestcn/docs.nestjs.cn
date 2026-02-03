@@ -9,7 +9,7 @@
 要创建基本控制器，我们使用类和**装饰器**。装饰器将类与必要的元数据关联起来，使 Nest 能够创建将请求连接到相应控制器的路由映射。
 
 :::info 提示
-要快速创建带有内置[验证](../techniques/validation)功能的 CRUD 控制器，可以使用 CLI 的 [CRUD 生成器](../recipes/crud-generator#crud-生成器)：`nest g resource [name]`。
+要快速创建带有[内置验证功能](../techniques/validation)功能的 CRUD 控制器，可以使用 CLI 的 [CRUD 生成器](../recipes/crud-generator#crud-生成器)：`nest g resource [name]`。
 :::
 
 #### 路由
@@ -45,7 +45,7 @@ export class CatsController {
     <td>标准方式（推荐）</td>
     <td>使用这种内置方法时，当请求处理程序返回 JavaScript 对象或数组时，它会自动序列化为 JSON。然而，当返回 JavaScript 基本类型（如 string、number、boolean）时，Nest 会直接发送该值而不进行序列化。这使得响应处理变得简单：只需返回值，Nest 会处理其余部分。
     <br /><br />
-    此外，默认情况下响应的状态码始终为 200，POST 请求除外（POST 请求使用 201 状态码）。我们可以通过在处理器级别添加 `@HttpCode(...)` 装饰器来轻松更改此行为（参见<a href="controllers#status-code">状态码</a>）。
+    此外，默认情况下响应的状态码始终为 200，POST 请求除外（POST 请求使用 201 状态码）。我们可以通过在处理器级别添加 `@HttpCode(...)` 装饰器来轻松更改此行为（参见<a href="/overview/controllers#状态码">状态码）。
     </td>
   </tr>
   <tr>
@@ -126,7 +126,7 @@ export class CatsController {
 \* 为兼容底层 HTTP 平台（如 Express 和 Fastify）的类型定义，Nest 提供了 `@Res()` 和 `@Response()` 装饰器。`@Res()` 是 `@Response()` 的别名。两者都直接暴露底层原生平台的 `response` 对象接口。使用时还需导入相应底层库的类型定义（如 `@types/express`）以获得完整支持。注意：在方法处理程序中注入 `@Res()` 或 `@Response()` 时，该处理程序将进入**库特定模式** ，此时需手动管理响应。必须通过调用 `response` 对象方法（如 `res.json(...)` 或 `res.send(...)`）返回响应，否则 HTTP 服务器会挂起。
 
 :::info 提示
-要了解如何创建自定义装饰器，请参阅[本章节](/custom-decorators) 。
+要了解如何创建自定义装饰器，请参阅[本章节](./custom-decorators) 。
 :::
 
 #### 资源

@@ -1,8 +1,5 @@
 import * as path from 'node:path';
 import { defineConfig } from '@rspress/core';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
-import rehypeSlug from 'rehype-slug';
 
 export default defineConfig({
   root: path.join(__dirname, 'docs'),
@@ -26,15 +23,6 @@ export default defineConfig({
   logo: {
     light: '/rspress-light-logo.png',
     dark: '/rspress-dark-logo.png',
-  },
-  markdown: {
-    // remarkPlugins: [
-    //   remarkGfm
-    // ],
-    // rehypePlugins: [
-    //   rehypeSlug,
-    //   rehypeRaw
-    // ],
   },
   route: {
     cleanUrls: true,

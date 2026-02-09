@@ -3,7 +3,7 @@
 Nest 提供了多种开箱即用的**传输器** ，同时提供了允许开发者构建新自定义传输策略的 API。传输器让你能够通过可插拔的通信层和非常简单的应用级消息协议（阅读完整[文章](https://dev.to/nestjs/integrate-nestjs-with-external-services-using-microservice-transporters-part-1-p3) ）在网络中连接组件。
 
 :::info 注意
-使用 Nest 构建微服务并不一定意味着你必须使用 `@nestjs/microservices` 包。例如，如果你需要与外部服务通信（比如用其他语言编写的微服务），可能并不需要 `@nestjs/microservice` 库提供的所有功能。实际上，如果你不需要通过装饰器（`@EventPattern` 或 `@MessagePattern`）来声明式定义订阅者，运行一个[独立应用](/standalone-applications)并手动维护连接/订阅通道对大多数用例来说已经足够，还能提供更大的灵活性。
+使用 Nest 构建微服务并不一定意味着你必须使用 `@nestjs/microservices` 包。例如，如果你需要与外部服务通信（比如用其他语言编写的微服务），可能并不需要 `@nestjs/microservices` 库提供的所有功能。实际上，如果你不需要通过装饰器（`@EventPattern` 或 `@MessagePattern`）来声明式定义订阅者，运行一个[独立应用](/standalone-applications)并手动维护连接/订阅通道对大多数用例来说已经足够，还能提供更大的灵活性。
 :::
 
 

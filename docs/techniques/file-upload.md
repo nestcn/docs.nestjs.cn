@@ -257,4 +257,4 @@ MulterModule.register({
 
 #### Fastify
 
-使用 `FastifyAdapter` 时，你需要一个不同的文件拦截器。它不是基于 `multer`，而是使用了 `@fastify/multipart` 包。你可以在[这里](/techniques/performance#文件上传)找到相关文档。
+使用 `FastifyAdapter` 时，你需要一个不同的文件拦截器。它不是基于 `multer`，而是使用了 `@fastify/multipart` 包。你可以在[这里](https://github.com/fastify/fastify-multipart)找到相关文档。

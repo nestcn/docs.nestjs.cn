@@ -50,7 +50,7 @@ $ nest g controller health
 ```
 
 :::info 信息
-强烈建议在应用程序中启用关闭钩子。如果启用，Terminus 集成会利用此生命周期事件。了解更多关于关闭钩子的信息 [请点击这里](/fundamentals/lifecycle-events#应用程序关闭) 。
+强烈建议在应用程序中启用关闭钩子。如果启用，Terminus 集成会利用此生命周期事件。了解更多关于关闭钩子的信息 [请点击这里](/fundamentals/lifecycle-events#应用关闭) 。
 :::
 
 #### HTTP 健康检查
@@ -197,7 +197,7 @@ export class HealthController {
 }
 ```
 
-如果您的应用使用[多个数据库](/techniques/sql#多个数据库) ，需要将每个连接注入到 `HealthController` 中。然后就可以直接将连接引用传递给 `TypeOrmHealthIndicator`。
+如果您的应用使用[多个数据库](/techniques/sql#多数据库) ，需要将每个连接注入到 `HealthController` 中。然后就可以直接将连接引用传递给 `TypeOrmHealthIndicator`。
 
  ```typescript title="health.controller.ts"
 @Controller('health')

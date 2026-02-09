@@ -166,7 +166,7 @@ export class AuthorsResolver {
 所有装饰器（例如 `@Resolver`、`@ResolveField`、`@Args` 等）均从 `@nestjs/graphql` 包中导出。
 :::
 
-您可以定义多个解析器类。Nest 将在运行时将它们组合起来。有关代码组织的更多信息，请参阅下面的[模块](/graphql/resolvers#模块)部分。
+您可以定义多个解析器类。Nest 将在运行时将它们组合起来。有关代码组织的更多信息，请参阅下面的[模块](#模块)部分。
 
 :::warning 注意
 `AuthorsService` 和 `PostsService` 类中的逻辑可以根据需要简单或复杂。本示例的主要目的是展示如何构建解析器以及它们如何与其他提供者交互。
@@ -657,7 +657,7 @@ export class CreatePostInput {
 ```
 
 :::info 注意
-要实现输入（及参数）的自动验证，请使用 `ValidationPipe`。有关验证的更多信息请[参阅此处](/techniques/validation) ，关于管道的具体说明请[查看这里](/pipes) 。
+要实现输入（及参数）的自动验证，请使用 `ValidationPipe`。有关验证的更多信息请[参阅此处](/techniques/validation) ，关于管道的具体说明请[查看这里](/overview/pipes) 。
 :::
 
 

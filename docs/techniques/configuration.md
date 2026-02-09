@@ -170,7 +170,7 @@ export default () => {
 ```
 
 :::warning 注意
- Nest CLI 在构建过程中不会自动将"assets"（非 TS 文件）移动到 `dist` 文件夹。为确保 YAML 文件被复制，您需要在 `nest-cli.json` 文件的 `compilerOptions#资源` 对象中进行指定。例如，如果 `config` 文件夹与 `src` 文件夹位于同一层级，则添加值为 `"assets": [{"include": "../config/*.yaml", "outDir": "./dist/config"}]` 的 `compilerOptions#资源`。了解更多[此处](/cli/monorepo#资源) 。
+ Nest CLI 在构建过程中不会自动将"assets"（非 TS 文件）移动到 `dist` 文件夹。为确保 YAML 文件被复制，您需要在 `nest-cli.json` 文件的 `compilerOptions#资源` 对象中进行指定。例如，如果 `config` 文件夹与 `src` 文件夹位于同一层级，则添加值为 `"assets": [{"include": "../config/*.yaml", "outDir": "./dist/config"}]` 的 `compilerOptions#资源`。了解更多[此处](/cli/workspaces#资源文件) 。
 :::
 
 快速提示 - 即使您在 NestJS 的 `ConfigModule` 中使用 `validationSchema` 选项，配置文件也不会自动验证。如果您需要验证或想应用任何转换，必须在工厂函数中处理这些操作，因为在那里您可以完全控制配置对象。这使您能够根据需要实现任何自定义验证逻辑。
@@ -293,7 +293,7 @@ constructor(private configService: ConfigService<{ PORT: number }, true>) {
 
 #### 配置命名空间
 
-`ConfigModule` 允许您定义并加载多个自定义配置文件，如上方[自定义配置文件](techniques/configuration#自定义配置文件)所示。您可以通过嵌套配置对象来管理复杂的配置对象层次结构，如该章节所示。或者，您也可以使用 `registerAs()` 函数返回一个"命名空间"配置对象，如下所示：
+`ConfigModule` 允许您定义并加载多个自定义配置文件，如上方[自定义配置文件](#自定义配置文件)所示。您可以通过嵌套配置对象来管理复杂的配置对象层次结构，如该章节所示。或者，您也可以使用 `registerAs()` 函数返回一个"命名空间"配置对象，如下所示：
 
  ```typescript title="config/database.config.ts"
 export default registerAs('database', () => ({
@@ -302,7 +302,7 @@ export default registerAs('database', () => ({
 }));
 ```
 
-与自定义配置文件相同，在 `registerAs()` 工厂函数内部，`process.env` 对象将包含完全解析的环境变量键值对（其中 `.env` 文件和外部定义的变量会按照[上文](./configuration#快速开始)所述进行解析和合并）。
+与自定义配置文件相同，在 `registerAs()` 工厂函数内部，`process.env` 对象将包含完全解析的环境变量键值对（其中 `.env` 文件和外部定义的变量会按照[上文](#快速开始)所述进行解析和合并）。
 
 :::info 提示
 `registerAs` 函数是从 `@nestjs/config` 包中导出的。

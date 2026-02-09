@@ -59,7 +59,7 @@ const moduleRef = await this.lazyModuleLoader.load(() => LazyModule);
 
 其中 `lazy.module.ts` 是一个导出**常规 Nest 模块**的 TypeScript 文件（无需额外修改）。
 
-`LazyModuleLoader#load` 方法返回一个[模块引用](/fundamentals/module-ref) （属于 `LazyModule` 类型），该引用允许您遍历内部提供者列表，并使用注入令牌作为查找键获取任意提供者的引用。
+`LazyModuleLoader#load` 方法返回一个[模块引用](/fundamentals/module-reference) （属于 `LazyModule` 类型），该引用允许您遍历内部提供者列表，并使用注入令牌作为查找键获取任意提供者的引用。
 
 例如，假设我们有一个 `LazyModule` 包含以下定义：
 
@@ -107,7 +107,7 @@ const lazyService = moduleRef.get(LazyService);
 由于 Nest 中的控制器（或 GraphQL 应用中的解析器）代表路由/路径/主题集（或查询/变更），您**无法通过** `LazyModuleLoader` 类实现懒加载。
 
  :::warning 警告
- 在懒加载模块中注册的控制器、 [解析器](/graphql/resolvers)和[网关](/websockets/gateways)将无法按预期工作。同样，你也不能按需注册中间件函数（通过实现 `MiddlewareConsumer` 接口）。
+ 在懒加载模块中注册的控制器、 [解析器](/graphql/resolvers-map)和[网关](/websockets/gateways)将无法按预期工作。同样，你也不能按需注册中间件函数（通过实现 `MiddlewareConsumer` 接口）。
 :::
 
 例如，假设你正在构建一个底层使用 Fastify 驱动（通过 `@nestjs/platform-fastify` 包）的 REST API（HTTP 应用）。Fastify 不允许在应用准备就绪/成功监听消息后注册路由。这意味着即使我们分析了模块控制器中注册的路由映射，所有懒加载路由也无法访问，因为在运行时无法注册它们。

@@ -27,7 +27,7 @@ type Mutation {
 }
 ```
 
-`upvotePost()` 方法接收 `postId`（`Int` 类型）作为参数，并返回更新后的 `Post` 实体。出于在 [解析器](/graphql/resolvers) 章节中解释的原因，我们必须显式设置预期类型。
+`upvotePost()` 方法接收 `postId`（`Int` 类型）作为参数，并返回更新后的 `Post` 实体。出于在 [解析器](/graphql/resolvers-map) 章节中解释的原因，我们必须显式设置预期类型。
 
 如果变更操作需要接收对象作为参数，我们可以创建一个 **输入类型** 。输入类型是一种特殊的对象类型，可以作为参数传递（了解更多 [此处](https://graphql.org/learn/schema/#input-types) ）。要声明输入类型，请使用 `@InputType()` 装饰器。
 
@@ -56,7 +56,7 @@ async upvotePost(
 
 #### 模式优先
 
-让我们扩展上一节中使用的 `AuthorResolver`（参见[解析器](/graphql/resolvers) ）。
+让我们扩展上一节中使用的 `AuthorResolver`（参见[解析器](/graphql/resolvers-map) ）。
 
 ```typescript
 @Mutation()

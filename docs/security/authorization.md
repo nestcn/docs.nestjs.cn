@@ -8,7 +8,7 @@
 
 #### 基本 RBAC 实现
 
-基于角色的访问控制（**RBAC**）是一种围绕角色和权限定义的策略无关的访问控制机制。在本节中，我们将演示如何使用 Nest [守卫](../guards)实现一个非常基本的 RBAC 机制。
+基于角色的访问控制（**RBAC**）是一种围绕角色和权限定义的策略无关的访问控制机制。在本节中，我们将演示如何使用 Nest [守卫](/overview/guards)实现一个非常基本的 RBAC 机制。
 
 首先，让我们创建一个 `Role` 枚举来表示系统中的角色：
 
@@ -313,7 +313,7 @@ findAll() {
 ```
 
 :::warning 警告
-由于我们必须使用 `new` 关键字就地实例化策略处理程序，因此 `ReadArticlePolicyHandler` 类无法使用依赖注入。这可以通过 `ModuleRef#get` 方法解决（在[这里](../fundamentals/module-ref)阅读更多）。基本上，不是通过 `@CheckPolicies()` 装饰器传递函数和实例，您需要注册所有处理程序作为提供者，并只通过引用传递它们。
+由于我们必须使用 `new` 关键字就地实例化策略处理程序，因此 `ReadArticlePolicyHandler` 类无法使用依赖注入。这可以通过 `ModuleRef#get` 方法解决（在[这里](/fundamentals/module-reference)阅读更多）。基本上，不是通过 `@CheckPolicies()` 装饰器传递函数和实例，您需要注册所有处理程序作为提供者，并只通过引用传递它们。
 :::
 
 

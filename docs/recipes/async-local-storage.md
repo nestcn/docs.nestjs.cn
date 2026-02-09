@@ -119,7 +119,7 @@ npm i nestjs-cls
 
 #### 使用方法
 
-可以使用 `nestjs-cls` 实现与[上文](recipes/async-local-storage#自定义实现)描述的类似功能，如下所示：
+可以使用 `nestjs-cls` 实现与[上文](#自定义实现)描述的类似功能，如下所示：
 
 1.  在根模块中导入 `ClsModule`。
 

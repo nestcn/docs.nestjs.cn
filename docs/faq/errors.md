@@ -5,7 +5,7 @@
 #### "无法解析依赖项"错误
 
 :::info 提示
-查看 [NestJS Devtools](./devtools/overview#调查无法解析依赖项错误) 可以帮助您轻松解决"无法解析依赖项"错误。
+查看 [NestJS Devtools](/devtools/overview#调查无法解析依赖项错误) 可以帮助您轻松解决"无法解析依赖项"错误。
 :::
 
 最常见的错误消息是关于 Nest 无法解析提供者的依赖项。错误消息通常如下所示：
@@ -22,7 +22,7 @@ Potential solutions:
   })
 ```
 
-导致此错误最常见的原因是没有将 `<provider>` 放入模块的 `providers` 数组中。请确保该提供者确实位于 `providers` 数组中，并遵循[标准 NestJS 提供者实践](./fundamentals/dependency-injection#di-基础)。
+导致此错误最常见的原因是没有将 `<provider>` 放入模块的 `providers` 数组中。请确保该提供者确实位于 `providers` 数组中，并遵循[标准 NestJS 提供者实践](/fundamentals/dependency-injection#di-基础)。
 
 有几个常见的陷阱需要注意。其中之一是将提供者放入了 `imports` 数组中。如果是这种情况，错误消息中会在 `<module>` 应该出现的位置显示提供者的名称。
 
@@ -32,7 +32,7 @@ Potential solutions:
 
 如果上方的 `<unknown_token>` 显示为 `Object`，说明您正在使用没有提供者令牌的类型/接口进行注入。要解决此问题，请确保：
 
-1.  您已导入类引用或使用带有 `@Inject()` 装饰器的自定义令牌。请阅读[自定义提供者页面](./fundamentals/dependency-injection)，以及
+1.  您已导入类引用或使用带有 `@Inject()` 装饰器的自定义令牌。请阅读[自定义提供者页面](/fundamentals/dependency-injection)，以及
 2.  对于基于类的提供者，您导入的是具体类而不仅仅是 [`import type ...`](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-8.html#type-only-imports-and-export) 语法引入的类型。
 
 同时请确保没有出现提供者自我注入的情况，因为 NestJS 不允许自我注入。当发生这种情况时，`<unknown_token>` 很可能会等于 `<provider>`。
@@ -68,7 +68,7 @@ Please make sure that the argument ModuleRef at index [<index>] is available in 
 
 #### "循环依赖"错误
 
-有时您会发现应用中难以避免[循环依赖](./fundamentals/circular-dependency)问题。您需要采取一些措施帮助 Nest 解决这些问题。由循环依赖引发的错误通常如下所示：
+有时您会发现应用中难以避免[循环依赖](/fundamentals/circular-dependency)问题。您需要采取一些措施帮助 Nest 解决这些问题。由循环依赖引发的错误通常如下所示：
 
 ```bash
 Nest cannot create the <module> instance.

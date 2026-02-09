@@ -1,6 +1,6 @@
 ### 异常过滤器
 
-HTTP [异常过滤器](/exception-filters)层与对应微服务层的唯一区别在于，不应抛出 `HttpException`，而应使用 `RpcException`。
+HTTP [异常过滤器](/overview/exception-filters)层与对应微服务层的唯一区别在于，不应抛出 `HttpException`，而应使用 `RpcException`。
 
 ```typescript
 throw new RpcException('Invalid credentials.');

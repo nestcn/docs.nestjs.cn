@@ -6,7 +6,7 @@ Nest 通过其跨平台功能如[守卫](/overview/guards)和[拦截器](/overvi
 
 #### 概述
 
-您可以像在任何 RESTful 应用中使用标准[守卫](/overview/guards) 、 [拦截器](/overview/interceptors) 、 [过滤器](/exception-filters)和[管道](/overview/pipes)那样，在 GraphQL 中以相同方式使用它们。此外，通过利用[自定义装饰器](/overview/custom-decorators)功能，您可以轻松创建自己的装饰器。让我们看一个示例 GraphQL 查询处理程序。
+您可以像在任何 RESTful 应用中使用标准[守卫](/overview/guards) 、 [拦截器](/overview/interceptors) 、 [过滤器](/overview/exception-filters)和[管道](/overview/pipes)那样，在 GraphQL 中以相同方式使用它们。此外，通过利用[自定义装饰器](/overview/custom-decorators)功能，您可以轻松创建自己的装饰器。让我们看一个示例 GraphQL 查询处理程序。
 
 ```typescript
 @Query('author')

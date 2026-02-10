@@ -1,6 +1,6 @@
 ### 执行上下文
 
-Nest 提供了多个实用工具类，帮助开发者轻松编写能在多种应用上下文（如基于 Nest HTTP 服务器的应用、微服务及 WebSockets 应用上下文）中运行的应用程序。这些工具类提供了当前执行上下文的信息，可用于构建通用的[守卫](/guards) 、 [过滤器](/exception-filters)和[拦截器](/interceptors) ，使其能够跨多种控制器、方法和执行上下文工作。
+Nest 提供了多个实用工具类，帮助开发者轻松编写能在多种应用上下文（如基于 Nest HTTP 服务器的应用、微服务及 WebSockets 应用上下文）中运行的应用程序。这些工具类提供了当前执行上下文的信息，可用于构建通用的[守卫](/overview/guards) 、 [过滤器](/overview/exception-filters)和[拦截器](/overview/interceptors) ，使其能够跨多种控制器、方法和执行上下文工作。
 
 本章我们将介绍两个这样的类：`ArgumentsHost` 和 `ExecutionContext`。
 
@@ -12,7 +12,7 @@ Nest 提供了多个实用工具类，帮助开发者轻松编写能在多种应
 
 #### 当前应用上下文
 
-当构建需要在多个应用上下文中运行的通用[守卫](/guards) 、 [过滤器](/exception-filters)和[拦截器](/interceptors)时，我们需要确定当前方法运行所在的应用类型。可通过 `ArgumentsHost` 的 `getType()` 方法实现：
+当构建需要在多个应用上下文中运行的通用[守卫](/overview/guards) 、 [过滤器](/overview/exception-filters)和[拦截器](/overview/interceptors)时，我们需要确定当前方法运行所在的应用类型。可通过 `ArgumentsHost` 的 `getType()` 方法实现：
 
 ```typescript
 if (host.getType() === 'http') {

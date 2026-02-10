@@ -169,7 +169,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 
 我们还实现了 `validate()` 方法。对于每个策略，Passport 会使用特定策略的参数集合来调用验证函数（在 `@nestjs/passport` 中通过 `validate()` 方法实现）。对于 local-strategy，Passport 期望 `validate()` 方法具有以下签名： `validate(username: string, password:string): any` 。
 
-大部分验证工作都在我们的 `AuthService` 中完成（借助 `UsersService` 实现），因此这个方法相当直接。`validate()` 方法对于**任何** Passport 策略都会遵循类似的模式，仅在凭证表示方式的细节上有所不同。如果找到用户且凭证有效，则返回该用户以便 Passport 完成其任务（例如在 `Request` 对象上创建 `user` 属性），请求处理管道可以继续执行。如果未找到用户，我们会抛出异常并由[异常处理层](exception-filters)进行处理。
+大部分验证工作都在我们的 `AuthService` 中完成（借助 `UsersService` 实现），因此这个方法相当直接。`validate()` 方法对于**任何** Passport 策略都会遵循类似的模式，仅在凭证表示方式的细节上有所不同。如果找到用户且凭证有效，则返回该用户以便 Passport 完成其任务（例如在 `Request` 对象上创建 `user` 属性），请求处理管道可以继续执行。如果未找到用户，我们会抛出异常并由[异常处理层](/overview/exception-filters)进行处理。
 
 通常，每种策略的 `validate()` 方法唯一显著区别在于**如何**判断用户存在且有效。例如在 JWT 策略中，根据需求不同，我们可能验证解码令牌中的 `userId` 是否匹配用户数据库记录，或是核对撤销令牌列表。因此，这种通过子类化实现策略特定验证的模式既一致优雅又具备扩展性。
 
@@ -191,7 +191,7 @@ export class AuthModule {}
 
 #### 内置 Passport 守卫
 
-[守卫](guards)章节描述了守卫的核心功能：决定请求是否应由路由处理程序处理。这一点仍然成立，我们很快会用到这个标准能力。但在使用 `@nestjs/passport` 模块时，我们会引入一个可能初看令人困惑的新变化，现在就来讨论它。从认证角度看，你的应用可能处于两种状态：
+[守卫](/overview/guards)章节描述了守卫的核心功能：决定请求是否应由路由处理程序处理。这一点仍然成立，我们很快会用到这个标准能力。但在使用 `@nestjs/passport` 模块时，我们会引入一个可能初看令人困惑的新变化，现在就来讨论它。从认证角度看，你的应用可能处于两种状态：
 
 1.  用户/客户端**未**登录（未认证）
 2.  用户/客户端**已**登录（已认证）
@@ -627,7 +627,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
 Passport API 基于向库的全局实例注册策略。因此策略并非设计为具有请求相关选项或按请求动态实例化（了解更多关于[请求作用域](/fundamentals/provider-scopes)提供者的信息）。当您将策略配置为请求作用域时，Nest 永远不会实例化它，因为它不与任何特定路由绑定。实际上无法确定每个请求应执行哪些"请求作用域"策略。
 
-不过，存在在策略内动态解析请求作用域提供者的方法。为此，我们利用了[模块引用](/fundamentals/module-ref)功能。
+不过，存在在策略内动态解析请求作用域提供者的方法。为此，我们利用了[模块引用](/fundamentals/module-reference)功能。
 
 首先，打开 `local.strategy.ts` 文件并以常规方式注入 `ModuleRef`：
 
@@ -645,7 +645,7 @@ constructor(private moduleRef: ModuleRef) {
 
 请确保将 `passReqToCallback` 配置属性设置为 `true`，如上所示。
 
-在下一步中，将使用请求实例来获取当前上下文标识符，而不是生成新的标识符（了解更多关于请求上下文的信息请[点击此处](/fundamentals/module-ref#获取当前子树) ）。
+在下一步中，将使用请求实例来获取当前上下文标识符，而不是生成新的标识符（了解更多关于请求上下文的信息请[点击此处](/fundamentals/module-reference#获取当前子树) ）。
 
 现在，在 `LocalStrategy` 类的 `validate()` 方法内部，使用 `ContextIdFactory` 类的 `getByRequest()` 方法基于请求对象创建上下文 ID，并将其传递给 `resolve()` 调用：
 

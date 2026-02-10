@@ -95,7 +95,7 @@ describe('CatsController', () => {
 
 
 
-`TestingModule` 继承自[模块引用](/fundamentals/module-ref)类，因此具备动态解析作用域提供者（瞬时或请求作用域）的能力。可通过 `resolve()` 方法实现（而 `get()` 方法仅能获取静态实例）。
+`TestingModule` 继承自[模块引用](/fundamentals/module-reference)类，因此具备动态解析作用域提供者（瞬时或请求作用域）的能力。可通过 `resolve()` 方法实现（而 `get()` 方法仅能获取静态实例）。
 
 ```typescript
 const moduleRef = await Test.createTestingModule({
@@ -111,7 +111,7 @@ catsService = await moduleRef.resolve(CatsService);
 :::
 
 :::info 提示
-了解更多模块引用特性请[点击此处](/fundamentals/module-ref) 。
+了解更多模块引用特性请[点击此处](/fundamentals/module-reference) 。
 :::
 
 您可以用[自定义提供者](/fundamentals/dependency-injection)覆盖任何生产环境的提供者实现来进行测试。例如，可以模拟数据库服务而非连接真实数据库。我们将在下一节讨论覆盖机制，该功能同样适用于单元测试场景。

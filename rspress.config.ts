@@ -1,14 +1,11 @@
 import * as path from 'node:path';
-import { defineConfig } from 'rspress/config';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
-import rehypeSlug from 'rehype-slug';
+import { defineConfig } from '@rspress/core';
 
 export default defineConfig({
   root: path.join(__dirname, 'docs'),
-  // @ts-ignore
   publicDir: path.join(__dirname, 'public'),
   outDir: path.join(__dirname, 'doc_build'),
+  lang: 'zh',
   builderConfig: {
     dev: {
       assetPrefix: '/',
@@ -27,17 +24,25 @@ export default defineConfig({
     light: '/rspress-light-logo.png',
     dark: '/rspress-dark-logo.png',
   },
-  markdown: {
-    remarkPlugins: [
-      remarkGfm
-    ],
-    rehypePlugins: [
-      rehypeSlug,
-      rehypeRaw
-    ]
-  },
   route: {
     cleanUrls: true,
+  },
+  i18nSource: {
+    outlineTitle: {
+      zh: '目录',
+    },
+    lastUpdatedText: {
+      zh: '最后更新于',
+    },
+    prevPageText: {
+      zh: '上一页',
+    },
+    nextPageText: {
+      zh: '下一页',
+    },
+    editLinkText: {
+      zh: '在 GitHub 上编辑此页',
+    },
   },
   head: [
     [
@@ -69,11 +74,10 @@ export default defineConfig({
     ],
     editLink: {
       docRepoBaseUrl: 'https://github.com/nestcn/docs.nestjs.cn/tree/main/docs',
-      text: '在 GitHub 上编辑此页',
     },
     footer: {
       message: `
-        <a href="https://github.com/nestcn/docs.nestjs.cn/issues/new" target="_blank" rel="noopener noreferrer" 
+        <a href="https://github.com/nestcn/docs.nestjs.cn/issues/new" target="_blank" rel="noopener noreferrer"
            onclick="event.preventDefault(); window.open('https://github.com/nestcn/docs.nestjs.cn/issues/new?title=Translation+Feedback&body=Page: ' + window.location.href, '_blank');"
            style="display: inline-flex; align-items: center; gap: 0.5rem; color: var(--rp-c-brand); font-weight: 500; text-decoration: none; margin-bottom: 1rem;">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
@@ -89,12 +93,7 @@ export default defineConfig({
         content: 'https://github.com/nestjs/nest',
       },
     ],
-    outlineTitle: '目录',
     lastUpdated: true,
-    lastUpdatedText: '最后更新于',
-    prevPageText: '上一页',
-    nextPageText: '下一页',
-    enableContentAnimation: true,
     sidebar: {
       '/': [
         {

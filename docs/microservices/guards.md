@@ -1,6 +1,6 @@
 ### 守卫
 
-微服务守卫与[常规 HTTP 应用守卫](/guards)没有本质区别。唯一的不同在于，你应该使用 `RpcException` 而不是抛出 `HttpException`。
+微服务守卫与[常规 HTTP 应用守卫](/overview/guards)没有本质区别。唯一的不同在于，你应该使用 `RpcException` 而不是抛出 `HttpException`。
 
 :::info 注意
 `RpcException` 类是从 `@nestjs/microservices` 包中导出的。

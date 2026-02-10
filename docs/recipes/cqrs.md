@@ -260,7 +260,7 @@ export class HeroKilledDragonHandler implements IEventHandler<HeroKilledDragonEv
 
 
 >
-> - `命令处理器`中的错误仍可被内置的[异常过滤器](/exception-filters)捕获。
+> - `命令处理器`中的错误仍可被内置的[异常过滤器](/overview/exception-filters)捕获。
 > - `事件处理器`中的错误无法被异常过滤器捕获：你必须手动处理它们。可以通过简单的 `try/catch`，使用 [Sagas](../recipes/cqrs#sagas) 触发补偿事件，或选择其他任何解决方案。
 > - 在 `CommandHandlers` 中的 HTTP 响应仍可返回给客户端。
 > - 而在 `EventHandlers` 中则无法返回 HTTP 响应。如需向客户端发送信息，可采用 [WebSocket](/websockets/gateways)、[SSE](/techniques/server-sent-events) 或其他自选方案。

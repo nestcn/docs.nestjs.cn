@@ -64,7 +64,7 @@ $ npm run start:dev
 | nest build 和 nest start 命令                | 目标默认自动指向上下文中的（唯一）项目 | 目标默认为 monorepo 中的默认项目 |
 | 库                                           | 手动管理，通常通过 npm 包管理          | 内置支持，包括路径管理和打包功能 |
 
-阅读[工作区](/cli/monorepo)和[库](/cli/libraries)相关章节获取更详细信息，以帮助您决定哪种模式最适合您的需求。
+阅读[工作区](/cli/workspaces)和[库](/cli/libraries)相关章节获取更详细信息，以帮助您决定哪种模式最适合您的需求。
 
 #### 命令行界面(CLI)命令语法
 

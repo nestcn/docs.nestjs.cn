@@ -1,6 +1,6 @@
 ### 异常过滤器
 
-HTTP [异常过滤器](/exception-filters) 层和相应的 web sockets 层之间的唯一区别是，您应该使用 `WsException` 而不是抛出 `HttpException`。
+HTTP [异常过滤器](/overview/exception-filters) 层和相应的 web sockets 层之间的唯一区别是，您应该使用 `WsException` 而不是抛出 `HttpException`。
 
 ```typescript
 throw new WsException('Invalid credentials.');

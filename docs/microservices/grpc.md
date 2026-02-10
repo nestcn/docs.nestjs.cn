@@ -16,7 +16,7 @@ $ npm i --save @grpc/grpc-js @grpc/proto-loader
 
 #### 概述
 
-与其他 Nest 微服务传输层实现类似，您可以通过传递给 `createMicroservice()` 方法的选项对象中的 `transport` 属性来选择 gRPC 传输机制。在以下示例中，我们将设置一个英雄服务。`options` 属性提供了有关该服务的元数据；其属性描述见[下文](microservices/grpc#选项) 。
+与其他 Nest 微服务传输层实现类似，您可以通过传递给 `createMicroservice()` 方法的选项对象中的 `transport` 属性来选择 gRPC 传输机制。在以下示例中，我们将设置一个英雄服务。`options` 属性提供了有关该服务的元数据；其属性描述见[下文](#选项) 。
 
  ```typescript title="main.ts"
 const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
@@ -85,7 +85,7 @@ message Hero {
 接下来我们需要实现该服务。为了定义一个满足此要求的处理程序，我们在控制器中使用 `@GrpcMethod()` 装饰器，如下所示。该装饰器提供了将方法声明为 gRPC 服务方法所需的元数据。
 
 :::info 提示
-在前面的微服务章节中介绍的 `@MessagePattern()` 装饰器（ [了解更多](microservices/basics#请求-响应) ）不适用于基于 gRPC 的微服务。对于基于 gRPC 的微服务，`@GrpcMethod()` 装饰器有效地取代了它的位置。
+在前面的微服务章节中介绍的 `@MessagePattern()` 装饰器（ [了解更多](/microservices/basics#请求-响应) ）不适用于基于 gRPC 的微服务。对于基于 gRPC 的微服务，`@GrpcMethod()` 装饰器有效地取代了它的位置。
 :::
 
  ```typescript title="heroes.controller.ts"
@@ -146,7 +146,7 @@ export class HeroesService {
 
 Nest 应用程序可以作为 gRPC 客户端，使用定义在 `.proto` 文件中的服务。你可以通过 `ClientGrpc` 对象访问远程服务。获取 `ClientGrpc` 对象有多种方式。
 
-首选技术是导入 `ClientsModule` 模块。使用 `register()` 方法将.proto 文件中定义的服务包绑定到注入令牌，并进行服务配置。`name` 属性即为注入令牌。对于 gRPC 服务，需使用 `transport: Transport.GRPC` 配置。`options` 属性是一个对象，其包含的属性与[前文](microservices/grpc#选项)所述相同。
+首选技术是导入 `ClientsModule` 模块。使用 `register()` 方法将.proto 文件中定义的服务包绑定到注入令牌，并进行服务配置。`name` 属性即为注入令牌。对于 gRPC 服务，需使用 `transport: Transport.GRPC` 配置。`options` 属性是一个对象，其包含的属性与[前文](#选项)所述相同。
 
 ```typescript
 imports: [
@@ -500,11 +500,11 @@ export class HeroesService {
 }
 ```
 
-同样地，要读取带有 `@GrpcStreamMethod()` 注解的处理程序（ [主题策略](microservices/grpc#主题策略) ）中的元数据，需使用第二个参数（metadata），其类型为 `Metadata`（从 `grpc` 包导入）。
+同样地，要读取带有 `@GrpcStreamMethod()` 注解的处理程序（ [主题策略](#主题策略) ）中的元数据，需使用第二个参数（metadata），其类型为 `Metadata`（从 `grpc` 包导入）。
 
 要从处理程序返回元数据，请使用 `ServerDuplexStream#sendMetadata()` 方法（第三个处理程序参数）。
 
-要从[调用流处理程序](microservices/grpc#调用流处理程序) （带有 `@GrpcStreamCall()` 装饰器注解的处理程序）内部读取元数据，需监听 `requestStream` 引用上的 `metadata` 事件，如下所示：
+要从[调用流处理程序](#调用流处理程序) （带有 `@GrpcStreamCall()` 装饰器注解的处理程序）内部读取元数据，需监听 `requestStream` 引用上的 `metadata` 事件，如下所示：
 
 ```typescript
 requestStream.on('metadata', (metadata: Metadata) => {

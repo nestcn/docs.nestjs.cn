@@ -102,7 +102,7 @@ NestJS 提供专业的 GraphQL 课程，包含 20+ 章节的深入内容：
 ## 相关章节
 
 - [快速开始](./quick-start.md) - GraphQL 入门指南
-- [解析器](./resolvers.md) - 创建 GraphQL 解析器
+- [解析器](./resolvers-map.md) - 创建 GraphQL 解析器
 - [变更](./mutations.md) - 处理数据变更
 - [订阅](./subscriptions.md) - 实时数据推送
 - [标量](./scalars.md) - 自定义标量类型
@@ -115,7 +115,7 @@ NestJS 提供专业的 GraphQL 课程，包含 20+ 章节的深入内容：
 - [复杂度](./complexity.md) - 查询复杂度分析
 - [扩展](./extensions.md) - GraphQL 扩展
 - [CLI 插件](./cli-plugin.md) - 命令行工具
-- [生成 SDL](./generating-sdl.md) - Schema 定义语言
+- [生成 SDL](./schema-generator.md) - Schema 定义语言
 - [共享模型](./sharing-models.md) - 模型共享
-- [其他功能](./other-features.md) - 高级功能
+- [其他功能](./guards-interceptors.md) - 高级功能
 - [联邦](./federation.md) - GraphQL 联邦

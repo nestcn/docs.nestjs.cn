@@ -117,7 +117,7 @@ findAll(@Res({ passthrough: true }) response: FastifyReply) {
 
 #### 创建自定义装饰器（跨平台）
 
-为提供便捷的声明式方法来访问传入的 cookies，我们可以创建一个[自定义装饰器](/custom-decorators) 。
+为提供便捷的声明式方法来访问传入的 cookies，我们可以创建一个[自定义装饰器](/overview/custom-decorators) 。
 
 ```typescript
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';

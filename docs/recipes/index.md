@@ -5,16 +5,16 @@
 ## 🔐 认证与安全
 
 ### 认证系统
-- **[认证](./authentication.md)** - JWT、Session 等认证方式
-- **[授权](./authorization.md)** - 基于角色和权限的访问控制
+- **[认证](/security/authentication)** - JWT、Session 等认证方式
+- **[授权](/security/authorization)** - 基于角色和权限的访问控制
 - **[Passport](./passport.md)** - 多种认证策略集成
-- **[加密和哈希](./encryption-hashing.md)** - 密码加密和数据安全
+- **[加密和哈希](/security/encryption-hashing)** - 密码加密和数据安全
 
 ### 安全防护
-- **[CORS](./cors.md)** - 跨域资源共享配置
-- **[CSRF 防护](./csrf.md)** - 跨站请求伪造防护
-- **[Helmet](./helmet.md)** - HTTP 安全头部设置
-- **[速率限制](./rate-limiting.md)** - API 访问频率控制
+- **[CORS](/security/cors)** - 跨域资源共享配置
+- **[CSRF 防护](/security/csrf)** - 跨站请求伪造防护
+- **[Helmet](/security/helmet)** - HTTP 安全头部设置
+- **[速率限制](/security/rate-limiting)** - API 访问频率控制
 
 ## 🏗️ 架构模式
 
@@ -60,16 +60,16 @@
 ### 按使用频率分类
 
 **🔥 高频使用**
-- [认证](./authentication.md) - 用户身份验证
+- [认证](/security/authentication) - 用户身份验证
 - [TypeORM](./sql-typeorm.md) - 数据库 ORM
-- [CORS](./cors.md) - 跨域配置
+- [CORS](/security/cors) - 跨域配置
 - [SWC](./swc.md) - 快速编译
 - [文档生成](./documentation.md) - API 文档
 
 **📈 进阶应用**
 - [CQRS](./cqrs.md) - 企业级架构
 - [Prisma](./prisma.md) - 现代数据库
-- [速率限制](./rate-limiting.md) - API 保护
+- [速率限制](/security/rate-limiting) - API 保护
 - [Terminus](./terminus.md) - 健康检查
 - [Sentry](./sentry.md) - 错误监控
 
@@ -115,14 +115,14 @@
 ### 🔰 新手推荐路径
 
 1. **基础设置**
-   - 配置 [CORS](./cors.md) 解决跨域问题
+   - 配置 [CORS](/security/cors) 解决跨域问题
    - 集成 [TypeORM](./sql-typeorm.md) 管理数据库
-   - 实现 [认证](./authentication.md) 系统
+   - 实现 [认证](/security/authentication) 系统
 
 2. **安全加固**
-   - 启用 [Helmet](./helmet.md) 安全头部
-   - 配置 [CSRF 防护](./csrf.md)
-   - 设置 [速率限制](./rate-limiting.md)
+   - 启用 [Helmet](/security/helmet) 安全头部
+   - 配置 [CSRF 防护](/security/csrf)
+   - 设置 [速率限制](/security/rate-limiting)
 
 3. **开发优化**
    - 使用 [SWC](./swc.md) 提升编译速度
@@ -133,7 +133,7 @@
 
 1. **架构升级**
    - 采用 [CQRS](./cqrs.md) 模式
-   - 实现 [授权](./authorization.md) 系统
+   - 实现 [授权](/security/authorization) 系统
    - 引入 [Prisma](./prisma.md) 现代化 ORM
 
 2. **监控完善**

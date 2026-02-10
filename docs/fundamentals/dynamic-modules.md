@@ -471,7 +471,7 @@ export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
     .build();
 ```
 
-上述示例中，传入 `setExtras` 方法的第一个参数是包含"extra"属性默认值的对象。第二个参数是一个函数，该函数接收自动生成的模块定义（包含 `provider`、`exports` 等）和表示额外属性的 `extras` 对象（可能是使用者指定的值或默认值）。该函数的返回值是修改后的模块定义。在这个具体示例中，我们获取 `extras.isGlobal` 属性并将其赋值给模块定义的 `global` 属性（该属性继而决定模块是否为全局模块，更多信息请参阅[此处](/modules#动态模块) ）。
+上述示例中，传入 `setExtras` 方法的第一个参数是包含"extra"属性默认值的对象。第二个参数是一个函数，该函数接收自动生成的模块定义（包含 `provider`、`exports` 等）和表示额外属性的 `extras` 对象（可能是使用者指定的值或默认值）。该函数的返回值是修改后的模块定义。在这个具体示例中，我们获取 `extras.isGlobal` 属性并将其赋值给模块定义的 `global` 属性（该属性继而决定模块是否为全局模块，更多信息请参阅[此处](/overview/modules#动态模块) ）。
 
 现在当使用此模块时，可以传入额外的 `isGlobal` 标志，如下所示：
 

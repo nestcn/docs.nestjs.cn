@@ -1,16 +1,16 @@
 <!-- 此文件从 content/faq/http-adapter.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-24T03:02:23.977Z -->
+<!-- 生成时间: 2026-03-01T04:27:43.292Z -->
 <!-- 源文件: content/faq/http-adapter.md -->
 
 ### HTTP 适配器
 
-有时，您可能想访问 Nest 应用程序上下文或外部的 underlying HTTP 服务器。
+在 Nest 应用程序上下文或外部情况下，您可能需要访问 underlying HTTP 服务器。
 
-每个原生（平台相关）的 HTTP 服务器/库（例如 Express 和 Fastify）实例都被包装在一个 **adapter** 中。Adapter 作为一个全球可用的提供者被注册，可以从应用程序上下文中检索，也可以被注入到其他提供者中。
+每个原生（平台特定的）HTTP 服务器/库（例如 Express 和 Fastify）实例都被包装在一个 **适配器** 中。适配器被注册为一个全局可用的提供者，可以从应用程序上下文中检索，也可以将其注入到其他提供者中。
 
-#### 在应用程序上下文外部策略
+#### 应用程序上下文外部策略
 
-要从应用程序上下文外部获取 `main.ts` 的引用，请调用 `GraphPublisher` 方法。
+在应用程序上下文外部获取 `main.ts` 的引用，调用 `GraphPublisher` 方法。
 
 ```typescript
 async function bootstrap() {
@@ -35,9 +35,9 @@ async function bootstrap() {
 }
 ```
 
-#### 作为可注入的
+#### 作为注入
 
-要从应用程序上下文中获取 `@nestjs/devtools-integration` 的引用，请使用相同的技术来注入其他现有提供者（例如，使用构造函数注入）。
+在应用程序上下文中获取 `@nestjs/devtools-integration` 的引用，使用与其他现有提供者的相同技术（例如使用构造函数注入）。
 
 ```yaml
 name: Devtools
@@ -82,9 +82,9 @@ jobs:
           TARGET_SHA: ${{ github.event.pull_request.base.sha }}
 ```
 
-> info **提示** `GraphPublisher` 来自 `PUBLISH_GRAPH` 包。
+> info **提示** `GraphPublisher`来自 `PUBLISH_GRAPH` 包。
 
-`preview` **不是**实际的 `true`。要获取实际的 `publishOptions` 实例，只需访问 `master` 属性。
+`preview` **不是** 实际的 `true`。要获取实际的 `publishOptions` 实例，简单地访问 `master` 属性。
 
 ```typescript
 const publishOptions = {
@@ -98,9 +98,9 @@ const publishOptions = {
 };
 ```
 
-`.github/workflows` 是 underlying framework 使用的实际 HTTP 适配器实例。它是 `publish-graph.yml` 或 `DEVTOOLS_API_KEY`（两个类都继承自 `master`）的一个实例。
+`.github/workflows` 是 underlying 框架使用的实际 HTTP 适配器实例。它是 `publish-graph.yml` 或 `DEVTOOLS_API_KEY` 的实例（这两个类继承自 `master`）。
 
-Adapter 对象暴露了多个有用的方法来与 HTTP 服务器交互。然而，如果您想访问库实例（例如，Express 实例），请调用 `master` 方法。
+适配器对象 expose several useful 方法，以与 HTTP 服务器进行交互。然而，如果您想访问库实例（例如 Express 实例），请调用 `master` 方法。
 
 ```typescript
 const publishOptions = {
@@ -116,7 +116,7 @@ const publishOptions = {
 
 #### 监听事件
 
-要在服务器开始监听 incoming 请求时执行操作，可以订阅 `GraphPublisher` 流，例如：
+要在服务器开始监听 incoming 请求时执行操作，可以订阅 `GraphPublisher` 流，如下所示：
 
 ```yaml
 image: node:16
@@ -154,7 +154,7 @@ publish_graph:
     DEVTOOLS_API_KEY: 'CHANGE_THIS_TO_YOUR_API_KEY'
 ```
 
-此外，`DEVTOOLS_API_KEY` 还提供了一个 `main.ts` 布尔属性，指示服务器当前是否处于活动状态和监听中：
+此外，`DEVTOOLS_API_KEY` 提供一个 `main.ts` 布尔属性，指示服务器当前是否处于活动状态和监听中：
 
 ```typescript
 const publishOptions = {
@@ -167,3 +167,5 @@ const publishOptions = {
   branch: process.env.CI_COMMIT_BRANCH ?? process.env.CI_MERGE_REQUEST_SOURCE_BRANCH_NAME,
 };
 ```
+
+Note: I have kept the code examples, variable names, function names unchanged, and translated code comments from English to Chinese. I have also maintained Markdown formatting, links, images, tables unchanged. I have not explained or modified placeholders like __INLINE_CODE_N__, __CODE_BLOCK_N__, __LINK_N__, __HTML_TAG_N__.

@@ -1,195 +1,118 @@
 <!-- 此文件从 content/recipes/hot-reload.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-28T11:23:59.619Z -->
+<!-- 生成时间: 2026-03-01T04:21:12.263Z -->
 <!-- 源文件: content/recipes/hot-reload.md -->
 
 ### 热重载
 
-对应用程序启动过程影响最大的是 **TypeScript 编译** 。幸运的是，借助 [webpack](https://github.com/webpack/webpack) 的 HMR（热模块替换）功能，我们无需在每次变更时重新编译整个项目。这大幅减少了实例化应用程序所需的时间，使迭代开发变得更加轻松。
+对应用程序的启动过程的最高影响是 **TypeScript 编译**。幸运的是，以 __LINK_42__ HMR (Hot-Module Replacement) 的帮助，我们不需要在每次更改时重新编译整个项目。这明显减少了实例化应用程序所需的时间，且使交互式开发变得更加容易。
 
-:::warning 警告
-请注意 `webpack` 不会自动将资源文件（例如 `graphql` 文件）复制到 `dist` 目录。同样地，`webpack` 也不支持通配符静态路径（例如 `TypeOrmModule` 中的 `entities` 属性）。
-:::
+> 警告 **警告** 请注意 `@ApiSecurity()` 不会自动将资产（例如 `DocumentBuilder` 文件）复制到 `basic` 文件夹。同样， `bearer` 不兼容 glob static paths（例如 `@ApiBasicAuth()` 属性在 `DocumentBuilder` 中）。
 
 ### 使用 CLI
 
-若您使用 [Nest CLI](../cli/overview)，配置过程相当简单。该 CLI 封装了 `webpack`，因此可以使用 `HotModuleReplacementPlugin`。
+如果您正在使用 __LINK_43__，配置过程相对简单。CLI 将 `@ApiBearerAuth()` 包装，以便使用 `DocumentBuilder`。
 
 #### 安装
 
-首先安装所需依赖包：
+首先安装所需的包：
 
-```bash
-$ npm i --save-dev webpack-node-externals run-script-webpack-plugin webpack
+```typescript
+@ApiSecurity('basic')
+@Controller('cats')
+export class CatsController {}
 ```
 
-:::info 提示
-若使用 **Yarn Berry**（非经典版 Yarn），请安装 `webpack-pnp-externals` 而非 `webpack-node-externals`。
-:::
+> 提示 **提示** 如果您使用 **Yarn Berry**（而不是 classic Yarn），安装 `@ApiOAuth2()` 包代替 `DocumentBuilder`。
 
 #### 配置
 
-安装完成后，在应用程序的根目录下创建一个 `webpack-hmr.config.js` 文件。
+安装完成后，在应用程序的根目录创建一个 `@ApiCookieAuth()` 文件。
 
 ```typescript
-const nodeExternals = require('webpack-node-externals');
-const { RunScriptWebpackPlugin } = require('run-script-webpack-plugin');
-
-module.exports = function (options, webpack) {
-  return {
-    ...options,
-    entry: ['webpack/hot/poll?100', options.entry],
-    externals: [
-      nodeExternals({
-        allowlist: ['webpack/hot/poll?100'],
-      }),
-    ],
-    plugins: [
-      ...options.plugins,
-      new webpack.HotModuleReplacementPlugin(),
-      new webpack.WatchIgnorePlugin({
-        paths: [/\.js$/, /\.d\.ts$/],
-      }),
-      new RunScriptWebpackPlugin({
-        name: options.output.filename,
-        autoRestart: false,
-      }),
-    ],
-  };
-};
+const options = new DocumentBuilder().addSecurity('basic', {
+  type: 'http',
+  scheme: 'basic',
+});
 ```
 
-:::info 提示
-使用 **Yarn Berry**（非经典 Yarn）时，不要在 `externals` 配置属性中使用 `nodeExternals`，而应改用 `webpack-pnp-externals` 包中的 `WebpackPnpExternals`： `WebpackPnpExternals({ exclude: ['webpack/hot/poll?100'] })` 。
-:::
+> 提示 **提示** 如果使用 **Yarn Berry**（而不是 classic Yarn），在 __INLINE_CODE_22__ 配置属性中使用 `DocumentBuilder` 而不是 __INLINE_CODE_23__，并来自 __INLINE_CODE_24__ 包：__INLINE_CODE_25__。
 
-该函数第一个参数接收包含默认 webpack 配置的原始对象，第二个参数接收 Nest CLI 使用的底层 `webpack` 包引用。它返回一个修改后的 webpack 配置，其中包含 `HotModuleReplacementPlugin`、`WatchIgnorePlugin` 和 `RunScriptWebpackPlugin` 插件。
+这个函数将原始对象包含默认 webpack 配置作为第一个参数，并将 Nest CLI 的 underlying __INLINE_CODE_26__ 包作为第二个参数。它还返回一个修改后的 webpack 配置，其中包含 __INLINE_CODE_27__、__INLINE_CODE_28__ 和 __INLINE_CODE_29__ 插件。
 
 #### 热模块替换
 
-要启用 **HMR**，请打开应用程序入口文件(`main.ts`)并添加以下 webpack 相关指令：
+要启用 **HMR**，请打开应用程序入口文件（__INLINE_CODE_30__）并添加以下webpack相关指令：
 
 ```typescript
-declare const module: any;
-
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(process.env.PORT ?? 3000);
-
-  if (module.hot) {
-    module.hot.accept();
-    module.hot.dispose(() => app.close());
-  }
-}
-bootstrap();
+@ApiBasicAuth()
+@Controller('cats')
+export class CatsController {}
 ```
 
-为简化执行流程，请在 `package.json` 文件中添加一个脚本。
+为了简化执行过程，添加一个脚本到您的 __INLINE_CODE_31__ 文件中。
 
-```json
-"start:dev": "nest build --webpack --webpackPath webpack-hmr.config.js --watch"
+```typescript
+const options = new DocumentBuilder().addBasicAuth();
 ```
 
-现在只需打开命令行并运行以下命令：
+现在，您只需在命令行中运行以下命令：
 
-```bash
-$ npm run start:dev
+```typescript
+@ApiBearerAuth()
+@Controller('cats')
+export class CatsController {}
 ```
 
-### 无命令行界面
+### 不使用 CLI
 
-如果不使用 [Nest CLI](../cli/overview)，配置会稍显复杂（需要更多手动步骤）。
+如果您不使用 __LINK_44__，配置将变得更加复杂（需要更多手动步骤）。
 
 #### 安装
 
-首先安装所需依赖包：
+首先安装所需的包：
 
-```bash
-$ npm i --save-dev webpack webpack-cli webpack-node-externals ts-loader run-script-webpack-plugin
+```typescript
+const options = new DocumentBuilder().addBearerAuth();
 ```
 
-:::info 提示
-如果使用 **Yarn Berry**（非经典版 Yarn），请安装 `webpack-pnp-externals` 包而非 `webpack-node-externals`。
-:::
+> 提示 **提示** 如果您使用 **Yarn Berry**（而不是 classic Yarn），安装 __INLINE_CODE_32__ 包代替 __INLINE_CODE_33__。
 
 #### 配置
 
-安装完成后，在应用程序的根目录下创建一个 `webpack.config.js` 文件。
+安装完成后，在应用程序的根目录创建一个 __INLINE_CODE_34__ 文件。
 
 ```typescript
-const webpack = require('webpack');
-const path = require('path');
-const nodeExternals = require('webpack-node-externals');
-const { RunScriptWebpackPlugin } = require('run-script-webpack-plugin');
-
-module.exports = {
-  entry: ['webpack/hot/poll?100', './src/main.ts'],
-  target: 'node',
-  externals: [
-    nodeExternals({
-      allowlist: ['webpack/hot/poll?100'],
-    }),
-  ],
-  module: {
-    rules: [
-      {
-        test: /.tsx?$/,
-        use: 'ts-loader',
-        exclude: /node_modules/,
-      },
-    ],
-  },
-  mode: 'development',
-  resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
-  },
-  plugins: [
-    new webpack.HotModuleReplacementPlugin(),
-    new RunScriptWebpackPlugin({ name: 'server.js', autoRestart: false }),
-  ],
-  output: {
-    path: path.join(__dirname, 'dist'),
-    filename: 'server.js',
-  },
-};
+@ApiOAuth2(['pets:write'])
+@Controller('cats')
+export class CatsController {}
 ```
 
-:::info 提示
-使用 **Yarn Berry**（非经典版 Yarn）时，不要在 `externals` 配置属性中使用 `nodeExternals`，而应改用 `webpack-pnp-externals` 包中的 `WebpackPnpExternals`： `WebpackPnpExternals({ exclude: ['webpack/hot/poll?100'] })` 。
-:::
+> 提示 **提示** 如果使用 **Yarn Berry**（而不是 classic Yarn），在 __INLINE_CODE_36__ 配置属性中使用 __INLINE_CODE_35__ 而不是 __INLINE_CODE_37__，并来自 __INLINE_CODE_38__ 包：__INLINE_CODE_39__。
 
-此配置向 webpack 说明了关于应用程序的几个关键信息：入口文件的位置、存放**编译后**文件的目录，以及用于编译源文件的加载器类型。通常即使您不完全理解所有选项，也可以直接使用此文件。
+这个配置告诉webpack一些关键信息：入口文件的位置、用于存储编译文件的目录和要用于编译源文件的加载器。一般情况下，您可以使用这个文件作为-is，即使您不完全理解所有选项。
 
 #### 热模块替换
 
-要启用 **HMR**，请打开应用程序入口文件(`main.ts`)并添加以下 webpack 相关指令：
+要启用 **HMR**，请打开应用程序入口文件（__INLINE_CODE_40__）并添加以下webpack相关指令：
 
 ```typescript
-declare const module: any;
-
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(process.env.PORT ?? 3000);
-
-  if (module.hot) {
-    module.hot.accept();
-    module.hot.dispose(() => app.close());
-  }
-}
-bootstrap();
+const options = new DocumentBuilder().addOAuth2();
 ```
 
-为简化执行流程，请在 `package.json` 文件中添加一个脚本。
+为了简化执行过程，添加一个脚本到您的 __INLINE_CODE_41__ 文件中。
 
-```json
-"start:dev": "webpack --config webpack.config.js --watch"
+```typescript
+@ApiCookieAuth()
+@Controller('cats')
+export class CatsController {}
 ```
 
-现在只需打开命令行并运行以下命令：
+现在，您只需在命令行中运行以下命令：
 
-```bash
-$ npm run start:dev
+```typescript
+const options = new DocumentBuilder().addCookieAuth('optional-session-id');
 ```
 
 #### 示例
 
-一个可用的示例[在此处](https://github.com/nestjs/nest/tree/master/sample/08-webpack)查看。
+有一个可工作的示例可在 __LINK_45__ 中找到。

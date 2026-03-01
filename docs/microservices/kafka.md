@@ -1,5 +1,5 @@
 <!-- 此文件从 content/microservices/kafka.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-24T02:57:06.461Z -->
+<!-- 生成时间: 2026-03-01T04:22:35.722Z -->
 <!-- 源文件: content/microservices/kafka.md -->
 
 ### Kafka
@@ -24,7 +24,7 @@ $ npm i --save kafkajs
 
 Like other Nest microservice transport layer implementations, you select the Kafka transporter mechanism using the `transport` property of the options object passed to the `createMicroservice()` method, along with an optional `options` property, as shown below:
 
-```typescript title="main"
+```typescript
 const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
   transport: Transport.KAFKA,
   options: {
@@ -86,7 +86,7 @@ The `options` property is specific to the chosen transporter. The <strong>Kafka<
     <td><code>producer</code></td>
     <td>Producer configuration options (read more
       <a
-        href="https://kafka.js.org/docs/producing#选项"
+        href="https://kafka.js.org/docs/producing#options"
         rel="nofollow"
         target="blank"
         >here</a
@@ -96,7 +96,7 @@ The `options` property is specific to the chosen transporter. The <strong>Kafka<
     <td><code>send</code></td>
     <td>Send configuration options (read more
       <a
-        href="https://kafka.js.org/docs/producing#选项"
+        href="https://kafka.js.org/docs/producing#options"
         rel="nofollow"
         target="blank"
         >here</a
@@ -116,9 +116,9 @@ The `options` property is specific to the chosen transporter. The <strong>Kafka<
 
 There is a small difference in Kafka compared to other microservice transporters. Instead of the `ClientProxy` class, we use the `ClientKafkaProxy` class.
 
-Like other microservice transporters, you have <a href="./microservices/basics#客户端">several options</a> for creating a `ClientKafkaProxy` instance.
+Like other microservice transporters, you have <a href="/microservices/basics#client">several options</a> for creating a `ClientKafkaProxy` instance.
 
-One method for creating an instance is to use the `ClientsModule`. To create a client instance with the `ClientsModule`, import it and use the `register()` method to pass an options object with the same properties shown above in the `createMicroservice()` method, as well as a `name` property to be used as the injection token. Read more about `ClientsModule` <a href="./microservices/basics#客户端">here</a>.
+One method for creating an instance is to use the `ClientsModule`. To create a client instance with the `ClientsModule`, import it and use the `register()` method to pass an options object with the same properties shown above in the `createMicroservice()` method, as well as a `name` property to be used as the injection token. Read more about `ClientsModule` <a href="/microservices/basics#client">here</a>.
 
 ```typescript
 @Module({
@@ -143,7 +143,7 @@ One method for creating an instance is to use the `ClientsModule`. To create a c
 })
 ```
 
-Other options to create a client (either `ClientProxyFactory` or `@Client()`) can be used as well. You can read about them <a href="./microservices/basics#客户端">here</a>.
+Other options to create a client (either `ClientProxyFactory` or `@Client()`) can be used as well. You can read about them <a href="/microservices/basics#client">here</a>.
 
 Use the `@Client()` decorator as follows:
 
@@ -177,11 +177,11 @@ To prevent the `ClientKafkaProxy` consumers from losing response messages, a Nes
 
 #### Message response subscription
 
-> warning **Note** This section is only relevant if you use [request-response](/microservices/basics#请求-响应) message style (with the `@MessagePattern` decorator and the `ClientKafkaProxy.send` method). Subscribing to the response topic is not necessary for the [event-based](/microservices/basics#event-based) communication (`@EventPattern` decorator and `ClientKafkaProxy.emit` method).
+> warning **Note** This section is only relevant if you use [request-response](/microservices/basics#request-response) message style (with the `@MessagePattern` decorator and the `ClientKafkaProxy.send` method). Subscribing to the response topic is not necessary for the [event-based](/microservices/basics#event-based) communication (`@EventPattern` decorator and `ClientKafkaProxy.emit` method).
 
 The `ClientKafkaProxy` class provides the `subscribeToResponseOf()` method. The `subscribeToResponseOf()` method takes a request's topic name as an argument and adds the derived reply topic name to a collection of reply topics. This method is required when implementing the message pattern.
 
-```typescript title="heroes.controller"
+```typescript
 onModuleInit() {
   this.client.subscribeToResponseOf('hero.kill.dragon');
 }
@@ -189,7 +189,7 @@ onModuleInit() {
 
 If the `ClientKafkaProxy` instance is created asynchronously, the `subscribeToResponseOf()` method must be called before calling the `connect()` method.
 
-```typescript title="heroes.controller"
+```typescript
 async onModuleInit() {
   this.client.subscribeToResponseOf('hero.kill.dragon');
   await this.client.connect();
@@ -204,7 +204,7 @@ Nest receives incoming Kafka messages as an object with `key`, `value`, and `hea
 
 Nest sends outgoing Kafka messages after a serialization process when publishing events or sending messages. This occurs on arguments passed to the `ClientKafkaProxy` `emit()` and `send()` methods or on values returned from a `@MessagePattern` method. This serialization "stringifies" objects that are not strings or buffers by using `JSON.stringify()` or the `toString()` prototype method.
 
-```typescript title="heroes.controller"
+```typescript
 @Controller()
 export class HeroesController {
   @MessagePattern('hero.kill.dragon')
@@ -223,7 +223,7 @@ export class HeroesController {
 
 Outgoing messages can also be keyed by passing an object with the `key` and `value` properties. Keying messages is important for meeting the [co-partitioning requirement](https://docs.confluent.io/current/ksql/docs/developer-guide/partition-data.html#co-partitioning-requirements).
 
-```typescript title="heroes.controller"
+```typescript
 @Controller()
 export class HeroesController {
   @MessagePattern('hero.kill.dragon')
@@ -250,7 +250,7 @@ export class HeroesController {
 
 Additionally, messages passed in this format can also contain custom headers set in the `headers` hash property. Header hash property values must be either of type `string` or type `Buffer`.
 
-```typescript title="heroes.controller"
+```typescript
 @Controller()
 export class HeroesController {
   @MessagePattern('hero.kill.dragon')
@@ -343,7 +343,7 @@ async killDragon(@Payload() message: KillDragonMessage, @Ctx() context: KafkaCon
 
 The Kafka microservice components append a description of their respective role onto the `client.clientId` and `consumer.groupId` options to prevent collisions between Nest microservice client and server components. By default the `ClientKafkaProxy` components append `-client` and the `ServerKafka` components append `-server` to both of these options. Note how the provided values below are transformed in that way (as shown in the comments).
 
-```typescript title="main"
+```typescript
 const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
   transport: Transport.KAFKA,
   options: {
@@ -360,7 +360,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 
 And for the client:
 
-```typescript title="heroes.controller"
+```typescript
 @Client({
   transport: Transport.KAFKA,
   options: {
@@ -380,7 +380,7 @@ client: ClientKafkaProxy;
 
 Since the Kafka microservice message pattern utilizes two topics for the request and reply channels, a reply pattern should be derived from the request topic. By default, the name of the reply topic is the composite of the request topic name with `.reply` appended.
 
-```typescript title="heroes.controller"
+```typescript
 onModuleInit() {
   this.client.subscribeToResponseOf('hero.get'); // hero.get.reply
 }
@@ -519,11 +519,18 @@ async handleUserCreated(@Payload() data: IncomingMessage, @Ctx() context: KafkaC
   const consumer = context.getConsumer();
   await consumer.commitOffsets([{ topic, partition, offset }])
 }
+
+  const { offset } = context.getMessage();
+  const partition = context.getPartition();
+  const topic = context.getTopic();
+  const consumer = context.getConsumer();
+  await consumer.commitOffsets([{ topic, partition, offset }])
+}
 ```
 
 To disable auto-committing of messages set `autoCommit: false` in the `run` configuration, as follows:
 
-```typescript title="main"
+```typescript
 const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
   transport: Transport.KAFKA,
   options: {

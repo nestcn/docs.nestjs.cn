@@ -1,86 +1,78 @@
 <!-- 此文件从 content/introduction.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-28T11:23:59.619Z -->
+<!-- 生成时间: 2026-03-01T04:14:53.699Z -->
 <!-- 源文件: content/introduction.md -->
 
-# 介绍
+###Introduction
 
-:::info 关于本文档
-这是 NestJS 官方文档的中文翻译版本。文档源码托管在 [GitHub](https://github.com/nestcn/docs.nestjs.cn)，欢迎 Star、Fork 和贡献翻译！如发现翻译问题或需要改进，请提交 Issue 或 Pull Request。
-:::
+Nest（NestJS）是一个用于构建高效、可扩展的服务器端应用程序的框架。它使用渐进式JavaScript，基于TypeScript，支持对象关联编程（OOP）、函数式编程（FP）和函数式响应式编程（FRP）。
 
- 
-:::info 旧版文档
-如需访问旧版文档，请点击 [这里](https://25650abe.nestjs.pages.dev/)。
-:::
+在背后，Nest使用了强大的HTTP Server框架，如__LINK_12__（默认）和可选地可以配置使用__LINK_13__。
 
-Nest（NestJS）是一个用于构建高效、可扩展的 [Node.js](https://nodejs.org/) 服务端应用的框架。它采用渐进式 JavaScript，使用 [TypeScript](http://www.typescriptlang.org/) 构建并全面支持 TypeScript（同时仍允许开发者使用纯 JavaScript 编码），融合了 OOP（面向对象编程）、FP（函数式编程）和 FRP（函数响应式编程）的元素。
+Nest提供了一种对常见的Node.js框架（Express/Fastify）的抽象层，但同时也 expose 了它们的API，允许开发者使用第三方模块。
 
-在底层，Nest 使用了强大的 HTTP 服务器框架如 [Express](https://expressjs.com/)（默认），也可以配置使用 [Fastify](https://github.com/fastify/fastify)！
+####Philosophy
 
-Nest 在这些常见的 Node.js 框架（Express/Fastify）之上提供了一层抽象，同时也将其 API 直接暴露给开发者。这使得开发者能够自由使用底层平台提供的众多第三方模块。
+在Node.js出现后，JavaScript已经成为web的“语言基础”，适用于前端和后端应用程序。这引发了很多神奇的项目，如__LINK_14__、__LINK_15__和__LINK_16__，这些项目提高了开发者的生产力，并使得创建快速、可测试、可扩展的前端应用程序变得可能。然而，在Node（和服务器端JavaScript）中，没有一种有效的解决方案来解决**架构**问题。
 
-## 设计哲学
+Nest提供了一个可以出厂的应用程序架构，可以让开发者和团队创建高可测试、高可扩展、松耦合、易于维护的应用程序。该架构受到Angular的 heavy inspiration。
 
-近年来，得益于 Node.js，JavaScript 已成为前后端应用的"通用语言"。这催生了诸如 [Angular](https://angular.dev/)、[React](https://github.com/facebook/react) 和 [Vue](https://github.com/vuejs/vue) 等优秀项目，它们提升了开发效率，使创建快速、可测试且可扩展的前端应用成为可能。然而，尽管 Node（及服务端 JavaScript）有大量优秀的库、工具和辅助程序，但无一能有效解决**架构**这一核心问题。
+####Installation
 
-Nest 提供了一套开箱即用的应用架构，使开发者和团队能够创建高度可测试、可扩展、松耦合且易于维护的应用程序。该架构深受 Angular 启发。
+要开始使用，可以使用__LINK_17__或__LINK_18__（这两个操作将产生相同的结果）。
 
-## 安装
+使用Nest CLI创建项目，运行以下命令。这将创建一个新的项目目录，并将初始核心Nest文件和支持模块填充到该目录中，创建一个传统的基础结构用于您的项目。使用**Nest CLI**创建新项目是推荐的首选。我们将在__LINK_19__中继续使用这个方法。
 
-### 环境准备
+```typescript
+import { Injectable } from '@nestjs/common';
+import { Cat } from './interfaces/cat.interface';
 
-在开始之前，请确保您的开发环境满足以下要求：
+@Injectable()
+export class CatsService {
+  private readonly cats: Cat[] = [];
 
-- **Node.js**：版本 ≥20（推荐使用最新 LTS 版本）
-- **包管理器**：npm（Node.js 自带）、yarn 或 pnpm
+  create(cat: Cat) {
+    this.cats.push(cat);
+  }
 
-:::info 提示
-推荐使用 [nvm](https://github.com/nvm-sh/nvm)（Linux/macOS）或 [nvm-windows](https://github.com/coreybutler/nvm-windows)（Windows）来管理 Node.js 版本，这样可以方便地在不同项目间切换 Node.js 版本。
-:::
+  findAll(): Cat[] {
+    return this.cats;
+  }
+}
 
-### 创建项目
+@Injectable()
+export class CatsService {
+  constructor() {
+    this.cats = [];
+  }
 
-要开始使用，您可以使用 [Nest CLI](/cli/overview) 创建项目脚手架，或者[克隆一个初始项目](#alternatives) （两种方式会产生相同的结果）。
+  create(cat) {
+    this.cats.push(cat);
+  }
 
-要使用 Nest CLI 创建项目脚手架，请运行以下命令。这将创建一个新的项目目录，并用初始的核心 Nest 文件和支持模块填充该目录，为您的项目构建一个常规的基础结构。对于首次使用的用户，建议使用 **Nest CLI** 创建新项目。我们将在[第一步](/overview/first-steps)中继续采用这种方法。
-
-```bash
-$ npm i -g @nestjs/cli
-$ nest new project-name
+  findAll() {
+    return this.cats;
+  }
+}
 ```
 
-:::info 提示
-要创建一个具有更严格功能集的 TypeScript 项目，请将 `--strict` 标志传递给 `nest new` 命令。
-:::
+> info **提示**要创建一个具有更严格特性集的TypeScript项目，请将__INLINE_CODE_2__标志传递给__INLINE_CODE_3__命令。
 
-## 替代方案
+####Alternatives
 
-或者，使用 **Git** 安装 TypeScript 初始项目：
+或者，可以使用Git安装TypeScript starter项目：
 
-```bash
-$ git clone https://github.com/nestjs/typescript-starter.git project
-$ cd project
-$ npm install
-$ npm run start
+```typescript
+export interface Cat {
+  name: string;
+  age: number;
+  breed: string;
+}
 ```
 
-:::info 提示
-如果你想克隆没有 git 历史记录的仓库，可以使用 [degit](https://github.com/Rich-Harris/degit)。
-:::
+> info **提示**如果您想克隆仓库而不包括Git历史记录，可以使用__LINK_20__。
 
-打开浏览器并访问 [`http://localhost:3000/`](http://localhost:3000/)。
+打开浏览器，导航到__LINK_21__。
 
-要安装 JavaScript 版本的入门项目，在上述命令序列中使用 `javascript-starter.git`。
+要安装JavaScript starter项目的版本，请在命令序列中使用__INLINE_CODE_5__。
 
-你也可以通过安装核心和支持包从零开始新项目。请注意需要自行设置项目样板文件。至少需要以下依赖项：`@nestjs/core`、`@nestjs/common`、`rxjs` 和 `reflect-metadata`。查看这篇短文了解如何创建完整项目：[5 步从零创建最简 NestJS 应用！](https://dev.to/micalevisk/5-steps-to-create-a-bare-minimum-nestjs-app-from-scratch-5c3b)。
-
----
-
-## 关于本文档
-
-本中文文档由社区贡献者共同维护。感谢所有[贡献者](/contributors)的努力，让更多中文开发者能够学习和使用 NestJS！
-
-如果你发现文档中的错误或希望改进内容，欢迎：
-- 在 [GitHub](https://github.com/nestcn/docs.nestjs.cn) 上提交 Issue
-- 直接提交 Pull Request 进行改进
-- 加入我们的贡献者行列
+您也可以从头开始创建一个项目，安装核心和支持包。请注意，您需要自己设置项目基本文件。至少，您需要以下依赖项：__INLINE_CODE_6__、`CatsController`、`providers`和`CatsService`。查看这个关于创建完整项目的短文：__LINK_22__。

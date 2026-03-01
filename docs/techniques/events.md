@@ -1,174 +1,119 @@
 <!-- 此文件从 content/techniques/events.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-28T11:23:59.619Z -->
+<!-- 生成时间: 2026-03-01T04:18:09.684Z -->
 <!-- 源文件: content/techniques/events.md -->
 
 ### 事件
 
-[事件发射器](https://www.npmjs.com/package/@nestjs/event-emitter)包（`@nestjs/event-emitter`）提供了一个简单的观察者实现，允许您订阅和监听应用程序中发生的各种事件。事件是实现应用程序各模块解耦的绝佳方式，因为单个事件可以拥有多个彼此独立的监听器。
+`__LINK_51__` 包（`__INLINE_CODE_11__`）提供了一个简单的观察者实现，允许您订阅和监听应用程序中发生的各种事件。事件作为应用程序的分离方式，允许多个事件监听器独立地工作，不依赖于彼此。
 
-`EventEmitterModule` 内部使用了 [eventemitter2](https://github.com/EventEmitter2/EventEmitter2) 包。
+`__INLINE_CODE_12__` 内部使用 `__LINK_52__` 包。
 
-#### 快速开始
+#### 开 始
 
-首先安装所需包：
+首先，安装所需的包：
 
-```shell
-$ npm i --save @nestjs/event-emitter
+```
+```bash
+$ npm i csrf-csrf
 ```
 
-安装完成后，将 `EventEmitterModule` 导入根模块 `AppModule`，并运行静态方法 `forRoot()`，如下所示：
+安装完成后，在根 `__INLINE_CODE_14__` 中导入 `__INLINE_CODE_13__`，然后运行 `__INLINE_CODE_15__` 静态方法，例如：
 
+```
 ```typescript
-import { Module } from '@nestjs/common';
-import { EventEmitterModule } from '@nestjs/event-emitter';
-
-@Module({
-  imports: [
-    EventEmitterModule.forRoot()
-  ],
-})
-export class AppModule {}
+import { doubleCsrf } from 'csrf-csrf';
+// ...
+// somewhere in your initialization file
+const {
+  invalidCsrfTokenError, // This is provided purely for convenience if you plan on creating your own middleware.
+  generateToken, // Use this in your routes to generate and provide a CSRF hash, along with a token cookie and token.
+  validateRequest, // Also a convenience if you plan on making your own middleware.
+  doubleCsrfProtection, // This is the default CSRF protection middleware.
+} = doubleCsrf(doubleCsrfOptions);
+app.use(doubleCsrfProtection);
 ```
 
-`.forRoot()` 调用会初始化事件发射器并注册应用中存在的所有声明式事件监听器。注册过程发生在 `onApplicationBootstrap` 生命周期钩子时，确保所有模块都已加载并声明了任何计划任务。
+`__INLINE_CODE_16__` 调用初始化事件 emitter，并注册任何在应用程序中存在的声明式事件监听器。注册发生在 `__INLINE_CODE_17__` 生命周期钩子中，该钩子确保所有模块已经加载并声明了任何已安排的工作。
 
-要配置底层的 `EventEmitter` 实例，请将配置对象传递给 `.forRoot()` 方法，如下所示：
+要配置 underlying `__INLINE_CODE_18__` 实例，请将配置对象传递给 `__INLINE_CODE_19__` 方法，例如：
 
-```typescript
-EventEmitterModule.forRoot({
-  // 设置为 `true` 以使用通配符
-  wildcard: false,
-  // 用于分割命名空间的分隔符
-  delimiter: '.',
-  // 如果您希望触发 newListener 事件，请设置为 `true`
-  newListener: false,
-  // 如果您希望触发 removeListener 事件，请设置为 `true`
-  removeListener: false,
-  // 可以分配给事件的最大监听器数量
-  maxListeners: 10,
-  // 当监听器数量超过最大值时，在内存泄漏消息中显示事件名称
-  verboseMemoryLeak: false,
-  // 当错误事件被触发且没有监听器时，禁用抛出 uncaughtException
-  ignoreErrors: false,
-});
+```
+```bash
+$ npm i --save @fastify/csrf-protection
 ```
 
-#### 事件派发
+#### 发送事件
 
-要派发（即触发）一个事件，首先使用标准的构造函数注入方式注入 `EventEmitter2`：
+要发送（即触发）事件，首先使用标准构造函数注入 `__INLINE_CODE_20__`：
 
+```
 ```typescript
-constructor(private eventEmitter: EventEmitter2) {}
+import fastifyCsrf from '@fastify/csrf-protection';
+// ...
+// somewhere in your initialization file after registering some storage plugin
+await app.register(fastifyCsrf);
 ```
 
-:::info 提示
-从 `@nestjs/event-emitter` 包中导入 `EventEmitter2`。
-:::
+> 提示：从 `__LINK_52__` 包中导入 `__INLINE_CODE_21__`。
 
-然后在类中按如下方式使用：
+然后，在类中使用它，例如：
 
-```typescript
-this.eventEmitter.emit(
-  'order.created',
-  new OrderCreatedEvent({
-    orderId: 1,
-    payload: {},
-  })
-);
+```
+__CODE_BLOCK_4__
 ```
 
 #### 监听事件
 
-要声明事件监听器，请在包含待执行代码的方法定义前使用 `@OnEvent()` 装饰器进行修饰，如下所示：
+要声明事件监听器，使用 `__INLINE_CODE_23__` 装饰器在方法定义中添加代码，例如：
 
-```typescript
-@OnEvent('order.created')
-handleOrderCreatedEvent(payload: OrderCreatedEvent) {
-  // 处理和处理 "OrderCreatedEvent" 事件
-}
+```
+__CODE_BLOCK_5__
 ```
 
-:::warning 警告
-事件订阅者不能是请求作用域的。
-:::
+> 警告：事件订阅者不能是请求作用域。
 
-第一个参数可以是简单事件发射器的 `string` 或 `symbol`，在通配符发射器情况下则是 `string | symbol | Array<string | symbol>` 。
+第一个参数可以是一个 `__INLINE_CODE_24__` 或 `__INLINE_CODE_25__`，用于简单的事件 emitter 和一个 `__INLINE_CODE_26__`，用于通配符 emitter。
 
-第二个参数（可选）是如下所示的监听器选项对象：
+第二个参数（可选）是监听选项对象，例如：
 
-```typescript
-export type OnEventOptions = OnOptions & {
-  /**
-   * 如果为 "true"，则将给定的监听器前置（而非追加）到监听器数组中。
-   *
-   * @see https://github.com/EventEmitter2/EventEmitter2#emitterprependlistenerevent-listener-options
-   *
-   * @default false
-   */
-  prependListener?: boolean;
-
-  /**
-   * 如果为 "true"，onEvent 回调在处理事件时不会抛出错误。如果为 "false"，则会抛出错误。
-   *
-   * @default true
-   */
-  suppressErrors?: boolean;
-};
+```
+__CODE_BLOCK_6__
 ```
 
-:::info 提示
-了解更多关于 `OnOptions` 选项对象的信息，请参阅 [`eventemitter2`](https://github.com/EventEmitter2/EventEmitter2#emitteronevent-listener-options-objectboolean)。
-:::
+> 提示：了解更多关于 `__INLINE_CODE_27__` 选项对象的信息，可以查看 `__LINK_53__`。
 
-```typescript
-@OnEvent('order.created', { async: true })
-handleOrderCreatedEvent(payload: OrderCreatedEvent) {
-  // 处理和处理 "OrderCreatedEvent" 事件
-}
+```
+__CODE_BLOCK_7__
 ```
 
-要使用命名空间/通配符，请将 `wildcard` 选项传入 `EventEmitterModule#forRoot()` 方法。启用命名空间/通配符后，事件可以是分隔符分隔的字符串(`foo.bar`)或数组(`['foo', 'bar']`)。分隔符也可作为配置属性(`delimiter`)进行配置。启用命名空间功能后，您可以使用通配符订阅事件：
+要使用命名空间/通配符，请将 `__INLINE_CODE_29__` 选项传递给 `__INLINE_CODE_30__` 方法。启用命名空间/通配符时，可以使用字符串（__INLINE_CODE_31__）或数组（__INLINE_CODE_32__）来订阅事件。分隔符也可以作为配置属性（__INLINE_CODE_33__）。启用命名空间功能后，可以使用通配符订阅事件：
 
-```typescript
-@OnEvent('order.*')
-handleOrderEvents(payload: OrderCreatedEvent | OrderRemovedEvent | OrderUpdatedEvent) {
-  // 处理和处理事件
-}
+```
+__CODE_BLOCK_8__
 ```
 
-请注意，此类通配符仅适用于单个区块。参数 `order.*` 将匹配例如事件 `order.created` 和 `order.shipped`，但不会匹配 `order.delayed.out_of_stock`。要监听此类事件，请使用`多级通配符`模式（即 `**`），详见 `EventEmitter2` [文档](https://github.com/EventEmitter2/EventEmitter2#multi-level-wildcards) 。
+注意，这种通配符仅适用于一个块。例如，`__INLINE_CODE_34__` 将匹配 `__INLINE_CODE_35__` 和 `__INLINE_CODE_36__` 事件，但不是 `__INLINE_CODE_37__` 事件。要监听这种事件，可以使用 `__INLINE_CODE_38__` 模式（即 `__INLINE_CODE_39__`），如 `__LINK_54__` 中所述。
 
-通过此模式，您可以创建捕获所有事件的事件监听器。
+使用该模式，可以创建一个事件监听器，该监听器可以捕捉所有事件。
 
-```typescript
-@OnEvent('**')
-handleEverything(payload: any) {
-  // 处理和处理事件
-}
+```
+__CODE_BLOCK_9__
 ```
 
-:::info 提示
-`EventEmitter2` 类提供了多个实用方法来处理事件，例如 `waitFor` 和 `onAny`。您可以点击[此处](https://github.com/EventEmitter2/EventEmitter2)了解更多信息。
-:::
+> 提示：`__INLINE_CODE_41__` 类提供了一些有用的方法来与事件交互，例如 `__INLINE_CODE_42__` 和 `__INLINE_CODE_43__`。可以在 `__LINK_55__` 中阅读更多信息。
 
 #### 防止事件丢失
 
-在 `onApplicationBootstrap` 生命周期钩子之前或期间触发的事件（例如来自模块构造函数或 `onModuleInit` 方法的事件）可能会被遗漏，因为 `EventSubscribersLoader` 可能尚未完成监听器的设置。
+在 `__INLINE_CODE_44__` 生命周期钩子之前或在钩子中触发的事件（例如来自模块构造函数或 `__INLINE_CODE_45__` 方法）可能会被miss，因为 `__INLINE_CODE_46__` 可能还没有完成设置监听器。
 
-为避免此问题，您可以使用 `EventEmitterReadinessWatcher` 的 `waitUntilReady` 方法，该方法返回一个在所有监听器注册完成后解析的 Promise。可以在模块的 `onApplicationBootstrap` 生命周期钩子中调用此方法，以确保所有事件都能被正确捕获。
+要避免这个问题，可以使用 `__INLINE_CODE_47__` 方法，返回一个promise，该promise在所有监听器注册完成时resolve。该方法可以在模块的 `__INLINE_CODE_49__` 生命周期钩子中调用，以确保所有事件都被捕捉。
 
-```typescript
-await this.eventEmitterReadinessWatcher.waitUntilReady();
-this.eventEmitter.emit(
-  'order.created',
-  new OrderCreatedEvent({ orderId: 1, payload: {} })
-);
+```
+__CODE_BLOCK_10__
 ```
 
-:::info 注意
-这仅适用于在 `onApplicationBootstrap` 生命周期钩子完成之前发出的事件。
-:::
+> 注意：这只是必要的，因为在 `__INLINE_CODE_50__` 生命周期钩子完成之前发出的事件可能会被miss。
 
 #### 示例
 
-一个可用的示例[在此处](https://github.com/nestjs/nest/tree/master/sample/30-event-emitter)查看。
+有一个工作示例可在 `__LINK_56__` 中查看。

@@ -1,290 +1,137 @@
 <!-- 此文件从 content/graphql/scalars.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-28T11:23:59.619Z -->
+<!-- 生成时间: 2026-03-01T04:24:31.179Z -->
 <!-- 源文件: content/graphql/scalars.md -->
 
-### 标量类型
+### Scalars
 
-GraphQL 对象类型具有名称和字段，但这些字段最终需要解析为具体数据。这就是标量类型的作用：它们表示查询的叶节点（了解更多[此处](https://graphql.org/learn/schema/#scalar-types) ）。GraphQL 默认包含以下类型：`Int`、`Float`、`String`、`Boolean` 和 `ID`。除了这些内置类型，您可能还需要支持自定义原子数据类型（例如 `Date`）。
+GraphQL 对象类型有一个名称和字段，但是有一些时候那些字段必须_resolve_到某些具体数据。Scalar 类型就是这些数据的代表：它们是查询的叶子节点（详见 __LINK_80__）。 GraphQL 包括以下默认类型：__INLINE_CODE_20__、__INLINE_CODE_21__、__INLINE_CODE_22__、__INLINE_CODE_23__ 和 __INLINE_CODE_24__。除了这些内置类型外，您可能需要支持自定义原子数据类型（例如、__INLINE_CODE_25__）。
 
-#### 代码优先
+#### Code first
 
-代码优先方法内置了五种标量类型，其中三种是现有 GraphQL 类型的简单别名。
+代码优先方法提供了五个 scalar，其中三者是对现有 GraphQL 类型的简单别名。
 
-- `ID`（`GraphQLID` 的别名）——表示唯一标识符，通常用于重新获取对象或作为缓存键
-- `Int`（`GraphQLInt` 的别名）- 有符号 32 位整数
-- `Float`（`GraphQLFloat` 的别名）- 有符号双精度浮点数值
-- `GraphQLISODateTime` - UTC 时区的日期时间字符串（默认用于表示 `Date` 类型）
-- `GraphQLTimestamp` - 有符号整数，表示从 UNIX 纪元开始计算的毫秒数
+- __INLINE_CODE_26__（别名为 __INLINE_CODE_27__）- 代表一个唯一标识符，通常用于重新获取对象或作为缓存的键
+- __INLINE_CODE_28__（别名为 __INLINE_CODE_29__）- 一个有符号的 32 位整数
+- __INLINE_CODE_30__（别名为 __INLINE_CODE_31__）- 一个有符号的双精度浮点值
+- __INLINE_CODE_32__ - 一个 UTC 日期时间字符串（用于默认表示 __INLINE_CODE_33__ 类型）
+- __INLINE_CODE_34__ - 一个有符号的整数，表示 UNIX epoch 的毫秒数
 
-默认使用 `GraphQLISODateTime`（例如 `2019-12-03T09:54:33Z`）来表示 `Date` 类型。若要改用 `GraphQLTimestamp`，需将 `buildSchemaOptions` 对象的 `dateScalarMode` 属性设置为 `'timestamp'`，如下所示：
+__INLINE_CODE_35__（例如、__INLINE_CODE_36__）用于默认表示 __INLINE_CODE_37__ 类型。要使用 __INLINE_CODE_38__ 而不是 __INLINE_CODE_39__，请将 __INLINE_CODE_40__ 对象的 __INLINE_CODE_41__ 设置为 __INLINE_CODE_42__，如下所示：
+
+```typescript
+import { FieldMiddleware, MiddlewareContext, NextFn } from '@nestjs/graphql';
+
+const loggerMiddleware: FieldMiddleware = async (
+  ctx: MiddlewareContext,
+  next: NextFn,
+) => {
+  const value = await next();
+  console.log(value);
+  return value;
+};
+```
+
+类似地，__INLINE_CODE_42__用于默认表示 __INLINE_CODE_43__ 类型。要使用 __INLINE_CODE_44__ 而不是 __INLINE_CODE_45__，请将 __INLINE_CODE_46__ 对象的 __INLINE_CODE_47__ 设置为 __INLINE_CODE_48__，如下所示：
+
+```typescript
+@ObjectType()
+export class Recipe {
+  @Field({ middleware: [loggerMiddleware] })
+  title: string;
+}
+```
+
+此外，您还可以创建自定义 scalar。
+
+#### Override a default scalar
+
+要创建一个自定义的 __INLINE_CODE_48__ scalar，简单地创建一个新类。
+
+```typescript
+const value = await next();
+return value?.toUpperCase();
+```
+
+然后，注册 __INLINE_CODE_49__ 作为提供者。
+
+```typescript
+@ResolveField(() => String, { middleware: [loggerMiddleware] })
+title() {
+  return 'Placeholder';
+}
+```
+
+现在，我们可以在我们的类中使用 __INLINE_CODE_50__ 类型。
 
 ```typescript
 GraphQLModule.forRoot({
+  autoSchemaFile: 'schema.gql',
   buildSchemaOptions: {
-    dateScalarMode: 'timestamp',
-  }
-}),
-```
-
-同理，默认使用 `GraphQLFloat` 来表示 `number` 类型。若要改用 `GraphQLInt`，需将 `buildSchemaOptions` 对象的 `numberScalarMode` 属性设置为 `'integer'`，如下所示：
-
-```typescript
-GraphQLModule.forRoot({
-  buildSchemaOptions: {
-    numberScalarMode: 'integer',
-  }
-}),
-```
-
-此外，您还可以创建自定义标量类型。
-
-#### 覆盖默认标量类型
-
-要为 `Date` 标量创建自定义实现，只需新建一个类即可。
-
-```typescript
-import { Scalar, CustomScalar } from '@nestjs/graphql';
-import { Kind, ValueNode } from 'graphql';
-
-@Scalar('Date', () => Date)
-export class DateScalar implements CustomScalar<number, Date> {
-  description = 'Date custom scalar type';
-
-  parseValue(value: number): Date {
-    return new Date(value); // value from the client
-  }
-
-  serialize(value: Date): number {
-    return value.getTime(); // value sent to the client
-  }
-
-  parseLiteral(ast: ValueNode): Date {
-    if (ast.kind === Kind.INT) {
-      return new Date(ast.value);
-    }
-    return null;
-  }
-}
-```
-
-完成此操作后，将 `DateScalar` 注册为提供程序。
-
-```typescript
-@Module({
-  providers: [DateScalar],
-})
-export class CommonModule {}
-```
-
-现在我们可以在类中使用 `Date` 类型。
-
-```typescript
-@Field()
-creationDate: Date;
-```
-
-#### 导入自定义标量
-
-要使用自定义标量类型，需将其作为解析器导入并注册。我们将以 `graphql-type-json` 包为例进行演示，这个 npm 包定义了一个 `JSON` 类型的 GraphQL 标量。
-
-首先安装该包：
-
-```bash
-$ npm i --save graphql-type-json
-```
-
-安装完成后，向 `forRoot()` 方法传入自定义解析器：
-
-```typescript
-import GraphQLJSON from 'graphql-type-json';
-
-@Module({
-  imports: [
-    GraphQLModule.forRoot({
-      resolvers: { JSON: GraphQLJSON },
-    }),
-  ],
-})
-export class AppModule {}
-```
-
-现在即可在类中使用 `JSON` 类型。
-
-```typescript
-@Field(() => GraphQLJSON)
-info: JSON;
-```
-
-如需获取一系列实用的标量类型，请查看 [graphql-scalars](https://www.npmjs.com/package/graphql-scalars) 包。
-
-#### 创建自定义标量
-
-要定义自定义标量，需新建一个 `GraphQLScalarType` 实例。我们将创建一个自定义的 `UUID` 标量。
-
-```typescript
-const regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-function validate(uuid: unknown): string | never {
-  if (typeof uuid !== 'string' || !regex.test(uuid)) {
-    throw new Error('invalid uuid');
-  }
-  return uuid;
-}
-
-export const CustomUuidScalar = new GraphQLScalarType({
-  name: 'UUID',
-  description: 'A simple UUID parser',
-  serialize: (value) => validate(value),
-  parseValue: (value) => validate(value),
-  parseLiteral: (ast) => validate(ast.value),
-});
-```
-
-我们向 `forRoot()` 方法传递了一个自定义解析器：
-
-```typescript
-@Module({
-  imports: [
-    GraphQLModule.forRoot({
-      resolvers: { UUID: CustomUuidScalar },
-    }),
-  ],
-})
-export class AppModule {}
-```
-
-现在我们可以在类中使用 `UUID` 类型了。
-
-```typescript
-@Field(() => CustomUuidScalar)
-uuid: string;
-```
-
-#### 模式优先
-
-要定义自定义标量类型（了解更多关于标量的信息[请点击这里](https://www.apollographql.com/docs/graphql-tools/scalars.html) ），需要创建一个类型定义和专用的解析器。这里（如同官方文档所示），我们将使用 `graphql-type-json` 包进行演示。这个 npm 包定义了一个 `JSON` GraphQL 标量类型。
-
-首先安装这个包：
-
-```bash
-$ npm i --save graphql-type-json
-```
-
-安装完成后，我们向 `forRoot()` 方法传递一个自定义解析器：
-
-```typescript
-import GraphQLJSON from 'graphql-type-json';
-
-@Module({
-  imports: [
-    GraphQLModule.forRoot({
-      typePaths: ['./**/*.graphql'],
-      resolvers: { JSON: GraphQLJSON },
-    }),
-  ],
-})
-export class AppModule {}
-```
-
-现在我们可以在类型定义中使用 `JSON` 标量：
-
-```graphql
-scalar JSON
-```
-
-type Foo {
-  field: JSON
-}
-```
-
-另一种定义标量类型的方法是创建一个简单的类。假设我们想要用 `Date` 类型增强我们的模式。
-
-```typescript
-import { Scalar, CustomScalar } from '@nestjs/graphql';
-import { Kind, ValueNode } from 'graphql';
-
-@Scalar('Date')
-export class DateScalar implements CustomScalar<number, Date> {
-  description = 'Date custom scalar type';
-
-  parseValue(value: number): Date {
-    return new Date(value); // value from the client
-  }
-
-  serialize(value: Date): number {
-    return value.getTime(); // value sent to the client
-  }
-
-  parseLiteral(ast: ValueNode): Date {
-    if (ast.kind === Kind.INT) {
-      return new Date(ast.value);
-    }
-    return null;
-  }
-}
-```
-
-完成这些后，将 `DateScalar` 注册为提供者。
-
-```typescript
-@Module({
-  providers: [DateScalar],
-})
-export class CommonModule {}
-```
-
-现在我们可以在类型定义中使用 `Date` 标量。
-
-```graphql
-scalar Date
-```
-
-默认情况下，所有标量生成的 TypeScript 定义都是 `any`——这并不具备良好的类型安全性。但当你指定类型生成方式时，可以配置 Nest 如何为自定义标量生成类型声明：
-
-```typescript
-import { GraphQLDefinitionsFactory } from '@nestjs/graphql';
-import { join } from 'path';
-
-const definitionsFactory = new GraphQLDefinitionsFactory();
-
-definitionsFactory.generate({
-  typePaths: ['./src/**/*.graphql'],
-  path: join(process.cwd(), 'src/graphql.ts'),
-  outputAs: 'class',
-  defaultScalarType: 'unknown',
-  customScalarTypeMapping: {
-    DateTime: 'Date',
-    BigNumber: '_BigNumber',
+    fieldMiddleware: [loggerMiddleware],
   },
-  additionalHeader: "import _BigNumber from 'bignumber.js'",
-});
+}),
 ```
 
-:::info 提示
-或者，你也可以使用类型引用，例如：`DateTime: Date`。这种情况下，`GraphQLDefinitionsFactory` 将提取指定类型的名称属性（`Date.name`）来生成 TS 定义。注意：对于非内置类型（自定义类型），需要添加对应的导入语句。
-:::
+#### Import a custom scalar
 
-现在，给定以下 GraphQL 自定义标量类型：
+要使用自定义 scalar，导入并注册它作为解析器。我们将使用 __INLINE_CODE_51__ 包作为示例。这个 npm 包定义了一个 __INLINE_CODE_52__ GraphQL scalar 类型。
 
-```graphql
-scalar DateTime
-scalar BigNumber
-scalar Payload
-```
+首先，安装包：
 
-我们将在 `src/graphql.ts` 中看到如下生成的 TypeScript 定义：
+__CODE_BLOCK_5__
 
-```typescript
-import _BigNumber from 'bignumber.js';
+安装完成后，我们将自定义解析器传递给 __INLINE_CODE_53__ 方法：
 
-export type DateTime = Date;
-export type BigNumber = _BigNumber;
-export type Payload = unknown;
-```
+__CODE_BLOCK_6__
 
-在此，我们使用了 `customScalarTypeMapping` 属性来提供我们希望为自定义标量声明的类型映射。我们还提供了一个 `additionalHeader` 属性，以便添加这些类型定义所需的任何导入项。最后，我们添加了一个默认标量类型 `defaultScalarType`，其值为 `'unknown'`，这样任何未在 `customScalarTypeMapping` 中指定的自定义标量都将被别名化为 `unknown` 而非 `any`（自 TypeScript 3.0 起[官方推荐](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-0.html#new-unknown-top-type)使用前者以增强类型安全性）。
+现在，我们可以在我们的类中使用 __INLINE_CODE_54__ 类型。
 
-:::info 注意
-我们已从 `bignumber.js` 导入了 `_BigNumber`；这是为了避免[循环类型引用](https://github.com/Microsoft/TypeScript/issues/12525#issuecomment-263166239) 。
-:::
+__CODE_BLOCK_7__
 
+#### Create a custom scalar
+
+要定义一个自定义 scalar，创建一个新 __INLINE_CODE_55__ 实例。我们将创建一个自定义 __INLINE_CODE_56__ scalar。
+
+__CODE_BLOCK_8__
+
+然后，我们将自定义解析器传递给 __INLINE_CODE_57__ 方法：
+
+__CODE_BLOCK_9__
+
+现在，我们可以在我们的类中使用 __INLINE_CODE_58__ 类型。
+
+__CODE_BLOCK_10__
+
+#### Schema first
+
+要定义一个自定义 scalar（详见关于 scalars 的更多信息 __LINK_82__），创建一个类型定义和一个专门的解析器。这里，我们将使用 __INLINE_CODE_59__ 包作为示例。这个 npm 包定义了一个 __INLINE_CODE_60__ GraphQL scalar 类型。
+
+首先，安装包：
+
+__CODE_BLOCK_11__
+
+安装完成后，我们将自定义解析器传递给 __INLINE_CODE_61__ 方法：
+
+__CODE_BLOCK_12__
+
+现在，我们可以在我们的类型定义中使用 __INLINE_CODE_62__ scalar。
+
+__CODE_BLOCK_13__
+
+另一种方法是创建一个简单的类。假设我们想以 __INLINE_CODE_63__ 类型增强我们的 schema。
+
+__CODE_BLOCK_14__
+
+然后，注册 __INLINE_CODE_64__ 作为提供者。
+
+__CODE_BLOCK_15__
+
+现在，我们可以在我们的类型定义中使用 __INLINE_CODE_65__ scalar。
+
+__CODE_BLOCK_16__
+
+默认情况下，Nest 生成的 TypeScript 定义将所有 scalar 定义为 __INLINE_CODE_66__ - 这不是特别类型安全的。但是，您可以配置 Nest 如何生成类型定义的自定义 scalar：
+
+__CODE_BLOCK_17__
+
+> info **Hint** 另外，您可以使用 type reference 来代替，例如：__INLINE_CODE_67__。在这种情况

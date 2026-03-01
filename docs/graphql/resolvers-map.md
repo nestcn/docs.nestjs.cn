@@ -1,5 +1,5 @@
 <!-- 此文件从 content/graphql/resolvers-map.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-24T02:58:12.183Z -->
+<!-- 生成时间: 2026-03-01T04:23:31.615Z -->
 <!-- 源文件: content/graphql/resolvers-map.md -->
 
 ### Resolvers
@@ -27,7 +27,7 @@ type Author {
 
 In this case, using the code first approach, we define schemas using TypeScript classes and using TypeScript decorators to annotate the fields of those classes. The equivalent of the above SDL in the code first approach is:
 
-```typescript title="authors/models/author.model"
+```typescript
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { Post } from './post';
 
@@ -81,7 +81,7 @@ For example:
 title: string;
 ```
 
-> info **Hint** You can also add a description to, or deprecate, the whole object type: `@ObjectType({ description: 'Author model' })`.
+> info **Hint** You can also add a description to, or deprecate, the whole object type: `@ObjectType({ description: 'Author model' }})`.
 
 When the field is an array, we must manually indicate the array type in the `Field()` decorator's type function, as shown below:
 
@@ -103,7 +103,7 @@ posts: Post[];
 
 Now that the `Author` object type is created, let's define the `Post` object type.
 
-```typescript title="posts/models/post.model"
+```typescript
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
@@ -133,7 +133,7 @@ type Post {
 
 At this point, we've defined the objects (type definitions) that can exist in our data graph, but clients don't yet have a way to interact with those objects. To address that, we need to create a resolver class. In the code first method, a resolver class both defines resolver functions **and** generates the **Query type**. This will be clear as we work through the example below:
 
-```typescript title="authors/authors.resolver"
+```typescript
 @Resolver(() => Author)
 export class AuthorsResolver {
   constructor(
@@ -156,7 +156,7 @@ export class AuthorsResolver {
 
 > info **Hint** All decorators (e.g., `@Resolver`, `@ResolveField`, `@Args`, etc.) are exported from the `@nestjs/graphql` package.
 
-You can define multiple resolver classes. Nest will combine these at run time. See the [module](/graphql/resolvers-map) section below for more on code organization.
+You can define multiple resolver classes. Nest will combine these at run time. See the [module](/graphql/resolvers#module) section below for more on code organization.
 
 > warning **Note** The logic inside the `AuthorsService` and `PostsService` classes can be as simple or sophisticated as needed. The main point of this example is to show how to construct resolvers and how they can interact with other providers.
 
@@ -195,7 +195,7 @@ type Query {
 
 Conventionally, we prefer to decouple these names; for example, we prefer to use a name like `getAuthor()` for our query handler method, but still use `author` for our query type name. The same applies to our field resolvers. We can easily do this by passing the mapping names as arguments of the `@Query()` and `@ResolveField()` decorators, as shown below:
 
-```typescript title="authors/authors.resolver"
+```typescript
 @Resolver(() => Author)
 export class AuthorsResolver {
   constructor(
@@ -226,7 +226,7 @@ type Query {
 
 #### Query decorator options
 
-The `@Query()` decorator's options object (where we pass `{name: 'author'}` above) accepts a number of key/value pairs:
+The `@Query()` decorator's options object (where we pass `{name: 'author'}}` above) accepts a number of key/value pairs:
 
 - `name`: name of the query; a `string`
 - `description`: a description that will be used to generate GraphQL schema documentation (e.g., in GraphQL playground); a `string`
@@ -235,7 +235,7 @@ The `@Query()` decorator's options object (where we pass `{name: 'author'}` abov
 
 #### Args decorator options
 
-Use the `@Args()` decorator to extract arguments from a request for use in the method handler. This works in a very similar fashion to [REST route parameter argument extraction](/controllers#路由参数).
+Use the `@Args()` decorator to extract arguments from a request for use in the method handler. This works in a very similar fashion to [REST route parameter argument extraction](/controllers#route-parameters).
 
 Usually, your `@Args()` decorator will be simple and not require an object argument, as seen with the `getAuthor()` method above. For example, if the type of an identifier is string, the following construction is sufficient, and simply plucks the named field from the inbound GraphQL request for use as a method argument.
 
@@ -281,7 +281,7 @@ With inline `@Args()` calls, code like the example above becomes bloated. Instea
 
 Create the `GetAuthorArgs` class using `@ArgsType()` as shown below:
 
-```typescript title="authors/dto/get-author.args"
+```typescript
 import { MinLength } from 'class-validator';
 import { Field, ArgsType } from '@nestjs/graphql';
 
@@ -490,7 +490,7 @@ The schema above exposes a single query - `author(id: Int!): Author`.
 
 Let's now create an `AuthorsResolver` class that resolves author queries:
 
-```typescript title="authors/authors.resolver"
+```typescript
 @Resolver('Author')
 export class AuthorsResolver {
   constructor(
@@ -551,7 +551,7 @@ type Query {
 
 Conventionally, we would prefer to decouple these, using names like `getAuthor()` or `getPosts()` for our resolver methods. We can easily do this by passing the mapping name as an argument to the decorator, as shown below:
 
-```typescript title="authors/authors.resolver"
+```typescript
 @Resolver('Author')
 export class AuthorsResolver {
   constructor(
@@ -578,7 +578,7 @@ export class AuthorsResolver {
 
 Assuming that we use the schema first approach and have enabled the typings generation feature (with `outputAs: 'class'` as shown in the [previous](/graphql/quick-start) chapter), once you run the application, it will generate the following file (in the location you specified in the `GraphQLModule.forRoot()` method). For example, in `src/graphql.ts`:
 
-```typescript title="graphql"
+```typescript
 export class Author {
   id: number;
   firstName?: string;
@@ -665,7 +665,7 @@ The only other thing you need to take care of is to **provide** (i.e., list as a
 
 For example, we can do this in an `AuthorsModule`, which can also provide other services needed in this context. Be sure to import `AuthorsModule` somewhere (e.g., in the root module, or some other module imported by the root module).
 
-```typescript title="authors/authors.module"
+```typescript
 @Module({
   imports: [PostsModule],
   providers: [AuthorsService, AuthorsResolver],

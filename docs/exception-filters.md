@@ -1,5 +1,5 @@
 <!-- 此文件从 content/exception-filters.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-24T02:49:46.281Z -->
+<!-- 生成时间: 2026-03-01T04:14:33.709Z -->
 <!-- 源文件: content/exception-filters.md -->
 
 ### Exception filters
@@ -27,7 +27,7 @@ Nest provides a built-in `HttpException` class, exposed from the `@nestjs/common
 
 For example, in the `CatsController`, we have a `findAll()` method (a `GET` route handler). Let's assume that this route handler throws an exception for some reason. To demonstrate this, we'll hard-code it as follows:
 
-```typescript title="cats.controller"
+```typescript
 @Get()
 async findAll() {
   throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
@@ -67,7 +67,7 @@ There is a **third** constructor argument (optional) - `options` - that can be u
 
 Here's an example overriding the entire response body and providing an error cause:
 
-```typescript title="cats.controller"
+```typescript
 @Get()
 async findAll() {
   try {
@@ -104,7 +104,7 @@ If you want to log these exceptions, you can create a custom exception filter. W
 
 In many cases, you will not need to write custom exceptions, and can use the built-in Nest HTTP exception, as described in the next section. If you do need to create customized exceptions, it's good practice to create your own **exceptions hierarchy**, where your custom exceptions inherit from the base `HttpException` class. With this approach, Nest will recognize your exceptions, and automatically take care of the error responses. Let's implement such a custom exception:
 
-```typescript title="forbidden.exception"
+```typescript
 export class ForbiddenException extends HttpException {
   constructor() {
     super('Forbidden', HttpStatus.FORBIDDEN);
@@ -114,7 +114,7 @@ export class ForbiddenException extends HttpException {
 
 Since `ForbiddenException` extends the base `HttpException`, it will work seamlessly with the built-in exception handler, and therefore we can use it inside the `findAll()` method.
 
-```typescript title="cats.controller"
+```typescript
 @Get()
 async findAll() {
   throw new ForbiddenException();
@@ -171,7 +171,7 @@ While the base (built-in) exception filter can automatically handle many cases f
 
 Let's create an exception filter that is responsible for catching exceptions which are an instance of the `HttpException` class, and implementing custom response logic for them. To do this, we'll need to access the underlying platform `Request` and `Response` objects. We'll access the `Request` object so we can pull out the original `url` and include that in the logging information. We'll use the `Response` object to take direct control of the response that is sent, using the `response.json()` method.
 
-```typescript title="http-exception.filter"
+```typescript
 import { ExceptionFilter, Catch, ArgumentsHost, HttpException } from '@nestjs/common';
 import { Request, Response } from 'express';
 
@@ -181,6 +181,24 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
+    const status = exception.getStatus();
+
+    response
+      .status(status)
+      .json({
+        statusCode: status,
+        timestamp: new Date().toISOString(),
+        path: request.url,
+      });
+  }
+}
+
+@Catch(HttpException)
+export class HttpExceptionFilter {
+  catch(exception, host) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse();
+    const request = ctx.getRequest();
     const status = exception.getStatus();
 
     response
@@ -204,7 +222,7 @@ The `@Catch(HttpException)` decorator binds the required metadata to the excepti
 
 Let's look at the parameters of the `catch()` method. The `exception` parameter is the exception object currently being processed. The `host` parameter is an `ArgumentsHost` object. `ArgumentsHost` is a powerful utility object that we'll examine further in the [execution context chapter](/fundamentals/execution-context)\*. In this code sample, we use it to obtain a reference to the `Request` and `Response` objects that are being passed to the original request handler (in the controller where the exception originates). In this code sample, we've used some helper methods on `ArgumentsHost` to get the desired `Request` and `Response` objects. Learn more about `ArgumentsHost` [here](/fundamentals/execution-context).
 
-\*The reason for this level of abstraction is that `ArgumentsHost` functions in all contexts (e.g., the HTTP server context we're working with now, but also Microservices and WebSockets). In the execution context chapter we'll see how we can access the appropriate <a href="./fundamentals/execution-context#host-methods">underlying arguments</a> for **any** execution context with the power of `ArgumentsHost` and its helper functions. This will allow us to write generic exception filters that operate across all contexts.
+\*The reason for this level of abstraction is that `ArgumentsHost` functions in all contexts (e.g., the HTTP server context we're working with now, but also Microservices and WebSockets). In the execution context chapter we'll see how we can access the appropriate <a href="/fundamentals/execution-context#host-methods">underlying arguments</a> for **any** execution context with the power of `ArgumentsHost` and its helper functions. This will allow us to write generic exception filters that operate across all contexts.
 
 <app-banner-courses></app-banner-courses>
 
@@ -212,7 +230,7 @@ Let's look at the parameters of the `catch()` method. The `exception` parameter 
 
 Let's tie our new `HttpExceptionFilter` to the `CatsController`'s `create()` method.
 
-```typescript title="cats.controller"
+```typescript
 @Post()
 @UseFilters(new HttpExceptionFilter())
 async create(@Body() createCatDto: CreateCatDto) {
@@ -224,7 +242,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 We have used the `@UseFilters()` decorator here. Similar to the `@Catch()` decorator, it can take a single filter instance, or a comma-separated list of filter instances. Here, we created the instance of `HttpExceptionFilter` in place. Alternatively, you may pass the class (instead of an instance), leaving responsibility for instantiation to the framework, and enabling **dependency injection**.
 
-```typescript title="cats.controller"
+```typescript
 @Post()
 @UseFilters(HttpExceptionFilter)
 async create(@Body() createCatDto: CreateCatDto) {
@@ -237,7 +255,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 In the example above, the `HttpExceptionFilter` is applied only to the single `create()` route handler, making it method-scoped. Exception filters can be scoped at different levels: method-scoped of the controller/resolver/gateway, controller-scoped, or global-scoped.
 For example, to set up a filter as controller-scoped, you would do the following:
 
-```typescript title="cats.controller"
+```typescript
 @Controller()
 @UseFilters(new HttpExceptionFilter())
 export class CatsController {}
@@ -247,7 +265,7 @@ This construction sets up the `HttpExceptionFilter` for every route handler defi
 
 To create a global-scoped filter, you would do the following:
 
-```typescript title="main"
+```typescript
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalFilters(new HttpExceptionFilter());
@@ -260,7 +278,7 @@ bootstrap();
 
 Global-scoped filters are used across the whole application, for every controller and every route handler. In terms of dependency injection, global filters registered from outside of any module (with `useGlobalFilters()` as in the example above) cannot inject dependencies since this is done outside the context of any module. In order to solve this issue, you can register a global-scoped filter **directly from any module** using the following construction:
 
-```typescript title="app.module"
+```typescript
 import { Module } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 
@@ -275,7 +293,7 @@ import { APP_FILTER } from '@nestjs/core';
 export class AppModule {}
 ```
 
-> info **Hint** When using this approach to perform dependency injection for the filter, note that regardless of the module where this construction is employed, the filter is, in fact, global. Where should this be done? Choose the module where the filter (`HttpExceptionFilter` in the example above) is defined. Also, `useClass` is not the only way of dealing with custom provider registration. Learn more [here](/fundamentals/dependency-injection).
+> info **Hint** When using this approach to perform dependency injection for the filter, note that regardless of the module where this construction is employed, the filter is, in fact, global. Where should this be done? Choose the module where the filter (`HttpExceptionFilter` in the example above) is defined. Also, `useClass` is not the only way of dealing with custom provider registration. Learn more [here](/fundamentals/custom-providers).
 
 You can add as many filters with this technique as needed; simply add each to the providers array.
 
@@ -330,13 +348,20 @@ Typically, you'll create fully customized exception filters crafted to fulfill y
 
 In order to delegate exception processing to the base filter, you need to extend `BaseExceptionFilter` and call the inherited `catch()` method.
 
-```typescript title="all-exceptions.filter"
+```typescript
 import { Catch, ArgumentsHost } from '@nestjs/common';
 import { BaseExceptionFilter } from '@nestjs/core';
 
 @Catch()
 export class AllExceptionsFilter extends BaseExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
+    super.catch(exception, host);
+  }
+}
+
+@Catch()
+export class AllExceptionsFilter extends BaseExceptionFilter {
+  catch(exception, host) {
     super.catch(exception, host);
   }
 }
@@ -360,4 +385,4 @@ async function bootstrap() {
 bootstrap();
 ```
 
-The second method is to use the `APP_FILTER` token <a href="exception-filters#绑定过滤器">as shown here</a>.
+The second method is to use the `APP_FILTER` token <a href="exception-filters#binding-filters">as shown here</a>.

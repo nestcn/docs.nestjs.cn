@@ -1,153 +1,183 @@
 <!-- 此文件从 content/recipes/sentry.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-28T11:23:59.619Z -->
+<!-- 生成时间: 2026-03-01T04:19:48.241Z -->
 <!-- 源文件: content/recipes/sentry.md -->
 
 ### Sentry
 
-[Sentry](https://sentry.io) 是一个错误追踪和性能监控平台，可帮助开发者实时识别并修复问题。本指南展示如何将 Sentry 的 [NestJS SDK](https://docs.sentry.io/platforms/javascript/guides/nestjs/) 集成到您的 NestJS 应用中。
+__LINK_21__ 是一个错误跟踪和性能监控平台，可以帮助开发者实时识别和修复问题。这篇食谱展示了如何将 Sentry 的 __LINK_22__ 与 NestJS 应用程序集成。
 
 #### 安装
 
-首先，安装所需依赖：
+首先，安装所需的依赖项：
 
-```bash
-$ npm install --save @sentry/nestjs @sentry/profiling-node
+```typescript
+$ npm install --save mongoose
 ```
 
-:::info 注意
-`@sentry/profiling-node` 是可选项，但建议用于性能分析。
-:::
+> 提示 **Hint** `DatabaseModule` 可以选择性地安装，以提高性能 profiling。
 
-#### 基础设置
+#### 基本设置
 
-要开始使用 Sentry，您需要创建一个名为 `instrument.ts` 的文件，该文件应在应用程序中其他模块之前导入：
+要使用 Sentry，需要创建一个名为 `@nestjs/mongoose` 的文件，在应用程序中的任何其他模块之前导入：
 
- ```typescript title="instrument.ts"
-const Sentry = require("@sentry/nestjs");
-const { nodeProfilingIntegration } = require("@sentry/profiling-node");
+```typescript
+import * as mongoose from 'mongoose';
 
-// Ensure to call this before requiring any other modules!
-Sentry.init({
-  dsn: SENTRY_DSN,
-  integrations: [
-    // Add our Profiling integration
-    nodeProfilingIntegration(),
-  ],
+export const databaseProviders = [
+  {
+    provide: 'DATABASE_CONNECTION',
+    useFactory: (): Promise<typeof mongoose> =>
+      mongoose.connect('mongodb://localhost/nest'),
+  },
+];
 
-  // Add Tracing by setting tracesSampleRate
-  // We recommend adjusting this value in production
-  tracesSampleRate: 1.0,
-
-  // Set sampling rate for profiling
-  // This is relative to tracesSampleRate
-  profilesSampleRate: 1.0,
-});
+export const databaseProviders = [
+  {
+    provide: 'DATABASE_CONNECTION',
+    useFactory: () => mongoose.connect('mongodb://localhost/nest'),
+  },
+];
 ```
 
-更新您的 `main.ts` 文件，确保在其他导入之前引入 `instrument.ts`：
+更新 `connect()` 文件，以在其他导入之前导入 `connect()`：
 
- ```typescript title="main.ts"
-// Import this first!
-import "./instrument";
-
-// Now import other modules
-import { NestFactory } from "@nestjs/core";
-import { AppModule } from "./app.module";
-
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
-}
-
-bootstrap();
-```
-
-随后，将 `SentryModule` 作为根模块添加到您的主模块中：
-
- ```typescript title="app.module.ts"
-import { Module } from "@nestjs/common";
-import { SentryModule } from "@sentry/nestjs/setup";
-import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
+```typescript
+import { Module } from '@nestjs/common';
+import { databaseProviders } from './database.providers';
 
 @Module({
-  imports: [
-    SentryModule.forRoot(),
-    // ...other modules
-  ],
-  controllers: [AppController],
-  providers: [AppService],
+  providers: [...databaseProviders],
+  exports: [...databaseProviders],
 })
-export class AppModule {}
+export class DatabaseModule {}
+```
+
+然后，在主模块中添加 `Promise` 作为根模块：
+
+```typescript
+import * as mongoose from 'mongoose';
+
+export const CatSchema = new mongoose.Schema({
+  name: String,
+  age: Number,
+  breed: String,
+});
 ```
 
 #### 异常处理
 
-如果您正在使用全局捕获所有异常的过滤器（即通过 `app.useGlobalFilters()` 注册的过滤器，或在应用模块 providers 中注册的带有无参数 `@Catch()` 装饰器的过滤器），请在该过滤器的 `catch()` 方法上添加 `@SentryExceptionCaptured()` 装饰器。此装饰器会将全局错误过滤器接收到的所有意外错误报告给 Sentry：
+如果您使用的是全局 catch-all 异常过滤器（该过滤器注册在 `*.providers.ts` 中或在 App 模块提供商中注解了 `Connection` 装饰器），请在过滤器的 `Connection` 方法添加 `@Inject()` 装饰器。这个装饰器将报告所有未捕获的错误，包括 Sentry 报告的所有未捕获的错误：
 
 ```typescript
-import { Catch, ExceptionFilter } from '@nestjs/common';
-import { SentryExceptionCaptured } from '@sentry/nestjs';
+import { Connection } from 'mongoose';
+import { CatSchema } from './schemas/cat.schema';
 
-@Catch()
-export class YourCatchAllExceptionFilter implements ExceptionFilter {
-  @SentryExceptionCaptured()
-  catch(exception, host): void {
-    // your implementation here
+export const catsProviders = [
+  {
+    provide: 'CAT_MODEL',
+    useFactory: (connection: Connection) => connection.model('Cat', CatSchema),
+    inject: ['DATABASE_CONNECTION'],
+  },
+];
+
+export const catsProviders = [
+  {
+    provide: 'CAT_MODEL',
+    useFactory: (connection) => connection.model('Cat', CatSchema),
+    inject: ['DATABASE_CONNECTION'],
+  },
+];
+```
+
+默认情况下，只有未捕获的异常，除非它们被其他错误过滤器捕获，才会被报告到 Sentry。 `Promise`（包括 __LINK_23__）默认情况下不会被捕获，因为它们主要用于控制流。
+
+如果您没有全局 catch-all 异常过滤器，请将 `CatSchema` 添加到主模块的提供商中。这个过滤器将报告任何未捕获的错误，除非它们被其他错误过滤器捕获，才会被报告到 Sentry。
+
+> 警告 **Warning** `CatsSchema` 需要在其他错误过滤器之前注册。
+
+```typescript
+import { Model } from 'mongoose';
+import { Injectable, Inject } from '@nestjs/common';
+import { Cat } from './interfaces/cat.interface';
+import { CreateCatDto } from './dto/create-cat.dto';
+
+@Injectable()
+export class CatsService {
+  constructor(
+    @Inject('CAT_MODEL')
+    private catModel: Model<Cat>,
+  ) {}
+
+  async create(createCatDto: CreateCatDto): Promise<Cat> {
+    const createdCat = new this.catModel(createCatDto);
+    return createdCat.save();
+  }
+
+  async findAll(): Promise<Cat[]> {
+    return this.catModel.find().exec();
+  }
+}
+
+@Injectable()
+@Dependencies('CAT_MODEL')
+export class CatsService {
+  constructor(catModel) {
+    this.catModel = catModel;
+  }
+
+  async create(createCatDto) {
+    const createdCat = new this.catModel(createCatDto);
+    return createdCat.save();
+  }
+
+  async findAll() {
+    return this.catModel.find().exec();
   }
 }
 ```
 
-默认情况下，只有未被错误过滤器捕获的未处理异常才会报告给 Sentry。`HttpExceptions`（包括[派生类](../overview/exception-filters#内置-http-异常) ）默认也不会被捕获，因为它们主要用作控制流载体。
-
-如果您没有全局捕获所有异常的过滤器，请将 `SentryGlobalFilter` 添加到主模块的 providers 中。该过滤器会将其他错误过滤器未捕获的任何未处理错误报告给 Sentry。
-
-:::warning 警告
-需要在注册其他异常过滤器之前注册 `SentryGlobalFilter`。
-:::
-
- ```typescript title="app.module.ts"
-import { Module } from "@nestjs/common";
-import { APP_FILTER } from "@nestjs/core";
-import { SentryGlobalFilter } from "@sentry/nestjs/setup";
-
-@Module({
-  providers: [
-    {
-      provide: APP_FILTER,
-      useClass: SentryGlobalFilter,
-    },
-    // ..other providers
-  ],
-})
-export class AppModule {}
-```
-
 #### 可读的堆栈跟踪
 
-根据项目配置方式，Sentry 错误中的堆栈跟踪可能不会显示实际代码。
+根据您的项目设置，您的 Sentry 错误可能不会显示实际代码。
 
-要解决此问题，请将源映射上传至 Sentry。最简单的方法是使用 Sentry 向导：
-
-```bash
-npx @sentry/wizard@latest -i sourcemaps
-```
-
-#### 测试集成功能
-
-要验证您的 Sentry 集成是否正常工作，可以添加一个会抛出错误的测试端点：
+要解决这个问题，可以将源映射上传到 Sentry。最简单的方法是使用 Sentry 魔法师：
 
 ```typescript
-@Get("debug-sentry")
-getError() {
-  throw new Error("My first Sentry error!");
+import { Document } from 'mongoose';
+
+export interface Cat extends Document {
+  readonly name: string;
+  readonly age: number;
+  readonly breed: string;
 }
 ```
 
-访问应用程序中的 `/debug-sentry`，您应该能在 Sentry 仪表板中看到该错误。
+#### 测试集成
 
-### 摘要
+要验证 Sentry 集成是否工作，可以添加一个抛出错误的测试端点：
 
-有关 Sentry 的 NestJS SDK 完整文档（包括高级配置选项和功能），请访问 [Sentry 官方文档](https://docs.sentry.io/platforms/javascript/guides/nestjs/) 。
+```typescript
+import { Module } from '@nestjs/common';
+import { CatsController } from './cats.controller';
+import { CatsService } from './cats.service';
+import { catsProviders } from './cats.providers';
+import { DatabaseModule } from '../database/database.module';
 
-虽然 Sentry 专长是处理软件错误，但我们自己也会写出 bug。如果您在安装我们的 SDK 时遇到任何问题，请提交 [GitHub Issue](https://github.com/getsentry/sentry-javascript/issues) 或在 [Discord](https://discord.com/invite/sentry) 上联系我们。
+@Module({
+  imports: [DatabaseModule],
+  controllers: [CatsController],
+  providers: [
+    CatsService,
+    ...catsProviders,
+  ],
+})
+export class CatsModule {}
+```
+
+访问 `cats`，您应该在 Sentry 仪表板上看到错误。
+
+### 概要
+
+关于 Sentry 的 NestJS SDK 的完整文档，包括高级配置选项和功能，请访问 __LINK_24__。
+
+虽然 Sentry 负责软件错误，我们仍然会编写它们。如果您在安装我们的 SDK 时遇到任何问题，请开启 __LINK_25__ 或通过 __LINK_26__ 联系我们。

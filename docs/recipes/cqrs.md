@@ -1,5 +1,5 @@
 <!-- 此文件从 content/recipes/cqrs.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-24T02:55:14.360Z -->
+<!-- 生成时间: 2026-03-01T04:20:44.534Z -->
 <!-- 源文件: content/recipes/cqrs.md -->
 
 ### CQRS
@@ -55,7 +55,7 @@ This module accepts an optional configuration object. The following options are 
 
 Commands are used to change the application state. They should be task-based, rather than data centric. When a command is dispatched, it is handled by a corresponding **Command Handler**. The handler is responsible for updating the application state.
 
-```typescript title="heroes-game.service"
+```typescript
 @Injectable()
 export class HeroesGameService {
   constructor(private commandBus: CommandBus) {}
@@ -66,11 +66,18 @@ export class HeroesGameService {
     );
   }
 }
+
+  async killDragon(heroId, killDragonDto) {
+    return this.commandBus.execute(
+      new KillDragonCommand(heroId, killDragonDto.dragonId)
+    );
+  }
+}
 ```
 
 In the code snippet above, we instantiate the `KillDragonCommand` class and pass it to the `CommandBus`'s `execute()` method. This is the demonstrated command class:
 
-```typescript title="kill-dragon.command"
+```typescript
 export class KillDragonCommand extends Command<{
   actionId: string // This type represents the command execution result
 }> {
@@ -83,7 +90,7 @@ export class KillDragonCommand extends Command<{
 }
 ```
 
-As you can see, the `KillDragonCommand` class extends the `Command` class. The `Command` class is a simple utility class exported from the `@nestjs/cqrs` package that lets you define the command's return type. In this case, the return type is an object with an `actionId` property. Now, whenever the `KillDragonCommand` command is dispatched, the `CommandBus#execute()` method return-type will be inferred as `Promise<{ actionId: string }>`. This is useful when you want to return some data from the command handler.
+As you can see, the `KillDragonCommand` class extends the `Command` class. The `Command` class is a simple utility class exported from the `@nestjs/cqrs` package that lets you define the command's return type. In this case, the return type is an object with an `actionId` property. Now, whenever the `KillDragonCommand` command is dispatched, the `CommandBus#execute()` method return-type will be inferred as `Promise<{ actionId: string }}>`. This is useful when you want to return some data from the command handler.
 
 > info **Hint** Inheritance from the `Command` class is optional. It is only necessary if you want to define the return type of the command.
 
@@ -91,12 +98,26 @@ The `CommandBus` represents a **stream** of commands. It is responsible for disp
 
 Let's create a handler for the `KillDragonCommand` command.
 
-```typescript title="kill-dragon.handler"
+```typescript
 @CommandHandler(KillDragonCommand)
 export class KillDragonHandler implements ICommandHandler<KillDragonCommand> {
   constructor(private repository: HeroesRepository) {}
 
   async execute(command: KillDragonCommand) {
+    const { heroId, dragonId } = command;
+    const hero = this.repository.findOneById(+heroId);
+
+    hero.killEnemy(dragonId);
+    await this.repository.persist(hero);
+
+    // "ICommandHandler<KillDragonCommand>" forces you to return a value that matches the command's return type
+    return {
+      actionId: crypto.randomUUID(), // This value will be returned to the caller
+    }
+  }
+}
+
+  async execute(command) {
     const { heroId, dragonId } = command;
     const hero = this.repository.findOneById(+heroId);
 
@@ -137,13 +158,18 @@ Similar to the `Command` class, the `Query` class is a simple utility class expo
 
 To retrieve the hero, we need to create a query handler:
 
-```typescript title="get-hero.handler"
+```typescript
 @QueryHandler(GetHeroQuery)
 export class GetHeroHandler implements IQueryHandler<GetHeroQuery> {
   constructor(private repository: HeroesRepository) {}
 
   async execute(query: GetHeroQuery) {
     return this.repository.findOneById(query.heroId);
+  }
+}
+
+  async execute(query) {
+    return this.repository.findOneById(query.hero);
   }
 }
 ```
@@ -168,7 +194,7 @@ Events are used to notify other parts of the application about changes in the ap
 
 For demonstration purposes, let's create an event class:
 
-```typescript title="hero-killed-dragon.event"
+```typescript
 export class HeroKilledDragonEvent {
   constructor(
     public readonly heroId: string,
@@ -179,7 +205,7 @@ export class HeroKilledDragonEvent {
 
 Now while events can be dispatched directly using the `EventBus.publish()` method, we can also dispatch them from the model. Let's update the `Hero` model to dispatch the `HeroKilledDragonEvent` event when the `killEnemy()` method is called.
 
-```typescript title="hero.model"
+```typescript
 export class Hero extends AggregateRoot {
   constructor(private id: string) {
     super();
@@ -190,11 +216,17 @@ export class Hero extends AggregateRoot {
     this.apply(new HeroKilledDragonEvent(this.id, enemyId));
   }
 }
+
+  killEnemy(enemyId) {
+    // Business logic
+    this.apply(new HeroKilledDragonEvent(this.id, enemyId));
+  }
+}
 ```
 
 The `apply()` method is used to dispatch events. It accepts an event object as an argument. However, since our model is not aware of the `EventBus`, we need to associate it with the model. We can do that by using the `EventPublisher` class.
 
-```typescript title="kill-dragon.handler"
+```typescript
 @CommandHandler(KillDragonCommand)
 export class KillDragonHandler implements ICommandHandler<KillDragonCommand> {
   constructor(
@@ -203,6 +235,16 @@ export class KillDragonHandler implements ICommandHandler<KillDragonCommand> {
   ) {}
 
   async execute(command: KillDragonCommand) {
+    const { heroId, dragonId } = command;
+    const hero = this.publisher.mergeObjectContext(
+      await this.repository.findOneById(+heroId),
+    );
+    hero.killEnemy(dragonId);
+    hero.commit();
+  }
+}
+
+  async execute(command) {
     const { heroId, dragonId } = command;
     const hero = this.publisher.mergeObjectContext(
       await this.repository.findOneById(+heroId),
@@ -245,7 +287,7 @@ this.eventBus.publish(new HeroKilledDragonEvent());
 
 Each event can have multiple **Event Handlers**.
 
-```typescript title="hero-killed-dragon.handler"
+```typescript
 @EventsHandler(HeroKilledDragonEvent)
 export class HeroKilledDragonHandler implements IEventHandler<HeroKilledDragonEvent> {
   constructor(private repository: HeroesRepository) {}
@@ -277,7 +319,7 @@ Sagas are an extremely powerful feature. A single saga may listen for 1..\* even
 
 Let's create a saga that listens to the `HeroKilledDragonEvent` and dispatches the `DropAncientItemCommand` command.
 
-```typescript title="heroes-game.saga"
+```typescript
 @Injectable()
 export class HeroesGameSagas {
   @Saga()
@@ -382,7 +424,7 @@ onModuleDestroy() {
 
 For those coming from different programming language backgrounds, it may be surprising to learn that in Nest, most things are shared across incoming requests. This includes a connection pool to the database, singleton services with global state, and more. Keep in mind that Node.js does not follow the request/response multi-threaded stateless model, where each request is processed by a separate thread. As a result, using singleton instances is **safe** for our applications.
 
-However, there are edge cases where a request-based lifetime for the handler might be desirable. This could include scenarios like per-request caching in GraphQL applications, request tracking, or multi-tenancy. You can learn more about how to control scopes [here](/fundamentals/provider-scopes).
+However, there are edge cases where a request-based lifetime for the handler might be desirable. This could include scenarios like per-request caching in GraphQL applications, request tracking, or multi-tenancy. You can learn more about how to control scopes [here](/fundamentals/injection-scopes).
 
 Using request-scoped providers alongside CQRS can be complex because the `CommandBus`, `QueryBus`, and `EventBus` are singletons. Thankfully, the `@nestjs/cqrs` package simplifies this by automatically creating a new instance of request-scoped handlers for each processed command, query, or event.
 

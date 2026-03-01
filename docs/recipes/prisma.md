@@ -1,5 +1,5 @@
 <!-- 此文件从 content/recipes/prisma.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-24T02:53:52.196Z -->
+<!-- 生成时间: 2026-03-01T04:19:18.758Z -->
 <!-- 源文件: content/recipes/prisma.md -->
 
 ### Prisma
@@ -27,7 +27,7 @@ $ npm install -g @nestjs/cli
 $ nest new hello-prisma
 ```
 
-See the [First steps](/overview/first-steps) page to learn more about the project files created by this command. Note also that you can now run `npm start` to start your application. The REST API running at `http://localhost:3000/` currently serves a single route that's implemented in `src/app.controller.ts`. Over the course of this guide, you'll implement additional routes to store and retrieve data about _users_ and _posts_.
+See the [First steps](/first-steps) page to learn more about the project files created by this command. Note also that you can now run `npm start` to start your application. The REST API running at `http://localhost:3000/` currently serves a single route that's implemented in `src/app.controller.ts`. Over the course of this guide, you'll implement additional routes to store and retrieve data about _users_ and _posts_.
 
 #### Set up Prisma
 

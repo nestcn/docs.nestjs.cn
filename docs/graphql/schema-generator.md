@@ -22,7 +22,6 @@ async upvotePost(@Args({ name: 'postId', type: () => Int }) postId: number) {
 
 `@Resolver` 方法接受一个 resolver 类引用数组。例如：
 
-```
 ```graphql
 type Mutation {
   upvotePost(postId: Int!): Post
@@ -31,7 +30,6 @@ type Mutation {
 
 它还接受第二个可选参数，一个 scalar 类数组：
 
-```
 ```typescript
 import { InputType, Field } from '@nestjs/graphql';
 
@@ -44,7 +42,6 @@ export class UpvotePostInput {
 
 最后，您可以传递一个选项对象：
 
-```
 ```typescript
 @Mutation(() => Post)
 async upvotePost(

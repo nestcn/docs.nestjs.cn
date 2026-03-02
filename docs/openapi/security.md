@@ -15,7 +15,6 @@ export class CatsController {}
 
 在运行应用程序前，记住将安全定义添加到基础文档中使用 __INLINE_CODE_11__：
 
-```
 ```typescript
 @ApiHeader({
   name: 'X-MyHeader',
@@ -31,7 +30,6 @@ export class CatsController {}
 
 要启用基本身份验证，请使用 __INLINE_CODE_14__。
 
-```
 ```typescript
 @Post()
 @ApiResponse({ status: 201, description: 'The record has been successfully created.'})
@@ -43,7 +41,6 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 在运行应用程序前，记住将安全定义添加到基础文档中使用 __INLINE_CODE_15__：
 
-```
 ```typescript
 @Post()
 @ApiCreatedResponse({ description: 'The record has been successfully created.'})
@@ -57,7 +54,6 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 要启用令牌身份验证，请使用 __INLINE_CODE_16__。
 
-```
 ```typescript
 export class Cat {
   @ApiProperty()
@@ -76,7 +72,6 @@ export class Cat {
 
 在运行应用程序前，记住将安全定义添加到基础文档中使用 __INLINE_CODE_17__：
 
-```
 ```typescript
 @ApiTags('cats')
 @Controller('cats')
@@ -96,7 +91,6 @@ export class CatsController {
 
 要启用 OAuth2，请使用 __INLINE_CODE_18__。
 
-```
 ```typescript
 const config = new DocumentBuilder()
   .addGlobalResponse({
@@ -109,7 +103,6 @@ const config = new DocumentBuilder()
 
 在运行应用程序前，记住将安全定义添加到基础文档中使用 __INLINE_CODE_19__：
 
-```
 ```typescript
 @UseInterceptors(FileInterceptor('file'))
 @ApiConsumes('multipart/form-data')
@@ -124,7 +117,6 @@ uploadFile(@UploadedFile() file: Express.Multer.File) {}
 
 要启用 Cookie 身份验证，请使用 __INLINE_CODE_20__。
 
-```
 ```typescript
 class FileUploadDto {
   @ApiProperty({ type: 'string', format: 'binary' })
@@ -134,7 +126,6 @@ class FileUploadDto {
 
 在运行应用程序前，记住将安全定义添加到基础文档中使用 `/users`：
 
-```
 ```typescript
 class FilesUploadDto {
   @ApiProperty({ type: 'array', items: { type: 'string', format: 'binary' } })

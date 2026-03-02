@@ -19,7 +19,6 @@ $ npm i csrf-csrf
 
 安装完成后，在根 `__INLINE_CODE_14__` 中导入 `__INLINE_CODE_13__`，然后运行 `__INLINE_CODE_15__` 静态方法，例如：
 
-```
 ```typescript
 import { doubleCsrf } from 'csrf-csrf';
 // ...
@@ -37,7 +36,6 @@ app.use(doubleCsrfProtection);
 
 要配置 underlying `__INLINE_CODE_18__` 实例，请将配置对象传递给 `__INLINE_CODE_19__` 方法，例如：
 
-```
 ```bash
 $ npm i --save @fastify/csrf-protection
 ```
@@ -46,7 +44,6 @@ $ npm i --save @fastify/csrf-protection
 
 要发送（即触发）事件，首先使用标准构造函数注入 `__INLINE_CODE_20__`：
 
-```
 ```typescript
 import fastifyCsrf from '@fastify/csrf-protection';
 // ...

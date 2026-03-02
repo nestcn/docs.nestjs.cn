@@ -1,5 +1,5 @@
 <!-- 此文件从 content/recipes/terminus.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-01T04:18:19.481Z -->
+<!-- 生成时间: 2026-03-02T04:10:16.291Z -->
 <!-- 源文件: content/recipes/terminus.md -->
 
 ### Healthchecks (Terminus)

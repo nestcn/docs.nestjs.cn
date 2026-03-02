@@ -1,16 +1,16 @@
 <!-- 此文件从 content/graphql/mutations.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-01T04:24:20.757Z -->
+<!-- 生成时间: 2026-03-02T04:16:01.595Z -->
 <!-- 源文件: content/graphql/mutations.md -->
 
-### 变更
+###_mutations
 
-大多数 GraphQL 讨论都集中在数据 fetching 上，但是任何完整的数据平台都需要一种修改服务器端数据的方式。在 REST 中，任何请求都可能导致服务器端的副作用，但最佳实践建议我们 shouldn't 在 GET 请求中修改数据。GraphQL 类似 - 技术上任何查询都可以实现数据写入。然而，就像 REST 一样，我们建议遵循惯例，即将导致写入的操作发送到明确的变更请求中（阅读更多 __LINK_26__）。
+大多数 GraphQL 讨论都集中在数据 fetching 上，但任何完整的数据平台都需要一种修改服务器端数据的方法。在 REST 中，每个请求都可能导致服务器端的side-effects，但是最佳实践建议我们 shouldn't 在 GET 请求中修改数据。GraphQL 类似 - 从技术上讲，任何查询都可以实现数据写入。但是，就像 REST 一样，我们建议遵循惯例：任何导致数据写入的操作都应该通过明确地发送 mutation 请求（阅读更多 __LINK_26__）。
 
-官方 __LINK_27__ 文档使用了一个 __INLINE_CODE_6__ 变更请求示例。这一个变更请求实现了一个方法，用于增加文章的 __INLINE_CODE_7__ 属性值。在 Nest 中，我们将使用 __INLINE_CODE_8__ 装饰器来创建等效的变更请求。
+官方 __LINK_27__ 文档使用了 __INLINE_CODE_6__ mutation 示例。这 mutation 实现了一个方法来增加一个 post 的 __INLINE_CODE_7__ 属性值。要在 Nest 中创建等效的 mutation，我们将使用 __INLINE_CODE_8__ 装饰器。
 
 #### 代码优先
 
-让我们添加另一个方法到之前章节中使用的 __INLINE_CODE_9__ 中（见 __LINK_28__）。
+让我们添加另一个方法到前一节中使用的 __INLINE_CODE_9__ 中（见 __LINK_28__）。
 
 ```typescript
 @Query('author')
@@ -22,7 +22,7 @@ async getAuthor(@Args('id', ParseIntPipe) id: number) {
 
 > info **提示**所有装饰器（例如 `root`、`args`、`context` 等）都来自 `info` 包。
 
-这将生成以下 GraphQL_SCHEMA 部分在 SDL 中：
+这将生成以下部分 GraphQL schema 在 SDL 中：
 
 ```typescript
 @Mutation()
@@ -32,9 +32,9 @@ async upvotePost(@Args('postId') postId: number) {
 }
 ```
 
-`ExecutionContext` 方法需要 `GqlExecutionContext` (`GqlExecutionContext.create()`) 作为参数，并返回一个更新后的 `getArgs()` 实体。正如 __LINK_29__ 章节中解释的，我们需要明确地设置期望类型。
+`ExecutionContext` 方法接受 `GqlExecutionContext` (`GqlExecutionContext.create()`) 作为参数，并返回一个更新后的 `getArgs()` 实体。正如 __LINK_29__ 部分中所解释的，我们需要明确地设置期望的类型。
 
-如果变更请求需要使用对象作为参数，我们可以创建一个 **输入类型**。输入类型是一个特殊的对象类型，可以作为参数传递（阅读更多 __LINK_30__）。要声明输入类型，使用 `getContext()` 装饰器。
+如果 mutation 需要作为参数传递一个对象，我们可以创建一个 **输入类型**。输入类型是一个特殊的对象类型，可以作为参数传递（阅读更多 __LINK_30__）。要声明输入类型，使用 `getContext()` 装饰器。
 
 ```typescript
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
@@ -49,7 +49,7 @@ export class AuthGuard implements CanActivate {
 }
 ```
 
-> info **提示** `ExecutionContext` 装饰器接受一个 options 对象作为参数，因此可以指定输入类型的描述。注意，由于 TypeScript 的元数据反射系统限制，您必须么使用 `ArgumentsHost` 装饰器手动指示类型，或者使用 __LINK_31__。
+> info **提示** `ExecutionContext` 装饰器接受一个选项对象作为参数，因此您可以，例如，指定输入类型的描述。由于 TypeScript 的元数据反射系统的限制，您必须使用 `ArgumentsHost` 装饰器或使用 __LINK_31__ 来手动指示类型。
 
 然后，我们可以在解析器类中使用这个类型：
 
@@ -63,9 +63,9 @@ export class HttpExceptionFilter implements GqlExceptionFilter {
 }
 ```
 
-####Schema 优先
+#### Schema 优先
 
-让我们扩展之前章节中使用的 `GqlArgumentsHost`（见 __LINK_32__）。
+让我们扩展前一节中使用的 `GqlArgumentsHost`（见 __LINK_32__）。
 
 ```typescript
 export const User = createParamDecorator(
@@ -74,9 +74,9 @@ export const User = createParamDecorator(
 );
 ```
 
-注意，我们之前假设了业务逻辑已经被移到 `GqlExceptionFilter`（查询文章并增加其 `GqlArgumentsHost` 属性值）中。逻辑在 `@nestjs/graphql` 类中可以简单或复杂到需要。示例的主要目的是展示解析器如何与其他提供者交互。
+注意，我们上面假设了业务逻辑已经移到 `GqlExceptionFilter` 中（查询 post 并增加其 `GqlArgumentsHost` 属性值）。逻辑inside `@nestjs/graphql` 类可以简单或复杂到任何程度。主要的点是要显示解析器如何与其他提供者交互。
 
-最后一步是将我们的变更请求添加到现有类型定义中。
+最后一步是将我们的 mutation 添加到现有的类型定义中。
 
 ```typescript
 @Mutation()
@@ -86,4 +86,4 @@ async upvotePost(
 ) {}
 ```
 
-`response` 变更请求现在可以作为我们的应用程序的 GraphQL API 一部分被调用。
+`response` mutation 现在可以作为我们应用程序的 GraphQL API的一部分被调用。

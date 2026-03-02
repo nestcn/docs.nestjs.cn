@@ -1,5 +1,5 @@
 <!-- 此文件从 content/security/rate-limiting.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-01T04:17:39.664Z -->
+<!-- 生成时间: 2026-03-02T04:09:41.484Z -->
 <!-- 源文件: content/security/rate-limiting.md -->
 
 ### Rate Limiting

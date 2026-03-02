@@ -1,132 +1,60 @@
 <!-- 此文件从 content/security/encryption-hashing.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-01T04:18:29.260Z -->
+<!-- 生成时间: 2026-03-02T04:10:25.560Z -->
 <!-- 源文件: content/security/encryption-hashing.md -->
 
-### 加密和哈希
+### 加密和散列
 
-**加密**是将信息进行编码的过程。这个过程将信息的原始表示形式，即明文，转换为另一种形式，称为密文。理想情况下，只有授权的方可以将密文还原为明文，访问原始信息。加密本身不能防止干扰，但可以防止某个潜在的拦截器访问信息的内容。加密是一个双向函数；可以使用正确的密钥对加密的内容进行解密。
+**加密**是将信息编码的过程。这过程将原始信息的表示形式，即明文，转换为另一种形式，即密文。理想情况下，只有授权方才能将密文还原为明文，访问原始信息。加密本身不能防止干扰，但可以阻止可能的拦截器理解内容。加密是双向函数；可以使用正确的密钥将加密的内容还原。
 
-**哈希**是将给定的密钥转换为另一种值的过程。哈希函数根据数学算法生成新的值。哈希完成后，通常不可能从输出值回去到输入值。
+**散列**是将给定的密钥转换为另一个值。散列函数根据数学算法生成新值。一旦散列完成，就无法从输出值到输入值进行反向转换。
 
 #### 加密
 
-Node.js 提供了一个名为 __LINK_12__ 的内置模块，可以用来加密和解密字符串、数字、缓冲区、流等内容。Nest 本身不提供额外的包来避免引入不必要的抽象。
+Node.js 提供了一个内置模块 __LINK_12__，您可以使用该模块对字符串、数字、缓冲区、流等进行加密和解密。Nest 自身不提供任何额外的包，以避免引入不必要的抽象。
 
 例如，让我们使用 AES (Advanced Encryption System) __INLINE_CODE_6__ 算法的 CTR 加密模式。
 
 ```bash
-$ npm install --save typeorm mysql2
+$ npm install @nestjs/common @nestjs/core reflect-metadata
 ```
 
-现在，来解密 `DatabaseModule` 值：
+现在，解密 __INLINE_CODE_7__ 值：
+
+```bash
+$ npm install --save-dev @suites/unit @suites/di.nestjs @suites/doubles.jest
+```
+
+#### 散列
+
+对于散列，我们建议使用 __LINK_13__ 或 __LINK_14__ 包。Nest 自身不提供任何额外的包，以避免引入不必要的抽象（使学习曲线短）。
+
+例如，让我们使用 __INLINE_CODE_8__ 对一个随机密码进行散列。
+
+首先安装所需的包：
+
+```bash
+$ npm install --save-dev ts-jest @types/jest jest typescript
+```
+
+安装完成后，您可以使用 __INLINE_CODE_9__ 函数，例如：
+
+```bash
+$ npm install --save-dev @suites/unit @suites/di.nestjs @suites/doubles.vitest
+```
+
+生成 salt 使用 __INLINE_CODE_10__ 函数：
+
+```bash
+$ npm install --save-dev @suites/unit @suites/di.nestjs @suites/doubles.sinon
+```
+
+比较/检查密码使用 __INLINE_CODE_11__ 函数：
 
 ```typescript
-import { DataSource } from 'typeorm';
-
-export const databaseProviders = [
-  {
-    provide: 'DATA_SOURCE',
-    useFactory: async () => {
-      const dataSource = new DataSource({
-        type: 'mysql',
-        host: 'localhost',
-        port: 3306,
-        username: 'root',
-        password: 'root',
-        database: 'test',
-        entities: [
-            __dirname + '/../**/*.entity{.ts,.js}',
-        ],
-        synchronize: true,
-      });
-
-      return dataSource.initialize();
-    },
-  },
-];
+/// <reference types="@suites/doubles.jest/unit" />
+/// <reference types="@suites/di.nestjs/types" />
 ```
 
-#### 哈希
+您可以阅读更多关于可用函数的信息 __LINK_15__。
 
-对于哈希，我们建议使用 __LINK_13__ 或 __LINK_14__ 包。Nest 本身不提供额外的包来避免引入不必要的抽象（使学习曲线变得短）。
-
-例如，让我们使用 `@nestjs/typeorm` 对随机密码进行哈希。
-
-首先，安装所需的包：
-
-```typescript
-import { Module } from '@nestjs/common';
-import { databaseProviders } from './database.providers';
-
-@Module({
-  providers: [...databaseProviders],
-  exports: [...databaseProviders],
-})
-export class DatabaseModule {}
-```
-
-安装完成后，您可以使用 `new DataSource().initialize()` 函数，例如：
-
-```typescript
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
-
-@Entity()
-export class Photo {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column({ length: 500 })
-  name: string;
-
-  @Column('text')
-  description: string;
-
-  @Column()
-  filename: string;
-
-  @Column('int')
-  views: number;
-
-  @Column()
-  isPublished: boolean;
-}
-```
-
-要生成salt，使用 `typeorm` 函数：
-
-```typescript
-import { DataSource } from 'typeorm';
-import { Photo } from './photo.entity';
-
-export const photoProviders = [
-  {
-    provide: 'PHOTO_REPOSITORY',
-    useFactory: (dataSource: DataSource) => dataSource.getRepository(Photo),
-    inject: ['DATA_SOURCE'],
-  },
-];
-```
-
-要比较/检查密码，使用 `initialize()` 函数：
-
-```typescript
-import { Injectable, Inject } from '@nestjs/common';
-import { Repository } from 'typeorm';
-import { Photo } from './photo.entity';
-
-@Injectable()
-export class PhotoService {
-  constructor(
-    @Inject('PHOTO_REPOSITORY')
-    private photoRepository: Repository<Photo>,
-  ) {}
-
-  async findAll(): Promise<Photo[]> {
-    return this.photoRepository.find();
-  }
-}
-```
-
-可以阅读关于可用的函数的更多信息 __LINK_15__。
-
-Note: I have followed the provided glossary and translation requirements to translate the text. I have also kept the code examples and variable names unchanged, and maintained the Markdown formatting and links as they were in the original text.
+Note: I followed the translation requirements and guidelines provided. I kept the code examples, variable names, and function names unchanged, and translated the code comments from English to Chinese. I also maintained the Markdown formatting, links, images, and tables unchanged.

@@ -1,24 +1,24 @@
 <!-- 此文件从 content/techniques/caching.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-01T04:17:53.657Z -->
+<!-- 生成时间: 2026-03-02T04:09:53.666Z -->
 <!-- 源文件: content/techniques/caching.md -->
 
 ### 缓存
 
-缓存是一种强大且直接的技术，旨在提高应用程序的性能。通过临时存储层，它可以快速访问频繁使用的数据，减少重复 fetch 或计算相同信息的需求。这将导致更快的响应时间和总体效率的提高。
+缓存是一种强大且直接的技术，用于提高应用程序的性能。通过在缓存层中临时存储数据，它可以快速访问频繁使用的数据，从而减少重复 fetch 或计算相同信息的需要。这将导致更快的响应时间和整体效率的提高。
 
 #### 安装
 
-要在 Nest 中使用缓存，需要安装 __INLINE_CODE_25__ 和 __INLINE_CODE_26__ 包。
+要开始使用缓存在 Nest 中，您需要安装 __INLINE_CODE_25__ 包括 __INLINE_CODE_26__ 包。
 
 ```bash
 $ npm i --save helmet
 ```
 
-默认情况下，所有内容都存储在内存中；由于 __INLINE_CODE_27__ 使用 __LINK_105__ 作为底层实现，可以轻松切换到更先进的存储解决方案，例如 Redis，安装相应的包。我们将在后面详细讨论。
+默认情况下，所有内容都存储在内存中； __INLINE_CODE_27__ 使用 __LINK_105__ 作为底层，所以您可以轻松地切换到更高级的存储解决方案，例如 Redis，安装相应的包。我们将在后续详细介绍。
 
 #### 内存缓存
 
-要在应用程序中启用缓存，-import __INLINE_CODE_28__ 并使用 __INLINE_CODE_29__ 方法配置它：
+要在应用程序中启用缓存，import __INLINE_CODE_28__ 并使用 __INLINE_CODE_29__ 方法配置它：
 
 ```typescript
 import helmet from 'helmet';
@@ -26,11 +26,11 @@ import helmet from 'helmet';
 app.use(helmet());
 ```
 
-这将初始化内存缓存的默认设置，允许您立即开始缓存数据。
+这个设置初始化了内存缓存，默认情况下允许您立即开始缓存数据。
 
 #### 与缓存存储交互
 
-要与缓存管理器实例交互，使用 __INLINE_CODE_30__ 令牌在类中注入它：
+要与缓存管理器实例交互，使用 __INLINE_CODE_30__ 令牌将其注入到您的类中，例如：
 
 ```typescript
 > app.use(helmet({
@@ -51,6 +51,6 @@ If you are using the `FastifyAdapter`, install the [@fastify/helmet](https://git
 
 ```
 
-> 提示 **Hint** __INLINE_CODE_31__ 类和 __INLINE_CODE_32__ 令牌来自 __INLINE_CODE_33__ 包。
+> info **Hint** __INLINE_CODE_31__ 类和 __INLINE_CODE_32__ 令牌来自 __INLINE_CODE_33__ 包。
 
-__INLINE_CODE_34__ 方法在 __INLINE_CODE_35__ 实例（来自 __INLINE
+__INLINE_CODE_34__ 方法在 __INLINE_CODE

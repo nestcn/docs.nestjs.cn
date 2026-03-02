@@ -1,164 +1,88 @@
 <!-- 此文件从 content/security/helmet.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-01T04:18:19.259Z -->
+<!-- 生成时间: 2026-03-02T04:10:19.189Z -->
 <!-- 源文件: content/security/helmet.md -->
 
 ### Helmet
 
-__LINK_21__ 可以帮助保护您的应用程序免受一些知名的web漏洞攻击，以设置适当的HTTP头。Helmet 通常只是一个小型的中间件函数集合，用于设置安全相关的HTTP头（请阅读 __LINK_22__）。
+__LINK_21__可以帮助保护您的应用程序免受某些知名 web 安全漏洞的影响，通过适当地设置 HTTP 标头。Helmet 通常是一个小型的中间件函数集合，它设置了安全相关的 HTTP 标头（请阅读 __LINK_22__）。
 
-> info **提示**请注意，在注册 __INLINE_CODE_5__ 作为全局中间件或在 setup 函数中注册它，需要在其他 __INLINE_CODE_6__ 或 setup 函数调用的前面。这是因为所使用的平台（即 Express 或 Fastify）中的中间件顺序对结果产生影响。如果您使用如 __INLINE_CODE_8__ 或 __INLINE_CODE_9__ 之类的中间件在定义路由后，那么这些中间件将只应用于路由，不能应用于定义在中间件后的路由。
+> 提示 **Hint**注意，在将 __INLINE_CODE_5__ 作为全局应用或注册它时，需要在其他调用 __INLINE_CODE_6__ 或设置函数之前执行。这是因为底层平台（即 Express 或 Fastify）的工作方式，中间件/路由的顺序定义很重要。如果您使用中间件像 __INLINE_CODE_8__ 或 __INLINE_CODE_9__ 后定义路由，那么该中间件将不应用于该路由，而是应用于定义后面的路由。
 
-#### 使用 Express (默认)
+#### 使用 Express（默认）
 
 首先，安装所需的包。
 
 ```bash
-$ nest g module auth
-$ nest g controller auth
-$ nest g service auth
+$ npm i --save-dev @swc/cli @swc/core
 ```
 
 安装完成后，应用它作为全局中间件。
 
 ```bash
-$ nest g module users
-$ nest g service users
+$ nest start -b swc
+# OR nest start --builder swc
 ```
 
-> warning **警告**在使用 __INLINE_CODE_10__、__INLINE_CODE_11__ (4.x) 和 __LINK_23__ 时，可能会出现在 Apollo Sandbox 上的 __LINK_24__ 问题。要解决这个问题，请按照以下配置 CSP：
+> 警告 **Warning**使用 __INLINE_CODE_10__, __INLINE_CODE_11__（4.x）和 __LINK_23__时，在 Apollo Sandbox 中可能会出现 __LINK_24__问题。要解决这个问题，请按照下面的配置 CSP：
 >
-> ```typescript
-import { Injectable } from '@nestjs/common';
-
-// This should be a real class/interface representing a user entity
-export type User = any;
-
-@Injectable()
-export class UsersService {
-  private readonly users = [
-    {
-      userId: 1,
-      username: 'john',
-      password: 'changeme',
-    },
-    {
-      userId: 2,
-      username: 'maria',
-      password: 'guess',
-    },
-  ];
-
-  async findOne(username: string): Promise<User | undefined> {
-    return this.users.find(user => user.username === username);
-  }
-}
-
-@Injectable()
-export class UsersService {
-  constructor() {
-    this.users = [
-      {
-        userId: 1,
-        username: 'john',
-        password: 'changeme',
-      },
-      {
-        userId: 2,
-        username: 'maria',
-        password: 'guess',
-      },
-    ];
-  }
-
-  async findOne(username) {
-    return this.users.find(user => user.username === username);
+> ```json
+{
+  "compilerOptions": {
+    "builder": "swc"
   }
 }
 ```bash
 $ npm i --save @fastify/helmet
-```typescript
-import { Module } from '@nestjs/common';
-import { UsersService } from './users.service';
-
-@Module({
-  providers: [UsersService],
-  exports: [UsersService],
-})
-export class UsersModule {}
-
-@Module({
-  providers: [UsersService],
-  exports: [UsersService],
-})
-export class UsersModule {}
-```typescript
-import helmet from '@fastify/helmet'
-// 在初始化文件中某处
-await app.register(helmet)
-```typescript
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
-
-@Injectable()
-export class AuthService {
-  constructor(private usersService: UsersService) {}
-
-  async signIn(username: string, pass: string): Promise<any> {
-    const user = await this.usersService.findOne(username);
-    if (user?.password !== pass) {
-      throw new UnauthorizedException();
+```json
+{
+  "compilerOptions": {
+    "builder": {
+      "type": "swc",
+      "options": {
+        "swcrcPath": "infrastructure/.swcrc",
+      }
     }
-    const { password, ...result } = user;
-    // TODO: Generate a JWT and return it here
-    // instead of the user object
-    return result;
+  }
+}
+```typescript
+import { helmet } from '@fastify/helmet';
+// 在您的初始化文件中somewhere
+await app.register(helmet);
+```json
+{
+  "compilerOptions": {
+    "builder": {
+      "type": "swc",
+      "options": { "extensions": [".ts", ".tsx", ".js", ".jsx"] }
+    },
   }
 }
 
-@Injectable()
-@Dependencies(UsersService)
-export class AuthService {
-  constructor(usersService) {
-    this.usersService = usersService;
-  }
-
-  async signIn(username: string, pass: string) {
-    const user = await this.usersService.findOne(username);
-    if (user?.password !== pass) {
-      throw new UnauthorizedException();
-    }
-    const { password, ...result } = user;
-    // TODO: Generate a JWT and return it here
-    // instead of the user object
-    return result;
-  }
-}
 ```typescript
 > await app.register(fastifyHelmet, {
 >    contentSecurityPolicy: {
 >      directives: {
->        defaultSrc: [__INLINE_CODE_12__, 'unpkg.com'],
+>        defaultSrc: ['提供者', 'unpkg.com'],
 >        styleSrc: [
->          __INLINE_CODE_13__,
->          __INLINE_CODE_14__,
 >          'cdn.jsdelivr.net',
 >          'fonts.googleapis.com',
 >          'unpkg.com',
+>          'cdn.jsdelivr.net',
 >        ],
->        fontSrc: [__INLINE_CODE_15__, 'fonts.gstatic.com', 'data:'],
->        imgSrc: [__INLINE_CODE_16__, 'data:', 'cdn.jsdelivr.net'],
+>        fontSrc: ['提供者', 'fonts.gstatic.com', 'data:'],
+>        imgSrc: ['提供者', 'data:', 'cdn.jsdelivr.net'],
 >        scriptSrc: [
->          __INLINE_CODE_17__,
->          __INLINE_CODE_18__,
->          `AuthModule`,
->          `AuthService`,
+>          '提供者',
+>          'cdn.jsdelivr.net',
+>          'fonts.googleapis.com',
+>          'unpkg.com',
 >        ],
 >      },
 >    },
 >  });
 >
-> // 如果您不打算使用 CSP，那么可以使用以下代码：
+> // 如果您不打算使用 CSP，可以使用以下：
 > await app.register(fastifyHelmet, {
 >   contentSecurityPolicy: false,
 > });
-> ```
+>

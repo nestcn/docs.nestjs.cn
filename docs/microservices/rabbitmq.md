@@ -1,5 +1,5 @@
 <!-- 此文件从 content/microservices/rabbitmq.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-01T04:22:21.135Z -->
+<!-- 生成时间: 2026-03-02T04:14:03.903Z -->
 <!-- 源文件: content/microservices/rabbitmq.md -->
 
 ### RabbitMQ

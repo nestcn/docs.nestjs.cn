@@ -1,5 +1,5 @@
 <!-- 此文件从 content/openapi/cli-plugin.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-01T04:21:55.610Z -->
+<!-- 生成时间: 2026-03-02T04:13:45.431Z -->
 <!-- 源文件: content/openapi/cli-plugin.md -->
 
 ### CLI Plugin

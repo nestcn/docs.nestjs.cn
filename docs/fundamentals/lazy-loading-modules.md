@@ -1,126 +1,127 @@
 <!-- 此文件从 content/fundamentals/lazy-loading-modules.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-01T04:26:41.935Z -->
+<!-- 生成时间: 2026-03-02T04:18:22.360Z -->
 <!-- 源文件: content/fundamentals/lazy-loading-modules.md -->
 
-### 懒加载模块
+### Lazy loading 模块
 
-默认情况下，模块都是急切加载的，这意味着在应用程序加载时，所有模块都将被加载，是否立即必要无关紧要。虽然这对于大多数应用程序来说是足够的，但是在 **无服务器环境** 中，启动延迟（“cold start”）是至关重要的。
+默认情况下，模块是急切地加载的，这意味着当应用程序加载时，所有模块都会被加载，是否立即必要。虽然这对于大多数应用程序来说是可以的，但是在 **serverless 环境** 中，这可能会成为一个瓶颈，因为启动延迟（“cold start”）是至关重要的。
 
-懒加载可以减少启动时间，仅加载特定 serverless 函数调用所需的模块。此外，您还可以异步加载其他模块，以加速后续调用时的启动时间（延迟模块注册）。
+Lazy loading 可以帮助减少引导时间，仅加载需要的模块，然后在 serverless 函数 “warm” 之后加载其他模块，以加速引导时间（延迟模块注册）。
 
-> 信息 **提示** 如果您熟悉 __LINK_29__框架，您可能已经见过 "__LINK_30__"术语。请注意，这种技术在 Nest 中具有不同的作用，因此将其视为一个独立的功能，共享类似命名约定的特性。
+> 提示 **Hint** 如果您熟悉 __LINK_29__ 框架，您可能已经见过 "__LINK_30__" 项。请注意，这个技术在 Nest 中是 **功能不同的**，因此请将其视为一个完全不同的特性，共享相似的命名约定。
 
-> 警告 **警告** 懒加载模块和服务中的 __LINK_31__ 不会被调用。
+> 警告 **Warning** Lazy loaded 模块和服务不调用 __LINK_31__。
 
 #### 入门
 
-要在需要时加载模块，Nest 提供了 __INLINE_CODE_7__ 类，可以像正常方式那样将其注入到类中：
+要按需加载模块，Nest 提供了 `FastifyAdapter` 类，可以像通常一样注入到类中：
 
 ```typescript
-import { NestFactory } from '@nestjs/core';
-import type { NestExpressApplication } from '@nestjs/platform-express';
-import { AppModule } from './app.module';
-
-// in the "bootstrap" function
-const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-  rawBody: true,
+const httpsOptions = {
+  key: fs.readFileSync('./secrets/private-key.pem'),
+  cert: fs.readFileSync('./secrets/public-certificate.pem'),
+};
+const app = await NestFactory.create(AppModule, {
+  httpsOptions,
 });
 await app.listen(process.env.PORT ?? 3000);
 ```
 
-> 信息 **提示** `bodyParser: false` 类来自 `RawBodyRequest` 包。
+> 提示 **Hint** `http.createServer` 类来自 `https.createServer` 包。
 
-Alternatively, you can obtain a reference to the `rawBody` provider from within your application bootstrap file (`RawBodyRequest`), as follows:
-
-```typescript
-import { Controller, Post, RawBodyRequest, Req } from '@nestjs/common';
-import { Request } from 'express';
-
-@Controller('cats')
-class CatsController {
-  @Post()
-  create(@Req() req: RawBodyRequest<Request>) {
-    const raw = req.rawBody; // returns a `Buffer`.
-  }
-}
-```
-
-With this in place, you can now load any module using the following construction:
+Alternatively，您可以在应用程序引导文件中 (`ExpressAdapter`) 获得 `app.close` 提供者的引用，以下是方法：
 
 ```typescript
-app.useBodyParser('text');
-```
-
-> 信息 **提示** "Lazy loaded" 模块在第一次 `json` 方法调用时将被缓存。这意味着，每次尝试加载 `urlencoded` 都将非常快，并返回缓存实例，而不是重新加载模块。
->
-> ```typescript
-app.useBodyParser('json', { limit: '10mb' });
-```
->
-> Additionally, "lazy loaded" 模块共享与应用程序启动时急切加载的模块图表，以及后续在您的应用程序中注册的任何其他懒加载模块。
-
-Where `text` is a TypeScript file that exports a regular Nest module (no extra changes are required).
-
-The `NestFactory.create` method returns the __LINK_32__ (of `NestExpressApplication`) that lets you navigate the internal list of providers and obtain a reference to any provider using its injection token as a lookup key.
-
-For example, let's say we have a `.useBodyParser` with the following definition:
-
-```typescript
-import { NestFactory } from '@nestjs/core';
-import {
-  FastifyAdapter,
-  NestFastifyApplication,
-} from '@nestjs/platform-fastify';
-import { AppModule } from './app.module';
-
-// in the "bootstrap" function
 const app = await NestFactory.create<NestFastifyApplication>(
   AppModule,
-  new FastifyAdapter(),
-  {
-    rawBody: true,
-  },
+  new FastifyAdapter({ https: httpsOptions }),
 );
-await app.listen(process.env.PORT ?? 3000);
 ```
 
-> 信息 **提示** 懒加载模块不能作为 **全局模块**注册，因为它们是在需要时懒加载的（由于它们是在静态注册的模块已经实例化后注册的）。同样，注册的 **全局增强器**（guards/interceptors/etc。）也将无法正常工作。
-
-With this, we could obtain a reference to the `100kb` provider, as follows:
+现在，您可以使用以下构造来加载任何模块：
 
 ```typescript
-import { Controller, Post, RawBodyRequest, Req } from '@nestjs/common';
-import { FastifyRequest } from 'fastify';
+const httpsOptions = {
+  key: fs.readFileSync('./secrets/private-key.pem'),
+  cert: fs.readFileSync('./secrets/public-certificate.pem'),
+};
 
-@Controller('cats')
-class CatsController {
-  @Post()
-  create(@Req() req: RawBodyRequest<FastifyRequest>) {
-    const raw = req.rawBody; // returns a `Buffer`.
-  }
-}
+const server = express();
+const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
+await app.init();
+
+const httpServer = http.createServer(server).listen(3000);
+const httpsServer = https.createServer(httpsOptions, server).listen(443);
 ```
 
-> 警告 **警告** 如果您使用 **Webpack**，请确保更新 `.useBodyParser` 文件 - 将 `rawBody` 设置为 `RawBodyRequest`，并添加 `rawBody` 属性，值为 `RawBodyRequest`：
+> 提示 **Hint** “Lazy loaded” 模块在第一次 `@nestjs/platform-express` 方法 invocation 时被缓存。这意味着，所有后续尝试加载 `http` 都将非常快，并且将返回一个缓存实例，而不是重新加载模块。
 >
 > ```typescript
-app.useBodyParser('text/plain');
+@Injectable()
+export class ShutdownObserver implements OnApplicationShutdown {
+  private httpServers: http.Server[] = [];
+
+  public addHttpServer(server: http.Server): void {
+    this.httpServers.push(server);
+  }
+
+  public async onApplicationShutdown(): Promise<void> {
+    await Promise.all(
+      this.httpServers.map(
+        (server) =>
+          new Promise((resolve, reject) => {
+            server.close((error) => {
+              if (error) {
+                reject(error);
+              } else {
+                resolve(null);
+              }
+            });
+          }),
+      ),
+    );
+  }
+}
+
+const shutdownObserver = app.get(ShutdownObserver);
+shutdownObserver.addHttpServer(httpServer);
+shutdownObserver.addHttpServer(httpsServer);
 ```
 >
-> With these options set up, you'll be able to leverage the __LINK_33__ feature.
+>  “Lazy loaded” 模块共享与应用程序引导时静态注册的模块图表相同，也与后续在应用程序中注册的lazy 模块相同。
 
-#### 懒加载控制器、网关和解析器
+其中 `https` 是一个将导出一个 **常规 Nest 模块**（不需要额外更改）的 TypeScript 文件。
 
-由于 Nest 中的控制器（或 GraphQL 应用程序中的解析器）代表了一些路由/路径/主题（或查询/ mutation），因此 **不能懒加载它们** 使用 `application/json` 类。
+__INLINE_CODE_15__ 方法返回 __LINK_32__（__INLINE_CODE_16__），允许您浏览内部提供者列表并使用注入令牌作为查找键来获取任何提供者的引用。
 
-> 错误 **警告** 在懒加载模块中注册的控制器、网关和解析器将不会正常工作。类似地，您不能在需要时注册中间件函数（实现 `application/x-www-form-urlencoded` 接口）。
+例如，让我们假设我们有一个 __INLINE_CODE_17__，具有以下定义：
 
-For example, let's say you're building a REST API (HTTP application) with a Fastify driver under the hood (using the `text/plain` package). Fastify does not let you register routes after the application is ready/successfully listening to messages. That means even if we analyzed route mappings registered in the module's controllers, all lazy loaded routes wouldn't be accessible since there is no way to register them at runtime.
+__CODE_BLOCK_4__
 
-Likewise, some transport strategies we provide as part of the `NestFactory.create` package (including Kafka, gRPC, or RabbitMQ) require to subscribe/listen to specific topics/channels before the connection is established. Once your application starts listening to messages, the framework would not be able to subscribe/listen to new topics.
+> 提示 **Hint** Lazy loaded 模块不能注册为 **全局模块**，因为它们是在按需加载的，仅在静态注册的模块都已经实例化后才注册。同样，注册 **全局增强器**（guards/interceptors 等）也将不起作用。
 
-Lastly, the `NestFastifyApplication` package with the code first approach enabled automatically generates the GraphQL schema on-the-fly based on the metadata. That means, it requires all classes to be loaded beforehand. Otherwise, it would not be doable to create the appropriate, valid schema.
+现在，我们可以获取 __INLINE_CODE_18__ 提供者的引用，以下是方法：
+
+__CODE_BLOCK_5__
+
+> 警告 **Warning** 如果您使用 **Webpack**，请确保更新您的 __INLINE_CODE_19__ 文件 - 将 __INLINE_CODE_20__ 设置为 __INLINE_CODE_21__，并添加 __INLINE_CODE_22__ 属性，__INLINE_CODE_23__ 作为值：
+>
+> __CODE_BLOCK_6__
+>
+> 在这些选项设置完毕后，您将能够利用 __LINK_33__ 功能。
+
+#### Lazy loading 控制器、网关和解析器
+
+由于 Nest 中的控制器（或 GraphQL 应用程序中的解析器）表示路由/路径/主题（或查询/mutation）集，您 **不能使用 __INLINE_CODE_24__ 类来 lazy loading它们**。
+
+> 警告 **Warning** 在 lazy loaded 模块中注册的控制器、 __LINK_34__ 和 __LINK_35__ 将不会按预期工作。同样，您不能在按需注册中间件函数（实现 __INLINE_CODE_25__ 接口）。
+
+例如，让我们假设您正在构建一个 REST API（HTTP 应用程序）使用 Fastify 驱动程序（使用 __INLINE_CODE_26__ 包）。Fastify 不允许在应用程序准备好/成功监听消息时注册路由。这意味着，即使我们分析了模块中的路由映射，所有 lazy loaded 路由都不能访问，因为没有办法在 runtime 注册它们。
+
+类似地，某些传输策略，我们提供的 __INLINE_CODE_27__ 包（包括 Kafka、gRPC 或 RabbitMQ）要求在连接建立之前订阅/监听特定主题/通道。应用程序开始监听消息后，框架无法订阅/监听新的主题。
+
+最后， __INLINE_CODE_28__ 包具有代码优先启用自动生成 GraphQL 架构的能力，这意味着需要在所有类加载后生成架构。否则，无法创建合法的架构。
 
 #### 常见用例
 
-大多数情况下，您将看到懒加载模块在以下情况下：您的 worker/cron job/lambda & serverless 函数/webhook 必须根据输入参数（路由路径/日期/查询参数等）触发不同的服务（不同的逻辑）。另一方面，懒加载模块对于 monolithic 应用程序来说可能不太有用，因为启动时间在这种情况下是无关紧要的。
+最常见的是，您将在 worker/cron job/lambda & serverless function/webhook 中看到 lazy loaded 模块，这些模块将根据输入参数（路由路径/日期/查询参数等）触发不同的服务（不同的逻辑）。相反，lazy loading 模块可能对 monolithic 应用程序来说不是太有意义，因为启动时间对它们来说是无关紧要的。

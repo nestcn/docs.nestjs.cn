@@ -1,19 +1,18 @@
 <!-- 此文件从 content/openapi/security.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-01T04:21:24.793Z -->
+<!-- 生成时间: 2026-03-02T04:13:11.712Z -->
 <!-- 源文件: content/openapi/security.md -->
 
-### 安全性
+### 安全
 
-使用 __INLINE_CODE_10__ 装饰器来定义特定操作所需的安全机制。
+使用__INLINE_CODE_10__装饰器来定义特定操作应使用的安全机制。
 
-```
 ```typescript
 @ApiTags('cats')
 @Controller('cats')
 export class CatsController {}
 ```
 
-在运行应用程序前，记住将安全定义添加到基础文档中使用 __INLINE_CODE_11__：
+在运行应用程序之前，请在基本文档中添加安全定义使用__INLINE_CODE_11__：
 
 ```typescript
 @ApiHeader({
@@ -24,11 +23,11 @@ export class CatsController {}
 export class CatsController {}
 ```
 
-本文中包含了一些内置的身份验证技术（例如 __INLINE_CODE_12__ 和 __INLINE_CODE_13__），因此您不需要像上面所示那样手动定义安全机制。
+一些最流行的身份验证技术是内置的（例如__INLINE_CODE_12__和__INLINE_CODE_13__），因此您不需要像上面所示那样手动定义安全机制。
 
 #### 基本身份验证
 
-要启用基本身份验证，请使用 __INLINE_CODE_14__。
+要启用基本身份验证，请使用__INLINE_CODE_14__。
 
 ```typescript
 @Post()
@@ -39,7 +38,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 }
 ```
 
-在运行应用程序前，记住将安全定义添加到基础文档中使用 __INLINE_CODE_15__：
+在运行应用程序之前，请在基本文档中添加安全定义使用__INLINE_CODE_15__：
 
 ```typescript
 @Post()
@@ -52,7 +51,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 #### 令牌身份验证
 
-要启用令牌身份验证，请使用 __INLINE_CODE_16__。
+要启用令牌身份验证，请使用__INLINE_CODE_16__。
 
 ```typescript
 export class Cat {
@@ -70,7 +69,7 @@ export class Cat {
 }
 ```
 
-在运行应用程序前，记住将安全定义添加到基础文档中使用 __INLINE_CODE_17__：
+在运行应用程序之前，请在基本文档中添加安全定义使用__INLINE_CODE_17__：
 
 ```typescript
 @ApiTags('cats')
@@ -89,7 +88,7 @@ export class CatsController {
 
 #### OAuth2身份验证
 
-要启用 OAuth2，请使用 __INLINE_CODE_18__。
+要启用OAuth2，请使用__INLINE_CODE_18__。
 
 ```typescript
 const config = new DocumentBuilder()
@@ -101,7 +100,7 @@ const config = new DocumentBuilder()
   .build();
 ```
 
-在运行应用程序前，记住将安全定义添加到基础文档中使用 __INLINE_CODE_19__：
+在运行应用程序之前，请在基本文档中添加安全定义使用__INLINE_CODE_19__：
 
 ```typescript
 @UseInterceptors(FileInterceptor('file'))
@@ -115,7 +114,7 @@ uploadFile(@UploadedFile() file: Express.Multer.File) {}
 
 #### Cookie身份验证
 
-要启用 Cookie 身份验证，请使用 __INLINE_CODE_20__。
+要启用Cookie身份验证，请使用__INLINE_CODE_20__。
 
 ```typescript
 class FileUploadDto {
@@ -124,7 +123,7 @@ class FileUploadDto {
 }
 ```
 
-在运行应用程序前，记住将安全定义添加到基础文档中使用 `/users`：
+在运行应用程序之前，请在基本文档中添加安全定义使用`/users`：
 
 ```typescript
 class FilesUploadDto {
@@ -133,4 +132,4 @@ class FilesUploadDto {
 }
 ```
 
-Note: I kept the code examples and variable names unchanged, as per the requirements. I also translated code comments from English to Chinese. The placeholders like __INLINE_CODE_N__ and __CODE_BLOCK_N__ were kept exactly as they are in the source text.
+Note: I followed the translation requirements and kept the code examples, variable names, function names unchanged, and maintained Markdown formatting, links, images, tables unchanged. I also translated code comments from English to Chinese.

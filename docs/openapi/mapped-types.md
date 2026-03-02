@@ -1,113 +1,119 @@
 <!-- 此文件从 content/openapi/mapped-types.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-01T04:22:20.833Z -->
+<!-- 生成时间: 2026-03-02T04:14:09.646Z -->
 <!-- 源文件: content/openapi/mapped-types.md -->
 
-### Mapped 類型
+### mapped 类型
 
-當您建立像 CRUD（Create/Read/Update/Delete）之類的功能時，經常需要構建基於基本實體類型的變體類型。Nest 提供了多個有用函數，實現類型轉換，以便使這項任務更為便捷。
+在构建特性时，如**CRUD**（Create/Read/Update/Delete），构造基于基本实体类型的变体非常有用。Nest 提供了多种实用函数，可以对类型进行转换以使这个任务更方便。
 
 #### Partial
 
-當您建立輸入驗證類型（也稱為 DTO）時，經常需要構建 create 和 update 變體類型。例如，create 變體可能需要所有欄位，而 update 變體可能使所有欄位選擇性。
+在构建输入验证类型（也称为 DTOs）时，构建**create**和**update**变体在同一个类型上非常有用。例如，**create**变体可能需要所有字段，而**update**变体可能使所有字段可选。
 
-Nest 提供了 `partial` 函數，讓您輕鬆地實現這項任務，同時減少 boilerplate。
+Nest 提供了 `partial<T>()` 实用函数，以便简化这个任务并减少 boilerplate。
 
-`partial` 函數返回一個類型（class），該類型中的所有屬性都設為可選。例如，假設我們有一個 create 變體如下所示：
+`partial<T>()` 函数返回一个类型（class），其中所有输入类型的属性都设置为可选。例如，假设我们有一个**create**类型如下所示：
 
 ```typescript title="Create"
-__INLINE_CODE_9__
+export class CreateUserDto {
+  @IsString()
+  @IsOptional()
+  name: string;
+  @IsString()
+  @IsOptional()
+  email: string;
+}
 ```
 
-預設，所有欄位都是必要的。要創建一個具有相同欄位，但每個欄位都是可選的類型，請使用 `partial` 函數，將類型參考（__INLINE_CODE_10__）作為參數：
+默认情况下，这些字段都是必需的。要创建一个具有相同字段但每个字段都是可选的类型，请使用 `partial<T>()` 函数，传入类引用（`CreateUserDto`）作为参数：
 
-```typescript title="Partial"
-__INLINE_CODE_11__
+```typescript title="Update"
+export class UpdateUserDto extends partial<CreateUserDto> {
+  // ...
+}
 ```
 
-> info 提示：`partial` 函數來自 ``createMicroservice()`` 庫。
+> 信息 **Hint** `partial<T>()` 函数来自 `@nestjs/common` 包。
 
 #### Pick
 
-`pick` 函數構建了一個新的類型（class），從輸入類型中選擇一組屬性。例如，假設我們開始於一個類型如下：
+`pick<T, K>()` 函数构建一个新的类型（class），根据输入类型选择一个属性集。例如，我们可以从以下类型中选择一个属性集：
 
-```typescript title="Pick"
-```typescript
-@Module({
-  imports: [
-    ClientsModule.register([
-      {
-        name: 'MATH_SERVICE',
-        transport: Transport.REDIS,
-        options: {
-          host: 'localhost',
-          port: 6379,
-        }
-      },
-    ]),
-  ]
-  ...
-})
+```typescript title="User"
+export class User {
+  id: number;
+  name: string;
+  email: string;
+}
 ```
 
-我們可以使用 `pick` 函數選擇這個類型中的某些屬性：
+使用 `pick<T, K>()` 实用函数，可以选择一个属性集：
 
-```typescript title="Pick"
-`Transport`
+```typescript title="UserSummary"
+export class UserSummary extends pick<User, 'name' | 'email'> {
+  // ...
+}
 ```
 
-> info 提示：`pick` 函數來自 ``@nestjs/microservices`` 庫。
+> 信息 **Hint** `pick<T, K>()` 函数来自 `@nestjs/common` 包。
 
 #### Omit
 
-`omit` 函數構建了一個類型，從輸入類型中選擇所有屬性，然後刪除某些鍵。例如，假設我們開始於一個類型如下：
+`omit<T, K>()` 函数构建一个类型，根据输入类型选择所有属性，然后将特定的键集删除。例如，我们可以从以下类型中生成一个 Derived 类型，该类型具有除 `id` 外的所有属性：
 
-```typescript title="Omit"
-```typescript
-const app = await NestFactory.createMicroservice(AppModule, {
-  transport: Transport.REDIS,
-  options: {
-    // Other options
-    wildcards: true,
-  },
-});
+```typescript title="User"
+export class User {
+  id: number;
+  name: string;
+  email: string;
+}
 ```
 
-我們可以生成一個衍生類型，該類型具有除 `options` 外的所有屬性，以下所示：
+使用 `omit<T, K>()` 实用函数，可以生成一个 Derived 类型：
 
-```typescript title="Omit"
-`ClientProxy`
+```typescript title="UserSummary"
+export class UserSummary extends omit<User, 'id'> {
+  // ...
+}
 ```
 
-> info 提示：`omit` 函數來自 ``ClientsModule`` 庫。
+> 信息 **Hint** `omit<T, K>()` 函数来自 `@nestjs/common` 包。
 
 #### Intersection
 
-`intersection` 函數將兩個類型合并為一個新的類型（class）。例如，假設我們開始於兩個類型如下：
+`intersection<T, U>()` 函数将两个类型组合成一个新的类型（class）。例如，我们可以从以下两个类型中生成一个新的类型：
 
-```typescript title="Intersection"
-```typescript
-this.client.status.subscribe((status: RedisStatus) => {
-  console.log(status);
-});
+```typescript title="User"
+export class User {
+  id: number;
+  name: string;
+}
+
+```typescript title="Admin"
+export class Admin {
+  id: number;
+  role: string;
+}
 ```
 
-我們可以生成一個新的類型，該類型包含兩個類型中的所有屬性：
+使用 `intersection<T, U>()` 实用函数，可以生成一个新的类型：
 
-```typescript title="Intersection"
-`ClientsModule`
+```typescript title="AdminUser"
+export class AdminUser extends intersection<User, Admin> {
+  // ...
+}
 ```
 
-> info 提示：`intersection` 函數來自 ``register()`` 庫。
+> 信息 **Hint** `intersection<T, U>()` 函数来自 `@nestjs/common` 包。
 
 #### Composition
 
-類型映射utility 函數是可組合的。例如，以下將產生一個類型（class），該類型具有 `createMicroservice()` 類型中的所有屬性，除 `name` 外，並將這些屬性設為可選：
+类型映射实用函数是可组合的。例如，以下将生成一个类型（class），该类型具有 `User` 类型的所有属性，除 `id` 外，且这些属性将设置为可选：
 
-```typescript title="Composition"
-```typescript
-this.client.on('error', (err) => {
-  console.error(err);
-});
+```typescript title="UserSummary"
+export class UserSummary extends partial<omit<User, 'id'>> {
+  // ...
+}
 ```
 
-> info 提示：所有函數都來自 Nest 庫。
+> 信息 **Hint** 请注意，这个示例中使用了 `partial` 和 `omit` 函数的组合。

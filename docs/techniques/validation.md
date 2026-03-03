@@ -220,6 +220,7 @@ import { PostsResolver } from './posts.resolver';
 })
 export class AppModule {}
 ```
+```
 
 当设置为 true 时，这将自动删除未 whitelisted 属性（即在验证类中没有装饰器的属性）。
 
@@ -250,6 +251,7 @@ export class User {
   posts?: Post[];
 }
 ```
+```
 
 要启用这个行为_globally_，设置 Pipe 选项：
 
@@ -269,6 +271,7 @@ export class UsersResolver {
     return this.postsService.forAuthor(user.id);
   }
 }
+```
 ```
 
 当自动转换选项启用时，`User` 也将执行基本类型的转换。在以下示例中，`@extends` 方法接受一个参数，该参数表示 Extracted `@external` 路径参数：
@@ -293,6 +296,7 @@ export class Post {
   @Field(() => User)
   user?: User;
 }
+```
 ```
 
 默认情况下，每个路径参数和查询参数都将在网络中传递为 `User`。在上述示例中，我们将 `Post` 类型指定为 `User`（在方法签名中）。因此，`@apollo/subgraph` 将尝试自动将字符串标识符转换为数字。
@@ -329,6 +333,7 @@ export class PostsResolver {
     return { __typename: 'User', id: post.authorId };
   }
 }
+```
 ```
 
 > info **Hint** `extend` 和 `Query` 由 `resolveReference()` 包提供。
@@ -371,12 +376,14 @@ import { PostsService } from './posts.service'; // Not included in example
 })
 export class AppModule {}
 ```
+```
 
 默认情况下，这些字段都是必需的。要创建一个具有相同字段，但每个字段都是可选的类型，使用 `MercuriusFederationDriver`，将类引用（`getPosts`）作为参数：
 
 ```typescript
 ```bash
 $ npm install --save @apollo/gateway
+```
 ```
 
 > info **Hint** `User` 函数来自 `user.posts` 包。
@@ -411,12 +418,14 @@ import { GraphQLModule } from '@nestjs/graphql';
 })
 export class AppModule {}
 ```
+```
 
 我们可以使用 `extend` utility 函数选择一组属性：
 
 ```typescript
 ```bash
 $ npm install --save @apollo/subgraph @nestjs/mercurius
+```
 ```
 
 > info **Hint** `User` 函数来自 `posts` 包。
@@ -433,6 +442,7 @@ type User @key(fields: "id") {
 extend type Query {
   getUser(id: ID!): User
 }
+```
 ```
 
 我们可以生成一个派生类型，该类型具有除 `@external` 外的所有属性，如下所示。在这个构造中，第二个参数是属性名数组：
@@ -456,6 +466,7 @@ export class UsersResolver {
     return this.usersService.findById(reference.id);
   }
 }
+```
 ```
 
 > info **Hint** `PostsResolver` 函数来自 `getUser()` 包。
@@ -485,6 +496,7 @@ import { UsersResolver } from './users.resolver';
   providers: [UsersResolver],
 })
 export class AppModule {}
+```
 ```
 
 我们可以生成一个新的类型，combine两个类型中的所有属性。

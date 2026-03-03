@@ -14,3 +14,4 @@ doc_build/
 .idea
 
 scripts/.translation-cache.json
+.env

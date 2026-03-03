@@ -2,21 +2,21 @@
 <!-- 生成时间: 2026-03-03T07:09:52.732Z -->
 <!-- 源文件: content/controllers.md -->
 
-### Controllers
+### 控制器
 
-Controllers are responsible for handling incoming **requests** and sending **responses** back to the client.
+控制器负责处理传入的 **请求** 并将 **响应** 发送回客户端。
 
 <figure><img class="illustrative-image" src="/assets/Controllers_1.png" /></figure>
 
-A controller's purpose is to handle specific requests for the application. The **routing** mechanism determines which controller will handle each request. Often, a controller has multiple routes, and each route can perform a different action.
+控制器的目的是处理应用程序的特定请求。**路由** 机制决定哪个控制器将处理每个请求。通常，一个控制器有多个路由，每个路由可以执行不同的操作。
 
-To create a basic controller, we use classes and **decorators**. Decorators link classes with the necessary metadata, allowing Nest to create a routing map that connects requests to their corresponding controllers.
+要创建基本控制器，我们使用类和 **装饰器**。装饰器将类与必要的元数据链接起来，允许 Nest 创建一个将请求连接到相应控制器的路由映射。
 
-> info **Hint** To quickly create a CRUD controller with built-in [validation](/techniques/validation), you can use the CLI's [CRUD generator](/recipes/crud-generator#crud-generator): `nest g resource [name]`.
+> info **提示** 要快速创建带有内置 [验证](/techniques/validation) 的 CRUD 控制器，您可以使用 CLI 的 [CRUD 生成器](/recipes/crud-generator#crud-生成器)：`nest g resource [name]`。
 
-#### Routing
+#### 路由
 
-In the following example, we’ll use the `@Controller()` decorator, which is **required** to define a basic controller. We'll specify an optional route path prefix of `cats`. Using a path prefix in the `@Controller()` decorator helps us group related routes together and reduces repetitive code. For example, if we want to group routes that manage interactions with a cat entity under the `/cats` path, we can specify the `cats` path prefix in the `@Controller()` decorator. This way, we don't need to repeat that portion of the path for each route in the file.
+在下面的示例中，我们将使用 `@Controller()` 装饰器，这是定义基本控制器 **必需** 的。我们将指定一个可选的路由路径前缀 `cats`。在 `@Controller()` 装饰器中使用路径前缀有助于我们将相关路由组合在一起并减少重复代码。例如，如果我们想将管理与猫实体交互的路由组合在 `/cats` 路径下，我们可以在 `@Controller()` 装饰器中指定 `cats` 路径前缀。这样，我们就不需要为文件中的每个路由重复该路径部分。
 
 ```typescript
 import { Controller, Get } from '@nestjs/common';
@@ -38,43 +38,43 @@ export class CatsController {
 }
 ```
 
-> info **Hint** To create a controller using the CLI, simply execute the `$ nest g controller [name]` command.
+> info **提示** 要使用 CLI 创建控制器，只需执行 `$ nest g controller [name]` 命令。
 
-The `@Get()` HTTP request method decorator placed before the `findAll()` method tells Nest to create a handler for a specific endpoint for HTTP requests. This endpoint is defined by the HTTP request method (GET in this case) and the route path. So, what is the route path? The route path for a handler is determined by combining the (optional) prefix declared for the controller with any path specified in the method's decorator. Since we've set a prefix (`cats`) for every route and haven't added any specific path in the method decorator, Nest will map `GET /cats` requests to this handler.
+放在 `findAll()` 方法之前的 `@Get()` HTTP 请求方法装饰器告诉 Nest 为 HTTP 请求的特定端点创建处理程序。此端点由 HTTP 请求方法（本例中为 GET）和路由路径定义。那么，什么是路由路径？处理程序的路由路径是通过将为控制器声明的（可选）前缀与方法装饰器中指定的任何路径组合来确定的。由于我们为每个路由设置了前缀（`cats`），并且没有在方法装饰器中添加任何特定路径，Nest 将把 `GET /cats` 请求映射到这个处理程序。
 
-As mentioned, the route path includes both the optional controller path prefix **and** any path string specified in the method's decorator. For example, if the controller prefix is `cats` and the method decorator is `@Get('breed')`, the resulting route will be `GET /cats/breed`.
+如前所述，路由路径包括可选的控制器路径前缀 **和** 方法装饰器中指定的任何路径字符串。例如，如果控制器前缀是 `cats`，方法装饰器是 `@Get('breed')`，则生成的路由将是 `GET /cats/breed`。
 
-In our example above, when a GET request is made to this endpoint, Nest routes the request to the user-defined `findAll()` method. Note that the method name we choose here is entirely arbitrary. While we must declare a method to bind the route to, Nest doesn’t attach any specific significance to the method name.
+在我们上面的示例中，当对该端点发出 GET 请求时，Nest 会将请求路由到用户定义的 `findAll()` 方法。请注意，我们在这里选择的方法名称完全是任意的。虽然我们必须声明一个方法来绑定路由，但 Nest 不会对方法名称附加任何特定意义。
 
-This method will return a 200 status code along with the associated response, which in this case is just a string. Why does this happen? To explain, we first need to introduce the concept that Nest uses two **different** options for manipulating responses:
+此方法将返回 200 状态码以及相关的响应，在这种情况下只是一个字符串。为什么会发生这种情况？要解释这一点，我们首先需要介绍 Nest 使用两种 **不同** 选项来操作响应的概念：
 
 <table>
   <tr>
-    <td>Standard (recommended)</td>
+    <td>标准（推荐）</td>
     <td>
-      Using this built-in method, when a request handler returns a JavaScript object or array, it will <strong>automatically</strong>
-      be serialized to JSON. When it returns a JavaScript primitive type (e.g., <code>string</code>, <code>number</code>, <code>boolean</code>), however, Nest will send just the value without attempting to serialize it. This makes response handling simple: just return the value, and Nest takes care of the rest.
+      使用这种内置方法，当请求处理程序返回 JavaScript 对象或数组时，它将 <strong>自动</strong>
+      被序列化为 JSON。然而，当它返回 JavaScript 原始类型（例如，<code>string</code>、<code>number</code>、<code>boolean</code>）时，Nest 将只发送值而不尝试序列化它。这使响应处理变得简单：只需返回值，Nest 就会处理其余的事情。
       <br />
-      <br /> Furthermore, the response's <strong>status code</strong> is always 200 by default, except for POST
-      requests which use 201. We can easily change this behavior by adding the <code>@HttpCode(...)</code>
-      decorator at a handler-level (see <a href='controllers#status-code'>Status codes</a>).
+      <br /> 此外，响应的 <strong>状态码</strong> 默认始终为 200，除了使用 201 的 POST
+      请求。我们可以通过在处理程序级别添加 <code>@HttpCode(...)</code>
+      装饰器来轻松更改此行为（请参阅 <a href='controllers#status-code'>状态码</a>）。
     </td>
   </tr>
   <tr>
-    <td>Library-specific</td>
+    <td>库特定</td>
     <td>
-      We can use the library-specific (e.g., Express) <a href="https://expressjs.com/en/api.html#res" rel="nofollow" target="_blank">response object</a>, which can be injected using the <code>@Res()</code> decorator in the method handler signature (e.g., <code>findAll(@Res() response)</code>).  With this approach, you have the ability to use the native response handling methods exposed by that object.  For example, with Express, you can construct responses using code like <code>response.status(200).send()</code>.
+      我们可以使用库特定的（例如，Express）<a href="https://expressjs.com/en/api.html#res" rel="nofollow" target="_blank">响应对象</a>，可以使用方法处理程序签名中的 <code>@Res()</code> 装饰器来注入（例如，<code>findAll(@Res() response)</code>）。通过这种方法，您可以使用该对象公开的本机响应处理方法。例如，使用 Express，您可以使用 <code>response.status(200).send()</code> 这样的代码构造响应。
     </td>
   </tr>
 </table>
 
-> warning **Warning** Nest detects when the handler is using either `@Res()` or `@Next()`, indicating you have chosen the library-specific option. If both approaches are used at the same time, the Standard approach is **automatically disabled** for this single route and will no longer work as expected. To use both approaches at the same time (for example, by injecting the response object to only set cookies/headers but still leave the rest to the framework), you must set the `passthrough` option to `true` in the `@Res({{ '{' }} passthrough: true {{ '}' }})` decorator.
+> warning **警告** Nest 会检测处理程序何时使用 `@Res()` 或 `@Next()`，表明您已选择库特定选项。如果同时使用两种方法，则此单个路由的标准方法会 **自动禁用**，并且将不再按预期工作。要同时使用两种方法（例如，通过注入响应对象仅设置 cookie/标头但仍将其余部分留给框架），您必须在 `@Res({{ '{' }} passthrough: true {{ '}' }})` 装饰器中将 `passthrough` 选项设置为 `true`。
 
 <app-banner-devtools></app-banner-devtools>
 
-#### Request object
+#### 请求对象
 
-Handlers often need access to the client’s **request** details. Nest provides access to the [request object](https://expressjs.com/en/api.html#req) from the underlying platform (Express by default). You can access the request object by instructing Nest to inject it using the `@Req()` decorator in the handler’s signature.
+处理程序通常需要访问客户端的 **请求** 详细信息。Nest 提供对来自底层平台（默认情况下为 Express）的 [请求对象](https://expressjs.com/en/api.html#req) 的访问。您可以通过指示 Nest 在处理程序的签名中使用 `@Req()` 装饰器注入请求对象来访问请求对象。
 
 ```typescript
 import { Controller, Get, Req } from '@nestjs/common';
@@ -98,9 +98,9 @@ export class CatsController {
 }
 ```
 
-> info **Hint** To take advantage of `express` typings (like in the `request: Request` parameter example above), make sure to install the `@types/express` package.
+> info **提示** 要利用 `express` 类型（如上面的 `request: Request` 参数示例），请确保安装 `@types/express` 包。
 
-The request object represents the HTTP request and contains properties for the query string, parameters, HTTP headers, and body (read more [here](https://expressjs.com/en/api.html#req)). In most cases, you don't need to manually access these properties. Instead, you can use dedicated decorators like `@Body()` or `@Query()`, which are available out of the box. Below is a list of the provided decorators and the corresponding platform-specific objects they represent.
+请求对象表示 HTTP 请求，并包含查询字符串、参数、HTTP 标头和主体的属性（更多信息请阅读 [这里](https://expressjs.com/en/api.html#req)）。在大多数情况下，您不需要手动访问这些属性。相反，您可以使用开箱即用的专用装饰器，如 `@Body()` 或 `@Query()`。下面是提供的装饰器列表以及它们表示的相应平台特定对象。
 
 <table>
   <tbody>
@@ -146,13 +146,13 @@ The request object represents the HTTP request and contains properties for the q
   </tbody>
 </table>
 
-<sup>\* </sup>For compatibility with typings across underlying HTTP platforms (e.g., Express and Fastify), Nest provides `@Res()` and `@Response()` decorators. `@Res()` is simply an alias for `@Response()`. Both directly expose the underlying native platform `response` object interface. When using them, you should also import the typings for the underlying library (e.g., `@types/express`) to take full advantage. Note that when you inject either `@Res()` or `@Response()` in a method handler, you put Nest into **Library-specific mode** for that handler, and you become responsible for managing the response. When doing so, you must issue some kind of response by making a call on the `response` object (e.g., `res.json(...)` or `res.send(...)`), or the HTTP server will hang.
+<sup>\* </sup>为了与底层 HTTP 平台（例如，Express 和 Fastify）的类型兼容，Nest 提供了 `@Res()` 和 `@Response()` 装饰器。`@Res()` 只是 `@Response()` 的别名。两者都直接公开底层本机平台 `response` 对象接口。使用它们时，您还应该导入底层库的类型（例如，`@types/express`）以充分利用。请注意，当您在方法处理程序中注入 `@Res()` 或 `@Response()` 时，您将 Nest 置于该处理程序的 **库特定模式**，并且您负责管理响应。这样做时，您必须通过对 `response` 对象进行调用（例如，`res.json(...)` 或 `res.send(...)`）来发出某种响应，否则 HTTP 服务器将挂起。
 
-> info **Hint** To learn how to create your own custom decorators, visit [this](/custom-decorators) chapter.
+> info **提示** 要学习如何创建自己的自定义装饰器，请访问 [此](/custom-decorators) 章节。
 
-#### Resources
+#### 资源
 
-Earlier, we defined an endpoint to fetch the cats resource (**GET** route). We'll typically also want to provide an endpoint that creates new records. For this, let's create the **POST** handler:
+ earlier，我们定义了一个端点来获取猫资源（**GET** 路由）。我们通常还希望提供一个创建新记录的端点。为此，让我们创建 **POST** 处理程序：
 
 ```typescript
 import { Controller, Get, Post } from '@nestjs/common';
@@ -184,11 +184,11 @@ export class CatsController {
 }
 ```
 
-It's that simple. Nest provides decorators for all of the standard HTTP methods: `@Get()`, `@Post()`, `@Put()`, `@Delete()`, `@Patch()`, `@Options()`, and `@Head()`. In addition, `@All()` defines an endpoint that handles all of them.
+就是这么简单。Nest 为所有标准 HTTP 方法提供装饰器：`@Get()`、`@Post()`、`@Put()`、`@Delete()`、`@Patch()`、`@Options()` 和 `@Head()`。此外，`@All()` 定义了一个处理所有这些的端点。
 
-#### Route wildcards
+#### 路由通配符
 
-Pattern-based routes are also supported in NestJS. For example, the asterisk (`*`) can be used as a wildcard to match any combination of characters in a route at the end of a path. In the following example, the `findAll()` method will be executed for any route that starts with `abcd/`, regardless of the number of characters that follow.
+NestJS 也支持基于模式的路由。例如，星号（`*`）可以用作通配符，以匹配路径末尾的路由中的任何字符组合。在以下示例中，`findAll()` 方法将对任何以 `abcd/` 开头的路由执行，无论后面跟着多少字符。
 
 ```typescript
 @Get('abcd/*')
@@ -197,15 +197,15 @@ findAll() {
 }
 ```
 
-The `'abcd/*'` route path will match `abcd/`, `abcd/123`, `abcd/abc`, and so on. The hyphen ( `-`) and the dot (`.`) are interpreted literally by string-based paths.
+`'abcd/*'` 路由路径将匹配 `abcd/`、`abcd/123`、`abcd/abc` 等。连字符（`-`）和点（`.`）在基于字符串的路径中按字面意思解释。
 
-This approach works on both Express and Fastify. However, with the latest release of Express (v5), the routing system has become more strict. In pure Express, you must use a named wildcard to make the route work—for example, `abcd/*splat`, where `splat` is simply the name of the wildcard parameter and has no special meaning. You can name it anything you like. That said, since Nest provides a compatibility layer for Express, you can still use the asterisk (`*`) as a wildcard.
+这种方法在 Express 和 Fastify 上都有效。然而，随着 Express（v5）的最新版本，路由系统变得更加严格。在纯 Express 中，您必须使用命名通配符来使路由工作 - 例如，`abcd/*splat`，其中 `splat` 只是通配符参数的名称，没有特殊含义。您可以随意命名它。也就是说，由于 Nest 为 Express 提供了兼容层，您仍然可以使用星号（`*`）作为通配符。
 
-When it comes to asterisks used in the **middle of a route**, Express requires named wildcards (e.g., `ab{{ '{' }}*splat&#125;cd`), while Fastify does not support them at all.
+当涉及到在路由 **中间** 使用的星号时，Express 需要命名通配符（例如，`ab{{ '{' }}*splat&#125;cd`），而 Fastify 根本不支持它们。
 
-#### Status code
+#### 状态码
 
-As mentioned, the default **status code** for responses is always **200**, except for POST requests, which default to **201**. You can easily change this behavior by using the `@HttpCode(...)` decorator at the handler level.
+如前所述，响应的默认 **状态码** 始终为 **200**，除了 POST 请求，默认为 **201**。您可以通过在处理程序级别使用 `@HttpCode(...)` 装饰器轻松更改此行为。
 
 ```typescript
 @Post()
@@ -215,13 +215,13 @@ create() {
 }
 ```
 
-> info **Hint** Import `HttpCode` from the `@nestjs/common` package.
+> info **提示** 从 `@nestjs/common` 包导入 `HttpCode`。
 
-Often, your status code isn't static but depends on various factors. In that case, you can use a library-specific **response** (inject using `@Res()`) object (or, in case of an error, throw an exception).
+通常，您的状态码不是静态的，而是取决于各种因素。在这种情况下，您可以使用库特定的 **响应**（使用 `@Res()` 注入）对象（或者，在错误的情况下，抛出异常）。
 
-#### Response headers
+#### 响应头
 
-To specify a custom response header, you can either use a `@Header()` decorator or a library-specific response object (and call `res.header()` directly).
+要指定自定义响应头，您可以使用 `@Header()` 装饰器或库特定的响应对象（并直接调用 `res.header()`）。
 
 ```typescript
 @Post()
@@ -231,26 +231,26 @@ create() {
 }
 ```
 
-> info **Hint** Import `Header` from the `@nestjs/common` package.
+> info **提示** 从 `@nestjs/common` 包导入 `Header`。
 
-#### Redirection
+#### 重定向
 
-To redirect a response to a specific URL, you can either use a `@Redirect()` decorator or a library-specific response object (and call `res.redirect()` directly).
+要将响应重定向到特定 URL，您可以使用 `@Redirect()` 装饰器或库特定的响应对象（并直接调用 `res.redirect()`）。
 
-`@Redirect()` takes two arguments, `url` and `statusCode`, both are optional. The default value of `statusCode` is `302` (`Found`) if omitted.
+`@Redirect()` 接受两个参数，`url` 和 `statusCode`，两者都是可选的。如果省略，`statusCode` 的默认值为 `302`（`Found`）。
 
 ```typescript
 @Get()
 @Redirect('https://nestjs.com', 301)
 ```
 
-> info **Hint** Sometimes you may want to determine the HTTP status code or the redirect URL dynamically. Do this by returning an object following the `HttpRedirectResponse` interface (from `@nestjs/common`).
+> info **提示** 有时您可能希望动态确定 HTTP 状态码或重定向 URL。为此，返回一个遵循 `HttpRedirectResponse` 接口（来自 `@nestjs/common`）的对象。
 
-Returned values will override any arguments passed to the `@Redirect()` decorator. For example:
+返回的值将覆盖传递给 `@Redirect()` 装饰器的任何参数。例如：
 
 ```typescript
 @Get('docs')
-@Redirect('https://docs.nestjs.com', 302)
+@Redirect('./', 302)
 getDocs(@Query('version') version) {
   if (version && version === '5') {
     return { url: '/v5/' };
@@ -258,11 +258,11 @@ getDocs(@Query('version') version) {
 }
 ```
 
-#### Route parameters
+#### 路由参数
 
-Routes with static paths won’t work when you need to accept **dynamic data** as part of the request (e.g., `GET /cats/1` to get the cat with id `1`). To define routes with parameters, you can add route parameter **tokens** in the route path to capture the dynamic values from the URL. The route parameter token in the `@Get()` decorator example below illustrates this approach. These route parameters can then be accessed using the `@Param()` decorator, which should be added to the method signature.
+当您需要接受请求的一部分 **动态数据** 时（例如，`GET /cats/1` 获取 id 为 `1` 的猫），具有静态路径的路由将不起作用。要定义带有参数的路由，您可以在路由路径中添加路由参数 **令牌**，以从 URL 捕获动态值。下面 `@Get()` 装饰器示例中的路由参数令牌说明了这种方法。然后可以使用 `@Param()` 装饰器访问这些路由参数，该装饰器应添加到方法签名中。
 
-> info **Hint** Routes with parameters should be declared after any static paths. This prevents the parameterized paths from intercepting traffic destined for the static paths.
+> info **提示** 带参数的路由应在任何静态路径之后声明。这可以防止参数化路径拦截发往静态路径的流量。
 
 ```typescript
 @Get(':id')
@@ -272,9 +272,9 @@ findOne(@Param() params: any): string {
 }
 ```
 
-The `@Param()` decorator is used to decorate a method parameter (in the example above, `params`), making the **route** parameters accessible as properties of that decorated method parameter inside the method. As shown in the code, you can access the `id` parameter by referencing `params.id`. Alternatively, you can pass a specific parameter token to the decorator and directly reference the route parameter by name within the method body.
+`@Param()` 装饰器用于装饰方法参数（在上面的示例中，`params`），使 **路由** 参数在方法内部作为该装饰方法参数的属性可访问。如代码所示，您可以通过引用 `params.id` 来访问 `id` 参数。或者，您可以将特定的参数令牌传递给装饰器，并在方法体中直接按名称引用路由参数。
 
-> info **Hint** Import `Param` from the `@nestjs/common` package.
+> info **提示** 从 `@nestjs/common` 包导入 `Param`。
 
 ```typescript
 @Get(':id')
@@ -283,9 +283,9 @@ findOne(@Param('id') id: string): string {
 }
 ```
 
-#### Sub-domain routing
+#### 子域路由
 
-The `@Controller` decorator can take a `host` option to require that the HTTP host of the incoming requests matches some specific value.
+`@Controller` 装饰器可以接受 `host` 选项，要求传入请求的 HTTP 主机匹配某个特定值。
 
 ```typescript
 @Controller({ host: 'admin.example.com' })
@@ -297,9 +297,9 @@ export class AdminController {
 }
 ```
 
-> warning **Warning** Since **Fastify** does not support nested routers, if you are using sub-domain routing, it is recommended to use the default Express adapter instead.
+> warning **警告** 由于 **Fastify** 不支持嵌套路由器，如果您使用子域路由，建议使用默认的 Express 适配器。
 
-Similar to a route `path`, the `host` option can use tokens to capture the dynamic value at that position in the host name. The host parameter token in the `@Controller()` decorator example below demonstrates this usage. Host parameters declared in this way can be accessed using the `@HostParam()` decorator, which should be added to the method signature.
+与路由 `path` 类似，`host` 选项可以使用令牌来捕获主机名中该位置的动态值。下面 `@Controller()` 装饰器示例中的主机参数令牌演示了此用法。以这种方式声明的主机参数可以使用 `@HostParam()` 装饰器访问，该装饰器应添加到方法签名中。
 
 ```typescript
 @Controller({ host: ':account.example.com' })
@@ -311,15 +311,15 @@ export class AccountController {
 }
 ```
 
-#### State sharing
+#### 状态共享
 
-For developers coming from other programming languages, it might be surprising to learn that in Nest, nearly everything is shared across incoming requests. This includes resources like the database connection pool, singleton services with global state, and more. It's important to understand that Node.js doesn't use the request/response Multi-Threaded Stateless Model, where each request is handled by a separate thread. As a result, using singleton instances in Nest is completely **safe** for our applications.
+对于来自其他编程语言的开发人员来说，了解 Nest 中几乎所有内容都在传入请求之间共享可能会令人惊讶。这包括数据库连接池、具有全局状态的单例服务等资源。重要的是要理解 Node.js 不使用请求/响应多线程无状态模型，其中每个请求由单独的线程处理。因此，在 Nest 中使用单例实例对我们的应用程序来说是完全 **安全** 的。
 
-That said, there are specific edge cases where having request-based lifetimes for controllers may be necessary. Examples include per-request caching in GraphQL applications, request tracking, or implementing multi-tenancy. You can learn more about controlling injection scopes [here](/fundamentals/injection-scopes).
+也就是说，在某些特定的边缘情况下，可能需要为控制器设置基于请求的生命周期。例如，GraphQL 应用程序中的每个请求缓存、请求跟踪或实现多租户。您可以在此处了解有关控制注入作用域的更多信息 [这里](/fundamentals/injection-scopes)。
 
-#### Asynchronicity
+#### 异步性
 
-We love modern JavaScript, especially its emphasis on **asynchronous** data handling. That’s why Nest fully supports `async` functions. Every `async` function must return a `Promise`, which allows you to return a deferred value that Nest can resolve automatically. Here's an example:
+我们喜欢现代 JavaScript，尤其是它对 **异步** 数据处理的强调。这就是为什么 Nest 完全支持 `async` 函数。每个 `async` 函数都必须返回一个 `Promise`，这允许您返回 Nest 可以自动解析的延迟值。这是一个例子：
 
 ```typescript
 @Get()
@@ -328,7 +328,7 @@ async findAll(): Promise<any[]> {
 }
 ```
 
-This code is perfectly valid. But Nest takes it a step further by allowing route handlers to return RxJS [observable streams](https://rxjs-dev.firebaseapp.com/guide/observable) as well. Nest will handle the subscription internally and resolve the final emitted value once the stream completes.
+这段代码完全有效。但 Nest 更进一步，允许路由处理程序也返回 RxJS [可观察流](https://rxjs-dev.firebaseapp.com/guide/observable)。Nest 将在内部处理订阅，并在流完成后解析最终发出的值。
 
 ```typescript
 @Get()
@@ -337,15 +337,15 @@ findAll(): Observable<any[]> {
 }
 ```
 
-Both approaches are valid, and you can choose the one that best suits your needs.
+两种方法都有效，您可以选择最适合您需求的方法。
 
-#### Request payloads
+#### 请求体
 
-In our previous example, the POST route handler didn’t accept any client parameters. Let's fix that by adding the `@Body()` decorator.
+在我们之前的示例中，POST 路由处理程序不接受任何客户端参数。让我们通过添加 `@Body()` 装饰器来解决这个问题。
 
-Before we proceed (if you're using TypeScript), we need to define the **DTO** (Data Transfer Object) schema. A DTO is an object that specifies how data should be sent over the network. We could define the DTO schema using **TypeScript** interfaces or simple classes. However, we recommend using **classes** here. Why? Classes are part of the JavaScript ES6 standard, so they remain intact as real entities in the compiled JavaScript. In contrast, TypeScript interfaces are removed during transpilation, meaning Nest can't reference them at runtime. This is important because features like **Pipes** rely on having access to the metatype of variables at runtime, which is only possible with classes.
+在我们继续之前（如果您使用 TypeScript），我们需要定义 **DTO**（数据传输对象）模式。DTO 是一个对象，指定数据应如何通过网络发送。我们可以使用 **TypeScript** 接口或简单类来定义 DTO 模式。但是，我们建议在此处使用 **类**。为什么？类是 JavaScript ES6 标准的一部分，因此它们在编译的 JavaScript 中作为真实实体保持不变。相比之下，TypeScript 接口在转译过程中被删除，这意味着 Nest 无法在运行时引用它们。这很重要，因为像 **Pipes** 这样的功能依赖于在运行时访问变量的元类型，这只有类才有可能。
 
-Let's create the `CreateCatDto` class:
+让我们创建 `CreateCatDto` 类：
 
 ```typescript
 export class CreateCatDto {
@@ -355,7 +355,7 @@ export class CreateCatDto {
 }
 ```
 
-It has only three basic properties. Thereafter we can use the newly created DTO inside the `CatsController`:
+它只有三个基本属性。之后，我们可以在 `CatsController` 中使用新创建的 DTO：
 
 ```typescript
 @Post()
@@ -364,13 +364,13 @@ async create(@Body() createCatDto: CreateCatDto) {
 }
 ```
 
-> info **Hint** Our `ValidationPipe` can filter out properties that should not be received by the method handler. In this case, we can whitelist the acceptable properties, and any property not included in the whitelist is automatically stripped from the resulting object. In the `CreateCatDto` example, our whitelist is the `name`, `age`, and `breed` properties. Learn more [here](/techniques/validation#stripping-properties).
+> info **提示** 我们的 `ValidationPipe` 可以过滤掉方法处理程序不应接收的属性。在这种情况下，我们可以白名单可接受的属性，任何未包含在白名单中的属性都会自动从结果对象中删除。在 `CreateCatDto` 示例中，我们的白名单是 `name`、`age` 和 `breed` 属性。了解更多 [这里](/techniques/validation#剥离属性)。
 
-#### Query parameters
+#### 查询参数
 
-When handling query parameters in your routes, you can use the `@Query()` decorator to extract them from incoming requests. Let's see how this works in practice.
+在处理路由中的查询参数时，您可以使用 `@Query()` 装饰器从传入请求中提取它们。让我们看看这在实践中是如何工作的。
 
-Consider a route where we want to filter a list of cats based on query parameters like `age` and `breed`. First, define the query parameters in the `CatsController`:
+考虑一个路由，我们希望根据 `age` 和 `breed` 等查询参数过滤猫的列表。首先，在 `CatsController` 中定义查询参数：
 
 ```typescript
 @Get()
@@ -379,29 +379,29 @@ async findAll(@Query('age') age: number, @Query('breed') breed: string) {
 }
 ```
 
-In this example, the `@Query()` decorator is used to extract the values of `age` and `breed` from the query string. For example, a request to:
+在这个例子中，`@Query()` 装饰器用于从查询字符串中提取 `age` 和 `breed` 的值。例如，对以下请求：
 
 ```plaintext
 GET /cats?age=2&breed=Persian
 ```
 
-would result in `age` being `2` and `breed` being `Persian`.
+会导致 `age` 为 `2`，`breed` 为 `Persian`。
 
-If your application requires handling more complex query parameters, such as nested objects or arrays:
+如果您的应用程序需要处理更复杂的查询参数，例如嵌套对象或数组：
 
 ```plaintext
 ?filter[where][name]=John&filter[where][age]=30
 ?item[]=1&item[]=2
 ```
 
-you'll need to configure your HTTP adapter (Express or Fastify) to use an appropriate query parser. In Express, you can use the `extended` parser, which allows for rich query objects:
+您需要配置 HTTP 适配器（Express 或 Fastify）以使用适当的查询解析器。在 Express 中，您可以使用 `extended` 解析器，它允许丰富的查询对象：
 
 ```typescript
 const app = await NestFactory.create<NestExpressApplication>(AppModule);
 app.set('query parser', 'extended');
 ```
 
-In Fastify, you can use the `querystringParser` option:
+在 Fastify 中，您可以使用 `querystringParser` 选项：
 
 ```typescript
 const app = await NestFactory.create<NestFastifyApplication>(
@@ -412,15 +412,15 @@ const app = await NestFactory.create<NestFastifyApplication>(
 );
 ```
 
-> info **Hint** `qs` is a querystring parser that supports nesting and arrays. You can install it using `npm install qs`.
+> info **提示** `qs` 是一个支持嵌套和数组的查询字符串解析器。您可以使用 `npm install qs` 安装它。
 
-#### Handling errors
+#### 错误处理
 
-There's a separate chapter about handling errors (i.e., working with exceptions) [here](/exception-filters).
+有关处理错误（即处理异常）的单独章节，请参阅 [这里](/exception-filters)。
 
-#### Full resource sample
+#### 完整资源示例
 
-Below is an example that demonstrates the use of several available decorators to create a basic controller. This controller provides a few methods to access and manipulate internal data.
+下面是一个示例，演示了使用几个可用装饰器创建基本控制器。此控制器提供了一些方法来访问和操作内部数据。
 
 ```typescript
 import { Controller, Get, Query, Post, Body, Put, Param, Delete } from '@nestjs/common';
@@ -489,13 +489,13 @@ export class CatsController {
 }
 ```
 
-> info **Hint** Nest CLI offers a generator (schematic) that automatically creates **all the boilerplate code**, saving you from doing this manually and improving the overall developer experience. Learn more about this feature [here](/recipes/crud-generator).
+> info **提示** Nest CLI 提供了一个生成器（schematic），可以自动创建 **所有样板代码**，为您省去手动操作的麻烦，提高整体开发体验。了解有关此功能的更多信息 [这里](/recipes/crud-generator)。
 
-#### Getting up and running
+#### 启动和运行
 
-Even with the `CatsController` fully defined, Nest doesn't yet know about it and won't automatically create an instance of the class.
+即使 `CatsController` 已完全定义，Nest 还不知道它，也不会自动创建该类的实例。
 
-Controllers must always be part of a module, which is why we include the `controllers` array within the `@Module()` decorator. Since we haven’t defined any other modules apart from the root `AppModule`, we’ll use it to register the `CatsController`:
+控制器必须始终是模块的一部分，这就是为什么我们在 `@Module()` 装饰器中包含 `controllers` 数组。由于除了根 `AppModule` 之外我们还没有定义任何其他模块，我们将使用它来注册 `CatsController`：
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -507,11 +507,11 @@ import { CatsController } from './cats/cats.controller';
 export class AppModule {}
 ```
 
-We attached the metadata to the module class using the `@Module()` decorator, and now Nest can easily determine which controllers need to be mounted.
+我们使用 `@Module()` 装饰器将元数据附加到模块类，现在 Nest 可以轻松确定需要挂载哪些控制器。
 
-#### Library-specific approach
+#### 库特定方法
 
-So far, we've covered the standard Nest way of manipulating responses. Another approach is to use a library-specific [response object](https://expressjs.com/en/api.html#res). To inject a specific response object, we can use the `@Res()` decorator. To highlight the differences, let’s rewrite the `CatsController` like this:
+到目前为止，我们已经介绍了操作响应的标准 Nest 方法。另一种方法是使用库特定的 [响应对象](https://expressjs.com/en/api.html#res)。要注入特定的响应对象，我们可以使用 `@Res()` 装饰器。为了突出差异，让我们像这样重写 `CatsController`：
 
 ```typescript
 import { Controller, Get, Post, Res, HttpStatus } from '@nestjs/common';
@@ -546,9 +546,9 @@ export class CatsController {
 }
 ```
 
-While this approach works and offers more flexibility by giving full control over the response object (such as header manipulation and access to library-specific features), it should be used with caution. Generally, this method is less clear and comes with some downsides. The main disadvantage is that your code becomes platform-dependent, as different underlying libraries may have different APIs for the response object. Additionally, it can make testing more challenging, as you'll need to mock the response object, among other things.
+虽然这种方法有效并且通过完全控制响应对象（例如，标头操作和访问库特定功能）提供了更大的灵活性，但应谨慎使用。通常，这种方法不太清晰，并且存在一些缺点。主要缺点是您的代码变得依赖于平台，因为不同的底层库可能对响应对象有不同的 API。此外，它会使测试更具挑战性，因为您需要模拟响应对象等。
 
-Furthermore, by using this approach, you lose compatibility with Nest features that rely on standard response handling, such as Interceptors and the `@HttpCode()` / `@Header()` decorators. To address this, you can enable the `passthrough` option like this:
+此外，通过使用这种方法，您会失去与依赖于标准响应处理的 Nest 功能的兼容性，例如拦截器和 `@HttpCode()` / `@Header()` 装饰器。要解决此问题，您可以像这样启用 `passthrough` 选项：
 
 ```typescript
 @Get()
@@ -558,4 +558,4 @@ findAll(@Res({ passthrough: true }) res: Response) {
 }
 ```
 
-With this approach, you can interact with the native response object (for example, setting cookies or headers based on specific conditions), while still allowing the framework to handle the rest.
+通过这种方法，您可以与本机响应对象交互（例如，根据特定条件设置 cookie 或标头），同时仍允许框架处理其余部分。

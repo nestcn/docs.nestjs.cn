@@ -2,25 +2,25 @@
 <!-- 生成时间: 2026-03-03T07:09:52.755Z -->
 <!-- 源文件: content/techniques\sql.md -->
 
-### Database
+### 数据库
 
-Nest is database agnostic, allowing you to easily integrate with any SQL or NoSQL database. You have a number of options available to you, depending on your preferences. At the most general level, connecting Nest to a database is simply a matter of loading an appropriate Node.js driver for the database, just as you would with [Express](https://expressjs.com/en/guide/database-integration.html) or Fastify.
+Nest 是数据库无关的，允许您轻松集成任何 SQL 或 NoSQL 数据库。根据您的偏好，您有多种选择。从最一般的层面来说，将 Nest 连接到数据库只是加载适用于该数据库的 Node.js 驱动程序的问题，就像您在 [Express](https://expressjs.com/en/guide/database-integration.html) 或 Fastify 中所做的那样。
 
-You can also directly use any general purpose Node.js database integration **library** or ORM, such as [MikroORM](https://mikro-orm.io/) (see [MikroORM recipe](/recipes/mikroorm)), [Sequelize](https://sequelize.org/) (see [Sequelize integration](/techniques/database#sequelize-integration)), [Knex.js](https://knexjs.org/) (see [Knex.js tutorial](https://dev.to/nestjs/build-a-nestjs-module-for-knex-js-or-other-resource-based-libraries-in-5-minutes-12an)), [TypeORM](https://github.com/typeorm/typeorm), and [Prisma](https://www.github.com/prisma/prisma) (see [Prisma recipe](/recipes/prisma)), to operate at a higher level of abstraction.
+您还可以直接使用任何通用的 Node.js 数据库集成**库**或 ORM，例如 [MikroORM](https://mikro-orm.io/)（请参阅 [MikroORM 教程](/recipes/mikroorm)）、[Sequelize](https://sequelize.org/)（请参阅 [Sequelize 集成](/techniques/database#sequelize-集成)）、[Knex.js](https://knexjs.org/)（请参阅 [Knex.js 教程](https://dev.to/nestjs/build-a-nestjs-module-for-knex-js-or-other-resource-based-libraries-in-5-minutes-12an)）、[TypeORM](https://github.com/typeorm/typeorm) 和 [Prisma](https://www.github.com/prisma/prisma)（请参阅 [Prisma 教程](/recipes/prisma)），以在更高的抽象级别上操作。
 
-For convenience, Nest provides tight integration with TypeORM and Sequelize out-of-the-box with the `@nestjs/typeorm` and `@nestjs/sequelize` packages respectively, which we'll cover in the current chapter, and Mongoose with `@nestjs/mongoose`, which is covered in [this chapter](/techniques/mongodb). These integrations provide additional NestJS-specific features, such as model/repository injection, testability, and asynchronous configuration to make accessing your chosen database even easier.
+为了方便起见，Nest 提供了与 TypeORM 和 Sequelize 的紧密集成，分别通过 `@nestjs/typeorm` 和 `@nestjs/sequelize` 包，我们将在本章中介绍，以及通过 `@nestjs/mongoose` 与 Mongoose 的集成，这在 [本章](/techniques/mongodb) 中介绍。这些集成提供了额外的 NestJS 特定功能，例如模型/存储库注入、可测试性和异步配置，使访问您选择的数据库更加容易。
 
-### TypeORM Integration
+### TypeORM 集成
 
-For integrating with SQL and NoSQL databases, Nest provides the `@nestjs/typeorm` package. [TypeORM](https://github.com/typeorm/typeorm) is the most mature Object Relational Mapper (ORM) available for TypeScript. Since it's written in TypeScript, it integrates well with the Nest framework.
+为了与 SQL 和 NoSQL 数据库集成，Nest 提供了 `@nestjs/typeorm` 包。[TypeORM](https://github.com/typeorm/typeorm) 是 TypeScript 可用的最成熟的对象关系映射器 (ORM)。由于它是用 TypeScript 编写的，因此它与 Nest 框架集成良好。
 
-To begin using it, we first install the required dependencies. In this chapter, we'll demonstrate using the popular [MySQL](https://www.mysql.com/) Relational DBMS, but TypeORM provides support for many relational databases, such as PostgreSQL, Oracle, Microsoft SQL Server, SQLite, and even NoSQL databases like MongoDB. The procedure we walk through in this chapter will be the same for any database supported by TypeORM. You'll simply need to install the associated client API libraries for your selected database.
+要开始使用它，我们首先安装所需的依赖项。在本章中，我们将演示使用流行的 [MySQL](https://www.mysql.com/) 关系型数据库管理系统，但 TypeORM 提供对许多关系型数据库的支持，例如 PostgreSQL、Oracle、Microsoft SQL Server、SQLite，甚至 NoSQL 数据库如 MongoDB。我们在本章中介绍的过程对于 TypeORM 支持的任何数据库都是相同的。您只需为所选数据库安装相关的客户端 API 库即可。
 
 ```bash
 $ npm install --save @nestjs/typeorm typeorm mysql2
 ```
 
-Once the installation process is complete, we can import the `TypeOrmModule` into the root `AppModule`.
+安装过程完成后，我们可以将 `TypeOrmModule` 导入到根 `AppModule` 中。
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -43,28 +43,28 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 export class AppModule {}
 ```
 
-> warning **Warning** Setting `synchronize: true` shouldn't be used in production - otherwise you can lose production data.
+> warning **警告** 在生产环境中不应使用 `synchronize: true` - 否则您可能会丢失生产数据。
 
-The `forRoot()` method supports all the configuration properties exposed by the `DataSource` constructor from the [TypeORM](https://typeorm.io/data-source-options#common-data-source-options) package. In addition, there are several extra configuration properties described below.
+`forRoot()` 方法支持 [TypeORM](https://typeorm.io/data-source-options#common-data-source-options) 包中 `DataSource` 构造函数公开的所有配置属性。此外，还有以下几个额外的配置属性。
 
 <table>
   <tr>
     <td><code>retryAttempts</code></td>
-    <td>Number of attempts to connect to the database (default: <code>10</code>)</td>
+    <td>连接数据库的尝试次数（默认值：<code>10</code>）</td>
   </tr>
   <tr>
     <td><code>retryDelay</code></td>
-    <td>Delay between connection retry attempts (ms) (default: <code>3000</code>)</td>
+    <td>连接重试尝试之间的延迟（毫秒）（默认值：<code>3000</code>）</td>
   </tr>
   <tr>
     <td><code>autoLoadEntities</code></td>
-    <td>If <code>true</code>, entities will be loaded automatically (default: <code>false</code>)</td>
+    <td>如果为 <code>true</code>，实体将自动加载（默认值：<code>false</code>）</td>
   </tr>
 </table>
 
-> info **Hint** Learn more about the data source options [here](https://typeorm.io/data-source-options).
+> info **提示** 了解更多关于数据源选项的信息 [这里](https://typeorm.io/data-source-options)。
 
-Once this is done, the TypeORM `DataSource` and `EntityManager` objects will be available to inject across the entire project (without needing to import any modules), for example:
+完成后，TypeORM `DataSource` 和 `EntityManager` 对象将可用于在整个项目中注入（无需导入任何模块），例如：
 
 ```typescript
 import { DataSource } from 'typeorm';
@@ -87,11 +87,11 @@ export class AppModule {
 }
 ```
 
-#### Repository pattern
+#### 存储库模式
 
-[TypeORM](https://github.com/typeorm/typeorm) supports the **repository design pattern**, so each entity has its own repository. These repositories can be obtained from the database data source.
+[TypeORM](https://github.com/typeorm/typeorm) 支持**存储库设计模式**，因此每个实体都有自己的存储库。这些存储库可以从数据库数据源获取。
 
-To continue the example, we need at least one entity. Let's define the `User` entity.
+要继续示例，我们至少需要一个实体。让我们定义 `User` 实体。
 
 ```typescript
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
@@ -112,11 +112,11 @@ export class User {
 }
 ```
 
-> info **Hint** Learn more about entities in the [TypeORM documentation](https://typeorm.io/docs/entity/entities/).
+> info **提示** 了解更多关于实体的信息，请参阅 [TypeORM 文档](https://typeorm.io/docs/entity/entities/)。
 
-The `User` entity file sits in the `users` directory. This directory contains all files related to the `UsersModule`. You can decide where to keep your model files, however, we recommend creating them near their **domain**, in the corresponding module directory.
+`User` 实体文件位于 `users` 目录中。此目录包含与 `UsersModule` 相关的所有文件。您可以决定将模型文件保存在哪里，但是，我们建议在相应的模块目录中，在其**域**附近创建它们。
 
-To begin using the `User` entity, we need to let TypeORM know about it by inserting it into the `entities` array in the module `forRoot()` method options (unless you use a static glob path):
+要开始使用 `User` 实体，我们需要通过将其插入到模块 `forRoot()` 方法选项的 `entities` 数组中来让 TypeORM 知道它（除非您使用静态 glob 路径）：
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -140,7 +140,7 @@ import { User } from './users/user.entity';
 export class AppModule {}
 ```
 
-Next, let's look at the `UsersModule`:
+接下来，让我们看看 `UsersModule`：
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -157,7 +157,7 @@ import { User } from './user.entity';
 export class UsersModule {}
 ```
 
-This module uses the `forFeature()` method to define which repositories are registered in the current scope. With that in place, we can inject the `UsersRepository` into the `UsersService` using the `@InjectRepository()` decorator:
+此模块使用 `forFeature()` 方法定义哪些存储库在当前作用域中注册。有了这个，我们可以使用 `@InjectRepository()` 装饰器将 `UsersRepository` 注入到 `UsersService` 中：
 
 ```typescript
 import { Injectable } from '@nestjs/common';
@@ -206,10 +206,10 @@ export class UsersService {
 }
 ```
 
-> warning **Notice** Don't forget to import the `UsersModule` into the root `AppModule`.
+> warning **注意** 不要忘记将 `UsersModule` 导入到根 `AppModule` 中。
 
-If you want to use the repository outside of the module which imports `TypeOrmModule.forFeature`, you'll need to re-export the providers generated by it.
-You can do this by exporting the whole module, like this:
+如果您想在导入 `TypeOrmModule.forFeature` 的模块之外使用存储库，您需要重新导出由它生成的提供程序。
+您可以通过导出整个模块来做到这一点，如下所示：
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -223,7 +223,7 @@ import { User } from './user.entity';
 export class UsersModule {}
 ```
 
-Now if we import `UsersModule` in `UserHttpModule`, we can use `@InjectRepository(User)` in the providers of the latter module.
+现在，如果我们在 `UserHttpModule` 中导入 `UsersModule`，我们可以在后者模块的提供程序中使用 `@InjectRepository(User)`。
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -239,28 +239,28 @@ import { UsersController } from './users.controller';
 export class UserHttpModule {}
 ```
 
-#### Relations
+#### 关系
 
-Relations are associations established between two or more tables. Relations are based on common fields from each table, often involving primary and foreign keys.
+关系是在两个或多个表之间建立的关联。关系基于每个表的公共字段，通常涉及主键和外键。
 
-There are three types of relations:
+有三种类型的关系：
 
 <table>
   <tr>
-    <td><code>One-to-one</code></td>
-    <td>Every row in the primary table has one and only one associated row in the foreign table.  Use the <code>@OneToOne()</code> decorator to define this type of relation.</td>
+    <td><code>一对一</code></td>
+    <td>主表中的每一行在外表中只有一个相关行。使用 <code>@OneToOne()</code> 装饰器定义这种类型的关系。</td>
   </tr>
   <tr>
-    <td><code>One-to-many / Many-to-one</code></td>
-    <td>Every row in the primary table has one or more related rows in the foreign table. Use the <code>@OneToMany()</code> and <code>@ManyToOne()</code> decorators to define this type of relation.</td>
+    <td><code>一对多 / 多对一</code></td>
+    <td>主表中的每一行在外表中有一个或多个相关行。使用 <code>@OneToMany()</code> 和 <code>@ManyToOne()</code> 装饰器定义这种类型的关系。</td>
   </tr>
   <tr>
-    <td><code>Many-to-many</code></td>
-    <td>Every row in the primary table has many related rows in the foreign table, and every record in the foreign table has many related rows in the primary table. Use the <code>@ManyToMany()</code> decorator to define this type of relation.</td>
+    <td><code>多对多</code></td>
+    <td>主表中的每一行在外表中有许多相关行，外表中的每条记录在主表中有许多相关行。使用 <code>@ManyToMany()</code> 装饰器定义这种类型的关系。</td>
   </tr>
 </table>
 
-To define relations in entities, use the corresponding **decorators**. For example, to define that each `User` can have multiple photos, use the `@OneToMany()` decorator.
+要在实体中定义关系，请使用相应的**装饰器**。例如，要定义每个 `User` 可以有多个照片，请使用 `@OneToMany()` 装饰器。
 
 ```typescript
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
@@ -285,11 +285,11 @@ export class User {
 }
 ```
 
-> info **Hint** To learn more about relations in TypeORM, visit the [TypeORM documentation](https://typeorm.io/docs/relations/relations).
+> info **提示** 要了解更多关于 TypeORM 中的关系，请访问 [TypeORM 文档](https://typeorm.io/docs/relations/relations)。
 
-#### Auto-load entities
+#### 自动加载实体
 
-Manually adding entities to the `entities` array of the data source options can be tedious. In addition, referencing entities from the root module breaks application domain boundaries and causes leaking implementation details to other parts of the application. To address this issue, an alternative solution is provided. To automatically load entities, set the `autoLoadEntities` property of the configuration object (passed into the `forRoot()` method) to `true`, as shown below:
+手动将实体添加到数据源选项的 `entities` 数组中可能很繁琐。此外，从根模块引用实体会破坏应用程序域边界，并导致实现细节泄漏到应用程序的其他部分。为了解决这个问题，提供了一个替代解决方案。要自动加载实体，请将配置对象（传递到 `forRoot()` 方法）的 `autoLoadEntities` 属性设置为 `true`，如下所示：
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -306,13 +306,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 export class AppModule {}
 ```
 
-With that option specified, every entity registered through the `forFeature()` method will be automatically added to the `entities` array of the configuration object.
+指定该选项后，通过 `forFeature()` 方法注册的每个实体将自动添加到配置对象的 `entities` 数组中。
 
-> warning **Warning** Note that entities that aren't registered through the `forFeature()` method, but are only referenced from the entity (via a relationship), won't be included by way of the `autoLoadEntities` setting.
+> warning **警告** 请注意，未通过 `forFeature()` 方法注册但仅从实体（通过关系）引用的实体不会通过 `autoLoadEntities` 设置包含。
 
-#### Separating entity definition
+#### 分离实体定义
 
-You can define an entity and its columns right in the model, using decorators. But some people prefer to define entities and their columns inside separate files using the ["entity schemas"](https://typeorm.io/docs/entity/separating-entity-definition).
+您可以使用装饰器在模型中直接定义实体及其列。但有些人更喜欢使用 ["实体模式"](https://typeorm.io/docs/entity/separating-entity-definition) 在单独的文件中定义实体及其列。
 
 ```typescript
 import { EntitySchema } from 'typeorm';
@@ -341,16 +341,16 @@ export const UserSchema = new EntitySchema<User>({
   relations: {
     photos: {
       type: 'one-to-many',
-      target: 'Photo', // the name of the PhotoSchema
+      target: 'Photo', // PhotoSchema 的名称
     },
   },
 });
 ```
 
-> warning error **Warning** If you provide the `target` option, the `name` option value has to be the same as the name of the target class.
-> If you do not provide the `target` you can use any name.
+> warning error **警告** 如果您提供 `target` 选项，`name` 选项值必须与目标类的名称相同。
+> 如果您不提供 `target`，您可以使用任何名称。
 
-Nest allows you to use an `EntitySchema` instance wherever an `Entity` is expected, for example:
+Nest 允许您在任何需要 `Entity` 的地方使用 `EntitySchema` 实例，例如：
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -367,13 +367,13 @@ import { UsersService } from './users.service';
 export class UsersModule {}
 ```
 
-#### TypeORM Transactions
+#### TypeORM 事务
 
-A database transaction symbolizes a unit of work performed within a database management system against a database, and treated in a coherent and reliable way independent of other transactions. A transaction generally represents any change in a database ([learn more](https://en.wikipedia.org/wiki/Database_transaction)).
+数据库事务象征着在数据库管理系统中针对数据库执行的工作单元，并以连贯且可靠的方式处理，独立于其他事务。事务通常表示数据库中的任何更改（[了解更多](https://en.wikipedia.org/wiki/Database_transaction)）。
 
-There are many different strategies to handle [TypeORM transactions](https://typeorm.io/docs/advanced-topics/transactions/). We recommend using the `QueryRunner` class because it gives full control over the transaction.
+处理 [TypeORM 事务](https://typeorm.io/docs/advanced-topics/transactions/) 有许多不同的策略。我们建议使用 `QueryRunner` 类，因为它可以完全控制事务。
 
-First, we need to inject the `DataSource` object into a class in the normal way:
+首先，我们需要以正常方式将 `DataSource` 对象注入到类中：
 
 ```typescript
 @Injectable()
@@ -382,9 +382,9 @@ export class UsersService {
 }
 ```
 
-> info **Hint** The `DataSource` class is imported from the `typeorm` package.
+> info **提示** `DataSource` 类从 `typeorm` 包导入。
 
-Now, we can use this object to create a transaction.
+现在，我们可以使用此对象创建事务。
 
 ```typescript
 async createMany(users: User[]) {
@@ -398,20 +398,20 @@ async createMany(users: User[]) {
 
     await queryRunner.commitTransaction();
   } catch (err) {
-    // since we have errors lets rollback the changes we made
+    // 由于我们有错误，让我们回滚我们所做的更改
     await queryRunner.rollbackTransaction();
   } finally {
-    // you need to release a queryRunner which was manually instantiated
+    // 您需要释放手动实例化的 queryRunner
     await queryRunner.release();
   }
 }
 ```
 
-> info **Hint** Note that the `dataSource` is used only to create the `QueryRunner`. However, to test this class would require mocking the entire `DataSource` object (which exposes several methods). Thus, we recommend using a helper factory class (e.g., `QueryRunnerFactory`) and defining an interface with a limited set of methods required to maintain transactions. This technique makes mocking these methods pretty straightforward.
+> info **提示** 请注意，`dataSource` 仅用于创建 `QueryRunner`。但是，测试此类需要模拟整个 `DataSource` 对象（它公开了几个方法）。因此，我们建议使用辅助工厂类（例如 `QueryRunnerFactory`）并定义一个接口，其中包含维护事务所需的有限方法集。这种技术使得模拟这些方法非常简单。
 
 <app-banner-devtools></app-banner-devtools>
 
-Alternatively, you can use the callback-style approach with the `transaction` method of the `DataSource` object ([read more](https://typeorm.io/docs/advanced-topics/transactions/#creating-and-using-transactions)).
+或者，您可以使用带有 `DataSource` 对象的 `transaction` 方法的回调风格方法（[阅读更多](https://typeorm.io/docs/advanced-topics/transactions/#creating-and-using-transactions)）。
 
 ```typescript
 async createMany(users: User[]) {
@@ -422,9 +422,9 @@ async createMany(users: User[]) {
 }
 ```
 
-#### Subscribers
+#### 订阅者
 
-With TypeORM [subscribers](https://typeorm.io/docs/advanced-topics/listeners-and-subscribers#what-is-a-subscriber), you can listen to specific entity events.
+使用 TypeORM [订阅者](https://typeorm.io/docs/advanced-topics/listeners-and-subscribers#what-is-a-subscriber)，您可以监听特定的实体事件。
 
 ```typescript
 import {
@@ -451,9 +451,9 @@ export class UserSubscriber implements EntitySubscriberInterface<User> {
 }
 ```
 
-> error **Warning** Event subscribers can not be [request-scoped](/fundamentals/injection-scopes).
+> error **警告** 事件订阅者不能是 [请求作用域](/fundamentals/injection-scopes)。
 
-Now, add the `UserSubscriber` class to the `providers` array:
+现在，将 `UserSubscriber` 类添加到 `providers` 数组中：
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -471,17 +471,17 @@ import { UserSubscriber } from './user.subscriber';
 export class UsersModule {}
 ```
 
-#### Migrations
+#### 迁移
 
-[Migrations](https://typeorm.io/docs/advanced-topics/migrations/) provide a way to incrementally update the database schema to keep it in sync with the application's data model while preserving existing data in the database. To generate, run, and revert migrations, TypeORM provides a dedicated [CLI](https://typeorm.io/docs/advanced-topics/migrations/#creating-a-new-migration).
+[迁移](https://typeorm.io/docs/advanced-topics/migrations/) 提供了一种增量更新数据库架构的方法，以使其与应用程序的数据模型保持同步，同时保留数据库中的现有数据。为了生成、运行和回滚迁移，TypeORM 提供了专用的 [CLI](https://typeorm.io/docs/advanced-topics/migrations/#creating-a-new-migration)。
 
-Migration classes are separate from the Nest application source code. Their lifecycle is maintained by the TypeORM CLI. Therefore, you are not able to leverage dependency injection and other Nest specific features with migrations. To learn more about migrations, follow the guide in the [TypeORM documentation](https://typeorm.io/docs/advanced-topics/migrations/).
+迁移类与 Nest 应用程序源代码分开。它们的生命周期由 TypeORM CLI 维护。因此，您无法在迁移中利用依赖注入和其他 Nest 特定功能。要了解有关迁移的更多信息，请按照 [TypeORM 文档](https://typeorm.io/docs/advanced-topics/migrations/) 中的指南进行操作。
 
-#### Multiple databases
+#### 多个数据库
 
-Some projects require multiple database connections. This can also be achieved with this module. To work with multiple connections, first create the connections. In this case, data source naming becomes **mandatory**.
+一些项目需要多个数据库连接。此模块也可以实现这一点。要处理多个连接，首先创建连接。在这种情况下，数据源命名变得**强制性**。
 
-Suppose you have an `Album` entity stored in its own database.
+假设您有一个存储在自己数据库中的 `Album` 实体。
 
 ```typescript
 const defaultOptions = {
@@ -511,9 +511,9 @@ const defaultOptions = {
 export class AppModule {}
 ```
 
-> warning **Notice** If you don't set the `name` for a data source, its name is set to `default`. Please note that you shouldn't have multiple connections without a name, or with the same name, otherwise they will get overridden.
+> warning **注意** 如果您不为数据源设置 `name`，其名称将设置为 `default`。请注意，您不应有多个没有名称或具有相同名称的连接，否则它们会被覆盖。
 
-> warning **Notice** If you are using `TypeOrmModule.forRootAsync`, you have to **also** set the data source name outside `useFactory`. For example:
+> warning **注意** 如果您使用 `TypeOrmModule.forRootAsync`，您还必须在 `useFactory` 外部设置数据源名称。例如：
 >
 > ```typescript
 > TypeOrmModule.forRootAsync({
@@ -523,9 +523,9 @@ export class AppModule {}
 > }),
 > ```
 >
-> See [this issue](https://github.com/nestjs/typeorm/issues/86) for more details.
+> 有关更多详细信息，请参阅 [此问题](https://github.com/nestjs/typeorm/issues/86)。
 
-At this point, you have `User` and `Album` entities registered with their own data source. With this setup, you have to tell the `TypeOrmModule.forFeature()` method and the `@InjectRepository()` decorator which data source should be used. If you do not pass any data source name, the `default` data source is used.
+此时，您已经注册了带有自己数据源的 `User` 和 `Album` 实体。通过此设置，您必须告诉 `TypeOrmModule.forFeature()` 方法和 `@InjectRepository()` 装饰器应该使用哪个数据源。如果您不传递任何数据源名称，则使用 `default` 数据源。
 
 ```typescript
 @Module({
@@ -537,7 +537,7 @@ At this point, you have `User` and `Album` entities registered with their own da
 export class AppModule {}
 ```
 
-You can also inject the `DataSource` or `EntityManager` for a given data source:
+您还可以为给定的数据源注入 `DataSource` 或 `EntityManager`：
 
 ```typescript
 @Injectable()
@@ -551,7 +551,7 @@ export class AlbumsService {
 }
 ```
 
-It's also possible to inject any `DataSource` to the providers:
+也可以将任何 `DataSource` 注入到提供程序中：
 
 ```typescript
 @Module({
@@ -568,11 +568,11 @@ It's also possible to inject any `DataSource` to the providers:
 export class AlbumsModule {}
 ```
 
-#### Testing
+#### 测试
 
-When it comes to unit testing an application, we usually want to avoid making a database connection, keeping our test suites independent and their execution process as fast as possible. But our classes might depend on repositories that are pulled from the data source (connection) instance. How do we handle that? The solution is to create mock repositories. In order to achieve that, we set up [custom providers](/fundamentals/custom-providers). Each registered repository is automatically represented by an `<EntityName>Repository` token, where `EntityName` is the name of your entity class.
+当涉及到应用程序的单元测试时，我们通常希望避免建立数据库连接，保持测试套件独立，并且其执行过程尽可能快。但是，我们的类可能依赖于从数据源（连接）实例中提取的存储库。我们如何处理这个问题？解决方案是创建模拟存储库。为了实现这一点，我们设置了 [自定义提供程序](/fundamentals/custom-providers)。每个注册的存储库都自动由 `<EntityName>Repository` 令牌表示，其中 `EntityName` 是您的实体类的名称。
 
-The `@nestjs/typeorm` package exposes the `getRepositoryToken()` function which returns a prepared token based on a given entity.
+`@nestjs/typeorm` 包公开了 `getRepositoryToken()` 函数，该函数基于给定的实体返回准备好的令牌。
 
 ```typescript
 @Module({
@@ -587,13 +587,13 @@ The `@nestjs/typeorm` package exposes the `getRepositoryToken()` function which 
 export class UsersModule {}
 ```
 
-Now a substitute `mockRepository` will be used as the `UsersRepository`. Whenever any class asks for `UsersRepository` using an `@InjectRepository()` decorator, Nest will use the registered `mockRepository` object.
+现在，替代的 `mockRepository` 将用作 `UsersRepository`。每当任何类使用 `@InjectRepository()` 装饰器请求 `UsersRepository` 时，Nest 将使用注册的 `mockRepository` 对象。
 
-#### Async configuration
+#### 异步配置
 
-You may want to pass your repository module options asynchronously instead of statically. In this case, use the `forRootAsync()` method, which provides several ways to deal with async configuration.
+您可能希望异步传递存储库模块选项，而不是静态传递。在这种情况下，使用 `forRootAsync()` 方法，该方法提供了几种处理异步配置的方法。
 
-One approach is to use a factory function:
+一种方法是使用工厂函数：
 
 ```typescript
 TypeOrmModule.forRootAsync({
@@ -610,7 +610,7 @@ TypeOrmModule.forRootAsync({
 });
 ```
 
-Our factory behaves like any other [asynchronous provider](/fundamentals/async-providers) (e.g., it can be `async` and it's able to inject dependencies through `inject`).
+我们的工厂行为类似于任何其他 [异步提供程序](/fundamentals/async-providers)（例如，它可以是 `async` 并且能够通过 `inject` 注入依赖项）。
 
 ```typescript
 TypeOrmModule.forRootAsync({
@@ -629,7 +629,7 @@ TypeOrmModule.forRootAsync({
 });
 ```
 
-Alternatively, you can use the `useClass` syntax:
+或者，您可以使用 `useClass` 语法：
 
 ```typescript
 TypeOrmModule.forRootAsync({
@@ -637,7 +637,7 @@ TypeOrmModule.forRootAsync({
 });
 ```
 
-The construction above will instantiate `TypeOrmConfigService` inside `TypeOrmModule` and use it to provide an options object by calling `createTypeOrmOptions()`. Note that this means that the `TypeOrmConfigService` has to implement the `TypeOrmOptionsFactory` interface, as shown below:
+上面的构造将在 `TypeOrmModule` 内部实例化 `TypeOrmConfigService`，并使用它通过调用 `createTypeOrmOptions()` 来提供选项对象。请注意，这意味着 `TypeOrmConfigService` 必须实现 `TypeOrmOptionsFactory` 接口，如下所示：
 
 ```typescript
 @Injectable()
@@ -657,7 +657,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
 }
 ```
 
-In order to prevent the creation of `TypeOrmConfigService` inside `TypeOrmModule` and use a provider imported from a different module, you can use the `useExisting` syntax.
+为了防止在 `TypeOrmModule` 内部创建 `TypeOrmConfigService` 并使用从不同模块导入的提供程序，您可以使用 `useExisting` 语法。
 
 ```typescript
 TypeOrmModule.forRootAsync({
@@ -666,22 +666,22 @@ TypeOrmModule.forRootAsync({
 });
 ```
 
-This construction works the same as `useClass` with one critical difference - `TypeOrmModule` will lookup imported modules to reuse an existing `ConfigService` instead of instantiating a new one.
+这种构造的工作方式与 `useClass` 相同，但有一个关键区别 - `TypeOrmModule` 将查找导入的模块以重用现有的 `ConfigService`，而不是实例化一个新的。
 
-> info **Hint** Make sure that the `name` property is defined at the same level as the `useFactory`, `useClass`, or `useValue` property. This will allow Nest to properly register the data source under the appropriate injection token.
+> info **提示** 确保 `name` 属性与 `useFactory`、`useClass` 或 `useValue` 属性定义在同一级别。这将允许 Nest 在适当的注入令牌下正确注册数据源。
 
-#### Custom DataSource Factory
+#### 自定义 DataSource 工厂
 
-In conjunction with async configuration using `useFactory`, `useClass`, or `useExisting`, you can optionally specify a `dataSourceFactory` function which will allow you to provide your own TypeORM data source rather than allowing `TypeOrmModule` to create the data source.
+结合使用 `useFactory`、`useClass` 或 `useExisting` 的异步配置，您可以可选地指定 `dataSourceFactory` 函数，该函数将允许您提供自己的 TypeORM 数据源，而不是允许 `TypeOrmModule` 创建数据源。
 
-`dataSourceFactory` receives the TypeORM `DataSourceOptions` configured during async configuration using `useFactory`, `useClass`, or `useExisting` and returns a `Promise` that resolves a TypeORM `DataSource`.
+`dataSourceFactory` 接收在使用 `useFactory`、`useClass` 或 `useExisting` 的异步配置期间配置的 TypeORM `DataSourceOptions`，并返回解析为 TypeORM `DataSource` 的 `Promise`。
 
 ```typescript
 TypeOrmModule.forRootAsync({
   imports: [ConfigModule],
   inject: [ConfigService],
-  // Use useFactory, useClass, or useExisting
-  // to configure the DataSourceOptions.
+  // 使用 useFactory、useClass 或 useExisting
+  // 配置 DataSourceOptions。
   useFactory: (configService: ConfigService) => ({
     type: 'mysql',
     host: configService.get('HOST'),
@@ -692,8 +692,8 @@ TypeOrmModule.forRootAsync({
     entities: [],
     synchronize: true,
   }),
-  // dataSource receives the configured DataSourceOptions
-  // and returns a Promise<DataSource>.
+  // dataSource 接收配置的 DataSourceOptions
+  // 并返回 Promise<DataSource>。
   dataSourceFactory: async (options) => {
     const dataSource = await new DataSource(options).initialize();
     return dataSource;
@@ -701,26 +701,26 @@ TypeOrmModule.forRootAsync({
 });
 ```
 
-> info **Hint** The `DataSource` class is imported from the `typeorm` package.
+> info **提示** `DataSource` 类从 `typeorm` 包导入。
 
-#### Example
+#### 示例
 
-A working example is available [here](https://github.com/nestjs/nest/tree/master/sample/05-sql-typeorm).
+一个工作示例可在 [这里](https://github.com/nestjs/nest/tree/master/sample/05-sql-typeorm) 找到。
 
 <app-banner-enterprise></app-banner-enterprise>
 
-### Sequelize Integration
+### Sequelize 集成
 
-An alternative to using TypeORM is to use the [Sequelize](https://sequelize.org/) ORM with the `@nestjs/sequelize` package. In addition, we leverage the [sequelize-typescript](https://github.com/RobinBuschmann/sequelize-typescript) package which provides a set of additional decorators to declaratively define entities.
+使用 TypeORM 的替代方法是使用带有 `@nestjs/sequelize` 包的 [Sequelize](https://sequelize.org/) ORM。此外，我们利用 [sequelize-typescript](https://github.com/RobinBuschmann/sequelize-typescript) 包，该包提供了一组额外的装饰器来声明性地定义实体。
 
-To begin using it, we first install the required dependencies. In this chapter, we'll demonstrate using the popular [MySQL](https://www.mysql.com/) Relational DBMS, but Sequelize provides support for many relational databases, such as PostgreSQL, MySQL, Microsoft SQL Server, SQLite, and MariaDB. The procedure we walk through in this chapter will be the same for any database supported by Sequelize. You'll simply need to install the associated client API libraries for your selected database.
+要开始使用它，我们首先安装所需的依赖项。在本章中，我们将演示使用流行的 [MySQL](https://www.mysql.com/) 关系型数据库管理系统，但 Sequelize 提供对许多关系型数据库的支持，例如 PostgreSQL、MySQL、Microsoft SQL Server、SQLite 和 MariaDB。我们在本章中介绍的过程对于 Sequelize 支持的任何数据库都是相同的。您只需为所选数据库安装相关的客户端 API 库即可。
 
 ```bash
 $ npm install --save @nestjs/sequelize sequelize sequelize-typescript mysql2
 $ npm install --save-dev @types/sequelize
 ```
 
-Once the installation process is complete, we can import the `SequelizeModule` into the root `AppModule`.
+安装过程完成后，我们可以将 `SequelizeModule` 导入到根 `AppModule` 中。
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -742,32 +742,32 @@ import { SequelizeModule } from '@nestjs/sequelize';
 export class AppModule {}
 ```
 
-The `forRoot()` method supports all the configuration properties exposed by the Sequelize constructor ([read more](https://sequelize.org/docs/v6/getting-started/#connecting-to-a-database)). In addition, there are several extra configuration properties described below.
+`forRoot()` 方法支持 Sequelize 构造函数公开的所有配置属性（[阅读更多](https://sequelize.org/docs/v6/getting-started/#connecting-to-a-database)）。此外，还有以下几个额外的配置属性。
 
 <table>
   <tr>
     <td><code>retryAttempts</code></td>
-    <td>Number of attempts to connect to the database (default: <code>10</code>)</td>
+    <td>连接数据库的尝试次数（默认值：<code>10</code>）</td>
   </tr>
   <tr>
     <td><code>retryDelay</code></td>
-    <td>Delay between connection retry attempts (ms) (default: <code>3000</code>)</td>
+    <td>连接重试尝试之间的延迟（毫秒）（默认值：<code>3000</code>）</td>
   </tr>
   <tr>
     <td><code>autoLoadModels</code></td>
-    <td>If <code>true</code>, models will be loaded automatically (default: <code>false</code>)</td>
+    <td>如果为 <code>true</code>，模型将自动加载（默认值：<code>false</code>）</td>
   </tr>
   <tr>
     <td><code>keepConnectionAlive</code></td>
-    <td>If <code>true</code>, connection will not be closed on the application shutdown (default: <code>false</code>)</td>
+    <td>如果为 <code>true</code>，连接将在应用程序关闭时不会关闭（默认值：<code>false</code>）</td>
   </tr>
   <tr>
     <td><code>synchronize</code></td>
-    <td>If <code>true</code>, automatically loaded models will be synchronized (default: <code>true</code>)</td>
+    <td>如果为 <code>true</code>，自动加载的模型将被同步（默认值：<code>true</code>）</td>
   </tr>
 </table>
 
-Once this is done, the `Sequelize` object will be available to inject across the entire project (without needing to import any modules), for example:
+完成后，`Sequelize` 对象将可用于在整个项目中注入（无需导入任何模块），例如：
 
 ```typescript
 import { Injectable } from '@nestjs/common';
@@ -787,9 +787,9 @@ export class AppService {
 }
 ```
 
-#### Models
+#### 模型
 
-Sequelize implements the Active Record pattern. With this pattern, you use model classes directly to interact with the database. To continue the example, we need at least one model. Let's define the `User` model.
+Sequelize 实现了活动记录模式。使用此模式，您直接使用模型类与数据库交互。要继续示例，我们至少需要一个模型。让我们定义 `User` 模型。
 
 ```typescript
 import { Column, Model, Table } from 'sequelize-typescript';
@@ -807,11 +807,11 @@ export class User extends Model {
 }
 ```
 
-> info **Hint** Learn more about the available decorators [here](https://github.com/RobinBuschmann/sequelize-typescript#column).
+> info **提示** 了解更多关于可用装饰器的信息 [这里](https://github.com/RobinBuschmann/sequelize-typescript#column)。
 
-The `User` model file sits in the `users` directory. This directory contains all files related to the `UsersModule`. You can decide where to keep your model files, however, we recommend creating them near their **domain**, in the corresponding module directory.
+`User` 模型文件位于 `users` 目录中。此目录包含与 `UsersModule` 相关的所有文件。您可以决定将模型文件保存在哪里，但是，我们建议在相应的模块目录中，在其**域**附近创建它们。
 
-To begin using the `User` model, we need to let Sequelize know about it by inserting it into the `models` array in the module `forRoot()` method options:
+要开始使用 `User` 模型，我们需要通过将其插入到模块 `forRoot()` 方法选项的 `models` 数组中来让 Sequelize 知道它：
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -834,7 +834,7 @@ import { User } from './users/user.model';
 export class AppModule {}
 ```
 
-Next, let's look at the `UsersModule`:
+接下来，让我们看看 `UsersModule`：
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -851,7 +851,7 @@ import { UsersService } from './users.service';
 export class UsersModule {}
 ```
 
-This module uses the `forFeature()` method to define which models are registered in the current scope. With that in place, we can inject the `UserModel` into the `UsersService` using the `@InjectModel()` decorator:
+此模块使用 `forFeature()` 方法定义哪些模型在当前作用域中注册。有了这个，我们可以使用 `@InjectModel()` 装饰器将 `UserModel` 注入到 `UsersService` 中：
 
 ```typescript
 import { Injectable } from '@nestjs/common';
@@ -909,10 +909,10 @@ export class UsersService {
 }
 ```
 
-> warning **Notice** Don't forget to import the `UsersModule` into the root `AppModule`.
+> warning **注意** 不要忘记将 `UsersModule` 导入到根 `AppModule` 中。
 
-If you want to use the model outside of the module which imports `SequelizeModule.forFeature`, you'll need to re-export the providers generated by it.
-You can do this by exporting the whole module, like this:
+如果您想在导入 `SequelizeModule.forFeature` 的模块之外使用模型，您需要重新导出由它生成的提供程序。
+您可以通过导出整个模块来做到这一点，如下所示：
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -926,7 +926,7 @@ import { User } from './user.entity';
 export class UsersModule {}
 ```
 
-Now if we import `UsersModule` in `UserHttpModule`, we can use `@InjectModel(User)` in the providers of the latter module.
+现在，如果我们在 `UserHttpModule` 中导入 `UsersModule`，我们可以在后者模块的提供程序中使用 `@InjectModel(User)`。
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -942,28 +942,28 @@ import { UsersController } from './users.controller';
 export class UserHttpModule {}
 ```
 
-#### Relations
+#### 关系
 
-Relations are associations established between two or more tables. Relations are based on common fields from each table, often involving primary and foreign keys.
+关系是在两个或多个表之间建立的关联。关系基于每个表的公共字段，通常涉及主键和外键。
 
-There are three types of relations:
+有三种类型的关系：
 
 <table>
   <tr>
-    <td><code>One-to-one</code></td>
-    <td>Every row in the primary table has one and only one associated row in the foreign table</td>
+    <td><code>一对一</code></td>
+    <td>主表中的每一行在外表中只有一个相关行</td>
   </tr>
   <tr>
-    <td><code>One-to-many / Many-to-one</code></td>
-    <td>Every row in the primary table has one or more related rows in the foreign table</td>
+    <td><code>一对多 / 多对一</code></td>
+    <td>主表中的每一行在外表中有一个或多个相关行</td>
   </tr>
   <tr>
-    <td><code>Many-to-many</code></td>
-    <td>Every row in the primary table has many related rows in the foreign table, and every record in the foreign table has many related rows in the primary table</td>
+    <td><code>多对多</code></td>
+    <td>主表中的每一行在外表中有许多相关行，外表中的每条记录在主表中有许多相关行</td>
   </tr>
 </table>
 
-To define relations in models, use the corresponding **decorators**. For example, to define that each `User` can have multiple photos, use the `@HasMany()` decorator.
+要在模型中定义关系，请使用相应的**装饰器**。例如，要定义每个 `User` 可以有多个照片，请使用 `@HasMany()` 装饰器。
 
 ```typescript
 import { Column, Model, Table, HasMany } from 'sequelize-typescript';
@@ -985,11 +985,11 @@ export class User extends Model {
 }
 ```
 
-> info **Hint** To learn more about associations in Sequelize, read [this](https://github.com/RobinBuschmann/sequelize-typescript#model-association) chapter.
+> info **提示** 要了解更多关于 Sequelize 中的关联，请阅读 [此](https://github.com/RobinBuschmann/sequelize-typescript#model-association) 章节。
 
-#### Auto-load models
+#### 自动加载模型
 
-Manually adding models to the `models` array of the connection options can be tedious. In addition, referencing models from the root module breaks application domain boundaries and causes leaking implementation details to other parts of the application. To solve this issue, automatically load models by setting both `autoLoadModels` and `synchronize` properties of the configuration object (passed into the `forRoot()` method) to `true`, as shown below:
+手动将模型添加到连接选项的 `models` 数组中可能很繁琐。此外，从根模块引用模型会破坏应用程序域边界，并导致实现细节泄漏到应用程序的其他部分。要解决此问题，通过将配置对象（传递到 `forRoot()` 方法）的 `autoLoadModels` 和 `synchronize` 属性都设置为 `true` 来自动加载模型，如下所示：
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -1007,17 +1007,17 @@ import { SequelizeModule } from '@nestjs/sequelize';
 export class AppModule {}
 ```
 
-With that option specified, every model registered through the `forFeature()` method will be automatically added to the `models` array of the configuration object.
+指定该选项后，通过 `forFeature()` 方法注册的每个模型将自动添加到配置对象的 `models` 数组中。
 
-> warning **Warning** Note that models that aren't registered through the `forFeature()` method, but are only referenced from the model (via an association), won't be included.
+> warning **警告** 请注意，未通过 `forFeature()` 方法注册但仅从模型（通过关联）引用的模型不会被包含。
 
-#### Sequelize Transactions
+#### Sequelize 事务
 
-A database transaction symbolizes a unit of work performed within a database management system against a database, and treated in a coherent and reliable way independent of other transactions. A transaction generally represents any change in a database ([learn more](https://en.wikipedia.org/wiki/Database_transaction)).
+数据库事务象征着在数据库管理系统中针对数据库执行的工作单元，并以连贯且可靠的方式处理，独立于其他事务。事务通常表示数据库中的任何更改（[了解更多](https://en.wikipedia.org/wiki/Database_transaction)）。
 
-There are many different strategies to handle [Sequelize transactions](https://sequelize.org/docs/v6/other-topics/transactions/). Below is a sample implementation of a managed transaction (auto-callback).
+处理 [Sequelize 事务](https://sequelize.org/docs/v6/other-topics/transactions/) 有许多不同的策略。下面是托管事务（自动回调）的示例实现。
 
-First, we need to inject the `Sequelize` object into a class in the normal way:
+首先，我们需要以正常方式将 `Sequelize` 对象注入到类中：
 
 ```typescript
 @Injectable()
@@ -1026,9 +1026,9 @@ export class UsersService {
 }
 ```
 
-> info **Hint** The `Sequelize` class is imported from the `sequelize-typescript` package.
+> info **提示** `Sequelize` 类从 `sequelize-typescript` 包导入。
 
-Now, we can use this object to create a transaction.
+现在，我们可以使用此对象创建事务。
 
 ```typescript
 async createMany() {
@@ -1046,27 +1046,27 @@ async createMany() {
       );
     });
   } catch (err) {
-    // Transaction has been rolled back
-    // err is whatever rejected the promise chain returned to the transaction callback
+    // 事务已回滚
+    // err 是返回给事务回调的 promise 链所拒绝的任何内容
   }
 }
 ```
 
-> info **Hint** Note that the `Sequelize` instance is used only to start the transaction. However, to test this class would require mocking the entire `Sequelize` object (which exposes several methods). Thus, we recommend using a helper factory class (e.g., `TransactionRunner`) and defining an interface with a limited set of methods required to maintain transactions. This technique makes mocking these methods pretty straightforward.
+> info **提示** 请注意，`Sequelize` 实例仅用于启动事务。但是，测试此类需要模拟整个 `Sequelize` 对象（它公开了几个方法）。因此，我们建议使用辅助工厂类（例如 `TransactionRunner`）并定义一个接口，其中包含维护事务所需的有限方法集。这种技术使得模拟这些方法非常简单。
 
-#### Migrations
+#### 迁移
 
-[Migrations](https://sequelize.org/docs/v6/other-topics/migrations/) provide a way to incrementally update the database schema to keep it in sync with the application's data model while preserving existing data in the database. To generate, run, and revert migrations, Sequelize provides a dedicated [CLI](https://sequelize.org/docs/v6/other-topics/migrations/#installing-the-cli).
+[迁移](https://sequelize.org/docs/v6/other-topics/migrations/) 提供了一种增量更新数据库架构的方法，以使其与应用程序的数据模型保持同步，同时保留数据库中的现有数据。为了生成、运行和回滚迁移，Sequelize 提供了专用的 [CLI](https://sequelize.org/docs/v6/other-topics/migrations/#installing-the-cli)。
 
-Migration classes are separate from the Nest application source code. Their lifecycle is maintained by the Sequelize CLI. Therefore, you are not able to leverage dependency injection and other Nest specific features with migrations. To learn more about migrations, follow the guide in the [Sequelize documentation](https://sequelize.org/docs/v6/other-topics/migrations/#installing-the-cli).
+迁移类与 Nest 应用程序源代码分开。它们的生命周期由 Sequelize CLI 维护。因此，您无法在迁移中利用依赖注入和其他 Nest 特定功能。要了解有关迁移的更多信息，请按照 [Sequelize 文档](https://sequelize.org/docs/v6/other-topics/migrations/#installing-the-cli) 中的指南进行操作。
 
 <app-banner-courses></app-banner-courses>
 
-#### Multiple databases
+#### 多个数据库
 
-Some projects require multiple database connections. This can also be achieved with this module. To work with multiple connections, first create the connections. In this case, connection naming becomes **mandatory**.
+一些项目需要多个数据库连接。此模块也可以实现这一点。要处理多个连接，首先创建连接。在这种情况下，连接命名变得**强制性**。
 
-Suppose you have an `Album` entity stored in its own database.
+假设您有一个存储在自己数据库中的 `Album` 实体。
 
 ```typescript
 const defaultOptions = {
@@ -1096,9 +1096,9 @@ const defaultOptions = {
 export class AppModule {}
 ```
 
-> warning **Notice** If you don't set the `name` for a connection, its name is set to `default`. Please note that you shouldn't have multiple connections without a name, or with the same name, otherwise they will get overridden.
+> warning **注意** 如果您不为连接设置 `name`，其名称将设置为 `default`。请注意，您不应有多个没有名称或具有相同名称的连接，否则它们会被覆盖。
 
-At this point, you have `User` and `Album` models registered with their own connection. With this setup, you have to tell the `SequelizeModule.forFeature()` method and the `@InjectModel()` decorator which connection should be used. If you do not pass any connection name, the `default` connection is used.
+此时，您已经注册了带有自己连接的 `User` 和 `Album` 模型。通过此设置，您必须告诉 `SequelizeModule.forFeature()` 方法和 `@InjectModel()` 装饰器应该使用哪个连接。如果您不传递任何连接名称，则使用 `default` 连接。
 
 ```typescript
 @Module({
@@ -1110,7 +1110,7 @@ At this point, you have `User` and `Album` models registered with their own conn
 export class AppModule {}
 ```
 
-You can also inject the `Sequelize` instance for a given connection:
+您还可以为给定的连接注入 `Sequelize` 实例：
 
 ```typescript
 @Injectable()
@@ -1122,7 +1122,7 @@ export class AlbumsService {
 }
 ```
 
-It's also possible to inject any `Sequelize` instance to the providers:
+也可以将任何 `Sequelize` 实例注入到提供程序中：
 
 ```typescript
 @Module({
@@ -1139,11 +1139,11 @@ It's also possible to inject any `Sequelize` instance to the providers:
 export class AlbumsModule {}
 ```
 
-#### Testing
+#### 测试
 
-When it comes to unit testing an application, we usually want to avoid making a database connection, keeping our test suites independent and their execution process as fast as possible. But our classes might depend on models that are pulled from the connection instance. How do we handle that? The solution is to create mock models. In order to achieve that, we set up [custom providers](/fundamentals/custom-providers). Each registered model is automatically represented by a `<ModelName>Model` token, where `ModelName` is the name of your model class.
+当涉及到应用程序的单元测试时，我们通常希望避免建立数据库连接，保持测试套件独立，并且其执行过程尽可能快。但是，我们的类可能依赖于从连接实例中提取的模型。我们如何处理这个问题？解决方案是创建模拟模型。为了实现这一点，我们设置了 [自定义提供程序](/fundamentals/custom-providers)。每个注册的模型都自动由 `<ModelName>Model` 令牌表示，其中 `ModelName` 是您的模型类的名称。
 
-The `@nestjs/sequelize` package exposes the `getModelToken()` function which returns a prepared token based on a given model.
+`@nestjs/sequelize` 包公开了 `getModelToken()` 函数，该函数基于给定的模型返回准备好的令牌。
 
 ```typescript
 @Module({
@@ -1158,13 +1158,13 @@ The `@nestjs/sequelize` package exposes the `getModelToken()` function which ret
 export class UsersModule {}
 ```
 
-Now a substitute `mockModel` will be used as the `UserModel`. Whenever any class asks for `UserModel` using an `@InjectModel()` decorator, Nest will use the registered `mockModel` object.
+现在，替代的 `mockModel` 将用作 `UserModel`。每当任何类使用 `@InjectModel()` 装饰器请求 `UserModel` 时，Nest 将使用注册的 `mockModel` 对象。
 
-#### Async configuration
+#### 异步配置
 
-You may want to pass your `SequelizeModule` options asynchronously instead of statically. In this case, use the `forRootAsync()` method, which provides several ways to deal with async configuration.
+您可能希望异步传递 `SequelizeModule` 选项，而不是静态传递。在这种情况下，使用 `forRootAsync()` 方法，该方法提供了几种处理异步配置的方法。
 
-One approach is to use a factory function:
+一种方法是使用工厂函数：
 
 ```typescript
 SequelizeModule.forRootAsync({
@@ -1180,7 +1180,7 @@ SequelizeModule.forRootAsync({
 });
 ```
 
-Our factory behaves like any other [asynchronous provider](/fundamentals/async-providers) (e.g., it can be `async` and it's able to inject dependencies through `inject`).
+我们的工厂行为类似于任何其他 [异步提供程序](/fundamentals/async-providers)（例如，它可以是 `async` 并且能够通过 `inject` 注入依赖项）。
 
 ```typescript
 SequelizeModule.forRootAsync({
@@ -1198,7 +1198,7 @@ SequelizeModule.forRootAsync({
 });
 ```
 
-Alternatively, you can use the `useClass` syntax:
+或者，您可以使用 `useClass` 语法：
 
 ```typescript
 SequelizeModule.forRootAsync({
@@ -1206,7 +1206,7 @@ SequelizeModule.forRootAsync({
 });
 ```
 
-The construction above will instantiate `SequelizeConfigService` inside `SequelizeModule` and use it to provide an options object by calling `createSequelizeOptions()`. Note that this means that the `SequelizeConfigService` has to implement the `SequelizeOptionsFactory` interface, as shown below:
+上面的构造将在 `SequelizeModule` 内部实例化 `SequelizeConfigService`，并使用它通过调用 `createSequelizeOptions()` 来提供选项对象。请注意，这意味着 `SequelizeConfigService` 必须实现 `SequelizeOptionsFactory` 接口，如下所示：
 
 ```typescript
 @Injectable()
@@ -1225,7 +1225,7 @@ class SequelizeConfigService implements SequelizeOptionsFactory {
 }
 ```
 
-In order to prevent the creation of `SequelizeConfigService` inside `SequelizeModule` and use a provider imported from a different module, you can use the `useExisting` syntax.
+为了防止在 `SequelizeModule` 内部创建 `SequelizeConfigService` 并使用从不同模块导入的提供程序，您可以使用 `useExisting` 语法。
 
 ```typescript
 SequelizeModule.forRootAsync({
@@ -1234,8 +1234,8 @@ SequelizeModule.forRootAsync({
 });
 ```
 
-This construction works the same as `useClass` with one critical difference - `SequelizeModule` will lookup imported modules to reuse an existing `ConfigService` instead of instantiating a new one.
+这种构造的工作方式与 `useClass` 相同，但有一个关键区别 - `SequelizeModule` 将查找导入的模块以重用现有的 `ConfigService`，而不是实例化一个新的。
 
-#### Example
+#### 示例
 
-A working example is available [here](https://github.com/nestjs/nest/tree/master/sample/07-sequelize).
+一个工作示例可在 [这里](https://github.com/nestjs/nest/tree/master/sample/07-sequelize) 找到。

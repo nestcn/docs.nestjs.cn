@@ -1,5 +1,14 @@
 #!/usr/bin/env node
 
+// 尝试加载 dotenv 包
+let dotenv;
+try {
+  dotenv = require('dotenv');
+  dotenv.config();
+} catch (error) {
+  console.warn('⚠️ dotenv not installed, using environment variables only');
+}
+
 const fs = require('fs');
 const path = require('path');
 const { glob } = require('glob');
@@ -41,6 +50,7 @@ class DocumentTranslator {
     this.errors = [];
     this.verbose = options.verbose || false;
     this.concurrency = options.concurrency || 5;
+    this.translateEnglish = options.translateEnglish || false;
 
     // AI 翻译配置 - 仅支持 Cloudflare Workers AI
     this.useAI = options.useAI !== false; // 默认启用
@@ -197,12 +207,9 @@ class DocumentTranslator {
 
   /**
    * 调用 Cloudflare Workers AI 进行翻译
+   * 在本地开发环境中使用代理服务器，在 CI 环境中直接调用 API
    */
   async translateWithCloudflare(text) {
-    if (!this.apiToken || !this.accountId) {
-      throw new Error('Cloudflare API token and Account ID not configured');
-    }
-
     const glossaryPrompt = this.getGlossaryPrompt();
 
     const systemPrompt = `You are a professional technical documentation translator specializing in translating NestJS-related English technical documentation to Chinese.
@@ -237,54 +244,84 @@ Translation Requirements:
 
 Please translate the following English technical documentation to Chinese following these rules:`;
 
-    const response = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${this.accountId}/ai/run/${this.model}`,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.apiToken}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          messages: [
-            {
-              role: 'system',
-              content: systemPrompt
+    const fullText = systemPrompt + '\n' + text;
+
+    // 检查是否在 CI 环境中
+    const isCI = process.env.CI === 'true' || process.env.NODE_ENV === 'production';
+
+    try {
+      let response;
+      if (isCI) {
+        // 在 CI 环境中，直接调用 Cloudflare API
+        if (!this.apiToken || !this.accountId) {
+          throw new Error('Cloudflare API token and Account ID not configured');
+        }
+
+        response = await fetch(
+          `https://api.cloudflare.com/client/v4/accounts/${this.accountId}/ai/run/${this.model}`,
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${this.apiToken}`,
+              'Content-Type': 'application/json'
             },
-            {
-              role: 'user',
-              content: text
-            }
-          ],
-          max_tokens: this.maxTokens
-        })
+            body: JSON.stringify({
+              messages: [
+                {
+                  role: 'system',
+                  content: systemPrompt
+                },
+                {
+                  role: 'user',
+                  content: text
+                }
+              ],
+              max_tokens: this.maxTokens
+            })
+          }
+        );
+      } else {
+        // 在本地环境中，使用代理服务器
+        response = await fetch('http://localhost:3000/translate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            text: fullText,
+            model: this.model
+          })
+        });
       }
-    );
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`Cloudflare Workers AI error: ${error.errors?.[0]?.message || response.statusText}`);
-    }
-
-    const result = await response.json();
-
-    // Cloudflare Workers AI 返回格式可能不同，需要适配
-    if (result.success && result.result) {
-      // 处理可能的响应格式
-      if (result.result.response) {
-        return result.result.response;
-      } else if (result.result.choices && result.result.choices[0]) {
-        return result.result.choices[0].message?.content || text;
-      } else if (typeof result.result === 'string') {
-        return result.result;
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(`${isCI ? 'Cloudflare Workers AI error' : 'Proxy error'}: ${error.error || error.errors?.[0]?.message || response.statusText}`);
       }
-    }
 
-    return text;
+      const result = await response.json();
+
+      // Cloudflare Workers AI 返回格式可能不同，需要适配
+      if (result.success && result.result) {
+        // 处理可能的响应格式
+        if (result.result.response) {
+          return result.result.response;
+        } else if (result.result.choices && result.result.choices[0]) {
+          return result.result.choices[0].message?.content || text;
+        } else if (typeof result.result === 'string') {
+          return result.result;
+        }
+      }
+
+      return text;
+    } catch (error) {
+      console.warn(`⚠️ Translation failed: ${error.message}`);
+      throw error;
+    }
   }
 
   /**
-   * 使用 Cloudflare Workers AI 翻译文本
+   * 使用本地代理服务器翻译文本
    */
   async translateWithAI(text, filePath) {
     if (!this.useAI) {
@@ -306,32 +343,116 @@ Please translate the following English technical documentation to Chinese follow
       // 保护代码块
       const protectedText = this.protectCodeBlocks(text);
 
-      // 使用 Cloudflare Workers AI 翻译
-      const translatedText = await this.translateWithCloudflare(protectedText);
+      // 检查文本长度，如果超过 5000 字符，进行分块翻译
+      if (protectedText.length > 5000) {
+        console.log(`  📝 Text too long, splitting into chunks...`);
+        const chunks = this.splitTextIntoChunks(protectedText, 5000);
+        const translatedChunks = [];
 
-      // 恢复代码块
-      const finalText = this.restoreCodeBlocks(translatedText);
+        for (let i = 0; i < chunks.length; i++) {
+          console.log(`  🤖 Translating chunk ${i + 1}/${chunks.length}...`);
+          const chunkTranslated = await this.translateWithCloudflare(chunks[i]);
+          translatedChunks.push(chunkTranslated);
+        }
 
-      // 校验翻译质量：如果源文件不是索引页，且翻译结果中文字数过少，视为失败
-      const chineseChars = finalText.match(/[\u4e00-\u9fa5]/g);
-      const chineseCount = chineseChars ? chineseChars.length : 0;
+        // 合并翻译结果
+        const translatedText = translatedChunks.join('');
+        const finalText = this.restoreCodeBlocks(translatedText);
 
-      if (!filePath.includes('index.md') && chineseCount < 20) {
-        throw new Error(`Translation quality check failed: only ${chineseCount} Chinese characters found.`);
+        // 校验翻译质量
+        const chineseChars = finalText.match(/[\u4e00-\u9fa5]/g);
+        const chineseCount = chineseChars ? chineseChars.length : 0;
+
+        if (!filePath.includes('index.md') && chineseCount < 20) {
+          throw new Error(`Translation quality check failed: only ${chineseCount} Chinese characters found.`);
+        }
+
+        // 缓存翻译结果
+        this.translationCache.set(cacheKey, finalText);
+
+        if (this.verbose) {
+          console.log(`  🤖 AI translated: ${filePath}`);
+        }
+
+        return finalText;
+      } else {
+        // 正常翻译
+        const translatedText = await this.translateWithCloudflare(protectedText);
+        const finalText = this.restoreCodeBlocks(translatedText);
+
+        // 校验翻译质量：如果源文件不是索引页，且翻译结果中文字数过少，视为失败
+        const chineseChars = finalText.match(/[\u4e00-\u9fa5]/g);
+        const chineseCount = chineseChars ? chineseChars.length : 0;
+
+        if (!filePath.includes('index.md') && chineseCount < 20) {
+          throw new Error(`Translation quality check failed: only ${chineseCount} Chinese characters found.`);
+        }
+
+        // 缓存翻译结果
+        this.translationCache.set(cacheKey, finalText);
+
+        if (this.verbose) {
+          console.log(`  🤖 AI translated: ${filePath}`);
+        }
+
+        return finalText;
       }
-
-      // 缓存翻译结果
-      this.translationCache.set(cacheKey, finalText);
-
-      if (this.verbose) {
-        console.log(`  🤖 AI translated: ${filePath}`);
-      }
-
-      return finalText;
     } catch (error) {
       console.warn(`⚠️ AI translation failed for ${filePath}: ${error.message}`);
       throw error; // 抛出异常，阻止后续的错误同步逻辑
     }
+  }
+
+  /**
+   * 将文本分割成块，避免超过模型的上下文窗口限制
+   */
+  splitTextIntoChunks(text, chunkSize) {
+    const chunks = [];
+    let currentChunk = '';
+
+    // 按段落分割
+    const paragraphs = text.split('\n\n');
+
+    for (const paragraph of paragraphs) {
+      if (currentChunk.length + paragraph.length + 2 <= chunkSize) {
+        currentChunk += paragraph + '\n\n';
+      } else {
+        if (currentChunk) {
+          chunks.push(currentChunk);
+          currentChunk = '';
+        }
+
+        // 如果单个段落超过 chunkSize，按句子分割
+        if (paragraph.length > chunkSize) {
+          const sentences = paragraph.split(/[.!?]+/);
+          let currentSentenceChunk = '';
+
+          for (const sentence of sentences) {
+            if (currentSentenceChunk.length + sentence.length + 1 <= chunkSize) {
+              currentSentenceChunk += sentence + '.';
+            } else {
+              if (currentSentenceChunk) {
+                chunks.push(currentSentenceChunk);
+                currentSentenceChunk = '';
+              }
+              chunks.push(sentence + '.');
+            }
+          }
+
+          if (currentSentenceChunk) {
+            chunks.push(currentSentenceChunk);
+          }
+        } else {
+          currentChunk = paragraph + '\n\n';
+        }
+      }
+    }
+
+    if (currentChunk) {
+      chunks.push(currentChunk);
+    }
+
+    return chunks;
   }
 
   /**
@@ -340,6 +461,14 @@ Please translate the following English technical documentation to Chinese follow
   needsUpdate(sourcePath, targetPath) {
     if (!fs.existsSync(targetPath)) {
       return true;
+    }
+
+    // 如果启用了翻译英文文件的选项，检查目标文件是否包含中文内容
+    if (this.translateEnglish) {
+      const targetContent = fs.readFileSync(targetPath, 'utf8');
+      if (!this.hasChineseContent(targetContent)) {
+        return true;
+      }
     }
 
     const sourceStats = fs.statSync(sourcePath);
@@ -353,7 +482,10 @@ Please translate the following English technical documentation to Chinese follow
    * 检查文件是否包含中文内容
    */
   hasChineseContent(content) {
-    return /[\u4e00-\u9fa5]/.test(content);
+    // 移除 HTML 注释
+    const contentWithoutComments = content.replace(/<!--[\s\S]*?-->/g, '');
+    // 检查是否包含中文
+    return /[\u4e00-\u9fa5]/.test(contentWithoutComments);
   }
 
   /**
@@ -391,21 +523,44 @@ Please translate the following English technical documentation to Chinese follow
         fs.mkdirSync(outputDir, { recursive: true });
       }
 
+      // 检查内容是否包含占位符
+      function hasPlaceholders(text) {
+        return /__\w+_\d+__/.test(text);
+      }
+
       // 3. 检查目标文件是否存在并且包含中文翻译
       let translatedContent = content;
       if (!this.useAI && fs.existsSync(outputPath)) {
         const existingContent = fs.readFileSync(outputPath, 'utf8');
         if (this.hasChineseContent(existingContent)) {
-          // 如果目标文件存在并且包含中文翻译，保留现有内容
-          translatedContent = existingContent;
-          if (this.verbose) {
-            console.log(`📝 Preserved existing translation: ${relativePath}`);
+          // 如果目标文件存在并且包含中文翻译
+          if (hasPlaceholders(existingContent)) {
+            // 如果包含占位符，重新处理占位符
+            const protectedText = this.protectCodeBlocks(content);
+            translatedContent = this.restoreCodeBlocks(protectedText);
+            if (this.verbose) {
+              console.log(`🔧 Processed placeholders for existing translation: ${relativePath}`);
+            }
+          } else {
+            // 如果不包含占位符，保留现有内容
+            translatedContent = existingContent;
+            if (this.verbose) {
+              console.log(`📝 Preserved existing translation: ${relativePath}`);
+            }
           }
+        } else {
+          // 如果目标文件存在但不包含中文翻译，处理占位符
+          const protectedText = this.protectCodeBlocks(content);
+          translatedContent = this.restoreCodeBlocks(protectedText);
         }
       } else if (this.useAI) {
         // 只有在启用 AI 翻译时才进行翻译
         console.log(`🤖 Translating: ${relativePath} -> ${relativePath}`);
         translatedContent = await this.translateWithAI(content, relativePath);
+      } else {
+        // 既不使用 AI 翻译，目标文件也不存在或不包含中文翻译，处理占位符
+        const protectedText = this.protectCodeBlocks(content);
+        translatedContent = this.restoreCodeBlocks(protectedText);
       }
 
       // 4. 后期处理（修复链接、清理格式等）
@@ -414,8 +569,7 @@ Please translate the following English technical documentation to Chinese follow
       // 5. 写入文件并同步时间
       fs.writeFileSync(outputPath, finalContent, 'utf8');
 
-      // 只有在真正进行了 AI 翻译或确认内容有效时才同步时间戳
-      // 如果没有使用 AI，也同步时间戳（可能是格式修复）
+      // 同步时间戳，确保文件的修改时间与源文件一致
       const sourceStats = fs.statSync(contentPath);
       fs.utimesSync(outputPath, sourceStats.atime, sourceStats.mtime);
 
@@ -534,7 +688,7 @@ Please translate the following English technical documentation to Chinese follow
       if (hasChanges) {
         console.log('\n🔄 Running post-translation processing...');
         try {
-          const PostTranslateProcessor = require('./post-translate-processor.js');
+          const PostTranslateProcessor = require('./post-translate-processor.cjs');
           const processor = new PostTranslateProcessor({
             docsDir: this.docsDir,
             verbose: this.verbose
@@ -573,7 +727,8 @@ if (require.main === module) {
     docsDir: 'docs',
     useAI: !args.includes('--no-ai'),
     model: '@cf/meta/llama-3-8b-instruct', // Updated default
-    concurrency: 5
+    concurrency: 5,
+    translateEnglish: args.includes('--translate-english')
   };
 
   // 解析命令行参数
@@ -620,6 +775,7 @@ if (require.main === module) {
   --api-token <token>     Cloudflare API 令牌 (或使用环境变量)
   --account-id <id>       Cloudflare Account ID (或使用环境变量)
   --no-ai                 禁用 AI 翻译，仅处理格式
+  --translate-english     翻译 docs 目录下的英文文件
   --verbose, -v           显示详细信息
   --help, -h              显示帮助信息
 

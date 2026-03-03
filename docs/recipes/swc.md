@@ -36,7 +36,7 @@ Sentry.init({
   // We recommend adjusting this value in production
   tracesSampleRate: 1.0,
 
-  // Set sampling rate for profiling
+  // 设置 sampling rate for profiling
   // This is relative to tracesSampleRate
   profilesSampleRate: 1.0,
 });
@@ -47,7 +47,7 @@ Sentry.init({
 您也可以将__INLINE_CODE_26__标志改为在__INLINE_CODE_29__文件中设置__INLINE_CODE_28__属性，例如：
 
 ```typescript
-// Import this first!
+// 导入 this first!
 import "./instrument";
 
 // Now import other modules

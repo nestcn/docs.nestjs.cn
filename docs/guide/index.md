@@ -4,19 +4,19 @@
 
 # Markdown & MDX
 
-Rspress supports not only Markdown but also [MDX](https://mdxjs.com/), a powerful way to develop content.
+Rspress 不仅支持 Markdown，还支持 [MDX](https://mdxjs.com/)，这是一种强大的内容开发方式。
 
 ## Markdown
 
-MDX is a superset of Markdown, which means you can write Markdown files as usual. For example:
+MDX 是 Markdown 的超集，这意味着您可以像往常一样编写 Markdown 文件。例如：
 
 ```md
 # Hello world
 ```
 
-## Use component
+## 使用组件
 
-When you want to use React components in Markdown files, you should name your files with `.mdx` extension. For example:
+当您想在 Markdown 文件中使用 React 组件时，应该将文件命名为 `.mdx` 扩展名。例如：
 
 ```mdx
 // docs/index.mdx
@@ -27,9 +27,9 @@ import { CustomComponent } from './custom';
 <CustomComponent />
 ```
 
-## Front matter
+## 前置元数据
 
-You can add Front Matter at the beginning of your Markdown file, which is a YAML-formatted object that defines some metadata. For example:
+您可以在 Markdown 文件的开头添加前置元数据（Front Matter），这是一个 YAML 格式的对象，用于定义一些元数据。例如：
 
 ```yaml
 ---
@@ -37,9 +37,9 @@ title: Hello world
 ---
 ```
 
-> Note: By default, Rspress uses h1 headings as html headings.
+> 注意：默认情况下，Rspress 使用 h1 标题作为 HTML 标题。
 
-You can also access properties defined in Front Matter in the body, for example:
+您还可以在正文中访问前置元数据中定义的属性，例如：
 
 ```markdown
 ---
@@ -50,17 +50,17 @@ title: Hello world
 # {frontmatter.title}
 ```
 
-The previously defined properties will be passed to the component as `frontmatter` properties. So the final output will be:
+先前定义的属性将作为 `frontmatter` 属性传递给组件。因此，最终输出将是：
 
 ```html
 <h1>Hello world</h1>
 ```
 
-## Custom container
+## 自定义容器
 
-You can use the `:::` syntax to create custom containers and support custom titles. For example:
+您可以使用 `:::` 语法创建自定义容器并支持自定义标题。例如：
 
-**Input:**
+**输入：**
 
 ```markdown
 :::info
@@ -93,7 +93,7 @@ This is a `block` of `Custom Title`
 :::
 ```
 
-**Output:**
+**输出：**
 
 :::info
 This is a `block` of type `tip`
@@ -123,13 +123,13 @@ This is a `block` of `Custom Title`
 This is a `block` of `Custom Title`
 :::
 
-## Code block
+## 代码块
 
-### Basic usage
+### 基本用法
 
-You can use the \`\`\` syntax to create code blocks and support custom titles. For example:
+您可以使用 ``` 语法创建代码块并支持自定义标题。例如：
 
-**Input:**
+**输入：**
 
 ````md
 ```js
@@ -140,7 +140,7 @@ console.log('Hello World');
 console.log('Hello World');
 ````
 
-**Output:**
+**输出：**
 
 ```js
 console.log('Hello World');
@@ -150,9 +150,9 @@ console.log('Hello World');
 console.log('Hello World');
 ```
 
-### Show line numbers
+### 显示行号
 
-If you want to display line numbers, you can enable the `showLineNumbers` option in the config file:
+如果您想显示行号，可以在配置文件中启用 `showLineNumbers` 选项：
 
 ```ts title="rspress.config.ts"
 export default {
@@ -163,9 +163,9 @@ export default {
 };
 ```
 
-### Wrap code
+### 代码换行
 
-If you want to wrap long code line by default, you can enable the `defaultWrapCode` option in the config file:
+如果您希望默认换行较长的代码行，可以在配置文件中启用 `defaultWrapCode` 选项：
 
 ```ts title="rspress.config.ts"
 export default {
@@ -176,11 +176,11 @@ export default {
 };
 ```
 
-### Line highlighting
+### 行高亮
 
-You can also apply line highlighting and code block title at the same time, for example:
+您还可以同时应用行高亮和代码块标题，例如：
 
-**Input:**
+**输入：**
 
 ````md
 ```js title="hello.js" {1,3-5}
@@ -195,7 +195,7 @@ const b = 2;
 console.log(b);
 ````
 
-**Output:**
+**输出：**
 
 ```js title="hello.js" {1,3-5}
 console.log('Hello World');
@@ -209,6 +209,6 @@ const b = 2;
 console.log(b);
 ```
 
-## Rustify MDX compiler
+## Rustify MDX 编译器
 
-You can enable Rustify MDX compiler by following config:
+您可以通过以下配置启用 Rustify MDX 编译器：

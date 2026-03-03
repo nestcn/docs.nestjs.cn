@@ -2,28 +2,28 @@
 <!-- 生成时间: 2026-03-03T07:09:52.705Z -->
 <!-- 源文件: content/pipes.md -->
 
-### Pipes
+### 管道
 
-A pipe is a class annotated with the `@Injectable()` decorator, which implements the `PipeTransform` interface.
+管道是一个使用 `@Injectable()` 装饰器注解的类，它实现了 `PipeTransform` 接口。
 
 <figure>
   <img class="illustrative-image" src="/assets/Pipe_1.png" />
 </figure>
 
-Pipes have two typical use cases:
+管道有两个典型用例：
 
-- **transformation**: transform input data to the desired form (e.g., from string to integer)
-- **validation**: evaluate input data and if valid, simply pass it through unchanged; otherwise, throw an exception
+- **转换**：将输入数据转换为所需的形式（例如，从字符串转换为整数）
+- **验证**：评估输入数据，如果有效，则原样传递；否则，抛出异常
 
-In both cases, pipes operate on the `arguments` being processed by a <a href="controllers#route-parameters">controller route handler</a>. Nest interposes a pipe just before a method is invoked, and the pipe receives the arguments destined for the method and operates on them. Any transformation or validation operation takes place at that time, after which the route handler is invoked with any (potentially) transformed arguments.
+在这两种情况下，管道都对 <a href="controllers#路由参数">控制器路由处理程序</a> 正在处理的 `arguments` 进行操作。Nest 在调用方法之前插入管道，管道接收发往该方法的参数并对其进行操作。任何转换或验证操作都在此时进行，之后路由处理程序会使用任何（可能经过转换的）参数被调用。
 
-Nest comes with a number of built-in pipes that you can use out-of-the-box. You can also build your own custom pipes. In this chapter, we'll introduce the built-in pipes and show how to bind them to route handlers. We'll then examine several custom-built pipes to show how you can build one from scratch.
+Nest 提供了许多内置管道，您可以直接使用。您也可以构建自己的自定义管道。在本章中，我们将介绍内置管道，并展示如何将它们绑定到路由处理程序。然后，我们将研究几个自定义构建的管道，以展示如何从头开始构建一个管道。
 
-> info **Hint** Pipes run inside the exceptions zone. This means that when a Pipe throws an exception it is handled by the exceptions layer (global exceptions filter and any [exceptions filters](/exception-filters) that are applied to the current context). Given the above, it should be clear that when an exception is thrown in a Pipe, no controller method is subsequently executed. This gives you a best-practice technique for validating data coming into the application from external sources at the system boundary.
+> info **提示** 管道在异常区域内运行。这意味着当管道抛出异常时，它会由异常层（全局异常过滤器和应用于当前上下文的任何 [异常过滤器](/exception-filters)）处理。鉴于上述情况，很明显，当在管道中抛出异常时，控制器方法不会被执行。这为您提供了一种最佳实践技术，用于在系统边界验证从外部源进入应用程序的数据。
 
-#### Built-in pipes
+#### 内置管道
 
-Nest comes with several pipes available out-of-the-box:
+Nest 提供了几个开箱即用的管道：
 
 - `ValidationPipe`
 - `ParseIntPipe`
@@ -36,13 +36,13 @@ Nest comes with several pipes available out-of-the-box:
 - `ParseFilePipe`
 - `ParseDatePipe`
 
-They're exported from the `@nestjs/common` package.
+它们从 `@nestjs/common` 包中导出。
 
-Let's take a quick look at using `ParseIntPipe`. This is an example of the **transformation** use case, where the pipe ensures that a method handler parameter is converted to a JavaScript integer (or throws an exception if the conversion fails). Later in this chapter, we'll show a simple custom implementation for a `ParseIntPipe`. The example techniques below also apply to the other built-in transformation pipes (`ParseBoolPipe`, `ParseFloatPipe`, `ParseEnumPipe`, `ParseArrayPipe`, `ParseDatePipe`, and `ParseUUIDPipe`, which we'll refer to as the `Parse*` pipes in this chapter).
+让我们快速了解一下使用 `ParseIntPipe`。这是 **转换** 用例的一个示例，其中管道确保方法处理程序参数被转换为 JavaScript 整数（如果转换失败则抛出异常）。在本章后面，我们将展示 `ParseIntPipe` 的简单自定义实现。下面的示例技术也适用于其他内置转换管道（`ParseBoolPipe`、`ParseFloatPipe`、`ParseEnumPipe`、`ParseArrayPipe`、`ParseDatePipe` 和 `ParseUUIDPipe`，我们在本章中将它们称为 `Parse*` 管道）。
 
-#### Binding pipes
+#### 绑定管道
 
-To use a pipe, we need to bind an instance of the pipe class to the appropriate context. In our `ParseIntPipe` example, we want to associate the pipe with a particular route handler method, and make sure it runs before the method is called. We do so with the following construct, which we'll refer to as binding the pipe at the method parameter level:
+要使用管道，我们需要将管道类的实例绑定到适当的上下文。在我们的 `ParseIntPipe` 示例中，我们希望将管道与特定的路由处理程序方法相关联，并确保它在方法调用之前运行。我们通过以下构造来实现，我们将其称为在方法参数级别绑定管道：
 
 ```typescript
 @Get(':id')
@@ -51,15 +51,15 @@ async findOne(@Param('id', ParseIntPipe) id: number) {
 }
 ```
 
-This ensures that one of the following two conditions is true: either the parameter we receive in the `findOne()` method is a number (as expected in our call to `this.catsService.findOne()`), or an exception is thrown before the route handler is called.
+这确保以下两个条件之一为真：要么我们在 `findOne()` 方法中接收的参数是数字（正如我们在调用 `this.catsService.findOne()` 时所期望的那样），要么在路由处理程序被调用之前抛出异常。
 
-For example, assume the route is called like:
+例如，假设路由被调用如下：
 
 ```bash
 GET localhost:3000/abc
 ```
 
-Nest will throw an exception like this:
+Nest 将抛出如下异常：
 
 ```json
 {
@@ -69,9 +69,9 @@ Nest will throw an exception like this:
 }
 ```
 
-The exception will prevent the body of the `findOne()` method from executing.
+该异常将阻止 `findOne()` 方法的主体执行。
 
-In the example above, we pass a class (`ParseIntPipe`), not an instance, leaving responsibility for instantiation to the framework and enabling dependency injection. As with pipes and guards, we can instead pass an in-place instance. Passing an in-place instance is useful if we want to customize the built-in pipe's behavior by passing options:
+在上面的示例中，我们传递了一个类（`ParseIntPipe`），而不是一个实例，将实例化的责任留给框架并启用依赖注入。与管道和守卫一样，我们也可以传递一个内联实例。如果我们想通过传递选项来自定义内置管道的行为，传递内联实例会很有用：
 
 ```typescript
 @Get(':id')
@@ -83,9 +83,9 @@ async findOne(
 }
 ```
 
-Binding the other transformation pipes (all of the **Parse\*** pipes) works similarly. These pipes all work in the context of validating route parameters, query string parameters and request body values.
+绑定其他转换管道（所有 **Parse\*** 管道）的工作方式类似。这些管道都在验证路由参数、查询字符串参数和请求体值的上下文中工作。
 
-For example with a query string parameter:
+例如，对于查询字符串参数：
 
 ```typescript
 @Get()
@@ -94,7 +94,7 @@ async findOne(@Query('id', ParseIntPipe) id: number) {
 }
 ```
 
-Here's an example of using the `ParseUUIDPipe` to parse a string parameter and validate if it is a UUID.
+下面是使用 `ParseUUIDPipe` 解析字符串参数并验证它是否为 UUID 的示例。
 
 ```typescript
 @Get(':uuid')
@@ -103,17 +103,17 @@ async findOne(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
 }
 ```
 
-> info **Hint** When using `ParseUUIDPipe()` you are parsing UUID in version 3, 4 or 5, if you only require a specific version of UUID you can pass a version in the pipe options.
+> info **提示** 当使用 `ParseUUIDPipe()` 时，您正在解析版本 3、4 或 5 的 UUID，如果您只需要特定版本的 UUID，您可以在管道选项中传递版本。
 
-Above we've seen examples of binding the various `Parse*` family of built-in pipes. Binding validation pipes is a little bit different; we'll discuss that in the following section.
+上面我们已经看到了绑定各种内置 `Parse*` 家族管道的示例。绑定验证管道略有不同；我们将在以下部分讨论这一点。
 
-> info **Hint** Also, see [Validation techniques](/techniques/validation) for extensive examples of validation pipes.
+> info **提示** 另请参阅 [验证技术](/techniques/validation) 以获取验证管道的大量示例。
 
-#### Custom pipes
+#### 自定义管道
 
-As mentioned, you can build your own custom pipes. While Nest provides a robust built-in `ParseIntPipe` and `ValidationPipe`, let's build simple custom versions of each from scratch to see how custom pipes are constructed.
+如前所述，您可以构建自己的自定义管道。虽然 Nest 提供了强大的内置 `ParseIntPipe` 和 `ValidationPipe`，但让我们从头开始构建它们的简单自定义版本，以了解如何构建自定义管道。
 
-We start with a simple `ValidationPipe`. Initially, we'll have it simply take an input value and immediately return the same value, behaving like an identity function.
+我们从一个简单的 `ValidationPipe` 开始。最初，我们让它简单地接受输入值并立即返回相同的值，表现得像一个恒等函数。
 
 ```typescript
 import { PipeTransform, Injectable, ArgumentMetadata } from '@nestjs/common';
@@ -133,14 +133,14 @@ export class ValidationPipe {
 }
 ```
 
-> info **Hint** `PipeTransform<T, R>` is a generic interface that must be implemented by any pipe. The generic interface uses `T` to indicate the type of the input `value`, and `R` to indicate the return type of the `transform()` method.
+> info **提示** `PipeTransform<T, R>` 是任何管道必须实现的通用接口。通用接口使用 `T` 表示输入 `value` 的类型，`R` 表示 `transform()` 方法的返回类型。
 
-Every pipe must implement the `transform()` method to fulfill the `PipeTransform` interface contract. This method has two parameters:
+每个管道都必须实现 `transform()` 方法以履行 `PipeTransform` 接口契约。此方法有两个参数：
 
 - `value`
 - `metadata`
 
-The `value` parameter is the currently processed method argument (before it is received by the route handling method), and `metadata` is the currently processed method argument's metadata. The metadata object has these properties:
+`value` 参数是当前处理的方法参数（在被路由处理方法接收之前），`metadata` 是当前处理的方法参数的元数据。元数据对象具有以下属性：
 
 ```typescript
 export interface ArgumentMetadata {
@@ -150,44 +150,44 @@ export interface ArgumentMetadata {
 }
 ```
 
-These properties describe the currently processed argument.
+这些属性描述了当前处理的参数。
 
 <table>
   <tr>
     <td>
       <code>type</code>
     </td>
-    <td>Indicates whether the argument is a body
-      <code>@Body()</code>, query
-      <code>@Query()</code>, param
-      <code>@Param()</code>, or a custom parameter (read more
-      <a routerLink="/custom-decorators">here</a>).</td>
+    <td>指示参数是 body
+      <code>@Body()</code>、query
+      <code>@Query()</code>、param
+      <code>@Param()</code> 还是自定义参数（阅读更多
+      <a routerLink="/custom-decorators">这里</a>）。</td>
   </tr>
   <tr>
     <td>
       <code>metatype</code>
     </td>
     <td>
-      Provides the metatype of the argument, for example,
-      <code>String</code>. Note: the value is
-      <code>undefined</code> if you either omit a type declaration in the route handler method signature, or use vanilla JavaScript.
+      提供参数的元类型，例如
+      <code>String</code>。注意：如果您在路由处理程序方法签名中省略类型声明，或者使用纯 JavaScript，则该值为
+      <code>undefined</code>。
     </td>
   </tr>
   <tr>
     <td>
       <code>data</code>
     </td>
-    <td>The string passed to the decorator, for example
-      <code>@Body('string')</code>. It's
-      <code>undefined</code> if you leave the decorator parenthesis empty.</td>
+    <td>传递给装饰器的字符串，例如
+      <code>@Body('string')</code>。如果您留空装饰器括号，则为
+      <code>undefined</code>。</td>
   </tr>
 </table>
 
-> warning **Warning** TypeScript interfaces disappear during transpilation. Thus, if a method parameter's type is declared as an interface instead of a class, the `metatype` value will be `Object`.
+> warning **警告** TypeScript 接口在转译过程中会消失。因此，如果方法参数的类型被声明为接口而不是类，`metatype` 值将为 `Object`。
 
-#### Schema based validation
+#### 基于模式的验证
 
-Let's make our validation pipe a little more useful. Take a closer look at the `create()` method of the `CatsController`, where we probably would like to ensure that the post body object is valid before attempting to run our service method.
+让我们使我们的验证管道更有用一些。仔细看看 `CatsController` 的 `create()` 方法，我们可能希望在尝试运行服务方法之前确保 post body 对象有效。
 
 ```typescript
 @Post()
@@ -196,7 +196,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 }
 ```
 
-Let's focus in on the `createCatDto` body parameter. Its type is `CreateCatDto`:
+让我们关注 `createCatDto` 主体参数。它的类型是 `CreateCatDto`：
 
 ```typescript
 export class CreateCatDto {
@@ -206,33 +206,33 @@ export class CreateCatDto {
 }
 ```
 
-We want to ensure that any incoming request to the create method contains a valid body. So we have to validate the three members of the `createCatDto` object. We could do this inside the route handler method, but doing so is not ideal as it would break the **single responsibility principle** (SRP).
+我们希望确保对 create 方法的任何传入请求都包含有效的主体。因此，我们必须验证 `createCatDto` 对象的三个成员。我们可以在路由处理程序方法内部执行此操作，但这样做并不理想，因为它会破坏 **单一职责原则** (SRP)。
 
-Another approach could be to create a **validator class** and delegate the task there. This has the disadvantage that we would have to remember to call this validator at the beginning of each method.
+另一种方法是创建一个 **验证器类** 并将任务委托给它。这样做的缺点是我们必须记住在每个方法的开始调用这个验证器。
 
-How about creating validation middleware? This could work, but unfortunately, it's not possible to create **generic middleware** which can be used across all contexts across the whole application. This is because middleware is unaware of the **execution context**, including the handler that will be called and any of its parameters.
+创建验证中间件怎么样？这可能有效，但不幸的是，无法创建可在整个应用程序的所有上下文中使用的 **通用中间件**。这是因为中间件不知道 **执行上下文**，包括将被调用的处理程序及其任何参数。
 
-This is, of course, exactly the use case for which pipes are designed. So let's go ahead and refine our validation pipe.
+当然，这正是管道设计的用例。所以让我们继续完善我们的验证管道。
 
 <app-banner-courses></app-banner-courses>
 
-#### Object schema validation
+#### 对象模式验证
 
-There are several approaches available for doing object validation in a clean, [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) way. One common approach is to use **schema-based** validation. Let's go ahead and try that approach.
+有几种方法可以以干净、[DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) 的方式进行对象验证。一种常见的方法是使用 **基于模式** 的验证。让我们尝试这种方法。
 
-The [Zod](https://zod.dev/) library allows you to create schemas in a straightforward way, with a readable API. Let's build a validation pipe that makes use of Zod-based schemas.
+[Zod](https://zod.dev/) 库允许您以简单的方式创建模式，具有可读的 API。让我们构建一个使用基于 Zod 的模式的验证管道。
 
-Start by installing the required package:
+首先安装所需的包：
 
 ```bash
 $ npm install --save zod
 ```
 
-In the code sample below, we create a simple class that takes a schema as a `constructor` argument. We then apply the `schema.parse()` method, which validates our incoming argument against the provided schema.
+在下面的代码示例中，我们创建了一个简单的类，该类将模式作为 `constructor` 参数。然后我们应用 `schema.parse()` 方法，该方法根据提供的模式验证我们的传入参数。
 
-As noted earlier, a **validation pipe** either returns the value unchanged or throws an exception.
+如前所述，**验证管道** 要么返回未更改的值，要么抛出异常。
 
-In the next section, you'll see how we supply the appropriate schema for a given controller method using the `@UsePipes()` decorator. Doing so makes our validation pipe reusable across contexts, just as we set out to do.
+在下一节中，您将看到我们如何使用 `@UsePipes()` 装饰器为给定的控制器方法提供适当的模式。这样做可以使我们的验证管道在不同上下文中可重用，正如我们所设定的那样。
 
 ```typescript
 import { PipeTransform, ArgumentMetadata, BadRequestException } from '@nestjs/common';
@@ -266,19 +266,19 @@ export class ZodValidationPipe {
 
 ```
 
-#### Binding validation pipes
+#### 绑定验证管道
 
-Earlier, we saw how to bind transformation pipes (like `ParseIntPipe` and the rest of the `Parse*` pipes).
+ earlier，我们看到了如何绑定转换管道（如 `ParseIntPipe` 和其他 `Parse*` 管道）。
 
-Binding validation pipes is also very straightforward.
+绑定验证管道也非常简单。
 
-In this case, we want to bind the pipe at the method call level. In our current example, we need to do the following to use the `ZodValidationPipe`:
+在这种情况下，我们希望在方法调用级别绑定管道。在我们当前的示例中，我们需要执行以下操作来使用 `ZodValidationPipe`：
 
-1. Create an instance of the `ZodValidationPipe`
-2. Pass the context-specific Zod schema in the class constructor of the pipe
-3. Bind the pipe to the method
+1. 创建 `ZodValidationPipe` 的实例
+2. 在管道的类构造函数中传递特定于上下文的 Zod 模式
+3. 将管道绑定到方法
 
-Zod schema example:
+Zod 模式示例：
 
 ```typescript
 import { z } from 'zod';
@@ -294,7 +294,7 @@ export const createCatSchema = z
 export type CreateCatDto = z.infer<typeof createCatSchema>;
 ```
 
-We do that using the `@UsePipes()` decorator as shown below:
+我们使用 `@UsePipes()` 装饰器来实现，如下所示：
 
 ```typescript
 @Post()
@@ -304,23 +304,23 @@ async create(@Body() createCatDto: CreateCatDto) {
 }
 ```
 
-> info **Hint** The `@UsePipes()` decorator is imported from the `@nestjs/common` package.
+> info **提示** `@UsePipes()` 装饰器从 `@nestjs/common` 包中导入。
 
-> warning **Warning** `zod` library requires the `strictNullChecks` configuration to be enabled in your `tsconfig.json` file.
+> warning **警告** `zod` 库要求在您的 `tsconfig.json` 文件中启用 `strictNullChecks` 配置。
 
-#### Class validator
+#### 类验证器
 
-> warning **Warning** The techniques in this section require TypeScript and are not available if your app is written using vanilla JavaScript.
+> warning **警告** 本节中的技术需要 TypeScript，如果您的应用程序使用纯 JavaScript 编写，则不可用。
 
-Let's look at an alternate implementation for our validation technique.
+让我们看看我们的验证技术的另一种实现。
 
-Nest works well with the [class-validator](https://github.com/typestack/class-validator) library. This powerful library allows you to use decorator-based validation. Decorator-based validation is extremely powerful, especially when combined with Nest's **Pipe** capabilities since we have access to the `metatype` of the processed property. Before we start, we need to install the required packages:
+Nest 与 [class-validator](https://github.com/typestack/class-validator) 库配合得很好。这个强大的库允许您使用基于装饰器的验证。基于装饰器的验证非常强大，尤其是与 Nest 的 **Pipe** 功能结合使用时，因为我们可以访问处理属性的 `metatype`。在开始之前，我们需要安装所需的包：
 
 ```bash
 $ npm i --save class-validator class-transformer
 ```
 
-Once these are installed, we can add a few decorators to the `CreateCatDto` class. Here we see a significant advantage of this technique: the `CreateCatDto` class remains the single source of truth for our Post body object (rather than having to create a separate validation class).
+安装这些包后，我们可以向 `CreateCatDto` 类添加一些装饰器。在这里，我们看到了这种技术的一个显著优势：`CreateCatDto` 类仍然是我们的 Post body 对象的单一事实来源（而不是必须创建一个单独的验证类）。
 
 ```typescript
 import { IsString, IsInt } from 'class-validator';
@@ -337,9 +337,9 @@ export class CreateCatDto {
 }
 ```
 
-> info **Hint** Read more about the class-validator decorators [here](https://github.com/typestack/class-validator#usage).
+> info **提示** 有关 class-validator 装饰器的更多信息，请阅读 [这里](https://github.com/typestack/class-validator#用法)。
 
-Now we can create a `ValidationPipe` class that uses these annotations.
+现在我们可以创建一个使用这些注解的 `ValidationPipe` 类。
 
 ```typescript
 import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException } from '@nestjs/common';
@@ -367,22 +367,22 @@ export class ValidationPipe implements PipeTransform<any> {
 }
 ```
 
-> info **Hint** As a reminder, you don't have to build a generic validation pipe on your own since the `ValidationPipe` is provided by Nest out-of-the-box. The built-in `ValidationPipe` offers more options than the sample we built in this chapter, which has been kept basic for the sake of illustrating the mechanics of a custom-built pipe. You can find full details, along with lots of examples [here](/techniques/validation).
+> info **提示** 提醒一下，您不必自己构建通用验证管道，因为 `ValidationPipe` 是 Nest 开箱即用的。内置的 `ValidationPipe` 提供了比我们在本章中构建的示例更多的选项，该示例为了说明自定义构建管道的机制而保持简单。您可以在 [这里](/techniques/validation) 找到完整的详细信息以及许多示例。
 
-> warning **Notice** We used the [class-transformer](https://github.com/typestack/class-transformer) library above which is made by the same author as the **class-validator** library, and as a result, they play very well together.
+> warning **注意** 我们上面使用了 [class-transformer](https://github.com/typestack/class-transformer) 库，它由与 **class-validator** 库相同的作者制作，因此它们配合得很好。
 
-Let's go through this code. First, note that the `transform()` method is marked as `async`. This is possible because Nest supports both synchronous and **asynchronous** pipes. We make this method `async` because some of the class-validator validations [can be async](https://github.com/typestack/class-validator#custom-validation-classes) (utilize Promises).
+让我们分析一下这段代码。首先，请注意 `transform()` 方法被标记为 `async`。这是可能的，因为 Nest 支持同步和 **异步** 管道。我们将此方法设为 `async`，因为一些 class-validator 验证 [可以是异步的](https://github.com/typestack/class-validator#custom-validation-classes)（利用 Promise）。
 
-Next note that we are using destructuring to extract the metatype field (extracting just this member from an `ArgumentMetadata`) into our `metatype` parameter. This is just shorthand for getting the full `ArgumentMetadata` and then having an additional statement to assign the metatype variable.
+接下来，请注意我们使用解构来将 metatype 字段（从 `ArgumentMetadata` 中提取仅此成员）提取到我们的 `metatype` 参数中。这只是获取完整 `ArgumentMetadata` 然后有一个额外语句来分配 metatype 变量的简写。
 
-Next, note the helper function `toValidate()`. It's responsible for bypassing the validation step when the current argument being processed is a native JavaScript type (these can't have validation decorators attached, so there's no reason to run them through the validation step).
+接下来，请注意辅助函数 `toValidate()`。它负责在当前处理的参数是原生 JavaScript 类型时跳过验证步骤（这些类型不能附加验证装饰器，因此没有理由通过验证步骤运行它们）。
 
-Next, we use the class-transformer function `plainToInstance()` to transform our plain JavaScript argument object into a typed object so that we can apply validation. The reason we must do this is that the incoming post body object, when deserialized from the network request, does **not have any type information** (this is the way the underlying platform, such as Express, works). Class-validator needs to use the validation decorators we defined for our DTO earlier, so we need to perform this transformation to treat the incoming body as an appropriately decorated object, not just a plain vanilla object.
+接下来，我们使用类转换器函数 `plainToInstance()` 将我们的纯 JavaScript 参数对象转换为类型化对象，以便我们可以应用验证。我们必须这样做的原因是，当从网络请求反序列化时，传入的 post body 对象 **没有任何类型信息**（这是底层平台的工作方式，例如 Express）。Class-validator 需要使用我们之前为 DTO 定义的验证装饰器，因此我们需要执行此转换，将传入的主体视为适当装饰的对象，而不仅仅是普通对象。
 
-Finally, as noted earlier, since this is a **validation pipe** it either returns the value unchanged, or throws an exception.
+最后，如前所述，由于这是一个 **验证管道**，它要么返回未更改的值，要么抛出异常。
 
-The last step is to bind the `ValidationPipe`. Pipes can be parameter-scoped, method-scoped, controller-scoped, or global-scoped. Earlier, with our Zod-based validation pipe, we saw an example of binding the pipe at the method level.
-In the example below, we'll bind the pipe instance to the route handler `@Body()` decorator so that our pipe is called to validate the post body.
+最后一步是绑定 `ValidationPipe`。管道可以是参数范围、方法范围、控制器范围或全局范围的。 earlier，通过我们基于 Zod 的验证管道，我们看到了在方法级别绑定管道的示例。
+在下面的示例中，我们将管道实例绑定到路由处理程序 `@Body()` 装饰器，以便调用我们的管道来验证 post body。
 
 ```typescript
 @Post()
@@ -393,11 +393,11 @@ async create(
 }
 ```
 
-Parameter-scoped pipes are useful when the validation logic concerns only one specified parameter.
+参数范围的管道在验证逻辑仅涉及一个指定参数时很有用。
 
-#### Global scoped pipes
+#### 全局范围管道
 
-Since the `ValidationPipe` was created to be as generic as possible, we can realize its full utility by setting it up as a **global-scoped** pipe so that it is applied to every route handler across the entire application.
+由于 `ValidationPipe` 被创建为尽可能通用，我们可以通过将其设置为 **全局范围** 管道来实现其全部效用，以便它应用于整个应用程序的每个路由处理程序。
 
 ```typescript
 async function bootstrap() {
@@ -408,11 +408,11 @@ async function bootstrap() {
 bootstrap();
 ```
 
-> warning **Notice** In the case of <a href="faq/hybrid-application">hybrid apps</a> the `useGlobalPipes()` method doesn't set up pipes for gateways and microservices. For "standard" (non-hybrid) microservice apps, `useGlobalPipes()` does mount pipes globally.
+> warning **注意** 在 <a href="faq/hybrid-application">混合应用程序</a> 的情况下，`useGlobalPipes()` 方法不会为网关和微服务设置管道。对于 "标准"（非混合）微服务应用程序，`useGlobalPipes()` 会全局挂载管道。
 
-Global pipes are used across the whole application, for every controller and every route handler.
+全局管道用于整个应用程序，适用于每个控制器和每个路由处理程序。
 
-Note that in terms of dependency injection, global pipes registered from outside of any module (with `useGlobalPipes()` as in the example above) cannot inject dependencies since the binding has been done outside the context of any module. In order to solve this issue, you can set up a global pipe **directly from any module** using the following construction:
+请注意，在依赖注入方面，从任何模块外部注册的全局管道（如上面的示例中的 `useGlobalPipes()`）不能注入依赖项，因为绑定是在任何模块的上下文之外完成的。为了解决这个问题，您可以使用以下构造 **直接从任何模块** 设置全局管道：
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -429,19 +429,19 @@ import { APP_PIPE } from '@nestjs/core';
 export class AppModule {}
 ```
 
-> info **Hint** When using this approach to perform dependency injection for the pipe, note that regardless of the module where this construction is employed, the pipe is, in fact, global. Where should this be done? Choose the module where the pipe (`ValidationPipe` in the example above) is defined. Also, `useClass` is not the only way of dealing with custom provider registration. Learn more [here](/fundamentals/custom-providers).
+> info **提示** 当使用这种方法为管道执行依赖注入时，请注意，无论在此构造中使用哪个模块，管道实际上都是全局的。应该在哪里做？选择定义管道（上面示例中的 `ValidationPipe`）的模块。此外，`useClass` 不是处理自定义提供程序注册的唯一方法。了解更多 [这里](/fundamentals/custom-providers)。
 
-#### The built-in ValidationPipe
+#### 内置的 ValidationPipe
 
-As a reminder, you don't have to build a generic validation pipe on your own since the `ValidationPipe` is provided by Nest out-of-the-box. The built-in `ValidationPipe` offers more options than the sample we built in this chapter, which has been kept basic for the sake of illustrating the mechanics of a custom-built pipe. You can find full details, along with lots of examples [here](/techniques/validation).
+提醒一下，您不必自己构建通用验证管道，因为 `ValidationPipe` 是 Nest 开箱即用的。内置的 `ValidationPipe` 提供了比我们在本章中构建的示例更多的选项，该示例为了说明自定义构建管道的机制而保持简单。您可以在 [这里](/techniques/validation) 找到完整的详细信息以及许多示例。
 
-#### Transformation use case
+#### 转换用例
 
-Validation isn't the only use case for custom pipes. At the beginning of this chapter, we mentioned that a pipe can also **transform** the input data to the desired format. This is possible because the value returned from the `transform` function completely overrides the previous value of the argument.
+验证不是自定义管道的唯一用例。在本章开始时，我们提到管道还可以 **转换** 输入数据为所需的格式。这是可能的，因为从 `transform` 函数返回的值完全覆盖了参数的先前值。
 
-When is this useful? Consider that sometimes the data passed from the client needs to undergo some change - for example converting a string to an integer - before it can be properly handled by the route handler method. Furthermore, some required data fields may be missing, and we would like to apply default values. **Transformation pipes** can perform these functions by interposing a processing function between the client request and the request handler.
+什么时候这有用？考虑到有时从客户端传递的数据需要进行一些更改 - 例如将字符串转换为整数 - 然后才能被路由处理程序方法正确处理。此外，一些必需的数据字段可能缺失，我们希望应用默认值。**转换管道** 可以通过在客户端请求和请求处理程序之间插入处理函数来执行这些功能。
 
-Here's a simple `ParseIntPipe` which is responsible for parsing a string into an integer value. (As noted above, Nest has a built-in `ParseIntPipe` that is more sophisticated; we include this as a simple example of a custom transformation pipe).
+下面是一个简单的 `ParseIntPipe`，它负责将字符串解析为整数值。（如上所述，Nest 有一个更复杂的内置 `ParseIntPipe`；我们将此作为自定义转换管道的简单示例）。
 
 ```typescript
 import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException } from '@nestjs/common';
@@ -469,7 +469,7 @@ export class ParseIntPipe {
 }
 ```
 
-We can then bind this pipe to the selected param as shown below:
+然后我们可以将此管道绑定到所选参数，如下所示：
 
 ```typescript
 @Get(':id')
@@ -478,7 +478,7 @@ async findOne(@Param('id', new ParseIntPipe()) id) {
 }
 ```
 
-Another useful transformation case would be to select an **existing user** entity from the database using an id supplied in the request:
+另一个有用的转换案例是使用请求中提供的 id 从数据库中选择 **现有用户** 实体：
 
 ```typescript
 @Get(':id')
@@ -487,11 +487,11 @@ findOne(@Param('id', UserByIdPipe) userEntity: UserEntity) {
 }
 ```
 
-We leave the implementation of this pipe to the reader, but note that like all other transformation pipes, it receives an input value (an `id`) and returns an output value (a `UserEntity` object). This can make your code more declarative and [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) by abstracting boilerplate code out of your handler and into a common pipe.
+我们将此管道的实现留给读者，但请注意，与所有其他转换管道一样，它接收输入值（一个 `id`）并返回输出值（一个 `UserEntity` 对象）。这可以通过将样板代码从处理程序抽象到公共管道中来使您的代码更加声明性和 [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself)。
 
-#### Providing defaults
+#### 提供默认值
 
-`Parse*` pipes expect a parameter's value to be defined. They throw an exception upon receiving `null` or `undefined` values. To allow an endpoint to handle missing querystring parameter values, we have to provide a default value to be injected before the `Parse*` pipes operate on these values. The `DefaultValuePipe` serves that purpose. Simply instantiate a `DefaultValuePipe` in the `@Query()` decorator before the relevant `Parse*` pipe, as shown below:
+`Parse*` 管道期望参数的值被定义。它们在收到 `null` 或 `undefined` 值时会抛出异常。为了允许端点处理缺失的查询字符串参数值，我们必须在 `Parse*` 管道对这些值进行操作之前提供要注入的默认值。`DefaultValuePipe` 用于此目的。只需在 `@Query()` 装饰器中在相关 `Parse*` 管道之前实例化一个 `DefaultValuePipe`，如下所示：
 
 ```typescript
 @Get()

@@ -131,7 +131,7 @@ module.exports = (options, webpack) => {
 
 到目前为止，我们已经介绍了编译时优化。这些与您定义提供者和加载Nest模块的方式无关，而这在您的应用程序变大时起着至关重要的作用。
 
-例如，想象一下将数据库连接定义为[异步提供者](/fundamentals/async-providers)。异步提供者旨在延迟应用程序启动，直到一个或多个异步任务完成。
+例如，想象一下将数据库连接定义为[异步提供者](/fundamentals/async-components)。异步提供者旨在延迟应用程序启动，直到一个或多个异步任务完成。
 这意味着，如果您的无服务器函数平均需要2秒才能连接到数据库（在引导时），您的端点将需要至少额外两秒（因为它必须等待连接建立）才能发送响应（当它是冷启动且您的应用程序尚未运行时）。
 
 如您所见，在**无服务器环境**中，引导时间很重要，因此您构建提供者的方式有所不同。
@@ -240,7 +240,7 @@ export const handler: Handler = async (
 };
 ```
 
-> info **提示** 对于创建多个无服务器函数并在它们之间共享公共模块，我们建议使用[CLI Monorepo模式](/cli/monorepo#monorepo-模式)。
+> info **提示** 对于创建多个无服务器函数并在它们之间共享公共模块，我们建议使用[CLI Monorepo模式](/cli/workspaces#monorepo-模式)。
 
 > warning **警告** 如果您使用`@nestjs/swagger`包，在无服务器函数上下文中使其正常工作需要几个额外步骤。查看此[线程](https://github.com/nestjs/swagger/issues/199)以获取更多信息。
 

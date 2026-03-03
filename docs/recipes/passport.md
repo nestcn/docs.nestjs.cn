@@ -623,9 +623,9 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
 #### 请求范围的策略
 
-passport API 基于向库的全局实例注册策略。因此，策略不是为了具有请求依赖的选项或为每个请求动态实例化而设计的（有关 [请求范围](/fundamentals/injection-scopes) 提供者的更多信息）。当您将策略配置为请求范围时，Nest 永远不会实例化它，因为它不绑定到任何特定的路由。没有物理方法来确定每个请求应该执行哪些“请求范围”策略。
+passport API 基于向库的全局实例注册策略。因此，策略不是为了具有请求依赖的选项或为每个请求动态实例化而设计的（有关 [请求范围](/fundamentals/provider-scopes) 提供者的更多信息）。当您将策略配置为请求范围时，Nest 永远不会实例化它，因为它不绑定到任何特定的路由。没有物理方法来确定每个请求应该执行哪些“请求范围”策略。
 
-然而，有方法可以在策略中动态解析请求范围的提供者。为此，我们利用 [模块引用](/fundamentals/module-ref) 功能。
+然而，有方法可以在策略中动态解析请求范围的提供者。为此，我们利用 [模块引用](/fundamentals/module-reference) 功能。
 
 首先，打开 `local.strategy.ts` 文件并以正常方式注入 `ModuleRef`：
 
@@ -641,7 +641,7 @@ constructor(private moduleRef: ModuleRef) {
 
 确保将 `passReqToCallback` 配置属性设置为 `true`，如上所示。
 
-在下一步中，请求实例将用于获取当前上下文标识符，而不是生成一个新的（有关请求上下文的更多信息，请参见 [这里](/fundamentals/module-ref#获取当前子树)）。
+在下一步中，请求实例将用于获取当前上下文标识符，而不是生成一个新的（有关请求上下文的更多信息，请参见 [这里](/fundamentals/module-reference#获取当前子树)）。
 
 现在，在 `LocalStrategy` 类的 `validate()` 方法内部，使用 `ContextIdFactory` 类的 `getByRequest()` 方法基于请求对象创建上下文 ID，并将其传递给 `resolve()` 调用：
 

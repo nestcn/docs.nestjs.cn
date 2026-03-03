@@ -288,7 +288,7 @@ const { schema } = app.get(GraphQLSchemaHost);
 }),
 ```
 
-与其他工厂提供者一样，我们的工厂函数可以是 <a href="/fundamentals/custom-providers#factory-providers-usefactory">异步的</a>，并且可以通过 `inject` 注入依赖项。
+与其他工厂提供者一样，我们的工厂函数可以是 <a href="/fundamentals/dependency-injection#factory-providers-usefactory">异步的</a>，并且可以通过 `inject` 注入依赖项。
 
 ```typescript
 GraphQLModule.forRootAsync<ApolloDriverConfig>({

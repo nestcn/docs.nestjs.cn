@@ -8,7 +8,7 @@
 
 #### 介绍
 
-文档**概述**部分中的大多数应用程序代码示例都使用常规的或静态的模块。模块定义了组件组，如[提供者](/providers)和[控制器](/controllers)，它们作为整体应用程序的模块化部分组合在一起。它们为这些组件提供执行上下文或作用域。例如，在模块中定义的提供者对模块的其他成员可见，无需导出它们。当提供者需要在模块外部可见时，它首先从其宿主模块导出，然后导入到其消费模块中。
+文档**概述**部分中的大多数应用程序代码示例都使用常规的或静态的模块。模块定义了组件组，如[](/overview/providers)和[控制器](/controllers)，它们作为整体应用程序的模块化部分组合在一起。它们为这些组件提供执行上下文或作用域。例如，在模块中定义的提供者对模块的其他成员可见，无需导出它们。当提供者需要在模块外部可见时，它首先从其宿主模块导出，然后导入到其消费模块中。
 
 让我们通过一个熟悉的示例来了解。
 
@@ -57,7 +57,7 @@ export class AuthService {
 
 我们将此称为**静态**模块绑定。Nest将模块连接在一起所需的所有信息已经在宿主和消费模块中声明。让我们分解这个过程中发生的事情。Nest通过以下方式使`UsersService`在`AuthModule`内部可用：
 
-1. 实例化`UsersModule`，包括传递性导入`UsersModule`本身消费的其他模块，并传递性解析任何依赖项（请参阅[自定义提供者](/fundamentals/custom-providers)）。
+1. 实例化`UsersModule`，包括传递性导入`UsersModule`本身消费的其他模块，并传递性解析任何依赖项（请参阅[自定义提供者](/fundamentals/dependency-injection)）。
 2. 实例化`AuthModule`，并使`UsersModule`的导出提供者对`AuthModule`中的组件可用（就像它们在`AuthModule`中声明一样）。
 3. 在`AuthService`中注入`UsersService`的实例。
 
@@ -210,7 +210,7 @@ export class ConfigService {
 
 现在我们的`ConfigService`知道如何在我们在`options`中指定的文件夹中找到`.env`文件。
 
-我们剩下的任务是以某种方式将`options`对象从`register()`步骤注入到我们的`ConfigService`中。当然，我们将使用**依赖注入**来做到这一点。这是一个关键点，所以确保你理解它。我们的`ConfigModule`正在提供`ConfigService`。`ConfigService`反过来依赖于仅在运行时提供的`options`对象。因此，在运行时，我们需要首先将`options`对象绑定到Nest IoC容器，然后让Nest将其注入到我们的`ConfigService`中。请记住，在**自定义提供者**章节中，提供者可以[包含任何值](/fundamentals/custom-providers#非基于服务的提供者)，而不仅仅是服务，所以我们可以使用依赖注入来处理简单的`options`对象。
+我们剩下的任务是以某种方式将`options`对象从`register()`步骤注入到我们的`ConfigService`中。当然，我们将使用**依赖注入**来做到这一点。这是一个关键点，所以确保你理解它。我们的`ConfigModule`正在提供`ConfigService`。`ConfigService`反过来依赖于仅在运行时提供的`options`对象。因此，在运行时，我们需要首先将`options`对象绑定到Nest IoC容器，然后让Nest将其注入到我们的`ConfigService`中。请记住，在**自定义提供者**章节中，提供者可以[包含任何值](/fundamentals/dependency-injection#非基于服务的提供者)，而不仅仅是服务，所以我们可以使用依赖注入来处理简单的`options`对象。
 
 让我们首先解决将选项对象绑定到IoC容器的问题。我们在静态`register()`方法中执行此操作。记住，我们正在动态构建一个模块，模块的属性之一是其提供者列表。所以我们需要做的是将我们的选项对象定义为一个提供者。这将使它可注入到`ConfigService`中，我们将在下一步中利用这一点。在下面的代码中，请注意`providers`数组：
 
@@ -236,7 +236,7 @@ export class ConfigModule {
 }
 ```
 
-现在我们可以通过将`'CONFIG_OPTIONS'`提供者注入到`ConfigService`中来完成这个过程。回想一下，当我们使用非类令牌定义提供者时，我们需要使用`@Inject()`装饰器[如这里所述](/fundamentals/custom-providers#非基于类的提供者令牌)。
+现在我们可以通过将`'CONFIG_OPTIONS'`提供者注入到`ConfigService`中来完成这个过程。回想一下，当我们使用非类令牌定义提供者时，我们需要使用`@Inject()`装饰器[如这里所述](/fundamentals/dependency-injection#非基于类的提供者令牌)。
 
 ```typescript
 import * as fs from 'node:fs';

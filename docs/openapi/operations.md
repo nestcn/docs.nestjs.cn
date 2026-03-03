@@ -112,7 +112,7 @@ getUser(@Param('id') id: string) {
 
 现在，让我们在浏览器中验证生成的 `User` 模型：
 
-![Swagger UI 模型示例](../assets/swagger-model.png)
+![](/public/assets/swagger-model.png)
 
 相反，我们可以为所有端点或控制器定义一个全局响应，使用 `@ApiResponse` 类。这种方法很有用，因为我们可以为应用程序中的所有端点定义一个全局响应（例如，用于错误如 400 或 500）。
 

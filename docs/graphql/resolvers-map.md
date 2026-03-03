@@ -156,7 +156,7 @@ export class AuthorsResolver {
 
 > info **提示** 所有装饰器（例如，`@Resolver`、`@ResolveField`、`@Args` 等）都从 `@nestjs/graphql` 包中导出。
 
-您可以定义多个解析器类。Nest 将在运行时组合这些。有关代码组织的更多信息，请参见下面的 [模块](/graphql/resolvers#模块) 部分。
+您可以定义多个解析器类。Nest 将在运行时组合这些。有关代码组织的更多信息，请参见下面的 [模块](/graphql/resolvers-map) 部分。
 
 > warning **注意** `AuthorsService` 和 `PostsService` 类中的逻辑可以根据需要简单或复杂。这个例子的主要目的是展示如何构造解析器以及它们如何与其他提供者交互。
 

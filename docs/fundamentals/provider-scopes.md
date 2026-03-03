@@ -40,7 +40,7 @@ import { Injectable, Scope } from '@nestjs/common';
 export class CatsService {}
 ```
 
-同样，对于[自定义提供者](/fundamentals/custom-providers)，在提供者注册的长表单中设置`scope`属性：
+同样，对于[自定义提供者](/fundamentals/dependency-injection)，在提供者注册的长表单中设置`scope`属性：
 
 ```typescript
 {
@@ -163,7 +163,7 @@ export class AppService {
 
 例如，假设您有一个由10个不同客户交替使用的应用程序。每个客户都有自己的**专用数据源**，您希望确保客户A永远无法访问客户B的数据库。实现这一点的一种方法是声明一个请求作用域的"数据源"提供者，该提供者基于请求对象确定"当前客户"并检索其相应的数据库。通过这种方法，您可以在几分钟内将应用程序转变为多租户应用程序。但是，这种方法的一个主要缺点是，由于您的应用程序组件很可能大部分依赖于"数据源"提供者，它们将隐式成为"请求作用域"的，因此您无疑会看到应用程序性能的影响。
 
-但是，如果我们有更好的解决方案呢？既然我们只有10个客户，我们难道不能为每个客户拥有10个单独的[DI子树](/fundamentals/module-ref#解析作用域提供者)（而不是每个请求重新创建每个树）吗？如果您的提供者不依赖于每个连续请求真正唯一的任何属性（例如，请求UUID），而是有一些特定的属性让我们聚合（分类）它们，那么就没有理由在每个传入请求上**重新创建DI子树**。
+但是，如果我们有更好的解决方案呢？既然我们只有10个客户，我们难道不能为每个客户拥有10个单独的[DI子树](/fundamentals/module-reference#解析作用域提供者)（而不是每个请求重新创建每个树）吗？如果您的提供者不依赖于每个连续请求真正唯一的任何属性（例如，请求UUID），而是有一些特定的属性让我们聚合（分类）它们，那么就没有理由在每个传入请求上**重新创建DI子树**。
 
 而这正是**持久提供者**派上用场的时候。
 
@@ -237,7 +237,7 @@ import { Injectable, Scope } from '@nestjs/common';
 export class CatsService {}
 ```
 
-同样，对于[自定义提供者](/fundamentals/custom-providers)，在提供者注册的长表单中设置`durable`属性：
+同样，对于[自定义提供者](/fundamentals/dependency-injection)，在提供者注册的长表单中设置`durable`属性：
 
 ```typescript
 {

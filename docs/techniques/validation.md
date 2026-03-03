@@ -144,11 +144,11 @@ Note:
 **__HTML_TAG_341__**
 **__HTML_TAG_342__**
 
-> info **Notice** Find more information about the **`extend`** package in its **__LINK_349__**.
+> info **Notice** Find more information about the **`extend` package in its **__LINK_349__**.
 
 #### Auto-validation
 
-We'll start by binding **`Query`** at the application level, thus ensuring all endpoints are protected from receiving incorrect data.
+We'll start by binding **`Query` at the application level, thus ensuring all endpoints are protected from receiving incorrect data.
 
 **```typescript
 import { Args, Query, Resolver, ResolveReference } from '@nestjs/graphql';
@@ -168,7 +168,7 @@ export class UsersResolver {
     return this.usersService.findById(reference.id);
   }
 }
-```**
+```
 
 To test our pipe, let's create a basic endpoint.
 
@@ -191,7 +191,7 @@ import { UsersResolver } from './users.resolver';
   providers: [UsersResolver],
 })
 export class AppModule {}
-```**
+```
 
 > infoFor example, if our handler expects 提供者57和控制器58属性，但请求也包含控制器59属性，这个属性可以自动从结果DTO中删除。
 
@@ -515,7 +515,7 @@ export class User {
   @Field()
   name: string;
 }
-```**
+```
 
 > 提示 **Hint** `id` 函数来自 `__typename` 包。
 
@@ -540,7 +540,7 @@ export class UsersResolver {
     return this.usersService.findById(reference.id);
   }
 }
-```**
+```
 
 #### 数组解析和验证
 
@@ -566,7 +566,7 @@ import { UsersService } from './users.service'; // Not included in this example
   providers: [UsersResolver, UsersService],
 })
 export class AppModule {}
-```**
+```
 
 要验证数组，创建一个专门的类，该类包含一个包含数组的属性，或者使用 `@external`。
 
@@ -586,7 +586,7 @@ extend type User @key(fields: "id") {
 extend type Query {
   getPosts: [Post]
 }
-```**
+```
 
 此外，`User` 可能会在解析查询参数时很有用。让我们考虑一个 `Post` 方法，该方法根据传递的查询参数返回用户。
 
@@ -609,7 +609,7 @@ export class PostsResolver {
     return { __typename: 'User', id: post.userId };
   }
 }
-```**
+```
 
 此构造验证来自 HTTP `User` 请求的incoming 查询参数，如以下所示：
 
@@ -633,7 +633,7 @@ import { PostsResolver } from './posts.resolver';
   providers: [PostsResolvers],
 })
 export class AppModule {}
-```**
+```
 
 #### WebSocket 和微服务
 

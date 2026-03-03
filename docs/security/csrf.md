@@ -71,7 +71,7 @@ async function bootstrap() {
 
 在 Express 中，CSRF 令牌会自动添加到请求对象中，您可以在模板中使用它：
 
-```ejs
+```html
 <form action="/submit" method="post">
   <input type="hidden" name="_csrf" value="<%= req.csrfToken() %>" />
   <!-- 其他表单字段 -->

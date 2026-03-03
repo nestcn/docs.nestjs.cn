@@ -429,7 +429,7 @@ import { APP_PIPE } from '@nestjs/core';
 export class AppModule {}
 ```
 
-> info **提示** 当使用这种方法为管道执行依赖注入时，请注意，无论在此构造中使用哪个模块，管道实际上都是全局的。应该在哪里做？选择定义管道（上面示例中的 `ValidationPipe`）的模块。此外，`useClass` 不是处理自定义提供程序注册的唯一方法。了解更多 [这里](/fundamentals/custom-providers)。
+> info **提示** 当使用这种方法为管道执行依赖注入时，请注意，无论在此构造中使用哪个模块，管道实际上都是全局的。应该在哪里做？选择定义管道（上面示例中的 `ValidationPipe`）的模块。此外，`useClass` 不是处理自定义提供程序注册的唯一方法。了解更多 [这里](/fundamentals/dependency-injection)。
 
 #### 内置的 ValidationPipe
 

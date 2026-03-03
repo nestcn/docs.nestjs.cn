@@ -188,7 +188,7 @@ getDate(@Payload() data: number[], @Ctx() context: NatsContext) {
 
 一种方法是导入 `ClientsModule`，它公开静态 `register()` 方法。此方法接受表示微服务传输器的对象数组。每个对象必须包含 `name` 属性，可选的 `transport` 属性（默认为 `Transport.TCP`），以及可选的 `options` 属性。
 
-`name` 属性充当 **注入令牌**，您可以使用它在任何需要的地方注入 `ClientProxy` 的实例。此 `name` 属性的值可以是任何任意字符串或 JavaScript 符号，如 [此处](/fundamentals/custom-providers#非基于类的提供者令牌) 所述。
+`name` 属性充当 **注入令牌**，您可以使用它在任何需要的地方注入 `ClientProxy` 的实例。此 `name` 属性的值可以是任何任意字符串或 JavaScript 符号，如 [此处](/fundamentals/dependency-injection#非基于类的提供者令牌) 所述。
 
 `options` 属性是一个对象，包含我们之前在 `createMicroservice()` 方法中看到的相同属性。
 
@@ -234,7 +234,7 @@ constructor(
 
 > info **提示** `ClientsModule` 和 `ClientProxy` 类是从 `@nestjs/microservices` 包导入的。
 
-有时，您可能需要从另一个服务（例如 `ConfigService`）获取传输器配置，而不是在客户端应用程序中硬编码它。要实现这一点，您可以使用 `ClientProxyFactory` 类注册 [自定义提供者](/fundamentals/custom-providers)。此类提供静态 `create()` 方法，该方法接受传输器选项对象并返回自定义的 `ClientProxy` 实例。
+有时，您可能需要从另一个服务（例如 `ConfigService`）获取传输器配置，而不是在客户端应用程序中硬编码它。要实现这一点，您可以使用 `ClientProxyFactory` 类注册 [自定义提供者](/fundamentals/dependency-injection)。此类提供静态 `create()` 方法，该方法接受传输器选项对象并返回自定义的 `ClientProxy` 实例。
 
 ```typescript
 @Module({
@@ -307,7 +307,7 @@ async publish() {
 
 对于那些来自不同编程语言背景的人来说，可能会惊讶地发现，在 Nest 中，大多数东西都是在传入请求之间共享的。这包括数据库连接池、具有全局状态的单例服务等。请记住，Node.js 不遵循请求/响应多线程无状态模型，其中每个请求由单独的线程处理。因此，对我们的应用程序使用单例实例是 **安全的**。
 
-然而，在边缘情况下，可能希望为处理程序使用基于请求的生命周期。这可能包括 GraphQL 应用程序中的每个请求缓存、请求跟踪或多租户等场景。您可以在 [这里](/fundamentals/injection-scopes) 了解更多关于如何控制作用域的信息。
+然而，在边缘情况下，可能希望为处理程序使用基于请求的生命周期。这可能包括 GraphQL 应用程序中的每个请求缓存、请求跟踪或多租户等场景。您可以在 [这里](/fundamentals/provider-scopes) 了解更多关于如何控制作用域的信息。
 
 请求作用域的处理程序和提供者可以使用 `@Inject()` 装饰器结合 `CONTEXT` 令牌来注入 `RequestContext`：
 

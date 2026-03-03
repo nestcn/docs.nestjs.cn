@@ -119,7 +119,7 @@ BullModule.registerQueue({
 
 #### 生产者
 
-作业生产者将作业添加到队列中。生产者通常是应用程序服务（Nest [提供者](/providers)）。要向队列添加作业，首先将队列注入到服务中，如下所示：
+作业生产者将作业添加到队列中。生产者通常是应用程序服务（Nest [](/overview/providers)）。要向队列添加作业，首先将队列注入到服务中，如下所示：
 
 ```typescript
 import { Injectable } from '@nestjs/common';
@@ -275,7 +275,7 @@ export class AudioConsumer extends WorkerHost {
 
 #### 请求作用域消费者
 
-当消费者被标记为请求作用域时（了解更多关于注入作用域 [这里](/fundamentals/injection-scopes#提供者作用域)），将为每个作业创建该类的新实例。该实例将在作业完成后被垃圾回收。
+当消费者被标记为请求作用域时（了解更多关于注入作用域 [这里](/fundamentals/provider-scopes#提供者作用域)），将为每个作业创建该类的新实例。该实例将在作业完成后被垃圾回收。
 
 ```typescript
 @Processor({
@@ -403,7 +403,7 @@ BullModule.forRootAsync({
 });
 ```
 
-我们的工厂行为类似于任何其他 [异步提供者](/fundamentals/async-providers)（例如，它可以是 `async` 并且能够通过 `inject` 注入依赖项）。
+我们的工厂行为类似于任何其他 [异步提供者](/fundamentals/async-components)（例如，它可以是 `async` 并且能够通过 `inject` 注入依赖项）。
 
 ```typescript
 BullModule.forRootAsync({
@@ -594,7 +594,7 @@ BullModule.registerQueue({
 
 #### 生产者
 
-作业生产者将作业添加到队列中。生产者通常是应用程序服务（Nest [提供者](/providers)）。要向队列添加作业，首先将队列注入到服务中，如下所示：
+作业生产者将作业添加到队列中。生产者通常是应用程序服务（Nest [](/overview/providers)）。要向队列添加作业，首先将队列注入到服务中，如下所示：
 
 ```typescript
 import { Injectable } from '@nestjs/common';
@@ -731,7 +731,7 @@ async transcode(job: Job<unknown>) { ... }
 
 #### 请求作用域消费者
 
-当消费者被标记为请求作用域时（了解更多关于注入作用域 [这里](/fundamentals/injection-scopes#提供者作用域)），将为每个作业创建该类的新实例。该实例将在作业完成后被垃圾回收。
+当消费者被标记为请求作用域时（了解更多关于注入作用域 [这里](/fundamentals/provider-scopes#提供者作用域)），将为每个作业创建该类的新实例。该实例将在作业完成后被垃圾回收。
 
 ```typescript
 @Processor({
@@ -905,7 +905,7 @@ BullModule.forRootAsync({
 });
 ```
 
-我们的工厂行为类似于任何其他 [异步提供者](/fundamentals/async-providers)（例如，它可以是 `async` 并且能够通过 `inject` 注入依赖项）。
+我们的工厂行为类似于任何其他 [异步提供者](/fundamentals/async-components)（例如，它可以是 `async` 并且能够通过 `inject` 注入依赖项）。
 
 ```typescript
 BullModule.forRootAsync({

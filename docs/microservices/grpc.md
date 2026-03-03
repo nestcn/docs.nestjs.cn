@@ -516,11 +516,11 @@ export class HeroesService {
 }
 ```
 
-同样，要在使用 `@GrpcStreamMethod()` 处理程序（[主题策略](microservices/grpc#主题策略)）注释的处理程序中读取元数据，请使用第二个参数（metadata），该参数的类型为 `Metadata`（从 `grpc` 包导入）。
+同样，要在使用 `@GrpcStreamMethod()` 处理程序（[主题策略](/microservices/grpc#主题策略)）注释的处理程序中读取元数据，请使用第二个参数（metadata），该参数的类型为 `Metadata`（从 `grpc` 包导入）。
 
 要从处理程序发送回元数据，请使用 `ServerDuplexStream#sendMetadata()` 方法（第三个处理程序参数）。
 
-要在 [调用流处理程序](microservices/grpc#调用流处理程序)（使用 `@GrpcStreamCall()` 装饰器注释的处理程序）中读取元数据，请在 `requestStream` 引用上监听 `metadata` 事件，如下所示：
+要在 [调用流处理程序](/microservices/grpc#调用流处理程序)（使用 `@GrpcStreamCall()` 装饰器注释的处理程序）中读取元数据，请在 `requestStream` 引用上监听 `metadata` 事件，如下所示：
 
 ```typescript
 requestStream.on('metadata', (metadata: Metadata) => {

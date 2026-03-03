@@ -410,4 +410,4 @@ findAll() {
 }
 ```
 
-> 警告 **注意** 由于我们必须使用 `new` 关键字在原地实例化策略处理程序，`ReadArticlePolicyHandler` 类不能使用依赖注入。这可以通过 `ModuleRef#get` 方法解决（更多信息请 [点击这里](/fundamentals/module-ref)）。基本上，不是通过 `@CheckPolicies()` 装饰器注册函数和实例，而是必须允许传递 `Type<IPolicyHandler>`。然后，在守卫内部，您可以使用类型引用检索实例：`moduleRef.get(YOUR_HANDLER_TYPE)` 或甚至使用 `ModuleRef#create` 方法动态实例化它。
+> 警告 **注意** 由于我们必须使用 `new` 关键字在原地实例化策略处理程序，`ReadArticlePolicyHandler` 类不能使用依赖注入。这可以通过 `ModuleRef#get` 方法解决（更多信息请 [点击这里](/fundamentals/module-reference)）。基本上，不是通过 `@CheckPolicies()` 装饰器注册函数和实例，而是必须允许传递 `Type<IPolicyHandler>`。然后，在守卫内部，您可以使用类型引用检索实例：`moduleRef.get(YOUR_HANDLER_TYPE)` 或甚至使用 `ModuleRef#create` 方法动态实例化它。

@@ -120,7 +120,7 @@ $ nest build <name> [options]
 | `--webpack`             | 使用 webpack 进行编译（已弃用：改用 `--builder webpack`）。                                                                                                                 |
 | `--webpackPath`         | webpack 配置的路径。                                                                                                                                                             |
 | `--tsc`                 | 强制使用 `tsc` 进行编译。                                                                                                                                                           |
-| `--watchAssets`         | 监视非 TS 文件（如 `.graphql` 等资产）。有关更多详细信息，请参见 [资产](cli/monorepo#资源)。                                                                                      |
+| `--watchAssets`         | 监视非 TS 文件（如 `.graphql` 等资产）。有关更多详细信息，请参见 [资产](/cli/workspaces#资源)。                                                                                      |
 | `--type-check`          | 启用类型检查（使用 SWC 时）。                                                                                                                                                   |
 | `--all`                 | 构建 monorepo 中的所有项目。                                                                                                                                                          |
 | `--preserveWatchOutput` | 在监视模式下保留过时的控制台输出，而不是清除屏幕。（仅 `tsc` 监视模式）                                                                                         |
@@ -148,7 +148,7 @@ $ nest start <name> [options]
 | `--watch`               | 在监视模式下运行（实时重新加载） <br/>别名 `-w`                                                                                    |
 | `--builder [name]`      | 指定用于编译的构建器（`tsc`、`swc` 或 `webpack`）。 <br/>别名 `-b`                                           |
 | `--preserveWatchOutput` | 在监视模式下保留过时的控制台输出，而不是清除屏幕。（仅 `tsc` 监视模式）                                 |
-| `--watchAssets`         | 在监视模式下运行（实时重新加载），监视非 TS 文件（资产）。有关更多详细信息，请参见 [资产](cli/monorepo#资源)。               |
+| `--watchAssets`         | 在监视模式下运行（实时重新加载），监视非 TS 文件（资产）。有关更多详细信息，请参见 [资产](/cli/workspaces#资源)。               |
 | `--debug [hostport]`    | 在调试模式下运行（带有 --inspect 标志） <br/>别名 `-d`                                                                            |
 | `--webpack`             | 使用 webpack 进行编译。（已弃用：改用 `--builder webpack`）                                                         |
 | `--webpackPath`         | webpack 配置的路径。                                                                                                     |

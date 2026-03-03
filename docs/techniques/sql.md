@@ -6,9 +6,9 @@
 
 Nest 是数据库无关的，允许您轻松集成任何 SQL 或 NoSQL 数据库。根据您的偏好，您有多种选择。从最一般的层面来说，将 Nest 连接到数据库只是加载适用于该数据库的 Node.js 驱动程序的问题，就像您在 [Express](https://expressjs.com/en/guide/database-integration.html) 或 Fastify 中所做的那样。
 
-您还可以直接使用任何通用的 Node.js 数据库集成**库**或 ORM，例如 [MikroORM](https://mikro-orm.io/)（请参阅 [MikroORM 教程](/recipes/mikroorm)）、[Sequelize](https://sequelize.org/)（请参阅 [Sequelize 集成](/techniques/database#sequelize-集成)）、[Knex.js](https://knexjs.org/)（请参阅 [Knex.js 教程](https://dev.to/nestjs/build-a-nestjs-module-for-knex-js-or-other-resource-based-libraries-in-5-minutes-12an)）、[TypeORM](https://github.com/typeorm/typeorm) 和 [Prisma](https://www.github.com/prisma/prisma)（请参阅 [Prisma 教程](/recipes/prisma)），以在更高的抽象级别上操作。
+您还可以直接使用任何通用的 Node.js 数据库集成**库**或 ORM，例如 [MikroORM](https://mikro-orm.io/)（请参阅 [MikroORM 教程](/recipes/mikroorm)）、[Sequelize](https://sequelize.org/)（请参阅 [Sequelize 集成](/techniques/sql#sequelize-集成)）、[Knex.js](https://knexjs.org/)（请参阅 [Knex.js 教程](https://dev.to/nestjs/build-a-nestjs-module-for-knex-js-or-other-resource-based-libraries-in-5-minutes-12an)）、[TypeORM](https://github.com/typeorm/typeorm) 和 [Prisma](https://www.github.com/prisma/prisma)（请参阅 [Prisma 教程](/recipes/prisma)），以在更高的抽象级别上操作。
 
-为了方便起见，Nest 提供了与 TypeORM 和 Sequelize 的紧密集成，分别通过 `@nestjs/typeorm` 和 `@nestjs/sequelize` 包，我们将在本章中介绍，以及通过 `@nestjs/mongoose` 与 Mongoose 的集成，这在 [本章](/techniques/mongodb) 中介绍。这些集成提供了额外的 NestJS 特定功能，例如模型/存储库注入、可测试性和异步配置，使访问您选择的数据库更加容易。
+为了方便起见，Nest 提供了与 TypeORM 和 Sequelize 的紧密集成，分别通过 `@nestjs/typeorm` 和 `@nestjs/sequelize` 包，我们将在本章中介绍，以及通过 `@nestjs/mongoose` 与 Mongoose 的集成，这在 [本章](/recipes/mongodb) 中介绍。这些集成提供了额外的 NestJS 特定功能，例如模型/存储库注入、可测试性和异步配置，使访问您选择的数据库更加容易。
 
 ### TypeORM 集成
 
@@ -451,7 +451,7 @@ export class UserSubscriber implements EntitySubscriberInterface<User> {
 }
 ```
 
-> error **警告** 事件订阅者不能是 [请求作用域](/fundamentals/injection-scopes)。
+> error **警告** 事件订阅者不能是 [请求作用域](/fundamentals/provider-scopes)。
 
 现在，将 `UserSubscriber` 类添加到 `providers` 数组中：
 
@@ -570,7 +570,7 @@ export class AlbumsModule {}
 
 #### 测试
 
-当涉及到应用程序的单元测试时，我们通常希望避免建立数据库连接，保持测试套件独立，并且其执行过程尽可能快。但是，我们的类可能依赖于从数据源（连接）实例中提取的存储库。我们如何处理这个问题？解决方案是创建模拟存储库。为了实现这一点，我们设置了 [自定义提供程序](/fundamentals/custom-providers)。每个注册的存储库都自动由 `<EntityName>Repository` 令牌表示，其中 `EntityName` 是您的实体类的名称。
+当涉及到应用程序的单元测试时，我们通常希望避免建立数据库连接，保持测试套件独立，并且其执行过程尽可能快。但是，我们的类可能依赖于从数据源（连接）实例中提取的存储库。我们如何处理这个问题？解决方案是创建模拟存储库。为了实现这一点，我们设置了 [自定义提供程序](/fundamentals/dependency-injection)。每个注册的存储库都自动由 `<EntityName>Repository` 令牌表示，其中 `EntityName` 是您的实体类的名称。
 
 `@nestjs/typeorm` 包公开了 `getRepositoryToken()` 函数，该函数基于给定的实体返回准备好的令牌。
 
@@ -610,7 +610,7 @@ TypeOrmModule.forRootAsync({
 });
 ```
 
-我们的工厂行为类似于任何其他 [异步提供程序](/fundamentals/async-providers)（例如，它可以是 `async` 并且能够通过 `inject` 注入依赖项）。
+我们的工厂行为类似于任何其他 [异步提供程序](/fundamentals/async-components)（例如，它可以是 `async` 并且能够通过 `inject` 注入依赖项）。
 
 ```typescript
 TypeOrmModule.forRootAsync({
@@ -1141,7 +1141,7 @@ export class AlbumsModule {}
 
 #### 测试
 
-当涉及到应用程序的单元测试时，我们通常希望避免建立数据库连接，保持测试套件独立，并且其执行过程尽可能快。但是，我们的类可能依赖于从连接实例中提取的模型。我们如何处理这个问题？解决方案是创建模拟模型。为了实现这一点，我们设置了 [自定义提供程序](/fundamentals/custom-providers)。每个注册的模型都自动由 `<ModelName>Model` 令牌表示，其中 `ModelName` 是您的模型类的名称。
+当涉及到应用程序的单元测试时，我们通常希望避免建立数据库连接，保持测试套件独立，并且其执行过程尽可能快。但是，我们的类可能依赖于从连接实例中提取的模型。我们如何处理这个问题？解决方案是创建模拟模型。为了实现这一点，我们设置了 [自定义提供程序](/fundamentals/dependency-injection)。每个注册的模型都自动由 `<ModelName>Model` 令牌表示，其中 `ModelName` 是您的模型类的名称。
 
 `@nestjs/sequelize` 包公开了 `getModelToken()` 函数，该函数基于给定的模型返回准备好的令牌。
 
@@ -1180,7 +1180,7 @@ SequelizeModule.forRootAsync({
 });
 ```
 
-我们的工厂行为类似于任何其他 [异步提供程序](/fundamentals/async-providers)（例如，它可以是 `async` 并且能够通过 `inject` 注入依赖项）。
+我们的工厂行为类似于任何其他 [异步提供程序](/fundamentals/async-components)（例如，它可以是 `async` 并且能够通过 `inject` 注入依赖项）。
 
 ```typescript
 SequelizeModule.forRootAsync({

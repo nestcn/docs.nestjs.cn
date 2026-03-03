@@ -102,7 +102,7 @@ $ nest generate app my-app
 - **应用程序**：完整的 Nest 应用程序，包括用于引导应用程序的 `main.ts` 文件。除了编译和构建考虑之外，工作区内的应用程序类型项目在功能上与 _标准模式_ 结构内的应用程序相同。
 - **库**：库是一种打包通用功能集（模块、提供者、控制器等）的方式，这些功能可以在其他项目中使用。库不能独立运行，也没有 `main.ts` 文件。有关库的更多信息，请阅读 [这里](/cli/libraries)。
 
-所有工作区都有一个 **默认项目**（应该是应用程序类型的项目）。这由 `nest-cli.json` 文件中的顶级 `"root"` 属性定义，该属性指向默认项目的根目录（有关更多详细信息，请参见下面的 [CLI 属性](/cli/monorepo#cli-properties)）。通常，这是您开始使用的 **标准模式** 应用程序，后来使用 `nest generate app` 转换为单体仓库。当您按照这些步骤操作时，此属性会自动填充。
+所有工作区都有一个 **默认项目**（应该是应用程序类型的项目）。这由 `nest-cli.json` 文件中的顶级 `"root"` 属性定义，该属性指向默认项目的根目录（有关更多详细信息，请参见下面的 [CLI 属性](/cli/workspaces#cli-properties)）。通常，这是您开始使用的 **标准模式** 应用程序，后来使用 `nest generate app` 转换为单体仓库。当您按照这些步骤操作时，此属性会自动填充。
 
 当未提供项目名称时，`nest` 命令（如 `nest build` 和 `nest start`）会使用默认项目。
 
@@ -194,7 +194,7 @@ Nest 将组织、构建和部署标准和单体仓库结构项目所需的元数
 | `webpackConfigPath` | string              | 指向 webpack 选项文件。如果未指定，Nest 会查找文件 `webpack.config.js`。详见下文。                                                                                                                                              |
 | `deleteOutDir`      | boolean             | 如果为 `true`，每当调用编译器时，它将首先删除编译输出目录（如 `tsconfig.json` 中配置的那样，默认为 `./dist`）。                                                                                                     |
 | `assets`            | array               | 启用在编译步骤开始时自动分发非 TypeScript 资产（资产分发在 `--watch` 模式下的增量编译中 **不会** 发生）。详见下文。                                                                    |
-| `watchAssets`       | boolean             | 如果为 `true`，在监视模式下运行，监视 **所有** 非 TypeScript 资产。（有关要监视的资产的更精细控制，请参见下面的 [资产](cli/monorepo#资源) 部分）。                                                                                            |
+| `watchAssets`       | boolean             | 如果为 `true`，在监视模式下运行，监视 **所有** 非 TypeScript 资产。（有关要监视的资产的更精细控制，请参见下面的 [资产](/cli/workspaces#资源) 部分）。                                                                                            |
 | `manualRestart`     | boolean             | 如果为 `true`，启用快捷键 `rs` 手动重启服务器。默认值为 `false`。                                                                                                                                                                            |
 | `builder`           | string/object       | 指示 CLI 使用什么 `builder` 来编译项目（`tsc`、`swc` 或 `webpack`）。要自定义 builder 的行为，您可以传递一个包含两个属性的对象：`type`（`tsc`、`swc` 或 `webpack`）和 `options`。                                         |
 | `typeCheck`         | boolean             | 如果为 `true`，为 SWC 驱动的项目启用类型检查（当 `builder` 为 `swc` 时）。默认值为 `false`。                                                                                                                                                             |

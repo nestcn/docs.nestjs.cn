@@ -289,7 +289,7 @@ import { APP_FILTER } from '@nestjs/core';
 export class AppModule {}
 ```
 
-> info **提示** 当使用这种方法为过滤器执行依赖注入时，请注意，无论在此构造中使用哪个模块，过滤器实际上都是全局的。应该在哪里做？选择定义过滤器（上面示例中的 `HttpExceptionFilter`）的模块。此外，`useClass` 不是处理自定义提供程序注册的唯一方法。了解更多 [这里](/fundamentals/custom-providers)。
+> info **提示** 当使用这种方法为过滤器执行依赖注入时，请注意，无论在此构造中使用哪个模块，过滤器实际上都是全局的。应该在哪里做？选择定义过滤器（上面示例中的 `HttpExceptionFilter`）的模块。此外，`useClass` 不是处理自定义提供程序注册的唯一方法。了解更多 [这里](/fundamentals/dependency-injection)。
 
 您可以根据需要使用此技术添加任意数量的过滤器；只需将每个过滤器添加到 providers 数组中即可。
 

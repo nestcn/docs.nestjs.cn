@@ -4,9 +4,9 @@
 
 ### 事件
 
-__[LINK_51](/_) 包（__INLINE_CODE_11__）提供了一个简单的观察者实现，使您可以订阅和监听应用程序中的各种事件。事件是一个非常好的方式来解耦应用程序的不同方面，因为一个事件可以有多个监听器，而这些监听器之间没有依赖关系。
+__[LINK_51](https://docs.nestjs.com/techniques/events) 包（__INLINE_CODE_11__）提供了一个简单的观察者实现，使您可以订阅和监听应用程序中的各种事件。事件是一个非常好的方式来解耦应用程序的不同方面，因为一个事件可以有多个监听器，而这些监听器之间没有依赖关系。
 
-__[INLINE_CODE_12__](/_) 内部使用__[LINK_52](/_) 包。
+__[INLINE_CODE_12__](https://docs.nestjs.com/techniques/events) 内部使用__[LINK_52](https://docs.nestjs.com/techniques/events) 包。
 
 #### 开始
 

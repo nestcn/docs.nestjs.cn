@@ -131,7 +131,7 @@ For more complicated Nest applications, for example, with 10 resources (generate
 
 Thus far we covered compile-time optimizations. These are unrelated to the way you define providers and load Nest modules in your application, and that plays an essential role as your application gets bigger.
 
-For example, imagine having a database connection defined as an [asynchronous provider](/fundamentals/async-providers). Async providers are designed to delay the application start until one or more asynchronous tasks are completed.
+For example, imagine having a database connection defined as an [asynchronous provider](/fundamentals/async-components). Async providers are designed to delay the application start until one or more asynchronous tasks are completed.
 That means, if your serverless function on average requires 2s to connect to the database (on bootstrap), your endpoint will need at least two extra seconds (because it must wait till the connection is established) to send a response back (when it's a cold start and your application wasn't running already).
 
 As you can see, the way you structure your providers is somewhat different in a **serverless environment** where bootstrap time is important.
@@ -241,7 +241,7 @@ export const handler: Handler = async (
 };
 ```
 
-> info **Hint** For creating multiple serverless functions and sharing common modules between them, we recommend using the [CLI Monorepo mode](/cli/monorepo#monorepo-mode).
+> info **Hint** For creating multiple serverless functions and sharing common modules between them, we recommend using the [CLI Monorepo mode](/cli/overview#monorepo-mode).
 
 > warning **Warning** If you use `@nestjs/swagger` package, there are a few additional steps required to make it work properly in the context of serverless function. Check out this [thread](https://github.com/nestjs/swagger/issues/199) for more information.
 

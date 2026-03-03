@@ -8,7 +8,7 @@
 
 In this chapter, we assume a basic understanding of GraphQL, and focus on how to work with the built-in `@nestjs/graphql` module. The `GraphQLModule` can be configured to use [Apollo](https://www.apollographql.com/) server (with the `@nestjs/apollo` driver) and [Mercurius](https://github.com/mercurius-js/mercurius) (with the `@nestjs/mercurius`). We provide official integrations for these proven GraphQL packages to provide a simple way to use GraphQL with Nest (see more integrations [here](/graphql/quick-start#third-party-integrations)).
 
-You can also build your own dedicated driver (read more on that [here](/graphql/other-features#creating-a-custom-driver)).
+You can also build your own dedicated driver (read more on that [here](/graphql/guards-interceptors#creating-a-custom-driver)).
 
 #### Installation
 

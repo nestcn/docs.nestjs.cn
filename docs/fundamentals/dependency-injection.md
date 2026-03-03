@@ -4,4 +4,4 @@
 
 ### 自定义提供者
 
-早些时候，我们已经探讨了 Nest 的依赖注入（DI）机制的一些方面。例如，使用 [constructor based](/providers#dependency-injection) 依赖注入将实例（通常是服务提供者）注入到类中。你可能不会感到惊讶的是，依赖注入是 Nest 核心的一部分。到目前为止，我们已经探讨了主要模式。随着应用程序变得更加复杂，您可能
+早些时候，我们已经探讨了 Nest 的依赖注入（DI）机制的一些方面。例如，使用 [constructor based](/overview/providers#dependency-injection) 依赖注入将实例（通常是服务提供者）注入到类中。你可能不会感到惊讶的是，依赖注入是 Nest 核心的一部分。到目前为止，我们已经探讨了主要模式。随着应用程序变得更加复杂，您可能

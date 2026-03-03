@@ -5,7 +5,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "rspress build && cp -r public/assets doc_build/ 2>/dev/null || true",
+    "build": "rspress build && node scripts/copy-assets.cjs",
     "dev": "rspress dev",
     "preview": "rspress preview",
     "fix-code-blocks": "node scripts/fix-code-blocks-v2.cjs",

@@ -38,7 +38,6 @@ sse(): Observable<MessageEvent> {
 
 要启用 **头版本控制**，请执行以下操作：
 
-```
 ```typescript
 export interface MessageEvent {
   data: string | object;

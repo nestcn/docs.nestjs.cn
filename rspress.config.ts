@@ -26,6 +26,52 @@ export default defineConfig({
   },
   route: {
     cleanUrls: true,
+    redirects: [
+      {
+        from: '/fundamentals/custom-providers',
+        to: '/fundamentals/dependency-injection',
+      },
+      {
+        from: '/fundamentals/custom-providers/:path*',
+        to: '/fundamentals/dependency-injection',
+      },
+      {
+        from: '/fundamentals/async-providers',
+        to: '/fundamentals/async-components',
+      },
+      {
+        from: '/fundamentals/injection-scopes',
+        to: '/fundamentals/provider-scopes',
+      },
+      {
+        from: '/fundamentals/module-ref',
+        to: '/fundamentals/module-reference',
+      },
+      {
+        from: '/techniques/database',
+        to: '/techniques/sql',
+      },
+      {
+        from: '/providers',
+        to: '/overview/providers',
+      },
+      {
+        from: '/graphql/resolvers',
+        to: '/graphql/resolvers-map',
+      },
+      {
+        from: '/graphql/other-features',
+        to: '/graphql/guards-interceptors',
+      },
+      {
+        from: '/cli/monorepo',
+        to: '/cli/workspaces',
+      },
+      {
+        from: '/techniques/mongodb',
+        to: '/recipes/mongodb',
+      },
+    ],
   },
   i18nSource: {
     outlineTitle: {

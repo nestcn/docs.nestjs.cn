@@ -563,7 +563,7 @@ export class JwtAuthGuard extends AuthGuard(['strategy_jwt_1', 'strategy_jwt_2',
 
 #### Enable authentication globally
 
-If the vast majority of your endpoints should be protected by default, you can register the authentication guard as a [global guard](/guards#binding-guards) and instead of using `@UseGuards()` decorator on top of each controller, you could simply flag which routes should be public.
+If the vast majority of your endpoints should be protected by default, you can register the authentication guard as a [global guard](/overview/guards#binding-guards) and instead of using `@UseGuards()` decorator on top of each controller, you could simply flag which routes should be public.
 
 First, register the `JwtAuthGuard` as a global guard using the following construction (in any module):
 
@@ -599,7 +599,7 @@ findAll() {
 }
 ```
 
-Lastly, we need the `JwtAuthGuard` to return `true` when the `"isPublic"` metadata is found. For this, we'll use the `Reflector` class (read more [here](/guards#putting-it-all-together)).
+Lastly, we need the `JwtAuthGuard` to return `true` when the `"isPublic"` metadata is found. For this, we'll use the `Reflector` class (read more [here](/overview/guards#putting-it-all-together)).
 
 ```typescript
 @Injectable()
@@ -623,9 +623,9 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
 #### Request-scoped strategies
 
-The passport API is based on registering strategies to the global instance of the library. Therefore strategies are not designed to have request-dependent options or to be dynamically instantiated per request (read more about the [request-scoped](/fundamentals/injection-scopes) providers). When you configure your strategy to be request-scoped, Nest will never instantiate it since it's not tied to any specific route. There is no physical way to determine which "request-scoped" strategies should be executed per request.
+The passport API is based on registering strategies to the global instance of the library. Therefore strategies are not designed to have request-dependent options or to be dynamically instantiated per request (read more about the [request-scoped](/fundamentals/provider-scopes) providers). When you configure your strategy to be request-scoped, Nest will never instantiate it since it's not tied to any specific route. There is no physical way to determine which "request-scoped" strategies should be executed per request.
 
-However, there are ways to dynamically resolve request-scoped providers within the strategy. For this, we leverage the [module reference](/fundamentals/module-ref) feature.
+However, there are ways to dynamically resolve request-scoped providers within the strategy. For this, we leverage the [module reference](/fundamentals/module-reference) feature.
 
 First, open the `local.strategy.ts` file and inject the `ModuleRef` in the normal way:
 
@@ -641,7 +641,7 @@ constructor(private moduleRef: ModuleRef) {
 
 Be sure to set the `passReqToCallback` configuration property to `true`, as shown above.
 
-In the next step, the request instance will be used to obtain the current context identifier, instead of generating a new one (read more about request context [here](/fundamentals/module-ref#getting-current-sub-tree)).
+In the next step, the request instance will be used to obtain the current context identifier, instead of generating a new one (read more about request context [here](/fundamentals/module-reference#getting-current-sub-tree)).
 
 Now, inside the `validate()` method of the `LocalStrategy` class, use the `getByRequest()` method of the `ContextIdFactory` class to create a context id based on the request object, and pass this to the `resolve()` call:
 

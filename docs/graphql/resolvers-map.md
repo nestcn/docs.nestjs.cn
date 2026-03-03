@@ -156,7 +156,7 @@ export class AuthorsResolver {
 
 > info **Hint** All decorators (e.g., `@Resolver`, `@ResolveField`, `@Args`, etc.) are exported from the `@nestjs/graphql` package.
 
-You can define multiple resolver classes. Nest will combine these at run time. See the [module](/graphql/resolvers#module) section below for more on code organization.
+You can define multiple resolver classes. Nest will combine these at run time. See the [module](/graphql/resolvers-map#module) section below for more on code organization.
 
 > warning **Note** The logic inside the `AuthorsService` and `PostsService` classes can be as simple or sophisticated as needed. The main point of this example is to show how to construct resolvers and how they can interact with other providers.
 
@@ -235,7 +235,7 @@ The `@Query()` decorator's options object (where we pass `{{ '{' }}name: 'author
 
 #### Args decorator options
 
-Use the `@Args()` decorator to extract arguments from a request for use in the method handler. This works in a very similar fashion to [REST route parameter argument extraction](/controllers#route-parameters).
+Use the `@Args()` decorator to extract arguments from a request for use in the method handler. This works in a very similar fashion to [REST route parameter argument extraction](/overview/controllers#route-parameters).
 
 Usually, your `@Args()` decorator will be simple and not require an object argument, as seen with the `getAuthor()` method above. For example, if the type of an identifier is string, the following construction is sufficient, and simply plucks the named field from the inbound GraphQL request for use as a method argument.
 
@@ -608,7 +608,7 @@ export class CreatePostInput {
 }
 ```
 
-> warning **Notice** To enable auto-validation of your inputs (and parameters), use `ValidationPipe`. Read more about validation [here](/techniques/validation) and more specifically about pipes [here](/pipes).
+> warning **Notice** To enable auto-validation of your inputs (and parameters), use `ValidationPipe`. Read more about validation [here](/techniques/validation) and more specifically about pipes [here](/overview/pipes).
 
 However, if you add decorators directly to the automatically generated file, they will be **overwritten** each time the file is generated. Instead, create a separate file and simply extend the generated class.
 

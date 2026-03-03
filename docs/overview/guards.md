@@ -8,7 +8,7 @@
 
 <figure><img class="illustrative-image" src="/assets/Guards_1.png" /></figure>
 
-守卫具有**单一职责** 。它们根据运行时存在的某些条件（如权限、角色、访问控制列表等）来决定是否由路由处理程序处理给定请求。这通常被称为**授权** 。授权（及其通常与之协作的**认证** ）在传统的 Express 应用中通常由[中间件](./middlewares)处理。中间件非常适合处理认证，因为像令牌验证和向 `request` 对象附加属性这类操作与特定路由上下文（及其元数据）没有强关联。
+守卫具有**单一职责** 。它们根据运行时存在的某些条件（如权限、角色、访问控制列表等）来决定是否由路由处理程序处理给定请求。这通常被称为**授权** 。授权（及其通常与之协作的**认证** ）在传统的 Express 应用中通常由[中间件](/overview/middlewares)处理。中间件非常适合处理认证，因为像令牌验证和向 `request` 对象附加属性这类操作与特定路由上下文（及其元数据）没有强关联。
 
 但中间件本质上是"哑"的，它不知道调用 `next()` 函数后会执行哪个处理程序。而**守卫**则能访问 `ExecutionContext` 实例，因此确切知道接下来要执行什么。与异常过滤器、管道和拦截器类似，守卫的设计让你能在请求/响应周期的精确时点介入处理逻辑，并以声明式方式实现。这有助于保持代码的 DRY 原则和声明式风格。
 
@@ -48,7 +48,7 @@ export class AuthGuard implements CanActivate {
 
 #### 执行上下文
 
-`canActivate()` 函数接收一个参数，即 `ExecutionContext` 实例。`ExecutionContext` 继承自 `ArgumentsHost`。我们之前在异常过滤器章节中已经见过 `ArgumentsHost`。在上面的示例中，我们只是使用了之前定义在 `ArgumentsHost` 上的相同辅助方法，来获取对 `Request` 对象的引用。您可以回顾[异常过滤器](./exception-filters#参数主机)章节中的 **Arguments host** 部分以获取更多相关信息。
+`canActivate()` 函数接收一个参数，即 `ExecutionContext` 实例。`ExecutionContext` 继承自 `ArgumentsHost`。我们之前在异常过滤器章节中已经见过 `ArgumentsHost`。在上面的示例中，我们只是使用了之前定义在 `ArgumentsHost` 上的相同辅助方法，来获取对 `Request` 对象的引用。您可以回顾[异常过滤器](/overview/exception-filters#参数主机)章节中的 **Arguments host** 部分以获取更多相关信息。
 
 通过扩展 `ArgumentsHost`，`ExecutionContext` 还添加了几个新的辅助方法，这些方法提供了有关当前执行过程的额外详细信息。这些细节有助于构建更通用的守卫，使其能够跨多种控制器、方法和执行上下文工作。了解更多关于 `ExecutionContext` 的信息[请点击此处](/fundamentals/execution-context) 。
 
@@ -207,7 +207,7 @@ export class RolesGuard implements CanActivate {
 throw new UnauthorizedException();
 ```
 
-守卫抛出的任何异常都将由[异常处理层](./exception-filters) （全局异常过滤器及应用于当前上下文的任何异常过滤器）处理。
+守卫抛出的任何异常都将由[异常处理层](/overview/exception-filters) （全局异常过滤器及应用于当前上下文的任何异常过滤器）处理。
 
 :::info 提示
 如果您正在寻找如何实现授权的实际示例，请查看[本章节](/security/authorization) 。

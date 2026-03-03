@@ -5,7 +5,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "rspress build && node scripts/copy-assets.cjs",
+    "build": "npm run check-links && rspress build && node scripts/copy-assets.cjs",
     "dev": "rspress dev",
     "preview": "rspress preview",
     "fix-code-blocks": "node scripts/fix-code-blocks-v2.cjs",
@@ -22,7 +22,8 @@
     "sync-and-translate:no-ai": "npm run translate-docs:no-ai && npm run fix-all",
     "update-sync-time": "node scripts/update-sync-time.cjs",
     "test-cloudflare": "node test-cloudflare-translate.js",
-    "check-links": "node scripts/check-internal-links.cjs"
+    "check-links": "node scripts/check-links.cjs",
+    "check-internal-links": "node scripts/check-internal-links.cjs"
   },
   "dependencies": {
     "@rspress/core": "^2.0.3",

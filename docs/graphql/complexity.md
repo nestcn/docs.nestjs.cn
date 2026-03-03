@@ -1,88 +1,104 @@
-<!-- 此文件从 content/graphql/complexity.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:18:08.566Z -->
-<!-- 源文件: content/graphql/complexity.md -->
+### 复杂度
 
-### 复杂性
+:::warning 警告
+本章仅适用于代码优先方法。
+:::
 
-> 警告 **Warning** 本章仅适用于代码优先approach。
+查询复杂度功能允许您定义特定字段的复杂程度，并通过设置**最大复杂度**来限制查询。其核心思想是使用简单数字来定义每个字段的复杂度，通常默认给每个字段分配 `1` 的复杂度值。此外，GraphQL 查询的复杂度计算可以通过所谓的复杂度估算器进行自定义。复杂度估算器是一个计算字段复杂度的简单函数，您可以在规则中添加任意数量的估算器，它们会按顺序依次执行。第一个返回数值型复杂度结果的估算器将决定该字段的最终复杂度。
 
-复杂度查询允许您定义某些字段的复杂度，并以**最高复杂度**限制查询。该想法是使用简单的数字来定义每个字段的复杂度。常见的默认值是为每个字段分配复杂度为 `onApplicationBootstrap`。此外，可以使用所谓的复杂度估算器来自定义 GraphQL 查询的复杂度计算。复杂度估算器是一种简单函数，它计算字段的复杂度。您可以将任意数量的复杂度估算器添加到规则中，然后依次执行它们。第一个返回数字复杂度值的估算器确定该字段的复杂度。
-
-`app.init()` 包括与工具 __LINK_18__ 集成，它提供基于成本分析的解决方案。使用该库，您可以拒绝对 GraphQL 服务器的查询，因为它们被认为是执行成本太高。
+`@nestjs/graphql` 包与 [graphql-query-complexity](https://github.com/slicknode/graphql-query-complexity) 等工具深度集成，后者提供了基于成本分析的解决方案。通过该库，您可以拒绝执行那些被认为代价过高的 GraphQL 服务器查询。
 
 #### 安装
 
-要开始使用它，我们首先安装所需的依赖项。
+要开始使用它，我们首先需要安装所需的依赖项。
+
+```bash
+$ npm install --save graphql-query-complexity
+```
+
+#### 快速开始
+
+安装过程完成后，我们就可以定义 `ComplexityPlugin` 类：
 
 ```typescript
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { GraphQLSchemaHost } from '@nestjs/graphql';
+import { Plugin } from '@nestjs/apollo';
+import {
+  ApolloServerPlugin,
+  BaseContext,
+  GraphQLRequestListener,
+} from '@apollo/server';
+import { GraphQLError } from 'graphql';
+import {
+  fieldExtensionsEstimator,
+  getComplexity,
+  simpleEstimator,
+} from 'graphql-query-complexity';
 
-@Injectable()
-export class UsersService implements OnModuleInit {
-  onModuleInit() {
-    console.log(`The module has been initialized.`);
-  }
-}
+@Plugin()
+export class ComplexityPlugin implements ApolloServerPlugin {
+  constructor(private gqlSchemaHost: GraphQLSchemaHost) {}
 
-@Injectable()
-export class UsersService {
-  onModuleInit() {
-    console.log(`The module has been initialized.`);
+  async requestDidStart(): Promise<GraphQLRequestListener<BaseContext>> {
+    const maxComplexity = 20;
+    const { schema } = this.gqlSchemaHost;
+
+    return {
+      async didResolveOperation({ request, document }) {
+        const complexity = getComplexity({
+          schema,
+          operationName: request.operationName,
+          query: document,
+          variables: request.variables,
+          estimators: [
+            fieldExtensionsEstimator(),
+            simpleEstimator({ defaultComplexity: 1 }),
+          ],
+        });
+        if (complexity > maxComplexity) {
+          throw new GraphQLError(
+            `Query is too complex: ${complexity}. Maximum allowed complexity: ${maxComplexity}`
+          );
+        }
+        console.log('Query Complexity:', complexity);
+      },
+    };
   }
 }
 ```
 
-#### getting started
+出于演示目的，我们将允许的最大复杂度指定为 `20`。在上面的示例中，我们使用了 2 个估算器：`simpleEstimator` 和 `fieldExtensionsEstimator`。
 
-安装过程完成后，我们可以定义 `app.listen()` 类：
+- `simpleEstimator`：简单估算器为每个字段返回一个固定的复杂度值
+- `fieldExtensionsEstimator`：字段扩展估算器用于提取模式中每个字段的复杂度值
 
-```typescript
-async onModuleInit(): Promise<void> {
-  await this.fetch();
-}
-```
-
-用于演示 purposes，我们指定了最大允许复杂度为 `onModuleDestroy`。在上面的示例中，我们使用了 2 个估算器， `beforeApplicationShutdown` 和 `onApplicationShutdown`。
-
-- `app.close()`:简单估算器返回每个字段的固定复杂度
-- `enableShutdownHooks`:字段扩展 estimator 提取每个字段的复杂度值
-
-> 提示 **Hint** 不要忘记将该类添加到 providers 数组中任何模块中。
+:::info 提示
+请记得将此类添加到任意模块的 providers 数组中
+:::
 
 #### 字段级复杂度
 
-在安装了插件后，我们现在可以定义任何字段的复杂度，方法是将 `onModuleInit()` 属性添加到 `onApplicationBootstrap()` 装饰器的选项对象中，例如：
+启用此插件后，我们现在可以通过在传入 `@Field()` 装饰器的选项对象中指定 `complexity` 属性来定义任意字段的复杂度，如下所示：
 
 ```typescript
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-
-  // Starts listening for shutdown hooks
-  app.enableShutdownHooks();
-
-  await app.listen(process.env.PORT ?? 3000);
-}
-bootstrap();
+@Field({ complexity: 3 })
+title: string;
 ```
 
-或者，您可以定义估算函数：
+或者，你也可以定义估算函数：
 
 ```typescript
-@Injectable()
-class UsersService implements OnApplicationShutdown {
-  onApplicationShutdown(signal: string) {
-    console.log(signal); // e.g. "SIGINT"
-  }
-}
+@Field({ complexity: (options: ComplexityEstimatorArgs) => ... })
+title: string;
 ```
 
-#### 查询/Mutation级复杂度
+#### 查询/变更级别的复杂度
 
-此外，`onModuleDestroy()` 和 `SIGTERM` 装饰器可能具有 `beforeApplicationShutdown()` 属性，例如：
+此外，`@Query()` 和 `@Mutation()` 装饰器可以像这样指定一个 `complexity` 属性：
 
-__CODE_BLOCK_4__
-
-Note: I followed the provided guidelines and kept the code examples, variable names, function names, and Markdown formatting unchanged. I also translated code comments from English to Chinese. I did not explain or modify placeholders like __INLINE_CODE_N__, __CODE_BLOCK_N__, __LINK_N__, __HTML_TAG_N__.
+```typescript
+@Query({ complexity: (options: ComplexityEstimatorArgs) => options.args.count * options.childComplexity })
+items(@Args('count') count: number) {
+  return this.itemsService.getItems({ count });
+}
+```

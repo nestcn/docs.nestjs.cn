@@ -1,67 +1,80 @@
-<!-- 此文件从 content/graphql/plugins.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:16:41.813Z -->
-<!-- 源文件: content/graphql/plugins.md -->
+### Apollo 插件
 
-### Apollo 服务插件
-
-插件使您可以通过在特定事件中执行自定义操作来扩展 Apollo 服务的核心功能。当前，这些事件对应于 GraphQL 请求生命周期的个别阶段，以及 Apollo 服务的启动本身（了解更多关于 __LINK_16__）。例如，一个基本的日志插件可能会将每个发送到 Apollo 服务的 GraphQL 查询字符串日志记录。
+插件能够通过响应特定事件执行自定义操作来扩展 Apollo Server 的核心功能。目前这些事件对应 GraphQL 请求生命周期的各个阶段，以及 Apollo Server 自身的启动过程（详见[此处](https://www.apollographql.com/docs/apollo-server/integrations/plugins/) ）。例如，一个基础日志插件可以记录发送到 Apollo Server 的每个请求所关联的 GraphQL 查询字符串。
 
 #### 自定义插件
 
-要创建插件， declare a class annotated with the __INLINE_CODE_4__ decorator exported from the __INLINE_CODE_5__ package. Besides, for better code autocompletion, implement the __INLINE_CODE_6__ interface from the __INLINE_CODE_7__ package.
+要创建插件，需声明一个用 `@Plugin` 装饰器标注的类，该装饰器从 `@nestjs/apollo` 包导出。同时，为了获得更好的代码自动补全功能，建议实现来自 `@apollo/server` 包的 `ApolloServerPlugin` 接口。
 
 ```typescript
-@InputType()
-class CreateUserInput {
-  @Field()
-  email: string;
+import { ApolloServerPlugin, GraphQLRequestListener } from '@apollo/server';
+import { Plugin } from '@nestjs/apollo';
 
-  @Field()
-  password: string;
-
-  @Field()
-  firstName: string;
+@Plugin()
+export class LoggingPlugin implements ApolloServerPlugin {
+  async requestDidStart(): Promise<GraphQLRequestListener<any>> {
+    console.log('Request started');
+    return {
+      async willSendResponse() {
+        console.log('Will send response');
+      },
+    };
+  }
 }
 ```
 
-这样，我们可以将 __INLINE_CODE_8__ 注册为提供者。
+这样我们就可以将 `LoggingPlugin` 注册为一个提供者。
 
 ```typescript
-@InputType()
-export class UpdateUserInput extends PartialType(CreateUserInput) {}
+@Module({
+  providers: [LoggingPlugin],
+})
+export class CommonModule {}
 ```
 
-Nest 将自动实例化插件并将其应用于 Apollo 服务。
+Nest 会自动实例化插件并将其应用到 Apollo Server。
 
 #### 使用外部插件
 
-有几个插件在外部提供。要使用现有插件，简单地导入它并将其添加到 __INLINE_CODE_9__ 数组中：
+系统提供了多个开箱即用的插件。要使用现有插件，只需导入它并将其添加到 `plugins` 数组中：
 
 ```typescript
-@InputType()
-export class UpdateUserInput extends PartialType(User, InputType) {}
+GraphQLModule.forRoot({
+  // ...
+  plugins: [ApolloServerOperationRegistry({ /* options */})]
+}),
 ```
 
-> info **提示** `PartialType()` 插件来自 `PartialType()` 包。
+:::info 提示
+`ApolloServerOperationRegistry` 插件是从 `@apollo/server-plugin-operation-registry` 包导出的。
+:::
 
-#### Mercurius 插件
+#### 与 Mercurius 搭配使用的插件
 
-一些现有的 Mercurius 特定 Fastify 插件需要在 Mercurius 插件加载后加载（了解更多关于 __LINK_17__）在插件树中。
+部分现有的 mercurius 专属 Fastify 插件必须在 mercurius 插件之后加载（详见插件树[此处](https://mercurius.dev/#/docs/plugins) ）。
 
-> warning **警告** __LINK_18__ 是一个例外，应该在主文件中注册。
+:::warning 注意
+[mercurius-upload](https://github.com/mercurius-js/mercurius-upload) 是个例外，应在主文件中注册。
+:::
 
-为此，`PartialType()` exposing an optional `CreateUserInput` 配置选项。它表示一个数组对象，其中包含两个属性：`PartialType()` 和它的 `@nestjs/graphql`。因此，注册 __LINK_19__ 将如下所示：
+为此，`MercuriusDriver` 提供了一个可选的 `plugins` 配置项。它表示一个由对象组成的数组，每个对象包含两个属性：`plugin` 及其对应的 `options`。因此，注册 [缓存插件](https://github.com/mercurius-js/cache) 的示例如下：
 
 ```typescript
-@InputType()
-class CreateUserInput {
-  @Field()
-  email: string;
-
-  @Field()
-  password: string;
-
-  @Field()
-  firstName: string;
-}
+GraphQLModule.forRoot({
+  driver: MercuriusDriver,
+  // ...
+  plugins: [
+    {
+      plugin: cache,
+      options: {
+        ttl: 10,
+        policy: {
+          Query: {
+            add: true
+          }
+        }
+      },
+    }
+  ]
+}),
 ```

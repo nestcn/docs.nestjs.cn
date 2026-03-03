@@ -1,44 +1,195 @@
 <!-- 此文件从 content/custom-decorators.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:08:10.793Z -->
+<!-- 生成时间: 2026-02-28T08:43:59.456Z -->
 <!-- 源文件: content/custom-decorators.md -->
 
 ### Custom route decorators
 
-Nest 是基于 ES2016 装饰器的。为了更好地理解装饰器的工作原理，我们建议阅读 __LINK_147__。下面是一个简单的定义：
+Nest is built around a language feature called **decorators**. Decorators are a well-known concept in a lot of commonly used programming languages, but in the JavaScript world, they're still relatively new. In order to better understand how decorators work, we recommend reading [this article](https://medium.com/google-developers/exploring-es7-decorators-76ecb65fb841). Here's a simple definition:
 
-__HTML_TAG_29__
-  ES2016 装饰器是一个表达式，它返回一个函数，可以接受目标、名称和属性描述符作为参数。您可以通过将装饰器前缀为 __HTML_TAG_30__@__HTML_TAG_31__ 的字符，并将其置于要装饰的内容的顶部来应用装饰器。装饰器可以定义为类、方法或属性。
+<blockquote class="external">
+  An ES2016 decorator is an expression which returns a function and can take a target, name and property descriptor as arguments.
+  You apply it by prefixing the decorator with an <code>@</code> character and placing this at the very top of what
+  you are trying to decorate. Decorators can be defined for either a class, a method or a property.
+</blockquote>
 
 #### Param decorators
 
-Nest 提供了一组有用的 Param 装饰器，您可以使用它们与 HTTP 路由处理程序一起。下面是一组提供的装饰器和它们对应的 Express 或 Fastify 对象
+Nest provides a set of useful **param decorators** that you can use together with the HTTP route handlers. Below is a list of the provided decorators and the plain Express (or Fastify) objects they represent
 
-__HTML_TAG_33__
-  __HTML_TAG_34__
-    __HTML_TAG_35__
-      __HTML_TAG_36____HTML_TAG_37__@Request(), @Req()__HTML_TAG_38____HTML_TAG_39__
-      __HTML_TAG_40____HTML_TAG_41__req__HTML_TAG_42____HTML_TAG_43__
-    __HTML_TAG_44__
-    __HTML_TAG_45__
-      __HTML_TAG_46____HTML_TAG_47__@Response(), @Res()__HTML_TAG_48____HTML_TAG_49__
-      __HTML_TAG_50____HTML_TAG_51__res__HTML_TAG_52____HTML_TAG_53__
-    __HTML_TAG_54__
-    __HTML_TAG_55__
-      __HTML_TAG_56____HTML_TAG_57__@Next()__HTML_TAG_58____HTML_TAG_59__
-      __HTML_TAG_60____HTML_TAG_61__next__HTML_TAG_62____HTML_TAG_63__
-    __HTML_TAG_64__
-    __HTML_TAG_65__
-      __HTML_TAG_66____HTML_TAG_67__@Session()__HTML_TAG_68____HTML_TAG_69__
-      __HTML_TAG_70____HTML_TAG_71__req.session__HTML_TAG_72____HTML_TAG_73__
-    __HTML_TAG_74__
-    __HTML_TAG_75__
-      __HTML_TAG_76____HTML_TAG_77__@Param(param?: string)__HTML_TAG_78____HTML_TAG_79__
-      __HTML_TAG_80____HTML_TAG_81__req.params__HTML_TAG_82__ / __HTML_TAG_83__req.params[param]__HTML_TAG_84____HTML_TAG_85__
-    __HTML_TAG_86__
-    __HTML_TAG_87__
-      __HTML_TAG_88____HTML_TAG_89__@Body(param?: string)__HTML_TAG_90____HTML_TAG_91__
-      __HTML_TAG_92____HTML_TAG_93__req.body__HTML_TAG_94__ / __HTML_TAG_95__req.body[param]__HTML_TAG_96____HTML_TAG_97__
-    __HTML_TAG_98__
-    __HTML_TAG_99__
-      __HTML_TAG_100____HTML_TAG_101__@Query(param?: string)__HTML_TAG_102____HTML_TAG_103__
-      __HTML_TAG_104____
+<table>
+  <tbody>
+    <tr>
+      <td><code>@Request(), @Req()</code></td>
+      <td><code>req</code></td>
+    </tr>
+    <tr>
+      <td><code>@Response(), @Res()</code></td>
+      <td><code>res</code></td>
+    </tr>
+    <tr>
+      <td><code>@Next()</code></td>
+      <td><code>next</code></td>
+    </tr>
+    <tr>
+      <td><code>@Session()</code></td>
+      <td><code>req.session</code></td>
+    </tr>
+    <tr>
+      <td><code>@Param(param?: string)</code></td>
+      <td><code>req.params</code> / <code>req.params[param]</code></td>
+    </tr>
+    <tr>
+      <td><code>@Body(param?: string)</code></td>
+      <td><code>req.body</code> / <code>req.body[param]</code></td>
+    </tr>
+    <tr>
+      <td><code>@Query(param?: string)</code></td>
+      <td><code>req.query</code> / <code>req.query[param]</code></td>
+    </tr>
+    <tr>
+      <td><code>@Headers(param?: string)</code></td>
+      <td><code>req.headers</code> / <code>req.headers[param]</code></td>
+    </tr>
+    <tr>
+      <td><code>@Ip()</code></td>
+      <td><code>req.ip</code></td>
+    </tr>
+    <tr>
+      <td><code>@HostParam()</code></td>
+      <td><code>req.hosts</code></td>
+    </tr>
+  </tbody>
+</table>
+
+Additionally, you can create your own **custom decorators**. Why is this useful?
+
+In the node.js world, it's common practice to attach properties to the **request** object. Then you manually extract them in each route handler, using code like the following:
+
+```typescript
+const user = req.user;
+```
+
+In order to make your code more readable and transparent, you can create a `@User()` decorator and reuse it across all of your controllers.
+
+```typescript
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+
+export const User = createParamDecorator(
+  (data: unknown, ctx: ExecutionContext) => {
+    const request = ctx.switchToHttp().getRequest();
+    return request.user;
+  },
+);
+```
+
+Then, you can simply use it wherever it fits your requirements.
+
+```typescript
+@Get()
+async findOne(@User() user: UserEntity) {
+  console.log(user);
+}
+```
+
+#### Passing data
+
+When the behavior of your decorator depends on some conditions, you can use the `data` parameter to pass an argument to the decorator's factory function. One use case for this is a custom decorator that extracts properties from the request object by key. Let's assume, for example, that our <a href="techniques/authentication#实现-passport-策略">authentication layer</a> validates requests and attaches a user entity to the request object. The user entity for an authenticated request might look like:
+
+```json
+{
+  "id": 101,
+  "firstName": "Alan",
+  "lastName": "Turing",
+  "email": "alan@email.com",
+  "roles": ["admin"]
+}
+```
+
+Let's define a decorator that takes a property name as key, and returns the associated value if it exists (or undefined if it doesn't exist, or if the `user` object has not been created).
+
+```typescript
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+
+export const User = createParamDecorator(
+  (data: string, ctx: ExecutionContext) => {
+    const request = ctx.switchToHttp().getRequest();
+    const user = request.user;
+
+    return data ? user?.[data] : user;
+  },
+);
+
+export const User = createParamDecorator((data, ctx) => {
+  const request = ctx.switchToHttp().getRequest();
+  const user = request.user;
+
+  return data ? user && user[data] : user;
+});
+```
+
+Here's how you could then access a particular property via the `@User()` decorator in the controller:
+
+```typescript
+@Get()
+async findOne(@User('firstName') firstName: string) {
+  console.log(`Hello ${firstName}`);
+}
+```
+
+You can use this same decorator with different keys to access different properties. If the `user` object is deep or complex, this can make for easier and more readable request handler implementations.
+
+> info **Hint** For TypeScript users, note that `createParamDecorator<T>()` is a generic. This means you can explicitly enforce type safety, for example `createParamDecorator<string>((data, ctx) => ...)`. Alternatively, specify a parameter type in the factory function, for example `createParamDecorator((data: string, ctx) => ...)`. If you omit both, the type for `data` will be `any`.
+
+#### Working with pipes
+
+Nest treats custom param decorators in the same fashion as the built-in ones (`@Body()`, `@Param()` and `@Query()`). This means that pipes are executed for the custom annotated parameters as well (in our examples, the `user` argument). Moreover, you can apply the pipe directly to the custom decorator:
+
+```typescript
+@Get()
+async findOne(
+  @User(new ValidationPipe({ validateCustomDecorators: true }))
+  user: UserEntity,
+) {
+  console.log(user);
+}
+```
+
+> info **Hint** Note that `validateCustomDecorators` option must be set to true. `ValidationPipe` does not validate arguments annotated with the custom decorators by default.
+
+#### Decorator composition
+
+Nest provides a helper method to compose multiple decorators. For example, suppose you want to combine all decorators related to authentication into a single decorator. This could be done with the following construction:
+
+```typescript
+import { applyDecorators } from '@nestjs/common';
+
+export function Auth(...roles: Role[]) {
+  return applyDecorators(
+    SetMetadata('roles', roles),
+    UseGuards(AuthGuard, RolesGuard),
+    ApiBearerAuth(),
+    ApiUnauthorizedResponse({ description: 'Unauthorized' }),
+  );
+}
+
+export function Auth(...roles) {
+  return applyDecorators(
+    SetMetadata('roles', roles),
+    UseGuards(AuthGuard, RolesGuard),
+    ApiBearerAuth(),
+    ApiUnauthorizedResponse({ description: 'Unauthorized' }),
+  );
+}
+```
+
+You can then use this custom `@Auth()` decorator as follows:
+
+```typescript
+@Get('users')
+@Auth('admin')
+findAllUsers() {}
+```
+
+This has the effect of applying all four decorators with a single declaration.
+
+> warning **Warning** The `@ApiHideProperty()` decorator from the `@nestjs/swagger` package is not composable and won't work properly with the `applyDecorators` function.

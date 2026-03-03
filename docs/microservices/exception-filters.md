@@ -1,77 +1,71 @@
-<!-- 此文件从 content/microservices/exception-filters.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:15:55.534Z -->
-<!-- 源文件: content/microservices/exception-filters.md -->
-
 ### 异常过滤器
 
-HTTP 层和微服务层之间唯一的不同之处是，而不是抛出 __INLINE_CODE_5__, 应该使用 __INLINE_CODE_6__。
+HTTP [异常过滤器](/overview/exception-filters)层与对应微服务层的唯一区别在于，不应抛出 `HttpException`，而应使用 `RpcException`。
 
 ```typescript
-import { Field, ObjectType } from '@nestjs/graphql';
-
-@ObjectType()
-export class Book {
-  @Field()
-  title: string;
-}
+throw new RpcException('Invalid credentials.');
 ```
 
-> info **提示** 类 __INLINE_CODE_7__ 来自包 __INLINE_CODE_8__。
+:::info 提示
+`RpcException` 类是从 `@nestjs/microservices` 包导入的。
+:::
 
-Nest 将处理抛出的异常，并将返回 __INLINE_CODE_9__ 对象，具有以下结构：
+使用上述示例时，Nest 将处理抛出的异常并返回具有以下结构的 `error` 对象：
 
-```typescript
-import { Field, ObjectType } from '@nestjs/graphql';
-
-@ObjectType()
-export class Author {
-  @Field()
-  name: string;
+```json
+{
+  "status": "error",
+  "message": "Invalid credentials."
 }
 ```
 
 #### 过滤器
 
-微服务异常过滤器的行为与 HTTP 异常过滤器相似，但有一小点不同。方法 __INLINE_CODE_10__ 必须返回 __INLINE_CODE_11__。
+微服务异常过滤器的行为与 HTTP 异常过滤器类似，只有一个小区别。`catch()` 方法必须返回一个 `Observable`。
 
-```typescript
-export const ResultUnion = createUnionType({
-  name: 'ResultUnion',
-  types: () => [Author, Book] as const,
-});
+ ```typescript title="rpc-exception.filter.ts"
+import { Catch, RpcExceptionFilter, ArgumentsHost } from '@nestjs/common';
+import { Observable, throwError } from 'rxjs';
+import { RpcException } from '@nestjs/microservices';
+
+@Catch(RpcException)
+export class ExceptionFilter implements RpcExceptionFilter<RpcException> {
+  catch(exception: RpcException, host: ArgumentsHost): Observable<any> {
+    return throwError(() => exception.getError());
+  }
+}
 ```
 
-> warning **警告** 使用 __LINK_16__ 时，全球微服务异常过滤器默认不可用。
+:::warning 警告
+使用[混合应用](/faq/hybrid-application)时，全局微服务异常过滤器默认未启用。
+:::
 
-以下示例使用手动实例化的方法作用域过滤器。与 HTTP 基于应用程序一样，你也可以使用控制器作用域过滤器（即将控制器类前缀为 __INLINE_CODE_12__ 装饰器）。
+以下示例使用了手动实例化的方法作用域过滤器。与基于 HTTP 的应用类似，您也可以使用控制器作用域过滤器（即在控制器类前添加 `@UseFilters()` 装饰器）。
 
 ```typescript
-@Query(() => [ResultUnion])
-search(): Array<typeof ResultUnion> {
-  return [new Author(), new Book()];
+@UseFilters(new ExceptionFilter())
+@MessagePattern({ cmd: 'sum' })
+accumulate(data: number[]): number {
+  return (data || []).reduce((a, b) => a + b);
 }
 ```
 
 #### 继承
 
-通常，您将创建完全定制的异常过滤器，以满足您的应用程序需求。然而，有些情况下，您可能想要简单地扩展 **core 异常过滤器**，并根据特定因素Override行为。
+通常，您会创建完全自定义的异常过滤器来满足应用程序需求。但在某些情况下，您可能希望直接扩展**核心异常过滤器** ，并根据特定因素覆盖其行为。
 
-为了将异常处理委派给基本过滤器，您需要扩展 __INLINE_CODE_13__ 并调用继承的 __INLINE_CODE_14__ 方法。
+要将异常处理委托给基础过滤器，需要扩展 `BaseExceptionFilter` 并调用继承的 `catch()` 方法。
 
-```graphql
-type Author {
-  name: String!
-}
+```typescript
+import { Catch, ArgumentsHost } from '@nestjs/common';
+import { BaseRpcExceptionFilter } from '@nestjs/microservices';
 
-type Book {
-  title: String!
-}
-
-union ResultUnion = Author | Book
-
-type Query {
-  search: [ResultUnion!]!
+@Catch()
+export class AllExceptionsFilter extends BaseRpcExceptionFilter {
+  catch(exception: any, host: ArgumentsHost) {
+    return super.catch(exception, host);
+  }
 }
 ```
 
-上面的实现只是一个 shell，显示了该方法。您的扩展异常过滤器实现将包括您定制的 **业务逻辑**（例如，处理各种情况）。
+上述实现仅是一个展示方法的框架。您对扩展异常过滤器的实现将包含您定制的**业务逻辑** （例如处理各种条件）。

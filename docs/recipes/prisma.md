@@ -1,425 +1,609 @@
 <!-- 此文件从 content/recipes\prisma.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T09:14:28.448Z -->
+<!-- 生成时间: 2026-03-03T07:09:52.785Z -->
 <!-- 源文件: content/recipes\prisma.md -->
-
-Here is the translation of the English technical documentation to Chinese:
 
 ### Prisma
 
-__LINK_135__ 是一个 Node.js 和 TypeScript 的 __LINK_136__ ORM。它可以用作写 SQL 代码或使用其他数据库访问工具（像 __LINK_137__ 或 __LINK_138__ 和 __LINK_139__）的一种替代方案。当前 Prisma 支持 PostgreSQL、MySQL、SQL Server、SQLite、MongoDB 和 CockroachDB（__LINK_140__）。
+[Prisma](https://www.prisma.io) is an [open-source](https://github.com/prisma/prisma) ORM for Node.js and TypeScript. It is used as an **alternative** to writing plain SQL, or using another database access tool such as SQL query builders (like [knex.js](https://knexjs.org/)) or ORMs (like [TypeORM](https://typeorm.io/) and [Sequelize](https://sequelize.org/)). Prisma currently supports PostgreSQL, MySQL, SQL Server, SQLite, MongoDB and CockroachDB ([Preview](https://www.prisma.io/docs/orm/reference/supported-databases)).
 
-虽然 Prisma 可以与 plain JavaScript 一起使用，但是它更强调 TypeScript，並提供了 TypeScript 生态系统中其他 ORM 之外的类型安全性。您可以在 __LINK_141__ 中找到 Prisma 和 TypeORM 的类型安全性比较。
+While Prisma can be used with plain JavaScript, it embraces TypeScript and provides a level to type-safety that goes beyond the guarantees other ORMs in the TypeScript ecosystem. You can find an in-depth comparison of the type-safety guarantees of Prisma and TypeORM [here](https://www.prisma.io/docs/orm/more/comparisons/prisma-and-typeorm#type-safety).
 
-> info **注意** 如果您想了解 Prisma 的工作原理，可以查看 __LINK_142__ 或阅读 __LINK_143__ 在 __LINK_144__ 中。同时，在 __LINK_147__ 仓库中也提供了 __LINK_145__ 和 __LINK_146__ 的示例。
+> info **Note** If you want to get a quick overview of how Prisma works, you can follow the [Quickstart](https://www.prisma.io/docs/getting-started/prisma-orm/quickstart/prisma-postgres) or read the [Introduction](https://www.prisma.io/docs/orm/overview/introduction/what-is-prisma) in the [documentation](https://www.prisma.io/docs). There also are ready-to-run examples for [REST](https://github.com/prisma/prisma-examples/tree/b53fad046a6d55f0090ddce9fd17ec3f9b95cab3/orm/nest) and [GraphQL](https://github.com/prisma/prisma-examples/tree/b53fad046a6d55f0090ddce9fd17ec3f9b95cab3/orm/nest-graphql) in the [`prisma-examples`](https://github.com/prisma/prisma-examples/) repo.
 
-#### 获取开始
+#### Getting started
 
-在本食谱中，您将学习如何使用 NestJS 和 Prisma从头开始构建一个 sample NestJS 应用程序。该应用程序将具有 REST API，可以读取和写入数据库。
+In this recipe, you'll learn how to get started with NestJS and Prisma from scratch. You are going to build a sample NestJS application with a REST API that can read and write data in a database.
 
-为了简化数据库设置，我们将使用 __LINK_148__ 数据库。如果您使用 PostgreSQL 或 MySQL，可以在适当的地方找到额外的指导。
+For the purpose of this guide, you'll use a [SQLite](https://sqlite.org/) database to save the overhead of setting up a database server. Note that you can still follow this guide, even if you're using PostgreSQL or MySQL – you'll get extra instructions for using these databases at the right places.
 
-> info **注意** 如果您已经有了现有项目并考虑迁移到 Prisma，可以遵循 __LINK_149__ 指南。如果您正在从 TypeORM 迁移到 Prisma，可以阅读 __LINK_150__ 指南。
+> info **Note** If you already have an existing project and consider migrating to Prisma, you can follow the guide for [adding Prisma to an existing project](https://www.prisma.io/docs/getting-started/setup-prisma/add-to-existing-project-typescript-postgres). If you are migrating from TypeORM, you can read the guide [Migrating from TypeORM to Prisma](https://www.prisma.io/docs/guides/migrate-from-typeorm).
 
-#### 创建您的 NestJS 项目
+#### Create your NestJS project
 
-要开始，安装 NestJS CLI，并使用以下命令创建应用程序 skeletons：
+To get started, install the NestJS CLI and create your app skeleton with the following commands:
 
 ```bash
-$ npm i --save class-validator class-transformer
+$ npm install -g @nestjs/cli
+$ nest new hello-prisma
 ```
 
-请查看 __LINK_151__ 页面以了解项目文件的创建。您现在可以使用 `ParseUUIDPipe` 启动应用程序。当前的 REST API 在 `ValidationPipe` 上运行，实现了 `ValidationPipe` 路由。在本指南中，您将实现更多路由来存储和检索用户和帖子的数据。
+See the [First steps](/first-steps) page to learn more about the project files created by this command. Note also that you can now run `npm start` to start your application. The REST API running at `http://localhost:3000/` currently serves a single route that's implemented in `src/app.controller.ts`. Over the course of this guide, you'll implement additional routes to store and retrieve data about _users_ and _posts_.
 
-#### 设置 Prisma
+#### Set up Prisma
 
-首先，安装 Prisma CLI 作为您的项目的开发依赖项：
+Start by installing the Prisma CLI as a development dependency in your project:
 
-```typescript
-export interface ValidationPipeOptions extends ValidatorOptions {
-  transform?: boolean;
-  disableErrorMessages?: boolean;
-  exceptionFactory?: (errors: ValidationError[]) => any;
+```bash
+$ cd hello-prisma
+$ npm install prisma --save-dev
+```
+
+In the following steps, we'll be utilizing the [Prisma CLI](https://www.prisma.io/docs/orm/tools/prisma-cli). As a best practice, it's recommended to invoke the CLI locally by prefixing it with `npx`:
+
+```bash
+$ npx prisma
+```
+
+<details><summary>Expand if you're using Yarn</summary>
+
+If you're using Yarn, then you can install the Prisma CLI as follows:
+
+```bash
+$ yarn add prisma --dev
+```
+
+Once installed, you can invoke it by prefixing it with `yarn`:
+
+```bash
+$ yarn prisma
+```
+
+</details>
+
+Now create your initial Prisma setup using the `init` command of the Prisma CLI:
+
+```bash
+$ npx prisma init
+```
+
+This command creates a new `prisma` directory with the following contents:
+
+- `schema.prisma`: Specifies your database connection and contains the database schema
+- `prisma.config.ts`: A configuration file for your projects
+- `.env`: A [dotenv](https://github.com/motdotla/dotenv) file, typically used to store your database credentials in a group of environment variables
+
+#### Set the generator output path
+
+Specify your output `path` for the generated Prisma client either by passing `--output ../src/generated/prisma` during prisma init, or directly in your Prisma schema:
+
+```groovy
+generator client {
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
 }
 ```
 
-在接下来的步骤中，我们将使用 __LINK_152__。作为最佳实践，建议在本地调用 CLI，通过添加 `ValidationPipe` 前缀来调用：
+#### Configure the module format
 
-```typescript
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(new ValidationPipe());
-  await app.listen(process.env.PORT ?? 3000);
-}
-bootstrap();
-```
+Set `moduleFormat` in the generator to `cjs`:
 
-<th></th>Expand if you're using Yarn<th>
-
-如果您使用 Yarn，可以使用以下命令安装 Prisma CLI：
-
-```typescript
-@Post()
-create(@Body() createUserDto: CreateUserDto) {
-  return 'This action adds a new user';
+```groovy
+generator client {
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
+  moduleFormat    = "cjs"
 }
 ```
 
-安装完成后，您可以通过添加 `ValidationPipe` 前缀来调用 CLI：
+> info **Note** The `moduleFormat` configuration is required because Prisma v7 ships as an ES module by default, which does not work with NestJS's CommonJS setup. Setting `moduleFormat` to `cjs` forces Prisma to generate a CommonJS module instead of ESM.
 
-```typescript
-import { IsEmail, IsNotEmpty } from 'class-validator';
+#### Set the database connection
 
-export class CreateUserDto {
-  @IsEmail()
-  email: string;
+Your database connection is configured in the `datasource` block in your `schema.prisma` file. By default it's set to `postgresql`, but since you're using a SQLite database in this guide you need to adjust the `provider` field of the `datasource` block to `sqlite`:
 
-  @IsNotEmpty()
-  password: string;
+```groovy
+datasource db {
+  provider = "sqlite"
+}
+
+generator client {
+  provider      = "prisma-client"
+  output        = "../src/generated/prisma"
+  moduleFormat  = "cjs"
 }
 ```
 
-</th>
+Now, open up `.env` and adjust the `DATABASE_URL` environment variable to look as follows:
 
-现在，使用 Prisma CLI 的 `@nestjs/common` 命令创建您的初始 Prisma 设置：
-
-```json
-{
-  "statusCode": 400,
-  "error": "Bad Request",
-  "message": ["email must be an email"]
-}
+```bash
+DATABASE_URL="file:./dev.db"
 ```
 
-这将创建一个名为 `class-validator` 的目录，包含以下内容：
+Make sure you have a [ConfigModule](/techniques/configuration) configured, otherwise the `DATABASE_URL` variable will not be picked up from `.env`.
 
-- `class-transformer`: 指定数据库连接和包含数据库架构
-- `class-validator`: 项目配置文件
-- `ValidatorOptions`: 一个 __LINK_153__ 文件，通常用于存储数据库凭证在环境变量组中
+SQLite databases are simple files; no server is required to use a SQLite database. So instead of configuring a connection URL with a _host_ and _port_, you can just point it to a local file which in this case is called `dev.db`. This file will be created in the next step.
 
-#### 设置生成器输出路径
+<details><summary>Expand if you're using PostgreSQL, MySQL, MsSQL or Azure SQL</summary>
 
-指定生成 Prisma 客户端的输出 `class-validator`，可以在 prisma init 运行时使用 `ValidationPipe`，或直接在 Prisma schema 中使用：
-
-```typescript
-@Get(':id')
-findOne(@Param() params: FindOneParams) {
-  return 'This action returns a user';
-}
-```
-
-#### 配置模块格式
-
-将 `ValidationPipe` 设置为 `import {{ '{' }} CreateUserDto {{ '}' }}`：
-
-```typescript
-import { IsNumberString } from 'class-validator';
-
-export class FindOneParams {
-  @IsNumberString()
-  id: string;
-}
-```
-
-> info **注意** Prisma v7 默认生成 ES 模块，而 NestJS 需要 CommonJS 模块。因此，在 Prisma 生成 CommonJS 模块时，需要将 `import type {{ '{' }} CreateUserDto {{ '}' }}` 设置为 `class-validator`。
-
-#### 设置数据库连接
-
-您的数据库连接在 `CreateUserDto` 块中配置在您的 `email` 文件中。默认情况下，它被设置为 `400 Bad Request`，但由于您使用 SQLite 数据库，因此需要将 `ValidationPipe` 字段设置为 `FindOneParams`：
-
-```typescript
-app.useGlobalPipes(
-  new ValidationPipe({
-    disableErrorMessages: true,
-  }),
-);
-```
-
-现在，打开 `class-validator` 并将 `ValidationPipe` 环境变量设置为以下内容：
-
-```typescript
-app.useGlobalPipes(
-  new ValidationPipe({
-    whitelist: true,
-  }),
-);
-```
-
-确保您已经配置了 __LINK_154__，否则 `ValidationPipe` 变量将不会从 `email` 中获取。
-
-SQLite 数据库是简单的文件；不需要服务器来使用 SQLite 数据库。因此，相反，您可以将连接 URL 指向本地文件，这个文件名是 `password`。这个文件将在下一步中创建。
-
-<th></th>Expand if you're using PostgreSQL, MySQL, MsSQL or Azure SQL</tr>
-
-Please note that I have followed the provided glossary and terminology guidelines to translate the text. I have also kept the code examples, variable names, function names, and formatting unchanged, as well as translated code comments from English to ChineseHere is the translation of the English technical documentation to Chinese:
-
-使用 PostgreSQL 和 MySQL 需要配置连接 URL,使其指向 _数据库服务器_。您可以了解更多关于所需连接 URL 格式的信息 __LINK_155__。
+With PostgreSQL and MySQL, you need to configure the connection URL to point to the _database server_. You can learn more about the required connection URL format [here](https://www.prisma.io/docs/orm/reference/connection-urls).
 
 **PostgreSQL**
 
-如果您使用 PostgreSQL,则需要将 `age` 和 `whitelist` 文件进行以下调整：
+If you're using PostgreSQL, you have to adjust the `schema.prisma` and `.env` files as follows:
 
-**`true`**
+**`schema.prisma`**
 
-```typescript
-@Post()
-@UsePipes(new ValidationPipe({ transform: true }))
-async create(@Body() createCatDto: CreateCatDto) {
-  this.catsService.create(createCatDto);
+```groovy
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client"
+  output          = "../src/generated/prisma"
+  moduleFormat  = "cjs"
 }
 ```
 
-**`forbidNonWhitelisted`**
+**`.env`**
 
-```typescript
-app.useGlobalPipes(
-  new ValidationPipe({
-    transform: true,
-  }),
-);
+```bash
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=SCHEMA"
 ```
 
-将所有大写字母的占位符替换为您的数据库凭证。请注意,如果您不确定 `true` 占位符的值,那么它可能是默认值 `whitelist`：
+Replace the placeholders spelled in all uppercase letters with your database credentials. Note that if you're unsure what to provide for the `SCHEMA` placeholder, it's most likely the default value `public`:
 
-```typescript
-@Get(':id')
-findOne(@Param('id') id: number) {
-  console.log(typeof id === 'number'); // true
-  return 'This action returns a user';
-}
+```bash
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public"
 ```
 
-如果您想了解如何设置 PostgreSQL 数据库,可以遵循 __LINK_156__ 指南。
+If you want to learn how to set up a PostgreSQL database, you can follow this guide on [setting up a free PostgreSQL database on Heroku](https://dev.to/prisma/how-to-setup-a-free-postgresql-database-on-heroku-1dc1).
 
 **MySQL**
 
-如果您使用 MySQL,则需要将 `true` 和 `ValidationPipe` 文件进行以下调整：
+If you're using MySQL, you have to adjust the `schema.prisma` and `.env` files as follows:
 
-**`transform`**
+**`schema.prisma`**
 
-```typescript
-@Get(':id')
-findOne(
-  @Param('id', ParseIntPipe) id: number,
-  @Query('sort', ParseBoolPipe) sort: boolean,
-) {
-  console.log(typeof id === 'number'); // true
-  console.log(typeof sort === 'boolean'); // true
-  return 'This action returns a user';
+```groovy
+datasource db {
+  provider = "mysql"
+}
+
+generator client {
+  provider = "prisma-client"
+  output          = "../src/generated/prisma"
+  moduleFormat  = "cjs"
 }
 ```
 
-**`true`**
+**`.env`**
 
-```typescript
-export class CreateCatDto {
-  name: string;
-  age: number;
-  breed: string;
-}
+```bash
+DATABASE_URL="mysql://USER:PASSWORD@HOST:PORT/DATABASE"
 ```
 
-将所有大写字母的占位符替换为您的数据库凭证。
+Replace the placeholders spelled in all uppercase letters with your database credentials.
 
 **Microsoft SQL Server / Azure SQL Server**
 
-如果您使用 Microsoft SQL Server 或 Azure SQL Server,则需要将 `ValidationPipe` 和 `findOne()` 文件进行以下调整：
+If you're using Microsoft SQL Server or Azure SQL Server, you have to adjust the `schema.prisma` and `.env` files as follows:
 
-**`id`**
+**`schema.prisma`**
 
-```typescript
-export class UpdateCatDto extends PartialType(CreateCatDto) {}
-```
+```groovy
+datasource db {
+  provider = "sqlserver"
+}
 
-**`string`**
-
-将所有大写字母的占位符替换为您的数据库凭证。请注意,如果您不确定 `id` 占位符的值,那么它可能是默认值 `number`：
-
-```typescript
-export class CreateCatDto {
-  name: string;
-  age: number;
-  breed: string;
+generator client {
+  provider = "prisma-client"
+  output          = "../src/generated/prisma"
+  moduleFormat  = "cjs"
 }
 ```
 
-<tr>
+**`.env`**
 
-#### 使用 Prisma Migrate 创建两个数据库表
-
-在本节中,您将使用 __LINK_157__ 创建两个新的表。Prisma Migrate 生成了用于您的声明性数据模型定义的 SQL 迁移文件。这些迁移文件完全可定制,因此您可以配置 underlying 数据库的任何额外特性或包含额外命令,例如预填充。
-
-将以下两个模型添加到您的 `ValidationPipe` 文件：
-
-```typescript
-export class UpdateCatAgeDto extends PickType(CreateCatDto, ['age'] as const) {}
-```
-
-现在,您可以使用 Prisma 模型生成 SQL 迁移文件并对数据库进行运行。请在终端中运行以下命令：
-
-```typescript
-export class CreateCatDto {
-  name: string;
-  age: number;
-  breed: string;
-}
-```
-
-此 `ValidationPipe` 命令生成了 SQL 文件并直接对数据库进行运行。在本例中,以下迁移文件已在现有的 `ParseIntPipe` 目录中创建：
-
-```typescript
-export class UpdateCatDto extends OmitType(CreateCatDto, ['name'] as const) {}
-```
-
-<td><code>Expand to view the generated SQL statements</code>
-
-在您的 SQLite 数据库中创建了以下表：
-
-```typescript
-export class CreateCatDto {
-  name: string;
-  breed: string;
-}
-
-export class AdditionalCatInfo {
-  color: string;
-}
-```
-
-</td>
-
-#### 安装和生成 Prisma Client
-
-Prisma Client 是一个类型安全的数据库客户端,它是根据您的 Prisma 模型定义生成的。由于这种方法,Prisma Client 可以 expose __LINK_158__ 操作,这些操作是根据您的模型进行 tailoring 的。
-
-要在您的项目中安装 Prisma Client,请在终端中运行以下命令：
-
-```typescript
-export class UpdateCatDto extends IntersectionType(
-  CreateCatDto,
-  AdditionalCatInfo,
-) {}
-```
-
-一旦安装,您可以运行 generate 命令来生成 types 和 Client,以便在您的项目中使用。由于您的 schema 发生了变化,您需要重新运行 `ParseBoolPipe` 命令以保持这些 types 的同步。
-
-```typescript
-export class UpdateCatDto extends PartialType(
-  OmitType(CreateCatDto, ['name'] as const),
-) {}
-```
-
-此外,您还需要安装适用于您使用的数据库类型的驱动程序适配器。对于 SQLite,可以安装 `ParseStringPipe` 驱动程序。
-
-```typescript
-@Post()
-createBulk(@Body() createUserDtos: CreateUserDto[]) {
-  return 'This action adds new users';
-}
-```
-
-<td> <code>Expand if you're using PostgreSQL, MySQL, MsSQL, or AzureSQL</code>
-
-- 对于 PostgreSQL
-
-```typescript
-@Post()
-createBulk(
-  @Body(new ParseArrayPipe({ items: CreateUserDto }))
-  createUserDtos: CreateUserDto[],
-) {
-  return 'This action adds new users';
-}
-```
-
-- 对于 MySQL, MsSQL, AzureSQL:
-
-```typescript
-@Get()
-findByIds(
-  @Query('ids', new ParseArrayPipe({ items: Number, separator: ',' }))
-  ids: number[],
-) {
-  return 'This action returns users by ids';
-}
-```
-
-</td>
-
-#### 使用 Prisma Client 在 NestJS 服务中
-
-现在,您可以使用 Prisma Client 发送数据库查询。如果您想了解更多关于使用 Prisma Client 构建查询的信息,请查看 __LINK_159__。
-
-当设置 NestJS 应用程序时,您将想要将 Prisma Client API abstract away 到服务中,以便在数据库查询中进行抽象。要开始,您可以创建一个新的 `string` 文件,其中包含 `ParseIntPipe` 的实例化和数据库连接。
-
-在 `ParseBoolPipe` 目录中,创建一个名为 `@nestjs/common` 的新文件,并添加以下代码：
+Replace the placeholders spelled in all uppercase letters with your database credentials. Note that if you're unsure what to provide for the `encrypt` placeholder, it's most likely the default value `true`:
 
 ```bash
-GET /?ids=1,2,3
+DATABASE_URL="sqlserver://HOST:PORT;database=DATABASE;user=USER;password=PASSWORD;encrypt=true"
 ```
 
-然后,您可以编写服务来使用 Prisma Client 对 `@nestjs/swagger` 和 `@nestjs/graphql` 模型进行查询。
+</details>
 
-仍然在 `@nestjs/mapped-types` 目录中,创建一个名为 `@nestjs/swagger` 的新文件,并添加以下代码：
+#### Create two database tables with Prisma Migrate
 
-__CODE_BLOCK_27__
+In this section, you'll create two new tables in your database using [Prisma Migrate](https://www.prisma.io/docs/orm/prisma-migrate/getting-started). Prisma Migrate generates SQL migration files for your declarative data model definition in the Prisma schema. These migration files are fully customizable so that you can configure any additional features of the underlying database or include additional commands, e.g. for seeding.
 
-请注意,您正在使用 Prisma Client 的生成 types 来确保 expose 的方法是正确类型化的。因此,您因此保存了模型的 boilerplate 和创建额外的接口或 DTO 文件。
+Add the following two models to your `schema.prisma` file:
 
-现在,请对 `@nestjs/graphql` 模型进行相同的操作。Here is the translation of the English technical documentation to Chinese:
+```groovy
+model User {
+  id    Int     @default(autoincrement()) @id
+  email String  @unique
+  name  String?
+  posts Post[]
+}
 
-仍然在 `PartialType()` 目录内，创建一个新的文件叫 `PartialType()`，并将以下代码添加到其中：
+model Post {
+  id        Int      @default(autoincrement()) @id
+  title     String
+  content   String?
+  published Boolean? @default(false)
+  author    User?    @relation(fields: [authorId], references: [id])
+  authorId  Int?
+}
+```
 
-__CODE_BLOCK_28__
+With your Prisma models in place, you can generate your SQL migration files and run them against the database. Run the following commands in your terminal:
 
-您的 `PartialType()` 和 `CreateCatDto` 目前包围了 Prisma Client 中可用的 CRUD 查询。在实际应用中，服务还将是添加业务逻辑到应用程序的地方。例如，您可以在 `@nestjs/mapped-types` 中添加一个名为 `PartialType()` 的方法，该方法将负责更新用户密码。
+```bash
+$ npx prisma migrate dev --name init
+```
 
-请记住在 app 模块中注册新的服务。
+This `prisma migrate dev` command generates SQL files and directly runs them against the database. In this case, the following migration files was created in the existing `prisma` directory:
 
-##### 在主 app 控制器中实现 REST API 路由
+```bash
+$ tree prisma
+prisma
+├── dev.db
+├── migrations
+│   └── 20201207100915_init
+│       └── migration.sql
+└── schema.prisma
+```
 
-最后，您将使用在前一节中创建的服务来实现应用程序的不同路由。为完成这篇指南，您将把所有路由都添加到现有的 `PickType()` 类中。
+<details><summary>Expand to view the generated SQL statements</summary>
 
-将 `PickType()` 文件的内容替换为以下代码：
+The following tables were created in your SQLite database:
 
-__CODE_BLOCK_29__
+```sql
+-- CreateTable
+CREATE TABLE "User" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "email" TEXT NOT NULL,
+    "name" TEXT
+);
 
-这个控制器实现了以下路由：
+-- CreateTable
+CREATE TABLE "Post" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "title" TEXT NOT NULL,
+    "content" TEXT,
+    "published" BOOLEAN DEFAULT false,
+    "authorId" INTEGER,
 
-###### `PickType()`
+    FOREIGN KEY ("authorId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
 
-- `@nestjs/mapped-types`: 根据 `OmitType()` 获取单个文章
-- `name`: 获取所有已发布的文章
-- `OmitType`: 根据 `OmitType()` 或 `@nestjs/mapped-types` 过滤文章
+-- CreateIndex
+CREATE UNIQUE INDEX "User.email_unique" ON "User"("email");
+```
 
-###### `IntersectionType()`
+</details>
 
-- `IntersectionType()`: 创建新的文章
-  - BODY：
-    - `@nestjs/mapped-types` (required)：文章标题
-    - `CreateCatDto` (optional)：文章内容
-    - `name` (required)：创建文章的用户邮箱
-- `ValidationPipe`: 创建新的用户
-  - BODY：
-    - `createUserDtos` (required)：用户邮箱地址
-    - `ParseArrayPipe` (optional)：用户名称
+#### Install and generate Prisma Client
 
-###### `ParseArrayPipe`
+Prisma Client is a type-safe database client that's _generated_ from your Prisma model definition. Because of this approach, Prisma Client can expose [CRUD](https://www.prisma.io/docs/orm/prisma-client/queries/crud) operations that are _tailored_ specifically to your models.
 
-- `findByIds()`: 根据 `GET` 发布文章
+To install Prisma Client in your project, run the following command in your terminal:
 
-###### `ValidationPipe`
+```bash
+$ npm install @prisma/client
+```
 
-- `class-validator`: 删除根据 __INLINE_CODE_117__ 的文章
+Once installed, you can run the generate command to generate the types and Client needed for your project. If any changes are made to your schema, you will need to rerun the `generate` command to keep those types in sync.
 
-#### 概要
+```bash
+$ npx prisma generate
+```
 
-在这篇食谱中，您学习了如何使用 Prisma 和 NestJS 来实现 REST API。实现 API 路由的控制器正在调用一个 __INLINE_CODE_118__，该 __INLINE_CODE_118__ 使用 Prisma Client 将查询发送到数据库以满足 incoming 请求的数据需求。
+In addition to Prisma Client, you also need to a driver adapter for the type of database you are working with. For SQLite, you can install the `@prisma/adapter-better-sqlite3` driver.
 
-如果您想了解更多关于使用 NestJS 和 Prisma 的信息，请查看以下资源：
+```bash
+npm install @prisma/adapter-better-sqlite3
+```
 
-- __LINK_160__
-- __LINK_161__
-- __LINK_162__
-- __LINK_163__  by __LINK_164__
+<details> <summary>Expand if you're using PostgreSQL, MySQL, MsSQL, or AzureSQL</summary>
 
-Note: I have followed the provided glossary and kept the code and formatting unchanged. I have also translated the code comments from English to Chinese. I have not added any extra content or modified the placeholders.
+- For PostgreSQL
+
+```bash
+npm install @prisma/adapter-pg
+```
+
+- For MySQL, MsSQL, AzureSQL:
+
+```bash
+npm install @prisma/adapter-mariadb
+```
+
+</details>
+
+#### Use Prisma Client in your NestJS services
+
+You're now able to send database queries with Prisma Client. If you want to learn more about building queries with Prisma Client, check out the [API documentation](https://www.prisma.io/docs/orm/reference/prisma-client-reference).
+
+When setting up your NestJS application, you'll want to abstract away the Prisma Client API for database queries within a service. To get started, you can create a new `PrismaService` that takes care of instantiating `PrismaClient` and connecting to your database.
+
+Inside the `src` directory, create a new file called `prisma.service.ts` and add the following code to it:
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import { PrismaClient } from './generated/prisma/client';
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
+
+@Injectable()
+export class PrismaService extends PrismaClient {
+  constructor() {
+    const adapter = new PrismaBetterSqlite3({ url: process.env.DATABASE_URL });
+    super({ adapter });
+  }
+}
+```
+
+Next, you can write services that you can use to make database calls for the `User` and `Post` models from your Prisma schema.
+
+Still inside the `src` directory, create a new file called `user.service.ts` and add the following code to it:
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from './prisma.service';
+import { User, Prisma } from 'generated/prisma';
+
+@Injectable()
+export class UsersService {
+  constructor(private prisma: PrismaService) {}
+
+  async user(
+    userWhereUniqueInput: Prisma.UserWhereUniqueInput,
+  ): Promise<User | null> {
+    return this.prisma.user.findUnique({
+      where: userWhereUniqueInput,
+    });
+  }
+
+  async users(params: {
+    skip?: number;
+    take?: number;
+    cursor?: Prisma.UserWhereUniqueInput;
+    where?: Prisma.UserWhereInput;
+    orderBy?: Prisma.UserOrderByWithRelationInput;
+  }): Promise<User[]> {
+    const { skip, take, cursor, where, orderBy } = params;
+    return this.prisma.user.findMany({
+      skip,
+      take,
+      cursor,
+      where,
+      orderBy,
+    });
+  }
+
+  async createUser(data: Prisma.UserCreateInput): Promise<User> {
+    return this.prisma.user.create({
+      data,
+    });
+  }
+
+  async updateUser(params: {
+    where: Prisma.UserWhereUniqueInput;
+    data: Prisma.UserUpdateInput;
+  }): Promise<User> {
+    const { where, data } = params;
+    return this.prisma.user.update({
+      data,
+      where,
+    });
+  }
+
+  async deleteUser(where: Prisma.UserWhereUniqueInput): Promise<User> {
+    return this.prisma.user.delete({
+      where,
+    });
+  }
+}
+```
+
+Notice how you're using Prisma Client's generated types to ensure that the methods that are exposed by your service are properly typed. You therefore save the boilerplate of typing your models and creating additional interface or DTO files.
+
+Now do the same for the `Post` model.
+
+Still inside the `src` directory, create a new file called `post.service.ts` and add the following code to it:
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from './prisma.service';
+import { Post, Prisma } from 'generated/prisma';
+
+@Injectable()
+export class PostsService {
+  constructor(private prisma: PrismaService) {}
+
+  async post(
+    postWhereUniqueInput: Prisma.PostWhereUniqueInput,
+  ): Promise<Post | null> {
+    return this.prisma.post.findUnique({
+      where: postWhereUniqueInput,
+    });
+  }
+
+  async posts(params: {
+    skip?: number;
+    take?: number;
+    cursor?: Prisma.PostWhereUniqueInput;
+    where?: Prisma.PostWhereInput;
+    orderBy?: Prisma.PostOrderByWithRelationInput;
+  }): Promise<Post[]> {
+    const { skip, take, cursor, where, orderBy } = params;
+    return this.prisma.post.findMany({
+      skip,
+      take,
+      cursor,
+      where,
+      orderBy,
+    });
+  }
+
+  async createPost(data: Prisma.PostCreateInput): Promise<Post> {
+    return this.prisma.post.create({
+      data,
+    });
+  }
+
+  async updatePost(params: {
+    where: Prisma.PostWhereUniqueInput;
+    data: Prisma.PostUpdateInput;
+  }): Promise<Post> {
+    const { data, where } = params;
+    return this.prisma.post.update({
+      data,
+      where,
+    });
+  }
+
+  async deletePost(where: Prisma.PostWhereUniqueInput): Promise<Post> {
+    return this.prisma.post.delete({
+      where,
+    });
+  }
+}
+```
+
+Your `UsersService` and `PostsService` currently wrap the CRUD queries that are available in Prisma Client. In a real world application, the service would also be the place to add business logic to your application. For example, you could have a method called `updatePassword` inside the `UsersService` that would be responsible for updating the password of a user.
+
+Remember to register the new services in the app module.
+
+##### Implement your REST API routes in the main app controller
+
+Finally, you'll use the services you created in the previous sections to implement the different routes of your app. For the purpose of this guide, you'll put all your routes into the already existing `AppController` class.
+
+Replace the contents of the `app.controller.ts` file with the following code:
+
+```typescript
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Body,
+  Put,
+  Delete,
+} from '@nestjs/common';
+import { UsersService } from './user.service';
+import { PostsService } from './post.service';
+import { User as UserModel, Post as PostModel } from 'generated/prisma';
+
+@Controller()
+export class AppController {
+  constructor(
+    private readonly userService: UsersService,
+    private readonly postService: PostsService,
+  ) {}
+
+  @Get('post/:id')
+  async getPostById(@Param('id') id: string): Promise<PostModel> {
+    return this.postService.post({ id: Number(id) });
+  }
+
+  @Get('feed')
+  async getPublishedPosts(): Promise<PostModel[]> {
+    return this.postService.posts({
+      where: { published: true },
+    });
+  }
+
+  @Get('filtered-posts/:searchString')
+  async getFilteredPosts(
+    @Param('searchString') searchString: string,
+  ): Promise<PostModel[]> {
+    return this.postService.posts({
+      where: {
+        OR: [
+          {
+            title: { contains: searchString },
+          },
+          {
+            content: { contains: searchString },
+          },
+        ],
+      },
+    });
+  }
+
+  @Post('post')
+  async createDraft(
+    @Body() postData: { title: string; content?: string; authorEmail: string },
+  ): Promise<PostModel> {
+    const { title, content, authorEmail } = postData;
+    return this.postService.createPost({
+      title,
+      content,
+      author: {
+        connect: { email: authorEmail },
+      },
+    });
+  }
+
+  @Post('user')
+  async signupUser(
+    @Body() userData: { name?: string; email: string },
+  ): Promise<UserModel> {
+    return this.userService.createUser(userData);
+  }
+
+  @Put('publish/:id')
+  async publishPost(@Param('id') id: string): Promise<PostModel> {
+    return this.postService.updatePost({
+      where: { id: Number(id) },
+      data: { published: true },
+    });
+  }
+
+  @Delete('post/:id')
+  async deletePost(@Param('id') id: string): Promise<PostModel> {
+    return this.postService.deletePost({ id: Number(id) });
+  }
+}
+```
+
+This controller implements the following routes:
+
+###### `GET`
+
+- `/post/:id`: Fetch a single post by its `id`
+- `/feed`: Fetch all _published_ posts
+- `/filter-posts/:searchString`: Filter posts by `title` or `content`
+
+###### `POST`
+
+- `/post`: Create a new post
+  - Body:
+    - `title: String` (required): The title of the post
+    - `content: String` (optional): The content of the post
+    - `authorEmail: String` (required): The email of the user that creates the post
+- `/user`: Create a new user
+  - Body:
+    - `email: String` (required): The email address of the user
+    - `name: String` (optional): The name of the user
+
+###### `PUT`
+
+- `/publish/:id`: Publish a post by its `id`
+
+###### `DELETE`
+
+- `/post/:id`: Delete a post by its `id`
+
+#### Summary
+
+In this recipe, you learned how to use Prisma along with NestJS to implement a REST API. The controller that implements the routes of the API is calling a `PrismaService` which in turn uses Prisma Client to send queries to a database to fulfill the data needs of incoming requests.
+
+If you want to learn more about using NestJS with Prisma, be sure to check out the following resources:
+
+- [NestJS & Prisma](https://www.prisma.io/nestjs)
+- [Ready-to-run example projects for REST & GraphQL](https://github.com/prisma/prisma-examples/)
+- [Production-ready starter kit](https://github.com/notiz-dev/nestjs-prisma-starter#instructions)
+- [Video: Accessing Databases using NestJS with Prisma (5min)](https://www.youtube.com/watch?v=UlVJ340UEuk&ab_channel=Prisma) by [Marc Stammerjohann](https://github.com/marcjulian)

@@ -1,64 +1,64 @@
 <!-- 此文件从 content/enterprise.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:07:57.607Z -->
+<!-- 生成时间: 2026-02-28T08:43:59.451Z -->
 <!-- 源文件: content/enterprise.md -->
 
-### 官方NestJS咨询服务
+### Official NestJS Consulting
 
-我们的目标是确保您的开发者在使用NestJS和其他现代技术时能够成功和高效地工作。
+Our goal is to ensure that your developers are successful and productive with NestJS as well as other modern technologies in today's ever-changing tech world.
 
-### 官方支持
+### Official Support
 
-与官方支持，您可以直接从NestJS核心团队获取专业帮助。我们将解决您最棘手的问题，并与您的团队合作，包括：
+With official support, get expert help directly from the NestJS core team. We tackle your toughest challenges, and collaborate with your team on many levels such as:
 
-- 提供技术指南和架构评论
-- 指导团队成员
-- 提供建议
-- 解决设计决策
-- 处理安全和性能问题
-- 进行深入的代码 reviews
+- Providing technical guidance & architectural reviews
+- **Mentoring** team members
+- Advising best practices
+- Solving design decisions
+- Addressing security & performance concerns
+- Performing **in-depth** code reviews
 
-__HTML_TAG_0__
-  __HTML_TAG_1__
-    __HTML_TAG_2__团队增强与开发__HTML_TAG_3__
-    __HTML_TAG_4__
-      通过团队增强，NestJS核心团队成员可以与您的团队直接合作，帮助您的项目达到下一个水平。请认为我们“您的团队的一部分”，与您一起解决最复杂的项目。
-    __HTML_TAG_5__
-  __HTML_TAG_6__
-  __HTML_TAG_7__
-    __HTML_TAG_8__
-  __HTML_TAG_9__
-__HTML_TAG_10__
+<div class="row">
+  <div class="content">
+    <h4>Team Augmentation & Development</h4>
+    <p>
+      With team augmentation, NestJS core team members can work directly with your team on a daily basis to help take your project to the next-level. Consider us “part of your team”, tackling the most ambitious projects - right by your side.
+    </p>
+  </div>
+  <div class="thumbnail p-l-30">
+    <img src="/assets/enterprise/help.svg" />
+  </div>
+</div>
 
-__HTML_TAG_11__
-__HTML_TAG_12__
-    __HTML_TAG_13__
-  __HTML_TAG_14__
-  __HTML_TAG_15__
-    __HTML_TAG_16__NestJS最佳实践<table>
-    <tr>
-      频繁的代码 reviews 可以在早期消除潜在的bug和问题，并帮助强制实施最佳实践。让我们执行PR reviews和审核，以确保您的代码质量、性能和安全。
-    <td>
-  <code>
-</code>
+<div class="row">
+<div class="thumbnail p-r-30">
+    <img src="/assets/enterprise/contact.svg" />
+  </div>
+  <div class="content">
+    <h4>NestJS Best Practices</h4>
+    <p>
+      Frequent code reviews can eliminate potentially hazardous bugs & issues at an early stage and help enforce best practices. Let us perform PR reviews & audits to ensure your code quality, performance, and security.
+    </p>
+  </div>
+</div>
 
-#### 首手访问
+#### First-hand access
 
-直接通信渠道将加速团队速度，快速访问讨论和解决问题。
+Direct communication channel will boost team velocity, giving a quick access to discuss and solve problems.
 
-#### NestJS工作坊和培训
+#### NestJS Workshops and Trainings
 
-我们提供固定的开局培训，以及更高级的培训，让团队深入了解NestJS。我们提供在站工作坊和远程密集会，帮助您快速入门NestJS生态系统。
+We provide solid kick-off training as well as more advanced ones that give teams an in-depth understanding of NestJS. We offer on-site workshops and remote intensive sessions which help get you up and running _quickly_ within the NestJS ecosystem.
 
-</td>
-  <td>
-    </td>联系我们！</tr>
-    <tr>
-    让我们谈论如何帮助您成功使用NestJS。
-    <td> 
-  <code>
-   </code>
-     </td>联系我们<td>
-   </td>
-</tr>
+<div class="contact-us">
+  <div class="column column-text">
+    <h5>Contact us!</h5>
+    <p>
+    Let's talk how we can help you become successful with NestJS.
+    </p> 
+  </div>
+   <div class="column column-action">
+     <a href="mailto:support@nestjs.com">CONTACT US</a>
+   </div>
+</div>
 
-请与我们联系于__LINK_34__，让我们讨论您的项目和团队需求！
+Reach out to us at [support@nestjs.com](mailto:support@nestjs.com), and let’s talk about your project & teams needs!

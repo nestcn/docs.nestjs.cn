@@ -1,137 +1,185 @@
-<!-- 此文件从 content/techniques/http-module.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:10:37.518Z -->
-<!-- 源文件: content/techniques/http-module.md -->
-
 ### HTTP 模块
 
-__LINK_53__ 是一个功能强大的 HTTP 客户端包，广泛使用。Nest 将 Axios 包装并将其暴露给内置的 __INLINE_CODE_12__。__INLINE_CODE_13__ 导出 __INLINE_CODE_14__ 类，该类暴露 Axios 基于的方法来执行 HTTP 请求。该库还将结果 HTTP 响应转换为 __INLINE_CODE_15__。
+[Axios](https://github.com/axios/axios) 是一个功能丰富的 HTTP 客户端包，被广泛使用。Nest 封装了 Axios 并通过内置的 `HttpModule` 暴露它。`HttpModule` 导出了 `HttpService` 类，该类提供了基于 Axios 的方法来执行 HTTP 请求。该库还将生成的 HTTP 响应转换为 `Observables`。
 
-> 信息 **提示** 您也可以使用任何一般 Node.js HTTP 客户端库，包括 __LINK_54__ 或 __LINK_55__。
+:::info 提示
+你也可以直接使用任何通用的 Node.js HTTP 客户端库，包括 [got](https://github.com/sindresorhus/got) 或 [undici](https://github.com/nodejs/undici)。
+:::
 
 #### 安装
 
-要开始使用它，我们首先安装所需的依赖项。
+要开始使用它，我们首先需要安装所需的依赖项。
 
 ```bash
-$ npm install @nestjs/cache-manager cache-manager
+$ npm i --save @nestjs/axios axios
 ```
 
-#### 获取开始
+#### 快速开始
 
-安装过程完成后，使用 __INLINE_CODE_16__，首先导入 __INLINE_CODE_17__。
+安装过程完成后，要使用 `HttpService`，首先需要导入 `HttpModule`。
 
 ```typescript
-import { Module } from '@nestjs/common';
-import { CacheModule } from '@nestjs/cache-manager';
-import { AppController } from './app.controller';
-
 @Module({
-  imports: [CacheModule.register()],
-  controllers: [AppController],
+  imports: [HttpModule],
+  providers: [CatsService],
 })
-export class AppModule {}
+export class CatsModule {}
 ```
 
-接下来，使用正常的构造函数注入注入 __INLINE_CODE_18__。
+接下来，通过常规的构造函数注入方式注入 `HttpService`。
 
-> 信息 **提示** __INLINE_CODE_19__ 和 __INLINE_CODE_20__ 由 __INLINE_CODE_21__ 包含。
-
-```typescript
-constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
-```
-
-> 信息 **提示** __INLINE_CODE_22__ 是从 __INLINE_CODE_23__ 包含的接口 (__INLINE_CODE_24__）。
-
-所有 `@nestjs/cache-manager` 方法返回一个 `cache-manager`，包装在一个 `cache-manager` 对象中。
-
-#### 配置
-
-__LINK_56__ 可以使用各种选项来自定义 `CacheModule` 的行为。了解更多信息 __LINK_57__。要配置 underlying Axios 实例，使用 `register()` 方法在导入 `CACHE_MANAGER` 时传递可选的 options 对象。这个 options 对象将直接传递给 underlying Axios 构造函数。
+:::info 提示
+`HttpModule` 和 `HttpService` 是从 `@nestjs/axios` 包中导入的。
+:::
 
 ```typescript
-const value = await this.cacheManager.get('key');
-```
+@Injectable()
+export class CatsService {
+  constructor(private readonly httpService: HttpService) {}
 
-#### 异步配置
-
-当您需要异步地传递模块选项而不是静态地时，使用 `Cache` 方法。与大多数动态模块一样，Nest 提供了多种技术来处理异步配置。
-
-一种技术是使用工厂函数：
-
-```typescript
-await this.cacheManager.set('key', 'value');
-```
-
-像其他工厂提供程序一样，我们的工厂函数可以 __LINK_58__ 并可以通过 `CACHE_MANAGER` 注入依赖项。
-
-```typescript
-await this.cacheManager.set('key', 'value', 1000);
-```
-
-Alternatively, you can configure the `@nestjs/cache-manager` using a class instead of a factory, as shown below.
-
-```typescript
-await this.cacheManager.set('key', 'value', 0);
-```
-
-上述构建将在 `get` 内部实例化 `Cache`，使用它创建 options 对象。注意，在这个示例中，`cache-manager` 必须实现 `null` 接口，如下所示。`set` 将在实例化对象的 `1000` 方法上调用。
-
-```typescript
-await this.cacheManager.del('key');
-```
-
-如果您想要重用现有 options 提供程序，而不是在 `ttl` 中创建私有副本，使用 `0` 语法。
-
-```typescript
-await this.cacheManager.clear();
-```
-
-您也可以将称为 `del` 的提供程序传递给 `clear` 方法。这些提供程序将与模块提供程序合并。
-
-```typescript
-@Controller()
-@UseInterceptors(CacheInterceptor)
-export class AppController {
-  @Get()
-  findAll(): string[] {
-    return [];
+  findAll(): Observable<AxiosResponse<Cat[]>> {
+    return this.httpService.get('http://localhost:3000/cats');
   }
 }
 ```
 
-这对在工厂函数或类构造函数中提供额外依赖项非常有用。
+:::info 提示
+`AxiosResponse` 是从 `axios` 包(`$ npm i axios`)导出的接口。
+:::
 
-#### 使用 Axios 直接
+所有 `HttpService` 方法都会返回一个封装在 `Observable` 对象中的 `AxiosResponse`。
 
-如果您认为 `CacheModule` 的选项不足或只是想访问 underlying Axios 实例由 `CacheInterceptor` 创建，可以访问它使用 `GET`，如下所示：
+#### 配置
+
+[Axios](https://github.com/axios/axios) 可通过多种选项进行配置，以自定义 `HttpService` 的行为。点击[此处](https://github.com/axios/axios#request-config)了解更多。要配置底层 Axios 实例，在导入 `HttpModule` 时，向其 `register()` 方法传递一个可选配置对象。该配置对象将直接传递给底层 Axios 构造函数。
 
 ```typescript
-import { Module } from '@nestjs/common';
-import { CacheModule, CacheInterceptor } from '@nestjs/cache-manager';
-import { AppController } from './app.controller';
-import { APP_INTERCEPTOR } from '@nestjs/core';
-
 @Module({
-  imports: [CacheModule.register()],
-  controllers: [AppController],
-  providers: [
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: CacheInterceptor,
-    },
+  imports: [
+    HttpModule.register({
+      timeout: 5000,
+      maxRedirects: 5,
+    }),
   ],
+  providers: [CatsService],
 })
-export class AppModule {}
+export class CatsModule {}
 ```
 
-#### 全部示例
+#### 异步配置
 
-由于 `@Res()` 方法的返回值是可观察的，我们可以使用 `CacheInterceptor` - `ttl` 或 `0` Retrieve the data of the request in the form of a promise。
+当需要异步传递模块配置而非静态传递时，请使用 `registerAsync()` 方法。与大多数动态模块一样，Nest 提供了多种处理异步配置的技术。
+
+其中一种技术是使用工厂函数：
 
 ```typescript
-CacheModule.register({
-  ttl: 5000, // milliseconds
+HttpModule.registerAsync({
+  useFactory: () => ({
+    timeout: 5000,
+    maxRedirects: 5,
+  }),
 });
 ```
 
-> 信息 **提示** 访问 RxJS 的文档了解 __LINK_59__ 和 __LINK_60__ 的区别。
+与其他工厂提供程序类似，我们的工厂函数可以是[异步的](../fundamentals/dependency-injection#工厂提供者-usefactory) ，并且可以通过 `inject` 注入依赖项。
+
+```typescript
+HttpModule.registerAsync({
+  imports: [ConfigModule],
+  useFactory: async (configService: ConfigService) => ({
+    timeout: configService.get('HTTP_TIMEOUT'),
+    maxRedirects: configService.get('HTTP_MAX_REDIRECTS'),
+  }),
+  inject: [ConfigService],
+});
+```
+
+或者，您也可以使用类而非工厂来配置 `HttpModule`，如下所示。
+
+```typescript
+HttpModule.registerAsync({
+  useClass: HttpConfigService,
+});
+```
+
+上述结构在 `HttpModule` 内部实例化 `HttpConfigService`，并用它来创建一个选项对象。请注意，在本例中，`HttpConfigService` 必须实现如下所示的 `HttpModuleOptionsFactory` 接口。`HttpModule` 将在提供的类的实例化对象上调用 `createHttpOptions()` 方法。
+
+```typescript
+@Injectable()
+class HttpConfigService implements HttpModuleOptionsFactory {
+  createHttpOptions(): HttpModuleOptions {
+    return {
+      timeout: 5000,
+      maxRedirects: 5,
+    };
+  }
+}
+```
+
+如果要在 `HttpModule` 中重用现有的选项提供程序，而不是创建私有副本，请使用 `useExisting` 语法。
+
+```typescript
+HttpModule.registerAsync({
+  imports: [ConfigModule],
+  useExisting: HttpConfigService,
+});
+```
+
+您还可以向 `registerAsync()` 方法传递所谓的 `extraProviders`。这些提供程序将与模块提供程序合并。
+
+```typescript
+HttpModule.registerAsync({
+  imports: [ConfigModule],
+  useClass: HttpConfigService,
+  extraProviders: [MyAdditionalProvider],
+});
+```
+
+当您需要向工厂函数或类构造函数提供额外依赖项时，这非常有用。
+
+#### 直接使用 Axios
+
+如果你认为 `HttpModule.register` 的配置选项无法满足需求，或者你只是想访问由 `@nestjs/axios` 创建的底层 Axios 实例，可以通过 `HttpService#axiosRef` 来访问它，如下所示：
+
+```typescript
+@Injectable()
+export class CatsService {
+  constructor(private readonly httpService: HttpService) {}
+
+  findAll(): Promise<AxiosResponse<Cat[]>> {
+    return this.httpService.axiosRef.get('http://localhost:3000/cats');
+    //                      ^ AxiosInstance interface
+  }
+}
+```
+
+#### 完整示例
+
+由于 `HttpService` 方法的返回值是一个 Observable，我们可以使用 `rxjs` 的 `firstValueFrom` 或 `lastValueFrom` 来以 Promise 形式获取请求数据。
+
+```typescript
+import { catchError, firstValueFrom } from 'rxjs';
+
+@Injectable()
+export class CatsService {
+  private readonly logger = new Logger(CatsService.name);
+  constructor(private readonly httpService: HttpService) {}
+
+  async findAll(): Promise<Cat[]> {
+    const { data } = await firstValueFrom(
+      this.httpService.get<Cat[]>('http://localhost:3000/cats').pipe(
+        catchError((error: AxiosError) => {
+          this.logger.error(error.response.data);
+          throw 'An error happened!';
+        }),
+      ),
+    );
+    return data;
+  }
+}
+```
+
+:::info 提示
+ 请访问 RxJS 关于 [`firstValueFrom`](https://rxjs.dev/api/index/function/firstValueFrom) 和 [`lastValueFrom`](https://rxjs.dev/api/index/function/lastValueFrom) 的文档，以了解它们之间的区别。
+:::
+

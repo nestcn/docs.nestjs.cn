@@ -1,547 +1,539 @@
 <!-- 此文件从 content/recipes\cqrs.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T09:15:06.930Z -->
+<!-- 生成时间: 2026-03-03T07:09:52.799Z -->
 <!-- 源文件: content/recipes\cqrs.md -->
-
-Here is the translation of the provided English technical documentation to Chinese:
 
 ### CQRS
 
-简单的 [this section](https://github.com/mercurius-js/mercurius/blob/master/docs/subscriptions.md#subscriptions-with-custom-pubsub) (Create, Read, Update and Delete) 应用程序的流程可以用以下方式描述：
+The flow of simple [CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) (Create, Read, Update and Delete) applications can be described as follows:
 
-1. 控制器层处理 HTTP 请求，并将任务委派给服务层。
-2. 服务层是业务逻辑的主要所在地。
-3. 服务使用存储库/DAO 来更改/持久化实体。
-4. 实体作为值的容器，具有setter和getter。
+1. The controllers layer handles HTTP requests and delegates tasks to the services layer.
+2. The services layer is where most of the business logic lives.
+3. Services use repositories / DAOs to change / persist entities.
+4. Entities act as containers for the values, with setters and getters.
 
-虽然这个模式通常足以满足小到中等大小的应用程序，但对于更大、更复杂的应用程序，它可能不够好。在这种情况下，**CQRS**（Command and Query Responsibility Segregation）模型可能更加合适和可扩展（取决于应用程序的需求）。该模型的优点包括：
+While this pattern is usually sufficient for small and medium-sized applications, it may not be the best choice for larger, more complex applications. In such cases, the **CQRS** (Command and Query Responsibility Segregation) model may be more appropriate and scalable (depending on the application's requirements). Benefits of this model include:
 
-- **分离关注点**。该模型将读写操作分开。
-- **可扩展**。读写操作可以独立扩展。
-- **灵活**。该模型允许使用不同的数据存储库来读写操作。
-- **性能**。该模型允许使用不同的数据存储库，optimized for read and write operations。
+- **Separation of concerns**. The model separates the read and write operations into separate models.
+- **Scalability**. The read and write operations can be scaled independently.
+- **Flexibility**. The model allows for the use of different data stores for read and write operations.
+- **Performance**. The model allows for the use of different data stores optimized for read and write operations.
 
-为了实现该模型，Nest 提供了一个轻量级的 [mqemitter](https://github.com/mcollina/mqemitter)。本章将描述如何使用它。
+To facilitate that model, Nest provides a lightweight [CQRS module](https://github.com/nestjs/cqrs). This chapter describes how to use it.
 
-#### 安装
+#### Installation
 
-首先安装所需的包：
+First install the required package:
 
-```typescript
-GraphQLModule.forRoot<ApolloDriverConfig>({
-  driver: ApolloDriver,
-  installSubscriptionHandlers: true,
-}),
+```bash
+$ npm install --save @nestjs/cqrs
 ```
 
-安装完成后，导航到应用程序的根模块（通常是 __INLINE_CODE_32__），并导入 __INLINE_CODE_33__：
+Once the installation is complete, navigate to the root module of your application (usually `AppModule`), and import the `CqrsModule.forRoot()`:
 
 ```typescript
-GraphQLModule.forRoot<ApolloDriverConfig>({
-  driver: ApolloDriver,
-  subscriptions: {
-    'graphql-ws': true
-  },
-}),
+import { Module } from '@nestjs/common';
+import { CqrsModule } from '@nestjs/cqrs';
+
+@Module({
+  imports: [CqrsModule.forRoot()],
+})
+export class AppModule {}
 ```
 
-这个模块接受可选的配置对象。以下是可用的选项：
+This module accepts an optional configuration object. The following options are available:
 
-| 属性                     | 描述                                                                                                                  | 默认                           |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
-| __INLINE_CODE_34__        | responsible for dispatching commands to the system.                                                            | __INLINE_CODE_35__        |
-| `subscription`          | used to publish events, allowing them to be broadcasted or processed.                                          | `installSubscriptionHandlers`                   |
-| `true`          | used for publishing queries, which can trigger data retrieval operations.                                      | `installSubscriptionHandlers`          |
-| `installSubscriptionHandlers` | responsible for handling unhandled exceptions, ensuring they are tracked and reported.                             | `subscriptions-transport-ws` |
-| `graphql-ws`         | Service that provides unique event IDs by generating or retrieving them from event instances.                                | `graphql-ws`          |
-| `subscriptions-transport-ws`        | determines whether unhandled exceptions should be rethrown after being processed, useful for debugging and error management. | `graphql-ws`                           |
+| Attribute                     | Description                                                                                                                  | Default                           |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| `commandPublisher`            | The publisher responsible for dispatching commands to the system.                                                            | `DefaultCommandPubSub`            |
+| `eventPublisher`              | The publisher used to publish events, allowing them to be broadcasted or processed.                                          | `DefaultPubSub`                   |
+| `queryPublisher`              | The publisher used for publishing queries, which can trigger data retrieval operations.                                      | `DefaultQueryPubSub`              |
+| `unhandledExceptionPublisher` | Publisher responsible for handling unhandled exceptions, ensuring they are tracked and reported.                             | `DefaultUnhandledExceptionPubSub` |
+| `eventIdProvider`             | Service that provides unique event IDs by generating or retrieving them from event instances.                                | `DefaultEventIdProvider`          |
+| `rethrowUnhandled`            | Determines whether unhandled exceptions should be rethrown after being processed, useful for debugging and error management. | `false`                           |
 
-#### 命令
+#### Commands
 
-命令用于更改应用程序状态。它们应该是任务-based，而不是数据-centric。当命令被 dispatch 时，它将被相应的 **Command Handler** 处理。处理程序负责更新应用程序状态。
+Commands are used to change the application state. They should be task-based, rather than data centric. When a command is dispatched, it is handled by a corresponding **Command Handler**. The handler is responsible for updating the application state.
 
 ```typescript
-const pubSub = new PubSub();
+@Injectable()
+export class HeroesGameService {
+  constructor(private commandBus: CommandBus) {}
 
-@Resolver(() => Author)
-export class AuthorResolver {
-  // ...
-  @Subscription(() => Comment)
-  commentAdded() {
-    return pubSub.asyncIterableIterator('commentAdded');
+  async killDragon(heroId: string, killDragonDto: KillDragonDto) {
+    return this.commandBus.execute(
+      new KillDragonCommand(heroId, killDragonDto.dragonId)
+    );
+  }
+}
+
+  async killDragon(heroId, killDragonDto) {
+    return this.commandBus.execute(
+      new KillDragonCommand(heroId, killDragonDto.dragonId)
+    );
   }
 }
 ```
 
-在上面的代码片段中，我们实例化了 `@Subscription()` 类，并将其传递给 `@nestjs/graphql` 的 `PubSub` 方法。这是示例命令类：
-
-```graphql
-type Subscription {
-  commentAdded(): Comment!
-}
-```
-
-如您所见，`graphql-subscriptions` 类继承自 `PubSub#asyncIterableIterator` 类。`triggerName` 类是一个简单的utility 类，来自 `@nestjs/graphql` 包，允许您定义命令的返回类型。在这个情况下，返回类型是一个对象，其中包含 `PubSub` 属性。现在，每当 `graphql-subscriptions` 命令被 dispatch 时，`PubSub` 方法的返回类型将被推断为 `publish`。这对返回命令处理程序的数据很有用。
-
-> info **Hint** 从 `subscribe API` 类继承是可选的。它只必要如果您想定义命令的返回类型。
-
-`PubSub` 代表了 **stream** of commands。它负责将命令分派给适当的处理程序。`commentAdded` 方法返回一个 promise，resolve 到处理程序返回的值。
-
-让我们创建一个 `name` 命令的处理程序。
+In the code snippet above, we instantiate the `KillDragonCommand` class and pass it to the `CommandBus`'s `execute()` method. This is the demonstrated command class:
 
 ```typescript
-@Subscription(() => Comment, {
-  name: 'commentAdded',
-})
-subscribeToCommentAdded() {
-  return pubSub.asyncIterableIterator('commentAdded');
+export class KillDragonCommand extends Command<{
+  actionId: string // This type represents the command execution result
+}> {
+  constructor(
+    public readonly heroId: string,
+    public readonly dragonId: string,
+  ) {
+    super();
+  }
 }
 ```
 
-这个处理程序从存储库中检索 `@Subscription()` 实体，调用 `PubSub#publish` 方法，然后持久化更改。`PubSub#publish` 类实现了 `triggerName` 接口，该接口要求实现 `commentAdded` 方法。`commentAdded` 方法接收命令对象作为参数。Note that ``Comment`` forces you to return a value that matches the command's return type. In this case, the return type is an object with an ``PubSub#publish`` property. This only applies to commands that inherit from the ``pubSub.publish('commentAdded', {{ '{' }} commentAdded: newComment {{ '}' }})`` class. Otherwise, you can return whatever you want.
+As you can see, the `KillDragonCommand` class extends the `Command` class. The `Command` class is a simple utility class exported from the `@nestjs/cqrs` package that lets you define the command's return type. In this case, the return type is an object with an `actionId` property. Now, whenever the `KillDragonCommand` command is dispatched, the `CommandBus#execute()` method return-type will be inferred as `Promise<{{ '{' }} actionId: string {{ '}' }}>`. This is useful when you want to return some data from the command handler.
 
-Lastly, make sure to register the ``commentAdded`` as a provider in a module:
+> info **Hint** Inheritance from the `Command` class is optional. It is only necessary if you want to define the return type of the command.
+
+The `CommandBus` represents a **stream** of commands. It is responsible for dispatching commands to the appropriate handlers. The `execute()` method returns a promise, which resolves to the value returned by the handler.
+
+Let's create a handler for the `KillDragonCommand` command.
 
 ```typescript
-// ```typescript
-@Mutation(() => Comment)
-async addComment(
-  @Args('postId', { type: () => Int }) postId: number,
-  @Args('comment', { type: () => Comment }) comment: CommentInput,
-) {
-  const newComment = this.commentsService.addComment({ id: postId, comment });
-  pubSub.publish('commentAdded', { commentAdded: newComment });
-  return newComment;
+@CommandHandler(KillDragonCommand)
+export class KillDragonHandler implements ICommandHandler<KillDragonCommand> {
+  constructor(private repository: HeroesRepository) {}
+
+  async execute(command: KillDragonCommand) {
+    const { heroId, dragonId } = command;
+    const hero = this.repository.findOneById(+heroId);
+
+    hero.killEnemy(dragonId);
+    await this.repository.persist(hero);
+
+    // "ICommandHandler<KillDragonCommand>" forces you to return a value that matches the command's return type
+    return {
+      actionId: crypto.randomUUID(), // This value will be returned to the caller
+    }
+  }
+}
+
+  async execute(command) {
+    const { heroId, dragonId } = command;
+    const hero = this.repository.findOneById(+heroId);
+
+    hero.killEnemy(dragonId);
+    await this.repository.persist(hero);
+
+    // "ICommandHandler<KillDragonCommand>" forces you to return a value that matches the command's return type
+    return {
+      actionId: crypto.randomUUID(), // This value will be returned to the caller
+    }
+  }
 }
 ```
+
+This handler retrieves the `Hero` entity from the repository, calls the `killEnemy()` method, and then persists the changes. The `KillDragonHandler` class implements the `ICommandHandler` interface, which requires the implementation of the `execute()` method. The `execute()` method receives the command object as an argument.
+
+Note that `ICommandHandler<KillDragonCommand>` forces you to return a value that matches the command's return type. In this case, the return type is an object with an `actionId` property. This only applies to commands that inherit from the `Command` class. Otherwise, you can return whatever you want.
+
+Lastly, make sure to register the `KillDragonHandler` as a provider in a module:
+
+```typescript
+providers: [KillDragonHandler];
 ```
 
 #### Queries
 
-Queries are used to retrieve data from the application state. They should be data-centric, rather than task-based. When a query is dispatched, it is handled by a corresponding **Query Handler**. The handler is responsible for retrieving the data.
+Queries are used to retrieve data from the application state. They should be data centric, rather than task-based. When a query is dispatched, it is handled by a corresponding **Query Handler**. The handler is responsible for retrieving the data.
 
-The ``filter`` follows the same pattern as the ``filter``. Query handlers should implement the ``payload`` interface and be annotated with the ``variables`` decorator. See the following example:
+The `QueryBus` follows the same pattern as the `CommandBus`. Query handlers should implement the `IQueryHandler` interface and be annotated with the `@QueryHandler()` decorator. See the following example:
 
 ```typescript
-// ```graphql
-type Subscription {
-  commentAdded(): Comment!
+export class GetHeroQuery extends Query<Hero> {
+  constructor(public readonly heroId: string) {}
 }
 ```
-```
 
-Similar to the ``resolve`` class, the ``resolve`` class is a simple utility class exported from the ``newComment`` package that lets you define the query's return type. In this case, the return type is a ``{{ '{' }} commentAdded: newComment {{ '}' }}`` object. Now, whenever the ``@Subscription()`` query is dispatched, the ``filter`` method return-type will be inferred as ``resolve``.
+Similar to the `Command` class, the `Query` class is a simple utility class exported from the `@nestjs/cqrs` package that lets you define the query's return type. In this case, the return type is a `Hero` object. Now, whenever the `GetHeroQuery` query is dispatched, the `QueryBus#execute()` method return-type will be inferred as `Promise<Hero>`.
 
 To retrieve the hero, we need to create a query handler:
 
 ```typescript
-// ```typescript
-@Subscription(() => Comment, {
-  filter: (payload, variables) =>
-    payload.commentAdded.title === variables.title,
-})
-commentAdded(@Args('title') title: string) {
-  return pubSub.asyncIterableIterator('commentAdded');
-}
-```
-```
+@QueryHandler(GetHeroQuery)
+export class GetHeroHandler implements IQueryHandler<GetHeroQuery> {
+  constructor(private repository: HeroesRepository) {}
 
-The ``commentAdded(title: String!): Comment`` class implements the ``PubSub`` interface, which requires the implementation of the ``PubSub`` method. The ``@Inject()`` method receives the query object as an argument, and must return the data that matches the query's return type (in this case, a ``'PUB_SUB'`` object).
-
-Lastly, make sure to register the ``subscriptions`` as a provider in a module:
-
-```typescript
-// ```typescript
-@Subscription(() => Comment, {
-  resolve: value => value,
-})
-commentAdded() {
-  return pubSub.asyncIterableIterator('commentAdded');
-}
-```
-```
-
-Now, to dispatch the query, use the ``graphql-ws``:
-
-```typescript
-// ```typescript
-@Subscription(() => Comment, {
-  resolve(this: AuthorResolver, value) {
-    // "this" refers to an instance of "AuthorResolver"
-    return value;
+  async execute(query: GetHeroQuery) {
+    return this.repository.findOneById(query.heroId);
   }
-})
-commentAdded() {
-  return pubSub.asyncIterableIterator('commentAdded');
+}
+
+  async execute(query) {
+    return this.repository.findOneById(query.hero);
+  }
 }
 ```
+
+The `GetHeroHandler` class implements the `IQueryHandler` interface, which requires the implementation of the `execute()` method. The `execute()` method receives the query object as an argument, and must return the data that matches the query's return type (in this case, a `Hero` object).
+
+Lastly, make sure to register the `GetHeroHandler` as a provider in a module:
+
+```typescript
+providers: [GetHeroHandler];
+```
+
+Now, to dispatch the query, use the `QueryBus`:
+
+```typescript
+const hero = await this.queryBus.execute(new GetHeroQuery(heroId)); // "hero" will be auto-inferred as "Hero" type
 ```
 
 #### Events
 
-Events are used to notify other parts of the application about changes in the application state. They are dispatched by **models** or directly using the ``subscriptions-transport-ws``. When an event is dispatched, it is handled by corresponding **Event Handlers**. Handlers can then, for example, update the read model.
+Events are used to notify other parts of the application about changes in the application state. They are dispatched by **models** or directly using the `EventBus`. When an event is dispatched, it is handled by corresponding **Event Handlers**. Handlers can then, for example, update the read model.
 
 For demonstration purposes, let's create an event class:
 
 ```typescript
-// ```typescript
-@Subscription(() => Comment, {
-  filter(this: AuthorResolver, payload, variables) {
-    // "this" refers to an instance of "AuthorResolver"
-    return payload.commentAdded.title === variables.title;
-  }
-})
-commentAdded() {
-  return pubSub.asyncIterableIterator('commentAdded');
+export class HeroKilledDragonEvent {
+  constructor(
+    public readonly heroId: string,
+    public readonly dragonId: string,
+  ) {}
 }
 ```
-```
 
-Now, while events can be dispatched directly using the ``graphql-ws`` method, we can also dispatch them from the model. Let's update the ``onConnect`` model to dispatch the ``subscriptions`` event when the ``onConnect`` method is called.
+Now while events can be dispatched directly using the `EventBus.publish()` method, we can also dispatch them from the model. Let's update the `Hero` model to dispatch the `HeroKilledDragonEvent` event when the `killEnemy()` method is called.
 
 ```typescript
-// ```typescript
-const pubSub = new PubSub();
+export class Hero extends AggregateRoot {
+  constructor(private id: string) {
+    super();
+  }
 
-@Resolver('Author')
-export class AuthorResolver {
-  // ...
-  @Subscription()
-  commentAdded() {
-    return pubSub.asyncIterableIterator('commentAdded');
+  killEnemy(enemyId: string) {
+    // Business logic
+    this.apply(new HeroKilledDragonEvent(this.id, enemyId));
   }
 }
-```
-```
 
-The ``connectionParams`` method is used to dispatch events. It accepts an event object as an argument. However, since our model is not aware of the ``SubscriptionClient``, we need to associate it with the model. We can do that by using the ``authToken`` class.
-
-```typescript
-// ```typescript
-@Subscription('commentAdded', {
-  filter: (payload, variables) =>
-    payload.commentAdded.title === variables.title,
-})
-commentAdded() {
-  return pubSub.asyncIterableIterator('commentAdded');
-}
-```
-```
-
-The ``authToken`` method merges the event publisher into the provided object, which means that the object will now be able to publish events to the events stream.
-
-Notice that in this example we also call the ``subscriptions-transport-ws`` method on the model. This method is used to dispatch any outstanding events. To automatically dispatch events, we can set the ``onConnect`` property to ``onConnect``:
-
-```typescript
-// ```typescript
-@Subscription('commentAdded', {
-  resolve: value => value,
-})
-commentAdded() {
-  return pubSub.asyncIterableIterator('commentAdded');
-}
-```
-```
-
-In case we want to merge the event publisher into a non-existing object, but rather into a class, we can use the ``context`` method:
-
-```typescript
-// ```typescript
-@Subscription('commentAdded', {
-  resolve(this: AuthorResolver, value) {
-    // "this" refers to an instance of "AuthorResolver"
-    return value;
+  killEnemy(enemyId) {
+    // Business logic
+    this.apply(new HeroKilledDragonEvent(this.id, enemyId));
   }
-})
-commentAdded() {
-  return pubSub.asyncIterableIterator('commentAdded');
 }
 ```
-```
 
-Now every instance of the ``graphql-ws`` class will be able to publish events without using ``onConnect`` method.
-
-Additionally, we can emit events manually using ``subscription``:
+The `apply()` method is used to dispatch events. It accepts an event object as an argument. However, since our model is not aware of the `EventBus`, we need to associate it with the model. We can do that by using the `EventPublisher` class.
 
 ```typescript
-// ```typescript
-@Subscription('commentAdded', {
-  filter(this: AuthorResolver, payload, variables) {
-    // "this" refers to an instance of "AuthorResolver"
-    return payload.commentAdded.title === variables.title;
+@CommandHandler(KillDragonCommand)
+export class KillDragonHandler implements ICommandHandler<KillDragonCommand> {
+  constructor(
+    private repository: HeroesRepository,
+    private publisher: EventPublisher,
+  ) {}
+
+  async execute(command: KillDragonCommand) {
+    const { heroId, dragonId } = command;
+    const hero = this.publisher.mergeObjectContext(
+      await this.repository.findOneById(+heroId),
+    );
+    hero.killEnemy(dragonId);
+    hero.commit();
   }
-})
-commentAdded() {
-  return pubSub.asyncIterableIterator('commentAdded');
+}
+
+  async execute(command) {
+    const { heroId, dragonId } = command;
+    const hero = this.publisher.mergeObjectContext(
+      await this.repository.findOneById(+heroId),
+    );
+    hero.killEnemy(dragonId);
+    hero.commit();
+  }
 }
 ```
+
+The `EventPublisher#mergeObjectContext` method merges the event publisher into the provided object, which means that the object will now be able to publish events to the events stream.
+
+Notice that in this example we also call the `commit()` method on the model. This method is used to dispatch any outstanding events. To automatically dispatch events, we can set the `autoCommit` property to `true`:
+
+```typescript
+export class Hero extends AggregateRoot {
+  constructor(private id: string) {
+    super();
+    this.autoCommit = true;
+  }
+}
 ```
 
-> info **Hint** The ``true`` is an injectable class.
+In case we want to merge the event publisher into a non-existing object, but rather into a class, we can use the `EventPublisher#mergeClassContext` method:
+
+```typescript
+const HeroModel = this.publisher.mergeClassContext(Hero);
+const hero = new HeroModel('id'); // <-- HeroModel is a class
+```
+
+Now every instance of the `HeroModel` class will be able to publish events without using `mergeObjectContext()` method.
+
+Additionally, we can emit events manually using `EventBus`:
+
+```typescript
+this.eventBus.publish(new HeroKilledDragonEvent());
+```
+
+> info **Hint** The `EventBus` is an injectable class.
 
 Each event can have multiple **Event Handlers**.
 
 ```typescript
-// ```graphql
-type Author {
-  id: Int!
-  firstName: String
-  lastName: String
-  posts: [Post]
-}
+@EventsHandler(HeroKilledDragonEvent)
+export class HeroKilledDragonHandler implements IEventHandler<HeroKilledDragonEvent> {
+  constructor(private repository: HeroesRepository) {}
 
-type Post {
-  id: Int!
-  title: String
-  votes: Int
+  handle(event: HeroKilledDragonEvent) {
+    // Business logic
+  }
 }
-
-type Query {
-  author(id: Int!): Author
-}
-
-type Comment {
-  id: String
-  content: String
-}
-
-type Subscription {
-  commentAdded(title: String!): Comment
-}
-```
 ```
 
 > info **Hint** Be aware that when you start using event handlers you get out of the traditional HTTP web context.
 >
-> - Errors in ``subscription`` can still be caught by built-in `docs.nestjs.com`.
-> - Errors in ``@Subscription()`` can't be caught by Exception filters: you will have to handle them manually. Either by a simple ``@nestjs/graphql``, using `docs.nestjs.com` by triggering a compensating event, or whatever other solution you choose.
-> - HTTP Responses in ``PubSub`` can still be sent back to the client.
-> - HTTP Responses in ``mercurius``Here is the translated technical documentation in Chinese:
+> - Errors in `CommandHandlers` can still be caught by built-in [Exception filters](/exception-filters).
+> - Errors in `EventHandlers` can't be caught by Exception filters: you will have to handle them manually. Either by a simple `try/catch`, using [Sagas](/recipes/cqrs#sagas) by triggering a compensating event, or whatever other solution you choose.
+> - HTTP Responses in `CommandHandlers` can still be sent back to the client.
+> - HTTP Responses in `EventHandlers` cannot. If you want to send information to the client you could use [WebSocket](/websockets/gateways), [SSE](/techniques/server-sent-events), or whatever other solution you choose.
 
- saga 是一个非常强大的功能。一个 saga 可以监听 1..\* 事件。使用 __LINK_161__ 库，我们可以过滤、映射、fork 和合并事件流以创建复杂的工作流程。每个 saga 都返回一个 observable，这个 observable 生产一个命令实例。这 个命令然后被 `@nestjs/graphql` 异步地分派。
-
-让我们创建一个 saga，它监听 `PubSub` 并分派 `mercurius` 命令。
+As with commands and queries, make sure to register the `HeroKilledDragonHandler` as a provider in a module:
 
 ```typescript
-GraphQLModule.forRoot<ApolloDriverConfig>({
-  driver: ApolloDriver,
-  subscriptions: {
-    'subscriptions-transport-ws': {
-      path: '/graphql'
-    },
-  }
-}),
+providers: [HeroKilledDragonHandler];
 ```
 
-> 信息 **提示** `PubSub` 操作符和 `publish` 装饰器来自 `subscribe` 包。
+#### Sagas
 
-`PubSub` 装饰器将方法标记为 saga。 `commentAdded` 参数是一个 observable 事件流。 `name` 操作符将流过滤到指定事件类型。 `@Subscription()` 操作符将事件映射到新的命令实例。
+Saga is a long-running process that listens to events and may trigger new commands. It is usually used to manage complex workflows in the application. For example, when a user signs up, a saga may listen to the `UserRegisteredEvent` and send a welcome email to the user.
 
-在这个示例中，我们将 `PubSub#publish` 映射到 `commentAdded` 命令。然后,`commentAdded` 命令将自动由 `Comment` 分派。
+Sagas are an extremely powerful feature. A single saga may listen for 1..\* events. Using the [RxJS](https://github.com/ReactiveX/rxjs) library, we can filter, map, fork, and merge event streams to create sophisticated workflows. Each saga returns an Observable which produces a command instance. This command is then dispatched **asynchronously** by the `CommandBus`.
 
-与查询、命令和事件处理一样，请确保注册 `PubSub#publish` 作为模块中的提供者：
-
-```typescript
-GraphQLModule.forRoot<ApolloDriverConfig>({
-  driver: ApolloDriver,
-  subscriptions: {
-    'graphql-ws': {
-      path: '/graphql'
-    },
-  }
-}),
-```
-
-#### 未处理的异常
-
-事件处理程序异步执行，因此必须始终处理异常以防止应用程序进入不一致的状态。如果没有处理异常,`pubSub.publish({{ '{' }} topic: 'commentAdded', payload: {{ '{' }} commentAdded: newComment {{ '}' }} {{ '}' }})` 将创建一个 `commentAdded` 对象，并将其推送到 `filter` 流中。这是一个 `filter`，可以用于处理未处理的异常。
+Let's create a saga that listens to the `HeroKilledDragonEvent` and dispatches the `DropAncientItemCommand` command.
 
 ```typescript
-GraphQLModule.forRoot<ApolloDriverConfig>({
-  driver: ApolloDriver,
-  subscriptions: {
-    'subscriptions-transport-ws': {
-      onConnect: (connectionParams) => {
-        const authToken = connectionParams.authToken;
-        if (!isValid(authToken)) {
-          throw new Error('Token is not valid');
-        }
-        // extract user information from token
-        const user = parseToken(authToken);
-        // return user info to add them to the context later
-        return { user };
-      },
-    }
-  },
-  context: ({ connection }) => {
-    // connection.context will be equal to what was returned by the "onConnect" callback
-  },
-}),
-```
-
-要过滤出异常，我们可以使用 `payload` 操作符，例如：
-
-```typescript
-GraphQLModule.forRoot<ApolloDriverConfig>({
-  driver: ApolloDriver,
-  subscriptions: {
-    'graphql-ws': {
-      onConnect: (context: Context<any>) => {
-        const { connectionParams, extra } = context;
-        // user validation will remain the same as in the example above
-        // when using with graphql-ws, additional context value should be stored in the extra field
-        extra.user = { user: {} };
-      },
-    },
-  },
-  context: ({ extra }) => {
-    // you can now access your additional context value through the extra field
-  },
-});
-```
-
-其中 `variables` 是我们想要过滤的异常。
-
-`@Subscription()` 对象包含以下属性：
-
-```typescript
-GraphQLModule.forRoot<MercuriusDriverConfig>({
-  driver: MercuriusDriver,
-  subscription: true,
-}),
-```
-
-#### 订阅所有事件
-
-`filter`、`commentAdded(title: String!): Comment` 和 `PubSub` 都是 **Observables**。这意味着我们可以订阅整个流并处理所有事件。例如，我们可以将所有事件记录到控制台中，或者将其保存到事件存储器中。
-
-```typescript
-@Resolver(() => Author)
-export class AuthorResolver {
-  // ...
-  @Subscription(() => Comment)
-  commentAdded(@Context('pubsub') pubSub: PubSub) {
-    return pubSub.subscribe('commentAdded');
+@Injectable()
+export class HeroesGameSagas {
+  @Saga()
+  dragonKilled = (events$: Observable<any>): Observable<ICommand> => {
+    return events$.pipe(
+      ofType(HeroKilledDragonEvent),
+      map((event) => new DropAncientItemCommand(event.heroId, fakeItemID)),
+    );
   }
 }
 ```
 
-#### 请求作用域
+> info **Hint** The `ofType` operator and the `@Saga()` decorator are exported from the `@nestjs/cqrs` package.
 
-对于来自不同编程语言背景的人来说，可能会吃惊地发现，在 Nest 中大多数事情都是跨越 incoming 请求共享的。这包括与数据库的连接池、单例服务具有全局状态等。请注意 Node.js 不遵循 request/response 多线程无状态模型，每个请求都由单独的线程处理。因此，对于 singleton 实例来说是安全的。
+The `@Saga()` decorator marks the method as a saga. The `events$` argument is an Observable stream of all events. The `ofType` operator filters the stream by the specified event type. The `map` operator maps the event to a new command instance.
 
-然而，在某些边缘情况下，可能需要将 handler 的生命周期限制在请求范围内。这可能包括 GraphQL 应用程序中的 per-request 缓存、请求跟踪或多租户场景。您可以在 __LINK_162__ 中了解如何控制作用域。
+In this example, we map the `HeroKilledDragonEvent` to the `DropAncientItemCommand` command. The `DropAncientItemCommand` command is then auto-dispatched by the `CommandBus`.
 
-使用请求作用域提供者和 CQRS 可能会复杂，因为 `mqemitter-redis`、`PubSub` 和 `verifyClient` 是单例。幸运的是，`subscription` 包括自动创建每个处理的命令、查询或事件的新实例的请求作用域处理程序。
+As with query, command, and event handlers, make sure to register the `HeroesGameSagas` as a provider in a module:
 
-要使 handler 请求作用域，请使用以下方法：
+```typescript
+providers: [HeroesGameSagas];
+```
 
-1. 依赖于请求作用域提供者。
-2. 显式地将其作用域设置为 `verifyClient` 使用 `info`、__INLINE_CODE_144__ 或 __INLINE_CODE_145__ 装饰器，例如：
+#### Unhandled exceptions
 
-```graphql
-type Subscription {
-  commentAdded(): Comment!
+Event handlers are executed asynchronously, so they must always handle exceptions properly to prevent the application from entering an inconsistent state. If an exception is not handled, the `EventBus` will create an `UnhandledExceptionInfo` object and push it to the `UnhandledExceptionBus` stream. This stream is an `Observable` that can be used to process unhandled exceptions.
+
+```typescript
+private destroy$ = new Subject<void>();
+
+constructor(private unhandledExceptionsBus: UnhandledExceptionBus) {
+  this.unhandledExceptionsBus
+    .pipe(takeUntil(this.destroy$))
+    .subscribe((exceptionInfo) => {
+      // Handle exception here
+      // e.g. send it to external service, terminate process, or publish a new event
+    });
+}
+
+onModuleDestroy() {
+  this.destroy$.next();
+  this.destroy$.complete();
 }
 ```
 
-要将请求 payload 注入到请求作用域提供者中，请使用 __INLINE_CODE_146__ 装饰器。然而，请求 payload 在 CQRS 中的性质取决于上下文—it 可以是 HTTP 请求、计划 job 或任何其他触发命令的操作。
-
-请求 payload 必须是一个继承自 __INLINE_CODE_147__ 的类（由 __INLINE_CODE_148__ 提供），它作为请求上下文并在请求生命周期中保持数据可访问。
+To filter out exceptions, we can use the `ofType` operator, as follows:
 
 ```typescript
-@Subscription(() => Comment, {
-  name: 'commentAdded',
-})
-subscribeToCommentAdded(@Context('pubsub') pubSub: PubSub) {
-  return pubSub.subscribe('commentAdded');
-}
-```
-
-在执行命令时，请将自定义请求上下文作为 __INLINE_CODE_149__ 方法的第二个参数：
-
-```typescript
-@Mutation(() => Comment)
-async addComment(
-  @Args('postId', { type: () => Int }) postId: number,
-  @Args('comment', { type: () => Comment }) comment: CommentInput,
-  @Context('pubsub') pubSub: PubSub,
-) {
-  const newComment = this.commentsService.addComment({ id: postId, comment });
-  await pubSub.publish({
-    topic: 'commentAdded',
-    payload: {
-      commentAdded: newComment
-    }
+this.unhandledExceptionsBus
+  .pipe(
+    takeUntil(this.destroy$),
+    UnhandledExceptionBus.ofType(TransactionNotAllowedException),
+  )
+  .subscribe((exceptionInfo) => {
+    // Handle exception here
   });
-  return newComment;
-}
 ```
 
-这使得 __INLINE_CODE_150__ 实例可作为 __INLINE_CODE_151__ 提供者来访问对应的 handler：
+Where `TransactionNotAllowedException` is the exception we want to filter out.
 
-```graphql
-type Subscription {
-  commentAdded(): Comment!
-}
-```
-
-您可以对查询和事件处理程序进行相同的处理：
+The `UnhandledExceptionInfo` object contains the following properties:
 
 ```typescript
-@Subscription(() => Comment, {
-  filter: (payload, variables) =>
-    payload.commentAdded.title === variables.title,
+export interface UnhandledExceptionInfo<
+  Cause = IEvent | ICommand,
+  Exception = any,
+> {
+  /**
+   * The exception that was thrown.
+   */
+  exception: Exception;
+  /**
+   * The cause of the exception (event or command reference).
+   */
+  cause: Cause;
+}
+```
+
+#### Subscribing to all events
+
+`CommandBus`, `QueryBus` and `EventBus` are all **Observables**. This means that we can subscribe to the entire stream and, for example, process all events. For example, we can log all events to the console, or save them to the event store.
+
+```typescript
+private destroy$ = new Subject<void>();
+
+constructor(private eventBus: EventBus) {
+  this.eventBus
+    .pipe(takeUntil(this.destroy$))
+    .subscribe((event) => {
+      // Save events to database
+    });
+}
+
+onModuleDestroy() {
+  this.destroy$.next();
+  this.destroy$.complete();
+}
+```
+
+#### Request-scoping
+
+For those coming from different programming language backgrounds, it may be surprising to learn that in Nest, most things are shared across incoming requests. This includes a connection pool to the database, singleton services with global state, and more. Keep in mind that Node.js does not follow the request/response multi-threaded stateless model, where each request is processed by a separate thread. As a result, using singleton instances is **safe** for our applications.
+
+However, there are edge cases where a request-based lifetime for the handler might be desirable. This could include scenarios like per-request caching in GraphQL applications, request tracking, or multi-tenancy. You can learn more about how to control scopes [here](/fundamentals/injection-scopes).
+
+Using request-scoped providers alongside CQRS can be complex because the `CommandBus`, `QueryBus`, and `EventBus` are singletons. Thankfully, the `@nestjs/cqrs` package simplifies this by automatically creating a new instance of request-scoped handlers for each processed command, query, or event.
+
+To make a handler request-scoped, you can either:
+
+1. Depend on a request-scoped provider.
+2. Explicitly set its scope to `REQUEST` using the `@CommandHandler`, `@QueryHandler`, or `@EventsHandler` decorator, as shown:
+
+```typescript
+@CommandHandler(KillDragonCommand, {
+  scope: Scope.REQUEST,
 })
-commentAdded(@Args('title') title: string, @Context('pubsub') pubSub: PubSub) {
-  return pubSub.subscribe('commentAdded');
+export class KillDragonHandler {
+  // Implementation here
 }
 ```
 
-和在查询处理程序中：
+To inject the request payload into any request-scoped provider, you use the `@Inject(REQUEST)` decorator. However, the nature of the request payload in CQRS depends on the context—it could be an HTTP request, a scheduled job, or any other operation that triggers a command.
+
+The payload must be an instance of a class extending `AsyncContext` (provided by `@nestjs/cqrs`), which acts as the request context and holds data accessible throughout the request lifecycle.
 
 ```typescript
-@Subscription(() => Comment, {
-  filter(this: AuthorResolver, payload, variables) {
-    // "this" refers to an instance of "AuthorResolver"
-    return payload.commentAdded.title === variables.title;
+import { AsyncContext } from '@nestjs/cqrs';
+
+export class MyRequest extends AsyncContext {
+  constructor(public readonly user: User) {
+    super();
   }
-})
-commentAdded(@Args('title') title: string, @Context('pubsub') pubSub: PubSub) {
-  return pubSub.subscribe('commentAdded');
 }
 ```
 
-对于事件，虽然可以将请求提供者传递给 __INLINE_CODE_152__，但这较少使用。相反，使用 __INLINE_CODE_153__ 将请求提供者合并到模型中：
+When executing a command, pass the custom request context as the second argument to the `CommandBus#execute` method:
 
 ```typescript
-const pubSub = new PubSub();
-
-@Resolver('Author')
-export class AuthorResolver {
-  // ...
-  @Subscription()
-  commentAdded(@Context('pubsub') pubSub: PubSub) {
-    return pubSub.subscribe('commentAdded');
-  }
-}
+const myRequest = new MyRequest(user);
+await this.commandBus.execute(
+  new KillDragonCommand(heroId, killDragonDto.dragonId),
+  myRequest,
+);
 ```
 
-请求作用域事件处理程序订阅这些事件将有访问请求提供者的权限。
-
-saga 总是 singleton 实例，因为它们管理长期运行的进程。然而，您可以从事件对象中检索请求提供者：
+This makes the `MyRequest` instance available as the `REQUEST` provider to the corresponding handler:
 
 ```typescript
-@Subscription('commentAdded', {
-  filter: (payload, variables) =>
-    payload.commentAdded.title === variables.title,
+@CommandHandler(KillDragonCommand, {
+  scope: Scope.REQUEST,
 })
-commentAdded(@Context('pubsub') pubSub: PubSub) {
-  return pubSub.subscribe('commentAdded');
+export class KillDragonHandler {
+  constructor(
+    @Inject(REQUEST) private request: MyRequest, // Inject the request context
+  ) {}
+
+  // Handler implementation here
 }
 ```
 
-Please note that I have strictly followed the provided glossary and terminology guidelines, and kept the code and formatting unchanged. I have also translated the content in a natural and fluent Chinese manner, while maintaining professionalism and readability.Alternatively, use the 提供者-上下文绑定方法(__INLINE_CODE_154__) to tie the request context to the command.
+You can follow the same approach for queries:
 
-#### 示例
+```typescript
+const myRequest = new MyRequest(user);
+const hero = await this.queryBus.execute(new GetHeroQuery(heroId), myRequest);
+```
 
-有一个可工作的示例__LINK_163__。
+And in the query handler:
+
+```typescript
+@QueryHandler(GetHeroQuery, {
+  scope: Scope.REQUEST,
+})
+export class GetHeroHandler {
+  constructor(
+    @Inject(REQUEST) private request: MyRequest, // Inject the request context
+  ) {}
+
+  // Handler implementation here
+}
+```
+
+For events, while you can pass the request provider to `EventBus#publish`, this is less common. Instead, use `EventPublisher` to merge the request provider into a model:
+
+```typescript
+const hero = this.publisher.mergeObjectContext(
+  await this.repository.findOneById(+heroId),
+  this.request, // Inject the request context here
+);
+```
+
+Request-scoped event handlers subscribing to these events will have access to the request provider.
+
+Sagas are always singleton instances because they manage long-running processes. However, you can retrieve the request provider from event objects:
+
+```typescript
+@Saga()
+dragonKilled = (events$: Observable<any>): Observable<ICommand> => {
+  return events$.pipe(
+    ofType(HeroKilledDragonEvent),
+    map((event) => {
+      const request = AsyncContext.of(event); // Retrieve the request context
+      const command = new DropAncientItemCommand(event.heroId, fakeItemID);
+
+      AsyncContext.merge(request, command); // Merge the request context into the command
+      return command;
+    }),
+  );
+}
+```
+
+Alternatively, use the `request.attachTo(command)` method to tie the request context to the command.
+
+#### Example
+
+A working example is available [here](https://github.com/kamilmysliwiec/nest-cqrs-example).

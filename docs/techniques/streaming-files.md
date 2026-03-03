@@ -1,51 +1,96 @@
-<!-- 此文件从 content/techniques/streaming-files.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:09:17.683Z -->
-<!-- 源文件: content/techniques/streaming-files.md -->
+### 流式文件
 
-### 文件流
+:::info 注意
+本章展示如何从你的 **HTTP 应用**中流式传输文件。以下示例不适用于 GraphQL 或微服务应用。
+:::
 
-> info **注意** 本章将展示如何从 HTTP 应用程序中流出文件。以下示例不适用于 GraphQL 或微服务应用程序。
+有时你可能需要从 REST API 向客户端返回文件。在 Nest 中通常你会这样做：
 
-有时候，您可能想将文件从 REST API 返回给客户端。使用 Nest 时，通常可以按照以下方式操作：
-
-__INLINE_CODE_0__
-
-然而，在这样做时，您将失去 post-controller拦截器逻辑。要解决这个问题，您可以返回一个 __INLINE_CODE_3__ 实例，并且框架将负责将响应 piped。
-
-#### 可流文件类
-
-__INLINE_CODE_4__ 是一个持有将要返回的流的类。要创建一个新的 __INLINE_CODE_5__，您可以将 __INLINE_CODE_6__ 或 `ClassSerializerInterceptor` 传递给 `instanceToPlain()` 构造函数。
-
-> info **提示** `class-transformer` 类可以从 `password` 导入。
-
-#### 跨平台支持
-
-Fastify 默认情况下可以无需调用 `{ user: new UserEntity() }}` 就可以发送文件，所以您不需要使用 `ClassSerializerInterceptor` 类。然而，Nest 在两个平台类型中都支持使用 `@nestjs/common`，因此，如果您最终在 Express 和 Fastify 之间切换，可以无需担心兼容性问题。
-
-#### 示例
-
-您可以在以下找到一个简单的示例，展示如何将 `UserEntity` 返回为文件，而不是 JSON。但是，这个想法自然地扩展到图像、文档和任何其他文件类型。
-
-```typescript
-@UseInterceptors(ClassSerializerInterceptor)
-@Get()
-findOne(): UserEntity {
-  return new UserEntity({
-    id: 1,
-    firstName: 'John',
-    lastName: 'Doe',
-    password: 'password',
-  });
+```ts
+@Controller('file')
+export class FileController {
+  @Get()
+  getFile(@Res() res: Response) {
+    const file = createReadStream(join(process.cwd(), 'package.json'));
+    file.pipe(res);
+  }
 }
 ```
 
-默认的内容类型（`password` HTTP 响应头的值）是 `@Expose()`。如果您需要自定义这个值，可以使用 `@Transform()` 选项来自 `RoleEntity`，或使用 `options` 方法或 __LINK_21__ 装饰器，如下所示：
+但这样做会导致你失去对控制器后拦截器逻辑的访问。要处理这种情况，你可以返回一个 `StreamableFile` 实例，框架会在底层自动处理响应流的管道传输。
 
-```json
-{
-  "id": 1,
-  "firstName": "John",
-  "lastName": "Doe"
+#### 可流式传输的文件类
+
+`StreamableFile` 是一个封装待返回流的类。要创建新的 `StreamableFile`，可以向 `StreamableFile` 构造函数传入 `Buffer` 或 `Stream`。
+
+:::info 提示
+`StreamableFile` 类可从 `@nestjs/common` 导入。
+:::
+
+#### 跨平台支持
+
+Fastify 默认支持直接发送文件而无需调用 `stream.pipe(res)`，因此您完全不需要使用 `StreamableFile` 类。不过 Nest 在两种平台类型中都支持使用 `StreamableFile`，所以如果您需要在 Express 和 Fastify 之间切换，也无需担心两个引擎的兼容性问题。
+
+#### 示例
+
+您可以在下方找到一个简单示例，该示例将 `package.json` 作为文件而非 JSON 返回，这个思路自然可以延伸到图片、文档及其他任何文件类型。
+
+```ts
+import { Controller, Get, StreamableFile } from '@nestjs/common';
+import { createReadStream } from 'fs';
+import { join } from 'path';
+
+@Controller('file')
+export class FileController {
+  @Get()
+  getFile(): StreamableFile {
+    const file = createReadStream(join(process.cwd(), 'package.json'));
+    return new StreamableFile(file);
+  }
 }
-```typescript title="示例"
+```
+
+默认的内容类型（即 HTTP 响应头 `Content-Type` 的值）是 `application/octet-stream`。如需自定义该值，您可以使用 `StreamableFile` 的 `type` 选项，或使用 `res.set` 方法以及 [`@Header()`](/overview/controllers#响应头) 装饰器，如下所示：
+
+```ts
+import { Controller, Get, StreamableFile, Res } from '@nestjs/common';
+import { createReadStream } from 'fs';
+import { join } from 'path';
+import type { Response } from 'express'; // 假设我们使用的是 ExpressJS HTTP 适配器
+```typescript
+@Controller('file')
+export class FileController {
+  @Get()
+  getFile(): StreamableFile {
+    const file = createReadStream(join(process.cwd(), 'package.json'));
+    return new StreamableFile(file, {
+      type: 'application/json',
+      disposition: 'attachment; filename="package.json"',
+      // 如果你想将 Content-Length 值定义为文件长度以外的其他值：
+      // length: 123,
+    });
+  }
+
+  // 或者：
+  @Get()
+  getFileChangingResponseObjDirectly(
+    @Res({ passthrough: true }) res: Response
+  ): StreamableFile {
+    const file = createReadStream(join(process.cwd(), 'package.json'));
+    res.set({
+      'Content-Type': 'application/json',
+      'Content-Disposition': 'attachment; filename="package.json"',
+    });
+    return new StreamableFile(file);
+  }
+
+  // 或者：
+  @Get()
+  @Header('Content-Type', 'application/json')
+  @Header('Content-Disposition', 'attachment; filename="package.json"')
+  getFileUsingStaticValues(): StreamableFile {
+    const file = createReadStream(join(process.cwd(), 'package.json'));
+    return new StreamableFile(file);
+  }
+}
 ```

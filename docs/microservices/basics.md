@@ -106,7 +106,7 @@ The request-response message style is useful when you need to **exchange** messa
 
 To enable the request-response message type, Nest creates two logical channels: one for transferring data and another for waiting for incoming responses. For some underlying transports, like [NATS](https://nats.io/), this dual-channel support is provided out-of-the-box. For others, Nest compensates by manually creating separate channels. While this is effective, it can introduce some overhead. Therefore, if you don’t require a request-response message style, you may want to consider using the event-based method.
 
-To create a message handler based on the request-response paradigm, use the `@MessagePattern()` decorator, which is imported from the `@nestjs/microservices` package. This decorator should only be used within [controller](/overview/controllers) classes, as they serve as the entry points for your application. Using it in providers will have no effect, as they will be ignored by the Nest runtime.
+To create a message handler based on the request-response paradigm, use the `@MessagePattern()` decorator, which is imported from the `@nestjs/microservices` package. This decorator should only be used within [controller](/controllers) classes, as they serve as the entry points for your application. Using it in providers will have no effect, as they will be ignored by the Nest runtime.
 
 ```typescript
 import { Controller } from '@nestjs/common';
@@ -188,7 +188,7 @@ A client Nest application can exchange messages or publish events to a Nest micr
 
 One approach is to import the `ClientsModule`, which exposes the static `register()` method. This method takes an array of objects representing microservice transporters. Each object must include a `name` property, and optionally a `transport` property (defaulting to `Transport.TCP`), as well as an optional `options` property.
 
-The `name` property acts as an **injection token**, which you can use to inject an instance of `ClientProxy` wherever needed. The value of this `name` property can be any arbitrary string or JavaScript symbol, as described [here](/fundamentals/dependency-injection#non-class-based-provider-tokens).
+The `name` property acts as an **injection token**, which you can use to inject an instance of `ClientProxy` wherever needed. The value of this `name` property can be any arbitrary string or JavaScript symbol, as described [here](/fundamentals/custom-providers#non-class-based-provider-tokens).
 
 The `options` property is an object that includes the same properties we saw in the `createMicroservice()` method earlier.
 
@@ -234,7 +234,7 @@ constructor(
 
 > info **Hint** The `ClientsModule` and `ClientProxy` classes are imported from the `@nestjs/microservices` package.
 
-At times, you may need to fetch the transporter configuration from another service (such as a `ConfigService`), rather than hard-coding it in your client application. To achieve this, you can register a [custom provider](/fundamentals/dependency-injection) using the `ClientProxyFactory` class. This class provides a static `create()` method that accepts a transporter options object and returns a customized `ClientProxy` instance.
+At times, you may need to fetch the transporter configuration from another service (such as a `ConfigService`), rather than hard-coding it in your client application. To achieve this, you can register a [custom provider](/fundamentals/custom-providers) using the `ClientProxyFactory` class. This class provides a static `create()` method that accepts a transporter options object and returns a customized `ClientProxy` instance.
 
 ```typescript
 @Module({
@@ -307,7 +307,7 @@ The `emit()` method takes two arguments: `pattern` and `payload`. The `pattern` 
 
 For those coming from different programming language backgrounds, it may be surprising to learn that in Nest, most things are shared across incoming requests. This includes a connection pool to the database, singleton services with global state, and more. Keep in mind that Node.js does not follow the request/response multi-threaded stateless model, where each request is processed by a separate thread. As a result, using singleton instances is **safe** for our applications.
 
-However, there are edge cases where a request-based lifetime for the handler might be desirable. This could include scenarios like per-request caching in GraphQL applications, request tracking, or multi-tenancy. You can learn more about how to control scopes [here](/fundamentals/provider-scopes).
+However, there are edge cases where a request-based lifetime for the handler might be desirable. This could include scenarios like per-request caching in GraphQL applications, request tracking, or multi-tenancy. You can learn more about how to control scopes [here](/fundamentals/injection-scopes).
 
 Request-scoped handlers and providers can inject `RequestContext` using the `@Inject()` decorator in combination with the `CONTEXT` token:
 

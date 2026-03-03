@@ -136,7 +136,7 @@ The `Test` class is useful for providing an application execution context that e
 
 > info **Hint** The `compile()` method is **asynchronous** and therefore has to be awaited. Once the module is compiled you can retrieve any **static** instance it declares (controllers and providers) using the `get()` method.
 
-`TestingModule` inherits from the [module reference](/fundamentals/module-reference) class, and therefore its ability to dynamically resolve scoped providers (transient or request-scoped). Do this with the `resolve()` method (the `get()` method can only retrieve static instances).
+`TestingModule` inherits from the [module reference](/fundamentals/module-ref) class, and therefore its ability to dynamically resolve scoped providers (transient or request-scoped). Do this with the `resolve()` method (the `get()` method can only retrieve static instances).
 
 ```typescript
 const moduleRef = await Test.createTestingModule({
@@ -149,9 +149,9 @@ catsService = await moduleRef.resolve(CatsService);
 
 > warning **Warning** The `resolve()` method returns a unique instance of the provider, from its own **DI container sub-tree**. Each sub-tree has a unique context identifier. Thus, if you call this method more than once and compare instance references, you will see that they are not equal.
 
-> info **Hint** Learn more about the module reference features [here](/fundamentals/module-reference).
+> info **Hint** Learn more about the module reference features [here](/fundamentals/module-ref).
 
-Instead of using the production version of any provider, you can override it with a [custom provider](/fundamentals/dependency-injection) for testing purposes. For example, you can mock a database service instead of connecting to a live database. We'll cover overrides in the next section, but they're available for unit tests as well.
+Instead of using the production version of any provider, you can override it with a [custom provider](/fundamentals/custom-providers) for testing purposes. For example, you can mock a database service instead of connecting to a live database. We'll cover overrides in the next section, but they're available for unit tests as well.
 
 <app-banner-courses></app-banner-courses>
 
@@ -315,7 +315,7 @@ We simulate HTTP tests using the `request()` function from Supertest. We want th
 
 In this example, we also provide an alternate (test-double) implementation of the `CatsService` which simply returns a hard-coded value that we can test for. Use `overrideProvider()` to provide such an alternate implementation. Similarly, Nest provides methods to override modules, guards, interceptors, filters and pipes with the `overrideModule()`, `overrideGuard()`, `overrideInterceptor()`, `overrideFilter()`, and `overridePipe()` methods respectively.
 
-Each of the override methods (except for `overrideModule()`) returns an object with 3 different methods that mirror those described for [custom providers](/fundamentals/dependency-injection):
+Each of the override methods (except for `overrideModule()`) returns an object with 3 different methods that mirror those described for [custom providers](/fundamentals/custom-providers):
 
 - `useClass`: you supply a class that will be instantiated to provide the instance to override the object (provider, guard, etc.).
 - `useValue`: you supply an instance that will override the object.
@@ -427,7 +427,7 @@ Now all your tests will use the `MockAuthGuard` on every request.
 
 #### Testing request-scoped instances
 
-[Request-scoped](/fundamentals/provider-scopes) providers are created uniquely for each incoming **request**. The instance is garbage-collected after the request has completed processing. This poses a problem, because we can't access a dependency injection sub-tree generated specifically for a tested request.
+[Request-scoped](/fundamentals/injection-scopes) providers are created uniquely for each incoming **request**. The instance is garbage-collected after the request has completed processing. This poses a problem, because we can't access a dependency injection sub-tree generated specifically for a tested request.
 
 We know (based on the sections above) that the `resolve()` method can be used to retrieve a dynamically instantiated class. Also, as described <a href="/fundamentals/module-ref#resolving-scoped-providers">here</a>, we know we can pass a unique context identifier to control the lifecycle of a DI container sub-tree. How do we leverage this in a testing context?
 

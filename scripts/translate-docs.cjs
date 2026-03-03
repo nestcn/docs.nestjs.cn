@@ -350,6 +350,13 @@ Please translate the following English technical documentation to Chinese follow
   }
 
   /**
+   * 检查文件是否包含中文内容
+   */
+  hasChineseContent(content) {
+    return /[\u4e00-\u9fa5]/.test(content);
+  }
+
+  /**
    * 处理单个文件的翻译
    */
   async translateFile(contentPath) {
@@ -384,9 +391,19 @@ Please translate the following English technical documentation to Chinese follow
         fs.mkdirSync(outputDir, { recursive: true });
       }
 
-      // 3. AI 翻译及占位符处理
+      // 3. 检查目标文件是否存在并且包含中文翻译
       let translatedContent = content;
-      if (this.useAI) {
+      if (!this.useAI && fs.existsSync(outputPath)) {
+        const existingContent = fs.readFileSync(outputPath, 'utf8');
+        if (this.hasChineseContent(existingContent)) {
+          // 如果目标文件存在并且包含中文翻译，保留现有内容
+          translatedContent = existingContent;
+          if (this.verbose) {
+            console.log(`📝 Preserved existing translation: ${relativePath}`);
+          }
+        }
+      } else if (this.useAI) {
+        // 只有在启用 AI 翻译时才进行翻译
         console.log(`🤖 Translating: ${relativePath} -> ${relativePath}`);
         translatedContent = await this.translateWithAI(content, relativePath);
       }

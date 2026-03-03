@@ -18,7 +18,7 @@
 
 #### 基础概念
 
-每个拦截器都实现了 `intercept()` 方法，该方法接收两个参数。第一个是 `ExecutionContext` 实例（与[守卫](/overview/guards)中的对象完全相同）。`ExecutionContext` 继承自 `ArgumentsHost`。我们在异常过滤器章节中见过 `ArgumentsHost`，它是对原始处理程序参数的包装器，根据应用程序类型包含不同的参数数组。更多内容可以参考[异常过滤器](/overview/exception-filters#参数主机)章节。
+每个拦截器都实现了 `intercept()` 方法，该方法接收两个参数。第一个是 `ExecutionContext` 实例（与[守卫](/overview/guards)中的对象完全相同）。`ExecutionContext` 继承自 `ArgumentsHost`。我们在异常过滤器章节中见过 `ArgumentsHost`，它是对原始处理程序参数的包装器，根据应用程序类型包含不同的参数数组。更多内容可以参考[异常过滤器](./exception-filters#参数主机)章节。
 
 #### 执行上下文
 
@@ -68,7 +68,7 @@ export class LoggingInterceptor implements NestInterceptor {
 
 #### 绑定拦截器
 
-要设置拦截器，我们需要使用从 `@nestjs/common` 包导入的 `@UseInterceptors()` 装饰器。与[管道](/overview/pipes)和[守卫](/overview/guards)类似，拦截器可以作用于控制器范围、方法范围或全局范围。
+要设置拦截器，我们需要使用从 `@nestjs/common` 包导入的 `@UseInterceptors()` 装饰器。与[管道](./pipes)和[守卫](/overview/guards)类似，拦截器可以作用于控制器范围、方法范围或全局范围。
 
  ```typescript title="cats.controller.ts"
 @UseInterceptors(LoggingInterceptor)

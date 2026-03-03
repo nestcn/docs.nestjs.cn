@@ -4,11 +4,11 @@
 
 ### Dynamic modules
 
-The [Modules chapter](/overview/modules) covers the basics of Nest modules, and includes a brief introduction to [dynamic modules](/overview/modules#dynamic-modules). This chapter expands on the subject of dynamic modules. Upon completion, you should have a good grasp of what they are and how and when to use them.
+The [Modules chapter](/modules) covers the basics of Nest modules, and includes a brief introduction to [dynamic modules](/modules#dynamic-modules). This chapter expands on the subject of dynamic modules. Upon completion, you should have a good grasp of what they are and how and when to use them.
 
 #### Introduction
 
-Most application code examples in the **Overview** section of the documentation make use of regular, or static, modules. Modules define groups of components like [providers](/overview/providers) and [controllers](/overview/controllers) that fit together as a modular part of an overall application. They provide an execution context, or scope, for these components. For example, providers defined in a module are visible to other members of the module without the need to export them. When a provider needs to be visible outside of a module, it is first exported from its host module, and then imported into its consuming module.
+Most application code examples in the **Overview** section of the documentation make use of regular, or static, modules. Modules define groups of components like [providers](/providers) and [controllers](/controllers) that fit together as a modular part of an overall application. They provide an execution context, or scope, for these components. For example, providers defined in a module are visible to other members of the module without the need to export them. When a provider needs to be visible outside of a module, it is first exported from its host module, and then imported into its consuming module.
 
 Let's walk through a familiar example.
 
@@ -57,7 +57,7 @@ export class AuthService {
 
 We'll refer to this as **static** module binding. All the information Nest needs to wire together the modules has already been declared in the host and consuming modules. Let's unpack what's happening during this process. Nest makes `UsersService` available inside `AuthModule` by:
 
-1. Instantiating `UsersModule`, including transitively importing other modules that `UsersModule` itself consumes, and transitively resolving any dependencies (see [Custom providers](/fundamentals/dependency-injection)).
+1. Instantiating `UsersModule`, including transitively importing other modules that `UsersModule` itself consumes, and transitively resolving any dependencies (see [Custom providers](/fundamentals/custom-providers)).
 2. Instantiating `AuthModule`, and making `UsersModule`'s exported providers available to components in `AuthModule` (just as if they had been declared in `AuthModule`).
 3. Injecting an instance of `UsersService` in `AuthService`.
 
@@ -210,7 +210,7 @@ export class ConfigService {
 
 Now our `ConfigService` knows how to find the `.env` file in the folder we've specified in `options`.
 
-Our remaining task is to somehow inject the `options` object from the `register()` step into our `ConfigService`. And of course, we'll use _dependency injection_ to do it. This is a key point, so make sure you understand it. Our `ConfigModule` is providing `ConfigService`. `ConfigService` in turn depends on the `options` object that is only supplied at run-time. So, at run-time, we'll need to first bind the `options` object to the Nest IoC container, and then have Nest inject it into our `ConfigService`. Remember from the **Custom providers** chapter that providers can [include any value](/fundamentals/dependency-injection#non-service-based-providers) not just services, so we're fine using dependency injection to handle a simple `options` object.
+Our remaining task is to somehow inject the `options` object from the `register()` step into our `ConfigService`. And of course, we'll use _dependency injection_ to do it. This is a key point, so make sure you understand it. Our `ConfigModule` is providing `ConfigService`. `ConfigService` in turn depends on the `options` object that is only supplied at run-time. So, at run-time, we'll need to first bind the `options` object to the Nest IoC container, and then have Nest inject it into our `ConfigService`. Remember from the **Custom providers** chapter that providers can [include any value](/fundamentals/custom-providers#non-service-based-providers) not just services, so we're fine using dependency injection to handle a simple `options` object.
 
 Let's tackle binding the options object to the IoC container first. We do this in our static `register()` method. Remember that we are dynamically constructing a module, and one of the properties of a module is its list of providers. So what we need to do is define our options object as a provider. This will make it injectable into the `ConfigService`, which we'll take advantage of in the next step. In the code below, pay attention to the `providers` array:
 
@@ -236,7 +236,7 @@ export class ConfigModule {
 }
 ```
 
-Now we can complete the process by injecting the `'CONFIG_OPTIONS'` provider into the `ConfigService`. Recall that when we define a provider using a non-class token we need to use the `@Inject()` decorator [as described here](/fundamentals/dependency-injection#non-class-based-provider-tokens).
+Now we can complete the process by injecting the `'CONFIG_OPTIONS'` provider into the `ConfigService`. Recall that when we define a provider using a non-class token we need to use the `@Inject()` decorator [as described here](/fundamentals/custom-providers#non-class-based-provider-tokens).
 
 ```typescript
 import * as fs from 'node:fs';
@@ -477,7 +477,7 @@ export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
     .build();
 ```
 
-In the example above, the first argument passed into the `setExtras` method is an object containing default values for the "extra" properties. The second argument is a function that takes an auto-generated module definitions (with `provider`, `exports`, etc.) and `extras` object which represents extra properties (either specified by the consumer or defaults). The returned value of this function is a modified module definition. In this specific example, we're taking the `extras.isGlobal` property and assigning it to the `global` property of the module definition (which in turn determines whether a module is global or not, read more [here](/overview/modules#dynamic-modules)).
+In the example above, the first argument passed into the `setExtras` method is an object containing default values for the "extra" properties. The second argument is a function that takes an auto-generated module definitions (with `provider`, `exports`, etc.) and `extras` object which represents extra properties (either specified by the consumer or defaults). The returned value of this function is a modified module definition. In this specific example, we're taking the `extras.isGlobal` property and assigning it to the `global` property of the module definition (which in turn determines whether a module is global or not, read more [here](/modules#dynamic-modules)).
 
 Now when consuming this module, the additional `isGlobal` flag can be passed in, as follows:
 

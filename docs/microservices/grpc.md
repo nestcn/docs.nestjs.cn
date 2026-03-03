@@ -518,11 +518,11 @@ export class HeroesService {
 }
 ```
 
-Likewise, to read the metadata in handlers annotated with the `@GrpcStreamMethod()` handler ([subject strategy](/microservices/grpc#subject-strategy)), use the second argument (metadata), which is of type `Metadata` (imported from the `grpc` package).
+Likewise, to read the metadata in handlers annotated with the `@GrpcStreamMethod()` handler ([subject strategy](microservices/grpc#subject-strategy)), use the second argument (metadata), which is of type `Metadata` (imported from the `grpc` package).
 
 To send back metadata from the handler, use the `ServerDuplexStream#sendMetadata()` method (third handler argument).
 
-To read metadata from within the [call stream handlers](/microservices/grpc#call-stream-handler) (handlers annotated with `@GrpcStreamCall()` decorator), listen to the `metadata` event on the `requestStream` reference, as follows:
+To read metadata from within the [call stream handlers](microservices/grpc#call-stream-handler) (handlers annotated with `@GrpcStreamCall()` decorator), listen to the `metadata` event on the `requestStream` reference, as follows:
 
 ```typescript
 requestStream.on('metadata', (metadata: Metadata) => {

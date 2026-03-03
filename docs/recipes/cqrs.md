@@ -113,7 +113,6 @@ async addComment(
   return newComment;
 }
 ```
-```
 
 #### Queries
 
@@ -126,7 +125,6 @@ The ``filter`` follows the same pattern as the ``filter``. Query handlers should
 type Subscription {
   commentAdded(): Comment!
 }
-```
 ```
 
 Similar to the ``resolve`` class, the ``resolve`` class is a simple utility class exported from the ``newComment`` package that lets you define the query's return type. In this case, the return type is a ``{{ '{' }} commentAdded: newComment {{ '}' }}`` object. Now, whenever the ``@Subscription()`` query is dispatched, the ``filter`` method return-type will be inferred as ``resolve``.
@@ -143,7 +141,6 @@ commentAdded(@Args('title') title: string) {
   return pubSub.asyncIterableIterator('commentAdded');
 }
 ```
-```
 
 The ``commentAdded(title: String!): Comment`` class implements the ``PubSub`` interface, which requires the implementation of the ``PubSub`` method. The ``@Inject()`` method receives the query object as an argument, and must return the data that matches the query's return type (in this case, a ``'PUB_SUB'`` object).
 
@@ -157,7 +154,6 @@ Lastly, make sure to register the ``subscriptions`` as a provider in a module:
 commentAdded() {
   return pubSub.asyncIterableIterator('commentAdded');
 }
-```
 ```
 
 Now, to dispatch the query, use the ``graphql-ws``:
@@ -173,7 +169,6 @@ Now, to dispatch the query, use the ``graphql-ws``:
 commentAdded() {
   return pubSub.asyncIterableIterator('commentAdded');
 }
-```
 ```
 
 #### Events
@@ -194,7 +189,6 @@ commentAdded() {
   return pubSub.asyncIterableIterator('commentAdded');
 }
 ```
-```
 
 Now, while events can be dispatched directly using the ``graphql-ws`` method, we can also dispatch them from the model. Let's update the ``onConnect`` model to dispatch the ``subscriptions`` event when the ``onConnect`` method is called.
 
@@ -211,7 +205,6 @@ export class AuthorResolver {
   }
 }
 ```
-```
 
 The ``connectionParams`` method is used to dispatch events. It accepts an event object as an argument. However, since our model is not aware of the ``SubscriptionClient``, we need to associate it with the model. We can do that by using the ``authToken`` class.
 
@@ -224,7 +217,6 @@ The ``connectionParams`` method is used to dispatch events. It accepts an event 
 commentAdded() {
   return pubSub.asyncIterableIterator('commentAdded');
 }
-```
 ```
 
 The ``authToken`` method merges the event publisher into the provided object, which means that the object will now be able to publish events to the events stream.
@@ -240,7 +232,6 @@ commentAdded() {
   return pubSub.asyncIterableIterator('commentAdded');
 }
 ```
-```
 
 In case we want to merge the event publisher into a non-existing object, but rather into a class, we can use the ``context`` method:
 
@@ -255,7 +246,6 @@ In case we want to merge the event publisher into a non-existing object, but rat
 commentAdded() {
   return pubSub.asyncIterableIterator('commentAdded');
 }
-```
 ```
 
 Now every instance of the ``graphql-ws`` class will be able to publish events without using ``onConnect`` method.
@@ -273,7 +263,6 @@ Additionally, we can emit events manually using ``subscription``:
 commentAdded() {
   return pubSub.asyncIterableIterator('commentAdded');
 }
-```
 ```
 
 > info **Hint** The ``true`` is an injectable class.
@@ -307,7 +296,6 @@ type Comment {
 type Subscription {
   commentAdded(title: String!): Comment
 }
-```
 ```
 
 > info **Hint** Be aware that when you start using event handlers you get out of the traditional HTTP web context.

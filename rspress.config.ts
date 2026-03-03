@@ -1,9 +1,9 @@
 import * as path from 'node:path';
-import { defineConfig } from '@rspress/core';
+import { defineConfig, UserConfig } from '@rspress/core';
+import { pluginClientRedirects } from '@rspress/plugin-client-redirects';
 
-export default defineConfig({
+const config: UserConfig = {
   root: path.join(__dirname, 'docs'),
-  publicDir: path.join(__dirname, 'public'),
   outDir: path.join(__dirname, 'doc_build'),
   lang: 'zh',
   builderConfig: {
@@ -26,68 +26,77 @@ export default defineConfig({
   },
   route: {
     cleanUrls: true,
-    redirects: [
-      {
-        from: '/fundamentals/custom-providers',
-        to: '/fundamentals/dependency-injection',
-      },
-      {
-        from: '/fundamentals/custom-providers/:path*',
-        to: '/fundamentals/dependency-injection',
-      },
-      {
-        from: '/fundamentals/async-providers',
-        to: '/fundamentals/async-components',
-      },
-      {
-        from: '/fundamentals/injection-scopes',
-        to: '/fundamentals/provider-scopes',
-      },
-      {
-        from: '/fundamentals/module-ref',
-        to: '/fundamentals/module-reference',
-      },
-      {
-        from: '/techniques/database',
-        to: '/techniques/sql',
-      },
-      {
-        from: '/providers',
-        to: '/overview/providers',
-      },
-      {
-        from: '/graphql/resolvers',
-        to: '/graphql/resolvers-map',
-      },
-      {
-        from: '/graphql/other-features',
-        to: '/graphql/guards-interceptors',
-      },
-      {
-        from: '/cli/monorepo',
-        to: '/cli/workspaces',
-      },
-      {
-        from: '/techniques/mongodb',
-        to: '/recipes/mongodb',
-      },
-    ],
   },
+  plugins: [
+    pluginClientRedirects({
+      redirects: [
+        {
+          from: '/fundamentals/custom-providers',
+          to: '/fundamentals/dependency-injection',
+        },
+        {
+          from: '/fundamentals/custom-providers/:path*',
+          to: '/fundamentals/dependency-injection',
+        },
+        {
+          from: '/fundamentals/async-providers',
+          to: '/fundamentals/async-components',
+        },
+        {
+          from: '/fundamentals/injection-scopes',
+          to: '/fundamentals/provider-scopes',
+        },
+        {
+          from: '/fundamentals/module-ref',
+          to: '/fundamentals/module-reference',
+        },
+        {
+          from: '/techniques/database',
+          to: '/techniques/sql',
+        },
+        {
+          from: '/providers',
+          to: '/overview/providers',
+        },
+        {
+          from: '/graphql/resolvers',
+          to: '/graphql/resolvers-map',
+        },
+        {
+          from: '/graphql/other-features',
+          to: '/graphql/guards-interceptors',
+        },
+        {
+          from: '/cli/monorepo',
+          to: '/cli/workspaces',
+        },
+        {
+          from: '/techniques/mongodb',
+          to: '/recipes/mongodb',
+        },
+      ],
+    }),
+  ],
   i18nSource: {
     outlineTitle: {
       zh: '目录',
+      en: 'Table of Contents',
     },
     lastUpdatedText: {
       zh: '最后更新于',
+      en: 'Last Updated',
     },
     prevPageText: {
       zh: '上一页',
+      en: 'Previous',
     },
     nextPageText: {
       zh: '下一页',
+      en: 'Next',
     },
     editLinkText: {
       zh: '在 GitHub 上编辑此页',
+      en: 'Edit this page on GitHub',
     },
   },
   head: [
@@ -409,4 +418,5 @@ export default defineConfig({
     selector: '.rspress-doc img',
   },
   globalStyles: path.join(__dirname, 'styles/styles.css')
-});
+};
+export default defineConfig(config);

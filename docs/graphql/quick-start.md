@@ -1,5 +1,5 @@
 <!-- 此文件从 content/graphql/quick-start.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-24T02:58:12.529Z -->
+<!-- 生成时间: 2026-03-02T04:15:14.075Z -->
 <!-- 源文件: content/graphql/quick-start.md -->
 
 ## Harnessing the power of TypeScript & GraphQL
@@ -8,7 +8,7 @@
 
 In this chapter, we assume a basic understanding of GraphQL, and focus on how to work with the built-in `@nestjs/graphql` module. The `GraphQLModule` can be configured to use [Apollo](https://www.apollographql.com/) server (with the `@nestjs/apollo` driver) and [Mercurius](https://github.com/mercurius-js/mercurius) (with the `@nestjs/mercurius`). We provide official integrations for these proven GraphQL packages to provide a simple way to use GraphQL with Nest (see more integrations [here](/graphql/quick-start#third-party-integrations)).
 
-You can also build your own dedicated driver (read more on that [here](/graphql/guards-interceptors)).
+You can also build your own dedicated driver (read more on that [here](/graphql/other-features#creating-a-custom-driver)).
 
 #### Installation
 
@@ -39,7 +39,7 @@ In the **schema first** approach, the source of truth is GraphQL SDL (Schema Def
 
 #### Getting started with GraphQL & TypeScript
 
-> info **Hint** In the following chapters, we'll be integrating the `@nestjs/apollo` package. If you want to use `mercurius` package instead, navigate to [this section](/graphql/quick-start#mercurius-集成).
+> info **Hint** In the following chapters, we'll be integrating the `@nestjs/apollo` package. If you want to use `mercurius` package instead, navigate to [this section](/graphql/quick-start#mercurius-integration).
 
 Once the packages are installed, we can import the `GraphQLModule` and configure it with the `forRoot()` static method.
 
@@ -288,7 +288,7 @@ One technique is to use a factory function:
 }),
 ```
 
-Like other factory providers, our factory function can be <a href="./fundamentals/dependency-injection#factory-providers-usefactory">async</a> and can inject dependencies through `inject`.
+Like other factory providers, our factory function can be <a href="/fundamentals/custom-providers#factory-providers-usefactory">async</a> and can inject dependencies through `inject`.
 
 ```typescript
 GraphQLModule.forRootAsync<ApolloDriverConfig>({

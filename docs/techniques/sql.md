@@ -1,14 +1,14 @@
 <!-- 此文件从 content/techniques/sql.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-24T02:50:27.416Z -->
+<!-- 生成时间: 2026-03-02T04:07:54.549Z -->
 <!-- 源文件: content/techniques/sql.md -->
 
 ### Database
 
 Nest is database agnostic, allowing you to easily integrate with any SQL or NoSQL database. You have a number of options available to you, depending on your preferences. At the most general level, connecting Nest to a database is simply a matter of loading an appropriate Node.js driver for the database, just as you would with [Express](https://expressjs.com/en/guide/database-integration.html) or Fastify.
 
-You can also directly use any general purpose Node.js database integration **library** or ORM, such as [MikroORM](https://mikro-orm.io/) (see [MikroORM recipe](/recipes/mikroorm)), [Sequelize](https://sequelize.org/) (see [Sequelize integration](/techniques/sql#sequelize-集成)), [Knex.js](https://knexjs.org/) (see [Knex.js tutorial](https://dev.to/nestjs/build-a-nestjs-module-for-knex-js-or-other-resource-based-libraries-in-5-minutes-12an)), [TypeORM](https://github.com/typeorm/typeorm), and [Prisma](https://www.github.com/prisma/prisma) (see [Prisma recipe](/recipes/prisma)), to operate at a higher level of abstraction.
+You can also directly use any general purpose Node.js database integration **library** or ORM, such as [MikroORM](https://mikro-orm.io/) (see [MikroORM recipe](/recipes/mikroorm)), [Sequelize](https://sequelize.org/) (see [Sequelize integration](/techniques/database#sequelize-integration)), [Knex.js](https://knexjs.org/) (see [Knex.js tutorial](https://dev.to/nestjs/build-a-nestjs-module-for-knex-js-or-other-resource-based-libraries-in-5-minutes-12an)), [TypeORM](https://github.com/typeorm/typeorm), and [Prisma](https://www.github.com/prisma/prisma) (see [Prisma recipe](/recipes/prisma)), to operate at a higher level of abstraction.
 
-For convenience, Nest provides tight integration with TypeORM and Sequelize out-of-the-box with the `@nestjs/typeorm` and `@nestjs/sequelize` packages respectively, which we'll cover in the current chapter, and Mongoose with `@nestjs/mongoose`, which is covered in [this chapter](/techniques/mongo). These integrations provide additional NestJS-specific features, such as model/repository injection, testability, and asynchronous configuration to make accessing your chosen database even easier.
+For convenience, Nest provides tight integration with TypeORM and Sequelize out-of-the-box with the `@nestjs/typeorm` and `@nestjs/sequelize` packages respectively, which we'll cover in the current chapter, and Mongoose with `@nestjs/mongoose`, which is covered in [this chapter](/techniques/mongodb). These integrations provide additional NestJS-specific features, such as model/repository injection, testability, and asynchronous configuration to make accessing your chosen database even easier.
 
 ### TypeORM Integration
 
@@ -22,7 +22,7 @@ $ npm install --save @nestjs/typeorm typeorm mysql2
 
 Once the installation process is complete, we can import the `TypeOrmModule` into the root `AppModule`.
 
-```typescript title="app.module"
+```typescript
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -66,7 +66,7 @@ The `forRoot()` method supports all the configuration properties exposed by the 
 
 Once this is done, the TypeORM `DataSource` and `EntityManager` objects will be available to inject across the entire project (without needing to import any modules), for example:
 
-```typescript title="app.module"
+```typescript
 import { DataSource } from 'typeorm';
 
 @Module({
@@ -74,6 +74,16 @@ import { DataSource } from 'typeorm';
 })
 export class AppModule {
   constructor(private dataSource: DataSource) {}
+}
+
+@Dependencies(DataSource)
+@Module({
+  imports: [TypeOrmModule.forRoot(), UsersModule],
+})
+export class AppModule {
+  constructor(dataSource) {
+    this.dataSource = dataSource;
+  }
 }
 ```
 
@@ -83,7 +93,7 @@ export class AppModule {
 
 To continue the example, we need at least one entity. Let's define the `User` entity.
 
-```typescript title="user.entity"
+```typescript
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
@@ -108,7 +118,7 @@ The `User` entity file sits in the `users` directory. This directory contains al
 
 To begin using the `User` entity, we need to let TypeORM know about it by inserting it into the `entities` array in the module `forRoot()` method options (unless you use a static glob path):
 
-```typescript title="app.module"
+```typescript
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/user.entity';
@@ -132,7 +142,7 @@ export class AppModule {}
 
 Next, let's look at the `UsersModule`:
 
-```typescript title="users.module"
+```typescript
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersService } from './users.service';
@@ -149,7 +159,7 @@ export class UsersModule {}
 
 This module uses the `forFeature()` method to define which repositories are registered in the current scope. With that in place, we can inject the `UsersRepository` into the `UsersService` using the `@InjectRepository()` decorator:
 
-```typescript title="users.service"
+```typescript
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -174,6 +184,26 @@ export class UsersService {
     await this.usersRepository.delete(id);
   }
 }
+
+@Injectable()
+@Dependencies(getRepositoryToken(User))
+export class UsersService {
+  constructor(usersRepository) {
+    this.usersRepository = usersRepository;
+  }
+
+  findAll() {
+    return this.usersRepository.find();
+  }
+
+  findOne(id) {
+    return this.usersRepository.findOneBy({ id });
+  }
+
+  async remove(id) {
+    await this.usersRepository.delete(id);
+  }
+}
 ```
 
 > warning **Notice** Don't forget to import the `UsersModule` into the root `AppModule`.
@@ -181,7 +211,7 @@ export class UsersService {
 If you want to use the repository outside of the module which imports `TypeOrmModule.forFeature`, you'll need to re-export the providers generated by it.
 You can do this by exporting the whole module, like this:
 
-```typescript title="users.module"
+```typescript
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './user.entity';
@@ -195,7 +225,7 @@ export class UsersModule {}
 
 Now if we import `UsersModule` in `UserHttpModule`, we can use `@InjectRepository(User)` in the providers of the latter module.
 
-```typescript title="users-http.module"
+```typescript
 import { Module } from '@nestjs/common';
 import { UsersModule } from './users.module';
 import { UsersService } from './users.service';
@@ -232,7 +262,7 @@ There are three types of relations:
 
 To define relations in entities, use the corresponding **decorators**. For example, to define that each `User` can have multiple photos, use the `@OneToMany()` decorator.
 
-```typescript title="user.entity"
+```typescript
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { Photo } from '../photos/photo.entity';
 
@@ -261,7 +291,7 @@ export class User {
 
 Manually adding entities to the `entities` array of the data source options can be tedious. In addition, referencing entities from the root module breaks application domain boundaries and causes leaking implementation details to other parts of the application. To address this issue, an alternative solution is provided. To automatically load entities, set the `autoLoadEntities` property of the configuration object (passed into the `forRoot()` method) to `true`, as shown below:
 
-```typescript title="app.module"
+```typescript
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -421,7 +451,7 @@ export class UserSubscriber implements EntitySubscriberInterface<User> {
 }
 ```
 
-> error **Warning** Event subscribers can not be [request-scoped](/fundamentals/provider-scopes).
+> error **Warning** Event subscribers can not be [request-scoped](/fundamentals/injection-scopes).
 
 Now, add the `UserSubscriber` class to the `providers` array:
 
@@ -540,7 +570,7 @@ export class AlbumsModule {}
 
 #### Testing
 
-When it comes to unit testing an application, we usually want to avoid making a database connection, keeping our test suites independent and their execution process as fast as possible. But our classes might depend on repositories that are pulled from the data source (connection) instance. How do we handle that? The solution is to create mock repositories. In order to achieve that, we set up [custom providers](/fundamentals/dependency-injection). Each registered repository is automatically represented by an `<EntityName>Repository` token, where `EntityName` is the name of your entity class.
+When it comes to unit testing an application, we usually want to avoid making a database connection, keeping our test suites independent and their execution process as fast as possible. But our classes might depend on repositories that are pulled from the data source (connection) instance. How do we handle that? The solution is to create mock repositories. In order to achieve that, we set up [custom providers](/fundamentals/custom-providers). Each registered repository is automatically represented by an `<EntityName>Repository` token, where `EntityName` is the name of your entity class.
 
 The `@nestjs/typeorm` package exposes the `getRepositoryToken()` function which returns a prepared token based on a given entity.
 
@@ -580,7 +610,7 @@ TypeOrmModule.forRootAsync({
 });
 ```
 
-Our factory behaves like any other [asynchronous provider](/fundamentals/async-components) (e.g., it can be `async` and it's able to inject dependencies through `inject`).
+Our factory behaves like any other [asynchronous provider](/fundamentals/async-providers) (e.g., it can be `async` and it's able to inject dependencies through `inject`).
 
 ```typescript
 TypeOrmModule.forRootAsync({
@@ -692,7 +722,7 @@ $ npm install --save-dev @types/sequelize
 
 Once the installation process is complete, we can import the `SequelizeModule` into the root `AppModule`.
 
-```typescript title="app.module"
+```typescript
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 
@@ -739,7 +769,7 @@ The `forRoot()` method supports all the configuration properties exposed by the 
 
 Once this is done, the `Sequelize` object will be available to inject across the entire project (without needing to import any modules), for example:
 
-```typescript title="app.service"
+```typescript
 import { Injectable } from '@nestjs/common';
 import { Sequelize } from 'sequelize-typescript';
 
@@ -747,13 +777,21 @@ import { Sequelize } from 'sequelize-typescript';
 export class AppService {
   constructor(private sequelize: Sequelize) {}
 }
+
+@Dependencies(Sequelize)
+@Injectable()
+export class AppService {
+  constructor(sequelize) {
+    this.sequelize = sequelize;
+  }
+}
 ```
 
 #### Models
 
 Sequelize implements the Active Record pattern. With this pattern, you use model classes directly to interact with the database. To continue the example, we need at least one model. Let's define the `User` model.
 
-```typescript title="user.model"
+```typescript
 import { Column, Model, Table } from 'sequelize-typescript';
 
 @Table
@@ -775,7 +813,7 @@ The `User` model file sits in the `users` directory. This directory contains all
 
 To begin using the `User` model, we need to let Sequelize know about it by inserting it into the `models` array in the module `forRoot()` method options:
 
-```typescript title="app.module"
+```typescript
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { User } from './users/user.model';
@@ -798,7 +836,7 @@ export class AppModule {}
 
 Next, let's look at the `UsersModule`:
 
-```typescript title="users.module"
+```typescript
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { User } from './user.model';
@@ -815,7 +853,7 @@ export class UsersModule {}
 
 This module uses the `forFeature()` method to define which models are registered in the current scope. With that in place, we can inject the `UserModel` into the `UsersService` using the `@InjectModel()` decorator:
 
-```typescript title="users.service"
+```typescript
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './user.model';
@@ -844,6 +882,31 @@ export class UsersService {
     await user.destroy();
   }
 }
+
+@Injectable()
+@Dependencies(getModelToken(User))
+export class UsersService {
+  constructor(usersRepository) {
+    this.usersRepository = usersRepository;
+  }
+
+  async findAll() {
+    return this.userModel.findAll();
+  }
+
+  findOne(id) {
+    return this.userModel.findOne({
+      where: {
+        id,
+      },
+    });
+  }
+
+  async remove(id) {
+    const user = await this.findOne(id);
+    await user.destroy();
+  }
+}
 ```
 
 > warning **Notice** Don't forget to import the `UsersModule` into the root `AppModule`.
@@ -851,7 +914,7 @@ export class UsersService {
 If you want to use the model outside of the module which imports `SequelizeModule.forFeature`, you'll need to re-export the providers generated by it.
 You can do this by exporting the whole module, like this:
 
-```typescript title="users.module"
+```typescript
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { User } from './user.entity';
@@ -865,7 +928,7 @@ export class UsersModule {}
 
 Now if we import `UsersModule` in `UserHttpModule`, we can use `@InjectModel(User)` in the providers of the latter module.
 
-```typescript title="users-http.module"
+```typescript
 import { Module } from '@nestjs/common';
 import { UsersModule } from './users.module';
 import { UsersService } from './users.service';
@@ -902,7 +965,7 @@ There are three types of relations:
 
 To define relations in models, use the corresponding **decorators**. For example, to define that each `User` can have multiple photos, use the `@HasMany()` decorator.
 
-```typescript title="user.model"
+```typescript
 import { Column, Model, Table, HasMany } from 'sequelize-typescript';
 import { Photo } from '../photos/photo.model';
 
@@ -928,7 +991,7 @@ export class User extends Model {
 
 Manually adding models to the `models` array of the connection options can be tedious. In addition, referencing models from the root module breaks application domain boundaries and causes leaking implementation details to other parts of the application. To solve this issue, automatically load models by setting both `autoLoadModels` and `synchronize` properties of the configuration object (passed into the `forRoot()` method) to `true`, as shown below:
 
-```typescript title="app.module"
+```typescript
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 
@@ -1078,7 +1141,7 @@ export class AlbumsModule {}
 
 #### Testing
 
-When it comes to unit testing an application, we usually want to avoid making a database connection, keeping our test suites independent and their execution process as fast as possible. But our classes might depend on models that are pulled from the connection instance. How do we handle that? The solution is to create mock models. In order to achieve that, we set up [custom providers](/fundamentals/dependency-injection). Each registered model is automatically represented by a `<ModelName>Model` token, where `ModelName` is the name of your model class.
+When it comes to unit testing an application, we usually want to avoid making a database connection, keeping our test suites independent and their execution process as fast as possible. But our classes might depend on models that are pulled from the connection instance. How do we handle that? The solution is to create mock models. In order to achieve that, we set up [custom providers](/fundamentals/custom-providers). Each registered model is automatically represented by a `<ModelName>Model` token, where `ModelName` is the name of your model class.
 
 The `@nestjs/sequelize` package exposes the `getModelToken()` function which returns a prepared token based on a given model.
 
@@ -1117,7 +1180,7 @@ SequelizeModule.forRootAsync({
 });
 ```
 
-Our factory behaves like any other [asynchronous provider](/fundamentals/async-components) (e.g., it can be `async` and it's able to inject dependencies through `inject`).
+Our factory behaves like any other [asynchronous provider](/fundamentals/async-providers) (e.g., it can be `async` and it's able to inject dependencies through `inject`).
 
 ```typescript
 SequelizeModule.forRootAsync({

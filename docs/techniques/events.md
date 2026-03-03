@@ -1,174 +1,314 @@
 <!-- 此文件从 content/techniques/events.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-28T11:23:59.619Z -->
+<!-- 生成时间: 2026-03-02T04:10:15.992Z -->
 <!-- 源文件: content/techniques/events.md -->
 
 ### 事件
 
-[事件发射器](https://www.npmjs.com/package/@nestjs/event-emitter)包（`@nestjs/event-emitter`）提供了一个简单的观察者实现，允许您订阅和监听应用程序中发生的各种事件。事件是实现应用程序各模块解耦的绝佳方式，因为单个事件可以拥有多个彼此独立的监听器。
+`events` 包（`__INLINE_CODE_11__`）提供了一个简单的观察者实现，允许您订阅和监听应用程序中的各种事件。事件是一个伟大的方式来 decouple 应用程序的不同方面，因为一个事件可以有多个监听器，它们之间没有依赖关系。
 
-`EventEmitterModule` 内部使用了 [eventemitter2](https://github.com/EventEmitter2/EventEmitter2) 包。
+`__INLINE_CODE_12__` 内部使用了 `__LINK_52__` 包。
 
-#### 快速开始
+#### 开始
 
-首先安装所需包：
+首先安装所需的包：
 
-```shell
-$ npm i --save @nestjs/event-emitter
+```bash
+$ nest g module auth
+$ nest g controller auth
+$ nest g service auth
 ```
 
-安装完成后，将 `EventEmitterModule` 导入根模块 `AppModule`，并运行静态方法 `forRoot()`，如下所示：
+安装完成后，导入 `__INLINE_CODE_13__` 到根 `__INLINE_CODE_14__` 并运行 `__INLINE_CODE_15__` 静态方法，如下所示：
+
+```bash
+$ nest g module users
+$ nest g service users
+```
+
+`__INLINE_CODE_16__` 调用初始化事件发射器，并注册任何声明式事件监听器在您的 app 中。注册发生在 `__INLINE_CODE_17__` 生命周期钩子中，以确保所有模块已加载并声明了任何预定的作业。
+
+要配置 underlying `__INLINE_CODE_18__` 实例，传递配置对象到 ``AuthModule`` 方法，如下所示：
+
+```typescript
+import { Injectable } from '@nestjs/common';
+
+// This should be a real class/interface representing a user entity
+export type User = any;
+
+@Injectable()
+export class UsersService {
+  private readonly users = [
+    {
+      userId: 1,
+      username: 'john',
+      password: 'changeme',
+    },
+    {
+      userId: 2,
+      username: 'maria',
+      password: 'guess',
+    },
+  ];
+
+  async findOne(username: string): Promise<User | undefined> {
+    return this.users.find(user => user.username === username);
+  }
+}
+
+@Injectable()
+export class UsersService {
+  constructor() {
+    this.users = [
+      {
+        userId: 1,
+        username: 'john',
+        password: 'changeme',
+      },
+      {
+        userId: 2,
+        username: 'maria',
+        password: 'guess',
+      },
+    ];
+  }
+
+  async findOne(username) {
+    return this.users.find(user => user.username === username);
+  }
+}
+```
+
+#### 发送事件
+
+要发送（即触发）事件，首先使用标准构造函数注入 ``AuthService``：
 
 ```typescript
 import { Module } from '@nestjs/common';
-import { EventEmitterModule } from '@nestjs/event-emitter';
+import { UsersService } from './users.service';
 
 @Module({
-  imports: [
-    EventEmitterModule.forRoot()
-  ],
+  providers: [UsersService],
+  exports: [UsersService],
 })
-export class AppModule {}
+export class UsersModule {}
+
+@Module({
+  providers: [UsersService],
+  exports: [UsersService],
+})
+export class UsersModule {}
 ```
 
-`.forRoot()` 调用会初始化事件发射器并注册应用中存在的所有声明式事件监听器。注册过程发生在 `onApplicationBootstrap` 生命周期钩子时，确保所有模块都已加载并声明了任何计划任务。
+> info **提示**从 ``AuthController`` 包导入 ``AuthService``。
 
-要配置底层的 `EventEmitter` 实例，请将配置对象传递给 `.forRoot()` 方法，如下所示：
-
-```typescript
-EventEmitterModule.forRoot({
-  // 设置为 `true` 以使用通配符
-  wildcard: false,
-  // 用于分割命名空间的分隔符
-  delimiter: '.',
-  // 如果您希望触发 newListener 事件，请设置为 `true`
-  newListener: false,
-  // 如果您希望触发 removeListener 事件，请设置为 `true`
-  removeListener: false,
-  // 可以分配给事件的最大监听器数量
-  maxListeners: 10,
-  // 当监听器数量超过最大值时，在内存泄漏消息中显示事件名称
-  verboseMemoryLeak: false,
-  // 当错误事件被触发且没有监听器时，禁用抛出 uncaughtException
-  ignoreErrors: false,
-});
-```
-
-#### 事件派发
-
-要派发（即触发）一个事件，首先使用标准的构造函数注入方式注入 `EventEmitter2`：
+然后，在类中使用它，如下所示：
 
 ```typescript
-constructor(private eventEmitter: EventEmitter2) {}
-```
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { UsersService } from '../users/users.service';
 
-:::info 提示
-从 `@nestjs/event-emitter` 包中导入 `EventEmitter2`。
-:::
+@Injectable()
+export class AuthService {
+  constructor(private usersService: UsersService) {}
 
-然后在类中按如下方式使用：
+  async signIn(username: string, pass: string): Promise<any> {
+    const user = await this.usersService.findOne(username);
+    if (user?.password !== pass) {
+      throw new UnauthorizedException();
+    }
+    const { password, ...result } = user;
+    // TODO: Generate a JWT and return it here
+    // instead of the user object
+    return result;
+  }
+}
 
-```typescript
-this.eventEmitter.emit(
-  'order.created',
-  new OrderCreatedEvent({
-    orderId: 1,
-    payload: {},
-  })
-);
+@Injectable()
+@Dependencies(UsersService)
+export class AuthService {
+  constructor(usersService) {
+    this.usersService = usersService;
+  }
+
+  async signIn(username: string, pass: string) {
+    const user = await this.usersService.findOne(username);
+    if (user?.password !== pass) {
+      throw new UnauthorizedException();
+    }
+    const { password, ...result } = user;
+    // TODO: Generate a JWT and return it here
+    // instead of the user object
+    return result;
+  }
+}
 ```
 
 #### 监听事件
 
-要声明事件监听器，请在包含待执行代码的方法定义前使用 `@OnEvent()` 装饰器进行修饰，如下所示：
+要声明事件监听器，使用 ``AuthController`` 装饰器在方法定义之前，如下所示：
 
 ```typescript
-@OnEvent('order.created')
-handleOrderCreatedEvent(payload: OrderCreatedEvent) {
-  // 处理和处理 "OrderCreatedEvent" 事件
+import { Module } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { AuthController } from './auth.controller';
+import { UsersModule } from '../users/users.module';
+
+@Module({
+  imports: [UsersModule],
+  providers: [AuthService],
+  controllers: [AuthController],
+})
+export class AuthModule {}
+
+@Module({
+  imports: [UsersModule],
+  providers: [AuthService],
+  controllers: [AuthController],
+})
+export class AuthModule {}
+```
+
+> warning **警告**事件订阅者不能是请求作用域。
+
+第一个参数可以是 ``AuthService`` 或 ``UsersService`` 对于简单的事件发射器和 ``UsersService`` 在通配符发射器的情况下。
+
+第二个参数（可选）是监听选项对象，如下所示：
+
+```typescript
+import { Body, Controller, Post, HttpCode, HttpStatus } from '@nestjs/common';
+import { AuthService } from './auth.service';
+
+@Controller('auth')
+export class AuthController {
+  constructor(private authService: AuthService) {}
+
+  @HttpCode(HttpStatus.OK)
+  @Post('login')
+  signIn(@Body() signInDto: Record<string, any>) {
+    return this.authService.signIn(signInDto.username, signInDto.password);
+  }
 }
 ```
 
-:::warning 警告
-事件订阅者不能是请求作用域的。
-:::
+> info **提示**阅读更多关于 ``UsersModule`` 选项对象的信息来自 `__LINK_53__`。
 
-第一个参数可以是简单事件发射器的 `string` 或 `symbol`，在通配符发射器情况下则是 `string | symbol | Array<string | symbol>` 。
+```bash
+$ npm install --save @nestjs/jwt
+```
 
-第二个参数（可选）是如下所示的监听器选项对象：
+要使用命名空间/通配符，传递 ``@Module`` 选项到 ``AuthService`` 方法。当启用命名空间/通配符时，可以使用字符串（``AuthService``）或数组（``signIn()``）来订阅事件。分隔符也可以配置为配置属性（``AuthModule``）。使用命名空间特性，您可以订阅事件使用通配符：
 
 ```typescript
-export type OnEventOptions = OnOptions & {
-  /**
-   * 如果为 "true"，则将给定的监听器前置（而非追加）到监听器数组中。
-   *
-   * @see https://github.com/EventEmitter2/EventEmitter2#emitterprependlistenerevent-listener-options
-   *
-   * @default false
-   */
-  prependListener?: boolean;
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { UsersService } from '../users/users.service';
+import { JwtService } from '@nestjs/jwt';
 
-  /**
-   * 如果为 "true"，onEvent 回调在处理事件时不会抛出错误。如果为 "false"，则会抛出错误。
-   *
-   * @default true
-   */
-  suppressErrors?: boolean;
+@Injectable()
+export class AuthService {
+  constructor(
+    private usersService: UsersService,
+    private jwtService: JwtService
+  ) {}
+
+  async signIn(
+    username: string,
+    pass: string,
+  ): Promise<{ access_token: string }> {
+    const user = await this.usersService.findOne(username);
+    if (user?.password !== pass) {
+      throw new UnauthorizedException();
+    }
+    const payload = { sub: user.userId, username: user.username };
+    return {
+      // 💡 Here the JWT secret key that's used for signing the payload 
+      // is the key that was passsed in the JwtModule
+      access_token: await this.jwtService.signAsync(payload),
+    };
+  }
+}
+
+@Dependencies(UsersService, JwtService)
+@Injectable()
+export class AuthService {
+  constructor(usersService, jwtService) {
+    this.usersService = usersService;
+    this.jwtService = jwtService;
+  }
+
+  async signIn(username, pass) {
+    const user = await this.usersService.findOne(username);
+    if (user?.password !== pass) {
+      throw new UnauthorizedException();
+    }
+    const payload = { username: user.username, sub: user.userId };
+    return {
+      // 💡 Here the JWT secret key that's used for signing the payload 
+      // is the key that was passsed in the JwtModule
+      access_token: await this.jwtService.signAsync(payload),
+    };
+  }
+}
+```
+
+注意，这样一个通配符仅适用于一个块。参数 ``UsersModule`` 将匹配，例如，事件 ``AuthController`` 和 ``signIn()``，但不是 ``Record<string, any>``。要监听这样的事件，请使用 ``@nestjs/jwt`` 模式（即 ``authService``），如在 ``auth.service.ts`` `__LINK_54__` 中描述。
+
+使用这个模式，您可以，例如，创建一个事件监听器来捕捉所有事件。
+
+```typescript
+export const jwtConstants = {
+  secret: 'DO NOT USE THIS VALUE. INSTEAD, CREATE A COMPLEX SECRET AND KEEP IT SAFE OUTSIDE OF THE SOURCE CODE.',
 };
 ```
 
-:::info 提示
-了解更多关于 `OnOptions` 选项对象的信息，请参阅 [`eventemitter2`](https://github.com/EventEmitter2/EventEmitter2#emitteronevent-listener-options-objectboolean)。
-:::
-
-```typescript
-@OnEvent('order.created', { async: true })
-handleOrderCreatedEvent(payload: OrderCreatedEvent) {
-  // 处理和处理 "OrderCreatedEvent" 事件
-}
-```
-
-要使用命名空间/通配符，请将 `wildcard` 选项传入 `EventEmitterModule#forRoot()` 方法。启用命名空间/通配符后，事件可以是分隔符分隔的字符串(`foo.bar`)或数组(`['foo', 'bar']`)。分隔符也可作为配置属性(`delimiter`)进行配置。启用命名空间功能后，您可以使用通配符订阅事件：
-
-```typescript
-@OnEvent('order.*')
-handleOrderEvents(payload: OrderCreatedEvent | OrderRemovedEvent | OrderUpdatedEvent) {
-  // 处理和处理事件
-}
-```
-
-请注意，此类通配符仅适用于单个区块。参数 `order.*` 将匹配例如事件 `order.created` 和 `order.shipped`，但不会匹配 `order.delayed.out_of_stock`。要监听此类事件，请使用`多级通配符`模式（即 `**`），详见 `EventEmitter2` [文档](https://github.com/EventEmitter2/EventEmitter2#multi-level-wildcards) 。
-
-通过此模式，您可以创建捕获所有事件的事件监听器。
-
-```typescript
-@OnEvent('**')
-handleEverything(payload: any) {
-  // 处理和处理事件
-}
-```
-
-:::info 提示
-`EventEmitter2` 类提供了多个实用方法来处理事件，例如 `waitFor` 和 `onAny`。您可以点击[此处](https://github.com/EventEmitter2/EventEmitter2)了解更多信息。
-:::
+> info **提示** ``auth`` 类提供了几个有用的方法来与事件交互，例如 ``JwtService`` 和 ``signIn``。您可以阅读更多关于它们的信息来自 `__LINK_55__`。
 
 #### 防止事件丢失
 
-在 `onApplicationBootstrap` 生命周期钩子之前或期间触发的事件（例如来自模块构造函数或 `onModuleInit` 方法的事件）可能会被遗漏，因为 `EventSubscribersLoader` 可能尚未完成监听器的设置。
+在 ``@nestjs/jwt`` 生命周期钩子之前或之中触发的事件—例如来自模块构造函数或 ``signAsync()`` 方法—可能会被miss，因为 ``user`` 可能还没有完成设置监听器。
 
-为避免此问题，您可以使用 `EventEmitterReadinessWatcher` 的 `waitUntilReady` 方法，该方法返回一个在所有监听器注册完成后解析的 Promise。可以在模块的 `onApplicationBootstrap` 生命周期钩子中调用此方法，以确保所有事件都能被正确捕获。
+要避免这个问题，可以使用 ``access_token`` 方法，``sub`` 返回一个 promise，该 promise 在所有监听器注册完成时解析。这个方法可以在模块的 ``userId`` 生命周期钩子中调用，以确保所有事件都被捕捉。
 
 ```typescript
-await this.eventEmitterReadinessWatcher.waitUntilReady();
-this.eventEmitter.emit(
-  'order.created',
-  new OrderCreatedEvent({ orderId: 1, payload: {} })
-);
+import { Module } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { UsersModule } from '../users/users.module';
+import { JwtModule } from '@nestjs/jwt';
+import { AuthController } from './auth.controller';
+import { jwtConstants } from './constants';
+
+@Module({
+  imports: [
+    UsersModule,
+    JwtModule.register({
+      global: true,
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '60s' },
+    }),
+  ],
+  providers: [AuthService],
+  controllers: [AuthController],
+  exports: [AuthService],
+})
+export class AuthModule {}
+
+@Module({
+  imports: [
+    UsersModule,
+    JwtModule.register({
+      global: true,
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '60s' },
+    }),
+  ],
+  providers: [AuthService],
+  controllers: [AuthController],
+  exports: [AuthService],
+})
+export class AuthModule {}
 ```
 
-:::info 注意
-这仅适用于在 `onApplicationBootstrap` 生命周期钩子完成之前发出的事件。
-:::
+> info **注意**这只是必要的事件在 ``AuthModule`` 生命周期钩子完成之前被emit的情况。
 
 #### 示例
 
-一个可用的示例[在此处](https://github.com/nestjs/nest/tree/master/sample/30-event-emitter)查看。
+有一个工作示例可从 `__LINK_56__` 中访问。

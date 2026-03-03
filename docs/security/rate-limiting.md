@@ -1,5 +1,5 @@
 <!-- 此文件从 content/security/rate-limiting.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-24T02:52:06.582Z -->
+<!-- 生成时间: 2026-03-02T04:09:41.484Z -->
 <!-- 源文件: content/security/rate-limiting.md -->
 
 ### Rate Limiting
@@ -12,7 +12,7 @@ $ npm i --save @nestjs/throttler
 
 Once the installation is complete, the `ThrottlerModule` can be configured as any other Nest package with `forRoot` or `forRootAsync` methods.
 
-```typescript title="app.module"
+```typescript
 @Module({
   imports: [
      ThrottlerModule.forRoot({
@@ -30,7 +30,7 @@ export class AppModule {}
 
 The above will set the global options for the `ttl`, the time to live in milliseconds, and the `limit`, the maximum number of requests within the ttl, for the routes of your application that are guarded.
 
-Once the module has been imported, you can then choose how you would like to bind the `ThrottlerGuard`. Any kind of binding as mentioned in the [guards](/overview/guards) section is fine. If you wanted to bind the guard globally, for example, you could do so by adding this provider to any module:
+Once the module has been imported, you can then choose how you would like to bind the `ThrottlerGuard`. Any kind of binding as mentioned in the [guards](/guards) section is fine. If you wanted to bind the guard globally, for example, you could do so by adding this provider to any module:
 
 ```typescript
 {
@@ -43,7 +43,7 @@ Once the module has been imported, you can then choose how you would like to bin
 
 There may come upon times where you want to set up multiple throttling definitions, like no more than 3 calls in a second, 20 calls in 10 seconds, and 100 calls in a minute. To do so, you can set up your definitions in the array with named options, that can later be referenced in the `@SkipThrottle()` and `@Throttle()` decorators to change the options again.
 
-```typescript title="app.module"
+```typescript
 @Module({
   imports: [
     ThrottlerModule.forRoot([
@@ -70,7 +70,7 @@ export class AppModule {}
 
 #### Customization
 
-There may be a time where you want to bind the guard to a controller or globally, but want to disable rate limiting for one or more of your endpoints. For that, you can use the `@SkipThrottle()` decorator, to negate the throttler for an entire class or a single route. The `@SkipThrottle()` decorator can also take in an object of string keys with boolean values for if there is a case where you want to exclude _most_ of a controller, but not every route, and configure it per throttler set if you have more than one. If you do not pass an object, the default is to use `{ default: true }`
+There may be a time where you want to bind the guard to a controller or globally, but want to disable rate limiting for one or more of your endpoints. For that, you can use the `@SkipThrottle()` decorator, to negate the throttler for an entire class or a single route. The `@SkipThrottle()` decorator can also take in an object of string keys with boolean values for if there is a case where you want to exclude _most_ of a controller, but not every route, and configure it per throttler set if you have more than one. If you do not pass an object, the default is to use `{ default: true }}`
 
 ```typescript
 @SkipThrottle()
@@ -113,7 +113,7 @@ If your application is running behind a proxy server, it’s essential to config
 
 Here's an example that demonstrates how to enable `trust proxy` for the Express adapter:
 
-```typescript title="main"
+```typescript
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
@@ -125,11 +125,19 @@ async function bootstrap() {
 }
 
 bootstrap();
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  app.set('trust proxy', 'loopback'); // Trust requests from the loopback address
+  await app.listen(3000);
+}
+
+bootstrap();
 ```
 
 Enabling `trust proxy` allows you to retrieve the original IP address from the `X-Forwarded-For` header. You can also customize the behavior of your application by overriding the `getTracker()` method to extract the IP address from this header instead of relying on `req.ip`. The following example demonstrates how to achieve this for both Express and Fastify:
 
-```typescript title="throttler-behind-proxy.guard"
+```typescript
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { Injectable } from '@nestjs/common';
 
@@ -255,7 +263,7 @@ If you need to set up storage instead, or want to use some of the above options 
 <table>
   <tr>
     <td><code>storage</code></td>
-    <td>a custom storage service for where the throttling should be kept track. <a href="/security/rate-limiting#存储">See here.</a></td>
+    <td>a custom storage service for where the throttling should be kept track. <a href="/security/rate-limiting#storages">See here.</a></td>
   </tr>
   <tr>
     <td><code>ignoreUserAgents</code></td>

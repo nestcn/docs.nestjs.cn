@@ -1,5 +1,5 @@
 <!-- 此文件从 content/openapi/cli-plugin.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-24T02:56:27.877Z -->
+<!-- 生成时间: 2026-03-02T04:13:45.431Z -->
 <!-- 源文件: content/openapi/cli-plugin.md -->
 
 ### CLI Plugin
@@ -46,7 +46,7 @@ export class CreateUserDto {
 
 While not a significant issue with medium-sized projects, it becomes verbose & hard to maintain once you have a large set of classes.
 
-By [enabling the Swagger plugin](/openapi/cli-plugin#使用-cli-插件), the above class definition can be declared simply:
+By [enabling the Swagger plugin](/openapi/cli-plugin#using-the-cli-plugin), the above class definition can be declared simply:
 
 ```typescript
 export class CreateUserDto {
@@ -240,7 +240,7 @@ getCustomTransformers: (program: any) => ({
 
 #### SWC builder
 
-For standard setups (non-monorepo), to use CLI Plugins with the SWC builder, you need to enable type checking, as described [here](/recipes/swc#类型检查).
+For standard setups (non-monorepo), to use CLI Plugins with the SWC builder, you need to enable type checking, as described [here](/recipes/swc#type-checking).
 
 ```bash
 $ nest start -b swc --type-check

@@ -1,76 +1,49 @@
 <!-- 此文件从 content/fundamentals/discovery-service.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-24T03:01:10.164Z -->
+<!-- 生成时间: 2026-03-02T04:18:07.085Z -->
 <!-- 源文件: content/fundamentals/discovery-service.md -->
 
 ### 发现服务
 
-`forwardRef()` 提供了由 `CatsService` 包提供的强大工具，可以让开发者在 NestJS 应用程序中动态地检查和检索提供者、控制器和其他元数据。这种机制特别有用于构建插件、装饰器或高级功能，它们需要在运行时进行 introspection。通过使用 `CommonService`，开发者可以创建更加灵活和模块化的架构，启用自动化和动态行为在应用程序中。
+__INLINE_CODE_7__ 提供者由 __INLINE_CODE_8__ 包提供，是一个功能强大的实用工具，允许开发者动态地检查和检索 NestJS 应用程序中的提供者、控制器和其他元数据。特别是在构建插件、装饰器或高级特性时，通过 __INLINE_CODE_9__，开发者可以创建更加灵活和模块化的架构，从而实现自动化和动态行为。
 
 #### 入门
 
-在使用 `@Inject()` 之前，您需要在想要使用它的模块中导入 `forwardRef()`。这确保了服务可供依赖注射使用。下面是一个在 NestJS 模块中配置它的示例：
+在使用 __INLINE_CODE_10__ 之前，需要在意向使用它的模块中导入 __INLINE_CODE_11__。这样可以确保服务可用于依赖注入。以下是一个在 NestJS 模块中配置它的示例：
 
-```typescript title="cats.service"
-@Injectable()
-export class CatsService {
-  constructor(
-    @Inject(forwardRef(() => CommonService))
-    private commonService: CommonService,
-  ) {}
-}
-```
-```
+__CODE_BLOCK_0__
 
-一旦模块设置好了，`forwardRef()` 就可以注入到任何需要动态发现的提供者或服务中。
+一旦模块设置好，__INLINE_CODE_12__ 就可以被注入到任何需要动态发现的提供者或服务中。
 
-```typescript title="common.service"
-@Injectable()
-export class CommonService {
-  constructor(
-    @Inject(forwardRef(() => CatsService))
-    private catsService: CatsService,
-  ) {}
-}
-```
+__CODE_BLOCK_1__
 
 #### 发现提供者和控制器
 
-`@nestjs/common` 的一个关键功能是检索应用程序中注册的所有提供者。这对于动态地处理提供者有用。下面是一个检索所有提供者的示例：
+__INLINE_CODE_13__ 的一个关键功能是检索应用程序中的所有注册提供者。这对于根据特定条件动态处理提供者非常有用。以下是一个检索所有提供者的示例：
 
-```typescript title="common.module"
-@Module({
-  imports: [forwardRef(() => CatsModule)],
-})
-export class CommonModule {}
-```
+__CODE_BLOCK_2__
 
-每个提供者对象包含了其实例、令牌和元数据信息。类似地，如果您需要检索应用程序中注册的所有控制器，可以使用：
+每个提供者对象都包含了实例、令牌和元数据的信息。类似地，如果需要检索应用程序中的所有注册控制器，可以使用以下代码：
 
-```typescript title="cats.module"
-@Module({
-  imports: [forwardRef(() => CommonModule)],
-})
-export class CatsModule {}
-```
+__CODE_BLOCK_3__
 
-这种功能特别有用在控制器需要动态处理的情况，例如 analytics 跟踪或自动注册机制。
+这项功能在处理动态的控制器，例如分析跟踪或自动注册机制时非常有用。
 
 #### 提取元数据
 
-除了发现提供者和控制器",`CommonService`"还可以检索附加到这些组件的元数据。这对于在运行时存储元数据的自定义装饰器特别有用。
+除了发现提供者和控制器，__INLINE_CODE_14__ 还允许检索连接到这些组件的元数据。这在工作中自定义装饰器时非常有用，这些装饰器可以在运行时存储元数据。
 
-例如，考虑一个自定义装饰器，它用于将特定的元数据标记到提供者上：
+例如，考虑一个场景，在其中使用自定义装饰器将提供者标记为特定的元数据：
 
 __CODE_BLOCK_4__
 
-将这个装饰器应用于服务，允许它存储可以后续查询的元数据：
+将这个装饰器应用于服务，可以将元数据存储到提供者中：
 
 __CODE_BLOCK_5__
 
-一旦元数据附加到提供者中",`Scope.REQUEST`"就可以轻松地根据分配的元数据过滤提供者。下面是一个检索具有特定元数据值的提供者的示例：
+一旦元数据被附加到提供者中，__INLINE_CODE_15__ 就可以轻松地根据分配的元数据过滤提供者。以下是一个检索已标记特定元数据值的提供者的示例：
 
 __CODE_BLOCK_6__
 
 #### 结论
 
-`forwardRef()` 是一个灵活和强大的工具，允许在 NestJS 应用程序中进行运行时 introspection。通过允许动态发现提供者、控制器和元数据，它在构建可扩展框架、插件和自动化驱动的功能方面扮演着关键角色。无论您需要扫描和处理提供者、提取元数据进行高级处理还是创建模块化和可扩展的架构",`ModuleRef`"都提供了一种高效和结构化的方法来实现这些目标。
+__INLINE_CODE_16__ 是一个多功能和强大的工具，允许在 NestJS 应用程序中进行运行时 introspection。通过动态地发现提供者、控制器和元数据，它在构建可扩展的框架、插件和自动化驱动的特性时扮演着重要的角色。无论您需要扫描和处理提供者、提取元数据进行高级处理还是创建模块化和可扩展的架构，__INLINE_CODE_17__ 都提供了一种高效和结构化的方法来实现这些目标。

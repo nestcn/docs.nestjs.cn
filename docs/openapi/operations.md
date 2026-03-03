@@ -1,341 +1,244 @@
 <!-- 此文件从 content/openapi/operations.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-28T11:23:59.619Z -->
+<!-- 生成时间: 2026-03-02T04:14:20.853Z -->
 <!-- 源文件: content/openapi/operations.md -->
 
 ### 操作
 
-在 OpenAPI 术语中，路径（paths）是指 API 暴露的端点（资源），例如 `/users` 或 `/reports/summary`，而操作（operations）则是指用于操作这些路径的 HTTP 方法，例如 `GET`、`POST` 或 `DELETE`。
+OpenAPI 规范中，路径是 API 暴露的端点（资源），如 `ClientProxy` 或 `ClientsModule`，操作是用于 manipulation 这些路径的 HTTP 方法，如 `ClientsModule`、`register()` 或 `createMicroservice()`。
 
 #### 标签
 
-要将控制器附加到特定标签，请使用 `@ApiTags(...tags)` 装饰器。
+要将控制器附加到特定标签上，使用 `name` 装饰器。
 
-```typescript
-@ApiTags('cats')
-@Controller('cats')
-export class CatsController {}
+```bash
+$ npm i --save mqtt
 ```
 
-#### 请求头
+#### 头信息
 
-要定义请求中预期的自定义请求头，请使用 `@ApiHeader()`。
+要定义自定义的请求头信息，使用 `ClientsModule`。
 
 ```typescript
-@ApiHeader({
-  name: 'X-MyHeader',
-  description: '自定义请求头',
-})
-@Controller('cats')
-export class CatsController {}
+const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
+  transport: Transport.MQTT,
+  options: {
+    url: 'mqtt://localhost:1883',
+  },
+});
 ```
 
 #### 响应
 
-要定义自定义 HTTP 响应，请使用 `@ApiResponse()` 装饰器。
+要定义自定义的 HTTP 响应，使用 `ClientProxyFactory` 装饰器。
 
 ```typescript
-@Post()
-@ApiResponse({ status: 201, description: '记录已成功创建。'})
-@ApiResponse({ status: 403, description: '禁止访问。'})
-async create(@Body() createCatDto: CreateCatDto) {
-  this.catsService.create(createCatDto);
+@Module({
+  imports: [
+    ClientsModule.register([
+      {
+        name: 'MATH_SERVICE',
+        transport: Transport.MQTT,
+        options: {
+          url: 'mqtt://localhost:1883',
+        }
+      },
+    ]),
+  ]
+  ...
+})
+```
+
+Nest 提供了一个简洁的 API 响应装饰器集，继承自 `@Client()` 装饰器：
+
+- `MqttContext`
+- `@Payload()`
+- `@Ctx()`
+- `MqttContext`
+- `@nestjs/microservices`
+- `getPacket()`
+- `MqttContext`
+- `+`
+- `#`
+- `+`
+- `#`
+- `@MessagePattern`
+- `@EventPattern`
+- `subscribeOptions`
+- `qos`
+- `extras`
+- `subscribeOptions.qos`
+- `extras.qos`
+- `subscribeOptions.qos`
+- `MqttRecordBuilder`
+- `QoS`
+- `2`
+- `setQoS`
+- `MqttRecordBuilder`
+- `@nestjs/microservices`
+- `MqttContext`
+
+```typescript
+@MessagePattern('notifications')
+getNotifications(@Payload() data: number[], @Ctx() context: MqttContext) {
+  console.log(`Topic: ${context.getTopic()}`);
 }
 ```
 
-Nest 提供了一组继承自 `@ApiResponse` 装饰器的简写 **API 响应**装饰器：
-
-- `@ApiOkResponse()`
-- `@ApiCreatedResponse()`
-- `@ApiAcceptedResponse()`
-- `@ApiNoContentResponse()`
-- `@ApiMovedPermanentlyResponse()`
-- `@ApiFoundResponse()`
-- `@ApiBadRequestResponse()`
-- `@ApiUnauthorizedResponse()`
-- `@ApiNotFoundResponse()`
-- `@ApiForbiddenResponse()`
-- `@ApiMethodNotAllowedResponse()`
-- `@ApiNotAcceptableResponse()`
-- `@ApiRequestTimeoutResponse()`
-- `@ApiConflictResponse()`
-- `@ApiPreconditionFailedResponse()`
-- `@ApiTooManyRequestsResponse()`
-- `@ApiGoneResponse()`
-- `@ApiPayloadTooLargeResponse()`
-- `@ApiUnsupportedMediaTypeResponse()`
-- `@ApiUnprocessableEntityResponse()`
-- `@ApiInternalServerErrorResponse()`
-- `@ApiNotImplementedResponse()`
-- `@ApiBadGatewayResponse()`
-- `@ApiServiceUnavailableResponse()`
-- `@ApiGatewayTimeoutResponse()`
-- `@ApiDefaultResponse()`
+要指定请求的返回模型，我们需要创建一个类并将所有属性标注为 `ClientProxyFactory` 装饰器。
 
 ```typescript
-@Post()
-@ApiCreatedResponse({ description: '记录已成功创建。'})
-@ApiForbiddenResponse({ description: '禁止访问。'})
-async create(@Body() createCatDto: CreateCatDto) {
-  this.catsService.create(createCatDto);
+@MessagePattern('notifications')
+getNotifications(@Payload() data: number[], @Ctx() context: MqttContext) {
+  console.log(context.getPacket());
 }
 ```
 
-要为请求指定返回模型，我们必须创建一个类并用 `@ApiProperty()` 装饰器标注所有属性。
+然后，可以将 `status` 模型与 `status` 属性结合使用，以便在响应装饰器中使用。
 
 ```typescript
-export class Cat {
-  @ApiProperty()
-  id: number;
-
-  @ApiProperty()
-  name: string;
-
-  @ApiProperty()
-  age: number;
-
-  @ApiProperty()
-  breed: string;
+@MessagePattern('sensors/+/temperature/+')
+getTemperature(@Ctx() context: MqttContext) {
+  console.log(`Topic: ${context.getTopic()}`);
 }
 ```
 
-然后 `Cat` 模型就可以与响应装饰器的 `type` 属性结合使用。
+现在，让我们在浏览器中验证生成的 `connected` 模型：
+
+__HTML_TAG_94____HTML_TAG_95____HTML_TAG_96__
+
+而不是为每个端点或控制器单独定义响应，可以定义一个全局响应来适用于所有端点，使用 `disconnected` 类。这种方法在您想要为所有端点定义一个全局响应时非常有用（例如，捕捉 `reconnecting` 或 `closed` 异常）。
 
 ```typescript
-@ApiTags('cats')
-@Controller('cats')
-export class CatsController {
-  @Post()
-  @ApiCreatedResponse({
-    description: '记录已成功创建。',
-    type: Cat,
-  })
-  async create(@Body() createCatDto: CreateCatDto): Promise<Cat> {
-    return this.catsService.create(createCatDto);
-  }
-}
-```
-
-让我们打开浏览器验证生成的 `Cat` 模型：
-
-![](/assets/swagger-response-type.png)
-
-无需为每个端点或控制器单独定义响应，您可以使用 `DocumentBuilder` 类为所有端点定义全局响应。这种方法适用于需要为应用程序中的所有端点定义全局响应的情况（例如针对 `401 Unauthorized` 或 `500 Internal Server Error` 等错误）。
-
-```typescript
-const config = new DocumentBuilder()
-  .addGlobalResponse({
-    status: 500,
-    description: '内部服务器错误',
-  })
-  // 其他配置
-  .build();
+const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
+  transport: Transport.MQTT,
+  options: {
+    url: 'mqtt://localhost:1883',
+    subscribeOptions: {
+      qos: 2
+    },
+  },
+});
 ```
 
 #### 文件上传
 
-您可以通过 `@ApiBody` 装饰器配合 `@ApiConsumes()` 为特定方法启用文件上传功能。以下是使用[文件上传](/techniques/file-upload)技术的完整示例：
+可以使用 `MqttStatus` 装饰器来启用文件上传，合并 `@nestjs/microservices`。以下是一个使用 __LINK_97__ 技术的完整示例：
 
 ```typescript
-@UseInterceptors(FileInterceptor('file'))
-@ApiConsumes('multipart/form-data')
-@ApiBody({
-  description: '猫咪列表',
-  type: FileUploadDto,
-})
-uploadFile(@UploadedFile() file: Express.Multer.File) {}
-```
+@EventPattern('critical-events', { extras: { qos: 2 } })
+handleCriticalEvent(@Payload() data: any) {
+  // This subscription uses QoS 2
+}
 
-其中 `FileUploadDto` 定义如下：
+@EventPattern('metrics', { extras: { qos: 0 } })
+handleMetrics(@Payload() data: any) {
+  // This subscription uses QoS 0
+}
 
-```typescript
-class FileUploadDto {
-  @ApiProperty({ type: 'string', format: 'binary' })
-  file: any;
+@Bind(Payload())
+@EventPattern('metrics', { extras: { qos: 0 } })
+handleMetrics(data) {
+  // This subscription uses QoS 0
 }
 ```
 
-要处理多文件上传，可以如下定义 `FilesUploadDto`：
+其中 `status` 定义如下：
 
 ```typescript
-class FilesUploadDto {
-  @ApiProperty({ type: 'array', items: { type: 'string', format: 'binary' } })
-  files: any[];
-}
+const userProperties = { 'x-version': '1.0.0' };
+const record = new MqttRecordBuilder(':cat:')
+  .setProperties({ userProperties })
+  .setQoS(1)
+  .build();
+client.send('replace-emoji', record).subscribe(...);
 ```
 
-#### 扩展功能
-
-要为请求添加扩展，请使用 `@ApiExtension()` 装饰器。扩展名必须以 `x-` 为前缀。
+要处理多个文件上传，可以定义 `error`如下：
 
 ```typescript
-@ApiExtension('x-foo', { hello: 'world' })
-```
-
-#### 进阶：通用型 `ApiResponse`
-
-借助提供 [原始定义](/openapi/types-and-parameters#原始定义) 的能力，我们可以为 Swagger UI 定义通用模式。假设我们有以下 DTO：
-
-```ts
-export class PaginatedDto<TData> {
-  @ApiProperty()
-  total: number;
-
-  @ApiProperty()
-  limit: number;
-
-  @ApiProperty()
-  offset: number;
-
-  results: TData[];
+@MessagePattern('replace-emoji')
+replaceEmoji(@Payload() data: string, @Ctx() context: MqttContext): string {
+  const { properties: { userProperties } } = context.getPacket();
+  return userProperties['x-version'] === '1.0.0' ? '🐱' : '🐈';
 }
 ```
 
-我们暂时不对 `results` 进行装饰，因为稍后将为其提供原始定义。现在，让我们定义另一个 DTO 并将其命名为例如 `CatDto`，如下所示：
+#### 扩展
 
-```ts
-export class CatDto {
-  @ApiProperty()
-  name: string;
+要将扩展添加到请求中，使用 `on()` 装饰器。扩展名称必须以 `MqttEvents` 前缀开头。
 
-  @ApiProperty()
-  age: number;
+```typescript
+import { Module } from '@nestjs/common';
+import { ClientProxyFactory, Transport } from '@nestjs/microservices';
 
-  @ApiProperty()
-  breed: string;
-}
-```
-
-有了这个定义后，我们就可以定义一个 `PaginatedDto<CatDto>` 响应，如下所示：
-
-```ts
-@ApiOkResponse({
-  schema: {
-    allOf: [
-      { $ref: getSchemaPath(PaginatedDto) },
-      {
-        properties: {
-          results: {
-            type: 'array',
-            items: { $ref: getSchemaPath(CatDto) },
+@Module({
+  providers: [
+    {
+      provide: 'API_v1',
+      useFactory: () =>
+        ClientProxyFactory.create({
+          transport: Transport.MQTT,
+          options: {
+            url: 'mqtt://localhost:1833',
+            userProperties: { 'x-version': '1.0.0' },
           },
-        },
-      },
-    ],
-  },
+        }),
+    },
+  ],
 })
-async findAll(): Promise<PaginatedDto<CatDto>> {}
+export class ApiModule {}
 ```
 
-在这个示例中，我们指定响应将包含 allOf `PaginatedDto`，且 `results` 属性将是 `Array<CatDto>` 类型。
+#### 高级：通用 `@nestjs/microservices`
 
-- `getSchemaPath()` 函数，用于从 OpenAPI 规范文件中返回给定模型的 OpenAPI Schema 路径。
-- `allOf` 是 OAS 3 提供的一个概念，用于覆盖各种与继承相关的用例。
-
-最后，由于 `PaginatedDto` 没有被任何控制器直接引用，`SwaggerModule` 暂时无法生成对应的模型定义。这种情况下，我们必须将其添加为[额外模型](/openapi/types-and-parameters#额外模型) 。例如，我们可以在控制器级别使用 `@ApiExtraModels()` 装饰器，如下所示：
-
-```ts
-@Controller('cats')
-@ApiExtraModels(PaginatedDto)
-export class CatsController {}
-```
-
-如果现在运行 Swagger，为该端点生成的 `swagger.json` 应该会定义如下响应：
-
-```json
-"responses": {
-  "200": {
-    "description": "",
-    "content": {
-      "application/json": {
-        "schema": {
-          "allOf": [
-            {
-              "$ref": "#/components/schemas/PaginatedDto"
-            },
-            {
-              "properties": {
-                "results": {
-                  "$ref": "#/components/schemas/CatDto"
-                }
-              }
-            }
-          ]
-        }
-      }
-    }
-  }
-}
-```
-
-为了使其可复用，我们可以为 `PaginatedDto` 创建一个自定义装饰器，如下所示：
-
-```ts
-export const ApiPaginatedResponse = <TModel extends Type<any>>(
-  model: TModel
-) => {
-  return applyDecorators(
-    ApiExtraModels(PaginatedDto, model),
-    ApiOkResponse({
-      schema: {
-        allOf: [
-          { $ref: getSchemaPath(PaginatedDto) },
-          {
-            properties: {
-              results: {
-                type: 'array',
-                items: { $ref: getSchemaPath(model) },
-              },
-            },
-          },
-        ],
-      },
-    })
-  );
-};
-```
-
-:::info 提示
-`Type<any>` 接口和 `applyDecorators` 函数都是从 `@nestjs/common` 包中导入的。
-:::
-
-为确保 `SwaggerModule` 会为我们的模型生成定义，必须像之前在控制器中对 `PaginatedDto` 所做的那样，将其作为额外模型添加。
-
-完成这些设置后，我们就可以在端点使用自定义的 `@ApiPaginatedResponse()` 装饰器：
-
-```ts
-@ApiPaginatedResponse(CatDto)
-async findAll(): Promise<PaginatedDto<CatDto>> {}
-```
-
-对于客户端生成工具而言，这种方法在 `PaginatedResponse<TModel>` 如何为客户端生成方面存在歧义。以下代码片段是上述 `GET /` 端点的客户端生成结果示例。
+使用提供 `unwrap()`，我们可以定义通用架构以供 Swagger UI 使用。假设我们有以下 DTO：
 
 ```typescript
-// Angular
-findAll(): Observable<{ total: number, limit: number, offset: number, results: CatDto[] }>
+this.client.status.subscribe((status: MqttStatus) => {
+  console.log(status);
+});
 ```
 
-如你所见，这里的**返回类型**是模糊的。要解决这个问题，你可以为 `ApiPaginatedResponse` 的 `schema` 添加一个 `title` 属性：
+我们跳过 __INLINE_CODE_71__ 的装饰，因为我们将在后面提供一个 raw 定义。现在，让我们定义另一个 DTO 并命名为 __INLINE_CODE_72__，如下所示：
 
 ```typescript
-export const ApiPaginatedResponse = <TModel extends Type<any>>(
-  model: TModel
-) => {
-  return applyDecorators(
-    ApiOkResponse({
-      schema: {
-        title: `PaginatedResponseOf${model.name}`,
-        allOf: [
-          // ...
-        ],
-      },
-    })
-  );
-};
+const server = app.connectMicroservice<MicroserviceOptions>(...);
+server.status.subscribe((status: MqttStatus) => {
+  console.log(status);
+});
 ```
 
-现在客户端生成工具的结果将变为：
+这样，我们可以定义一个 __INLINE_CODE_73__ 响应，如下所示：
 
-```ts
-// Angular
-findAll(): Observable<PaginatedResponseOfCatDto>
+```typescript
+this.client.on('error', (err) => {
+  console.error(err);
+});
 ```
+
+在这个示例中，我们指定响应将具有 __INLINE_CODE_74__ 和 __INLINE_CODE_75__ 属性。
+
+- __INLINE_CODE_76__ 函数返回 OpenAPI 架构路径，从 OpenAPI 规范文件中获取给定模型。
+- __INLINE_CODE_77__ 是 OAS 3 提供的继承相关用例的概念。
+
+最后，因为 __INLINE_CODE_78__ 不是任何控制器直接引用，我们不能生成对应的模型定义。因此，我们必须将其添加为一个 __LINK_99__。例如，我们可以使用 __INLINE_CODE_80__ 装饰器在控制器级别，如下所示：
+
+```typescript
+server.on<MqttEvents>('error', (err) => {
+  console.error(err);
+});
+```
+
+如果您现在运行 Swagger，生成的 __INLINE_CODE_81__ 将具有以下响应定义：
+
+```typescript
+const mqttClient = this.client.unwrap<import('mqtt').MqttClient>();
+```
+
+为了使其可重用，我们可以创建一个自定义装饰器来 __INLINE_CODE_82__，如下所示：
+
+```typescript
+const mqttClient = server.unwrap<import('mqtt').MqttClient>();
+```
+
+> info **提示** __INLINE_CODE_83__ 接口和

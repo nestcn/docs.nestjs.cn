@@ -1,5 +1,5 @@
 <!-- 此文件从 content/techniques/queues.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-24T02:50:53.719Z -->
+<!-- 生成时间: 2026-03-02T04:08:16.349Z -->
 <!-- 源文件: content/techniques/queues.md -->
 
 ### Queues
@@ -12,7 +12,7 @@ Queues are a powerful design pattern that help you deal with common application 
 
 Nest provides the `@nestjs/bullmq` package for BullMQ integration and `@nestjs/bull` package for Bull integration. Both packages are abstractions/wrappers on top of their respective libraries, which were developed by the same team. Bull is currently in maintenance mode, with the team focusing on fixing bugs, while BullMQ is actively developed, featuring a modern TypeScript implementation and a different set of features. If Bull meets your requirements, it remains a reliable and battle-tested choice. The Nest packages make it easy to integrate both, BullMQ or Bull Queues, into your Nest application in a friendly way.
 
-Both BullMQ and Bull use [Redis](https://redis.io/) to persist job data, so you'll need to have Redis installed on your system. Because they are Redis-backed, your Queue architecture can be completely distributed and platform-independent. For example, you can have some Queue <a href="techniques/queues#生产者">producers</a> and <a href="techniques/queues#消费者">consumers</a> and <a href="techniques/queues#事件监听器">listeners</a> running in Nest on one (or several) nodes, and other producers, consumers and listeners running on other Node.js platforms on other network nodes.
+Both BullMQ and Bull use [Redis](https://redis.io/) to persist job data, so you'll need to have Redis installed on your system. Because they are Redis-backed, your Queue architecture can be completely distributed and platform-independent. For example, you can have some Queue <a href="techniques/queues#producers">producers</a> and <a href="techniques/queues#consumers">consumers</a> and <a href="techniques/queues#event-listeners">listeners</a> running in Nest on one (or several) nodes, and other producers, consumers and listeners running on other Node.js platforms on other network nodes.
 
 This chapter covers the `@nestjs/bullmq` and `@nestjs/bull` packages. We also recommend reading the [BullMQ](https://docs.bullmq.io/) and [Bull](https://github.com/OptimalBits/bull/blob/master/REFERENCE.md) documentation for more background and specific implementation details.
 
@@ -26,7 +26,7 @@ $ npm install --save @nestjs/bullmq bullmq
 
 Once the installation process is complete, we can import the `BullModule` into the root `AppModule`.
 
-```typescript title="app.module"
+```typescript
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
 
@@ -88,7 +88,7 @@ BullModule.registerFlowProducer({
 
 Since jobs are persisted in Redis, each time a specific named queue is instantiated (e.g., when an app is started/restarted), it attempts to process any old jobs that may exist from a previous unfinished session.
 
-Each queue can have one or many producers, consumers, and listeners. Consumers retrieve jobs from the queue in a specific order: FIFO (the default), LIFO, or according to priorities. Controlling queue processing order is discussed <a href="techniques/queues#消费者">here</a>.
+Each queue can have one or many producers, consumers, and listeners. Consumers retrieve jobs from the queue in a specific order: FIFO (the default), LIFO, or according to priorities. Controlling queue processing order is discussed <a href="techniques/queues#consumers">here</a>.
 
 <app-banner-enterprise></app-banner-enterprise>
 
@@ -119,7 +119,7 @@ BullModule.registerQueue({
 
 #### Producers
 
-Job producers add jobs to queues. Producers are typically application services (Nest [providers](/overview/providers)). To add jobs to a queue, first inject the queue into the service as follows:
+Job producers add jobs to queues. Producers are typically application services (Nest [providers](/providers)). To add jobs to a queue, first inject the queue into the service as follows:
 
 ```typescript
 import { Injectable } from '@nestjs/common';
@@ -134,7 +134,7 @@ export class AudioService {
 
 > info **Hint** The `@InjectQueue()` decorator identifies the queue by its name, as provided in the `registerQueue()` method call (e.g., `'audio'`).
 
-Now, add a job by calling the queue's `add()` method, passing a user-defined job object. Jobs are represented as serializable JavaScript objects (since that is how they are stored in the Redis database). The shape of the job you pass is arbitrary; use it to represent the semantics of your job object. You also need to give it a name. This allows you to create specialized <a href="techniques/queues#消费者">consumers</a> that will only process jobs with a given name.
+Now, add a job by calling the queue's `add()` method, passing a user-defined job object. Jobs are represented as serializable JavaScript objects (since that is how they are stored in the Redis database). The shape of the job you pass is arbitrary; use it to represent the semantics of your job object. You also need to give it a name. This allows you to create specialized <a href="techniques/queues#consumers">consumers</a> that will only process jobs with a given name.
 
 ```typescript
 const job = await this.audioQueue.add('transcode', {
@@ -276,7 +276,7 @@ This is covered in the [named processor](https://docs.bullmq.io/patterns/named-p
 
 #### Request-scoped consumers
 
-When a consumer is flagged as request-scoped (learn more about the injection scopes [here](/fundamentals/provider-scopes#提供者作用域)), a new instance of the class will be created exclusively for each job. The instance will be garbage-collected after the job has completed.
+When a consumer is flagged as request-scoped (learn more about the injection scopes [here](/fundamentals/injection-scopes#provider-scope)), a new instance of the class will be created exclusively for each job. The instance will be garbage-collected after the job has completed.
 
 ```typescript
 @Processor({
@@ -299,7 +299,7 @@ constructor(@Inject(JOB_REF) jobRef: Job) {
 
 BullMQ generates a set of useful events when queue and/or job state changes occur. These events can be subscribed to at the Worker level using the `@OnWorkerEvent(event)` decorator, or at the Queue level with a dedicated listener class and the `@OnQueueEvent(event)` decorator.
 
-Worker events must be declared within a <a href="techniques/queues#消费者">consumer</a> class (i.e., within a class decorated with the `@Processor()` decorator). To listen for an event, use the `@OnWorkerEvent(event)` decorator with the event you want to be handled. For example, to listen to the event emitted when a job enters the active state in the `audio` queue, use the following construct:
+Worker events must be declared within a <a href="techniques/queues#consumers">consumer</a> class (i.e., within a class decorated with the `@Processor()` decorator). To listen for an event, use the `@OnWorkerEvent(event)` decorator with the event you want to be handled. For example, to listen to the event emitted when a job enters the active state in the `audio` queue, use the following construct:
 
 ```typescript
 import { Processor, Process, OnWorkerEvent } from '@nestjs/bullmq';
@@ -369,7 +369,7 @@ Job handlers can also be run in a separate (forked) process ([source](https://do
 - Much better utilization of multi-core CPUs.
 - Less connections to redis.
 
-```typescript title="app.module"
+```typescript
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
 import { join } from 'node:path';
@@ -404,7 +404,7 @@ BullModule.forRootAsync({
 });
 ```
 
-Our factory behaves like any other [asynchronous provider](/fundamentals/async-components) (e.g., it can be `async` and it's able to inject dependencies through `inject`).
+Our factory behaves like any other [asynchronous provider](/fundamentals/async-providers) (e.g., it can be `async` and it's able to inject dependencies through `inject`).
 
 ```typescript
 BullModule.forRootAsync({
@@ -512,7 +512,7 @@ $ npm install --save @nestjs/bull bull
 
 Once the installation process is complete, we can import the `BullModule` into the root `AppModule`.
 
-```typescript title="app.module"
+```typescript
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bull';
 
@@ -564,7 +564,7 @@ BullModule.registerQueue({
 
 Since jobs are persisted in Redis, each time a specific named queue is instantiated (e.g., when an app is started/restarted), it attempts to process any old jobs that may exist from a previous unfinished session.
 
-Each queue can have one or many producers, consumers, and listeners. Consumers retrieve jobs from the queue in a specific order: FIFO (the default), LIFO, or according to priorities. Controlling queue processing order is discussed <a href="techniques/queues#消费者">here</a>.
+Each queue can have one or many producers, consumers, and listeners. Consumers retrieve jobs from the queue in a specific order: FIFO (the default), LIFO, or according to priorities. Controlling queue processing order is discussed <a href="techniques/queues#consumers">here</a>.
 
 <app-banner-enterprise></app-banner-enterprise>
 
@@ -595,7 +595,7 @@ BullModule.registerQueue({
 
 #### Producers
 
-Job producers add jobs to queues. Producers are typically application services (Nest [providers](/overview/providers)). To add jobs to a queue, first inject the queue into the service as follows:
+Job producers add jobs to queues. Producers are typically application services (Nest [providers](/providers)). To add jobs to a queue, first inject the queue into the service as follows:
 
 ```typescript
 import { Injectable } from '@nestjs/common';
@@ -620,7 +620,7 @@ const job = await this.audioQueue.add({
 
 #### Named jobs
 
-Jobs may have unique names. This allows you to create specialized <a href="techniques/queues#消费者">consumers</a> that will only process jobs with a given name.
+Jobs may have unique names. This allows you to create specialized <a href="techniques/queues#consumers">consumers</a> that will only process jobs with a given name.
 
 ```typescript
 const job = await this.audioQueue.add('transcode', {
@@ -628,7 +628,7 @@ const job = await this.audioQueue.add('transcode', {
 });
 ```
 
-> Warning **Warning** When using named jobs, you must create processors for each unique name added to a queue, or the queue will complain that you are missing a processor for the given job. See <a href="techniques/queues#消费者">here</a> for more information on consuming named jobs.
+> Warning **Warning** When using named jobs, you must create processors for each unique name added to a queue, or the queue will complain that you are missing a processor for the given job. See <a href="techniques/queues#consumers">here</a> for more information on consuming named jobs.
 
 #### Job options
 
@@ -729,11 +729,11 @@ You can designate that a job handler method will handle **only** jobs of a certa
 async transcode(job: Job<unknown>) { ... }
 ```
 
-> warning **Warning** When defining multiple consumers for the same queue, the `concurrency` option in `@Process({ concurrency: 1 })` won't take effect. The minimum `concurrency` will match the number of consumers defined. This also applies even if `@Process()` handlers use a different `name` to handle named jobs.
+> warning **Warning** When defining multiple consumers for the same queue, the `concurrency` option in `@Process({ concurrency: 1 }})` won't take effect. The minimum `concurrency` will match the number of consumers defined. This also applies even if `@Process()` handlers use a different `name` to handle named jobs.
 
 #### Request-scoped consumers
 
-When a consumer is flagged as request-scoped (learn more about the injection scopes [here](/fundamentals/provider-scopes#提供者作用域)), a new instance of the class will be created exclusively for each job. The instance will be garbage-collected after the job has completed.
+When a consumer is flagged as request-scoped (learn more about the injection scopes [here](/fundamentals/injection-scopes#provider-scope)), a new instance of the class will be created exclusively for each job. The instance will be garbage-collected after the job has completed.
 
 ```typescript
 @Processor({
@@ -756,7 +756,7 @@ constructor(@Inject(JOB_REF) jobRef: Job) {
 
 Bull generates a set of useful events when queue and/or job state changes occur. Nest provides a set of decorators that allow subscribing to a core set of standard events. These are exported from the `@nestjs/bull` package.
 
-Event listeners must be declared within a <a href="techniques/queues#消费者">consumer</a> class (i.e., within a class decorated with the `@Processor()` decorator). To listen for an event, use one of the decorators in the table below to declare a handler for the event. For example, to listen to the event emitted when a job enters the active state in the `audio` queue, use the following construct:
+Event listeners must be declared within a <a href="techniques/queues#consumers">consumer</a> class (i.e., within a class decorated with the `@Processor()` decorator). To listen for an event, use one of the decorators in the table below to declare a handler for the event. For example, to listen to the event emitted when a job enters the active state in the `audio` queue, use the following construct:
 
 ```typescript
 import { Processor, Process, OnQueueActive } from '@nestjs/bull';
@@ -836,7 +836,7 @@ async onGlobalCompleted(jobId: number, result: any) {
 
 > info **Hint** To access the `Queue` object (to make a `getJob()` call), you must of course inject it. Also, the Queue must be registered in the module where you are injecting it.
 
-In addition to the specific event listener decorators, you can also use the generic `@OnQueueEvent()` decorator in combination with either `BullQueueEvents` or `BullQueueGlobalEvents` enums. Read more about events [here](https://github.com/OptimalBits/bull/blob/master/REFERENCE.md#事件).
+In addition to the specific event listener decorators, you can also use the generic `@OnQueueEvent()` decorator in combination with either `BullQueueEvents` or `BullQueueGlobalEvents` enums. Read more about events [here](https://github.com/OptimalBits/bull/blob/master/REFERENCE.md#events).
 
 #### Queue management
 
@@ -856,14 +856,14 @@ await audioQueue.resume();
 
 #### Separate processes
 
-Job handlers can also be run in a separate (forked) process ([source](https://github.com/OptimalBits/bull#独立进程)). This has several advantages:
+Job handlers can also be run in a separate (forked) process ([source](https://github.com/OptimalBits/bull#separate-processes)). This has several advantages:
 
 - The process is sandboxed so if it crashes it does not affect the worker.
 - You can run blocking code without affecting the queue (jobs will not stall).
 - Much better utilization of multi-core CPUs.
 - Less connections to redis.
 
-```ts title="app.module"
+```ts
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bull';
 import { join } from 'path';
@@ -881,7 +881,7 @@ export class AppModule {}
 
 Please note that because your function is being executed in a forked process, Dependency Injection (and IoC container) won't be available. That means that your processor function will need to contain (or create) all instances of external dependencies it needs.
 
-```ts title="processor"
+```ts
 import { Job, DoneCallback } from 'bull';
 
 export default function (job: Job, cb: DoneCallback) {
@@ -907,7 +907,7 @@ BullModule.forRootAsync({
 });
 ```
 
-Our factory behaves like any other [asynchronous provider](/fundamentals/async-components) (e.g., it can be `async` and it's able to inject dependencies through `inject`).
+Our factory behaves like any other [asynchronous provider](/fundamentals/async-providers) (e.g., it can be `async` and it's able to inject dependencies through `inject`).
 
 ```typescript
 BullModule.forRootAsync({

@@ -1,5 +1,5 @@
 <!-- 此文件从 content/pipes.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-24T02:49:47.009Z -->
+<!-- 生成时间: 2026-03-02T04:06:09.535Z -->
 <!-- 源文件: content/pipes.md -->
 
 ### Pipes
@@ -15,7 +15,7 @@ Pipes have two typical use cases:
 - **transformation**: transform input data to the desired form (e.g., from string to integer)
 - **validation**: evaluate input data and if valid, simply pass it through unchanged; otherwise, throw an exception
 
-In both cases, pipes operate on the `arguments` being processed by a <a href="controllers#路由参数">controller route handler</a>. Nest interposes a pipe just before a method is invoked, and the pipe receives the arguments destined for the method and operates on them. Any transformation or validation operation takes place at that time, after which the route handler is invoked with any (potentially) transformed arguments.
+In both cases, pipes operate on the `arguments` being processed by a <a href="controllers#route-parameters">controller route handler</a>. Nest interposes a pipe just before a method is invoked, and the pipe receives the arguments destined for the method and operates on them. Any transformation or validation operation takes place at that time, after which the route handler is invoked with any (potentially) transformed arguments.
 
 Nest comes with a number of built-in pipes that you can use out-of-the-box. You can also build your own custom pipes. In this chapter, we'll introduce the built-in pipes and show how to bind them to route handlers. We'll then examine several custom-built pipes to show how you can build one from scratch.
 
@@ -115,12 +115,19 @@ As mentioned, you can build your own custom pipes. While Nest provides a robust 
 
 We start with a simple `ValidationPipe`. Initially, we'll have it simply take an input value and immediately return the same value, behaving like an identity function.
 
-```typescript title="validation.pipe"
+```typescript
 import { PipeTransform, Injectable, ArgumentMetadata } from '@nestjs/common';
 
 @Injectable()
 export class ValidationPipe implements PipeTransform {
   transform(value: any, metadata: ArgumentMetadata) {
+    return value;
+  }
+}
+
+@Injectable()
+export class ValidationPipe {
+  transform(value, metadata) {
     return value;
   }
 }
@@ -191,7 +198,7 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 Let's focus in on the `createCatDto` body parameter. Its type is `CreateCatDto`:
 
-```typescript title="create-cat.dto"
+```typescript
 export class CreateCatDto {
   name: string;
   age: number;
@@ -243,6 +250,20 @@ export class ZodValidationPipe implements PipeTransform {
     }
   }
 }
+
+export class ZodValidationPipe {
+  constructor(private schema) {}
+
+  transform(value, metadata) {
+    try {
+      const parsedValue = this.schema.parse(value);
+      return parsedValue;
+    } catch (error) {
+      throw new BadRequestException('Validation failed');
+    }
+  }
+}
+
 ```
 
 #### Binding validation pipes
@@ -275,7 +296,7 @@ export type CreateCatDto = z.infer<typeof createCatSchema>;
 
 We do that using the `@UsePipes()` decorator as shown below:
 
-```typescript title="cats.controller"
+```typescript
 @Post()
 @UsePipes(new ZodValidationPipe(createCatSchema))
 async create(@Body() createCatDto: CreateCatDto) {
@@ -301,7 +322,7 @@ $ npm i --save class-validator class-transformer
 
 Once these are installed, we can add a few decorators to the `CreateCatDto` class. Here we see a significant advantage of this technique: the `CreateCatDto` class remains the single source of truth for our Post body object (rather than having to create a separate validation class).
 
-```typescript title="create-cat.dto"
+```typescript
 import { IsString, IsInt } from 'class-validator';
 
 export class CreateCatDto {
@@ -316,11 +337,11 @@ export class CreateCatDto {
 }
 ```
 
-> info **Hint** Read more about the class-validator decorators [here](https://github.com/typestack/class-validator#用法).
+> info **Hint** Read more about the class-validator decorators [here](https://github.com/typestack/class-validator#usage).
 
 Now we can create a `ValidationPipe` class that uses these annotations.
 
-```typescript title="validation.pipe"
+```typescript
 import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException } from '@nestjs/common';
 import { validate } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
@@ -363,7 +384,7 @@ Finally, as noted earlier, since this is a **validation pipe** it either returns
 The last step is to bind the `ValidationPipe`. Pipes can be parameter-scoped, method-scoped, controller-scoped, or global-scoped. Earlier, with our Zod-based validation pipe, we saw an example of binding the pipe at the method level.
 In the example below, we'll bind the pipe instance to the route handler `@Body()` decorator so that our pipe is called to validate the post body.
 
-```typescript title="cats.controller"
+```typescript
 @Post()
 async create(
   @Body(new ValidationPipe()) createCatDto: CreateCatDto,
@@ -378,7 +399,7 @@ Parameter-scoped pipes are useful when the validation logic concerns only one sp
 
 Since the `ValidationPipe` was created to be as generic as possible, we can realize its full utility by setting it up as a **global-scoped** pipe so that it is applied to every route handler across the entire application.
 
-```typescript title="main"
+```typescript
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
@@ -393,7 +414,7 @@ Global pipes are used across the whole application, for every controller and eve
 
 Note that in terms of dependency injection, global pipes registered from outside of any module (with `useGlobalPipes()` as in the example above) cannot inject dependencies since the binding has been done outside the context of any module. In order to solve this issue, you can set up a global pipe **directly from any module** using the following construction:
 
-```typescript title="app.module"
+```typescript
 import { Module } from '@nestjs/common';
 import { APP_PIPE } from '@nestjs/core';
 
@@ -408,7 +429,7 @@ import { APP_PIPE } from '@nestjs/core';
 export class AppModule {}
 ```
 
-> info **Hint** When using this approach to perform dependency injection for the pipe, note that regardless of the module where this construction is employed, the pipe is, in fact, global. Where should this be done? Choose the module where the pipe (`ValidationPipe` in the example above) is defined. Also, `useClass` is not the only way of dealing with custom provider registration. Learn more [here](/fundamentals/dependency-injection).
+> info **Hint** When using this approach to perform dependency injection for the pipe, note that regardless of the module where this construction is employed, the pipe is, in fact, global. Where should this be done? Choose the module where the pipe (`ValidationPipe` in the example above) is defined. Also, `useClass` is not the only way of dealing with custom provider registration. Learn more [here](/fundamentals/custom-providers).
 
 #### The built-in ValidationPipe
 
@@ -422,12 +443,23 @@ When is this useful? Consider that sometimes the data passed from the client nee
 
 Here's a simple `ParseIntPipe` which is responsible for parsing a string into an integer value. (As noted above, Nest has a built-in `ParseIntPipe` that is more sophisticated; we include this as a simple example of a custom transformation pipe).
 
-```typescript title="parse-int.pipe"
+```typescript
 import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException } from '@nestjs/common';
 
 @Injectable()
 export class ParseIntPipe implements PipeTransform<string, number> {
   transform(value: string, metadata: ArgumentMetadata): number {
+    const val = parseInt(value, 10);
+    if (isNaN(val)) {
+      throw new BadRequestException('Validation failed');
+    }
+    return val;
+  }
+}
+
+@Injectable()
+export class ParseIntPipe {
+  transform(value, metadata) {
     const val = parseInt(value, 10);
     if (isNaN(val)) {
       throw new BadRequestException('Validation failed');

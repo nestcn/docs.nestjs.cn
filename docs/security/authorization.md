@@ -1,5 +1,5 @@
 <!-- 此文件从 content/security/authorization.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-24T02:52:53.307Z -->
+<!-- 生成时间: 2026-03-02T04:10:14.640Z -->
 <!-- 源文件: content/security/authorization.md -->
 
 ### Authorization
@@ -16,29 +16,31 @@ Role-based access control (**RBAC**) is a policy-neutral access-control mechanis
 
 First, let's create a `Role` enum representing roles in the system:
 
-```typescript title="role.enum"
+```typescript
 export enum Role {
   User = 'user',
   Admin = 'admin',
 }
-```
 ```
 
 > info **Hint** In more sophisticated systems, you may store roles within a database, or pull them from the external authentication provider.
 
 With this in place, we can create a `@Roles()` decorator. This decorator allows specifying what roles are required to access specific resources.
 
-```typescript title="roles.decorator"
+```typescript
 import { SetMetadata } from '@nestjs/common';
 import { Role } from '../enums/role.enum';
 
 export const ROLES_KEY = 'roles';
 export const Roles = (...roles: Role[]) => SetMetadata(ROLES_KEY, roles);
+
+export const ROLES_KEY = 'roles';
+export const Roles = (...roles) => SetMetadata(ROLES_KEY, roles);
 ```
 
 Now that we have a custom `@Roles()` decorator, we can use it to decorate any route handler.
 
-```typescript title="cats.controller"
+```typescript
 @Post()
 @Roles(Role.Admin)
 create(@Body() createCatDto: CreateCatDto) {
@@ -48,7 +50,7 @@ create(@Body() createCatDto: CreateCatDto) {
 
 Finally, we create a `RolesGuard` class which will compare the roles assigned to the current user to the actual roles required by the current route being processed. In order to access the route's role(s) (custom metadata), we'll use the `Reflector` helper class, which is provided out of the box by the framework and exposed from the `@nestjs/core` package.
 
-```typescript title="roles.guard"
+```typescript
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
@@ -66,6 +68,26 @@ export class RolesGuard implements CanActivate {
     }
     const { user } = context.switchToHttp().getRequest();
     return requiredRoles.some((role) => user.roles?.includes(role));
+  }
+}
+
+@Injectable()
+@Dependencies(Reflector)
+export class RolesGuard {
+  constructor(reflector) {
+    this.reflector = reflector;
+  }
+
+  canActivate(context) {
+    const requiredRoles = this.reflector.getAllAndOverride(ROLES_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    if (!requiredRoles) {
+      return true;
+    }
+    const { user } = context.switchToHttp().getRequest();
+    return requiredRoles.some((role) => user.roles.includes(role));
   }
 }
 ```
@@ -114,9 +136,9 @@ When a user with insufficient privileges requests an endpoint, Nest automaticall
 
 When an identity is created it may be assigned one or more claims issued by a trusted party. A claim is a name-value pair that represents what the subject can do, not what the subject is.
 
-To implement a Claims-based authorization in Nest, you can follow the same steps we have shown above in the [RBAC](/security/authorization#基本-rbac-实现) section with one significant difference: instead of checking for specific roles, you should compare **permissions**. Every user would have a set of permissions assigned. Likewise, each resource/endpoint would define what permissions are required (for example, through a dedicated `@RequirePermissions()` decorator) to access them.
+To implement a Claims-based authorization in Nest, you can follow the same steps we have shown above in the [RBAC](/security/authorization#basic-rbac-implementation) section with one significant difference: instead of checking for specific roles, you should compare **permissions**. Every user would have a set of permissions assigned. Likewise, each resource/endpoint would define what permissions are required (for example, through a dedicated `@RequirePermissions()` decorator) to access them.
 
-```typescript title="cats.controller"
+```typescript
 @Post()
 @RequirePermissions(Permission.CREATE_CAT)
 create(@Body() createCatDto: CreateCatDto) {
@@ -389,4 +411,4 @@ findAll() {
 }
 ```
 
-> warning **Notice** Since we must instantiate the policy handler in-place using the `new` keyword, `ReadArticlePolicyHandler` class cannot use the Dependency Injection. This can be addressed with the `ModuleRef#get` method (read more [here](/fundamentals/module-reference)). Basically, instead of registering functions and instances through the `@CheckPolicies()` decorator, you must allow passing a `Type<IPolicyHandler>`. Then, inside your guard, you could retrieve an instance using a type reference: `moduleRef.get(YOUR_HANDLER_TYPE)` or even dynamically instantiate it using the `ModuleRef#create` method.
+> warning **Notice** Since we must instantiate the policy handler in-place using the `new` keyword, `ReadArticlePolicyHandler` class cannot use the Dependency Injection. This can be addressed with the `ModuleRef#get` method (read more [here](/fundamentals/module-ref)). Basically, instead of registering functions and instances through the `@CheckPolicies()` decorator, you must allow passing a `Type<IPolicyHandler>`. Then, inside your guard, you could retrieve an instance using a type reference: `moduleRef.get(YOUR_HANDLER_TYPE)` or even dynamically instantiate it using the `ModuleRef#create` method.

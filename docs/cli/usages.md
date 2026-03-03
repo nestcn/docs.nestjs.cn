@@ -1,5 +1,5 @@
 <!-- 此文件从 content/cli/usages.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-24T03:02:24.252Z -->
+<!-- 生成时间: 2026-03-02T04:19:25.106Z -->
 <!-- 源文件: content/cli/usages.md -->
 
 ### CLI command reference
@@ -120,7 +120,7 @@ $ nest build <name> [options]
 | `--webpack`             | Use webpack for compilation (deprecated: use `--builder webpack` instead).                                                                                                                 |
 | `--webpackPath`         | Path to webpack configuration.                                                                                                                                                             |
 | `--tsc`                 | Force use `tsc` for compilation.                                                                                                                                                           |
-| `--watchAssets`         | Watch non-TS files (assets like `.graphql` etc.). See [Assets](/cli/overview) for more details.                                                                                      |
+| `--watchAssets`         | Watch non-TS files (assets like `.graphql` etc.). See [Assets](cli/monorepo#assets) for more details.                                                                                      |
 | `--type-check`          | Enable type checking (when SWC is used).                                                                                                                                                   |
 | `--all`                 | Build all projects in a monorepo.                                                                                                                                                          |
 | `--preserveWatchOutput` | Keep outdated console output in watch mode instead of clearing the screen. (`tsc` watch mode only)                                                                                         |
@@ -148,7 +148,7 @@ $ nest start <name> [options]
 | `--watch`               | Run in watch mode (live-reload) <br/>Alias `-w`                                                                                    |
 | `--builder [name]`      | Specify the builder to use for compilation (`tsc`, `swc`, or `webpack`). <br/>Alias `-b`                                           |
 | `--preserveWatchOutput` | Keep outdated console output in watch mode instead of clearing the screen. (`tsc` watch mode only)                                 |
-| `--watchAssets`         | Run in watch mode (live-reload), watching non-TS files (assets). See [Assets](/cli/overview) for more details.               |
+| `--watchAssets`         | Run in watch mode (live-reload), watching non-TS files (assets). See [Assets](cli/monorepo#assets) for more details.               |
 | `--debug [hostport]`    | Run in debug mode (with --inspect flag) <br/>Alias `-d`                                                                            |
 | `--webpack`             | Use webpack for compilation. (deprecated: use `--builder webpack` instead)                                                         |
 | `--webpackPath`         | Path to webpack configuration.                                                                                                     |

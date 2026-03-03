@@ -1,77 +1,61 @@
 <!-- 此文件从 content/middlewares.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-02T04:06:53.922Z -->
+<!-- 生成时间: 2026-03-03T04:07:45.988Z -->
 <!-- 源文件: content/middlewares.md -->
 
-### 中间件
+### Middleware
 
-中间件是一种函数，位于路由处理器之前。中间件函数可以访问 `__LINK_93__` 和 `__LINK_94__` 对象，以及应用程序的请求-响应周期中的 ``$ nest g service cats`` 中间件函数。常用的 `next` 中间件函数通常以变量 ``CatsService`` 的形式出现。
+Middleware 是一个在路由处理器之前被调用的函数。Middleware 函数可以访问 `request` 和 `response` 对象，并且可以在应用程序的请求响应周期中执行任何代码。
 
-`__HTML_TAG_72__` `__HTML_TAG_73__` `__HTML_TAG_74__`
+__HTML_TAG_72____HTML_TAG_73____HTML_TAG_74__
 
-Nest 中间件默认情况下等同于 Express 中间件。以下是官方 Express 文档中对中间件的描述：
+NestJS 的 middleware 等同于 Express 中的 middleware。Middleware 函数可以执行以下任务：
 
-`__HTML_TAG_75__`
-  中间件函数可以执行以下任务：
-  `__HTML_TAG_76__`
-    `__HTML_TAG_77__` 执行任何代码。
-    `__HTML_TAG_79__` 修改请求和响应对象。
-    `__HTML_TAG_81__` 结束请求-响应周期。
-    `__HTML_TAG_83__` 调用下一个中间件函数。
-    `__HTML_TAG_85__` 如果当前中间件函数不结束请求-响应周期，它必须调用 `__HTML_TAG_86__` `next()` `__HTML_TAG_87__` 将控制权传递给下一个中间件函数。否则，请求将被留下。
-  `__HTML_TAG_89__`
-`__HTML_TAG_90__`
+__HTML_TAG_75__
+  中WARE 函数可以执行以下任务：
+  __HTML_TAG_76__执行任何代码。
+  __HTML_TAG_77__修改请求和响应对象。
+  __HTML_TAG_78__结束请求响应周期。
+  __HTML_TAG_79__调用下一个 middleware 函数。
+  __HTML_TAG_80__如果当前 middleware 函数不结束请求响应周期，必须调用 `next()` 将控制权传递给下一个 middleware 函数。否则，请求将被留下。
+  __HTML_TAG_81__
+__HTML_TAG_90__
 
-您可以使用函数或带有 ``@Injectable()`` 装饰器的类来实现自定义 Nest 中间件。类应该实现 ``CatsService`` 接口，而函数没有特殊要求。让我们从实现一个简单的中间件特性开始，使用类方法。
-
-> 警告 **警告** ``Cat`` 和 ``CatsController`` 处理中间件 differently 和提供不同的方法签名，阅读更多 `__LINK_96__`。
-
-````typescript
-import { Injectable } from '@nestjs/common';
-import { Cat } from './interfaces/cat.interface';
-
-@Injectable()
-export class CatsService {
-  private readonly cats: Cat[] = [];
-
-  create(cat: Cat) {
-    this.cats.push(cat);
-  }
-
-  findAll(): Cat[] {
-    return this.cats;
-  }
-}
-
-@Injectable()
-export class CatsService {
-  constructor() {
-    this.cats = [];
-  }
-
-  create(cat) {
-    this.cats.push(cat);
-  }
-
-  findAll() {
-    return this.cats;
-  }
-}
-````
+您可以使用函数或类来实现自定义 Nest middleware。类中应该实现 `@Injectable` 装饰器，而函数不需要特殊要求。
 
 #### 依赖注入
 
-Nest 中间件完全支持依赖注入。正如provider和控制器一样，它们可以注入同一个模块中的依赖项。通常，这是通过 ``CatsService`` 来实现的。
+Nest middleware 完全支持依赖注入。正如提供者和控制器一样，它们可以注入同一个模块中的依赖项。通过 `@Inject` 装饰器来实现依赖注入。
 
-#### 应用中间件
+#### 应用 middleware
 
-没有中间件在 ``private`` 装饰器中。相反，我们使用 ``catsService`` 方法来设置它们。包含中间件的模块必须实现 ``catsService`` 接口。让我们在 ``@Optional()`` 等级上设置 ``HTTP_OPTIONS``。
+middleware 不在 `@Controller` 装饰器中。相反，我们使用 `@Module` 类的 `forRoot()` 方法来设置它们。实现 `@Module` 接口的模块可以包含 middleware。
 
-````typescript
-export interface Cat {
-  name: string;
-  age: number;
-  breed: string;
+#### 路由通配符
+
+NestJS 还支持模式路由。例如，命名通配符 (`__INLINE_CODE_42__`) 可以用作通配符，以匹配路由中的任何组合字符。下面是一个示例，middleware 将被执行为任何以 `__INLINE_CODE_43__` 开头的路由，无论其后字符的数量。
+
+```typescript
+constructor(private catsService: CatsService) {}
+```
+
+> info **Hint** __INLINE_CODE_44__ 是通配符参数的名称，它没有特殊含义。您可以将其命名为任何名称，例如 `__INLINE_CODE_45__`。
+
+#### middleware 消费者
+
+__INLINE_CODE_53__ 是一个帮助类，它提供了多种方法来管理 middleware。所有这些方法都可以被链式调用在 `__LINK_97__` 中。`__INLINE_CODE_54__` 方法可以接受单个字符串、多个字符串、`__INLINE_CODE_55__` 对象、控制器类或多个控制器类。通常情况下，您可能会传递控制器列表，使用逗号分隔。下面是一个使用单个控制器的示例：
+
+```typescript
+import { Injectable, Inject } from '@nestjs/common';
+
+@Injectable()
+export class HttpService<T> {
+  @Inject('HTTP_OPTIONS')
+  private readonly httpClient: T;
 }
-````
+```
 
-在上面的示例中，我们已经设置了 ``super()`` 对于之前在 ``@Inject()`` 中定义的路由处理器。我们还可以进一步限制中间件到特定的请求方法通过将对象包含路由 ``@Inject`` 和请求 ``CatsService`` 传递给 ``CatsController`` 方法
+> info **Hint** `__INLINE_CODE_56__` 方法可以接受单个 middleware 或多个参数，以指定多个 middleware。
+
+#### 排除路由
+
+有时，我们可能想排除某些路由不应用 middleware。这可以使用 `__INLINE_CODE_57__` 方法来实现。`__INLINE_CODE_58__` 方法接受单

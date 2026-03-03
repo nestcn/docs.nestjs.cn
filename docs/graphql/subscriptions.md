@@ -1,5 +1,5 @@
 <!-- 此文件从 content/graphql/subscriptions.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-02T04:14:54.346Z -->
+<!-- 生成时间: 2026-03-03T04:15:55.848Z -->
 <!-- 源文件: content/graphql/subscriptions.md -->
 
 ### Subscriptions

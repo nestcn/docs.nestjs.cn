@@ -1,10 +1,10 @@
 <!-- 此文件从 content/microservices/exception-filters.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-02T04:14:54.147Z -->
+<!-- 生成时间: 2026-03-03T04:15:55.534Z -->
 <!-- 源文件: content/microservices/exception-filters.md -->
 
 ### 异常过滤器
 
-HTTP 层和微服务层之间唯一的区别是，在抛出 __LINK_15__ 时，您应该使用 __INLINE_CODE_6__。
+HTTP 层和微服务层之间唯一的不同之处是，而不是抛出 __INLINE_CODE_5__, 应该使用 __INLINE_CODE_6__。
 
 ```typescript
 import { Field, ObjectType } from '@nestjs/graphql';
@@ -16,9 +16,9 @@ export class Book {
 }
 ```
 
-> info **提示** __INLINE_CODE_7__ 类是来自 __INLINE_CODE_8__ 包的。
+> info **提示** 类 __INLINE_CODE_7__ 来自包 __INLINE_CODE_8__。
 
-Nest 将处理抛出的异常并返回一个具有以下结构的 __INLINE_CODE_9__ 对象：
+Nest 将处理抛出的异常，并将返回 __INLINE_CODE_9__ 对象，具有以下结构：
 
 ```typescript
 import { Field, ObjectType } from '@nestjs/graphql';
@@ -32,7 +32,7 @@ export class Author {
 
 #### 过滤器
 
-微服务异常过滤器与 HTTP 异常过滤器类似，但是有一点小差异。__INLINE_CODE_10__ 方法必须返回一个 __INLINE_CODE_11__。
+微服务异常过滤器的行为与 HTTP 异常过滤器相似，但有一小点不同。方法 __INLINE_CODE_10__ 必须返回 __INLINE_CODE_11__。
 
 ```typescript
 export const ResultUnion = createUnionType({
@@ -41,9 +41,9 @@ export const ResultUnion = createUnionType({
 });
 ```
 
-> warning **警告** 使用 __LINK_16__ 时，全球微服务异常过滤器默认不启用。
+> warning **警告** 使用 __LINK_16__ 时，全球微服务异常过滤器默认不可用。
 
-以下示例使用了手动实例化的方法作用域过滤器。与 HTTP 基于应用程序一样，您也可以使用控制器作用域过滤器（即在控制器类前加上一个 __INLINE_CODE_12__ 装饰器）。
+以下示例使用手动实例化的方法作用域过滤器。与 HTTP 基于应用程序一样，你也可以使用控制器作用域过滤器（即将控制器类前缀为 __INLINE_CODE_12__ 装饰器）。
 
 ```typescript
 @Query(() => [ResultUnion])
@@ -54,9 +54,9 @@ search(): Array<typeof ResultUnion> {
 
 #### 继承
 
-通常，您将创建完全自定义的异常过滤器，以满足您的应用程序需求。然而，有些情况下，您可能想要简单继承 **core exception filter**，并根据某些因素Override行为。
+通常，您将创建完全定制的异常过滤器，以满足您的应用程序需求。然而，有些情况下，您可能想要简单地扩展 **core 异常过滤器**，并根据特定因素Override行为。
 
-为了委派异常处理给基本过滤器，您需要继承 __INLINE_CODE_13__ 并调用继承的 __INLINE_CODE_14__ 方法。
+为了将异常处理委派给基本过滤器，您需要扩展 __INLINE_CODE_13__ 并调用继承的 __INLINE_CODE_14__ 方法。
 
 ```graphql
 type Author {
@@ -74,4 +74,4 @@ type Query {
 }
 ```
 
-上面的实现只是一个示例，展示了该approach。您的扩展异常过滤器实现将包括您的自定义 **业务逻辑**（例如，处理各种条件）。
+上面的实现只是一个 shell，显示了该方法。您的扩展异常过滤器实现将包括您定制的 **业务逻辑**（例如，处理各种情况）。

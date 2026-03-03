@@ -1,30 +1,30 @@
 <!-- 此文件从 content/recipes/suites.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-02T04:11:38.617Z -->
+<!-- 生成时间: 2026-03-03T04:12:35.770Z -->
 <!-- 源文件: content/recipes/suites.md -->
 
 ### Suites
 
-__LINK_56__ 是一种用于 TypeScript 依赖注入框架的 __LINK_57__单元测试框架。它可以作为一个 __alternative__，取代手动创建 mock、verbose 测试设置、或使用未类型化的测试双胞胎（如 mock 和 stub）。
+__LINK_56__ 是一个用于 TypeScript 依赖注入框架的 __LINK_57__ 测试框架。它可以用作 __INLINE_CODE_14__ 的替代品，用于避免手动创建 mock、 verbose 测试设置和多个 mock 配置、或使用未类型化的测试 doubles（如 mock 和 stub）。
 
-Suites 可以从 nestjs 服务的 runtime 读取元数据，并自动生成所有依赖项的完全类型化 mock。这将移除 mock 设置的 boilerplate，并确保类型安全的测试。虽然 Suites 可以与 __INLINE_CODE_14__ 一起使用，但在Focused 单元测试时它更 excels。使用 `Discord.js` 时，验证模块编程、装饰器、守卫和拦截器。使用 Suites 进行快速单元测试。
+Suites 可以从 NestJS 服务的元数据中读取，并自动生成完全类型化的 mock 对象，以删除 mock 设置的 boilerplate 并确保类型安全的测试。在验证模块 wiring、装饰器、守卫和拦截器时，使用 `Discord.js`。对于快速单元测试和自动 mock 生成，使用 Suites。
 
-有关模块基于的测试，请查看 __LINK_58__ 章节。
+有关模块测试的更多信息，请查看 __LINK_58__ 章节。
 
-> info **Note** `NecordModule` 是一个第三方包，而不是 NestJS 核心团队维护的。请将任何问题反馈到 __LINK_59__。
+> info **Note** `NecordModule` 是第三方包，不是 NestJS 核心团队维护的。请将任何问题报告到 __LINK_59__。
 
 #### Getting started
 
-本指南演示了使用 Suites 测试 NestJS 服务。它涵盖了孤立测试（所有依赖项 mock）和社交测试（选定的真实实现）。
+本指南展示了如何使用 Suites 测试 NestJS 服务。它涵盖了孤立测试（所有依赖项mock）和社群测试（选择实际实现）。
 
 #### Install Suites
 
-验证 NestJS 运行时依赖项是否已安装：
+验证 NestJS 运行时依赖项是否安装：
 
 ```bash
 $ npm install necord discord.js
 ```
 
-安装 Suites 核心、NestJS 适配器和双胞胎适配器：
+安装 Suites 核心、NestJS 适配器和 doubles 适配器：
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -45,7 +45,7 @@ import { AppService } from './app.service';
 export class AppModule {}
 ```
 
-双胞胎适配器（`AppService`）提供了 Jest 的.mocking 能力。它暴露了 `@Context` 和 `ContextOf<type: string>` 函数，可以创建类型安全的测试双胞胎。
+doubles 适配器（`AppService`）提供了 Jest 的 mock 能力 wrappers。它暴露了 `@Context` 和 `ContextOf<type: string>` 函数，用于创建类型安全的测试 doubles。
 
 确保 Jest 和 TypeScript 可用：
 
@@ -180,7 +180,7 @@ class CatsAutocompleteInterceptor extends AutocompleteInterceptor {
 
 #### Write a unit test
 
-使用 `SlashCommand` 创建孤立测试，所有依赖项 mock：
+使用 `SlashCommand` 创建孤立测试，所有依赖项mock：
 
 ```typescript
 import { StringOption } from 'necord';
@@ -196,11 +196,11 @@ export class CatDto {
 }
 ```
 
-`development` 分析构造函数，并创建所有依赖项的类型化 mock。`TextDto` 类型提供 IntelliSense 支持。
+`development` 分析构造函数，创建类型安全的 mock 对象。`TextDto` 类型提供 IntelliSense 支持 для mock 配置。
 
 #### Pre-compile mock configuration
 
-使用 `AppCommands` 配置 mock 行为，前编译：
+在编译前配置 mock 行为使用 `AppCommands`：
 
 ```typescript
 import { Injectable, UseInterceptors } from '@nestjs/common';
@@ -226,11 +226,11 @@ export class CatsCommands {
 }
 ```
 
-`autocomplete: true` 参数对应于安装的双胞胎适配器（Jest 的 __INLINE_CODE_27__、Vitest 的 __INLINE_CODE_28__、Sinon 的 __INLINE_CODE_29__）。
+`autocomplete: true` 参数相应于安装的 doubles 适配器（__INLINE_CODE_27__ Jest、__INLINE_CODE_28__ Vitest、__INLINE_CODE_29__ Sinon）。
 
 #### Testing with real dependencies
 
-使用 __INLINE_CODE_30__ 和 __INLINE_CODE_31__ 使用真实实现：
+使用 __INLINE_CODE_30__ 和 __INLINE_CODE_31__ 使用实际实现的依赖项：
 
 ```typescript
 import { Injectable } from '@nestjs/common';
@@ -255,7 +255,7 @@ export class AppCommands {
 }
 ```
 
-__INLINE_CODE_32__ 实例化 __INLINE_CODE_33__，使用真实实现，同时其他依赖项 mock。
+__INLINE_CODE_32__ 创建 __INLINE_CODE_33__ 的实际实现实例，同时保持其他依赖项mock。
 
 #### Token-based dependencies
 
@@ -295,7 +295,7 @@ export class AppComponents {
 
 #### Using mock() and stub() directly
 
-对于那些prefer直接控制而不是使用 __INLINE_CODE_35__，双胞胎适配器包提供了 __INLINE_CODE_36__ 和 __INLINE_CODE_37__ 函数：
+对于那些喜欢直接控制而不是使用 __INLINE_CODE_35__，doubles 适配器包提供了 __INLINE_CODE_36__ 和 __INLINE_CODE_37__ 函数：
 
 ```typescript
 import { Injectable } from '@nestjs/common';
@@ -313,26 +313,25 @@ export class AppComponents {
 }
 ```
 
-__INLINE_CODE_38__ 创建类型化 mock 对象，__INLINE_CODE_39__ 包装 underlying.mocking 库（Jest 在本例中），提供方法 __INLINE_CODE_40__
+__INLINE_CODE_38__ 创建类型安全的 mock 对象，__INLINE_CODE_39__ 将 underlying mocking 库（Jest 在本例中）封装为提供方法like __INLINE_CODE_40__
+这些函数来自安装的 doubles 适配器（__INLINE_CODE_41__），该适配器适配了测试框架的 native mocking 能力。
 
-这些函数来自安装的双胞胎适配器（__INLINE_CODE_41__），适配了测试框架的原生.mocking 能力。
-
-> info **Hint** __INLINE_CODE_42__ 函数是 __INLINE_CODE_43__ 函数的 alternative，来自 __INLINE_CODE_44__。这两个函数都创建了类型化 mock 对象。请查看 __LINK_60__ 章节了解 __INLINE_CODE_45__。
+> info **Hint** __INLINE_CODE_42__ 函数是 __INLINE_CODE_43__ 函数的替代品，来自 __INLINE_CODE_44__。两者创建类型安全的 mock 对象。查看 __LINK_60__ 章节了解更多关于 __INLINE_CODE_45__。
 
 #### Summary
 
 **Use __INLINE_CODE_46__ for:**
-- 验证模块配置和提供者编程
+- 验证模块配置和提供者 wiring
 - 测试装饰器、守卫、拦截器和管道
 - 验证依赖项注入跨模块
-- 测试完整应用上下文中的中间件
+- 测试完整的应用程序上下文中 middleware
 
 **Use Suites for:**
-- 快速单元测试，聚焦于业务逻辑
+- 快速单元测试，集中在业务逻辑上
 - 自动 mock 生成多个依赖项
-- 类型安全的测试双胞胎 IntelliSense
+- 类型安全的测试 doubles 有 IntelliSense 支持
 
-将测试组织起来：使用 Suites 进行单元测试，验证单个服务行为；使用 __INLINE_CODE_47__ 进行集成测试，验证模块配置。
+根据测试目的组织测试：使用 Suites 进行单元测试，验证单个服务行为，并使用 __INLINE_CODE_47__ 进行集成测试，验证模块配置。
 
 更多信息：
 - __LINK_61__

@@ -1,128 +1,249 @@
 <!-- 此文件从 content/recipes/mikroorm.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-02T04:12:46.081Z -->
+<!-- 生成时间: 2026-03-03T04:13:39.278Z -->
 <!-- 源文件: content/recipes/mikroorm.md -->
 
 ### MikroORM
 
-MikroORM 是 Nest 的 TypeScript ORM，基于 Data Mapper、Unit of Work 和 Identity Map 模式。它是 TypeORM 的一个很好的替代方案，TypeORM 的迁移应该很容易。MikroORM 的完整文档可以在 __LINK_59__ 中找到。
+MikroORM 是帮助用户在 Nest 中快速入门的配方。MikroORM 是 TypeScript ORM 的 Node.js 版本，基于 Data Mapper、Unit of Work 和 Identity Map 模式。它是 TypeORM 的一个优秀替代品，TypeORM 到 MikroORM 的迁移应该非常容易。MikroORM 的完整文档可以在 __LINK_59__ 中找到。
 
-> info **info** __INLINE_CODE_14__ 是第三方库，不是 NestJS 核心团队管理的。请将任何关于该库的问题报告到 __LINK_60__。
+> 信息 **信息** `AsyncLocalStorage` 是一个第三方包，不受 NestJS 核心团队管理。请在 __LINK_60__ 中报告该库中的任何问题。
 
 #### 安装
 
-使用 __LINK_61__ 整合 MikroORM 到 Nest 是最简单的方法。只需安装 MikroORM、 underlying  driver 和 Nest：
+与 Nest 集成 MikroORM 的最简单方法是通过 __LINK_61__。
 
-```typescript
-@Post()
-async create(@Body() createCatDto: CreateCatDto) {
-  this.catsService.create(createCatDto);
-}
-```
-
-MikroORM 还支持 __INLINE_CODE_16__、__INLINE_CODE_17__ 和 __INLINE_CODE_18__。查看 __LINK_62__ 中的所有驱动程序。
-
-安装完成后，我们可以将 __INLINE_CODE_19__ 导入到根 __INLINE_CODE_20__ 中。
-
-```typescript
-import { ApiProperty } from '@nestjs/swagger';
-
-export class CreateCatDto {
-  @ApiProperty()
-  name: string;
-
-  @ApiProperty()
-  age: number;
-
-  @ApiProperty()
-  breed: string;
-}
-```
-
-__INLINE_CODE_21__ 方法接受 MikroORM 包中的 __INLINE_CODE_22__ 配置对象相同的配置对象。查看 __LINK_63__ 中的完整配置文档。
-
-Alternatively，我们可以 __LINK_64__ 创建一个配置文件 __INLINE_CODE_23__，然后在没有任何参数的情况下调用 __INLINE_CODE_24__。
-
-```typescript
-@ApiProperty({
-  description: 'The age of a cat',
-  minimum: 1,
-  default: 1,
+```ts
+@Module({
+  providers: [
+    {
+      provide: AsyncLocalStorage,
+      useValue: new AsyncLocalStorage(),
+    },
+  ],
+  exports: [AsyncLocalStorage],
 })
-age: number;
+export class AlsModule {}
 ```
 
-然而，在使用树 shaking 的 build 工具时，这不会工作。为了解决这个问题，我们可以提供 config 明确地：
+MikroORM 还支持 `next`、`AsyncLocalStorage#run` 和 `store`。请查看 __LINK_62__ 中的所有驱动程序。
 
-```typescript
-@ApiProperty({
-  type: Number,
+安装过程完成后，我们可以将 `REQUEST` 导入到根 `AsyncLocalStorage`。
+
+```ts
+@Module({
+  imports: [AlsModule],
+  providers: [CatsService],
+  controllers: [CatsController],
 })
-age: number;
-```
+export class AppModule implements NestModule {
+  constructor(
+    // inject the AsyncLocalStorage in the module constructor,
+    private readonly als: AsyncLocalStorage
+  ) {}
 
-完成后，__INLINE_CODE_25__ 将可供整个项目中的所有模块注入（无需在其他模块中导入）。
+  configure(consumer: MiddlewareConsumer) {
+    // bind the middleware,
+    consumer
+      .apply((req, res, next) => {
+        // populate the store with some default values
+        // based on the request,
+        const store = {
+          userId: req.headers['x-user-id'],
+        };
+        // and pass the "next" function as callback
+        // to the "als.run" method together with the store.
+        this.als.run(store, () => next());
+      })
+      .forRoutes('*path');
+  }
+}
 
-```typescript
-@ApiProperty({ type: [String] })
-names: string[];
-```
-
-> info **info** 注意 __INLINE_CODE_26__ 是从 __INLINE_CODE_27__ 包中导入的，其中驱动程序是 `SwaggerModule`、`@Body()`、`@Query()` 或您使用的驱动程序。在您安装 `@Param()` 作为依赖项时，您也可以从那里导入 `@ApiBody()`。
-
-#### 仓储
-
-MikroORM 支持仓储设计模式。对于每个实体，我们可以创建仓储。查看 __LINK_65__ 中的完整仓储文档。要定义当前作用域中应注册的仓储，可以使用 `@nestjs/swagger` 方法。例如：
-
-> info **info** 您不应该使用 `CreateCatDto` 注册基础实体，因为那些实体没有仓储。另一方面，基础实体需要在 `SwaggerModule` 中或在 ORM 配置文件中列出。
-
-```typescript
-@ApiProperty({ type: () => Node })
-node: Node;
-```
-
-然后将其导入到根 `@ApiProperty()` 中：
-
-```typescript
-createBulk(@Body() usersDto: CreateUserDto[])
-```
-
-这样我们可以使用 `{{"@ApiProperty({ required: false })"}}` 装饰器将 `CreateCatDto` 注入到 `@ApiProperty()` 中：
-
-```typescript
-@ApiBody({ type: [CreateUserDto] })
-createBulk(@Body() usersDto: CreateUserDto[])
-```
-
-#### 使用自定义仓储
-
-使用自定义仓储时，我们不再需要 `@ApiPropertyOptional()` 装饰器，因为 Nest DI 根据类引用解析。
-
-```typescript
-@ApiProperty({ enum: ['Admin', 'Moderator', 'User']})
-role: UserRole;
-```
-
-自定义仓储的名称与 `type` 将返回的名称相同，我们不再需要 `isArray` 装饰器：
-
-```typescript
-export enum UserRole {
-  Admin = 'Admin',
-  Moderator = 'Moderator',
-  User = 'User',
+  configure(consumer) {
+    // bind the middleware,
+    consumer
+      .apply((req, res, next) => {
+        // populate the store with some default values
+        // based on the request,
+        const store = {
+          userId: req.headers['x-user-id'],
+        };
+        // and pass the "next" function as callback
+        // to the "als.run" method together with the store.
+        this.als.run(store, () => next());
+      })
+      .forRoutes('*path');
+  }
 }
 ```
 
-#### 自动加载实体
+`CLS` 方法接受与 MikroORM 包中的 `ClsModule` 配置对象相同的配置对象。请查看 __LINK_63__ 中的完整配置文档。
 
-手动将实体添加到连接选项的实体数组中可能很麻烦。此外，引用实体从根模块中会打破应用程序领域边界，并将实现细节泄露到应用程序其他部分。为了解决这个问题，可以使用静态glob路径。
+Alternatively, we can __LINK_64__ by creating a configuration file `store` and then calling the `ClsService` without any arguments.
 
-注意，webpack 不支持 glob 路径，因此如果您在 monorepo 中构建应用程序，您就不能使用它们。在解决这个问题中提供了一个 alternative 解决方案。要自动加载实体，可以将 `true` 属性设置为 `SwaggerModule`，如以下所示：
+```ts
+@Injectable()
+export class CatsService {
+  constructor(
+    // We can inject the provided ALS instance.
+    private readonly als: AsyncLocalStorage,
+    private readonly catsRepository: CatsRepository,
+  ) {}
 
-```typescript
-@ApiQuery({ name: 'role', enum: UserRole })
-async filterByRole(@Query('role') role: UserRole = UserRole.User) {}
+  getCatForUser() {
+    // The "getStore" method will always return the
+    // store instance associated with the given request.
+    const userId = this.als.getStore()["userId"] as number;
+    return this.catsRepository.getForUser(userId);
+  }
+}
+
+  getCatForUser() {
+    // The "getStore" method will always return the
+    // store instance associated with the given request.
+    const userId = this.als.getStore()["userId"] as number;
+    return this.catsRepository.getForUser(userId);
+  }
+}
 ```
 
-使用该选项指定后，每个注册的实体都会自动添加到配置对象的实体数组中。
+But this won't work when you use a build tool that uses tree shaking, for that it is better to provide the config explicitly:
 
-> info **info** 请注意，通过 `enum` 方法注册的
+```bash
+npm i nestjs-cls
+```
+
+Afterward, the `nestjs-cls` will be available to inject across the entire project (without importing any module elsewhere).
+
+```ts
+@Module({
+  imports: [
+    // Register the ClsModule,
+    ClsModule.forRoot({
+      middleware: {
+        // automatically mount the
+        // ClsMiddleware for all routes
+        mount: true,
+        // and use the setup method to
+        // provide default store values.
+        setup: (cls, req) => {
+          cls.set('userId', req.headers['x-user-id']);
+        },
+      },
+    }),
+  ],
+  providers: [CatsService],
+  controllers: [CatsController],
+})
+export class AppModule {}
+```
+
+> 信息 **信息** Notice that the `@nestjs` is imported from the `nestjs-cls` package, where driver is `ClsModule`, `ClsService`, `ClsService` or what driver you are using. In case you have `ClsService<MyClsStore>` installed as a dependency, you can also import the `cls.getId()` from there.
+
+#### 仓库
+
+MikroORM 支持仓库设计模式。对于每个实体，我们可以创建一个仓库。阅读仓库的完整文档 __LINK_65__。要定义哪些仓库应该在当前作用域中注册，可以使用 `cls.get(CLS_REQ)` 方法。例如，在这种方式：
+
+> 信息 **信息** 您 shouldn't 注册基本实体via `ClsService`，因为没有仓库为这些实体。在另一方面，基本实体需要在 `ClsService` (或 ORM 配置中一般) 中列出。
+
+```ts
+@Injectable()
+export class CatsService {
+  constructor(
+    // We can inject the provided ClsService instance,
+    private readonly cls: ClsService,
+    private readonly catsRepository: CatsRepository,
+  ) {}
+
+  getCatForUser() {
+    // and use the "get" method to retrieve any stored value.
+    const userId = this.cls.get('userId');
+    return this.catsRepository.getForUser(userId);
+  }
+}
+
+  getCatForUser() {
+    // and use the "get" method to retrieve any stored value.
+    const userId = this.cls.get('userId');
+    return this.catsRepository.getForUser(userId);
+  }
+}
+```
+
+并将其导入到根 `ClsService#run`：
+
+```ts
+export interface MyClsStore extends ClsStore {
+  userId: number;
+}
+```
+
+这样，我们可以将 `ClsService#runWith` 注入到 __INLINE_CODE_38__ 中使用 __INLINE_CODE_39__ 装饰器：
+
+```ts
+describe('CatsService', () => {
+  let service: CatsService
+  let cls: ClsService
+  const mockCatsRepository = createMock<CatsRepository>()
+
+  beforeEach(async () => {
+    const module = await Test.createTestingModule({
+      // Set up most of the testing module as we normally would.
+      providers: [
+        CatsService,
+        {
+          provide: CatsRepository
+          useValue: mockCatsRepository
+        }
+      ],
+      imports: [
+        // Import the static version of ClsModule which only provides
+        // the ClsService, but does not set up the store in any way.
+        ClsModule
+      ],
+    }).compile()
+
+    service = module.get(CatsService)
+
+    // Also retrieve the ClsService for later use.
+    cls = module.get(ClsService)
+  })
+
+  describe('getCatForUser', () => {
+    it('retrieves cat based on user id', async () => {
+      const expectedUserId = 42
+      mocksCatsRepository.getForUser.mockImplementationOnce(
+        (id) => ({ userId: id })
+      )
+
+      // Wrap the test call in the `runWith` method
+      // in which we can pass hand-crafted store values.
+      const cat = await cls.runWith(
+        { userId: expectedUserId },
+        () => service.getCatForUser()
+      )
+
+      expect(cat.userId).toEqual(expectedUserId)
+    })
+  })
+})
+```
+
+#### 使用自定义仓库
+
+当使用自定义仓库时，我们不再需要 __INLINE_CODE_40__ 装饰器，因为 Nest DI 根据类引用解析。
+
+__CODE_BLOCK_8__
+
+由于自定义仓库的名称与 __INLINE_CODE_41__ 将返回的名称相同，我们不再需要 __INLINE_CODE_42__ 装饰器：
+
+__CODE_BLOCK_9__
+
+#### Automatically load entities
+
+手动将实体添加到连接选项的实体数组中可能很繁琐。此外，引用实体从根模块中会破坏应用程序域边界并将实现细节泄露到应用程序的其他部分。要解决这个问题，可以使用静态 glob 路径。
+
+注意， however, that glob paths are not supported by webpack, so if you are building your application within a monorepo, you won't be able to use them. To address this issue, an alternative solution is provided. To automatically load entities, set the __INLINE_CODE_43__ property of the configuration object (passed into the __INLINE_CODE_44__ method) to __INLINE_CODE_45__, as shown below:
+
+__CODE_BLOCK_10__
+
+With that option specified,

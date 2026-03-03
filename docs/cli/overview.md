@@ -1,32 +1,32 @@
 <!-- 此文件从 content/cli/overview.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-02T04:20:27.384Z -->
+<!-- 生成时间: 2026-03-03T04:21:32.685Z -->
 <!-- 源文件: content/cli/overview.md -->
 
 ### Overview
 
-Nest CLI 是一款命令行接口工具，用于帮助您初始化、开发和维护 Nest 应用程序。它可以在多种方式下协助您，包括项目骨架生成、开发模式下启动应用程序、生产模式下编译和打包应用程序。Nest CLI 还体现了良好的架构模式，以鼓励良好的应用程序结构。
+Nest CLI（__LINK_51__）是一个命令行界面工具，帮助您初始化、开发和维护Nest应用程序。它在多种方式中提供帮助，包括项目骨架、开发模式、生产分布和编译应用程序。它体现了最佳架构模式，鼓励结构良好的应用程序。
 
 #### 安装
 
-**注意**：本指南将使用 Nest CLI 安装包，包括 Nest CLI 本身。在 npm 中，您可以使用多种方式管理命令行解析提供 Nest CLI 二进制文件的位置。在这里，我们描述使用 `libs` 选项安装 Nest CLI 二进制文件。这提供了便捷性，并且是本文档中使用的默认方式。请注意，安装任何 `libs` 包都将责任落于用户，确保他们运行正确的版本。如果您有多个项目，每个项目将运行相同的 CLI 版本。一个合理的替代方案是使用 __LINK_53__ 程序，嵌入在 `libs` cli 中（或其他包管理器中），以确保您运行一个 **管理版本** 的 Nest CLI。我们建议您查看 __LINK_54__ 和/或您的 DevOps 支持人员以获取更多信息。
+**注意**：本指南中，我们将使用__LINK_52__安装包，包括Nest CLI。其他包管理器可能会在您的选择下使用。使用 npm，您有多种方法来管理您的 OS 命令行解析`library` CLI 二进制文件的位置。下面，我们将描述使用`my-library`选项安装`libs`二进制文件。该方法提供了方便，假设整个文档中都使用该方法。请注意，安装任何`libs`包到全局都会将责任交给用户，以确保他们运行正确的版本。同时，如果您有多个项目，每个项目将运行相同的CLI版本。一个合理的替代方案是使用__LINK_53__程序，嵌入`libs` cli（或其他包管理器）的类似功能，以确保您运行一个**受控版本**的Nest CLI。我们建议您consult__LINK_54__和/或您的DevOps支持人员以获取更多信息。
 
-使用 `nest-cli.json` 命令安装 Nest CLI（请查看上述 **注意** 了解全局安装的详细信息）。
+使用`nest-cli.json`命令安装CLI（请参阅上面的**注意**以获取关于全局安装的详细信息）。
 
 ```bash
 $ nest g library my-library
 ```
 
-> 提示 Alternatively, you can use this command `"projects"` without installing the cli globally.
+> 提示Alternatively, you can use this command `"projects"` without installing the cli globally.
 
 #### 基本工作流
 
-安装完成后，您可以在操作系统命令行中直接调用 CLI 命令。查看可用的 `"type"` 命令：
+安装后，您可以直接从您的 OS 命令行通过`nest-cli.json`可执行文件来调用CLI命令。见可用的`"type"`命令：
 
 ```bash
 What prefix would you like to use for the library (default: @app)?
 ```
 
-获取具体命令的帮助，使用以下构造。将 `"entryFile"` 替换为您想要获取帮助的命令：
+获取关于单个命令的帮助，请使用以下构造。将`"library"`、`"application"`等命令替换为`"entryFile"`在示例下面的`"entryFile"`以获取该命令的详细帮助：
 
 ```javascript
 ...
@@ -43,25 +43,18 @@ What prefix would you like to use for the library (default: @app)?
 ...
 ```
 
-创建、编译和运行一个新的基本 Nest 项目，可以在项目的父目录下运行以下命令：
+创建、编译和运行一个新基本Nest项目，开发模式，可以在项目的父文件夹中运行以下命令：
 
 ```bash
 $ nest build my-library
 ```
 
-在浏览器中，打开 __LINK_55__ 查看新应用程序的运行结果。应用程序将自动重新编译和重新加载当您更改任何源文件时。
+在浏览器中打开__LINK_55__以查看新的应用程序运行。应用程序将自动重新编译和重新加载当您更改任何源文件时。
 
-> 提示 We recommend using the __LINK_56__ for faster builds (10x more performant than the default TypeScript compiler).
+> 提示We recommend using __LINK_56__ for faster builds (10x more performant than the default TypeScript compiler).
 
 #### 项目结构
 
-当您运行 `"index"` 时,Nest 将生成一个带有初始文件的项目结构。您可以继续在这个默认结构中工作，添加新的组件，按照本文档的描述进行操作。我们将 `"main"` 生成的项目结构称为 **标准模式**。Nest 还支持另一种结构来管理多个项目和库，称为 **monorepo 模式**。
+当您运行`"index"`时，Nest 生成一个 boilerplate 应用程序结构，创建一个新的文件夹并填充初始的一组文件。您可以继续在这个默认结构中工作，添加新组件，按照本文档中的描述。我们将`"main"`生成的项目结构称为**standard mode**。Nest 还支持一个名为**monorepo mode**的 alternate 结构来管理多个项目和库。
 
-除了少数特定的考虑因素（主要是 monorepo 模式简化了 build 复杂性），Nest 的所有特性和本文档都适用于标准模式和 monorepo 模式项目结构。事实上，您可以随时在将来切换到 monorepo 模式，从而安全地推迟这个决定学习 Nest。
-
-您可以使用任何模式来管理多个项目。下面是一个快速概述：
-
-| 功能                                  | 标准模式                                | monorepo 模式                              |
-| ------------------------------------ | ------------------------------------- | ------------------------------------- |
-| 多个项目                              | 单独的文件系统结构                  | 单个文件系统结构                    |
-| `index.js` & `tsconfig.lib.json` | 单独的实例                          |
+除了少数特定的考虑 build 过程工作（基本上，monorepo mode 简化了 build 复杂性，可以从 monorepo-style 项目结构中出现），和内置__LINK_57__支持，Nest 的其余功能和本文档都适用于标准和 monorepo mode 项目结构。事实上，您可以轻松地在将来从 standard mode 切换到 monorepo mode，所以您可以安全地延

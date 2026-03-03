@@ -1,17 +1,17 @@
 <!-- 此文件从 content/custom-decorators.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-02T04:07:22.472Z -->
+<!-- 生成时间: 2026-03-03T04:08:10.793Z -->
 <!-- 源文件: content/custom-decorators.md -->
 
-### Custom 路由装饰器
+### Custom route decorators
 
-Nest 是基于语言特性称为**装饰器**的。装饰器是很多常见编程语言中一个熟悉的概念，但是在 JavaScript 世界中，它们仍然相对较新。在更好地理解装饰器如何工作之前，我们建议阅读 __LINK_147__。下面是一个简单的定义：
+Nest 是基于 ES2016 装饰器的。为了更好地理解装饰器的工作原理，我们建议阅读 __LINK_147__。下面是一个简单的定义：
 
 __HTML_TAG_29__
-  ES2016 装饰器是一个表达式，它返回一个函数，可以以目标、名称和属性描述符为参数。您可以将其应用于类、方法或属性上。装饰器可以定义为类、方法或属性。
+  ES2016 装饰器是一个表达式，它返回一个函数，可以接受目标、名称和属性描述符作为参数。您可以通过将装饰器前缀为 __HTML_TAG_30__@__HTML_TAG_31__ 的字符，并将其置于要装饰的内容的顶部来应用装饰器。装饰器可以定义为类、方法或属性。
 
-#### Param 装饰器
+#### Param decorators
 
-Nest 提供了一组有用的 **param 装饰器**，您可以将其与 HTTP 路由处理程序一起使用。下面是一个装饰器列表和它们对应的纯 Express（或 Fastify）对象
+Nest 提供了一组有用的 Param 装饰器，您可以使用它们与 HTTP 路由处理程序一起。下面是一组提供的装饰器和它们对应的 Express 或 Fastify 对象
 
 __HTML_TAG_33__
   __HTML_TAG_34__
@@ -40,4 +40,5 @@ __HTML_TAG_33__
       __HTML_TAG_92____HTML_TAG_93__req.body__HTML_TAG_94__ / __HTML_TAG_95__req.body[param]__HTML_TAG_96____HTML_TAG_97__
     __HTML_TAG_98__
     __HTML_TAG_99__
-      __HTML_TAG_100____HTML_TAG_101__@Query(param?: string)__HTML_TAG_102____HTML_TAG_
+      __HTML_TAG_100____HTML_TAG_101__@Query(param?: string)__HTML_TAG_102____HTML_TAG_103__
+      __HTML_TAG_104____

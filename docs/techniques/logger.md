@@ -1,5 +1,5 @@
 <!-- 此文件从 content/techniques/logger.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-02T04:08:42.274Z -->
+<!-- 生成时间: 2026-03-03T04:09:36.048Z -->
 <!-- 源文件: content/techniques/logger.md -->
 
 ### Logger

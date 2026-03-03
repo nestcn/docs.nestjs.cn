@@ -1,5 +1,5 @@
 <!-- 此文件从 content/pipes.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:06:57.831Z -->
+<!-- 生成时间: 2026-03-03T07:09:52.705Z -->
 <!-- 源文件: content/pipes.md -->
 
 ### Pipes
@@ -429,7 +429,7 @@ import { APP_PIPE } from '@nestjs/core';
 export class AppModule {}
 ```
 
-> info **Hint** When using this approach to perform dependency injection for the pipe, note that regardless of the module where this construction is employed, the pipe is, in fact, global. Where should this be done? Choose the module where the pipe (`ValidationPipe` in the example above) is defined. Also, `useClass` is not the only way of dealing with custom provider registration. Learn more [here](/fundamentals/dependency-injection).
+> info **Hint** When using this approach to perform dependency injection for the pipe, note that regardless of the module where this construction is employed, the pipe is, in fact, global. Where should this be done? Choose the module where the pipe (`ValidationPipe` in the example above) is defined. Also, `useClass` is not the only way of dealing with custom provider registration. Learn more [here](/fundamentals/custom-providers).
 
 #### The built-in ValidationPipe
 

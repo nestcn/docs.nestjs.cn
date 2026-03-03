@@ -1,6 +1,6 @@
-<!-- 此文件从 content/recipes/passport.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:12:07.134Z -->
-<!-- 源文件: content/recipes/passport.md -->
+<!-- 此文件从 content/recipes\passport.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-03T07:09:52.789Z -->
+<!-- 源文件: content/recipes\passport.md -->
 
 ### Passport (authentication)
 
@@ -81,28 +81,6 @@ export class UsersService {
     return this.users.find(user => user.username === username);
   }
 }
-
-@Injectable()
-export class UsersService {
-  constructor() {
-    this.users = [
-      {
-        userId: 1,
-        username: 'john',
-        password: 'changeme',
-      },
-      {
-        userId: 2,
-        username: 'maria',
-        password: 'guess',
-      },
-    ];
-  }
-
-  async findOne(username) {
-    return this.users.find(user => user.username === username);
-  }
-}
 ```
 
 In the `UsersModule`, the only change needed is to add the `UsersService` to the exports array of the `@Module` decorator so that it is visible outside this module (we'll soon use it in our `AuthService`).
@@ -110,12 +88,6 @@ In the `UsersModule`, the only change needed is to add the `UsersService` to the
 ```typescript
 import { Module } from '@nestjs/common';
 import { UsersService } from './users.service';
-
-@Module({
-  providers: [UsersService],
-  exports: [UsersService],
-})
-export class UsersModule {}
 
 @Module({
   providers: [UsersService],
@@ -143,23 +115,6 @@ export class AuthService {
     return null;
   }
 }
-
-@Injectable()
-@Dependencies(UsersService)
-export class AuthService {
-  constructor(usersService) {
-    this.usersService = usersService;
-  }
-
-  async validateUser(username, pass) {
-    const user = await this.usersService.findOne(username);
-    if (user && user.password === pass) {
-      const { password, ...result } = user;
-      return result;
-    }
-    return null;
-  }
-}
 ```
 
 > Warning **Warning** Of course in a real application, you wouldn't store a password in plain text. You'd instead use a library like [bcrypt](https://github.com/kelektiv/node.bcrypt.js#readme), with a salted one-way hash algorithm. With that approach, you'd only store hashed passwords, and then compare the stored password to a hashed version of the **incoming** password, thus never storing or exposing user passwords in plain text. To keep our sample app simple, we violate that absolute mandate and use plain text. **Don't do this in your real app!**
@@ -170,12 +125,6 @@ Now, we update our `AuthModule` to import the `UsersModule`.
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersModule } from '../users/users.module';
-
-@Module({
-  imports: [UsersModule],
-  providers: [AuthService],
-})
-export class AuthModule {}
 
 @Module({
   imports: [UsersModule],
@@ -208,28 +157,11 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     return user;
   }
 }
-
-@Injectable()
-@Dependencies(AuthService)
-export class LocalStrategy extends PassportStrategy(Strategy) {
-  constructor(authService) {
-    super();
-    this.authService = authService;
-  }
-
-  async validate(username, password) {
-    const user = await this.authService.validateUser(username, password);
-    if (!user) {
-      throw new UnauthorizedException();
-    }
-    return user;
-  }
-}
 ```
 
 We've followed the recipe described earlier for all Passport strategies. In our use case with passport-local, there are no configuration options, so our constructor simply calls `super()`, without an options object.
 
-> info **Hint** We can pass an options object in the call to `super()` to customize the behavior of the passport strategy. In this example, the passport-local strategy by default expects properties called `username` and `password` in the request body. Pass an options object to specify different property names, for example: `super({ usernameField: 'email' }})`. See the [Passport documentation](http://www.passportjs.org/docs/configure/) for more information.
+> info **Hint** We can pass an options object in the call to `super()` to customize the behavior of the passport strategy. In this example, the passport-local strategy by default expects properties called `username` and `password` in the request body. Pass an options object to specify different property names, for example: `super({{ '{' }} usernameField: 'email' {{ '}' }})`. See the [Passport documentation](http://www.passportjs.org/docs/configure/) for more information.
 
 We've also implemented the `validate()` method. For each strategy, Passport will call the verify function (implemented with the `validate()` method in `@nestjs/passport`) using an appropriate strategy-specific set of parameters. For the local-strategy, Passport expects a `validate()` method with the following signature: `validate(username: string, password:string): any`.
 
@@ -245,12 +177,6 @@ import { AuthService } from './auth.service';
 import { UsersModule } from '../users/users.module';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './local.strategy';
-
-@Module({
-  imports: [UsersModule, PassportModule],
-  providers: [AuthService, LocalStrategy],
-})
-export class AuthModule {}
 
 @Module({
   imports: [UsersModule, PassportModule],
@@ -293,16 +219,6 @@ export class AppController {
   @UseGuards(AuthGuard('local'))
   @Post('auth/login')
   async login(@Request() req) {
-    return req.user;
-  }
-}
-
-@Controller()
-export class AppController {
-  @UseGuards(AuthGuard('local'))
-  @Post('auth/login')
-  @Bind(Request())
-  async login(req) {
     return req.user;
   }
 }
@@ -404,30 +320,6 @@ export class AuthService {
   }
 }
 
-@Dependencies(UsersService, JwtService)
-@Injectable()
-export class AuthService {
-  constructor(usersService, jwtService) {
-    this.usersService = usersService;
-    this.jwtService = jwtService;
-  }
-
-  async validateUser(username, pass) {
-    const user = await this.usersService.findOne(username);
-    if (user && user.password === pass) {
-      const { password, ...result } = user;
-      return result;
-    }
-    return null;
-  }
-
-  async login(user) {
-    const payload = { username: user.username, sub: user.userId };
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
-  }
-}
 ```
 
 We're using the `@nestjs/jwt` library, which supplies a `sign()` function to generate our JWT from a subset of the `user` object properties, which we then return as a simple object with a single `access_token` property. Note: we choose a property name of `sub` to hold our `userId` value to be consistent with JWT standards. Don't forget to inject the JwtService provider into the `AuthService`.
@@ -470,20 +362,6 @@ import { jwtConstants } from './constants';
   exports: [AuthService],
 })
 export class AuthModule {}
-
-@Module({
-  imports: [
-    UsersModule,
-    PassportModule,
-    JwtModule.register({
-      secret: jwtConstants.secret,
-      signOptions: { expiresIn: '60s' },
-    }),
-  ],
-  providers: [AuthService, LocalStrategy],
-  exports: [AuthService],
-})
-export class AuthModule {}
 ```
 
 We configure the `JwtModule` using `register()`, passing in a configuration object. See [here](https://github.com/nestjs/jwt/blob/master/README.md) for more on the Nest `JwtModule` and [here](https://github.com/auth0/node-jsonwebtoken#usage) for more details on the available configuration options.
@@ -502,18 +380,6 @@ export class AppController {
   @UseGuards(LocalAuthGuard)
   @Post('auth/login')
   async login(@Request() req) {
-    return this.authService.login(req.user);
-  }
-}
-
-@Controller()
-export class AppController {
-  constructor(private authService: AuthService) {}
-
-  @UseGuards(LocalAuthGuard)
-  @Post('auth/login')
-  @Bind(Request())
-  async login(req) {
     return this.authService.login(req.user);
   }
 }
@@ -552,21 +418,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     return { userId: payload.sub, username: payload.username };
   }
 }
-
-@Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor() {
-    super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ignoreExpiration: false,
-      secretOrKey: jwtConstants.secret,
-    });
-  }
-
-  async validate(payload) {
-    return { userId: payload.sub, username: payload.username };
-  }
-}
 ```
 
 With our `JwtStrategy`, we've followed the same recipe described earlier for all Passport strategies. This strategy requires some initialization, so we do that by passing in an options object in the `super()` call. You can read more about the available options [here](https://github.com/mikenicholson/passport-jwt#configure-strategy). In our case, these options are:
@@ -594,20 +445,6 @@ import { UsersModule } from '../users/users.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
-
-@Module({
-  imports: [
-    UsersModule,
-    PassportModule,
-    JwtModule.register({
-      secret: jwtConstants.secret,
-      signOptions: { expiresIn: '60s' },
-    }),
-  ],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
-  exports: [AuthService],
-})
-export class AuthModule {}
 
 @Module({
   imports: [
@@ -661,28 +498,6 @@ export class AppController {
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
-    return req.user;
-  }
-}
-
-@Dependencies(AuthService)
-@Controller()
-export class AppController {
-  constructor(authService) {
-    this.authService = authService;
-  }
-
-  @UseGuards(LocalAuthGuard)
-  @Post('auth/login')
-  @Bind(Request())
-  async login(req) {
-    return this.authService.login(req.user);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('profile')
-  @Bind(Request())
-  getProfile(req) {
     return req.user;
   }
 }
@@ -808,9 +623,9 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
 #### Request-scoped strategies
 
-The passport API is based on registering strategies to the global instance of the library. Therefore strategies are not designed to have request-dependent options or to be dynamically instantiated per request (read more about the [request-scoped](/fundamentals/provider-scopes) providers). When you configure your strategy to be request-scoped, Nest will never instantiate it since it's not tied to any specific route. There is no physical way to determine which "request-scoped" strategies should be executed per request.
+The passport API is based on registering strategies to the global instance of the library. Therefore strategies are not designed to have request-dependent options or to be dynamically instantiated per request (read more about the [request-scoped](/fundamentals/injection-scopes) providers). When you configure your strategy to be request-scoped, Nest will never instantiate it since it's not tied to any specific route. There is no physical way to determine which "request-scoped" strategies should be executed per request.
 
-However, there are ways to dynamically resolve request-scoped providers within the strategy. For this, we leverage the [module reference](/fundamentals/module-reference) feature.
+However, there are ways to dynamically resolve request-scoped providers within the strategy. For this, we leverage the [module reference](/fundamentals/module-ref) feature.
 
 First, open the `local.strategy.ts` file and inject the `ModuleRef` in the normal way:
 
@@ -826,7 +641,7 @@ constructor(private moduleRef: ModuleRef) {
 
 Be sure to set the `passReqToCallback` configuration property to `true`, as shown above.
 
-In the next step, the request instance will be used to obtain the current context identifier, instead of generating a new one (read more about request context [here](/fundamentals/module-reference#getting-current-sub-tree)).
+In the next step, the request instance will be used to obtain the current context identifier, instead of generating a new one (read more about request context [here](/fundamentals/module-ref#getting-current-sub-tree)).
 
 Now, inside the `validate()` method of the `LocalStrategy` class, use the `getByRequest()` method of the `ContextIdFactory` class to create a context id based on the request object, and pass this to the `resolve()` call:
 

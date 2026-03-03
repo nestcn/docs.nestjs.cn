@@ -1,5 +1,5 @@
 <!-- 此文件从 content/exception-filters.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:07:18.185Z -->
+<!-- 生成时间: 2026-03-03T07:09:52.722Z -->
 <!-- 源文件: content/exception-filters.md -->
 
 ### Exception filters
@@ -293,7 +293,7 @@ import { APP_FILTER } from '@nestjs/core';
 export class AppModule {}
 ```
 
-> info **Hint** When using this approach to perform dependency injection for the filter, note that regardless of the module where this construction is employed, the filter is, in fact, global. Where should this be done? Choose the module where the filter (`HttpExceptionFilter` in the example above) is defined. Also, `useClass` is not the only way of dealing with custom provider registration. Learn more [here](/fundamentals/dependency-injection).
+> info **Hint** When using this approach to perform dependency injection for the filter, note that regardless of the module where this construction is employed, the filter is, in fact, global. Where should this be done? Choose the module where the filter (`HttpExceptionFilter` in the example above) is defined. Also, `useClass` is not the only way of dealing with custom provider registration. Learn more [here](/fundamentals/custom-providers).
 
 You can add as many filters with this technique as needed; simply add each to the providers array.
 

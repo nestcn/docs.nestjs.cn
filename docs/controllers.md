@@ -1,5 +1,5 @@
 <!-- 此文件从 content/controllers.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:07:44.017Z -->
+<!-- 生成时间: 2026-03-03T07:09:52.732Z -->
 <!-- 源文件: content/controllers.md -->
 
 ### Controllers
@@ -68,7 +68,7 @@ This method will return a 200 status code along with the associated response, wh
   </tr>
 </table>
 
-> warning **Warning** Nest detects when the handler is using either `@Res()` or `@Next()`, indicating you have chosen the library-specific option. If both approaches are used at the same time, the Standard approach is **automatically disabled** for this single route and will no longer work as expected. To use both approaches at the same time (for example, by injecting the response object to only set cookies/headers but still leave the rest to the framework), you must set the `passthrough` option to `true` in the `@Res({ passthrough: true }})` decorator.
+> warning **Warning** Nest detects when the handler is using either `@Res()` or `@Next()`, indicating you have chosen the library-specific option. If both approaches are used at the same time, the Standard approach is **automatically disabled** for this single route and will no longer work as expected. To use both approaches at the same time (for example, by injecting the response object to only set cookies/headers but still leave the rest to the framework), you must set the `passthrough` option to `true` in the `@Res({{ '{' }} passthrough: true {{ '}' }})` decorator.
 
 <app-banner-devtools></app-banner-devtools>
 
@@ -201,7 +201,7 @@ The `'abcd/*'` route path will match `abcd/`, `abcd/123`, `abcd/abc`, and so on.
 
 This approach works on both Express and Fastify. However, with the latest release of Express (v5), the routing system has become more strict. In pure Express, you must use a named wildcard to make the route work—for example, `abcd/*splat`, where `splat` is simply the name of the wildcard parameter and has no special meaning. You can name it anything you like. That said, since Nest provides a compatibility layer for Express, you can still use the asterisk (`*`) as a wildcard.
 
-When it comes to asterisks used in the **middle of a route**, Express requires named wildcards (e.g., `ab{*splat}cd`), while Fastify does not support them at all.
+When it comes to asterisks used in the **middle of a route**, Express requires named wildcards (e.g., `ab{{ '{' }}*splat&#125;cd`), while Fastify does not support them at all.
 
 #### Status code
 
@@ -315,7 +315,7 @@ export class AccountController {
 
 For developers coming from other programming languages, it might be surprising to learn that in Nest, nearly everything is shared across incoming requests. This includes resources like the database connection pool, singleton services with global state, and more. It's important to understand that Node.js doesn't use the request/response Multi-Threaded Stateless Model, where each request is handled by a separate thread. As a result, using singleton instances in Nest is completely **safe** for our applications.
 
-That said, there are specific edge cases where having request-based lifetimes for controllers may be necessary. Examples include per-request caching in GraphQL applications, request tracking, or implementing multi-tenancy. You can learn more about controlling injection scopes [here](/fundamentals/provider-scopes).
+That said, there are specific edge cases where having request-based lifetimes for controllers may be necessary. Examples include per-request caching in GraphQL applications, request tracking, or implementing multi-tenancy. You can learn more about controlling injection scopes [here](/fundamentals/injection-scopes).
 
 #### Asynchronicity
 

@@ -312,6 +312,14 @@ Please translate the following English technical documentation to Chinese follow
       // 恢复代码块
       const finalText = this.restoreCodeBlocks(translatedText);
 
+      // 校验翻译质量：如果源文件不是索引页，且翻译结果中文字数过少，视为失败
+      const chineseChars = finalText.match(/[\u4e00-\u9fa5]/g);
+      const chineseCount = chineseChars ? chineseChars.length : 0;
+
+      if (!filePath.includes('index.md') && chineseCount < 20) {
+        throw new Error(`Translation quality check failed: only ${chineseCount} Chinese characters found.`);
+      }
+
       // 缓存翻译结果
       this.translationCache.set(cacheKey, finalText);
 
@@ -322,7 +330,7 @@ Please translate the following English technical documentation to Chinese follow
       return finalText;
     } catch (error) {
       console.warn(`⚠️ AI translation failed for ${filePath}: ${error.message}`);
-      return text; // 翻译失败时返回原文
+      throw error; // 抛出异常，阻止后续的错误同步逻辑
     }
   }
 
@@ -388,6 +396,9 @@ Please translate the following English technical documentation to Chinese follow
 
       // 5. 写入文件并同步时间
       fs.writeFileSync(outputPath, finalContent, 'utf8');
+
+      // 只有在真正进行了 AI 翻译或确认内容有效时才同步时间戳
+      // 如果没有使用 AI，也同步时间戳（可能是格式修复）
       const sourceStats = fs.statSync(contentPath);
       fs.utimesSync(outputPath, sourceStats.atime, sourceStats.mtime);
 

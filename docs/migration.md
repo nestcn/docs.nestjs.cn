@@ -1,5 +1,5 @@
 <!-- 此文件从 content/migration.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:06:57.849Z -->
+<!-- 生成时间: 2026-03-03T07:09:52.714Z -->
 <!-- 源文件: content/migration.md -->
 
 ### Migration guide
@@ -16,8 +16,8 @@ After years of development, Express v5 was officially released in 2024 and becam
 
 One of the most notable updates in Express v5 is the revised path route matching algorithm. The following changes have been introduced to how path strings are matched with incoming requests:
 
-- The wildcard `*` must have a name, matching the behavior of parameters: use `/*splat` or `/{*splat}` instead of `/*`. `splat` is simply the name of the wildcard parameter and has no special meaning. You can name it anything you like, for example, `*wildcard`
-- The optional character `?` is no longer supported, use braces instead: `/:file{.:ext}`.
+- The wildcard `*` must have a name, matching the behavior of parameters: use `/*splat` or `/{{ '{' }}*splat&#125;` instead of `/*`. `splat` is simply the name of the wildcard parameter and has no special meaning. You can name it anything you like, for example, `*wildcard`
+- The optional character `?` is no longer supported, use braces instead: `/:file{{ '{' }}.:ext&#125;`.
 - Regexp characters are not supported.
 - Some characters have been reserved to avoid confusion during upgrade `(()[]?+!)`, use `\` to escape them.
 - Parameter names now support valid JavaScript identifiers, or quoted like `:"this"`.
@@ -42,7 +42,7 @@ findAll() {
 }
 ```
 
-> warning **Warning** Note that `*splat` is a named wildcard that matches any path without the root path. If you need to match the root path as well (`/users`), you can use `/users/{*splat}`, wrapping the wildcard in braces (optional group). Note that `splat` is simply the name of the wildcard parameter and has no special meaning. You can name it anything you like, for example, `*wildcard`.
+> warning **Warning** Note that `*splat` is a named wildcard that matches any path without the root path. If you need to match the root path as well (`/users`), you can use `/users/{{ '{' }}*splat&#125;`, wrapping the wildcard in braces (optional group). Note that `splat` is simply the name of the wildcard parameter and has no special meaning. You can name it anything you like, for example, `*wildcard`.
 
 Similarly, if you have a middleware that runs on all routes, you may need to update the path to use a named wildcard:
 
@@ -58,7 +58,7 @@ Instead, you can update the path to use a named wildcard:
 forRoutes('{*splat}'); // <-- This will work in Express v5
 ```
 
-Note that `{*splat}` is a named wildcard that matches any path including the root path. Outer braces make path optional.
+Note that `{{ '{' }}*splat&#125;` is a named wildcard that matches any path including the root path. Outer braces make path optional.
 
 #### Query parameters parsing
 
@@ -146,8 +146,8 @@ This new algorithm might impact your integration tests if you use a lot of dynam
 
 - Deduplicate the dynamic module you'd like to stub
 - Use `module.select(ParentModule).get(Target)` to find the correct instance
-- Stub all instances using `module.get(Target, { each: true })`
-- Or switch your test back to the old algorithm using `Test.createTestingModule({}, { moduleIdGeneratorAlgorithm: 'deep-hash' })`
+- Stub all instances using `module.get(Target, {{ '{' }} each: true &#125;)`
+- Or switch your test back to the old algorithm using `Test.createTestingModule({{ '{' }}&#125;, {{ '{' }} moduleIdGeneratorAlgorithm: 'deep-hash' &#125;)`
 
 #### Reflector type inference
 
@@ -231,7 +231,7 @@ CacheModule.registerAsync({
 
 Where `KeyvRedis` is imported from the `@keyv/redis` package. See the [Caching documentation](/techniques/caching) to learn more.
 
-> warning **Warning** In this update, cached data handled by the Keyv library is now structured as an object containing `value` and `expires` fields, for example: `{"value": "yourData", "expires": 1678901234567}}`. While Keyv automatically retrieves the `value` field when accessing data through its API, it’s important to note this change if you interact with the cache data directly (e.g., outside of the cache-manager API) or need to support data written using the previous version of `@nestjs/cache-manager`.
+> warning **Warning** In this update, cached data handled by the Keyv library is now structured as an object containing `value` and `expires` fields, for example: `{{ '{' }}"value": "yourData", "expires": 1678901234567{{ '}' }}`. While Keyv automatically retrieves the `value` field when accessing data through its API, it’s important to note this change if you interact with the cache data directly (e.g., outside of the cache-manager API) or need to support data written using the previous version of `@nestjs/cache-manager`.
 
 #### Config module
 

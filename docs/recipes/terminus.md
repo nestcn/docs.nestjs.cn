@@ -1,6 +1,6 @@
-<!-- 此文件从 content/recipes/terminus.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:11:17.996Z -->
-<!-- 源文件: content/recipes/terminus.md -->
+<!-- 此文件从 content/recipes\terminus.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-03T07:09:52.779Z -->
+<!-- 源文件: content/recipes\terminus.md -->
 
 ### Healthchecks (Terminus)
 
@@ -24,7 +24,7 @@ $ npm install --save @nestjs/terminus
 
 #### Setting up a Healthcheck
 
-A health check represents a summary of **health indicators**. A health indicator executes a check of a service, whether it is in a healthy or unhealthy state. A health check is positive if all the assigned health indicators are up and running. Because a lot of applications will need similar health indicators, [__INLINE_CODE_27__](https://github.com/nestjs/terminus) provides a set of predefined indicators, such as:
+A health check represents a summary of **health indicators**. A health indicator executes a check of a service, whether it is in a healthy or unhealthy state. A health check is positive if all the assigned health indicators are up and running. Because a lot of applications will need similar health indicators, [`@nestjs/terminus`](https://github.com/nestjs/terminus) provides a set of predefined indicators, such as:
 
 - `HttpHealthIndicator`
 - `TypeOrmHealthIndicator`
@@ -39,7 +39,7 @@ A health check represents a summary of **health indicators**. A health indicator
 
 To get started with our first health check, let's create the `HealthModule` and import the `TerminusModule` into it in its imports array.
 
-> info **Hint** To create the module using the [Nest CLI](/cli/overview), simply execute the `$ nest g module health` command.
+> info **Hint** To create the module using the [Nest CLI](cli/overview), simply execute the `$ nest g module health` command.
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -51,13 +51,13 @@ import { TerminusModule } from '@nestjs/terminus';
 export class HealthModule {}
 ```
 
-Our healthcheck(s) can be executed using a [controller](/controllers), which can be easily set up using the [Nest CLI](/cli/overview).
+Our healthcheck(s) can be executed using a [controller](/controllers), which can be easily set up using the [Nest CLI](cli/overview).
 
 ```bash
 $ nest g controller health
 ```
 
-> info **Info** It is highly recommended to enable shutdown hooks in your application. Terminus integration makes use of this lifecycle event if enabled. Read more about shutdown hooks [here](/fundamentals/lifecycle-events#application-shutdown).
+> info **Info** It is highly recommended to enable shutdown hooks in your application. Terminus integration makes use of this lifecycle event if enabled. Read more about shutdown hooks [here](fundamentals/lifecycle-events#application-shutdown).
 
 #### HTTP Healthcheck
 
@@ -238,7 +238,7 @@ If your database is reachable, you should now see the following JSON-result when
 }
 ```
 
-In case your app uses [multiple databases](/techniques/sql#multiple-databases), you need to inject each
+In case your app uses [multiple databases](techniques/database#multiple-databases), you need to inject each
 connection into your `HealthController`. Then, you can simply pass the connection reference to the `TypeOrmHealthIndicator`.
 
 ```typescript

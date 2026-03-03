@@ -1,6 +1,6 @@
-<!-- 此文件从 content/fundamentals/dynamic-modules.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:18:22.389Z -->
-<!-- 源文件: content/fundamentals/dynamic-modules.md -->
+<!-- 此文件从 content/fundamentals\dynamic-modules.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-03T07:09:52.873Z -->
+<!-- 源文件: content/fundamentals\dynamic-modules.md -->
 
 ### Dynamic modules
 
@@ -8,7 +8,7 @@ The [Modules chapter](/modules) covers the basics of Nest modules, and includes 
 
 #### Introduction
 
-Most application code examples in the **Overview** section of the documentation make use of regular, or static, modules. Modules define groups of components like [providers](/overview/providers) and [controllers](/controllers) that fit together as a modular part of an overall application. They provide an execution context, or scope, for these components. For example, providers defined in a module are visible to other members of the module without the need to export them. When a provider needs to be visible outside of a module, it is first exported from its host module, and then imported into its consuming module.
+Most application code examples in the **Overview** section of the documentation make use of regular, or static, modules. Modules define groups of components like [providers](/providers) and [controllers](/controllers) that fit together as a modular part of an overall application. They provide an execution context, or scope, for these components. For example, providers defined in a module are visible to other members of the module without the need to export them. When a provider needs to be visible outside of a module, it is first exported from its host module, and then imported into its consuming module.
 
 Let's walk through a familiar example.
 
@@ -57,7 +57,7 @@ export class AuthService {
 
 We'll refer to this as **static** module binding. All the information Nest needs to wire together the modules has already been declared in the host and consuming modules. Let's unpack what's happening during this process. Nest makes `UsersService` available inside `AuthModule` by:
 
-1. Instantiating `UsersModule`, including transitively importing other modules that `UsersModule` itself consumes, and transitively resolving any dependencies (see [Custom providers](/fundamentals/dependency-injection)).
+1. Instantiating `UsersModule`, including transitively importing other modules that `UsersModule` itself consumes, and transitively resolving any dependencies (see [Custom providers](/fundamentals/custom-providers)).
 2. Instantiating `AuthModule`, and making `UsersModule`'s exported providers available to components in `AuthModule` (just as if they had been declared in `AuthModule`).
 3. Injecting an instance of `UsersService` in `AuthService`.
 
@@ -210,7 +210,7 @@ export class ConfigService {
 
 Now our `ConfigService` knows how to find the `.env` file in the folder we've specified in `options`.
 
-Our remaining task is to somehow inject the `options` object from the `register()` step into our `ConfigService`. And of course, we'll use _dependency injection_ to do it. This is a key point, so make sure you understand it. Our `ConfigModule` is providing `ConfigService`. `ConfigService` in turn depends on the `options` object that is only supplied at run-time. So, at run-time, we'll need to first bind the `options` object to the Nest IoC container, and then have Nest inject it into our `ConfigService`. Remember from the **Custom providers** chapter that providers can [include any value](/fundamentals/dependency-injection#non-service-based-providers) not just services, so we're fine using dependency injection to handle a simple `options` object.
+Our remaining task is to somehow inject the `options` object from the `register()` step into our `ConfigService`. And of course, we'll use _dependency injection_ to do it. This is a key point, so make sure you understand it. Our `ConfigModule` is providing `ConfigService`. `ConfigService` in turn depends on the `options` object that is only supplied at run-time. So, at run-time, we'll need to first bind the `options` object to the Nest IoC container, and then have Nest inject it into our `ConfigService`. Remember from the **Custom providers** chapter that providers can [include any value](/fundamentals/custom-providers#non-service-based-providers) not just services, so we're fine using dependency injection to handle a simple `options` object.
 
 Let's tackle binding the options object to the IoC container first. We do this in our static `register()` method. Remember that we are dynamically constructing a module, and one of the properties of a module is its list of providers. So what we need to do is define our options object as a provider. This will make it injectable into the `ConfigService`, which we'll take advantage of in the next step. In the code below, pay attention to the `providers` array:
 
@@ -236,7 +236,7 @@ export class ConfigModule {
 }
 ```
 
-Now we can complete the process by injecting the `'CONFIG_OPTIONS'` provider into the `ConfigService`. Recall that when we define a provider using a non-class token we need to use the `@Inject()` decorator [as described here](/fundamentals/dependency-injection#non-class-based-provider-tokens).
+Now we can complete the process by injecting the `'CONFIG_OPTIONS'` provider into the `ConfigService`. Recall that when we define a provider using a non-class token we need to use the `@Inject()` decorator [as described here](/fundamentals/custom-providers#non-class-based-provider-tokens).
 
 ```typescript
 import * as fs from 'node:fs';
@@ -277,7 +277,7 @@ You may have seen the use for methods like `forRoot`, `register`, and `forFeatur
 
 When creating a module with:
 
-- `register`, you are expecting to configure a dynamic module with a specific configuration for use only by the calling module. For example, with Nest's `@nestjs/axios`: `HttpModule.register({ baseUrl: 'someUrl' }})`. If, in another module you use `HttpModule.register({ baseUrl: 'somewhere else' }})`, it will have the different configuration. You can do this for as many modules as you want.
+- `register`, you are expecting to configure a dynamic module with a specific configuration for use only by the calling module. For example, with Nest's `@nestjs/axios`: `HttpModule.register({{ '{' }} baseUrl: 'someUrl' {{ '}' }})`. If, in another module you use `HttpModule.register({{ '{' }} baseUrl: 'somewhere else' {{ '}' }})`, it will have the different configuration. You can do this for as many modules as you want.
 
 - `forRoot`, you are expecting to configure a dynamic module once and reuse that configuration in multiple places (though possibly unknowingly as it's abstracted away). This is why you have one `GraphQLModule.forRoot()`, one `TypeOrmModule.forRoot()`, etc.
 

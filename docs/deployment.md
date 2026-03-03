@@ -1,5 +1,5 @@
 <!-- 此文件从 content/deployment.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:07:24.550Z -->
+<!-- 生成时间: 2026-03-03T07:09:52.727Z -->
 <!-- 源文件: content/deployment.md -->
 
 ### Deployment
@@ -41,7 +41,7 @@ Upon successful compilation, you should see a `dist` directory in your project r
 
 Your production environment is where your application will be accessible to external users. This could be a cloud-based platform like [AWS](https://aws.amazon.com/) (with EC2, ECS, etc.), [Azure](https://azure.microsoft.com/), or [Google Cloud](https://cloud.google.com/), or even a dedicated server you manage, such as [Hetzner](https://www.hetzner.com/).
 
-To simplify the deployment process and avoid manual setup, you can use a service like [Mau](https://mau.nestjs.com/ 'Deploy Nest'), our official platform for deploying NestJS applications on AWS. For more details, check out [this section](https://docs.nestjs.com/deployment).
+To simplify the deployment process and avoid manual setup, you can use a service like [Mau](https://mau.nestjs.com/ 'Deploy Nest'), our official platform for deploying NestJS applications on AWS. For more details, check out [this section](todo).
 
 Some of the pros of using a **cloud-based platform** or service like [Mau](https://mau.nestjs.com/ 'Deploy Nest') include:
 

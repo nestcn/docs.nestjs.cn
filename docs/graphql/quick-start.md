@@ -1,6 +1,6 @@
-<!-- 此文件从 content/graphql/quick-start.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:16:14.321Z -->
-<!-- 源文件: content/graphql/quick-start.md -->
+<!-- 此文件从 content/graphql\quick-start.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-03T07:09:52.846Z -->
+<!-- 源文件: content/graphql\quick-start.md -->
 
 ## Harnessing the power of TypeScript & GraphQL
 
@@ -8,7 +8,7 @@
 
 In this chapter, we assume a basic understanding of GraphQL, and focus on how to work with the built-in `@nestjs/graphql` module. The `GraphQLModule` can be configured to use [Apollo](https://www.apollographql.com/) server (with the `@nestjs/apollo` driver) and [Mercurius](https://github.com/mercurius-js/mercurius) (with the `@nestjs/mercurius`). We provide official integrations for these proven GraphQL packages to provide a simple way to use GraphQL with Nest (see more integrations [here](/graphql/quick-start#third-party-integrations)).
 
-You can also build your own dedicated driver (read more on that [here](/graphql/guards-interceptors#creating-a-custom-driver)).
+You can also build your own dedicated driver (read more on that [here](/graphql/other-features#creating-a-custom-driver)).
 
 #### Installation
 

@@ -1,6 +1,6 @@
-<!-- 此文件从 content/security/rate-limiting.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:10:37.962Z -->
-<!-- 源文件: content/security/rate-limiting.md -->
+<!-- 此文件从 content/security\rate-limiting.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-03T07:09:52.803Z -->
+<!-- 源文件: content/security\rate-limiting.md -->
 
 ### Rate Limiting
 
@@ -70,7 +70,7 @@ export class AppModule {}
 
 #### Customization
 
-There may be a time where you want to bind the guard to a controller or globally, but want to disable rate limiting for one or more of your endpoints. For that, you can use the `@SkipThrottle()` decorator, to negate the throttler for an entire class or a single route. The `@SkipThrottle()` decorator can also take in an object of string keys with boolean values for if there is a case where you want to exclude _most_ of a controller, but not every route, and configure it per throttler set if you have more than one. If you do not pass an object, the default is to use `{ default: true }}`
+There may be a time where you want to bind the guard to a controller or globally, but want to disable rate limiting for one or more of your endpoints. For that, you can use the `@SkipThrottle()` decorator, to negate the throttler for an entire class or a single route. The `@SkipThrottle()` decorator can also take in an object of string keys with boolean values for if there is a case where you want to exclude _most_ of a controller, but not every route, and configure it per throttler set if you have more than one. If you do not pass an object, the default is to use `{{ '{' }} default: true {{ '}' }}`
 
 ```typescript
 @SkipThrottle()
@@ -120,14 +120,6 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  app.set('trust proxy', 'loopback'); // Trust requests from the loopback address
-  await app.listen(3000);
-}
-
-bootstrap();
-
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
   app.set('trust proxy', 'loopback'); // Trust requests from the loopback address
   await app.listen(3000);
 }

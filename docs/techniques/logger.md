@@ -1,6 +1,6 @@
-<!-- 此文件从 content/techniques/logger.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:09:36.048Z -->
-<!-- 源文件: content/techniques/logger.md -->
+<!-- 此文件从 content/techniques\logger.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-03T07:09:52.769Z -->
+<!-- 源文件: content/techniques\logger.md -->
 
 ### Logger
 
@@ -293,7 +293,7 @@ You can also inject this `MyLogger` provider in your feature classes, thus ensur
 
 #### Injecting a custom logger
 
-To start, extend the built-in logger with code like the following. We supply the `scope` option as configuration metadata for the `ConsoleLogger` class, specifying a [transient](/fundamentals/provider-scopes) scope, to ensure that we'll have a unique instance of the `MyLogger` in each feature module. In this example, we do not extend the individual `ConsoleLogger` methods (like `log()`, `warn()`, etc.), though you may choose to do so.
+To start, extend the built-in logger with code like the following. We supply the `scope` option as configuration metadata for the `ConsoleLogger` class, specifying a [transient](/fundamentals/injection-scopes) scope, to ensure that we'll have a unique instance of the `MyLogger` in each feature module. In this example, we do not extend the individual `ConsoleLogger` methods (like `log()`, `warn()`, etc.), though you may choose to do so.
 
 ```typescript
 import { Injectable, Scope, ConsoleLogger } from '@nestjs/common';

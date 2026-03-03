@@ -1,6 +1,6 @@
-<!-- 此文件从 content/recipes/cqrs.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:13:34.703Z -->
-<!-- 源文件: content/recipes/cqrs.md -->
+<!-- 此文件从 content/recipes\cqrs.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-03T07:09:52.799Z -->
+<!-- 源文件: content/recipes\cqrs.md -->
 
 ### CQRS
 
@@ -90,7 +90,7 @@ export class KillDragonCommand extends Command<{
 }
 ```
 
-As you can see, the `KillDragonCommand` class extends the `Command` class. The `Command` class is a simple utility class exported from the `@nestjs/cqrs` package that lets you define the command's return type. In this case, the return type is an object with an `actionId` property. Now, whenever the `KillDragonCommand` command is dispatched, the `CommandBus#execute()` method return-type will be inferred as `Promise<{ actionId: string }}>`. This is useful when you want to return some data from the command handler.
+As you can see, the `KillDragonCommand` class extends the `Command` class. The `Command` class is a simple utility class exported from the `@nestjs/cqrs` package that lets you define the command's return type. In this case, the return type is an object with an `actionId` property. Now, whenever the `KillDragonCommand` command is dispatched, the `CommandBus#execute()` method return-type will be inferred as `Promise<{{ '{' }} actionId: string {{ '}' }}>`. This is useful when you want to return some data from the command handler.
 
 > info **Hint** Inheritance from the `Command` class is optional. It is only necessary if you want to define the return type of the command.
 
@@ -424,7 +424,7 @@ onModuleDestroy() {
 
 For those coming from different programming language backgrounds, it may be surprising to learn that in Nest, most things are shared across incoming requests. This includes a connection pool to the database, singleton services with global state, and more. Keep in mind that Node.js does not follow the request/response multi-threaded stateless model, where each request is processed by a separate thread. As a result, using singleton instances is **safe** for our applications.
 
-However, there are edge cases where a request-based lifetime for the handler might be desirable. This could include scenarios like per-request caching in GraphQL applications, request tracking, or multi-tenancy. You can learn more about how to control scopes [here](/fundamentals/provider-scopes).
+However, there are edge cases where a request-based lifetime for the handler might be desirable. This could include scenarios like per-request caching in GraphQL applications, request tracking, or multi-tenancy. You can learn more about how to control scopes [here](/fundamentals/injection-scopes).
 
 Using request-scoped providers alongside CQRS can be complex because the `CommandBus`, `QueryBus`, and `EventBus` are singletons. Thankfully, the `@nestjs/cqrs` package simplifies this by automatically creating a new instance of request-scoped handlers for each processed command, query, or event.
 

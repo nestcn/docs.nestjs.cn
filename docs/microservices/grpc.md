@@ -1,6 +1,6 @@
-<!-- 此文件从 content/microservices/grpc.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:15:30.025Z -->
-<!-- 源文件: content/microservices/grpc.md -->
+<!-- 此文件从 content/microservices\grpc.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-03T07:09:52.822Z -->
+<!-- 源文件: content/microservices\grpc.md -->
 
 ### gRPC
 
@@ -394,6 +394,7 @@ bidiHello(messages: Observable<any>, metadata: Metadata, call: ServerDuplexStrea
     complete: onComplete,
   });
 
+
   return subject.asObservable();
 }
 ```
@@ -515,20 +516,13 @@ export class HeroesService {
     return items.find(({ id }) => id === data.id);
   }
 }
-
-    serverMetadata.add('Set-Cookie', 'yummy_cookie=choco');
-    call.sendMetadata(serverMetadata);
-
-    return items.find(({ id }) => id === data.id);
-  }
-}
 ```
 
-Likewise, to read the metadata in handlers annotated with the `@GrpcStreamMethod()` handler ([subject strategy](/microservices/grpc#subject-strategy)), use the second argument (metadata), which is of type `Metadata` (imported from the `grpc` package).
+Likewise, to read the metadata in handlers annotated with the `@GrpcStreamMethod()` handler ([subject strategy](microservices/grpc#subject-strategy)), use the second argument (metadata), which is of type `Metadata` (imported from the `grpc` package).
 
 To send back metadata from the handler, use the `ServerDuplexStream#sendMetadata()` method (third handler argument).
 
-To read metadata from within the [call stream handlers](/microservices/grpc#call-stream-handler) (handlers annotated with `@GrpcStreamCall()` decorator), listen to the `metadata` event on the `requestStream` reference, as follows:
+To read metadata from within the [call stream handlers](microservices/grpc#call-stream-handler) (handlers annotated with `@GrpcStreamCall()` decorator), listen to the `metadata` event on the `requestStream` reference, as follows:
 
 ```typescript
 requestStream.on('metadata', (metadata: Metadata) => {

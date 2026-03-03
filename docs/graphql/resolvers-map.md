@@ -1,6 +1,6 @@
-<!-- 此文件从 content/graphql/resolvers-map.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:16:14.060Z -->
-<!-- 源文件: content/graphql/resolvers-map.md -->
+<!-- 此文件从 content/graphql\resolvers-map.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-03T07:09:52.843Z -->
+<!-- 源文件: content/graphql\resolvers-map.md -->
 
 ### Resolvers
 
@@ -81,7 +81,7 @@ For example:
 title: string;
 ```
 
-> info **Hint** You can also add a description to, or deprecate, the whole object type: `@ObjectType({ description: 'Author model' }})`.
+> info **Hint** You can also add a description to, or deprecate, the whole object type: `@ObjectType({{ '{' }} description: 'Author model' {{ '}' }})`.
 
 When the field is an array, we must manually indicate the array type in the `Field()` decorator's type function, as shown below:
 
@@ -156,7 +156,7 @@ export class AuthorsResolver {
 
 > info **Hint** All decorators (e.g., `@Resolver`, `@ResolveField`, `@Args`, etc.) are exported from the `@nestjs/graphql` package.
 
-You can define multiple resolver classes. Nest will combine these at run time. See the [module](/graphql/resolvers-map#module) section below for more on code organization.
+You can define multiple resolver classes. Nest will combine these at run time. See the [module](/graphql/resolvers#module) section below for more on code organization.
 
 > warning **Note** The logic inside the `AuthorsService` and `PostsService` classes can be as simple or sophisticated as needed. The main point of this example is to show how to construct resolvers and how they can interact with other providers.
 
@@ -226,7 +226,7 @@ type Query {
 
 #### Query decorator options
 
-The `@Query()` decorator's options object (where we pass `{name: 'author'}}` above) accepts a number of key/value pairs:
+The `@Query()` decorator's options object (where we pass `{{ '{' }}name: 'author'{{ '}' }}` above) accepts a number of key/value pairs:
 
 - `name`: name of the query; a `string`
 - `description`: a description that will be used to generate GraphQL schema documentation (e.g., in GraphQL playground); a `string`

@@ -1,6 +1,6 @@
-<!-- 此文件从 content/techniques/validation.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:08:47.326Z -->
-<!-- 源文件: content/techniques/validation.md -->
+<!-- 此文件从 content/techniques\validation.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-03T07:09:52.748Z -->
+<!-- 源文件: content/techniques\validation.md -->
 
 ### Validation
 
@@ -161,7 +161,7 @@ create(@Body() createUserDto: CreateUserDto) {
 
 > info **Hint** Since TypeScript does not store metadata about **generics or interfaces**, when you use them in your DTOs, `ValidationPipe` may not be able to properly validate incoming data. For this reason, consider using concrete classes in your DTOs.
 
-> info **Hint** When importing your DTOs, you can't use a type-only import as that would be erased at runtime, i.e. remember to `import { CreateUserDto }}` instead of `import type { CreateUserDto }}`.
+> info **Hint** When importing your DTOs, you can't use a type-only import as that would be erased at runtime, i.e. remember to `import {{ '{' }} CreateUserDto {{ '}' }}` instead of `import type {{ '{' }} CreateUserDto {{ '}' }}`.
 
 Now we can add a few validation rules in our `CreateUserDto`. We do this using decorators provided by the `class-validator` package, described in detail [here](https://github.com/typestack/class-validator#validation-decorators). In this fashion, any route that uses the `CreateUserDto` will automatically enforce these validation rules.
 

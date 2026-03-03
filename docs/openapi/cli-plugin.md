@@ -1,6 +1,6 @@
-<!-- 此文件从 content/openapi/cli-plugin.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:14:49.915Z -->
-<!-- 源文件: content/openapi/cli-plugin.md -->
+<!-- 此文件从 content/openapi\cli-plugin.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-03T07:09:52.835Z -->
+<!-- 源文件: content/openapi\cli-plugin.md -->
 
 ### CLI Plugin
 
@@ -225,7 +225,7 @@ export interface PluginOptions {
   <tr>
     <td><code>esmCompatible</code></td>
     <td><code>false</code></td>
-    <td>If set to true, resolves syntax errors encountered when using ESM (<code>&#123; "type": "module" }</code>).</td>
+    <td>If set to true, resolves syntax errors encountered when using ESM (<code>&#123; "type": "module" &#125;</code>).</td>
   </tr>
 </table>
 

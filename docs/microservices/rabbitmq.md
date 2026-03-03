@@ -1,6 +1,6 @@
-<!-- 此文件从 content/microservices/rabbitmq.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:14:57.880Z -->
-<!-- 源文件: content/microservices/rabbitmq.md -->
+<!-- 此文件从 content/microservices\rabbitmq.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-03T07:09:52.814Z -->
+<!-- 源文件: content/microservices\rabbitmq.md -->
 
 ### RabbitMQ
 
@@ -192,9 +192,6 @@ When manual consumer acknowledgements are turned on, we must send a proper ackno
 getNotifications(@Payload() data: number[], @Ctx() context: RmqContext) {
   const channel = context.getChannelRef();
   const originalMsg = context.getMessage();
-
-  channel.ack(originalMsg);
-}
 
   channel.ack(originalMsg);
 }

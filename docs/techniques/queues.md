@@ -1,6 +1,6 @@
-<!-- 此文件从 content/techniques/queues.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:09:17.768Z -->
-<!-- 源文件: content/techniques/queues.md -->
+<!-- 此文件从 content/techniques\queues.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-03T07:09:52.761Z -->
+<!-- 源文件: content/techniques\queues.md -->
 
 ### Queues
 
@@ -119,7 +119,7 @@ BullModule.registerQueue({
 
 #### Producers
 
-Job producers add jobs to queues. Producers are typically application services (Nest [providers](/overview/providers)). To add jobs to a queue, first inject the queue into the service as follows:
+Job producers add jobs to queues. Producers are typically application services (Nest [providers](/providers)). To add jobs to a queue, first inject the queue into the service as follows:
 
 ```typescript
 import { Injectable } from '@nestjs/common';
@@ -276,7 +276,7 @@ This is covered in the [named processor](https://docs.bullmq.io/patterns/named-p
 
 #### Request-scoped consumers
 
-When a consumer is flagged as request-scoped (learn more about the injection scopes [here](/fundamentals/provider-scopes#provider-scope)), a new instance of the class will be created exclusively for each job. The instance will be garbage-collected after the job has completed.
+When a consumer is flagged as request-scoped (learn more about the injection scopes [here](/fundamentals/injection-scopes#provider-scope)), a new instance of the class will be created exclusively for each job. The instance will be garbage-collected after the job has completed.
 
 ```typescript
 @Processor({
@@ -404,7 +404,7 @@ BullModule.forRootAsync({
 });
 ```
 
-Our factory behaves like any other [asynchronous provider](/fundamentals/async-components) (e.g., it can be `async` and it's able to inject dependencies through `inject`).
+Our factory behaves like any other [asynchronous provider](/fundamentals/async-providers) (e.g., it can be `async` and it's able to inject dependencies through `inject`).
 
 ```typescript
 BullModule.forRootAsync({
@@ -595,7 +595,7 @@ BullModule.registerQueue({
 
 #### Producers
 
-Job producers add jobs to queues. Producers are typically application services (Nest [providers](/overview/providers)). To add jobs to a queue, first inject the queue into the service as follows:
+Job producers add jobs to queues. Producers are typically application services (Nest [providers](/providers)). To add jobs to a queue, first inject the queue into the service as follows:
 
 ```typescript
 import { Injectable } from '@nestjs/common';
@@ -729,11 +729,11 @@ You can designate that a job handler method will handle **only** jobs of a certa
 async transcode(job: Job<unknown>) { ... }
 ```
 
-> warning **Warning** When defining multiple consumers for the same queue, the `concurrency` option in `@Process({ concurrency: 1 }})` won't take effect. The minimum `concurrency` will match the number of consumers defined. This also applies even if `@Process()` handlers use a different `name` to handle named jobs.
+> warning **Warning** When defining multiple consumers for the same queue, the `concurrency` option in `@Process({{ '{' }} concurrency: 1 {{ '}' }})` won't take effect. The minimum `concurrency` will match the number of consumers defined. This also applies even if `@Process()` handlers use a different `name` to handle named jobs.
 
 #### Request-scoped consumers
 
-When a consumer is flagged as request-scoped (learn more about the injection scopes [here](/fundamentals/provider-scopes#provider-scope)), a new instance of the class will be created exclusively for each job. The instance will be garbage-collected after the job has completed.
+When a consumer is flagged as request-scoped (learn more about the injection scopes [here](/fundamentals/injection-scopes#provider-scope)), a new instance of the class will be created exclusively for each job. The instance will be garbage-collected after the job has completed.
 
 ```typescript
 @Processor({
@@ -907,7 +907,7 @@ BullModule.forRootAsync({
 });
 ```
 
-Our factory behaves like any other [asynchronous provider](/fundamentals/async-components) (e.g., it can be `async` and it's able to inject dependencies through `inject`).
+Our factory behaves like any other [asynchronous provider](/fundamentals/async-providers) (e.g., it can be `async` and it's able to inject dependencies through `inject`).
 
 ```typescript
 BullModule.forRootAsync({

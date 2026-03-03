@@ -1,6 +1,6 @@
-<!-- 此文件从 content/fundamentals/provider-scopes.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:17:57.612Z -->
-<!-- 源文件: content/fundamentals/provider-scopes.md -->
+<!-- 此文件从 content/fundamentals\provider-scopes.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-03T07:09:52.867Z -->
+<!-- 源文件: content/fundamentals\provider-scopes.md -->
 
 ### Injection scopes
 
@@ -40,7 +40,7 @@ import { Injectable, Scope } from '@nestjs/common';
 export class CatsService {}
 ```
 
-Similarly, for [custom providers](/fundamentals/dependency-injection), set the `scope` property in the long-hand form for a provider registration:
+Similarly, for [custom providers](/fundamentals/custom-providers), set the `scope` property in the long-hand form for a provider registration:
 
 ```typescript
 {
@@ -163,7 +163,7 @@ Having a common provider that most providers depend on (think of a database conn
 
 For instance, let's say you have an application alternately used by 10 different customers. Each customer has its **own dedicated data source**, and you want to make sure customer A will never be able to reach customer B's database. One way to achieve this could be to declare a request-scoped "data source" provider that - based on the request object - determines what's the "current customer" and retrieves its corresponding database. With this approach, you can turn your application into a multi-tenant application in just a few minutes. But, a major downside to this approach is that since most likely a large chunk of your application' components rely on the "data source" provider, they will implicitly become "request-scoped", and therefore you will undoubtedly see an impact in your apps performance.
 
-But what if we had a better solution? Since we only have 10 customers, couldn't we have 10 individual [DI sub-trees](/fundamentals/module-reference#resolving-scoped-providers) per customer (instead of recreating each tree per request)? If your providers don't rely on any property that's truly unique for each consecutive request (e.g., request UUID) but instead there're some specific attributes that let us aggregate (classify) them, there's no reason to _recreate DI sub-tree_ on every incoming request.
+But what if we had a better solution? Since we only have 10 customers, couldn't we have 10 individual [DI sub-trees](/fundamentals/module-ref#resolving-scoped-providers) per customer (instead of recreating each tree per request)? If your providers don't rely on any property that's truly unique for each consecutive request (e.g., request UUID) but instead there're some specific attributes that let us aggregate (classify) them, there's no reason to _recreate DI sub-tree_ on every incoming request.
 
 And that's exactly when the **durable providers** come in handy.
 
@@ -237,7 +237,7 @@ import { Injectable, Scope } from '@nestjs/common';
 export class CatsService {}
 ```
 
-Similarly, for [custom providers](/fundamentals/dependency-injection), set the `durable` property in the long-hand form for a provider registration:
+Similarly, for [custom providers](/fundamentals/custom-providers), set the `durable` property in the long-hand form for a provider registration:
 
 ```typescript
 {

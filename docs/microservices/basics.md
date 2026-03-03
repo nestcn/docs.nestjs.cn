@@ -1,6 +1,6 @@
-<!-- 此文件从 content/microservices/basics.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:15:43.944Z -->
-<!-- 源文件: content/microservices/basics.md -->
+<!-- 此文件从 content/microservices\basics.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-03T07:09:52.829Z -->
+<!-- 源文件: content/microservices\basics.md -->
 
 ### Overview
 
@@ -36,14 +36,6 @@ async function bootstrap() {
       transport: Transport.TCP,
     },
   );
-  await app.listen();
-}
-bootstrap();
-
-async function bootstrap() {
-  const app = await NestFactory.createMicroservice(AppModule, {
-    transport: Transport.TCP,
-  });
   await app.listen();
 }
 bootstrap();
@@ -127,17 +119,9 @@ export class MathController {
     return (data || []).reduce((a, b) => a + b);
   }
 }
-
-@Controller()
-export class MathController {
-  @MessagePattern({ cmd: 'sum' })
-  accumulate(data) {
-    return (data || []).reduce((a, b) => a + b);
-  }
-}
 ```
 
-In the above code, the `accumulate()` **message handler** listens for messages that match the `{ cmd: 'sum' }}` message pattern. The message handler takes a single argument, the `data` passed from the client. In this case, the data is an array of numbers that need to be accumulated.
+In the above code, the `accumulate()` **message handler** listens for messages that match the `{{ '{' }} cmd: 'sum' {{ '}' }}` message pattern. The message handler takes a single argument, the `data` passed from the client. In this case, the data is an array of numbers that need to be accumulated.
 
 #### Asynchronous responses
 
@@ -204,7 +188,7 @@ A client Nest application can exchange messages or publish events to a Nest micr
 
 One approach is to import the `ClientsModule`, which exposes the static `register()` method. This method takes an array of objects representing microservice transporters. Each object must include a `name` property, and optionally a `transport` property (defaulting to `Transport.TCP`), as well as an optional `options` property.
 
-The `name` property acts as an **injection token**, which you can use to inject an instance of `ClientProxy` wherever needed. The value of this `name` property can be any arbitrary string or JavaScript symbol, as described [here](/fundamentals/dependency-injection#non-class-based-provider-tokens).
+The `name` property acts as an **injection token**, which you can use to inject an instance of `ClientProxy` wherever needed. The value of this `name` property can be any arbitrary string or JavaScript symbol, as described [here](/fundamentals/custom-providers#non-class-based-provider-tokens).
 
 The `options` property is an object that includes the same properties we saw in the `createMicroservice()` method earlier.
 
@@ -250,7 +234,7 @@ constructor(
 
 > info **Hint** The `ClientsModule` and `ClientProxy` classes are imported from the `@nestjs/microservices` package.
 
-At times, you may need to fetch the transporter configuration from another service (such as a `ConfigService`), rather than hard-coding it in your client application. To achieve this, you can register a [custom provider](/fundamentals/dependency-injection) using the `ClientProxyFactory` class. This class provides a static `create()` method that accepts a transporter options object and returns a customized `ClientProxy` instance.
+At times, you may need to fetch the transporter configuration from another service (such as a `ConfigService`), rather than hard-coding it in your client application. To achieve this, you can register a [custom provider](/fundamentals/custom-providers) using the `ClientProxyFactory` class. This class provides a static `create()` method that accepts a transporter options object and returns a customized `ClientProxy` instance.
 
 ```typescript
 @Module({
@@ -323,7 +307,7 @@ The `emit()` method takes two arguments: `pattern` and `payload`. The `pattern` 
 
 For those coming from different programming language backgrounds, it may be surprising to learn that in Nest, most things are shared across incoming requests. This includes a connection pool to the database, singleton services with global state, and more. Keep in mind that Node.js does not follow the request/response multi-threaded stateless model, where each request is processed by a separate thread. As a result, using singleton instances is **safe** for our applications.
 
-However, there are edge cases where a request-based lifetime for the handler might be desirable. This could include scenarios like per-request caching in GraphQL applications, request tracking, or multi-tenancy. You can learn more about how to control scopes [here](/fundamentals/provider-scopes).
+However, there are edge cases where a request-based lifetime for the handler might be desirable. This could include scenarios like per-request caching in GraphQL applications, request tracking, or multi-tenancy. You can learn more about how to control scopes [here](/fundamentals/injection-scopes).
 
 Request-scoped handlers and providers can inject `RequestContext` using the `@Inject()` decorator in combination with the `CONTEXT` token:
 

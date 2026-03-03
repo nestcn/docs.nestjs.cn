@@ -1,10 +1,10 @@
-<!-- 此文件从 content/techniques/mongo.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:09:35.673Z -->
-<!-- 源文件: content/techniques/mongo.md -->
+<!-- 此文件从 content/techniques\mongo.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-03T07:09:52.766Z -->
+<!-- 源文件: content/techniques\mongo.md -->
 
 ### Mongo
 
-Nest supports two methods for integrating with the [MongoDB](https://www.mongodb.com/) database. You can either use the built-in [TypeORM](https://github.com/typeorm/typeorm) module described [here](/techniques/sql), which has a connector for MongoDB, or use [Mongoose](https://mongoosejs.com), the most popular MongoDB object modeling tool. In this chapter we'll describe the latter, using the dedicated `@nestjs/mongoose` package.
+Nest supports two methods for integrating with the [MongoDB](https://www.mongodb.com/) database. You can either use the built-in [TypeORM](https://github.com/typeorm/typeorm) module described [here](/techniques/database), which has a connector for MongoDB, or use [Mongoose](https://mongoosejs.com), the most popular MongoDB object modeling tool. In this chapter we'll describe the latter, using the dedicated `@nestjs/mongoose` package.
 
 Start by installing the [required dependencies](https://github.com/Automattic/mongoose):
 
@@ -175,23 +175,6 @@ export class CatsService {
     return this.catModel.find().exec();
   }
 }
-
-@Injectable()
-@Dependencies(getModelToken(Cat.name))
-export class CatsService {
-  constructor(catModel) {
-    this.catModel = catModel;
-  }
-
-  async create(createCatDto) {
-    const createdCat = new this.catModel(createCatDto);
-    return createdCat.save();
-  }
-
-  async findAll() {
-    return this.catModel.find().exec();
-  }
-}
 ```
 
 #### Connection
@@ -325,7 +308,7 @@ Middleware (also called pre and post hooks) are functions which are passed contr
 export class AppModule {}
 ```
 
-Like other [factory providers](/fundamentals/dependency-injection#factory-providers-usefactory), our factory function can be `async` and can inject dependencies through `inject`.
+Like other [factory providers](/fundamentals/custom-providers#factory-providers-usefactory), our factory function can be `async` and can inject dependencies through `inject`.
 
 ```typescript
 @Module({
@@ -477,7 +460,7 @@ export class EventsModule {}
 
 When unit testing an application, we usually want to avoid any database connection, making our test suites simpler to set up and faster to execute. But our classes might depend on models that are pulled from the connection instance. How do we resolve these classes? The solution is to create mock models.
 
-To make this easier, the `@nestjs/mongoose` package exposes a `getModelToken()` function that returns a prepared [injection token](/fundamentals/dependency-injection#di-fundamentals) based on a token name. Using this token, you can easily provide a mock implementation using any of the standard [custom provider](/fundamentals/dependency-injection) techniques, including `useClass`, `useValue`, and `useFactory`. For example:
+To make this easier, the `@nestjs/mongoose` package exposes a `getModelToken()` function that returns a prepared [injection token](/fundamentals/custom-providers#di-fundamentals) based on a token name. Using this token, you can easily provide a mock implementation using any of the standard [custom provider](/fundamentals/custom-providers) techniques, including `useClass`, `useValue`, and `useFactory`. For example:
 
 ```typescript
 @Module({
@@ -510,7 +493,7 @@ MongooseModule.forRootAsync({
 });
 ```
 
-Like other [factory providers](/fundamentals/dependency-injection#factory-providers-usefactory), our factory function can be `async` and can inject dependencies through `inject`.
+Like other [factory providers](/fundamentals/custom-providers#factory-providers-usefactory), our factory function can be `async` and can inject dependencies through `inject`.
 
 ```typescript
 MongooseModule.forRootAsync({

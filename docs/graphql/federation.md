@@ -1,6 +1,6 @@
-<!-- 此文件从 content/graphql/federation.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:17:19.881Z -->
-<!-- 源文件: content/graphql/federation.md -->
+<!-- 此文件从 content/graphql\federation.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-03T07:09:52.852Z -->
+<!-- 源文件: content/graphql\federation.md -->
 
 ### Federation
 

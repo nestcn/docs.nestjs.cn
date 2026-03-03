@@ -1,6 +1,6 @@
-<!-- 此文件从 content/techniques/configuration.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:10:17.166Z -->
-<!-- 源文件: content/techniques/configuration.md -->
+<!-- 此文件从 content/techniques\configuration.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-03T07:09:52.775Z -->
+<!-- 源文件: content/techniques\configuration.md -->
 
 ### Configuration
 
@@ -166,7 +166,7 @@ export default () => {
 };
 ```
 
-> warning **Note** Nest CLI does not automatically move your "assets" (non-TS files) to the `dist` folder during the build process. To make sure that your YAML files are copied, you have to specify this in the `compilerOptions#assets` object in the `nest-cli.json` file. As an example, if the `config` folder is at the same level as the `src` folder, add `compilerOptions#assets` with the value `"assets": [{"include": "../config/*.yaml", "outDir": "./dist/config"}}]`. Read more [here](/cli/overview#assets).
+> warning **Note** Nest CLI does not automatically move your "assets" (non-TS files) to the `dist` folder during the build process. To make sure that your YAML files are copied, you have to specify this in the `compilerOptions#assets` object in the `nest-cli.json` file. As an example, if the `config` folder is at the same level as the `src` folder, add `compilerOptions#assets` with the value `"assets": [{{ '{' }}"include": "../config/*.yaml", "outDir": "./dist/config"{{ '}' }}]`. Read more [here](/cli/monorepo#assets).
 
 Just a quick note - configuration files aren't automatically validated, even if you're using the `validationSchema` option in NestJS's `ConfigModule`. If you need validation or want to apply any transformations, you'll have to handle that within the factory function where you have complete control over the configuration object. This allows you to implement any custom validation logic as needed.
 
@@ -599,7 +599,7 @@ APP_URL=mywebsite.com
 SUPPORT_EMAIL=support@${APP_URL}
 ```
 
-With this construction, the variable `SUPPORT_EMAIL` resolves to `'support@mywebsite.com'`. Note the use of the `${...}}` syntax to trigger resolving the value of the variable `APP_URL` inside the definition of `SUPPORT_EMAIL`.
+With this construction, the variable `SUPPORT_EMAIL` resolves to `'support@mywebsite.com'`. Note the use of the `${{ '{' }}...{{ '}' }}` syntax to trigger resolving the value of the variable `APP_URL` inside the definition of `SUPPORT_EMAIL`.
 
 > info **Hint** For this feature, `@nestjs/config` package internally uses [dotenv-expand](https://github.com/motdotla/dotenv-expand).
 

@@ -6,11 +6,6 @@ on:
     - cron: '0 2 * * *'
   workflow_dispatch:
     # 允许手动触发
-  push:
-    branches:
-      - main
-    paths:
-      - '.github/workflows/sync-official-docs.yml'
 
 jobs:
   sync-docs:
@@ -40,7 +35,6 @@ jobs:
 
       - name: Install dependencies
         run: bun install
-
 
       - name: Clone official NestJS docs repository
         run: |
@@ -121,6 +115,7 @@ jobs:
           # effectively ERASING the newly updated content folder. We must re-copy it!
           rm -rf content
           cp -r official-docs/content ./content
+
       - name: Compare and sync assets folder
         id: sync-assets
         run: |
@@ -218,12 +213,30 @@ jobs:
           bun run fix-all
           echo "✅ 代码格式化完成"
 
+      - name: Check for placeholders
+        id: check-placeholders
+        run: |
+          echo "🔍 检查翻译文件中是否存在占位符问题..."
+          
+          # 检查 docs 目录中是否有占位符
+          PLACEHOLDER_COUNT=$(grep -r -c "__LINK_\|__HTML_TAG_\|__INLINE_CODE_\|__CODE_BLOCK_" docs/ 2>/dev/null | grep -v ":0$" | wc -l || echo "0")
+          
+          if [ "$PLACEHOLDER_COUNT" -gt 0 ]; then
+            echo "❌ 发现 $PLACEHOLDER_COUNT 个文件存在占位符问题"
+            echo "has_placeholders=true" >> $GITHUB_OUTPUT
+            
+            # 列出有问题的文件
+            echo "📋 存在占位符问题的文件："
+            grep -r -l "__LINK_\|__HTML_TAG_\|__INLINE_CODE_\|__CODE_BLOCK_" docs/ 2>/dev/null || true
+          else
+            echo "✅ 未发现占位符问题"
+            echo "has_placeholders=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Check internal links
-        # Run check even if translation failed, but maybe good to run after fix-all
         if: always() 
         run: |
           echo "🔗 正在检查内部链接..."
-          # Continue on error so we don't block the sync, but report it
           bun run check-links || echo "⚠️ Found broken links"
 
       - name: Update README sync time and check for changes
@@ -254,6 +267,90 @@ jobs:
             # 输出变更的文件列表
             echo "📋 变更的文件："
             git diff --cached --name-status
+          fi
+
+      - name: Create Pull Request
+        if: steps.changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # 生成 PR 标题
+          SYNC_DATE=$(date -u '+%Y-%m-%d')
+          PR_TITLE="🔄 Sync official NestJS docs - $SYNC_DATE"
+          
+          # 生成 PR 描述
+          PR_BODY="## 📋 同步摘要
+
+### 同步信息
+- **同步日期**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+- **源仓库**: https://github.com/nestjs/docs.nestjs.com
+
+### 变更类型
+"
+          
+          if [ "${{ steps.sync-content.outputs.content_changed }}" == "true" ]; then
+            PR_BODY="${PR_BODY}
+- ✅ 内容同步：检测到变更并已翻译
+"
+          fi
+          
+          if [ "${{ steps.translate-content.outputs.translation_changed }}" == "true" ]; then
+            PR_BODY="${PR_BODY}
+- ✅ 翻译更新：使用 Cloudflare Workers AI 更新
+"
+          fi
+          
+          if [ "${{ steps.sync-assets.outputs.assets_changed }}" == "true" ]; then
+            PR_BODY="${PR_BODY}
+- ✅ 资源同步：检测到变更并已同步
+"
+          fi
+
+          if [ "${{ steps.check-placeholders.outputs.has_placeholders }}" == "true" ]; then
+            PR_BODY="${PR_BODY}
+
+### ⚠️ 警告
+检测到翻译文件中存在占位符问题，请在校对时注意检查。
+"
+          fi
+          
+          PR_BODY="${PR_BODY}
+
+### 变更文件
+\`\`\`
+$(git diff --cached --name-status)
+\`\`\`
+
+---
+*此 PR 由自动化工作流创建，请在校对后合并。*
+"
+          
+          # 创建分支名
+          BRANCH_NAME="sync/docs-${SYNC_DATE}"
+          
+          # 创建并切换到新分支
+          git checkout -b "$BRANCH_NAME"
+          
+          # 提交变更
+          git commit -m "$PR_TITLE"
+          
+          # 推送分支
+          git push origin "$BRANCH_NAME" --force
+          
+          # 检查是否已存在相同的 PR
+          EXISTING_PR=$(gh pr list --head "$BRANCH_NAME" --json number --jq '.[0].number' 2>/dev/null || echo "")
+          
+          if [ -n "$EXISTING_PR" ]; then
+            echo "📝 更新已存在的 PR #$EXISTING_PR"
+            gh pr edit "$EXISTING_PR" --title "$PR_TITLE" --body "$PR_BODY"
+          else
+            echo "📝 创建新的 PR"
+            gh pr create \
+              --title "$PR_TITLE" \
+              --body "$PR_BODY" \
+              --base main \
+              --head "$BRANCH_NAME" \
+              --label "sync,translation"
           fi
 
       - name: Update sync time badge JSON (Gist) - Always run
@@ -306,42 +403,8 @@ jobs:
           else
             echo "❌ Gist 更新失败:"
             echo "$response"
-            # 不让失败中断整个工作流
             echo "继续执行后续步骤..."
           fi
-
-      - name: Commit and push changes
-        if: steps.changes.outputs.has_changes == 'true'
-        run: |
-          # 生成详细的提交信息
-          COMMIT_MSG="🔄 Sync official NestJS docs content and assets"
-          
-          if [ "${{ steps.sync-content.outputs.content_changed }}" == "true" ]; then
-            COMMIT_MSG="${COMMIT_MSG}
-
-          📝 Content changes detected and synced"
-          fi
-          
-          if [ "${{ steps.translate-content.outputs.translation_changed }}" == "true" ]; then
-            COMMIT_MSG="${COMMIT_MSG}
-
-          🌐 Translations updated with Cloudflare Workers AI"
-          fi
-          
-          if [ "${{ steps.sync-assets.outputs.assets_changed }}" == "true" ]; then
-            COMMIT_MSG="${COMMIT_MSG}
-
-          🎨 Assets changes detected and synced"
-          fi
-          
-          # 添加同步信息
-          COMMIT_MSG="${COMMIT_MSG}
-
-          🕒 Sync date: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
-          📦 Source: https://github.com/nestjs/docs.nestjs.com"
-          
-          git commit -m "$COMMIT_MSG"
-          git push
 
       - name: Create summary
         run: |
@@ -377,11 +440,11 @@ jobs:
             echo "- **资源同步**: ⚠️ 源中未找到" >> $GITHUB_STEP_SUMMARY
           fi
           
-          # Git 提交状态
+          # PR 状态
           if [ "${{ steps.changes.outputs.has_changes }}" == "true" ]; then
-            echo "- **变更提交**: ✅ 是，变更已提交并推送" >> $GITHUB_STEP_SUMMARY
+            echo "- **PR 创建**: ✅ 是，已创建 PR 等待校对合并" >> $GITHUB_STEP_SUMMARY
           else
-            echo "- **变更提交**: ❌ 无变更需要提交" >> $GITHUB_STEP_SUMMARY
+            echo "- **PR 创建**: ❌ 无变更需要提交" >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: Notify on failure

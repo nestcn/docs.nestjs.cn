@@ -1,0 +1,305 @@
+name: AI Proofread and Merge PR
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to proofread and merge'
+        required: true
+        type: number
+
+jobs:
+  proofread:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false || github.event_name == 'workflow_dispatch'
+    
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.ref || format('refs/pull/{0}/head', github.event.inputs.pr_number) }}
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Get changed files
+        id: changed-files
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # 获取 PR 号
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            PR_NUMBER="${{ github.event.inputs.pr_number }}"
+          else
+            PR_NUMBER="${{ github.event.pull_request.number }}"
+          fi
+          
+          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+          
+          # 获取变更的 markdown 文件
+          CHANGED_FILES=$(gh pr diff "$PR_NUMBER" --name-only | grep "^docs/.*\.md$" || true)
+          
+          if [ -n "$CHANGED_FILES" ]; then
+            echo "changed_files<<EOF" >> $GITHUB_OUTPUT
+            echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            
+            echo "📋 变更的文档文件："
+            echo "$CHANGED_FILES"
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ 没有变更的文档文件"
+          fi
+
+      - name: Check for placeholders
+        id: check-placeholders
+        if: steps.changed-files.outputs.has_changes == 'true'
+        run: |
+          echo "🔍 检查翻译文件中是否存在占位符问题..."
+          
+          # 检查 docs 目录中是否有占位符
+          PLACEHOLDER_FILES=$(grep -r -l "__LINK_\|__HTML_TAG_\|__INLINE_CODE_\|__CODE_BLOCK_" docs/ 2>/dev/null || true)
+          PLACEHOLDER_COUNT=$(echo "$PLACEHOLDER_FILES" | grep -c "." || echo "0")
+          
+          if [ "$PLACEHOLDER_COUNT" -gt 0 ]; then
+            echo "❌ 发现 $PLACEHOLDER_COUNT 个文件存在占位符问题"
+            echo "has_placeholders=true" >> $GITHUB_OUTPUT
+            
+            # 列出有问题的文件
+            echo "📋 存在占位符问题的文件："
+            echo "$PLACEHOLDER_FILES"
+            
+            # 创建评论内容
+            COMMENT_BODY="## ⚠️ 占位符检查失败
+
+检测到以下文件存在占位符问题，需要手动修复：
+
+\`\`\`
+$PLACEHOLDER_FILES
+\`\`\`
+
+占位符 \`__LINK_N__\`、\`__HTML_TAG_N__\`、\`__INLINE_CODE_N__\`、\`__CODE_BLOCK_N__\` 未被正确恢复。
+
+请检查翻译脚本或手动修复这些文件。
+"
+            echo "comment_body<<EOF" >> $GITHUB_OUTPUT
+            echo "$COMMENT_BODY" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "✅ 未发现占位符问题"
+            echo "has_placeholders=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: AI Proofread
+        id: ai-proofread
+        if: steps.changed-files.outputs.has_changes == 'true' && steps.check-placeholders.outputs.has_placeholders != 'true'
+        run: |
+          echo "🤖 开始 AI 校对..."
+          
+          # 创建校对脚本
+          cat > /tmp/proofread.js << 'SCRIPT'
+          const fs = require('fs');
+          const path = require('path');
+          
+          async function proofreadWithAI(content, filePath) {
+            const response = await fetch('https://api.cloudflare.com/client/v4/accounts/' + process.env.CLOUDFLARE_ACCOUNT_ID + '/ai/run/@cf/meta/llama-3-8b-instruct', {
+              method: 'POST',
+              headers: {
+                'Authorization': 'Bearer ' + process.env.CLOUDFLARE_API_TOKEN,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                messages: [
+                  {
+                    role: 'system',
+                    content: `你是一个专业的技术文档校对专家。请检查以下中文翻译文档的质量。
+
+校对要求：
+1. 检查是否有明显的翻译错误
+2. 检查是否有未翻译的英文内容（代码和专有名词除外）
+3. 检查是否有占位符问题（如 __LINK_N__、__CODE_BLOCK_N__ 等）
+4. 检查是否有格式问题
+
+如果发现问题，请列出具体问题和建议的修复方案。
+如果没有问题，请回复 "✅ 校对通过"。
+
+文件路径: ${filePath}`
+                  },
+                  {
+                    role: 'user',
+                    content: content.substring(0, 4000) // 限制长度
+                  }
+                ],
+                max_tokens: 1000
+              })
+            });
+            
+            const data = await response.json();
+            return data.result?.response || '校对失败';
+          }
+          
+          async function main() {
+            const changedFiles = process.env.CHANGED_FILES.split('\n').filter(f => f.trim());
+            const results = [];
+            
+            for (const file of changedFiles.slice(0, 5)) { // 最多校对5个文件
+              try {
+                const content = fs.readFileSync(file, 'utf8');
+                const result = await proofreadWithAI(content, file);
+                results.push({ file, result });
+                console.log(`✅ 校对完成: ${file}`);
+              } catch (error) {
+                console.error(`❌ 校对失败: ${file}`, error.message);
+                results.push({ file, result: '校对失败: ' + error.message });
+              }
+            }
+            
+            fs.writeFileSync('/tmp/proofread-results.json', JSON.stringify(results, null, 2));
+          }
+          
+          main().catch(console.error);
+          SCRIPT
+          
+          # 运行校对脚本
+          CHANGED_FILES="${{ steps.changed-files.outputs.changed_files }}" \
+          node /tmp/proofread.js || true
+          
+          # 检查校对结果
+          if [ -f "/tmp/proofread-results.json" ]; then
+            echo "📋 校对结果："
+            cat /tmp/proofread-results.json
+            
+            # 检查是否有校对失败的情况
+            FAILED=$(cat /tmp/proofread-results.json | jq -r '.[] | select(.result | contains("校对失败") or contains("问题"))' || true)
+            
+            if [ -n "$FAILED" ]; then
+              echo "proofread_passed=false" >> $GITHUB_OUTPUT
+            else
+              echo "proofread_passed=true" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "proofread_passed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create PR comment
+        if: always() && steps.changed-files.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER="${{ steps.changed-files.outputs.pr_number }}"
+          
+          # 构建评论内容
+          COMMENT_BODY="## 🤖 AI 校对报告
+
+### 校对状态
+
+"
+          
+          if [ "${{ steps.check-placeholders.outputs.has_placeholders }}" == "true" ]; then
+            COMMENT_BODY="${COMMENT_BODY}- ❌ **占位符检查**: 发现问题
+"
+          else
+            COMMENT_BODY="${COMMENT_BODY}- ✅ **占位符检查**: 通过
+"
+          fi
+          
+          if [ "${{ steps.ai-proofread.outputs.proofread_passed }}" == "true" ]; then
+            COMMENT_BODY="${COMMENT_BODY}- ✅ **AI 校对**: 通过
+"
+          elif [ "${{ steps.ai-proofread.outputs.proofread_passed }}" == "false" ]; then
+            COMMENT_BODY="${COMMENT_BODY}- ⚠️ **AI 校对**: 发现问题
+"
+          else
+            COMMENT_BODY="${COMMENT_BODY}- ➖ **AI 校对**: 跳过
+"
+          fi
+          
+          # 添加校对结果
+          if [ -f "/tmp/proofread-results.json" ]; then
+            COMMENT_BODY="${COMMENT_BODY}
+
+### 详细校对结果
+
+\`\`\`json
+$(cat /tmp/proofread-results.json | jq -r '.[] | "📄 \(.file)\n\(.result)\n"')
+\`\`\`
+"
+          fi
+          
+          COMMENT_BODY="${COMMENT_BODY}
+
+---
+*此评论由 AI 校对工作流自动生成*
+"
+          
+          # 发布评论
+          echo "$COMMENT_BODY" | gh pr comment "$PR_NUMBER" --body-file -
+
+      - name: Auto merge PR
+        if: |
+          steps.check-placeholders.outputs.has_placeholders != 'true' &&
+          (steps.ai-proofread.outputs.proofread_passed == 'true' || steps.ai-proofread.outputs.proofread_passed == '')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER="${{ steps.changed-files.outputs.pr_number }}"
+          
+          echo "✅ 校对通过，准备合并 PR #$PR_NUMBER"
+          
+          # 等待一段时间，让其他检查完成
+          sleep 30
+          
+          # 检查 PR 状态
+          PR_STATE=$(gh pr view "$PR_NUMBER" --json state,mergeable,mergeStateStatus --jq '{state: .state, mergeable: .mergeable, mergeStateStatus: .mergeStateStatus}')
+          
+          echo "📋 PR 状态: $PR_STATE"
+          
+          STATE=$(echo "$PR_STATE" | jq -r '.state')
+          MERGEABLE=$(echo "$PR_STATE" | jq -r '.mergeable')
+          MERGE_STATE=$(echo "$PR_STATE" | jq -r '.mergeStateStatus')
+          
+          if [ "$STATE" == "OPEN" ] && [ "$MERGEABLE" == "MERGEABLE" ]; then
+            echo "🔄 合并 PR..."
+            gh pr merge "$PR_NUMBER" --squash --delete-branch
+            echo "✅ PR 已合并"
+          else
+            echo "⚠️ PR 无法自动合并"
+            echo "状态: $STATE"
+            echo "可合并: $MERGEABLE"
+            echo "合并状态: $MERGE_STATE"
+            
+            # 添加评论说明原因
+            gh pr comment "$PR_NUMBER" --body "## ⚠️ 无法自动合并
+
+PR 当前状态无法自动合并：
+- **状态**: $STATE
+- **可合并**: $MERGEABLE
+- **合并状态**: $MERGE_STATE
+
+请手动检查并合并此 PR。
+"
+          fi
+
+      - name: Create summary
+        if: always()
+        run: |
+          echo "## 🤖 AI 校对摘要" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **PR 号**: ${{ steps.changed-files.outputs.pr_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **占位符检查**: ${{ steps.check-placeholders.outputs.has_placeholders == 'true' && '❌ 失败' || '✅ 通过' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **AI 校对**: ${{ steps.ai-proofread.outputs.proofread_passed == 'true' && '✅ 通过' || (steps.ai-proofread.outputs.proofread_passed == 'false' && '⚠️ 有问题') || '➖ 跳过' }}" >> $GITHUB_STEP_SUMMARY

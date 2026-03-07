@@ -1,14 +1,14 @@
-<!-- 此文件从 content/recipes/serve-static.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-24T02:53:34.247Z -->
-<!-- 源文件: content/recipes/serve-static.md -->
+<!-- 此文件从 content/recipes\serve-static.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-02-28T06:24:18.004Z -->
+<!-- 源文件: content/recipes\serve-static.md -->
 
 ### Serve Static
 
-使用 Static App 来服务静态内容，如 Single Page Application（SPA）可以使用来自 [__INLINE_CODE_3__](https://www.npmjs.com/package/@nestjs/serve-static) 包的 `ServeStaticModule`。
+In order to serve static content like a Single Page Application (SPA) we can use the `ServeStaticModule` from the [`@nestjs/serve-static`](https://www.npmjs.com/package/@nestjs/serve-static) package.
 
-#### 安装
+#### Installation
 
-首先，我们需要安装所需的包：
+First we need to install the required package:
 
 ```bash
 $ npm install --save @nestjs/serve-static
@@ -16,7 +16,7 @@ $ npm install --save @nestjs/serve-static
 
 #### Bootstrap
 
-安装过程完成后，我们可以将 `ServeStaticModule` 导入到根 `AppModule` 中，并通过将配置对象传递给 `forRoot()` 方法来配置它。
+Once the installation process is done, we can import the `ServeStaticModule` into the root `AppModule` and configure it by passing in a configuration object to the `forRoot()` method.
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -37,17 +37,18 @@ import { join } from 'path';
 export class AppModule {}
 ```
 
-这样配置后，构建静态网站，并将其内容放置在 `rootPath` 属性指定的位置。
+With this in place, build the static website and place its content in the location specified by the `rootPath` property.
 
-#### 配置
+#### Configuration
 
-[ServeStaticModule](https://github.com/nestjs/serve-static) 可以使用各种选项来自定义其行为。你可以设置渲染静态应用的路径、指定排除路径、启用或禁用 Cache-Control 响应头等。见完整的选项列表 [here](https://github.com/nestjs/serve-static/blob/master/lib/interfaces/serve-static-options.interface.ts)。
+[ServeStaticModule](https://github.com/nestjs/serve-static) can be configured with a variety of options to customize its behavior.
+You can set the path to render your static app, specify excluded paths, enable or disable setting Cache-Control response header, etc. See the full list of options [here](https://github.com/nestjs/serve-static/blob/master/lib/interfaces/serve-static-options.interface.ts).
 
-> 警告 **注意** Static App 的默认 `renderPath` 是 `*`（所有路径），模块将在响应中发送“index.html”文件。
-> 这样可以让您创建客户端路由对于您的 SPA。路径，指定在控制器中将fallback到服务器。
-> 可以更改此行为设置 `serveRoot`、`renderPath` 将其与其他选项组合。
-> 此外，Fastify 适配器中实现了 `serveStaticOptions.fallthrough` 选项，以模仿 Express 的fallthrough 行为，并需要将其设置为 `true` 发送 `index.html` 而不是404错误对不存在的路由。
+> warning **Notice** The default `renderPath` of the Static App is `*` (all paths), and the module will send "index.html" files in response.
+> It lets you create Client-Side routing for your SPA. Paths, specified in your controllers will fallback to the server.
+> You can change this behavior setting `serveRoot`, `renderPath` combining them with other options.
+> Additionally, the option `serveStaticOptions.fallthrough` has been implemented in the Fastify adapter to mimic Express's fallthrough behavior and needs to be set to `true` to send `index.html` instead of a 404 error for non existing route.
 
-#### 示例
+#### Example
 
-可用的工作示例 [here](https://github.com/nestjs/nest/tree/master/sample/24-serve-static)。
+A working example is available [here](https://github.com/nestjs/nest/tree/master/sample/24-serve-static).

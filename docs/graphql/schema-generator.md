@@ -1,56 +1,55 @@
-<!-- 此文件从 content/graphql/schema-generator.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-24T02:58:21.113Z -->
-<!-- 源文件: content/graphql/schema-generator.md -->
+<!-- 此文件从 content/graphql\schema-generator.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-02-28T06:24:18.167Z -->
+<!-- 源文件: content/graphql\schema-generator.md -->
 
-### 生成SDL
+### Generating SDL
 
-> 警告 **警告** 本章仅适用于代码优先approach。
+> warning **Warning** This chapter applies only to the code first approach.
 
-使用 __INLINE_CODE_4__ 手动生成 GraphQL SDL schema（即不运行应用程序、连接数据库、hook up 解析器等），可以在没有运行应用程序的情况下生成SDL。
+To manually generate a GraphQL SDL schema (i.e., without running an application, connecting to the database, hooking up resolvers, etc.), use the `GraphQLSchemaBuilderModule`.
 
 ```typescript
-@Mutation(() => Post)
-async upvotePost(@Args({ name: 'postId', type: () => Int }) postId: number) {
-  return this.postsService.upvoteById({ id: postId });
+async function generateSchema() {
+  const app = await NestFactory.create(GraphQLSchemaBuilderModule);
+  await app.init();
+
+  const gqlSchemaFactory = app.get(GraphQLSchemaFactory);
+  const schema = await gqlSchemaFactory.create([RecipesResolver]);
+  console.log(printSchema(schema));
 }
 ```
 
-> 提示 **提示** __INLINE_CODE_5__ 和 `upvotePost()` 是从 `votes` 包中导入的。 `@Mutation()` 函数是从 `AuthorResolver` 包中导入的。
+> info **Hint** The `GraphQLSchemaBuilderModule` and `GraphQLSchemaFactory` are imported from the `@nestjs/graphql` package. The `printSchema` function is imported from the `graphql` package.
 
-#### 使用
+#### Usage
 
-`@Resolver` 方法接受一个 resolver 类引用数组。例如：
-
-```graphql
-type Mutation {
-  upvotePost(postId: Int!): Post
-}
-```
-
-它还接受一个第二个可选参数，带有 scalar 类数组：
+The `gqlSchemaFactory.create()` method takes an array of resolver class references. For example:
 
 ```typescript
-import { InputType, Field } from '@nestjs/graphql';
-
-@InputType()
-export class UpvotePostInput {
-  @Field()
-  postId: number;
-}
+const schema = await gqlSchemaFactory.create([
+  RecipesResolver,
+  AuthorsResolver,
+  PostsResolvers,
+]);
 ```
 
-最后，您可以传递一个选项对象：
+It also takes a second optional argument with an array of scalar classes:
 
 ```typescript
-@Mutation(() => Post)
-async upvotePost(
-  @Args('upvotePostData') upvotePostData: UpvotePostInput,
-) {}
+const schema = await gqlSchemaFactory.create(
+  [RecipesResolver, AuthorsResolver, PostsResolvers],
+  [DurationScalar, DateScalar],
+);
 ```
 
-- `@ResolveField`: 忽略架构验证；布尔值，缺省为 `@Args`
-- `@nestjs/graphql`: 将不被明确引用（不在对象图中）的类列表生成。通常，如果类被声明但否在图中没有被引用，它将被省略。属性值是一个类引用数组。
+Lastly, you can pass an options object:
 
-Note:
+```typescript
+const schema = await gqlSchemaFactory.create([RecipesResolver], {
+  skipCheck: true,
+  orphanedTypes: [],
+});
+```
 
-* I removed all 
+- `skipCheck`: ignore schema validation; boolean, defaults to `false`
+- `orphanedTypes`: list of classes that are not explicitly referenced (not part of the object graph) to be generated. Normally, if a class is declared but isn't otherwise referenced in the graph, it's omitted. The property value is an array of class references.

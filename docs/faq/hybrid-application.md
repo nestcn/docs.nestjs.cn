@@ -1,64 +1,74 @@
-<!-- 此文件从 content/faq/hybrid-application.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-24T03:02:15.490Z -->
-<!-- 源文件: content/faq/hybrid-application.md -->
+<!-- 此文件从 content/faq\hybrid-application.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-02-28T06:24:18.275Z -->
+<!-- 源文件: content/faq\hybrid-application.md -->
 
-### 混合应用
+### Hybrid application
 
-混合应用是指监听来自两个或多个不同的来源的请求。这可以组合 HTTP 服务器与微服务监听器或只是多个不同的微服务监听器。默认的__INLINE_CODE_4__方法不允许多个服务器，因此在这种情况下，每个微服务都需要手动创建和启动。在执行此操作时，可以通过`providers`方法将__INLINE_CODE_5__实例连接到`<provider>`实例。
+A hybrid application is one that listens for requests from two or more different sources. This can combine an HTTP server with a microservice listener or even just multiple different microservice listeners. The default `createMicroservice` method does not allow for multiple servers so in this case each microservice must be created and started manually. In order to do this, the `INestApplication` instance can be connected with `INestMicroservice` instances through the `connectMicroservice()` method.
 
-```bash
-Nest can't resolve dependencies of the <provider> (?). Please make sure that the argument <unknown_token> at index [<index>] is available in the <module> context.
+```typescript
+const app = await NestFactory.create(AppModule);
+const microservice = app.connectMicroservice<MicroserviceOptions>({
+  transport: Transport.TCP,
+});
 
-Potential solutions:
-- Is <module> a valid NestJS module?
-- If <unknown_token> is a provider, is it part of the current <module>?
-- If <unknown_token> is exported from a separate @Module, is that module imported within <module>?
-  @Module({
-    imports: [ /* the Module containing <unknown_token> */ ]
-  })
+await app.startAllMicroservices();
+await app.listen(3001);
 ```
 
-> info **提示**`providers`方法在指定的地址上启动 HTTP 服务器。如果您的应用程序不处理 HTTP 请求，那么应该使用`imports`方法。
+> info **Hint** the `app.listen(port)` method starts an HTTP server on the specified address. If your application does not handle HTTP requests then you should use the `app.init()` method instead.
 
-要连接多个微服务实例，需要对每个微服务调用`<module>`：
+To connect multiple microservice instances, issue the call to `connectMicroservice()` for each microservice:
 
-```bash
-Nest can't resolve dependencies of the <provider> (?).
-Please make sure that the argument ModuleRef at index [<index>] is available in the <module> context.
-...
+```typescript
+const app = await NestFactory.create(AppModule);
+// microservice #1
+const microserviceTcp = app.connectMicroservice<MicroserviceOptions>({
+  transport: Transport.TCP,
+  options: {
+    port: 3001,
+  },
+});
+// microservice #2
+const microserviceRedis = app.connectMicroservice<MicroserviceOptions>({
+  transport: Transport.REDIS,
+  options: {
+    host: 'localhost',
+    port: 6379,
+  },
+});
+
+await app.startAllMicroservices();
+await app.listen(3001);
 ```
 
-要将`providers`绑定到仅一个传输策略（例如 MQTT）中，hybrid 应用程序中具有多个微服务，可以将第二个参数类型为`providers`的枚举作为第二个参数，这是一个定义了所有内置传输策略的枚举。
+To bind `@MessagePattern()` to only one transport strategy (for example, MQTT) in a hybrid application with multiple microservices, we can pass the second argument of type `Transport` which is an enum with all the built-in transport strategies defined.
 
-```text
-.
-├── package.json
-├── apps
-│   └── api
-│       └── node_modules
-│           └── @nestjs/bull
-│               └── node_modules
-│                   └── @nestjs/core
-└── node_modules
-    ├── (other packages)
-    └── @nestjs/core
+```typescript
+@@filename()
+@MessagePattern('time.us.*', Transport.NATS)
+getDate(@Payload() data: number[], @Ctx() context: NatsContext) {
+  console.log(`Subject: ${context.getSubject()}`); // e.g. "time.us.east"
+  return new Date().toLocaleTimeString(...);
+}
+@MessagePattern({ cmd: 'time.us' }, Transport.TCP)
+getTCPDate(@Payload() data: number[]) {
+  return new Date().toLocaleTimeString(...);
+}
 ```
 
-> info **提示**`providers`、`<provider>`、`imports` 和 `<unknown_token>` 来自 `dependency`。
+> info **Hint** `@Payload()`, `@Ctx()`, `Transport` and `NatsContext` are imported from `@nestjs/microservices`.
 
-#### 共享配置
+#### Sharing configuration
 
-默认情况下，混合应用程序不会继承主应用程序（基于 HTTP 的应用程序）的全局管道、拦截器、守卫和过滤器。
-要继承主应用程序的配置属性，需要在`Object`调用的第二个参数（可选的选项对象）中设置`<unknown_token>`属性，例如：
+By default a hybrid application will not inherit global pipes, interceptors, guards and filters configured for the main (HTTP-based) application.
+To inherit these configuration properties from the main application, set the `inheritAppConfig` property in the second argument (an optional options object) of the `connectMicroservice()` call, as follow:
 
-```bash
-Nest cannot create the <module> instance.
-The module at index [<index>] of the <module> "imports" array is undefined.
-
-Potential causes:
-- A circular dependency between modules. Use forwardRef() to avoid it. Read more: ./fundamentals/circular-dependency
-- The module at index [<index>] is of type "undefined". Check your import statements and the type of the module.
-
-Scope [<module_import_chain>]
-# example chain AppModule -> FooModule
+```typescript
+const microservice = app.connectMicroservice<MicroserviceOptions>(
+  {
+    transport: Transport.TCP,
+  },
+  { inheritAppConfig: true },
+);
 ```

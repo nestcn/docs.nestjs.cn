@@ -29,12 +29,14 @@
 
 ```bash
 nest commandOrAlias requiredArg [optionalArg] [options]
+
 ```
 
 例如：
 
 ```bash
 $ nest new my-nest-project --dry-run
+
 ```
 
 在这里，`new` 是 _commandOrAlias_。`new` 命令有一个别名 `n`。`my-nest-project`
@@ -44,6 +46,7 @@ $ nest new my-nest-project --dry-run
 
 ```bash
 $ nest n my-nest-project -d
+
 ```
 
 大多数命令和一些选项都有别名。尝试运行 `nest new --help`
@@ -73,6 +76,7 @@ Node.js 二进制文件，例如 [Node.js 项目页面](https://nodejs.org/en/do
 
 ```bash
 node -p process.versions.icu
+
 ```
 
 如果命令打印 `undefined`，则您的 Node.js 二进制文件没有国际化支持。

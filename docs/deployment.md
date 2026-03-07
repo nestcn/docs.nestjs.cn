@@ -18,6 +18,7 @@ Before deploying your NestJS application, ensure you have:
 > $ npm install -g @nestjs/mau
 > $ mau deploy
 > ```
+
 >
 > Once the deployment is complete, you'll have your NestJS application up and running on AWS in seconds!
 
@@ -27,6 +28,7 @@ To build your NestJS application, you need to compile your TypeScript code into 
 
 ```bash
 $ npm run build
+
 ```
 
 This command typically runs the `nest build` command under the hood, which is basically a wrapper around the TypeScript compiler with some additional features (assets copying, etc.). In case you have a custom build script, you can run it directly. Also, for NestJS CLI mono-repos, make sure to pass the name of the project to build as an argument (`npm run build my-app`).
@@ -56,6 +58,7 @@ You can set the `NODE_ENV` environment variable when starting your application l
 
 ```bash
 $ NODE_ENV=production node dist/main.js
+
 ```
 
 Or just set it in your cloud provider's/Mau dashboard.
@@ -66,6 +69,7 @@ To run your NestJS application in production, just use the following command:
 
 ```bash
 $ node dist/main.js # Adjust this based on your entry point location
+
 ```
 
 This command starts your application, which will listen on the specified port (usually `3000` by default). Ensure that this matches the port you’ve configured in your application.
@@ -171,6 +175,7 @@ EXPOSE 3000
 
 # Command to run the application
 CMD ["node", "dist/main"]
+
 ```
 
 > info **Hint** Make sure to replace `node:20` with the appropriate Node.js version you're using in your project. You can find the available Node.js Docker images on the [official Docker Hub repository](https://hub.docker.com/_/node).
@@ -185,12 +190,14 @@ dist
 *.log
 *.md
 .git
+
 ```
 
 This file ensures that unnecessary files are not included in the container image, keeping it lightweight. Now that you have your Dockerfile set up, you can build your Docker image. Open your terminal, navigate to your project directory, and run the following command:
 
 ```bash
 docker build -t my-nestjs-app .
+
 ```
 
 In this command:
@@ -202,6 +209,7 @@ After building the image, you can run it as a container. Execute the following c
 
 ```bash
 docker run -p 3000:3000 my-nestjs-app
+
 ```
 
 In this command:
@@ -219,6 +227,7 @@ Once you decide on a registry, you can push your image by following these steps:
 docker login # Log in to your Docker registry
 docker tag my-nestjs-app your-dockerhub-username/my-nestjs-app # Tag your image
 docker push your-dockerhub-username/my-nestjs-app # Push your image
+
 ```
 
 Replace `your-dockerhub-username` with your Docker Hub username or the appropriate registry URL. After pushing your image, you can pull it on any machine and run it as a container.
@@ -258,6 +267,7 @@ To deploy your NestJS application with Mau, just run the following command:
 ```bash
 $ npm install -g @nestjs/mau
 $ mau deploy
+
 ```
 
 Sign up today and [Deploy with Mau](https://mau.nestjs.com/ 'Deploy Nest') to get your NestJS applications up and running on AWS in minutes!

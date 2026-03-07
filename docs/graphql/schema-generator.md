@@ -13,6 +13,7 @@ async function generateSchema() {
   const schema = await gqlSchemaFactory.create([RecipesResolver]);
   console.log(printSchema(schema));
 }
+
 ```
 
 > info **Hint** The `GraphQLSchemaBuilderModule` and `GraphQLSchemaFactory` are imported from the `@nestjs/graphql` package. The `printSchema` function is imported from the `graphql` package.
@@ -27,6 +28,7 @@ const schema = await gqlSchemaFactory.create([
   AuthorsResolver,
   PostsResolvers,
 ]);
+
 ```
 
 It also takes a second optional argument with an array of scalar classes:
@@ -36,6 +38,7 @@ const schema = await gqlSchemaFactory.create(
   [RecipesResolver, AuthorsResolver, PostsResolvers],
   [DurationScalar, DateScalar],
 );
+
 ```
 
 Lastly, you can pass an options object:
@@ -45,6 +48,7 @@ const schema = await gqlSchemaFactory.create([RecipesResolver], {
   skipCheck: true,
   orphanedTypes: [],
 });
+
 ```
 
 - `skipCheck`: ignore schema validation; boolean, defaults to `false`

@@ -54,6 +54,7 @@ export class LoggerMiddleware {
     next();
   }
 }
+
 ```
 
 #### Dependency injection
@@ -95,6 +96,7 @@ export class AppModule {
       .forRoutes("cats");
   }
 }
+
 ```
 
 In the above example we have set up the `LoggerMiddleware` for the `/cats` route
@@ -135,6 +137,7 @@ export class AppModule {
       .forRoutes({ path: "cats", method: RequestMethod.GET });
   }
 }
+
 ```
 
 > info **Hint** The `configure()` method can be made asynchronous using
@@ -161,6 +164,7 @@ forRoutes({
   path: "abcd/*splat",
   method: RequestMethod.ALL,
 });
+
 ```
 
 > info **Hint** `splat` is simply the name of the wildcard parameter and has no
@@ -177,6 +181,7 @@ forRoutes({
   path: "abcd/{*splat}",
   method: RequestMethod.ALL,
 });
+
 ```
 
 #### Middleware consumer
@@ -216,6 +221,7 @@ export class AppModule {
       .forRoutes(CatsController);
   }
 }
+
 ```
 
 > info **Hint** The `apply()` method may either take a single middleware, or
@@ -240,6 +246,7 @@ consumer
     "cats/{*splat}",
   )
   .forRoutes(CatsController);
+
 ```
 
 > info **Hint** The `exclude()` method supports wildcard parameters using the
@@ -268,6 +275,7 @@ export function logger(req: Request, res: Response, next: NextFunction) {
   console.log(`Request...`);
   next();
 }
+
 ```
 
 And use it within the `AppModule`:
@@ -276,6 +284,7 @@ And use it within the `AppModule`:
 consumer
   .apply(logger)
   .forRoutes(CatsController);
+
 ```
 
 > info **Hint** Consider using the simpler **functional middleware** alternative
@@ -288,6 +297,7 @@ sequentially, simply provide a comma separated list inside the `apply()` method:
 
 ```typescript
 consumer.apply(cors(), helmet(), logger).forRoutes(CatsController);
+
 ```
 
 #### Global middleware
@@ -299,6 +309,7 @@ If we want to bind middleware to every registered route at once, we can use the
 const app = await NestFactory.create(AppModule);
 app.use(logger);
 await app.listen(process.env.PORT ?? 3000);
+
 ```
 
 > info **Hint** Consider using the simpler **functional middleware** alternative

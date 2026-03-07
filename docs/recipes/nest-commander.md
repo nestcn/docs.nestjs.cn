@@ -12,6 +12,7 @@
 
 ```bash
 $ npm i nest-commander
+
 ```
 
 #### 命令文件
@@ -33,6 +34,7 @@ async function bootstrap() {
 }
 
 bootstrap();
+
 ```
 
 默认情况下，使用 `CommandFactory` 时 Nest 的日志记录器是禁用的。但可以通过将其作为 `run` 函数的第二个参数来启用。你可以传入自定义的 NestJS 日志记录器，或是需要保留的日志级别数组——如果只想输出 Nest 的错误日志，至少传入 `['error']` 会很有帮助。
@@ -50,6 +52,7 @@ async function bootstrap() {
 }
 
 bootstrap();
+
 ```
 
 就这样。`CommandFactory` 会在底层自动为你调用 `NestFactory` 并在必要时执行 `app.close()`，因此你无需担心内存泄漏问题。如需添加错误处理，可以用 `try/catch` 包裹 `run` 命令，或者在 `bootstrap()` 调用后链式添加 `.catch()` 方法。
@@ -133,6 +136,7 @@ export class BasicCommand extends CommandRunner {
     this.logService.log({ param });
   }
 }
+
 ```
 
 确保命令类已添加到模块中
@@ -142,6 +146,7 @@ export class BasicCommand extends CommandRunner {
   providers: [LogService, BasicCommand],
 })
 export class AppModule {}
+
 ```
 
 现在，要在你的 main.ts 中运行 CLI，可以按照以下步骤操作
@@ -152,6 +157,7 @@ async function bootstrap() {
 }
 
 bootstrap();
+
 ```
 
 就这样，你已经拥有了一个命令行应用程序。

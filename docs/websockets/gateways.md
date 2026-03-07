@@ -17,10 +17,8 @@
 要开始构建基于 WebSockets 的应用程序，首先安装所需的包：
 
 ```bash
-@@filename()
 $ npm i --save @nestjs/websockets @nestjs/platform-socket.io
-@@switch
-$ npm i --save @nestjs/websockets @nestjs/platform-socket.io
+
 ```
 
 #### 概述
@@ -29,6 +27,7 @@ $ npm i --save @nestjs/websockets @nestjs/platform-socket.io
 
 ```typescript
 @WebSocketGateway(80, { namespace: 'events' })
+
 ```
 
 > warning **警告** 在现有模块的 providers 数组中引用网关之前，它们不会被实例化。
@@ -37,22 +36,17 @@ $ npm i --save @nestjs/websockets @nestjs/platform-socket.io
 
 ```typescript
 @WebSocketGateway(81, { transports: ['websocket'] })
+
 ```
 
 网关现在正在监听，但我们尚未订阅任何传入消息。让我们创建一个处理器，它将订阅 `events` 消息并使用完全相同的数据响应用户。
 
 ```typescript
-@@filename(events.gateway)
 @SubscribeMessage('events')
 handleEvent(@MessageBody() data: string): string {
   return data;
 }
-@@switch
-@Bind(MessageBody())
-@SubscribeMessage('events')
-handleEvent(data) {
-  return data;
-}
+
 ```
 
 > info **提示** `@SubscribeMessage()` 和 `@MessageBody()` 装饰器是从 `@nestjs/websockets` 包中导入的。
@@ -63,44 +57,32 @@ handleEvent(data) {
 import { Module } from '@nestjs/common';
 import { EventsGateway } from './events.gateway';
 
-@@filename(events.module)
 @Module({
   providers: [EventsGateway]
 })
 export class EventsModule {}
+
 ```
 
 您还可以将属性键传递给装饰器以从传入消息正文中提取它：
 
 ```typescript
-@@filename(events.gateway)
 @SubscribeMessage('events')
 handleEvent(@MessageBody('id') id: number): number {
   // id === messageBody.id
   return id;
 }
-@@switch
-@Bind(MessageBody('id'))
-@SubscribeMessage('events')
-handleEvent(id) {
-  // id === messageBody.id
-  return id;
-}
+
 ```
 
 如果您不想使用装饰器，以下代码在功能上是等效的：
 
 ```typescript
-@@filename(events.gateway)
 @SubscribeMessage('events')
 handleEvent(client: Socket, data: string): string {
   return data;
 }
-@@switch
-@SubscribeMessage('events')
-handleEvent(client, data) {
-  return data;
-}
+
 ```
 
 在上面的示例中，`handleEvent()` 函数有两个参数。第一个是平台特定的 [socket 实例](https://socket.io/docs/v4/server-api/#socket)，而第二个是从客户端接收的数据。但不推荐这种方法，因为它需要在每个单元测试中模拟 `socket` 实例。
@@ -108,7 +90,6 @@ handleEvent(client, data) {
 一旦接收到 `events` 消息，处理器就会发送一个包含在网络上发送的相同数据的确认。此外，可以使用库特定的方法发射消息，例如，利用 `client.emit()` 方法。为了访问连接的 socket 实例，使用 `@ConnectedSocket()` 装饰器。
 
 ```typescript
-@@filename(events.gateway)
 @SubscribeMessage('events')
 handleEvent(
   @MessageBody() data: string,
@@ -116,12 +97,7 @@ handleEvent(
 ): string {
   return data;
 }
-@@switch
-@Bind(MessageBody(), ConnectedSocket())
-@SubscribeMessage('events')
-handleEvent(data, client) {
-  return data;
-}
+
 ```
 
 > info **提示** `@ConnectedSocket()` 装饰器是从 `@nestjs/websockets` 包中导入的。
@@ -132,12 +108,14 @@ handleEvent(data, client) {
 
 ```typescript
 socket.emit('events', { name: 'Nest' });
+
 ```
 
 `handleEvent()` 方法将被执行。为了监听从上述处理器内部发射的消息，客户端必须附加一个相应的确认监听器：
 
 ```typescript
 socket.emit('events', { name: 'Nest' }, (data) => console.log(data));
+
 ```
 
 虽然从消息处理器返回值本质上会发送确认，但高级场景通常需要直接控制确认回调。
@@ -146,7 +124,6 @@ socket.emit('events', { name: 'Nest' }, (data) => console.log(data));
 如果不使用装饰器，此回调将作为方法的第三个参数传递。
 
 ```typescript
-@@filename(events.gateway)
 @SubscribeMessage('events')
 handleEvent(
   @MessageBody() data: string,
@@ -154,12 +131,7 @@ handleEvent(
 ) {
   ack({ status: 'received', data });
 }
-@@switch
-@Bind(MessageBody(), Ack())
-@SubscribeMessage('events')
-handleEvent(data, ack) {
-  ack({ status: 'received', data });
-}
+
 ```
 
 #### 多个响应
@@ -167,19 +139,12 @@ handleEvent(data, ack) {
 确认仅调度一次。此外，原生 WebSockets 实现不支持它。为了解决此限制，您可以返回一个由两个属性组成的对象。`event` 是发射的事件名称，`data` 是必须转发给客户端的数据。
 
 ```typescript
-@@filename(events.gateway)
 @SubscribeMessage('events')
 handleEvent(@MessageBody() data: unknown): WsResponse<unknown> {
   const event = 'events';
   return { event, data };
 }
-@@switch
-@Bind(MessageBody())
-@SubscribeMessage('events')
-handleEvent(data) {
-  const event = 'events';
-  return { event, data };
-}
+
 ```
 
 > info **提示** `WsResponse` 接口是从 `@nestjs/websockets` 包中导入的。
@@ -190,6 +155,7 @@ handleEvent(data) {
 
 ```typescript
 socket.on('events', (data) => console.log(data));
+
 ```
 
 #### 异步响应
@@ -197,7 +163,6 @@ socket.on('events', (data) => console.log(data));
 消息处理器能够以同步或 **异步** 方式响应。因此，支持 `async` 方法。消息处理器还能够返回一个 `Observable`，在这种情况下，结果值将被发射直到流完成。
 
 ```typescript
-@@filename(events.gateway)
 @SubscribeMessage('events')
 onEvent(@MessageBody() data: unknown): Observable<WsResponse<number>> {
   const event = 'events';
@@ -207,17 +172,13 @@ onEvent(@MessageBody() data: unknown): Observable<WsResponse<number>> {
     map(data => ({ event, data })),
   );
 }
-@@switch
-@Bind(MessageBody())
-@SubscribeMessage('events')
-onEvent(data) {
-  const event = 'events';
-  const response = [1, 2, 3];
+
 
   return from(response).pipe(
     map(data => ({ event, data })),
   );
 }
+
 ```
 
 在上面的示例中，消息处理器将响应 **3 次**（数组中的每个项目对应一次）。
@@ -262,6 +223,7 @@ onEvent(data) {
 ```typescript
 @WebSocketServer()
 server: Server;
+
 ```
 
 此外，您可以使用 `namespace` 属性检索相应的命名空间，如下所示：
@@ -272,6 +234,7 @@ export class EventsGateway {
   @WebSocketServer()
   namespace: Namespace;
 }
+
 ```
 
 `@WebSocketServer()` 装饰器通过引用 `@WebSocketGateway()` 装饰器存储的元数据来注入服务器实例。如果您为 `@WebSocketGateway()` 装饰器提供了命名空间选项，则 `@WebSocketServer()` 装饰器将返回 `Namespace` 实例而不是 `Server` 实例。

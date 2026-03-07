@@ -12,6 +12,7 @@
 
 ```bash
 $ npm i --save helmet
+
 ```
 
 安装完成后，将其作为全局中间件应用。
@@ -20,6 +21,7 @@ $ npm i --save helmet
 import helmet from 'helmet';
 // 在您的初始化文件中的某处
 app.use(helmet());
+
 ```
 
 :::warning 警告
@@ -47,6 +49,7 @@ app.use(helmet());
 
 ```bash
 $ npm i --save @fastify/helmet
+
 ```
 
 [fastify-helmet](https://github.com/fastify/fastify-helmet) 不应用作中间件，而应作为 [Fastify 插件](https://www.fastify.io/docs/latest/Reference/Plugins/)，即通过使用 `app.register()`：
@@ -55,6 +58,7 @@ $ npm i --save @fastify/helmet
 import helmet from '@fastify/helmet'
 // 在您的初始化文件中的某处
 await app.register(helmet)
+
 ```
 
 :::warning 警告

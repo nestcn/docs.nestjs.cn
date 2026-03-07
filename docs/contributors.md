@@ -1,118 +1,8 @@
+------
+
 <!-- 此文件从 content/contributors.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-28T11:23:59.619Z -->
-<!-- 源文件: content/contributors.md -->
 
-# 贡献者
-
-感谢所有为 NestJS 中文文档项目做出贡献的开发者们！你们的努力让更多中文开发者能够更好地学习和使用 NestJS。
-
-## 如何贡献
-
-我们欢迎各种形式的贡献：
-
-- 📝 **翻译改进**：修正翻译错误，提升表达质量
-- 🐛 **错误修复**：发现并修复文档中的错误
-- ✨ **内容完善**：添加示例代码、补充说明等
-- 🎨 **界面优化**：改进文档网站的用户体验
-
-## 贡献指南
-
-### 开始之前
-
-在提交贡献之前，请确保：
-
-1. **搜索现有问题**：查看 [GitHub Issues](https://github.com/nestcn/docs.nestjs.cn/issues) 是否已有相关讨论
-2. **了解项目结构**：熟悉文档的组织方式和文件结构
-3. **遵循规范**：确保你的贡献符合项目的编码和文档规范
-
-### 提交步骤
-
-1. **Fork 本仓库**
-   ```bash
-   # 在 GitHub 上点击 Fork 按钮
-   git clone https://github.com/YOUR_USERNAME/docs.nestjs.cn.git
-   cd docs.nestjs.cn
-   ```
-```
-
-2. **创建特性分支**
-   ```bash
-   git checkout -b feature/amazing-feature
-   # 或者
-   git checkout -b fix/some-bug
-   ```
-```
-
-3. **进行你的修改**
-   - 📝 翻译新内容或改进现有翻译
-   - 🐛 修复文档中的错误
-   - ✨ 添加示例代码或补充说明
-   - 🎨 改进文档的格式和样式
-
-4. **测试你的修改**
-   ```bash
-   npm install
-   npm run dev
-   ```
-   在浏览器中查看你的修改效果
-```
-
-5. **提交你的修改**
-   ```bash
-   git add .
-   git commit -m "feat: add some amazing feature"
-   # 或者
-   git commit -m "fix: correct translation error"
-   ```
-```
-
-6. **推送到你的分支**
-   ```bash
-   git push origin feature/amazing-feature
-   ```
-```
-
-7. **创建 Pull Request**
-   - 访问你的 Fork 仓库页面
-   - 点击 "New Pull Request" 按钮
-   - 填写详细的 PR 描述
-
-### 提交消息规范
-
-我们使用 [约定式提交](https://www.conventionalcommits.org/zh-hans/v1.0.0/) 规范：
-
-```
-<类型>[可选的作用域]: <描述>
-
-[可选的正文]
-
-[可选的脚注]
-```
-
-**类型包括：**
-- `feat`: 新功能
-- `fix`: 修复问题
-- `docs`: 文档修改
-- `style`: 代码格式修改
-- `refactor`: 重构代码
-- `test`: 测试相关
-- `chore`: 构建过程或辅助工具的变动
-
-**示例：**
-```bash
-feat(awesome): add new learning resources section
-fix(contributors): correct community link
-docs(readme): update installation instructions
-```
-
-### 翻译指南
-
-#### 术语一致性
-
-请参考我们的 [术语表](https://github.com/nestcn/docs.nestjs.cn/wiki/术语表) 确保翻译的一致性：
-
-| 英文 | 中文 | 说明 |
-|------|------|------|
+|------|------|
 | Controller | 控制器 | 不翻译为"控制器类" |
 | Provider | 提供者 | 不翻译为"提供商" |
 | Module | 模块 | - |
@@ -140,6 +30,7 @@ docs(readme): update installation instructions
 ### 文档结构
 
 ```
+
 docs/
 ├── overview/          # 概览
 ├── fundamentals/      # 基础概念
@@ -152,6 +43,7 @@ docs/
 ├── recipes/          # 使用指南
 ├── faq/              # 常见问题
 └── ...
+
 ```
 
 ## 社区交流

@@ -27,6 +27,7 @@ const encryptedText = Buffer.concat([
   cipher.update(textToEncrypt),
   cipher.final(),
 ]);
+
 ```
 
 现在解密 `encryptedText` 值：
@@ -39,6 +40,7 @@ const decryptedText = Buffer.concat([
   decipher.update(encryptedText),
   decipher.final(),
 ]);
+
 ```
 
 #### 哈希
@@ -52,6 +54,7 @@ const decryptedText = Buffer.concat([
 ```shell
 $ npm i bcrypt
 $ npm i -D @types/bcrypt
+
 ```
 
 安装完成后，您可以使用 `hash` 函数，如下所示：
@@ -62,18 +65,21 @@ import * as bcrypt from 'bcrypt';
 const saltOrRounds = 10;
 const password = 'random_password';
 const hash = await bcrypt.hash(password, saltOrRounds);
+
 ```
 
 要生成盐，请使用 `genSalt` 函数：
 
 ```typescript
 const salt = await bcrypt.genSalt();
+
 ```
 
 要比较/检查密码，请使用 `compare` 函数：
 
 ```typescript
 const isMatch = await bcrypt.compare(password, hash);
+
 ```
 
 您可以在[这里](https://www.npmjs.com/package/bcrypt)阅读更多关于可用函数的信息。

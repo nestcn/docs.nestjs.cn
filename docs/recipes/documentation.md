@@ -8,6 +8,7 @@
 
 ```bash
 $ npm i -D @compodoc/compodoc
+
 ```
 
 #### 生成
@@ -16,6 +17,7 @@ $ npm i -D @compodoc/compodoc
 
 ```bash
 $ npx @compodoc/compodoc -p tsconfig.json -s
+
 ```
 
 打开浏览器并访问 [http://localhost:8080](http://localhost:8080)，您将看到一个初始的 Nest CLI 项目：

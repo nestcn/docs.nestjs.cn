@@ -23,6 +23,7 @@ type Author {
   lastName: String
   posts: [Post!]!
 }
+
 ```
 
 在这种情况下，使用代码优先方法，我们使用 TypeScript 类定义模式，并使用 TypeScript 装饰器注释这些类的字段。代码优先方法中上述 SDL 的等价物是：
@@ -45,6 +46,7 @@ export class Author {
   @Field(type => [Post])
   posts: Post[];
 }
+
 ```
 
 > info **提示** TypeScript 的元数据反射系统有几个限制，例如，无法确定类由哪些属性组成或识别给定属性是可选的还是必需的。由于这些限制，我们必须在模式定义类中显式使用 `@Field()` 装饰器来提供关于每个字段的 GraphQL 类型和可选性的元数据，或者使用 [CLI 插件](/graphql/cli-plugin) 为我们生成这些元数据。
@@ -62,6 +64,7 @@ type Author {
   lastName: String
   posts: [Post!]!
 }
+
 ```
 
 `@Field()` 装饰器接受一个可选的类型函数（例如，`type => Int`）和一个可选的选项对象。
@@ -79,6 +82,7 @@ type Author {
 ```typescript
 @Field({ description: `Book title`, deprecationReason: 'Not useful in v2 schema' })
 title: string;
+
 ```
 
 > info **提示** 您还可以添加描述或弃用整个对象类型：`@ObjectType({ description: 'Author model' })`。
@@ -88,6 +92,7 @@ title: string;
 ```typescript
 @Field(type => [Post])
 posts: Post[];
+
 ```
 
 > info **提示** 使用数组括号表示法（`[ ]`），我们可以指示数组的深度。例如，使用 `[[Int]]` 将表示整数矩阵。
@@ -97,6 +102,7 @@ posts: Post[];
 ```typescript
 @Field(type => [Post], { nullable: 'items' })
 posts: Post[];
+
 ```
 
 > info **提示** 如果数组及其项目都可为空，请将 `nullable` 设置为 `'itemsAndList'`。
@@ -117,6 +123,7 @@ export class Post {
   @Field(type => Int, { nullable: true })
   votes?: number;
 }
+
 ```
 
 `Post` 对象类型将导致在 SDL 中生成 GraphQL 模式的以下部分：
@@ -127,6 +134,7 @@ type Post {
   title: String!
   votes: Int
 }
+
 ```
 
 #### 代码优先解析器
@@ -152,6 +160,7 @@ export class AuthorsResolver {
     return this.postsService.findAll({ authorId: id });
   }
 }
+
 ```
 
 > info **提示** 所有装饰器（例如，`@Resolver`、`@ResolveField`、`@Args` 等）都从 `@nestjs/graphql` 包中导出。
@@ -181,6 +190,7 @@ export class AuthorsResolver {
 async author(@Args('id', { type: () => Int }) id: number) {
   return this.authorsService.findOneById(id);
 }
+
 ```
 
 这会在我们的模式中生成作者查询的以下条目（查询类型使用与方法名称相同的名称）：
@@ -189,6 +199,7 @@ async author(@Args('id', { type: () => Int }) id: number) {
 type Query {
   author(id: Int!): Author
 }
+
 ```
 
 > info **提示** 在此处了解有关 GraphQL 查询的更多信息 [here](https://graphql.org/learn/queries/)。
@@ -214,6 +225,7 @@ export class AuthorsResolver {
     return this.postsService.findAll({ authorId: id });
   }
 }
+
 ```
 
 上面的 `getAuthor` 处理程序方法将导致在 SDL 中生成 GraphQL 模式的以下部分：
@@ -222,6 +234,7 @@ export class AuthorsResolver {
 type Query {
   author(id: Int!): Author
 }
+
 ```
 
 #### Query 装饰器选项
@@ -241,6 +254,7 @@ type Query {
 
 ```typescript
 @Args('id') id: string
+
 ```
 
 在 `getAuthor()` 情况下，使用了 `number` 类型，这提出了一个挑战。`number` TypeScript 类型没有给我们足够的信息来了解预期的 GraphQL 表示（例如，`Int` vs. `Float`）。因此，我们必须**显式**传递类型引用。我们通过向 `Args()` 装饰器传递第二个参数来做到这一点，该参数包含参数选项，如下所示：
@@ -250,6 +264,7 @@ type Query {
 async getAuthor(@Args('id', { type: () => Int }) id: number) {
   return this.authorsService.findOneById(id);
 }
+
 ```
 
 选项对象允许我们指定以下可选的键值对：
@@ -267,6 +282,7 @@ getAuthor(
   @Args('firstName', { nullable: true }) firstName?: string,
   @Args('lastName', { defaultValue: '' }) lastName?: string,
 ) {}
+
 ```
 
 > info **提示** 在 `firstName` 的情况下，这是一个 GraphQL 可空字段，不需要将 `null` 或 `undefined` 的非值类型添加到此字段的类型。只需注意，您需要在解析器中为这些可能的非值类型进行类型保护，因为 GraphQL 可空字段将允许这些类型传递到您的解析器。
@@ -277,6 +293,7 @@ getAuthor(
 
 ```typescript
 @Args() args: GetAuthorArgs
+
 ```
 
 使用 `@ArgsType()` 创建 `GetAuthorArgs` 类，如下所示：
@@ -294,6 +311,7 @@ class GetAuthorArgs {
   @MinLength(3)
   lastName: string;
 }
+
 ```
 
 > info **提示** 同样，由于 TypeScript 的元数据反射系统限制，必须使用 `@Field` 装饰器手动指示类型和可选性，或使用 [CLI 插件](/graphql/cli-plugin)。此外，在 `firstName` 的情况下，这是一个 GraphQL 可空字段，不需要将 `null` 或 `undefined` 的非值类型添加到此字段的类型。只需注意，您需要在解析器中为这些可能的非值类型进行类型保护，因为 GraphQL 可空字段将允许这些类型传递到您的解析器。
@@ -304,6 +322,7 @@ class GetAuthorArgs {
 type Query {
   author(firstName: String, lastName: String = ''): Author
 }
+
 ```
 
 > info **提示** 请注意，像 `GetAuthorArgs` 这样的参数类与 `ValidationPipe` 配合得很好（阅读 [更多](/techniques/validation)）。
@@ -323,6 +342,7 @@ class PaginationArgs {
   @Field(() => Int)
   limit: number = 10;
 }
+
 ```
 
 基础 `@ArgsType()` 类的类型特定子类：
@@ -337,6 +357,7 @@ class GetAuthorArgs extends PaginationArgs {
   @MinLength(3)
   lastName: string;
 }
+
 ```
 
 同样的方法也可以用于 `@ObjectType()` 对象。在基类上定义通用属性：
@@ -350,6 +371,7 @@ class Character {
   @Field()
   name: string;
 }
+
 ```
 
 在子类上添加类型特定属性：
@@ -360,6 +382,7 @@ class Warrior extends Character {
   @Field()
   level: number;
 }
+
 ```
 
 您也可以使用解析器进行继承。您可以通过结合继承和 TypeScript 泛型来确保类型安全。例如，要创建一个带有通用 `findAll` 查询的基类，请使用如下构造：
@@ -375,6 +398,7 @@ function BaseResolver<T extends Type<unknown>>(classRef: T): any {
   }
   return BaseResolverHost;
 }
+
 ```
 
 注意以下几点：
@@ -392,6 +416,7 @@ export class RecipesResolver extends BaseResolver(Recipe) {
     super();
   }
 }
+
 ```
 
 此构造将生成以下 SDL：
@@ -400,6 +425,7 @@ export class RecipesResolver extends BaseResolver(Recipe) {
 type Query {
   findAllRecipe: [Recipe!]!
 }
+
 ```
 
 #### 泛型
@@ -448,6 +474,7 @@ export function Paginated<T>(classRef: Type<T>): Type<IPaginatedType<T>> {
   }
   return PaginatedType as Type<IPaginatedType<T>>;
 }
+
 ```
 
 有了上面定义的基类，我们现在可以轻松创建继承此行为的专用类型。例如：
@@ -455,6 +482,7 @@ export function Paginated<T>(classRef: Type<T>): Type<IPaginatedType<T>> {
 ```typescript
 @ObjectType()
 class PaginatedAuthor extends Paginated(Author) {}
+
 ```
 
 #### 模式优先
@@ -480,6 +508,7 @@ type Post {
 type Query {
   author(id: Int!): Author
 }
+
 ```
 
 #### 模式优先解析器
@@ -509,6 +538,7 @@ export class AuthorsResolver {
     return this.postsService.findAll({ authorId: id });
   }
 }
+
 ```
 
 > info **提示** 所有装饰器（例如，`@Resolver`、`@ResolveField`、`@Args` 等）都从 `@nestjs/graphql` 包中导出。
@@ -524,6 +554,7 @@ async posts(@Parent() author) {
   const { id } = author;
   return this.postsService.findAll({ authorId: id });
 }
+
 ```
 
 在这种情况下（方法级别的 `@Resolver()` 装饰器），如果类中有多个 `@ResolveField()` 装饰器，则必须将 `@Resolver()` 添加到所有装饰器。这不被认为是最佳实践（因为它会产生额外的开销）。
@@ -539,6 +570,7 @@ async posts(@Parent() author) {
 async author(@Args('id') id: number) {
   return this.authorsService.findOneById(id);
 }
+
 ```
 
 这会在我们的模式中生成作者查询的以下条目（查询类型使用与方法名称相同的名称）：
@@ -547,6 +579,7 @@ async author(@Args('id') id: number) {
 type Query {
   author(id: Int!): Author
 }
+
 ```
 
 按照惯例，我们更希望将这些解耦，为我们的解析器方法使用像 `getAuthor()` 或 `getPosts()` 这样的名称。我们可以通过将映射名称作为装饰器的参数传递来轻松做到这一点，如下所示：
@@ -570,6 +603,7 @@ export class AuthorsResolver {
     return this.postsService.findAll({ authorId: id });
   }
 }
+
 ```
 
 > info **提示** Nest CLI 提供了一个生成器（示意图），它会自动生成**所有样板代码**，帮助我们避免做所有这些工作，并使开发人员体验更加简单。在此处了解有关此功能的更多信息 [/recipes/crud-generator]。
@@ -594,6 +628,7 @@ export class Post {
 export abstract class IQuery {
   abstract author(id: number): Author | Promise<Author>;
 }
+
 ```
 
 通过生成类（而不是生成接口的默认技术），您可以将声明式验证**装饰器**与模式优先方法结合使用，这是一种非常有用的技术（阅读 [更多](/techniques/validation)）。例如，您可以将 `class-validator` 装饰器添加到生成的 `CreatePostInput` 类，如下所示，以强制 `title` 字段的最小和最大字符串长度：
@@ -606,6 +641,7 @@ export class CreatePostInput {
   @MaxLength(50)
   title: string;
 }
+
 ```
 
 > warning **注意** 要启用输入（和参数）的自动验证，请使用 `ValidationPipe`。在此处阅读有关验证的更多信息 [/techniques/validation]，更具体地说，在此处阅读有关管道的信息 [/pipes]。
@@ -621,6 +657,7 @@ export class CreatePostInput extends Post {
   @MaxLength(50)
   title: string;
 }
+
 ```
 
 #### GraphQL 参数装饰器
@@ -671,6 +708,7 @@ export class CreatePostInput extends Post {
   providers: [AuthorsService, AuthorsResolver],
 })
 export class AuthorsModule {}
+
 ```
 
 > info **提示** 通过所谓的**域模型**组织代码会很有帮助（类似于您在 REST API 中组织入口点的方式）。在这种方法中，将模型（`ObjectType` 类）、解析器和服务保存在代表域模型的 Nest 模块中。将所有这些组件保存在每个模块的单个文件夹中。当您这样做并使用 [Nest CLI](/cli/overview) 生成每个元素时，Nest 将自动将所有这些部分连接在一起（在适当的文件夹中定位文件，在 `provider` 和 `imports` 数组中生成条目等）。

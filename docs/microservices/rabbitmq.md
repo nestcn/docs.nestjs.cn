@@ -12,6 +12,7 @@
 
 ```bash
 $ npm i --save amqplib amqp-connection-manager
+
 ```
 
 #### 概述
@@ -29,6 +30,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
     },
   },
 });
+
 ```
 
 > info **提示** `Transport` 枚举从 `@nestjs/microservices` 包导入。
@@ -133,6 +135,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
   ]
   ...
 })
+
 ```
 
 也可以使用其他选项创建客户端（`ClientProxyFactory` 或 `@Client()`）。您可以在 <a href="/microservices/basics#客户端">此处</a> 了解它们。
@@ -146,6 +149,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 getNotifications(@Payload() data: number[], @Ctx() context: RmqContext) {
   console.log(`Pattern: ${context.getPattern()}`);
 }
+
 ```
 
 > info **提示** `@Payload()`、`@Ctx()` 和 `RmqContext` 从 `@nestjs/microservices` 包导入。
@@ -157,6 +161,7 @@ getNotifications(@Payload() data: number[], @Ctx() context: RmqContext) {
 getNotifications(@Payload() data: number[], @Ctx() context: RmqContext) {
   console.log(context.getMessage());
 }
+
 ```
 
 要检索对 RabbitMQ [通道](https://www.rabbitmq.com/channels.html) 的引用，请使用 `RmqContext` 对象的 `getChannelRef` 方法，如下所示：
@@ -166,6 +171,7 @@ getNotifications(@Payload() data: number[], @Ctx() context: RmqContext) {
 getNotifications(@Payload() data: number[], @Ctx() context: RmqContext) {
   console.log(context.getChannelRef());
 }
+
 ```
 
 #### 消息确认
@@ -183,6 +189,7 @@ options: {
     durable: false
   },
 },
+
 ```
 
 当手动消费者确认开启时，我们必须从工作者发送适当的确认信号，以表明我们已完成任务。
@@ -195,6 +202,7 @@ getNotifications(@Payload() data: number[], @Ctx() context: RmqContext) {
 
   channel.ack(originalMsg);
 }
+
 ```
 
 #### 记录构建器
@@ -213,6 +221,7 @@ const record = new RmqRecordBuilder(message)
   .build();
 
 this.client.send('replace-emoji', record).subscribe(...);
+
 ```
 
 > info **提示** `RmqRecordBuilder` 类从 `@nestjs/microservices` 包导出。
@@ -225,6 +234,7 @@ replaceEmoji(@Payload() data: string, @Ctx() context: RmqContext): string {
   const { properties: { headers } } = context.getMessage();
   return headers['x-version'] === '1.0.0' ? '🐱' : '🐈';
 }
+
 ```
 
 #### 实例状态更新
@@ -235,6 +245,7 @@ replaceEmoji(@Payload() data: string, @Ctx() context: RmqContext): string {
 this.client.status.subscribe((status: RmqStatus) => {
   console.log(status);
 });
+
 ```
 
 > info **提示** `RmqStatus` 类型从 `@nestjs/microservices` 包导入。
@@ -246,6 +257,7 @@ const server = app.connectMicroservice<MicroserviceOptions>(...);
 server.status.subscribe((status: RmqStatus) => {
   console.log(status);
 });
+
 ```
 
 #### 监听 RabbitMQ 事件
@@ -256,6 +268,7 @@ server.status.subscribe((status: RmqStatus) => {
 this.client.on('error', (err) => {
   console.error(err);
 });
+
 ```
 
 同样，您可以监听服务器的内部事件：
@@ -264,6 +277,7 @@ this.client.on('error', (err) => {
 server.on<RmqEvents>('error', (err) => {
   console.error(err);
 });
+
 ```
 
 > info **提示** `RmqEvents` 类型从 `@nestjs/microservices` 包导入。
@@ -277,6 +291,7 @@ server.on<RmqEvents>('error', (err) => {
 ```typescript
 const managerRef =
   this.client.unwrap<import('amqp-connection-manager').AmqpConnectionManager>();
+
 ```
 
 同样，您可以访问服务器的底层驱动程序实例：
@@ -284,6 +299,7 @@ const managerRef =
 ```typescript
 const managerRef =
   server.unwrap<import('amqp-connection-manager').AmqpConnectionManager>();
+
 ```
 
 #### 通配符
@@ -306,6 +322,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     },
   },
 );
+
 ```
 
 使用此配置，您可以在订阅事件/消息时在路由键中使用通配符。例如，要监听路由键为 `cats.#` 的消息，您可以使用以下代码：
@@ -319,6 +336,7 @@ getCats(@Payload() data: { message: string }, @Ctx() context: RmqContext) {
     message: 'Hello from the cats service!',
   }
 }
+
 ```
 
 要发送具有特定路由键的消息，您可以使用 `ClientProxy` 实例的 `send()` 方法：
@@ -327,4 +345,5 @@ getCats(@Payload() data: { message: string }, @Ctx() context: RmqContext) {
 this.client.send('cats.meow', { message: 'Meow!' }).subscribe((response) => {
   console.log(response);
 });
+
 ```

@@ -11,6 +11,7 @@ const app = await NestFactory.create(AppModule, {
   httpsOptions,
 });
 await app.listen(process.env.PORT ?? 3000);
+
 ```
 
 如果使用 `FastifyAdapter`，则按如下方式创建应用程序：
@@ -20,6 +21,7 @@ const app = await NestFactory.create<NestFastifyApplication>(
   AppModule,
   new FastifyAdapter({ https: httpsOptions })
 );
+
 ```
 
 #### 同时运行多个服务器
@@ -38,6 +40,7 @@ await app.init();
 
 const httpServer = http.createServer(server).listen(3000);
 const httpsServer = https.createServer(httpsOptions, server).listen(443);
+
 ```
 
 由于我们自行调用了 `http.createServer`/`https.createServer`，NestJS 在调用 `app.close` 或终止信号时不会关闭这些服务器。我们需要自行处理：
@@ -72,6 +75,7 @@ export class ShutdownObserver implements OnApplicationShutdown {
 const shutdownObserver = app.get(ShutdownObserver);
 shutdownObserver.addHttpServer(httpServer);
 shutdownObserver.addHttpServer(httpsServer);
+
 ```
 
 :::info 注意

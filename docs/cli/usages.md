@@ -1,31 +1,8 @@
+------
+
 <!-- 此文件从 content/cli\usages.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T07:09:52.883Z -->
-<!-- 源文件: content/cli\usages.md -->
 
-### CLI 命令参考
-
-#### nest new
-
-创建一个新的（标准模式）Nest 项目。
-
-```bash
-$ nest new <name> [options]
-$ nest n <name> [options]
-```
-
-##### 描述
-
-创建并初始化一个新的 Nest 项目。提示选择包管理器。
-
-- 创建一个具有给定 `<name>` 的文件夹
-- 用配置文件填充该文件夹
-- 为源代码 (`/src`) 和端到端测试 (`/test`) 创建子文件夹
-- 用应用组件和测试的默认文件填充子文件夹
-
-##### 参数
-
-| 参数 | 描述 |
-| -------- | --------------------------- |
+-- | --------------------------- |
 | `<name>` | 新项目的名称 |
 
 ##### 选项
@@ -44,9 +21,11 @@ $ nest n <name> [options]
 
 基于 schematic 生成和/或修改文件
 
+
 ```bash
 $ nest generate <schematic> <name> [options]
 $ nest g <schematic> <name> [options]
+
 ```
 
 ##### 参数
@@ -99,8 +78,10 @@ $ nest g <schematic> <name> [options]
 - 用 OpenAPI 装饰器注释 DTO（如果启用了 `@nestjs/swagger` CLI 插件）
 - 用 GraphQL 装饰器注释 DTO（如果启用了 `@nestjs/graphql` CLI 插件）
 
+
 ```bash
 $ nest build <name> [options]
+
 ```
 
 ##### 参数
@@ -129,8 +110,10 @@ $ nest build <name> [options]
 
 编译并运行应用程序（或工作区中的默认项目）。
 
+
 ```bash
 $ nest start <name> [options]
+
 ```
 
 ##### 参数
@@ -162,8 +145,10 @@ $ nest start <name> [options]
 
 导入已打包为 **nest library** 的库，运行其安装 schematic。
 
+
 ```bash
 $ nest add <name> [options]
+
 ```
 
 ##### 参数
@@ -176,8 +161,10 @@ $ nest add <name> [options]
 
 显示有关已安装的 nest 包和其他有用的系统信息。例如：
 
+
 ```bash
 $ nest info
+
 ```
 
 ```bash
@@ -197,4 +184,5 @@ websockets version : 10.0.0
 testing version : 10.0.0
 common version : 10.0.0
 core version : 10.0.0
+
 ```

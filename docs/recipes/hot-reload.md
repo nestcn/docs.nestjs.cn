@@ -16,6 +16,7 @@
 
 ```bash
 $ npm i --save-dev webpack-node-externals run-script-webpack-plugin webpack
+
 ```
 
 :::info 提示
@@ -52,6 +53,7 @@ module.exports = function (options, webpack) {
     ],
   };
 };
+
 ```
 
 :::info 提示
@@ -77,18 +79,21 @@ async function bootstrap() {
   }
 }
 bootstrap();
+
 ```
 
 为简化执行流程，请在 `package.json` 文件中添加一个脚本。
 
 ```json
 "start:dev": "nest build --webpack --webpackPath webpack-hmr.config.js --watch"
+
 ```
 
 现在只需打开命令行并运行以下命令：
 
 ```bash
 $ npm run start:dev
+
 ```
 
 ### 无命令行界面
@@ -101,6 +106,7 @@ $ npm run start:dev
 
 ```bash
 $ npm i --save-dev webpack webpack-cli webpack-node-externals ts-loader run-script-webpack-plugin
+
 ```
 
 :::info 提示
@@ -147,6 +153,7 @@ module.exports = {
     filename: 'server.js',
   },
 };
+
 ```
 
 :::info 提示
@@ -172,18 +179,21 @@ async function bootstrap() {
   }
 }
 bootstrap();
+
 ```
 
 为简化执行流程，请在 `package.json` 文件中添加一个脚本。
 
 ```json
 "start:dev": "webpack --config webpack.config.js --watch"
+
 ```
 
 现在只需打开命令行并运行以下命令：
 
 ```bash
 $ npm run start:dev
+
 ```
 
 #### 示例

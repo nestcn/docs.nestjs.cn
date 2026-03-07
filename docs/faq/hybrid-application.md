@@ -14,6 +14,7 @@ const microservice = app.connectMicroservice<MicroserviceOptions>({
 
 await app.startAllMicroservices();
 await app.listen(3001);
+
 ```
 
 > info **Hint** the `app.listen(port)` method starts an HTTP server on the specified address. If your application does not handle HTTP requests then you should use the `app.init()` method instead.
@@ -40,12 +41,12 @@ const microserviceRedis = app.connectMicroservice<MicroserviceOptions>({
 
 await app.startAllMicroservices();
 await app.listen(3001);
+
 ```
 
 To bind `@MessagePattern()` to only one transport strategy (for example, MQTT) in a hybrid application with multiple microservices, we can pass the second argument of type `Transport` which is an enum with all the built-in transport strategies defined.
 
 ```typescript
-@@filename()
 @MessagePattern('time.us.*', Transport.NATS)
 getDate(@Payload() data: number[], @Ctx() context: NatsContext) {
   console.log(`Subject: ${context.getSubject()}`); // e.g. "time.us.east"
@@ -55,6 +56,7 @@ getDate(@Payload() data: number[], @Ctx() context: NatsContext) {
 getTCPDate(@Payload() data: number[]) {
   return new Date().toLocaleTimeString(...);
 }
+
 ```
 
 > info **Hint** `@Payload()`, `@Ctx()`, `Transport` and `NatsContext` are imported from `@nestjs/microservices`.
@@ -71,4 +73,5 @@ const microservice = app.connectMicroservice<MicroserviceOptions>(
   },
   { inheritAppConfig: true },
 );
+
 ```

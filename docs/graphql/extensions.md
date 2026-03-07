@@ -14,6 +14,7 @@
 @Field()
 @Extensions({ role: Role.ADMIN })
 password: string;
+
 ```
 
 在上面的示例中，我们将 `role` 元数据属性赋值为 `Role.ADMIN`。`Role` 是一个简单的 TypeScript 枚举，用于分组系统中所有可用的用户角色。
@@ -47,6 +48,7 @@ export const checkRoleMiddleware: FieldMiddleware = async (
   }
   return next();
 };
+
 ```
 
 完成上述定义后，我们可以为 `password` 字段注册中间件，如下所示：
@@ -55,4 +57,5 @@ export const checkRoleMiddleware: FieldMiddleware = async (
 @Field({ middleware: [checkRoleMiddleware] })
 @Extensions({ role: Role.ADMIN })
 password: string;
+
 ```

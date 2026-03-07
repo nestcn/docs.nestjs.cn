@@ -13,9 +13,9 @@
 要从应用程序上下文外部获取 `HttpAdapter` 的引用，请调用 `getHttpAdapter()` 方法。
 
 ```typescript
-@@filename()
 const app = await NestFactory.create(AppModule);
 const httpAdapter = app.getHttpAdapter();
+
 ```
 
 #### 作为可注入对象
@@ -23,17 +23,10 @@ const httpAdapter = app.getHttpAdapter();
 要从应用程序上下文内部获取 `HttpAdapterHost` 的引用，请使用与其他现有提供者相同的注入技术（例如使用构造函数注入）。
 
 ```typescript
-@@filename()
 export class CatsService {
   constructor(private adapterHost: HttpAdapterHost) {}
 }
-@@switch
-@Dependencies(HttpAdapterHost)
-export class CatsService {
-  constructor(adapterHost) {
-    this.adapterHost = adapterHost;
-  }
-}
+
 ```
 
 > info **提示** `HttpAdapterHost` 从 `@nestjs/core` 包中导入。
@@ -43,6 +36,7 @@ export class CatsService {
 ```typescript
 const adapterHost = app.get(HttpAdapterHost);
 const httpAdapter = adapterHost.httpAdapter;
+
 ```
 
 `httpAdapter` 是底层框架使用的 HTTP 适配器的实际实例。它是 `ExpressAdapter` 或 `FastifyAdapter` 的实例（两个类都继承自 `AbstractHttpAdapter`）。
@@ -51,6 +45,7 @@ const httpAdapter = adapterHost.httpAdapter;
 
 ```typescript
 const instance = httpAdapter.getInstance();
+
 ```
 
 #### 监听事件
@@ -61,6 +56,7 @@ const instance = httpAdapter.getInstance();
 this.httpAdapterHost.listen$.subscribe(() =>
   console.log('HTTP 服务器正在监听'),
 );
+
 ```
 
 此外，`HttpAdapterHost` 提供了一个 `listening` 布尔属性，指示服务器当前是否处于活动状态和监听状态：
@@ -69,4 +65,5 @@ this.httpAdapterHost.listen$.subscribe(() =>
 if (this.httpAdapterHost.listening) {
   console.log('HTTP 服务器正在监听');
 }
+
 ```

@@ -67,6 +67,7 @@ In the node.js world, it's common practice to attach properties to the **request
 
 ```typescript
 const user = req.user;
+
 ```
 
 In order to make your code more readable and transparent, you can create a `@User()` decorator and reuse it across all of your controllers.
@@ -80,6 +81,7 @@ export const User = createParamDecorator(
     return request.user;
   },
 );
+
 ```
 
 Then, you can simply use it wherever it fits your requirements.
@@ -89,6 +91,7 @@ Then, you can simply use it wherever it fits your requirements.
 async findOne(@User() user: UserEntity) {
   console.log(user);
 }
+
 ```
 
 #### Passing data
@@ -103,6 +106,7 @@ When the behavior of your decorator depends on some conditions, you can use the 
   "email": "alan@email.com",
   "roles": ["admin"]
 }
+
 ```
 
 Let's define a decorator that takes a property name as key, and returns the associated value if it exists (or undefined if it doesn't exist, or if the `user` object has not been created).
@@ -125,6 +129,7 @@ export const User = createParamDecorator((data, ctx) => {
 
   return data ? user && user[data] : user;
 });
+
 ```
 
 Here's how you could then access a particular property via the `@User()` decorator in the controller:
@@ -134,6 +139,7 @@ Here's how you could then access a particular property via the `@User()` decorat
 async findOne(@User('firstName') firstName: string) {
   console.log(`Hello ${firstName}`);
 }
+
 ```
 
 You can use this same decorator with different keys to access different properties. If the `user` object is deep or complex, this can make for easier and more readable request handler implementations.
@@ -152,6 +158,7 @@ async findOne(
 ) {
   console.log(user);
 }
+
 ```
 
 > info **Hint** Note that `validateCustomDecorators` option must be set to true. `ValidationPipe` does not validate arguments annotated with the custom decorators by default.
@@ -180,6 +187,7 @@ export function Auth(...roles) {
     ApiUnauthorizedResponse({ description: 'Unauthorized' }),
   );
 }
+
 ```
 
 You can then use this custom `@Auth()` decorator as follows:
@@ -188,6 +196,7 @@ You can then use this custom `@Auth()` decorator as follows:
 @Get('users')
 @Auth('admin')
 findAllUsers() {}
+
 ```
 
 This has the effect of applying all four decorators with a single declaration.

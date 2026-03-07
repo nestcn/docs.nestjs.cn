@@ -8,6 +8,7 @@
 
 ```bash
 $ npm i --save @nestjs/throttler
+
 ```
 
 安装完成后，`ThrottlerModule` 可以像其他 Nest 包一样使用 `forRoot` 或 `forRootAsync` 方法进行配置。
@@ -26,6 +27,7 @@ $ npm i --save @nestjs/throttler
   ],
 })
 export class AppModule {}
+
 ```
 
 上面的配置将为应用程序中受保护的路由设置全局选项，包括 `ttl`（生存时间，以毫秒为单位）和 `limit`（在 ttl 内的最大请求数）。
@@ -37,6 +39,7 @@ export class AppModule {}
   provide: APP_GUARD,
   useClass: ThrottlerGuard
 }
+
 ```
 
 #### 多个速率限制定义
@@ -66,6 +69,7 @@ export class AppModule {}
   ],
 })
 export class AppModule {}
+
 ```
 
 #### 自定义
@@ -76,6 +80,7 @@ export class AppModule {}
 @SkipThrottle()
 @Controller('users')
 export class UsersController {}
+
 ```
 
 这个 `@SkipThrottle()` 装饰器可以用来跳过路由或类，或者在被跳过的类中取消跳过路由。
@@ -94,6 +99,7 @@ export class UsersController {
     return 'List users work without Rate limiting.';
   }
 }
+
 ```
 
 还有 `@Throttle()` 装饰器，可用于覆盖全局模块中设置的 `limit` 和 `ttl`，以提供更严格或更宽松的安全选项。此装饰器也可以用于类或函数。从版本 5 开始，装饰器接受一个对象，其中字符串与速率限制设置的名称相关，值是具有 `limit` 和 `ttl` 键以及整数值的对象，类似于传递给根模块的选项。如果您在原始选项中没有设置名称，请使用字符串 `default`。您必须这样配置：
@@ -105,6 +111,7 @@ export class UsersController {
 findAll() {
   return "List users works with custom rate limiting.";
 }
+
 ```
 
 #### 代理
@@ -125,6 +132,7 @@ async function bootstrap() {
 }
 
 bootstrap();
+
 ```
 
 启用 `trust proxy` 允许您从 `X-Forwarded-For` 标头中检索原始 IP 地址。您还可以通过覆盖 `getTracker()` 方法来自定义应用程序的行为，以从该标头中提取 IP 地址，而不是依赖 `req.ip`。以下示例演示如何为 Express 和 Fastify 实现这一点：
@@ -139,6 +147,7 @@ export class ThrottlerBehindProxyGuard extends ThrottlerGuard {
     return req.ips.length ? req.ips[0] : req.ip; // 个性化 IP 提取以满足您自己的需求
   }
 }
+
 ```
 
 > 提示 **提示** 您可以在 [这里](https://expressjs.com/en/api.html#req.ips) 找到 Express 的 `req` 请求对象的 API，在 [这里](https://www.fastify.io/docs/latest/Reference/Request/) 找到 Fastify 的。
@@ -193,6 +202,7 @@ export class WsThrottlerGuard extends ThrottlerGuard {
     return true;
   }
 }
+
 ```
 
 > 提示 **提示** 如果您使用 ws，需要将 `_socket` 替换为 `conn`
@@ -217,6 +227,7 @@ export class GqlThrottlerGuard extends ThrottlerGuard {
     return { req: ctx.req, res: ctx.res };
   }
 }
+
 ```
 
 #### 配置
@@ -305,6 +316,7 @@ export class GqlThrottlerGuard extends ThrottlerGuard {
   ],
 })
 export class AppModule {}
+
 ```
 
 您也可以使用 `useClass` 语法：
@@ -319,6 +331,7 @@ export class AppModule {}
   ],
 })
 export class AppModule {}
+
 ```
 
 这是可行的，只要 `ThrottlerConfigService` 实现了接口 `ThrottlerOptionsFactory`。

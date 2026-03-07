@@ -1,71 +1,8 @@
+------
+
 <!-- 此文件从 content/cli/index.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-28T11:23:59.619Z -->
-<!-- 源文件: content/cli/index.md -->
 
-# CLI
-
-[Nest CLI](https://github.com/nestjs/nest-cli) 是一个命令行界面工具，可帮助您初始化、开发和维护 NestJS 应用程序。它通过多种方式提供帮助，包括搭建项目、在开发模式下运行项目，以及构建和打包应用程序用于生产分发。它体现了最佳实践架构模式，鼓励结构良好的应用程序。
-
-## 主要功能
-
-- **项目脚手架** - 快速创建新的 NestJS 项目
-- **代码生成** - 自动生成模块、控制器、服务等
-- **开发服务器** - 提供热重载的开发环境
-- **构建工具** - 打包和编译应用程序
-- **工作区管理** - 支持 monorepo 模式
-- **库支持** - 内置库创建和管理
-- **脚本管理** - 项目脚本的便捷管理
-
-## 安装
-
-使用 `npm install -g` 命令全局安装 CLI：
-
-```bash
-$ npm install -g @nestjs/cli
-```
-
-:::info 提示
-或者，您可以使用 `npx @nestjs/cli@latest` 命令而无需全局安装 CLI。
-:::
-
-## 基本工作流程
-
-安装后，您可以通过 `nest` 可执行文件直接从操作系统命令行调用 CLI 命令。通过输入以下内容查看可用的 `nest` 命令：
-
-```bash
-$ nest --help
-```
-
-使用以下结构获取单个命令的帮助。在下面的示例中，将 `generate` 替换为任何命令（如 `new`、`add` 等）以获得该命令的详细帮助：
-
-```bash
-$ nest generate --help
-```
-
-要在开发模式下创建、构建和运行新的基本 Nest 项目，请转到应该成为新项目父目录的文件夹，并运行以下命令：
-
-```bash
-$ nest new my-nest-project
-$ cd my-nest-project
-$ npm run start:dev
-```
-
-在浏览器中，打开 [http://localhost:3000](http://localhost:3000) 以查看正在运行的新应用程序。当您更改任何源文件时，应用程序将自动重新编译和重新加载。
-
-:::info 提示
-我们推荐使用 [SWC 构建器](../recipes/swc.md)来获得更快的构建速度（比默认的 TypeScript 编译器快 10 倍）。
-:::
-
-## 项目结构
-
-当您运行 `nest new` 时，Nest 通过创建新文件夹并填充初始文件集来生成样板应用程序结构。您可以继续在这个默认结构中工作，添加新组件，如本文档中所述。我们将 `nest new` 生成的项目结构称为**标准模式**。Nest 还支持管理多个项目和库的替代结构，称为 **monorepo 模式**。
-
-除了围绕构建过程如何工作的一些具体考虑（本质上，monorepo 模式简化了有时从 monorepo 风格的项目结构中产生的构建复杂性）和内置[库](./libraries.md)支持外，其余的 Nest 功能和本文档同样适用于标准和 monorepo 模式项目结构。事实上，您可以随时轻松地从标准模式切换到 monorepo 模式，因此在您仍在学习 Nest 时，可以安全地推迟此决定。
-
-您可以使用任一模式来管理多个项目。以下是差异的快速摘要：
-
-| 功能 | 标准模式 | Monorepo 模式 |
-|------|----------|---------------|
+|----------|---------------|
 | 多个项目 | 独立的文件系统结构 | 单一文件系统结构 |
 | node_modules 和 package.json | 独立实例 | 在 monorepo 间共享 |
 | 默认编译器 | tsc | webpack |
@@ -82,18 +19,21 @@ $ npm run start:dev
 
 ```bash
 nest commandOrAlias requiredArg [optionalArg] [options]
+
 ```
 
 例如：
 
 ```bash
 $ nest new my-nest-project --dry-run
+
 ```
 
 这里，`new` 是 commandOrAlias。`new` 命令有一个别名 `n`。`my-nest-project` 是 requiredArg。如果在命令行中没有提供 requiredArg，`nest` 将提示您输入。另外，`--dry-run` 有一个等效的简写形式 `-d`。考虑到这一点，以下命令与上面的命令等效：
 
 ```bash
 $ nest n my-nest-project -d
+
 ```
 
 大多数命令和一些选项都有别名。尝试运行 `nest new --help` 来查看这些选项和别名，并确认您对上述结构的理解。
@@ -119,6 +59,7 @@ Nest CLI 需要构建时支持[国际化](https://nodejs.org/api/intl.html) (ICU
 
 ```bash
 node -p process.versions.icu
+
 ```
 
 如果命令打印 `undefined`，则您的 Node.js 二进制文件没有国际化支持。

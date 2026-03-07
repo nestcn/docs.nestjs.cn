@@ -23,6 +23,7 @@ const loggerMiddleware: FieldMiddleware = async (
   console.log(value);
   return value;
 };
+
 ```
 
 :::info 提示
@@ -43,6 +44,7 @@ export class Recipe {
   @Field({ middleware: [loggerMiddleware] })
   title: string;
 }
+
 ```
 
 现在每当我们请求 `Recipe` 对象类型的 `title` 字段时，原始字段值将被记录到控制台。
@@ -60,6 +62,7 @@ export class Recipe {
 ```typescript
 const value = await next();
 return value?.toUpperCase();
+
 ```
 
 在这种情况下，每当请求时，每个标题都会自动转换为大写。
@@ -71,6 +74,7 @@ return value?.toUpperCase();
 title() {
   return 'Placeholder';
 }
+
 ```
 
 :::warning 警告
@@ -88,6 +92,7 @@ GraphQLModule.forRoot({
     fieldMiddleware: [loggerMiddleware],
   },
 }),
+
 ```
 
 :::info 提示

@@ -21,6 +21,7 @@
 
 ```bash
 $ npm i --save-dev @nestjs/testing
+
 ```
 
 #### 单元测试
@@ -68,6 +69,7 @@ describe('CatsController', () => {
     });
   });
 });
+
 ```
 
 > info **提示** 将测试文件保存在它们测试的类附近。测试文件应该有`.spec`或`.test`后缀。
@@ -130,6 +132,7 @@ describe('CatsController', () => {
     });
   });
 });
+
 ```
 
 `Test`类对于提供应用程序执行上下文非常有用，该上下文本质上模拟了完整的Nest运行时，但为您提供了钩子，使管理类实例（包括模拟和覆盖）变得容易。`Test`类有一个`createTestingModule()`方法，该方法将模块元数据对象作为其参数（与您传递给`@Module()`装饰器的对象相同）。此方法返回一个`TestingModule`实例，该实例又提供了一些方法。对于单元测试，重要的是`compile()`方法。此方法引导模块及其依赖项（类似于应用程序在传统`main.ts`文件中使用`NestFactory.create()`引导的方式），并返回一个准备好测试的模块。
@@ -145,6 +148,7 @@ const moduleRef = await Test.createTestingModule({
 }).compile();
 
 catsService = await moduleRef.resolve(CatsService);
+
 ```
 
 > warning **警告** `resolve()`方法返回提供者的唯一实例，来自其自己的**DI容器子树**。每个子树都有唯一的上下文标识符。因此，如果您多次调用此方法并比较实例引用，您会发现它们不相等。
@@ -192,6 +196,7 @@ describe('CatsController', () => {
     controller = moduleRef.get(CatsController);
   });
 });
+
 ```
 
 您也可以像通常处理自定义提供者一样从测试容器中检索这些模拟，`moduleRef.get(CatsService)`。
@@ -270,6 +275,7 @@ describe('Cats', () => {
     await app.close();
   });
 });
+
 ```
 
 > info **提示** 如果您使用[Fastify](/techniques/performance)作为HTTP适配器，它需要略有不同的配置，并具有内置的测试功能：
@@ -330,6 +336,7 @@ const moduleRef = await Test.createTestingModule({
   .overrideModule(CatsModule)
   .useModule(AlternateCatsModule)
   .compile();
+
 ```
 
 每种覆盖方法类型又返回`TestingModule`实例，因此可以与[流畅风格](https://en.wikipedia.org/wiki/Fluent_interface)中的其他方法链接。您应该在这样的链的末尾使用`compile()`，以使Nest实例化并初始化模块。
@@ -395,6 +402,7 @@ providers: [
     useClass: JwtAuthGuard,
   },
 ],
+
 ```
 
 这是通过`APP_*`令牌将守卫注册为"多"提供者。为了能够在此处替换`JwtAuthGuard`，注册需要使用此插槽中的现有提供者：
@@ -408,6 +416,7 @@ providers: [
   },
   JwtAuthGuard,
 ],
+
 ```
 
 > info **提示** 将`useClass`更改为`useExisting`以引用已注册的提供者，而不是让Nest在令牌后面实例化它。
@@ -421,6 +430,7 @@ const moduleRef = await Test.createTestingModule({
   .overrideProvider(JwtAuthGuard)
   .useClass(MockAuthGuard)
   .compile();
+
 ```
 
 现在您的所有测试都将在每个请求上使用`MockAuthGuard`。
@@ -440,10 +450,12 @@ const contextId = ContextIdFactory.create();
 jest
   .spyOn(ContextIdFactory, 'getByRequest')
   .mockImplementation(() => contextId);
+
 ```
 
 现在我们可以使用`contextId`访问任何后续请求的单个生成的DI容器子树。
 
 ```typescript
 catsService = await moduleRef.resolve(CatsService, contextId);
+
 ```

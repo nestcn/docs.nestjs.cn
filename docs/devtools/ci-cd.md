@@ -45,6 +45,7 @@ async function bootstrap() {
     await app.listen(process.env.PORT ?? 3000);
   }
 }
+
 ```
 
 可以看到，我们在此使用 `GraphPublisher` 将序列化的图发布到中央注册表。`PUBLISH_GRAPH` 是一个自定义环境变量，用于控制是否应发布该图（CI/CD 工作流）或不发布（常规应用程序启动）。此外，我们在此将 `preview` 属性设置为 `true`。启用此标志后，我们的应用程序将以预览模式启动 - 这意味着应用程序中所有控制器、增强器和提供者的构造函数（及生命周期钩子）都不会被执行。注意 - 这并非**必需** ，但对我们来说会简化操作，因为在这种情况下，在 CI/CD 流水线中运行应用程序时，我们实际上无需连接数据库等操作。
@@ -130,6 +131,7 @@ jobs:
           REPOSITORY_NAME: {{ '${{' }} github.event.repository.name {{ '}}' }}
           BRANCH_NAME: {{ '${{' }} github.head_ref || github.ref_name {{ '}}' }}
           TARGET_SHA: {{ '${{' }} github.event.pull_request.base.sha {{ '}}' }}
+
 ```
 
 理想情况下，`DEVTOOLS_API_KEY` 环境变量应从 GitHub Secrets 中获取，更多信息请参阅[此处](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository) 。
@@ -150,6 +152,7 @@ const publishOptions = {
   trigger: process.env.GITHUB_BASE_REF ? 'pull' : 'push',
   branch: process.env.BRANCH_NAME,
 };
+
 ```
 
 为了获得最佳开发者体验，请确保通过点击"集成 GitHub 应用"按钮（见下方截图）为项目集成 **GitHub 应用程序** 。注意——此步骤非必需。
@@ -174,6 +177,7 @@ const publishOptions = {
   trigger: process.env.GITHUB_BASE_REF ? 'pull' : 'push',
   branch: process.env.BRANCH_NAME,
 };
+
 ```
 
 :::info 提示
@@ -220,6 +224,7 @@ publish_graph:
   variables:
     PUBLISH_GRAPH: 'true'
     DEVTOOLS_API_KEY: 'CHANGE_THIS_TO_YOUR_API_KEY'
+
 ```
 
 #### 其他 CI/CD 工具
@@ -238,6 +243,7 @@ const publishOptions = {
   trigger: process.env.CI_MERGE_REQUEST_DIFF_BASE_SHA ? 'pull' : 'push',
   branch: process.env.CI_COMMIT_BRANCH ?? process.env.CI_MERGE_REQUEST_SOURCE_BRANCH_NAME,
 };
+
 ```
 
 这些信息大多通过 CI/CD 内置环境变量提供（参见 [CircleCI 内置环境变量列表](https://circleci.com/docs/variables/#built-in-environment-variables)和 [Bitbucket 变量](https://support.atlassian.com/bitbucket-cloud/docs/variables-and-secrets/) ）。

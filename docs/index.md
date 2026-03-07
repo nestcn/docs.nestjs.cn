@@ -1,7 +1,3 @@
-<!-- 此文件从 content/index.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-28T11:23:59.619Z -->
-<!-- 源文件: content/index.md -->
-
 ---
 pageType: home
 
@@ -44,3 +40,6 @@ footer:
   message: "NestJS 是 MIT 协议开源项目。本中文文档项目基于 Apache 2.0 协议开源。"
   copyright: "© 2025 NestJS 中文文档 | 由社区维护 | Apache 2.0 许可证"
 ---
+
+<!-- 此文件从 content/index.md 自动生成，请勿直接修改此文件 -->
+

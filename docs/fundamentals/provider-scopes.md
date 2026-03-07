@@ -38,6 +38,7 @@ import { Injectable, Scope } from '@nestjs/common';
 
 @Injectable({ scope: Scope.REQUEST })
 export class CatsService {}
+
 ```
 
 同样，对于[自定义提供者](/fundamentals/dependency-injection)，在提供者注册的长表单中设置`scope`属性：
@@ -48,6 +49,7 @@ export class CatsService {}
   useClass: CacheManager,
   scope: Scope.TRANSIENT,
 }
+
 ```
 
 > info **提示** 从`@nestjs/common`导入`Scope`枚举
@@ -68,6 +70,7 @@ export class CatsService {}
   scope: Scope.REQUEST,
 })
 export class CatsController {}
+
 ```
 
 #### 作用域层次结构
@@ -95,6 +98,7 @@ import { Request } from 'express';
 export class CatsService {
   constructor(@Inject(REQUEST) private request: Request) {}
 }
+
 ```
 
 由于底层平台/协议差异，您在Microservice或GraphQL应用程序中访问入站请求的方式略有不同。在[GraphQL](/graphql/quick-start)应用程序中，您注入`CONTEXT`而不是`REQUEST`：
@@ -107,6 +111,7 @@ import { CONTEXT } from '@nestjs/graphql';
 export class CatsService {
   constructor(@Inject(CONTEXT) private context) {}
 }
+
 ```
 
 然后，您配置`context`值（在`GraphQLModule`中）以包含`request`作为其属性。
@@ -127,6 +132,7 @@ export class HelloService {
     console.log(`${this.parentClass?.constructor?.name}: ${message}`);
   }
 }
+
 ```
 
 然后按如下方式使用它：
@@ -145,6 +151,7 @@ export class AppService {
     return 'Hello world!';
   }
 }
+
 ```
 
 在上面的示例中，当调用`AppService#getRoot`时，`"AppService: My name is getRoot"`将被记录到控制台。
@@ -197,6 +204,7 @@ export class AggregateByTenantContextIdStrategy implements ContextIdStrategy {
       info.isTreeDurable ? tenantSubTreeId : contextId;
   }
 }
+
 ```
 
 > info **提示** 类似于请求作用域，持久性会在注入链中向上冒泡。这意味着如果A依赖于B，而B被标记为`durable`，A也会隐式变得持久（除非A提供者的`durable`显式设置为`false`）。
@@ -214,6 +222,7 @@ return {
     info.isTreeDurable ? tenantSubTreeId : contextId,
   payload: { tenantId },
 };
+
 ```
 
 现在，每当您使用`@Inject(REQUEST)`/`@Inject(CONTEXT)`注入`REQUEST`提供者（或GraphQL应用程序的`CONTEXT`）时，`payload`对象将被注入（在这种情况下，由单个属性`tenantId`组成）。
@@ -222,6 +231,7 @@ return {
 
 ```typescript
 ContextIdFactory.apply(new AggregateByTenantContextIdStrategy());
+
 ```
 
 > info **提示** `ContextIdFactory`类是从`@nestjs/core`包导入的。
@@ -235,6 +245,7 @@ import { Injectable, Scope } from '@nestjs/common';
 
 @Injectable({ scope: Scope.REQUEST, durable: true })
 export class CatsService {}
+
 ```
 
 同样，对于[自定义提供者](/fundamentals/dependency-injection)，在提供者注册的长表单中设置`durable`属性：
@@ -246,4 +257,5 @@ export class CatsService {}
   scope: Scope.REQUEST,
   durable: true,
 }
+
 ```

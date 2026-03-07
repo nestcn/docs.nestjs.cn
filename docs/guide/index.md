@@ -1,40 +1,9 @@
-<!-- 此文件从 content/guide/index.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-28T11:23:59.619Z -->
-<!-- 源文件: content/guide/index.md -->
-
-# Markdown & MDX
-
-Rspress 不仅支持 Markdown，还支持 [MDX](https://mdxjs.com/)，这是一种强大的内容开发方式。
-
-## Markdown
-
-MDX 是 Markdown 的超集，这意味着您可以像往常一样编写 Markdown 文件。例如：
-
-```md
-# Hello world
-```
-
-## 使用组件
-
-当您想在 Markdown 文件中使用 React 组件时，应该将文件命名为 `.mdx` 扩展名。例如：
-
-```mdx
-// docs/index.mdx
-import { CustomComponent } from './custom';
-
-# Hello world
-
-<CustomComponent />
-```
-
-## 前置元数据
-
-您可以在 Markdown 文件的开头添加前置元数据（Front Matter），这是一个 YAML 格式的对象，用于定义一些元数据。例如：
-
-```yaml
 ---
 title: Hello world
 ---
+
+<!-- 此文件从 content/guide/index.md 自动生成，请勿直接修改此文件 -->
+
 ```
 
 > 注意：默认情况下，Rspress 使用 h1 标题作为 HTML 标题。
@@ -45,15 +14,18 @@ title: Hello world
 ---
 title: Hello world
 ---
+
 ```
 
 # {frontmatter.title}
+
 ```
 
 先前定义的属性将作为 `frontmatter` 属性传递给组件。因此，最终输出将是：
 
 ```html
 <h1>Hello world</h1>
+
 ```
 
 ## 自定义容器
@@ -66,6 +38,7 @@ title: Hello world
 :::info
 This is a `block` of type `tip`
 :::
+
 ```
 
 :::info
@@ -91,6 +64,7 @@ This is a `block` of `Custom Title`
 :::info "Custom Title"
 This is a `block` of `Custom Title`
 :::
+
 ```
 
 **输出：**
@@ -132,22 +106,27 @@ This is a `block` of `Custom Title`
 **输入：**
 
 ````md
+
 ```js
 console.log('Hello World');
+
 ```
 
 ```js title="hello.js"
 console.log('Hello World');
+
 ````
 
 **输出：**
 
 ```js
 console.log('Hello World');
+
 ```
 
 ```js title="hello.js"
 console.log('Hello World');
+
 ```
 
 ### 显示行号
@@ -161,6 +140,7 @@ export default {
     showLineNumbers: true,
   },
 };
+
 ```
 
 ### 代码换行
@@ -174,6 +154,7 @@ export default {
     defaultWrapCode: true,
   },
 };
+
 ```
 
 ### 行高亮
@@ -183,6 +164,7 @@ export default {
 **输入：**
 
 ````md
+
 ```js title="hello.js" {1,3-5}
 console.log('Hello World');
 
@@ -193,6 +175,7 @@ console.log(a);
 const b = 2;
 
 console.log(b);
+
 ````
 
 **输出：**
@@ -207,6 +190,7 @@ console.log(a);
 const b = 2;
 
 console.log(b);
+
 ```
 
 ## Rustify MDX 编译器

@@ -4,6 +4,7 @@ HTTP [异常过滤器](/overview/exception-filters) 层和相应的 web sockets 
 
 ```typescript
 throw new WsException('Invalid credentials.');
+
 ```
 
 :::info 提示
@@ -17,6 +18,7 @@ throw new WsException('Invalid credentials.');
   status: 'error',
   message: 'Invalid credentials.'
 }
+
 ```
 
 #### 过滤器
@@ -30,6 +32,7 @@ onEvent(client, data: any): WsResponse<any> {
   const event = 'events';
   return { event, data };
 }
+
 ```
 
 #### 继承
@@ -48,6 +51,7 @@ export class AllExceptionsFilter extends BaseWsExceptionFilter {
     super.catch(exception, host);
   }
 }
+
 ```
 
 ```javascript title="all-exceptions.filter.js"
@@ -60,6 +64,7 @@ export class AllExceptionsFilter extends BaseWsExceptionFilter {
     super.catch(exception, host);
   }
 }
+
 ```
 
 上述实现只是一个演示该方法的外壳。您对扩展异常过滤器的实现将包括您量身定制的**业务逻辑**（例如，处理各种条件）。

@@ -21,6 +21,7 @@
 export class CatsService {
   constructor(private lazyModuleLoader: LazyModuleLoader) {}
 }
+
 ```
 
 :::info 提示
@@ -32,6 +33,7 @@ export class CatsService {
 ```typescript
 // "app" 代表 Nest 应用实例
 const lazyModuleLoader = app.get(LazyModuleLoader);
+
 ```
 
 这样配置后，您现在可以使用以下结构加载任何模块：
@@ -39,6 +41,7 @@ const lazyModuleLoader = app.get(LazyModuleLoader);
 ```typescript
 const { LazyModule } = await import('./lazy.module');
 const moduleRef = await this.lazyModuleLoader.load(() => LazyModule);
+
 ```
 
 :::info 提示
@@ -54,6 +57,7 @@ const moduleRef = await this.lazyModuleLoader.load(() => LazyModule);
 > Load "LazyModule" attempt: 3
 > time: 0.303ms
 > ```
+
 >
 > 此外，"懒加载"模块与应用启动时急切加载的模块以及后续在应用中注册的其他懒加载模块共享相同的模块关系图。
 
@@ -69,6 +73,7 @@ const moduleRef = await this.lazyModuleLoader.load(() => LazyModule);
   exports: [LazyService],
 })
 export class LazyModule {}
+
 ```
 
 :::info 提示
@@ -83,6 +88,7 @@ const moduleRef = await this.lazyModuleLoader.load(() => LazyModule);
 
 const { LazyService } = await import('./lazy.service');
 const lazyService = moduleRef.get(LazyService);
+
 ```
 
 :::warning 警告
@@ -99,6 +105,7 @@ const lazyService = moduleRef.get(LazyService);
 >   }
 > }
 > ```
+
 >
 > 设置这些选项后，您就能利用[代码分割](https://webpack.js.org/guides/code-splitting/)功能。
 

@@ -33,6 +33,7 @@ export class AuthGuard implements CanActivate {
     return validateRequest(request);
   }
 }
+
 ```
 
 :::info 提示
@@ -68,6 +69,7 @@ export class RolesGuard implements CanActivate {
     return true;
   }
 }
+
 ```
 
 #### 绑定守卫
@@ -78,6 +80,7 @@ export class RolesGuard implements CanActivate {
 @Controller('cats')
 @UseGuards(RolesGuard)
 export class CatsController {}
+
 ```
 
 :::info 注意
@@ -90,6 +93,7 @@ export class CatsController {}
 @Controller('cats')
 @UseGuards(new RolesGuard())
 export class CatsController {}
+
 ```
 
 上述构造将该守卫附加到该控制器声明的每个处理程序上。如果我们希望守卫仅应用于单个方法，则应在**方法级别**使用 `@UseGuards()` 装饰器。
@@ -99,6 +103,7 @@ export class CatsController {}
 ```typescript
 const app = await NestFactory.create(AppModule);
 app.useGlobalGuards(new RolesGuard());
+
 ```
 
 :::warning 注意
@@ -120,6 +125,7 @@ import { APP_GUARD } from '@nestjs/core';
   ],
 })
 export class AppModule {}
+
 ```
 
 :::info 注意
@@ -138,6 +144,7 @@ export class AppModule {}
 import { Reflector } from '@nestjs/core';
 
 export const Roles = Reflector.createDecorator<string[]>();
+
 ```
 
 这里的 `Roles` 装饰器是一个接收 `string[]` 类型单一参数的函数。
@@ -150,6 +157,7 @@ export const Roles = Reflector.createDecorator<string[]>();
 async create(@Body() createCatDto: CreateCatDto) {
   this.catsService.create(createCatDto);
 }
+
 ```
 
 这里我们将 `Roles` 装饰器元数据附加到 `create()` 方法上，表明只有具有 `admin` 角色的用户才被允许访问此路由。
@@ -179,6 +187,7 @@ export class RolesGuard implements CanActivate {
     return matchRoles(roles, user.roles);
   }
 }
+
 ```
 
 :::info 提示
@@ -199,12 +208,14 @@ export class RolesGuard implements CanActivate {
   "message": "Forbidden resource",
   "error": "Forbidden"
 }
+
 ```
 
 请注意，在底层实现中，当守卫返回 `false` 时，框架会抛出 `ForbiddenException`。如果您想返回不同的错误响应，应该抛出特定的自定义异常。例如：
 
 ```typescript
 throw new UnauthorizedException();
+
 ```
 
 守卫抛出的任何异常都将由[异常处理层](./exception-filters) （全局异常过滤器及应用于当前上下文的任何异常过滤器）处理。

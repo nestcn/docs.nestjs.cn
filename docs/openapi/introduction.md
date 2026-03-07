@@ -8,6 +8,7 @@
 
 ```bash
 $ npm install --save @nestjs/swagger
+
 ```
 
 #### 引导程序
@@ -34,6 +35,7 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
+
 ```
 
 :::info 提示
@@ -53,6 +55,7 @@ bootstrap();
 
 ```bash
 $ npm run start
+
 ```
 
 当应用程序运行时，在浏览器中访问 `http://localhost:3000/api`，您将看到 Swagger UI。
@@ -71,6 +74,7 @@ $ npm run start
 >   jsonDocumentUrl: 'swagger/json',
 > });
 > ```
+
 >
 > 这将在 `http://localhost:3000/swagger/json` 上暴露它
 
@@ -152,6 +156,7 @@ export interface SwaggerDocumentOptions {
    */
   autoTagControllers?: boolean;
 }
+
 ```
 
 例如，若需确保库生成类似 `createUser` 而非 `UsersController_createUser` 的操作名称，可进行如下设置：
@@ -164,6 +169,7 @@ const options: SwaggerDocumentOptions =  {
   ) => methodKey
 };
 const documentFactory = () => SwaggerModule.createDocument(app, config, options);
+
 ```
 
 #### 设置选项
@@ -291,6 +297,7 @@ export interface SwaggerCustomOptions {
    */
   urls?: Record<'url' | 'name', string>[];
 }
+
 ```
 
 :::info 提示
@@ -307,6 +314,7 @@ export interface SwaggerCustomOptions {
 > };
 > SwaggerModule.setup('api', app, documentFactory, options);
 > ```
+
 >
 > 在这种情况下，`http://localhost:3000/api-json` 仍可访问，但 `http://localhost:3000/api`（Swagger UI）将不可用。
 

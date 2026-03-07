@@ -1,88 +1,8 @@
+------
+
 <!-- 此文件从 content/overview/first-steps.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-28T11:23:59.619Z -->
-<!-- 源文件: content/overview/first-steps.md -->
 
-# 第一步
-
-在这一系列文章中，你将学习 Nest 的**核心基础**。为了熟悉 Nest 应用程序的基本构建块，我们将构建一个涵盖了许多入门级功能的 CRUD 基础应用程序。
-
-## 语言
-
-我们热爱 [TypeScript](https://www.typescriptlang.org/)，但最重要的是——我们热爱 [Node.js](https://nodejs.org/en/)。因此，Nest 同时兼容 TypeScript 和纯 JavaScript。Nest 利用了最新的语言特性，所以要在原生 JavaScript 中使用它，我们需要一个 [Babel](https://babeljs.io/) 编译器。
-
-我们提供的示例将主要使用 TypeScript，但你可以随时将**代码片段**切换为原生 JavaScript 语法（只需点击每个代码片段右上角的语言切换按钮即可）。
-
-## 先决条件
-
-请确保你的操作系统上安装了 [Node.js](https://nodejs.org) (版本 >= 20)。
-
-### Node.js 安装指南 (国内用户优化)
-
-为了帮助中国用户更好地安装 Node.js，这里提供详细的安装指南：
-
-**安装方式：**
-
-1.  **访问官网下载**：前往 [Node.js 官网](https://nodejs.org/) 下载最新的 LTS（长期支持）版本。
-2.  **使用包管理器**：
-    *   **Windows**: 使用 [Chocolatey](https://chocolatey.org/) 或 [Scoop](https://scoop.sh/)
-    *   **macOS**: 使用 [Homebrew](https://brew.sh/) 或 [MacPorts](https://www.macports.org/)
-    *   **Linux**: 使用系统包管理器（如 `apt`、`yum`、`dnf` 等）
-3.  **使用版本管理器**：
-    *   [nvm](https://github.com/nvm-sh/nvm)（Linux/macOS）
-    *   [nvm-windows](https://github.com/coreybutler/nvm-windows)（Windows）
-    *   [fnm](https://github.com/Schniz/fnm)（跨平台）
-
-**验证安装：**
-
-安装完成后，可以通过以下命令验证 Node.js 和 npm 是否正确安装：
-
-```bash
-$ node --version
-$ npm --version
-```
-
-**网络问题解决方案：**
-
-如果遇到网络问题，可以尝试使用淘宝镜像：
-
-```bash
-# 设置淘宝镜像
-$ npm config set registry https://registry.npmmirror.com
-
-# 或者使用 cnpm
-$ npm install -g cnpm --registry=https://registry.npmmirror.com
-```
-
-## 设置
-
-使用 [Nest CLI](/cli/overview) 搭建新项目非常简单。安装 [npm](https://www.npmjs.com/) 后，你可以在操作系统终端中使用以下命令创建新的 Nest 项目：
-
-```bash
-$ npm i -g @nestjs/cli
-$ nest new project-name
-```
-
-:::info 提示
-要使用 TypeScript 的[更严格](https://www.typescriptlang.org/tsconfig#strict)功能集创建新项目，请在 `nest new` 命令中传递 `--strict` 标志。
-:::
-
-`project-name` 目录将被创建，node 模块和一些其他样板文件将被安装，`src/` 目录将被创建并填充几个核心文件。
-
-<div class="file-tree">
-  <div class="item">src</div>
-  <div class="children">
-    <div class="item">app.controller.spec.ts</div>
-    <div class="item">app.controller.ts</div>
-    <div class="item">app.module.ts</div>
-    <div class="item">app.service.ts</div>
-    <div class="item">main.ts</div>
-  </div>
-</div>
-
-以下是这些核心文件的简要概述：
-
-| 文件                     | 描述                                                                                                   |
-| ------------------------ | ------------------------------------------------------------------------------------------------------ |
+------------------ | ------------------------------------------------------------------------------------------------------ |
 | `app.controller.ts`      | 一个具有单个路由的基本控制器。                                                                         |
 | `app.controller.spec.ts` | 控制器的单元测试。                                                                                     |
 | `app.module.ts`          | 应用程序的根模块。                                                                                     |
@@ -100,6 +20,7 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
+
 ```
 
 要创建 Nest 应用程序实例，我们使用核心的 `NestFactory` 类。`NestFactory` 暴露了几个静态方法，允许创建应用程序实例。`create()` 方法返回一个应用程序对象，该对象实现了 `INestApplication` 接口。该对象提供了一组方法，这些方法将在后续章节中描述。在上面的 `main.ts` 示例中，我们只是启动了 HTTP 监听器，这让应用程序可以等待入站的 HTTP 请求。
@@ -125,6 +46,7 @@ Nest 旨在成为一个平台无关的框架。平台独立性使得创建可重
 
 ```typescript
 const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
 ```
 
 ## 运行应用程序
@@ -133,6 +55,7 @@ const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
 ```bash
 $ npm run start
+
 ```
 
 > 提示 为了加快开发过程（构建速度快 20 倍），您可以通过在 `start` 脚本中传递 `-b swc` 标志来使用 [SWC 构建器](/recipes/swc)，如下所示 `npm run start -- -b swc`。
@@ -143,6 +66,7 @@ $ npm run start
 
 ```bash
 $ npm run start:dev
+
 ```
 
 此命令将监视您的文件，自动重新编译并重新加载服务器。
@@ -163,4 +87,5 @@ $ npm run lint
 
 # 使用 prettier 进行代码格式化
 $ npm run format
+
 ```

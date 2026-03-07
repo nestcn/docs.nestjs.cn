@@ -20,6 +20,7 @@ resolve: { // see: https://webpack.js.org/configuration/resolve/
     "@nestjs/graphql": path.resolve(__dirname, "../node_modules/@nestjs/graphql/dist/extra/graphql-model-shim")
   }
 }
+
 ```
 
 :::info 注意

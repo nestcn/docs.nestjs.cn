@@ -12,6 +12,7 @@
 
 ```bash
 $ npm i --save @nestjs/axios axios
+
 ```
 
 #### 快速开始
@@ -24,6 +25,7 @@ $ npm i --save @nestjs/axios axios
   providers: [CatsService],
 })
 export class CatsModule {}
+
 ```
 
 接下来，通过常规的构造函数注入方式注入 `HttpService`。
@@ -41,6 +43,7 @@ export class CatsService {
     return this.httpService.get('http://localhost:3000/cats');
   }
 }
+
 ```
 
 :::info 提示
@@ -64,6 +67,7 @@ export class CatsService {
   providers: [CatsService],
 })
 export class CatsModule {}
+
 ```
 
 #### 异步配置
@@ -79,6 +83,7 @@ HttpModule.registerAsync({
     maxRedirects: 5,
   }),
 });
+
 ```
 
 与其他工厂提供程序类似，我们的工厂函数可以是[异步的](../fundamentals/dependency-injection#工厂提供者-usefactory) ，并且可以通过 `inject` 注入依赖项。
@@ -92,6 +97,7 @@ HttpModule.registerAsync({
   }),
   inject: [ConfigService],
 });
+
 ```
 
 或者，您也可以使用类而非工厂来配置 `HttpModule`，如下所示。
@@ -100,6 +106,7 @@ HttpModule.registerAsync({
 HttpModule.registerAsync({
   useClass: HttpConfigService,
 });
+
 ```
 
 上述结构在 `HttpModule` 内部实例化 `HttpConfigService`，并用它来创建一个选项对象。请注意，在本例中，`HttpConfigService` 必须实现如下所示的 `HttpModuleOptionsFactory` 接口。`HttpModule` 将在提供的类的实例化对象上调用 `createHttpOptions()` 方法。
@@ -114,6 +121,7 @@ class HttpConfigService implements HttpModuleOptionsFactory {
     };
   }
 }
+
 ```
 
 如果要在 `HttpModule` 中重用现有的选项提供程序，而不是创建私有副本，请使用 `useExisting` 语法。
@@ -123,6 +131,7 @@ HttpModule.registerAsync({
   imports: [ConfigModule],
   useExisting: HttpConfigService,
 });
+
 ```
 
 您还可以向 `registerAsync()` 方法传递所谓的 `extraProviders`。这些提供程序将与模块提供程序合并。
@@ -133,6 +142,7 @@ HttpModule.registerAsync({
   useClass: HttpConfigService,
   extraProviders: [MyAdditionalProvider],
 });
+
 ```
 
 当您需要向工厂函数或类构造函数提供额外依赖项时，这非常有用。
@@ -151,6 +161,7 @@ export class CatsService {
     //                      ^ AxiosInstance interface
   }
 }
+
 ```
 
 #### 完整示例
@@ -177,6 +188,7 @@ export class CatsService {
     return data;
   }
 }
+
 ```
 
 :::info 提示

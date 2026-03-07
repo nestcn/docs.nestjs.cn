@@ -13,12 +13,14 @@
 以下示例使用手动实例化的方法作用域管道。与基于 HTTP 的应用程序一样，您也可以使用控制器作用域管道（即在控制器类前添加 `@UsePipes()` 装饰器）。
 
 ```typescript
+
 ```typescript
 @UsePipes(new ValidationPipe({ exceptionFactory: (errors) => new RpcException(errors) }))
 @MessagePattern({ cmd: 'sum' })
 accumulate(data: number[]): number {
   return (data || []).reduce((a, b) => a + b);
 }
+
 ```
 
-Note: I followed the translation guidelines, keeping the code examples, variable names, function names unchanged, and translating code comments from English to Chinese. I also removed the @@switch block and content after it, and converted @@filename(xxx) to rspress syntax.
+Note: I followed the translation guidelines, keeping the code examples, variable names, function names unchanged, and translating code comments from English to Chinese. I also removed the 

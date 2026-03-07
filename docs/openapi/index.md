@@ -22,6 +22,7 @@
 
 ```bash
 $ npm install --save @nestjs/swagger
+
 ```
 
 ## 快速开始
@@ -48,6 +49,7 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
+
 ```
 
 :::info 提示
@@ -67,6 +69,7 @@ bootstrap();
 
 ```bash
 $ npm run start
+
 ```
 
 应用程序运行时，打开浏览器并导航到 `http://localhost:3000/api`。您应该看到 Swagger UI。
@@ -81,6 +84,7 @@ $ npm run start
 SwaggerModule.setup('swagger', app, documentFactory, {
   jsonDocumentUrl: 'swagger/json',
 });
+
 ```
 
 这将在 `http://localhost:3000/swagger/json` 处暴露它。
@@ -105,6 +109,7 @@ app.register(helmet, {
 app.register(helmet, {
   contentSecurityPolicy: false,
 });
+
 ```
 
 ## 文档选项
@@ -147,6 +152,7 @@ export interface SwaggerDocumentOptions {
    */
   autoTagControllers?: boolean;
 }
+
 ```
 
 例如，如果您想确保库生成像 `createUser` 而不是 `UsersController_createUser` 这样的操作名称，可以设置以下内容：
@@ -159,6 +165,7 @@ const options: SwaggerDocumentOptions = {
   ) => methodKey
 };
 const documentFactory = () => SwaggerModule.createDocument(app, config, options);
+
 ```
 
 ## 设置选项

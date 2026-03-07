@@ -12,6 +12,7 @@
 
 ```bash
 $ npm install --save csurf cookie-parser
+
 ```
 
 > 警告 **注意**，如 [csurf 文档](https://github.com/expressjs/csurf) 中所述，这个中间件需要会话中间件或 `cookie-parser` 在初始化之前。请查看文档以获取更多详细信息。
@@ -28,6 +29,7 @@ app.use(cookieParser());
 app.use(csurf({
   cookie: true,
 }));
+
 ```
 
 #### 使用 Fastify
@@ -36,6 +38,7 @@ app.use(csurf({
 
 ```bash
 $ npm install --save @fastify/csrf-protection
+
 ```
 
 安装完成后，请将 `@fastify/csrf-protection` 插件注册如下：
@@ -61,6 +64,7 @@ async function bootstrap() {
   
   // ...
 }
+
 ```
 
 > 警告 **注意**，如 [@fastify/csrf-protection 文档](https://github.com/fastify/fastify-csrf-protection) 中所述，这个插件需要在初始化存储插件之前。请查看文档以获取更多详细信息。
@@ -77,6 +81,7 @@ async function bootstrap() {
   <!-- 其他表单字段 -->
   <button type="submit">提交</button>
 </form>
+
 ```
 
 在控制器中，您不需要手动验证令牌，因为 `csurf` 中间件会自动处理：
@@ -88,6 +93,7 @@ async submit(@Body() data: any) {
   // 处理表单数据
   return { message: '表单提交成功' };
 }
+
 ```
 
 ##### Fastify 示例
@@ -115,6 +121,7 @@ async submit(@Body() data: any, @Res() res: FastifyReply) {
     return { message: 'CSRF 验证失败' };
   }
 }
+
 ```
 
 #### 注意事项

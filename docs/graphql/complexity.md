@@ -14,6 +14,7 @@
 
 ```bash
 $ npm install --save graphql-query-complexity
+
 ```
 
 #### 快速开始
@@ -65,6 +66,7 @@ export class ComplexityPlugin implements ApolloServerPlugin {
     };
   }
 }
+
 ```
 
 出于演示目的，我们将允许的最大复杂度指定为 `20`。在上面的示例中，我们使用了 2 个估算器：`simpleEstimator` 和 `fieldExtensionsEstimator`。
@@ -83,6 +85,7 @@ export class ComplexityPlugin implements ApolloServerPlugin {
 ```typescript
 @Field({ complexity: 3 })
 title: string;
+
 ```
 
 或者，你也可以定义估算函数：
@@ -90,6 +93,7 @@ title: string;
 ```typescript
 @Field({ complexity: (options: ComplexityEstimatorArgs) => ... })
 title: string;
+
 ```
 
 #### 查询/变更级别的复杂度
@@ -101,4 +105,5 @@ title: string;
 items(@Args('count') count: number) {
   return this.itemsService.getItems({ count });
 }
+
 ```

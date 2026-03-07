@@ -16,6 +16,7 @@
 
 ```bash
 $ npm i --save @grpc/grpc-js @grpc/proto-loader
+
 ```
 
 #### 概述
@@ -30,6 +31,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
     protoPath: join(__dirname, 'hero/hero.proto'),
   },
 });
+
 ```
 
 > info **提示** `join()` 函数从 `path` 包导入；`Transport` 枚举从 `@nestjs/microservices` 包导入。
@@ -43,6 +45,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
     "watchAssets": true
   }
 }
+
 ```
 
 #### 选项
@@ -115,6 +118,7 @@ message Hero {
   int32 id = 1;
   string name = 2;
 }
+
 ```
 
 我们的 `HeroesService` 公开了一个 `FindOne()` 方法。此方法期望类型为 `HeroById` 的输入参数，并返回 `Hero` 消息（协议缓冲区使用 `message` 元素来定义参数类型和返回类型）。
@@ -135,6 +139,7 @@ export class HeroesController {
     return items.find(({ id }) => id === data.id);
   }
 }
+
 ```
 
 > info **提示** `@GrpcMethod()` 装饰器从 `@nestjs/microservices` 包导入，而 `Metadata` 和 `ServerUnaryCall` 从 `grpc` 包导入。
@@ -157,6 +162,7 @@ export class HeroesController {
     return items.find(({ id }) => id === data.id);
   }
 }
+
 ```
 
 您也可以省略第一个 `@GrpcMethod()` 参数。在这种情况下，Nest 会根据定义处理程序的 **类** 名称自动将处理程序与 proto 定义文件中的服务定义相关联。例如，在以下代码中，`HeroesService` 类基于名称 `'HeroesService'` 的匹配，将其处理程序方法与 `hero.proto` 文件中的 `HeroesService` 服务定义相关联。
@@ -173,6 +179,7 @@ export class HeroesService {
     return items.find(({ id }) => id === data.id);
   }
 }
+
 ```
 
 #### 客户端
@@ -194,6 +201,7 @@ imports: [
     },
   ]),
 ];
+
 ```
 
 > info **提示** `register()` 方法接受对象数组。通过提供逗号分隔的注册对象列表来注册多个包。
@@ -215,6 +223,7 @@ export class AppService implements OnModuleInit {
     return this.heroesService.findOne({ id: 1 });
   }
 }
+
 ```
 
 > error **警告** 除非在 proto 加载器配置 (`options.loader.keepcase` 在微服务传输器配置中) 中设置 `keepCase` 选项为 `true`，否则 gRPC 客户端不会发送名称中包含下划线 `_` 的字段。
@@ -245,6 +254,7 @@ export class AppService implements OnModuleInit {
     return this.heroesService.findOne({ id: 1 });
   }
 }
+
 ```
 
 最后，对于更复杂的场景，我们可以使用 <a href="/microservices/basics#客户端">此处</a> 描述的 `ClientProxyFactory` 类注入动态配置的客户端。
@@ -257,6 +267,7 @@ export class AppService implements OnModuleInit {
 interface HeroesService {
   findOne(data: { id: number }): Observable<any>;
 }
+
 ```
 
 消息处理程序还能够返回 `Observable`，在这种情况下，结果值将被发出，直到流完成。
@@ -266,6 +277,7 @@ interface HeroesService {
 call(): Observable<any> {
   return this.heroesService.findOne({ id: 1 });
 }
+
 ```
 
 要发送 gRPC 元数据（连同请求），您可以传递第二个参数，如下所示：
@@ -277,6 +289,7 @@ call(): Observable<any> {
 
   return this.heroesService.findOne({ id: 1 }, metadata);
 }
+
 ```
 
 > info **提示** `Metadata` 类从 `grpc` 包导入。
@@ -295,6 +308,7 @@ call(): Observable<any> {
 
 ```bash
 $ npm i --save @grpc/reflection
+
 ```
 
 然后可以使用 gRPC 服务器选项中的 `onLoadPackageDefinition` 钩子将其挂钩到 gRPC 服务器，如下所示：
@@ -309,6 +323,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
     },
   },
 });
+
 ```
 
 现在您的服务器将使用反射规范响应请求 API 详情的消息。
@@ -346,6 +361,7 @@ message HelloRequest {
 message HelloResponse {
   string reply = 1;
 }
+
 ```
 
 > info **提示** `LotsOfGreetings` 方法可以使用 `@GrpcMethod` 装饰器简单实现（如上面的示例），因为返回的流可以发出多个值。
@@ -367,6 +383,7 @@ interface HelloRequest {
 interface HelloResponse {
   reply: string;
 }
+
 ```
 
 > info **提示** proto 接口可以由 [ts-proto](https://github.com/stephenh/ts-proto) 包自动生成，了解更多 [此处](https://github.com/stephenh/ts-proto/blob/main/NESTJS.markdown)。
@@ -395,6 +412,7 @@ bidiHello(messages: Observable<any>, metadata: Metadata, call: ServerDuplexStrea
 
   return subject.asObservable();
 }
+
 ```
 
 > warning **警告** 为了支持与 `@GrpcStreamMethod()` 装饰器的全双工交互，控制器方法必须返回 RxJS `Observable`。
@@ -412,6 +430,7 @@ helloRequest$.next({ greeting: 'Hello (2)!' });
 helloRequest$.complete();
 
 return helloService.bidiHello(helloRequest$);
+
 ```
 
 在上面的示例中，我们向流写入了两条消息（`next()` 调用）并通知服务我们已完成发送数据（`complete()` 调用）。
@@ -434,6 +453,7 @@ bidiHello(requestStream: any) {
     });
   });
 }
+
 ```
 
 > info **提示** 此装饰器不需要提供任何特定的返回参数。预计流将类似于任何其他标准流类型进行处理。
@@ -450,6 +470,7 @@ lotsOfGreetings(requestStream: any, callback: (err: unknown, value: HelloRespons
   });
   requestStream.on('end', () => callback(null, { reply: 'Hello, world!' }));
 }
+
 ```
 
 这里我们使用 `callback` 函数在 `requestStream` 处理完成后发送响应。
@@ -462,6 +483,7 @@ lotsOfGreetings(requestStream: any, callback: (err: unknown, value: HelloRespons
 
 ```bash
 $ npm i --save grpc-health-check
+
 ```
 
 然后可以使用 gRPC 服务选项中的 `onLoadPackageDefinition` 钩子将其挂钩到 gRPC 服务，如下所示。请注意，`protoPath` 需要同时具有健康检查和 hero 包。
@@ -485,6 +507,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
     },
   },
 });
+
 ```
 
 > info **提示** [gRPC 健康探针](https://github.com/grpc-ecosystem/grpc-health-probe) 是一个有用的 CLI，用于在容器化环境中测试 gRPC 健康检查。
@@ -514,6 +537,7 @@ export class HeroesService {
     return items.find(({ id }) => id === data.id);
   }
 }
+
 ```
 
 同样，要在使用 `@GrpcStreamMethod()` 处理程序（[主题策略](/microservices/grpc#主题策略)）注释的处理程序中读取元数据，请使用第二个参数（metadata），该参数的类型为 `Metadata`（从 `grpc` 包导入）。
@@ -526,4 +550,5 @@ export class HeroesService {
 requestStream.on('metadata', (metadata: Metadata) => {
   const meta = metadata.get('X-Meta');
 });
+
 ```

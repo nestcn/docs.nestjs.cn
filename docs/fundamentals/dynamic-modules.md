@@ -23,6 +23,7 @@ import { UsersService } from './users.service';
   exports: [UsersService],
 })
 export class UsersModule {}
+
 ```
 
 接下来，我们将定义一个`AuthModule`，它导入`UsersModule`，使`UsersModule`的导出提供者在`AuthModule`内部可用：
@@ -38,6 +39,7 @@ import { UsersModule } from '../users/users.module';
   exports: [AuthService],
 })
 export class AuthModule {}
+
 ```
 
 这些构造允许我们在例如`AuthModule`中托管的`AuthService`中注入`UsersService`：
@@ -53,6 +55,7 @@ export class AuthService {
     使用 this.usersService 的实现
   */
 }
+
 ```
 
 我们将此称为**静态**模块绑定。Nest将模块连接在一起所需的所有信息已经在宿主和消费模块中声明。让我们分解这个过程中发生的事情。Nest通过以下方式使`UsersService`在`AuthModule`内部可用：
@@ -93,6 +96,7 @@ import { ConfigModule } from './config/config.module';
   providers: [AppService],
 })
 export class AppModule {}
+
 ```
 
 让我们考虑一下**动态模块**导入的样子，我们在其中传递配置对象。比较这两个示例中`imports`数组的差异：
@@ -109,6 +113,7 @@ import { ConfigModule } from './config/config.module';
   providers: [AppService],
 })
 export class AppModule {}
+
 ```
 
 让我们看看上面的动态示例中发生了什么。有哪些移动部件？
@@ -126,6 +131,7 @@ export class AppModule {}
   providers: [CatsService],
   exports: [CatsService]
 })
+
 ```
 
 动态模块必须返回一个具有完全相同接口的对象，加上一个称为`module`的额外属性。`module`属性用作模块的名称，应该与模块的类名相同，如下面的示例所示。
@@ -155,6 +161,7 @@ export class ConfigModule {
     };
   }
 }
+
 ```
 
 现在应该清楚各个部分是如何联系在一起的。调用`ConfigModule.register(...)`返回一个`DynamicModule`对象，其属性基本上与我们直到现在通过`@Module()`装饰器作为元数据提供的属性相同。
@@ -179,6 +186,7 @@ import { ConfigModule } from './config/config.module';
   providers: [AppService],
 })
 export class AppModule {}
+
 ```
 
 这很好地处理了将`options`对象传递给我们的动态模块。然后我们如何在`ConfigModule`中使用这个`options`对象呢？让我们考虑一下。我们知道我们的`ConfigModule`基本上是一个主机，用于提供和导出一个可注入的服务 - `ConfigService` - 供其他提供者使用。实际上是我们的`ConfigService`需要读取`options`对象来自定义其行为。让我们暂时假设我们知道如何以某种方式将`options`从`register()`方法传递到`ConfigService`中。基于这个假设，我们可以对服务进行一些更改，以根据`options`对象中的属性自定义其行为。（**注意**：暂时，由于我们**还没有**确定如何传递它，我们将只是硬编码`options`。我们稍后会修复这个问题）。
@@ -206,6 +214,7 @@ export class ConfigService {
     return this.envConfig[key];
   }
 }
+
 ```
 
 现在我们的`ConfigService`知道如何在我们在`options`中指定的文件夹中找到`.env`文件。
@@ -234,6 +243,7 @@ export class ConfigModule {
     };
   }
 }
+
 ```
 
 现在我们可以通过将`'CONFIG_OPTIONS'`提供者注入到`ConfigService`中来完成这个过程。回想一下，当我们使用非类令牌定义提供者时，我们需要使用`@Inject()`装饰器[如这里所述](/fundamentals/dependency-injection#非基于类的提供者令牌)。
@@ -259,12 +269,14 @@ export class ConfigService {
     return this.envConfig[key];
   }
 }
+
 ```
 
 最后一个注意事项：为了简单起见，我们上面使用了基于字符串的注入令牌（`'CONFIG_OPTIONS'`），但最佳实践是在单独的文件中将其定义为常量（或`Symbol`），并导入该文件。例如：
 
 ```typescript
 export const CONFIG_OPTIONS = 'CONFIG_OPTIONS';
+
 ```
 
 #### 示例
@@ -295,6 +307,7 @@ export const CONFIG_OPTIONS = 'CONFIG_OPTIONS';
 export interface ConfigModuleOptions {
   folder: string;
 }
+
 ```
 
 有了这个，创建一个新的专用文件（与现有的`config.module.ts`文件一起），并将其命名为`config.module-definition.ts`。在这个文件中，让我们利用`ConfigurableModuleBuilder`来构建`ConfigModule`定义。
@@ -308,6 +321,7 @@ export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
 
 export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
   new ConfigurableModuleBuilder().build();
+
 ```
 
 现在让我们打开`config.module.ts`文件，并修改其实现以利用自动生成的`ConfigurableModuleClass`：
@@ -322,6 +336,7 @@ import { ConfigurableModuleClass } from './config.module-definition';
   exports: [ConfigService],
 })
 export class ConfigModule extends ConfigurableModuleClass {}
+
 ```
 
 扩展`ConfigurableModuleClass`意味着`ConfigModule`现在不仅提供`register`方法（如之前的自定义实现），还提供`registerAsync`方法，该方法允许消费者异步配置该模块，例如，通过提供异步工厂：
@@ -342,6 +357,7 @@ export class ConfigModule extends ConfigurableModuleClass {}
   ],
 })
 export class AppModule {}
+
 ```
 
 `registerAsync`方法将以下对象作为参数：
@@ -371,6 +387,7 @@ export class AppModule {}
     ConfigurableModuleOptionsFactory<ModuleOptions, FactoryClassMethodKey>
   >;
 }
+
 ```
 
 让我们逐一查看上述属性：
@@ -389,6 +406,7 @@ export class AppModule {}
 export class ConfigService {
   constructor(@Inject(MODULE_OPTIONS_TOKEN) private options: ConfigModuleOptions) { ... }
 }
+
 ```
 
 #### 自定义方法键
@@ -398,6 +416,7 @@ export class ConfigService {
 ```typescript
 export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
   new ConfigurableModuleBuilder<ConfigModuleOptions>().setClassMethodName('forRoot').build();
+
 ```
 
 这种构造将指示`ConfigurableModuleBuilder`生成一个公开`forRoot`和`forRootAsync`的类，而不是`register`和`registerAsync`。示例：
@@ -418,6 +437,7 @@ export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
   ],
 })
 export class AppModule {}
+
 ```
 
 #### 自定义选项工厂类
@@ -433,6 +453,7 @@ export class AppModule {}
   ],
 })
 export class AppModule {}
+
 ```
 
 默认情况下，此类必须提供`create()`方法，该方法返回模块配置对象。但是，如果你的库遵循不同的命名约定，你可以更改该行为，并指示`ConfigurableModuleBuilder`期望一个不同的方法，例如`createConfigOptions`，使用`ConfigurableModuleBuilder#setFactoryMethodName`方法：
@@ -440,6 +461,7 @@ export class AppModule {}
 ```typescript
 export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
   new ConfigurableModuleBuilder<ConfigModuleOptions>().setFactoryMethodName('createConfigOptions').build();
+
 ```
 
 现在，`ConfigModuleOptionsFactory`类必须公开`createConfigOptions`方法（而不是`create`）：
@@ -453,6 +475,7 @@ export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
   ],
 })
 export class AppModule {}
+
 ```
 
 #### 额外选项
@@ -474,6 +497,7 @@ export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
       }),
     )
     .build();
+
 ```
 
 在上面的示例中，传递给`setExtras`方法的第一个参数是一个对象，包含"额外"属性的默认值。第二个参数是一个函数，它接受自动生成的模块定义（带有`provider`、`exports`等）和`extras`对象，该对象表示额外的属性（由消费者指定或默认值）。此函数的返回值是修改后的模块定义。在这个特定的例子中，我们将`extras.isGlobal`属性分配给模块定义的`global`属性（这反过来决定模块是否是全局的，更多信息[这里](/modules#动态模块)）。
@@ -490,6 +514,7 @@ export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
   ],
 })
 export class AppModule {}
+
 ```
 
 然而，由于`isGlobal`被声明为"额外"属性，它将不会在`MODULE_OPTIONS_TOKEN`提供者中可用：
@@ -504,6 +529,7 @@ export class ConfigService {
     // ...
   }
 }
+
 ```
 
 #### 扩展自动生成的方法
@@ -538,6 +564,7 @@ export class ConfigModule extends ConfigurableModuleClass {
     };
   }
 }
+
 ```
 
 请注意使用`OPTIONS_TYPE`和`ASYNC_OPTIONS_TYPE`类型，这些类型必须从模块定义文件中导出：
@@ -549,4 +576,5 @@ export const {
   OPTIONS_TYPE,
   ASYNC_OPTIONS_TYPE,
 } = new ConfigurableModuleBuilder<ConfigModuleOptions>().build();
+
 ```

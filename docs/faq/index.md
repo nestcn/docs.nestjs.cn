@@ -88,6 +88,7 @@
 **A:** 循环依赖是 NestJS 中常见的问题，可以通过以下方式解决：
 
 1. **使用 forwardRef()**：
+
 ```typescript
 @Injectable()
 export class CatsService {
@@ -96,15 +97,18 @@ export class CatsService {
     private commonService: CommonService,
   ) {}
 }
+
 ```
 
 2. **重构模块结构**：
+
 ```typescript
 // 将共享逻辑提取到单独的模块
 @Module({
   exports: [CommonService],
 })
 export class SharedModule {}
+
 ```
 
 ### Q: 如何处理全局前缀问题？
@@ -117,6 +121,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api/v1');
   await app.listen(3000);
 }
+
 ```
 
 ### Q: 如何保持长连接？
@@ -135,6 +140,7 @@ async function bootstrap() {
   
   await app.listen(3000);
 }
+
 ```
 
 ### Q: 如何获取原始请求体？
@@ -152,6 +158,7 @@ async function bootstrap() {
   
   await app.listen(3000);
 }
+
 ```
 
 ### Q: 如何在 Serverless 环境中部署？
@@ -181,6 +188,7 @@ export const handler: Handler = async (event: any, context: Context) => {
   const server = await bootstrap();
   return proxy(server, event, context, 'PROMISE').promise;
 };
+
 ```
 
 ## 性能优化建议
@@ -226,6 +234,7 @@ export class AppController {
     return 'Hello World!';
   }
 }
+
 ```
 
 ## 相关章节

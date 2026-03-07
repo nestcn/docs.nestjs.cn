@@ -14,6 +14,7 @@ export class Book {
   @Field()
   title: string;
 }
+
 ```
 
 然后是 `Author`：
@@ -26,6 +27,7 @@ export class Author {
   @Field()
   name: string;
 }
+
 ```
 
 完成这些设置后，使用从 `@nestjs/graphql` 包导出的 `createUnionType` 函数注册 `ResultUnion` 联合类型：
@@ -35,6 +37,7 @@ export const ResultUnion = createUnionType({
   name: 'ResultUnion',
   types: () => [Author, Book] as const,
 });
+
 ```
 
 :::warning 警告
@@ -48,6 +51,7 @@ export const ResultUnion = createUnionType({
 search(): Array<typeof ResultUnion> {
   return [new Author(), new Book()];
 }
+
 ```
 
 这将生成以下 GraphQL 模式定义语言(SDL)部分：
@@ -66,6 +70,7 @@ union ResultUnion = Author | Book
 type Query {
   search: [ResultUnion!]!
 }
+
 ```
 
 该库生成的默认 `resolveType()` 函数会根据解析器方法返回的值提取类型。这意味着必须返回类实例而非字面量 JavaScript 对象。
@@ -86,6 +91,7 @@ export const ResultUnion = createUnionType({
     return null;
   },
 });
+
 ```
 
 #### 模式优先
@@ -102,6 +108,7 @@ type Book {
 }
 
 union ResultUnion = Author | Book
+
 ```
 
 然后，你可以使用类型生成功能（如[快速开始](/graphql/quick-start)章节所示）来生成对应的 TypeScript 定义：
@@ -116,6 +123,7 @@ export class Book {
 }
 
 export type ResultUnion = Author | Book;
+
 ```
 
 联合类型需要在解析器映射中添加额外的 `__resolveType` 字段来确定应解析为哪种类型。另外请注意，`ResultUnionResolver` 类必须注册为任何模块的提供者。让我们创建一个 `ResultUnionResolver` 类并定义 `__resolveType` 方法。
@@ -134,6 +142,7 @@ export class ResultUnionResolver {
     return null;
   }
 }
+
 ```
 
 :::info 提示
@@ -157,6 +166,7 @@ export enum AllowedColor {
   GREEN,
   BLUE,
 }
+
 ```
 
 完成这些设置后，使用从 `@nestjs/graphql` 包导出的 `registerEnumType` 函数注册 `AllowedColor` 枚举：
@@ -165,6 +175,7 @@ export enum AllowedColor {
 registerEnumType(AllowedColor, {
   name: 'AllowedColor',
 });
+
 ```
 
 现在你可以在我们的类型中引用 `AllowedColor` 枚举：
@@ -172,6 +183,7 @@ registerEnumType(AllowedColor, {
 ```typescript
 @Field(type => AllowedColor)
 favoriteColor: AllowedColor;
+
 ```
 
 这将生成以下 GraphQL 模式定义语言(SDL)部分：
@@ -182,6 +194,7 @@ enum AllowedColor {
   GREEN
   BLUE
 }
+
 ```
 
 要为枚举提供描述，请将 `description` 属性传入 `registerEnumType()` 函数。
@@ -191,6 +204,7 @@ registerEnumType(AllowedColor, {
   name: 'AllowedColor',
   description: 'The supported colors.',
 });
+
 ```
 
 要为枚举值提供描述，或将某个值标记为弃用，请传入 `valuesMap` 属性，如下所示：
@@ -208,6 +222,7 @@ registerEnumType(AllowedColor, {
     },
   },
 });
+
 ```
 
 这将生成以下 SDL 格式的 GraphQL 模式：
@@ -224,6 +239,7 @@ enum AllowedColor {
   GREEN
   BLUE @deprecated(reason: "Too blue.")
 }
+
 ```
 
 #### 模式优先
@@ -236,6 +252,7 @@ enum AllowedColor {
   GREEN
   BLUE
 }
+
 ```
 
 然后您可以使用类型生成功能（如[快速入门](/graphql/quick-start)章节所示）来生成对应的 TypeScript 定义：
@@ -246,6 +263,7 @@ export enum AllowedColor {
   GREEN
   BLUE
 }
+
 ```
 
 有时后端会强制要求枚举在内部使用与公开 API 不同的值。在这个例子中，API 包含 `RED`，但在解析器中我们可能使用 `#f00` 代替（了解更多[此处](https://www.apollographql.com/docs/apollo-server/schema/scalars-enums/#internal-values) ）。要实现这一点，需要为 `AllowedColor` 枚举声明一个解析器对象：
@@ -254,6 +272,7 @@ export enum AllowedColor {
 export const allowedColorResolver: Record<keyof typeof AllowedColor, any> = {
   RED: '#f00',
 };
+
 ```
 
 :::info 提示
@@ -268,4 +287,5 @@ GraphQLModule.forRoot({
     AllowedColor: allowedColorResolver,
   },
 });
+
 ```

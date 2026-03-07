@@ -53,6 +53,7 @@ class GoogleCloudPubSubServer
     throw new Error('Method not implemented.');
   }
 }
+
 ```
 
 :::warning 注意
@@ -70,6 +71,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     strategy: new GoogleCloudPubSubServer(),
   }
 );
+
 ```
 
 本质上，我们不再传递包含 `transport` 和 `options` 属性的常规传输器选项对象，而是传递一个单独的 `strategy` 属性，其值是我们自定义传输器类的实例。
@@ -83,6 +85,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(
 echo(@Payload() data: object) {
   return data;
 }
+
 ```
 
 该消息处理器将由 Nest 运行时自动注册。通过 `Server` 类，您可以查看已注册的消息模式，并访问和执行分配给它们的实际方法。为了测试这一点，让我们在 `listen()` 方法中的 `callback` 函数被调用前添加一个简单的 `console.log`：
@@ -92,12 +95,14 @@ listen(callback: () => void) {
   console.log(this.messageHandlers);
   callback();
 }
+
 ```
 
 当应用重启后，您将在终端看到以下日志：
 
 ```typescript
 Map { 'echo' => [AsyncFunction] { isEventHandler: false } }
+
 ```
 
 :::info 提示
@@ -112,12 +117,14 @@ async listen(callback: () => void) {
   console.log(await echoHandler('Hello world!'));
   callback();
 }
+
 ```
 
 当我们执行传递任意字符串作为参数的 `echoHandler`（此处为 `"Hello world!"`）时，应该在控制台中看到它：
 
 ```json
 Hello world!
+
 ```
 
 这意味着我们的方法处理程序已正确执行。
@@ -135,6 +142,7 @@ async listen(callback: () => void) {
   }
   callback();
 }
+
 ```
 
 #### 客户端代理
@@ -162,6 +170,7 @@ class GoogleCloudPubSubClient extends ClientProxy {
     throw new Error('Method not implemented.');
   }
 }
+
 ```
 
 :::warning 注意
@@ -204,6 +213,7 @@ class GoogleCloudPubSubClient extends ClientProxy {
     throw new Error('Method not implemented.');
   }
 }
+
 ```
 
 完成这些后，让我们创建 `GoogleCloudPubSubClient` 类的实例并运行 `send()` 方法（你可能在前面的章节中见过），同时订阅返回的可观察流。
@@ -213,6 +223,7 @@ const googlePubSubClient = new GoogleCloudPubSubClient();
 googlePubSubClient
   .send('pattern', 'Hello world!')
   .subscribe((response) => console.log(response));
+
 ```
 
 现在，您应该在终端中看到以下输出：
@@ -221,6 +232,7 @@ googlePubSubClient
 connect
 message: { pattern: 'pattern', data: 'Hello world!' }
 Hello world! // <-- after 5 seconds
+
 ```
 
 为了测试我们的"teardown"方法（由 `publish()` 方法返回）是否正确执行，让我们对数据流应用一个超时操作符，将其设置为 2 秒以确保它比我们的 `setTimeout` 调用 `callback` 函数更早抛出错误。
@@ -234,6 +246,7 @@ googlePubSubClient
     (response) => console.log(response),
     (error) => console.error(error.message)
   );
+
 ```
 
 :::info 提示
@@ -247,12 +260,14 @@ connect
 message: { pattern: 'pattern', data: 'Hello world!' }
 teardown // <-- teardown
 Timeout has occurred
+
 ```
 
 要派发事件（而非发送消息），请使用 `emit()` 方法：
 
 ```typescript
 googlePubSubClient.emit('event', 'Hello world!');
+
 ```
 
 这是你将在控制台中看到的内容：
@@ -260,6 +275,7 @@ googlePubSubClient.emit('event', 'Hello world!');
 ```typescript
 connect
 event to dispatch:  { pattern: 'event', data: 'Hello world!' }
+
 ```
 
 #### 消息序列化
@@ -274,6 +290,7 @@ class ErrorHandlingProxy extends ClientTCP {
     return new RpcException(err);
   }
 }
+
 ```
 
 然后在 `ClientsModule` 中这样使用：
@@ -288,6 +305,7 @@ class ErrorHandlingProxy extends ClientTCP {
   ]
 })
 export class AppModule
+
 ```
 
 :::info 注意

@@ -20,6 +20,7 @@ GraphQLModule.forRoot({
     dateScalarMode: 'timestamp',
   }
 }),
+
 ```
 
 同理，默认使用 `GraphQLFloat` 来表示 `number` 类型。若要改用 `GraphQLInt`，需将 `buildSchemaOptions` 对象的 `numberScalarMode` 属性设置为 `'integer'`，如下所示：
@@ -30,6 +31,7 @@ GraphQLModule.forRoot({
     numberScalarMode: 'integer',
   }
 }),
+
 ```
 
 此外，您还可以创建自定义标量类型。
@@ -61,6 +63,7 @@ export class DateScalar implements CustomScalar<number, Date> {
     return null;
   }
 }
+
 ```
 
 完成此操作后，将 `DateScalar` 注册为提供程序。
@@ -70,6 +73,7 @@ export class DateScalar implements CustomScalar<number, Date> {
   providers: [DateScalar],
 })
 export class CommonModule {}
+
 ```
 
 现在我们可以在类中使用 `Date` 类型。
@@ -77,6 +81,7 @@ export class CommonModule {}
 ```typescript
 @Field()
 creationDate: Date;
+
 ```
 
 #### 导入自定义标量
@@ -87,6 +92,7 @@ creationDate: Date;
 
 ```bash
 $ npm i --save graphql-type-json
+
 ```
 
 安装完成后，向 `forRoot()` 方法传入自定义解析器：
@@ -102,6 +108,7 @@ import GraphQLJSON from 'graphql-type-json';
   ],
 })
 export class AppModule {}
+
 ```
 
 现在即可在类中使用 `JSON` 类型。
@@ -109,6 +116,7 @@ export class AppModule {}
 ```typescript
 @Field(() => GraphQLJSON)
 info: JSON;
+
 ```
 
 如需获取一系列实用的标量类型，请查看 [graphql-scalars](https://www.npmjs.com/package/graphql-scalars) 包。
@@ -134,6 +142,7 @@ export const CustomUuidScalar = new GraphQLScalarType({
   parseValue: (value) => validate(value),
   parseLiteral: (ast) => validate(ast.value),
 });
+
 ```
 
 我们向 `forRoot()` 方法传递了一个自定义解析器：
@@ -147,6 +156,7 @@ export const CustomUuidScalar = new GraphQLScalarType({
   ],
 })
 export class AppModule {}
+
 ```
 
 现在我们可以在类中使用 `UUID` 类型了。
@@ -154,6 +164,7 @@ export class AppModule {}
 ```typescript
 @Field(() => CustomUuidScalar)
 uuid: string;
+
 ```
 
 #### 模式优先
@@ -164,6 +175,7 @@ uuid: string;
 
 ```bash
 $ npm i --save graphql-type-json
+
 ```
 
 安装完成后，我们向 `forRoot()` 方法传递一个自定义解析器：
@@ -180,17 +192,20 @@ import GraphQLJSON from 'graphql-type-json';
   ],
 })
 export class AppModule {}
+
 ```
 
 现在我们可以在类型定义中使用 `JSON` 标量：
 
 ```graphql
 scalar JSON
+
 ```
 
 type Foo {
   field: JSON
 }
+
 ```
 
 另一种定义标量类型的方法是创建一个简单的类。假设我们想要用 `Date` 类型增强我们的模式。
@@ -218,6 +233,7 @@ export class DateScalar implements CustomScalar<number, Date> {
     return null;
   }
 }
+
 ```
 
 完成这些后，将 `DateScalar` 注册为提供者。
@@ -227,12 +243,14 @@ export class DateScalar implements CustomScalar<number, Date> {
   providers: [DateScalar],
 })
 export class CommonModule {}
+
 ```
 
 现在我们可以在类型定义中使用 `Date` 标量。
 
 ```graphql
 scalar Date
+
 ```
 
 默认情况下，所有标量生成的 TypeScript 定义都是 `any`——这并不具备良好的类型安全性。但当你指定类型生成方式时，可以配置 Nest 如何为自定义标量生成类型声明：
@@ -254,6 +272,7 @@ definitionsFactory.generate({
   },
   additionalHeader: "import _BigNumber from 'bignumber.js'",
 });
+
 ```
 
 :::info 提示
@@ -266,6 +285,7 @@ definitionsFactory.generate({
 scalar DateTime
 scalar BigNumber
 scalar Payload
+
 ```
 
 我们将在 `src/graphql.ts` 中看到如下生成的 TypeScript 定义：
@@ -276,6 +296,7 @@ import _BigNumber from 'bignumber.js';
 export type DateTime = Date;
 export type BigNumber = _BigNumber;
 export type Payload = unknown;
+
 ```
 
 在此，我们使用了 `customScalarTypeMapping` 属性来提供我们希望为自定义标量声明的类型映射。我们还提供了一个 `additionalHeader` 属性，以便添加这些类型定义所需的任何导入项。最后，我们添加了一个默认标量类型 `defaultScalarType`，其值为 `'unknown'`，这样任何未在 `customScalarTypeMapping` 中指定的自定义标量都将被别名化为 `unknown` 而非 `any`（自 TypeScript 3.0 起[官方推荐](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-0.html#new-unknown-top-type)使用前者以增强类型安全性）。

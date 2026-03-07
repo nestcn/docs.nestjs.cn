@@ -9,6 +9,7 @@
 ```shell
 $ npm i cookie-parser
 $ npm i -D @types/cookie-parser
+
 ```
 
 安装完成后，将 `cookie-parser` 中间件作为全局中间件应用（例如在 `main.ts` 文件中）。
@@ -17,6 +18,7 @@ $ npm i -D @types/cookie-parser
 import * as cookieParser from 'cookie-parser';
 // somewhere in your initialization file
 app.use(cookieParser());
+
 ```
 
 你可以向 `cookieParser` 中间件传递多个选项：
@@ -36,6 +38,7 @@ findAll(@Req() request: Request) {
   console.log(request.cookies); // or "request.cookies['cookieKey']"
   // or console.log(request.signedCookies);
 }
+
 ```
 
 :::info 提示
@@ -49,6 +52,7 @@ findAll(@Req() request: Request) {
 findAll(@Res({ passthrough: true }) response: Response) {
   response.cookie('key', 'value')
 }
+
 ```
 
 :::warning 警告
@@ -65,6 +69,7 @@ findAll(@Res({ passthrough: true }) response: Response) {
 
 ```shell
 $ npm i @fastify/cookie
+
 ```
 
 安装完成后，注册 `@fastify/cookie` 插件：
@@ -80,6 +85,7 @@ const app = await NestFactory.create<NestFastifyApplication>(
 await app.register(fastifyCookie, {
   secret: 'my-secret', // for cookies signature
 });
+
 ```
 
 配置完成后，您现在可以在路由处理程序中读取 cookie，如下所示：
@@ -89,6 +95,7 @@ await app.register(fastifyCookie, {
 findAll(@Req() request: FastifyRequest) {
   console.log(request.cookies); // or "request.cookies['cookieKey']"
 }
+
 ```
 
 :::info 注意
@@ -102,6 +109,7 @@ findAll(@Req() request: FastifyRequest) {
 findAll(@Res({ passthrough: true }) response: FastifyReply) {
   response.setCookie('key', 'value')
 }
+
 ```
 
 要了解更多关于 `FastifyReply#setCookie()` 方法的信息，请查看此[页面](https://github.com/fastify/fastify-cookie#sending) 。
@@ -127,6 +135,7 @@ export const Cookies = createParamDecorator(
     return data ? request.cookies?.[data] : request.cookies;
   }
 );
+
 ```
 
 `@Cookies()` 装饰器将从 `req.cookies` 对象中提取所有 cookie 或指定名称的 cookie，并用该值填充被装饰的参数。
@@ -136,4 +145,5 @@ export const Cookies = createParamDecorator(
 ```typescript
 @Get()
 findAll(@Cookies('name') name: string) {}
+
 ```

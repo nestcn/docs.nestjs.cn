@@ -47,6 +47,7 @@ export class UsersService implements OnModuleInit {
     console.log(`The module has been initialized.`);
   }
 }
+
 ```
 
 #### 异步初始化
@@ -57,6 +58,7 @@ export class UsersService implements OnModuleInit {
 async onModuleInit(): Promise<void> {
   await this.fetch();
 }
+
 ```
 
 #### 应用关闭
@@ -78,6 +80,7 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
+
 ```
 
 :::warning 警告
@@ -97,6 +100,7 @@ class UsersService implements OnApplicationShutdown {
     console.log(signal); // e.g. "SIGINT"
   }
 }
+
 ```
 
 :::info 提示

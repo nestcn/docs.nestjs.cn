@@ -14,6 +14,7 @@
 
 ```bash
 $ npm install --save typeorm mysql2
+
 ```
 
 第一步需要使用从 `typeorm` 包导入的 `new DataSource().initialize()` 类建立与数据库的连接。`initialize()` 函数返回一个 `Promise`，因此我们需要创建一个[异步提供者](/fundamentals/async-components) 。
@@ -42,6 +43,7 @@ export const databaseProviders = [
     },
   },
 ];
+
 ```
 
 :::warning 注意
@@ -63,6 +65,7 @@ import { databaseProviders } from './database.providers';
   exports: [...databaseProviders],
 })
 export class DatabaseModule {}
+
 ```
 
 现在我们可以使用 `@Inject()` 装饰器注入 `DATA_SOURCE` 对象。任何依赖 `DATA_SOURCE` 异步提供者的类都将等待 `Promise` 解析完成。
@@ -96,6 +99,7 @@ export class Photo {
   @Column()
   isPublished: boolean;
 }
+
 ```
 
 `Photo` 实体属于 `photo` 目录，该目录代表 `PhotoModule`。现在让我们创建一个 **Repository** 提供者：
@@ -111,6 +115,7 @@ export const photoProviders = [
     inject: ['DATA_SOURCE'],
   },
 ];
+
 ```
 
 :::warning 注意
@@ -135,6 +140,7 @@ export class PhotoService {
     return this.photoRepository.find();
   }
 }
+
 ```
 
 数据库连接是**异步**的，但 Nest 使得这个过程对终端用户完全透明。`PhotoRepository` 会等待数据库连接就绪，而 `PhotoService` 则会延迟到存储库可用时才初始化。整个应用将在每个类实例化完成后启动。
@@ -155,6 +161,7 @@ import { PhotoService } from './photo.service';
   ],
 })
 export class PhotoModule {}
+
 ```
 
 :::info 提示

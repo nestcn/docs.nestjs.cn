@@ -10,6 +10,7 @@
 
 ```bash
 $ npm i --save ioredis
+
 ```
 
 #### 概述
@@ -24,6 +25,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
     port: 6379,
   },
 });
+
 ```
 
 :::info 提示
@@ -66,6 +68,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
   ]
   ...
 })
+
 ```
 
 也可以使用其他方式创建客户端（`ClientProxyFactory` 或 `@Client()`）。相关说明请查看[此文档](./basics#客户端) 。
@@ -79,6 +82,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 getNotifications(@Payload() data: number[], @Ctx() context: RedisContext) {
   console.log(`Channel: ${context.getChannel()}`);
 }
+
 ```
 
 :::info 提示
@@ -97,6 +101,7 @@ const app = await NestFactory.createMicroservice(AppModule, {
     wildcards: true,
   },
 });
+
 ```
 
 创建客户端实例时也请确保传递 `wildcards` 选项。
@@ -105,6 +110,7 @@ const app = await NestFactory.createMicroservice(AppModule, {
 
 ```typescript
 @EventPattern('notifications.*')
+
 ```
 
 #### 实例状态更新
@@ -115,6 +121,7 @@ const app = await NestFactory.createMicroservice(AppModule, {
 this.client.status.subscribe((status: RedisStatus) => {
   console.log(status);
 });
+
 ```
 
 :::info 提示
@@ -128,6 +135,7 @@ const server = app.connectMicroservice<MicroserviceOptions>(...);
 server.status.subscribe((status: RedisStatus) => {
   console.log(status);
 });
+
 ```
 
 #### 监听 Redis 事件
@@ -138,6 +146,7 @@ server.status.subscribe((status: RedisStatus) => {
 this.client.on('error', (err) => {
   console.error(err);
 });
+
 ```
 
 同样地，您可以监听服务器的内部事件：
@@ -146,6 +155,7 @@ this.client.on('error', (err) => {
 server.on<RedisEvents>('error', (err) => {
   console.error(err);
 });
+
 ```
 
 :::info 注意
@@ -161,6 +171,7 @@ server.on<RedisEvents>('error', (err) => {
 ```typescript
 const [pub, sub] =
   this.client.unwrap<[import('ioredis').Redis, import('ioredis').Redis]>();
+
 ```
 
 同样地，您可以访问服务器的底层驱动实例：
@@ -168,6 +179,7 @@ const [pub, sub] =
 ```typescript
 const [pub, sub] =
   server.unwrap<[import('ioredis').Redis, import('ioredis').Redis]>();
+
 ```
 
 请注意，与其他传输器不同，Redis 传输器会返回一个由两个 `ioredis` 实例组成的元组：第一个实例用于发布消息，第二个实例用于订阅消息。

@@ -8,6 +8,7 @@
 
 ```bash
 $ npm install @nestjs/cache-manager cache-manager
+
 ```
 
 默认情况下所有内容都存储在内存中；由于 `cache-manager` 底层使用 [Keyv](https://keyv.org/docs/)，您只需安装相应包即可轻松切换到更高级的存储解决方案（如 Redis）。我们将在后续详细讨论这一点。
@@ -26,6 +27,7 @@ import { AppController } from './app.controller';
   controllers: [AppController],
 })
 export class AppModule {}
+
 ```
 
 此配置将以默认设置初始化内存缓存，使您能够立即开始缓存数据。
@@ -36,6 +38,7 @@ export class AppModule {}
 
 ```typescript
 constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
+
 ```
 
 :::info 提示
@@ -46,12 +49,14 @@ constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 
 ```typescript
 const value = await this.cacheManager.get('key');
+
 ```
 
 要向缓存添加项目，请使用 `set` 方法：
 
 ```typescript
 await this.cacheManager.set('key', 'value');
+
 ```
 
 :::warning 注意
@@ -62,6 +67,7 @@ await this.cacheManager.set('key', 'value');
 
 ```typescript
 await this.cacheManager.set('key', 'value', 1000);
+
 ```
 
 其中 `1000` 表示 TTL 毫秒数——在此情况下，缓存项将在一秒后过期。
@@ -70,18 +76,21 @@ await this.cacheManager.set('key', 'value', 1000);
 
 ```typescript
 await this.cacheManager.set('key', 'value', 0);
+
 ```
 
 要从缓存中移除某个项目，请使用 `del` 方法：
 
 ```typescript
 await this.cacheManager.del('key');
+
 ```
 
 要清除整个缓存，请使用 `clear` 方法：
 
 ```typescript
 await this.cacheManager.clear();
+
 ```
 
 #### 自动缓存响应
@@ -101,6 +110,7 @@ export class AppController {
     return [];
   }
 }
+
 ```
 
 :::warning 警告
@@ -126,6 +136,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
   ],
 })
 export class AppModule {}
+
 ```
 
 #### 生存时间（TTL）
@@ -136,6 +147,7 @@ export class AppModule {}
 CacheModule.register({
   ttl: 5000, // milliseconds
 });
+
 ```
 
 #### 全局使用模块
@@ -146,6 +158,7 @@ CacheModule.register({
 CacheModule.register({
   isGlobal: true,
 });
+
 ```
 
 #### 全局缓存覆盖
@@ -164,6 +177,7 @@ export class AppController {
     return [];
   }
 }
+
 ```
 
 :::info 提示
@@ -183,6 +197,7 @@ export class AppController {
 handleEvent(client: Client, data: string[]): Observable<string[]> {
   return [];
 }
+
 ```
 
 但需要额外使用 `@CacheKey()` 装饰器来指定用于后续存储和检索缓存数据的键。同时请注意**不应缓存所有内容** ，执行业务操作而非单纯查询数据的操作永远不应被缓存。
@@ -196,6 +211,7 @@ handleEvent(client: Client, data: string[]): Observable<string[]> {
 handleEvent(client: Client, data: string[]): Observable<string[]> {
   return [];
 }
+
 ```
 
 :::info 提示
@@ -215,6 +231,7 @@ class HttpCacheInterceptor extends CacheInterceptor {
     return 'key';
   }
 }
+
 ```
 
 #### 使用其他缓存存储方案
@@ -223,6 +240,7 @@ class HttpCacheInterceptor extends CacheInterceptor {
 
 ```bash
 $ npm install @keyv/redis
+
 ```
 
 完成上述步骤后，您就可以像下面这样注册支持多存储的 `CacheModule` 模块：
@@ -253,6 +271,7 @@ import { CacheableMemory } from 'cacheable';
   controllers: [AppController],
 })
 export class AppModule {}
+
 ```
 
 在此示例中，我们注册了两个存储库：`CacheableMemory` 和 `KeyvRedis`。其中 `CacheableMemory` 是一个简单的内存存储，而 `KeyvRedis` 则是 Redis 存储。`stores` 数组用于指定要使用的存储库，数组中的第一个存储库为默认存储，其余为备用存储。
@@ -271,6 +290,7 @@ CacheModule.registerAsync({
     ttl: 5,
   }),
 });
+
 ```
 
 我们的工厂行为与其他异步模块工厂类似（可以是 `async` 的，并且能够通过 `inject` 注入依赖项）。
@@ -283,6 +303,7 @@ CacheModule.registerAsync({
   }),
   inject: [ConfigService],
 });
+
 ```
 
 或者，您可以使用 `useClass` 方法：
@@ -291,6 +312,7 @@ CacheModule.registerAsync({
 CacheModule.registerAsync({
   useClass: CacheConfigService,
 });
+
 ```
 
 上述构造将在 `CacheModule` 内部实例化 `CacheConfigService`，并使用它来获取选项对象。`CacheConfigService` 必须实现 `CacheOptionsFactory` 接口才能提供配置选项：
@@ -304,6 +326,7 @@ class CacheConfigService implements CacheOptionsFactory {
     };
   }
 }
+
 ```
 
 若希望使用从其他模块导入的现有配置提供程序，请使用 `useExisting` 语法：
@@ -313,6 +336,7 @@ CacheModule.registerAsync({
   imports: [ConfigModule],
   useExisting: ConfigService,
 });
+
 ```
 
 其工作原理与 `useClass` 相同，但存在一个关键区别——`CacheModule` 会查找已导入的模块以复用任何已创建的 `ConfigService`，而非实例化自身的副本。
@@ -329,6 +353,7 @@ CacheModule.registerAsync({
   useClass: ConfigService,
   extraProviders: [MyAdditionalProvider],
 });
+
 ```
 
 这在您需要为工厂函数或类构造函数提供额外依赖项时非常有用。

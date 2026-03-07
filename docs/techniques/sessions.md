@@ -9,6 +9,7 @@
 ```shell
 $ npm i express-session
 $ npm i -D @types/express-session
+
 ```
 
 安装完成后，将 `express-session` 中间件作为全局中间件应用（例如在您的 `main.ts` 文件中）。
@@ -23,6 +24,7 @@ app.use(
     saveUninitialized: false,
   })
 );
+
 ```
 
 :::warning 注意
@@ -48,6 +50,7 @@ app.use(
 findAll(@Req() request: Request) {
   request.session.visits = request.session.visits ? request.session.visits + 1 : 1;
 }
+
 ```
 
 :::info 提示
@@ -61,6 +64,7 @@ findAll(@Req() request: Request) {
 findAll(@Session() session: Record<string, any>) {
   session.visits = session.visits ? session.visits + 1 : 1;
 }
+
 ```
 
 :::info 提示
@@ -73,6 +77,7 @@ findAll(@Session() session: Record<string, any>) {
 
 ```shell
 $ npm i @fastify/secure-session
+
 ```
 
 安装完成后，注册 `fastify-secure-session` 插件：
@@ -89,6 +94,7 @@ await app.register(secureSession, {
   secret: 'averylogphrasebiggerthanthirtytwochars',
   salt: 'mq9hDxBVDbspDR6n',
 });
+
 ```
 
 :::info 您也可以预生成密钥
@@ -105,6 +111,7 @@ findAll(@Req() request: FastifyRequest) {
   const visits = request.session.get('visits');
   request.session.set('visits', visits ? visits + 1 : 1);
 }
+
 ```
 
 或者，您也可以使用 `@Session()` 装饰器从请求中提取会话对象，如下所示：
@@ -115,6 +122,7 @@ findAll(@Session() session: secureSession.Session) {
   const visits = session.get('visits');
   session.set('visits', visits ? visits + 1 : 1);
 }
+
 ```
 
 :::info 提示

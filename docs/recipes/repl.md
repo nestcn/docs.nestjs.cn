@@ -14,12 +14,14 @@ async function bootstrap() {
   await repl(AppModule);
 }
 bootstrap();
+
 ```
 
 现在在终端中，使用以下命令启动 REPL：
 
 ```bash
 $ npm run start -- --entryFile repl
+
 ```
 
 :::info 提示
@@ -32,6 +34,7 @@ $ npm run start -- --entryFile repl
 LOG [NestFactory] Starting Nest application...
 LOG [InstanceLoader] AppModule dependencies initialized
 LOG REPL initialized
+
 ```
 
 现在你可以开始与依赖关系图进行交互。例如，你可以获取一个 `AppService`（这里我们以启动项目为例）并调用 `getHello()` 方法：
@@ -39,6 +42,7 @@ LOG REPL initialized
 ```typescript
 > get(AppService).getHello()
 'Hello World!'
+
 ```
 
 你可以在终端内执行任何 JavaScript 代码，例如将 `AppController` 的实例赋值给局部变量，并使用 `await` 调用异步方法：
@@ -48,6 +52,7 @@ LOG REPL initialized
 AppController { appService: AppService {} }
 > await appController.getHello()
 'Hello World!'
+
 ```
 
 要显示给定提供者或控制器上所有可用的公共方法，请使用 `methods()` 函数，如下所示：
@@ -57,6 +62,7 @@ AppController { appService: AppService {} }
 
 Methods:
  ◻ getHello
+
 ```
 
 要打印所有已注册模块及其控制器和提供者的列表，请使用 `debug()`。
@@ -69,6 +75,7 @@ AppModule:
   ◻ AppController
  - providers:
   ◻ AppService
+
 ```
 
 快速演示：
@@ -87,6 +94,7 @@ AppModule:
 > $.help
 Retrieves an instance of either injectable or controller, otherwise, throws exception.
 Interface: $(token: InjectionToken) => any
+
 ```
 
 :::info 提示
@@ -107,6 +115,7 @@ Interface: $(token: InjectionToken) => any
 
 ```bash
 $ npm run start -- --watch --entryFile repl
+
 ```
 
 这种方式存在一个缺陷：每次重新加载后 REPL 的命令历史记录都会被丢弃，这可能带来不便。幸运的是，有个非常简单的解决方案。像这样修改你的 `bootstrap` 函数：
@@ -120,6 +129,7 @@ async function bootstrap() {
     }
   });
 }
+
 ```
 
 现在运行/重新加载之间的历史记录都能保留了。

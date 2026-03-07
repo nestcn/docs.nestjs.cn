@@ -1,19 +1,8 @@
+------
+
 <!-- 此文件从 content/overview/modules.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-28T11:23:59.619Z -->
-<!-- 源文件: content/overview/modules.md -->
 
-# 模块
-
-模块是一个用 `@Module()` 装饰器注解的类。该装饰器提供了元数据，Nest 使用它来有效地组织和管理应用程序结构。
-
-<figure><img class="illustrative-image" src="/assets/Modules_1.png" /></figure>
-
-每个 Nest 应用程序至少有一个模块，即 **根模块** ，它是 Nest 构建**应用程序图**的起点。该图是一种内部结构，Nest 利用它来解决模块和提供程序（提供者）之间的关系和依赖性问题。虽然小型应用程序可能只有一个根模块，但一般情况并非如此。强烈推荐使用模块作为组织组件的有效方式。对于大多数应用程序，您可能会拥有多个模块，每个模块都封装了一组密切相关的功能 。
-
-`@Module()` 装饰器接收一个带有描述模块属性的对象：
-
-| 属性          |                                                                   |
-|-------------|-------------------------------------------------------------------|
+-------|-------------------------------------------------------------------|
 | providers   | 将由 Nest 注入器实例化,且至少可在本模块内共享的提供者                                    |
 | controllers | 本模块中定义的需要实例化的控制器集合                                                |
 | imports     | 导入模块的列表，这些模块导出了本模块所需的提供者                                          |
@@ -37,6 +26,7 @@ import { CatsService } from './cats.service';
   providers: [CatsService],
 })
 export class CatsModule {}
+
 ```
 
 :::info 提示
@@ -53,6 +43,7 @@ import { CatsModule } from './cats/cats.module';
   imports: [CatsModule],
 })
 export class AppModule {}
+
 ```
 
 以下是当前目录结构：
@@ -98,6 +89,7 @@ import { CatsService } from './cats.service';
   exports: [CatsService]
 })
 export class CatsModule {}
+
 ```
 
 现在任何导入 `CatsModule` 的模块都可以访问 `CatsService`，并且将与所有其他导入该模块的模块共享同一个实例。
@@ -116,6 +108,7 @@ export class CatsModule {}
   exports: [CommonModule],
 })
 export class CoreModule {}
+
 ```
 
 #### 依赖注入
@@ -134,6 +127,7 @@ import { CatsService } from './cats.service';
 export class CatsModule {
   constructor(private catsService: CatsService) {}
 }
+
 ```
 
 但由于 [循环依赖](/fundamentals/circular-dependency) 的存在，模块类本身不能作为提供者被注入。
@@ -156,6 +150,7 @@ import { CatsService } from './cats.service';
   exports: [CatsService],
 })
 export class CatsModule {}
+
 ```
 
 `@Global()` 装饰器使模块具有全局作用域。全局模块通常应由根模块或核心模块**仅注册一次**。在上例中，`CatsService` 提供者将无处不在，希望注入该服务的模块无需在其 imports 数组中导入 `CatsModule`。
@@ -187,6 +182,7 @@ export class DatabaseModule {
     };
   }
 }
+
 ```
 
 :::info 提示
@@ -204,6 +200,7 @@ export class DatabaseModule {
   providers: providers,
   exports: providers,
 }
+
 ```
 
 :::warning 警告
@@ -221,6 +218,7 @@ import { User } from './users/entities/user.entity';
   imports: [DatabaseModule.forRoot([User])],
 })
 export class AppModule {}
+
 ```
 
 若需重新导出动态模块，可在导出数组中省略 `forRoot()` 方法调用：
@@ -235,6 +233,7 @@ import { User } from './users/entities/user.entity';
   exports: [DatabaseModule],
 })
 export class AppModule {}
+
 ```
 
 [动态模块](/fundamentals/dynamic-modules)章节对此主题有更详细讲解，并包含一个[实际示例](https://github.com/nestjs/nest/tree/master/sample/25-dynamic-modules) 。

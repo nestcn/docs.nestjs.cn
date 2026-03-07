@@ -8,6 +8,7 @@
 
 ```bash
 $ npm i --save nats
+
 ```
 
 #### 概述
@@ -21,6 +22,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
     servers: ['nats://localhost:4222'],
   },
 });
+
 ```
 
 :::info 提示
@@ -58,6 +60,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
   ]
   ...
 })
+
 ```
 
 也可以使用其他创建客户端的方法（`ClientProxyFactory` 或 `@Client()`）。相关说明可查看[此文档](../microservices/basics#客户端生产者类) 。
@@ -82,6 +85,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
     queue: 'cats_queue',
   },
 });
+
 ```
 
 #### 上下文
@@ -93,6 +97,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 getNotifications(@Payload() data: number[], @Ctx() context: NatsContext) {
   console.log(`Subject: ${context.getSubject()}`);
 }
+
 ```
 
 :::info 提示
@@ -109,6 +114,7 @@ getDate(@Payload() data: number[], @Ctx() context: NatsContext) {
   console.log(`Subject: ${context.getSubject()}`); // e.g. "time.us.east"
   return new Date().toLocaleTimeString(...);
 }
+
 ```
 
 #### 记录构建器
@@ -124,6 +130,7 @@ headers.set('x-version', '1.0.0');
 
 const record = new NatsRecordBuilder(':cat:').setHeaders(headers).build();
 this.client.send('replace-emoji', record).subscribe(...);
+
 ```
 
 :::info 提示
@@ -138,6 +145,7 @@ replaceEmoji(@Payload() data: string, @Ctx() context: NatsContext): string {
   const headers = context.getHeaders();
   return headers['x-version'] === '1.0.0' ? '🐱' : '🐈';
 }
+
 ```
 
 在某些情况下，你可能需要为多个请求配置头部信息，可以将这些作为选项传递给 `ClientProxyFactory`：
@@ -162,6 +170,7 @@ import { ClientProxyFactory, Transport } from '@nestjs/microservices';
   ],
 })
 export class ApiModule {}
+
 ```
 
 #### 实例状态更新
@@ -172,6 +181,7 @@ export class ApiModule {}
 this.client.status.subscribe((status: NatsStatus) => {
   console.log(status);
 });
+
 ```
 
 :::info 提示
@@ -185,6 +195,7 @@ const server = app.connectMicroservice<MicroserviceOptions>(...);
 server.status.subscribe((status: NatsStatus) => {
   console.log(status);
 });
+
 ```
 
 #### 监听 Nats 事件
@@ -195,6 +206,7 @@ server.status.subscribe((status: NatsStatus) => {
 this.client.on('error', (err) => {
   console.error(err);
 });
+
 ```
 
 同样地，您可以监听服务器的内部事件：
@@ -203,6 +215,7 @@ this.client.on('error', (err) => {
 server.on<NatsEvents>('error', (err) => {
   console.error(err);
 });
+
 ```
 
 :::info 提示
@@ -217,10 +230,12 @@ server.on<NatsEvents>('error', (err) => {
 
 ```typescript
 const natsConnection = this.client.unwrap<import('nats').NatsConnection>();
+
 ```
 
 同样地，您可以访问服务器的底层驱动实例：
 
 ```typescript
 const natsConnection = server.unwrap<import('nats').NatsConnection>();
+
 ```

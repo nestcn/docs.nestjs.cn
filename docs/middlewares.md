@@ -45,6 +45,7 @@ export class LoggerMiddleware {
     next();
   }
 }
+
 ```
 
 #### Dependency injection
@@ -81,6 +82,7 @@ export class AppModule {
       .forRoutes('cats');
   }
 }
+
 ```
 
 In the above example we have set up the `LoggerMiddleware` for the `/cats` route handlers that were previously defined inside the `CatsController`. We may also further restrict a middleware to a particular request method by passing an object containing the route `path` and request `method` to the `forRoutes()` method when configuring the middleware. In the example below, notice that we import the `RequestMethod` enum to reference the desired request method type.
@@ -111,6 +113,7 @@ export class AppModule {
       .forRoutes({ path: 'cats', method: RequestMethod.GET });
   }
 }
+
 ```
 
 > info **Hint** The `configure()` method can be made asynchronous using `async/await` (e.g., you can `await` completion of an asynchronous operation inside the `configure()` method body).
@@ -126,6 +129,7 @@ forRoutes({
   path: 'abcd/*splat',
   method: RequestMethod.ALL,
 });
+
 ```
 
 > info **Hint** `splat` is simply the name of the wildcard parameter and has no special meaning. You can name it anything you like, for example, `*wildcard`.
@@ -137,6 +141,7 @@ forRoutes({
   path: 'abcd/{*splat}',
   method: RequestMethod.ALL,
 });
+
 ```
 
 #### Middleware consumer
@@ -170,6 +175,7 @@ export class AppModule {
       .forRoutes(CatsController);
   }
 }
+
 ```
 
 > info **Hint** The `apply()` method may either take a single middleware, or multiple arguments to specify <a href="/middleware#多个中间件">multiple middlewares</a>.
@@ -189,6 +195,7 @@ consumer
     'cats/{*splat}',
   )
   .forRoutes(CatsController);
+
 ```
 
 > info **Hint** The `exclude()` method supports wildcard parameters using the [path-to-regexp](https://github.com/pillarjs/path-to-regexp#parameters) package.
@@ -208,6 +215,7 @@ export function logger(req: Request, res: Response, next: NextFunction) {
   console.log(`Request...`);
   next();
 };
+
 ```
 
 And use it within the `AppModule`:
@@ -216,6 +224,7 @@ And use it within the `AppModule`:
 consumer
   .apply(logger)
   .forRoutes(CatsController);
+
 ```
 
 > info **Hint** Consider using the simpler **functional middleware** alternative any time your middleware doesn't need any dependencies.
@@ -226,6 +235,7 @@ As mentioned above, in order to bind multiple middleware that are executed seque
 
 ```typescript
 consumer.apply(cors(), helmet(), logger).forRoutes(CatsController);
+
 ```
 
 #### Global middleware
@@ -236,6 +246,7 @@ If we want to bind middleware to every registered route at once, we can use the 
 const app = await NestFactory.create(AppModule);
 app.use(logger);
 await app.listen(process.env.PORT ?? 3000);
+
 ```
 
 > info **Hint** Accessing the DI container in a global middleware is not possible. You can use a [functional middleware](middleware#函数式中间件) instead when using `app.use()`. Alternatively, you can use a class middleware and consume it with `.forRoutes('*')` within the `AppModule` (or any other module).

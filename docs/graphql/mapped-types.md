@@ -22,6 +22,7 @@ class Create {
   name: string;
   email: string;
 }
+
 ```
 
 默认情况下，这些字段都是必需的。要创建一个类型，其中每个字段都可选，可以使用 `pickPartial()` 函数，传入类引用（`Create`）作为参数：
@@ -30,6 +31,7 @@ class Create {
 class Update extends pickPartial(Create) {
   // ...
 }
+
 ```
 
 > info **Hint** `pickPartial()` 函数来自 `@nestjs/mapped-types` 包。
@@ -45,6 +47,7 @@ class User {
   email: string;
   phone: string;
 }
+
 ```
 
 我们可以使用 `pick()` 函数，选择一组属性：
@@ -53,6 +56,7 @@ class User {
 class UserInfo extends pick(User, ['name', 'email']) {
   // ...
 }
+
 ```
 
 > info **Hint** `pick()` 函数来自 `@nestjs/mapped-types` 包。
@@ -68,6 +72,7 @@ class User {
   email: string;
   phone: string;
 }
+
 ```
 
 我们可以生成一个派生类型，该类型除了 `phone` 属性外具有所有属性：
@@ -76,6 +81,7 @@ class User {
 class UserInfo extends omit(User, ['phone']) {
   // ...
 }
+
 ```
 
 > info **Hint** `omit()` 函数来自 `@nestjs/mapped-types` 包。
@@ -94,6 +100,7 @@ class Admin {
   id: number;
   role: string;
 }
+
 ```
 
 我们可以生成一个新的类型，该类型将包含这两个类型中的所有属性：
@@ -102,6 +109,7 @@ class Admin {
 class UserManager extends intersection(User, Admin) {
   // ...
 }
+
 ```
 
 > info **Hint** `intersection()` 函数来自 `@nestjs/mapped-types` 包。
@@ -114,6 +122,7 @@ class UserManager extends intersection(User, Admin) {
 class UserInfo extends omit(pick(User, ['name', 'email']), ['phone']) {
   // ...
 }
+
 ```
 
 Note:

@@ -24,6 +24,7 @@ One of the most notable updates in Express v5 is the revised path route matching
 
 That said, routes that previously worked in Express v4 may not work in Express v5. For example:
 
+
 ```typescript
 @Get('users/*')
 findAll() {
@@ -31,31 +32,38 @@ findAll() {
   // While it may still work, it's no longer advisable to use this wildcard syntax in Express v5.
   return 'This route should not work in Express v5';
 }
+
 ```
 
 To fix this issue, you can update the route to use a named wildcard:
+
 
 ```typescript
 @Get('users/*splat')
 findAll() {
   return 'This route will work in Express v5';
 }
+
 ```
 
 > warning **Warning** Note that `*splat` is a named wildcard that matches any path without the root path. If you need to match the root path as well (`/users`), you can use `/users/{{ '{' }}*splat&#125;`, wrapping the wildcard in braces (optional group). Note that `splat` is simply the name of the wildcard parameter and has no special meaning. You can name it anything you like, for example, `*wildcard`.
 
 Similarly, if you have a middleware that runs on all routes, you may need to update the path to use a named wildcard:
 
+
 ```typescript
 // In NestJS 11, this will be automatically converted to a valid Express v5 route.
 // While it may still work, it's no longer advisable to use this wildcard syntax in Express v5.
 forRoutes('*'); // <-- This should not work in Express v5
+
 ```
 
 Instead, you can update the path to use a named wildcard:
 
+
 ```typescript
 forRoutes('{*splat}'); // <-- This will work in Express v5
+
 ```
 
 Note that `{{ '{' }}*splat&#125;` is a named wildcard that matches any path including the root path. Outer braces make path optional.
@@ -68,12 +76,15 @@ In Express v5, query parameters are no longer parsed using the `qs` library by d
 
 As a result, query strings like these:
 
+
 ```plaintext
 ?filter[where][name]=John&filter[where][age]=30
 ?item[]=1&item[]=2
+
 ```
 
 will no longer be parsed as expected. To revert to the previous behavior, you can configure Express to use the `extended` parser (the default in Express v4) by setting the `query parser` option to `extended`:
+
 
 ```typescript
 import { NestFactory } from '@nestjs/core';
@@ -86,6 +97,7 @@ async function bootstrap() {
   await app.listen(3000);
 }
 bootstrap();
+
 ```
 
 #### Fastify v5
@@ -97,6 +109,7 @@ bootstrap();
 #### Fastify CORS
 
 By default, only [CORS-safelisted methods](https://fetch.spec.whatwg.org/#methods) are allowed. If you need to enable additional methods (such as `PUT`, `PATCH`, or `DELETE`), you must explicitly define them in the `methods` option.
+
 
 ```typescript
 const methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']; // OR comma-delimited string 'GET,POST,PUT,PATH,DELETE'
@@ -113,6 +126,7 @@ const app = await NestFactory.create<NestFastifyApplication>(
   new FastifyAdapter(),
 );
 app.enableCors({ methods });
+
 ```
 
 #### Fastify middleware registration
@@ -121,15 +135,19 @@ NestJS 11 now uses the latest version of the [path-to-regexp](https://www.npmjs.
 
 For example, if you have a middleware that applies to all routes:
 
+
 ```typescript
 // In NestJS 11, this will automatically be converted to a valid route, even if you don't update it.
 .forRoutes('(.*)');
+
 ```
 
 You'll need to update it to use a named wildcard instead:
 
+
 ```typescript
 .forRoutes('*splat');
+
 ```
 
 Where `splat` is just an arbitrary name for the wildcard parameter. You can name it anything you like.
@@ -165,21 +183,27 @@ Termination lifecycle hooks are now executed in the reverse order to their initi
 
 Imagine the following scenario:
 
+
 ```plaintext
 // Where A, B, and C are modules and "->" represents the module dependency.
 A -> B -> C
+
 ```
 
 In this case, the `OnModuleInit` hooks are executed in the following order:
 
+
 ```plaintext
 C -> B -> A
+
 ```
 
 While the `OnModuleDestroy` hooks are executed in the reverse order:
 
+
 ```plaintext
 A -> B -> C
+
 ```
 
 > info **Hint** Global modules are treated as a dependency of all other modules. This means that global modules are initialized first and destroyed last.
@@ -195,6 +219,7 @@ From v11 onwards, middleware registered in global modules is now **executed firs
 The `CacheModule` (from the `@nestjs/cache-manager` package) has been updated to support the latest version of the `cache-manager` package. This update brings a few breaking changes, including a migration to [Keyv](https://keyv.org/), which offers a unified interface for key-value storage across multiple backend stores through storage adapters.
 
 The key difference between the previous version and the new version lies in the configuration of external stores. In the previous version, to register a Redis store, you would have likely configured it like this:
+
 
 ```ts
 // Old version - no longer supported
@@ -212,9 +237,11 @@ CacheModule.registerAsync({
     };
   },
 }),
+
 ```
 
 In the new version, you should use the `Keyv` adapter to configure the store:
+
 
 ```ts
 // New version - supported
@@ -227,6 +254,7 @@ CacheModule.registerAsync({
     };
   },
 }),
+
 ```
 
 Where `KeyvRedis` is imported from the `@keyv/redis` package. See the [Caching documentation](/techniques/caching) to learn more.
@@ -252,6 +280,7 @@ A new `skipProcessEnv` option has also been introduced. This option allows you t
 If you are using the `TerminusModule` and have built your own custom health indicator, a new API has been introduced in version 11. The new `HealthIndicatorService` is designed to enhance the readability and testability of custom health indicators.
 
 Before version 11, a health indicator might have looked like this:
+
 
 ```typescript
 @Injectable()
@@ -289,9 +318,11 @@ export class DogHealthIndicator extends HealthIndicator {
     );
   }
 }
+
 ```
 
 Starting with version 11, it is recommended to use the new `HealthIndicatorService` API, which streamlines the implementation process. Here's how the same health indicator can now be implemented:
+
 
 ```typescript
 @Injectable()
@@ -326,6 +357,7 @@ export class DogHealthIndicator {
     // ...
   }
 }
+
 ```
 
 Key changes:
@@ -350,9 +382,11 @@ Mau is a fully managed platform that simplifies the deployment process for NestJ
 
 Mau makes provisioning and maintaining your infrastructure as simple as clicking just a few buttons. Mau is designed to be simple and intuitive, so you can focus on building your applications and not worry about the underlying infrastructure. Under the hood, we use Amazon Web Services to provide you with a powerful and reliable platform, while abstracting away all the complexity of AWS. We take care of all the heavy lifting for you, so you can focus on building your applications and growing your business.
 
+
 ```bash
 $ npm install -g @nestjs/mau
 $ mau deploy
+
 ```
 
 You can learn more about Mau [in this chapter](/deployment#easy-deployment-with-mau).

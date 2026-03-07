@@ -17,6 +17,7 @@ export abstract class Character {
   @Field()
   name: string;
 }
+
 ```
 
 :::warning 注意
@@ -30,6 +31,7 @@ interface Character {
   id: ID!
   name: String!
 }
+
 ```
 
 现在要实现 `Character` 接口，请使用 `implements` 关键字：
@@ -42,6 +44,7 @@ export class Human implements Character {
   id: string;
   name: string;
 }
+
 ```
 
 :::info 提示
@@ -68,6 +71,7 @@ export abstract class Book {
   @Field()
   title: string;
 }
+
 ```
 
 #### 接口解析器
@@ -89,6 +93,7 @@ export class CharacterInterfaceResolver {
     return [];
   }
 }
+
 ```
 
 现在 `friends` 字段解析器会自动为所有实现 `Character` 接口的对象类型注册。
@@ -106,6 +111,7 @@ interface Character {
   id: ID!
   name: String!
 }
+
 ```
 
 然后，你可以使用类型生成功能（如[快速开始](/graphql/quick-start)章节所示）来生成对应的 TypeScript 定义：
@@ -115,6 +121,7 @@ export interface Character {
   id: string;
   name: string;
 }
+
 ```
 
 接口需要在解析器映射中添加一个额外的 `__resolveType` 字段，以确定接口应解析为何种类型。让我们创建一个 `CharactersResolver` 类并定义 `__resolveType` 方法：
@@ -130,6 +137,7 @@ export class CharactersResolver {
     return null;
   }
 }
+
 ```
 
 :::info 

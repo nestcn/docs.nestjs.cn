@@ -14,6 +14,7 @@
 
 ```typescript
 $ npm install --save mongoose
+
 ```
 
 我们首先需要使用 `connect()` 函数建立与数据库的连接。`connect()` 函数返回一个 `Promise`，因此我们必须创建一个[异步提供者](/fundamentals/async-components) 。
@@ -28,6 +29,7 @@ export const databaseProviders = [
       mongoose.connect('mongodb://localhost/nest'),
   },
 ];
+
 ```
 
 :::info 提示
@@ -45,6 +47,7 @@ import { databaseProviders } from './database.providers';
   exports: [...databaseProviders],
 })
 export class DatabaseModule {}
+
 ```
 
 现在我们可以使用 `@Inject()` 装饰器注入 `Connection` 对象。每个依赖于 `Connection` 异步提供者的类都将等待 `Promise` 解析完成。
@@ -61,6 +64,7 @@ export const CatSchema = new mongoose.Schema({
   age: Number,
   breed: String,
 });
+
 ```
 
 `CatsSchema` 属于 `cats` 目录。该目录代表 `CatsModule`。
@@ -78,6 +82,7 @@ export const catsProviders = [
     inject: ['DATABASE_CONNECTION'],
   },
 ];
+
 ```
 
 :::warning 警告
@@ -108,6 +113,7 @@ export class CatsService {
     return this.catModel.find().exec();
   }
 }
+
 ```
 
 在上例中我们使用了 `Cat` 接口。该接口扩展了 mongoose 包中的 `Document`：
@@ -120,6 +126,7 @@ export interface Cat extends Document {
   readonly age: number;
   readonly breed: string;
 }
+
 ```
 
 数据库连接是**异步的** ，但 Nest 使这个过程对终端用户完全透明。`CatModel` 类会等待数据库连接，而 `CatsService` 会延迟到模型准备就绪。整个应用会在所有类实例化完成后启动。
@@ -142,6 +149,7 @@ import { DatabaseModule } from '../database/database.module';
   ],
 })
 export class CatsModule {}
+
 ```
 
 :::info 提示

@@ -86,6 +86,7 @@
 ### 按应用场景分类
 
 **🌐 Web 应用**
+
 ```typescript
 // 典型的 Web 应用技术栈
 - 认证: JWT + Passport
@@ -93,9 +94,11 @@
 - 安全: CORS + Helmet + CSRF
 - 文档: OpenAPI + Swagger
 - 监控: Terminus + Sentry
+
 ```
 
 **🏢 企业应用**
+
 ```typescript
 // 企业级应用推荐配置
 - 架构: CQRS + 微服务
@@ -103,15 +106,18 @@
 - 安全: RBAC + 速率限制
 - 监控: 健康检查 + 错误追踪
 - 测试: 完整测试套件
+
 ```
 
 **🎮 实时应用**
+
 ```typescript
 // 实时应用技术选择
 - 通信: WebSocket + Socket.IO
 - 状态: CQRS + Event Sourcing
 - 缓存: Redis + 会话管理
 - 安全: 实时认证 + 权限控制
+
 ```
 
 ## 实践建议

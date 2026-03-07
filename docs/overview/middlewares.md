@@ -38,6 +38,7 @@ export class LoggerMiddleware implements NestMiddleware {
     next();
   }
 }
+
 ```
 
 #### Dependency injection
@@ -63,6 +64,7 @@ export class AppModule implements NestModule {
       .forRoutes('cats');
   }
 }
+
 ```
 
 在上述示例中，我们为之前定义在 `CatsController` 中的 `/cats` 路由处理器配置了 `LoggerMiddleware`。在配置中间件时，我们还可以通过向 `forRoutes()` 方法传递包含路由 `path` 和请求 `method` 的对象来进一步限制中间件仅适用于特定请求方法。在下面的示例中，请注意我们导入了 `RequestMethod` 枚举来引用所需的请求方法类型。
@@ -82,6 +84,7 @@ export class AppModule implements NestModule {
       .forRoutes({ path: 'cats', method: RequestMethod.GET });
   }
 }
+
 ```
 
 :::info 提示
@@ -101,6 +104,7 @@ forRoutes({
   path: 'abcd/*splat',
   method: RequestMethod.ALL,
 });
+
 ```
 
 :::info 注意
@@ -114,6 +118,7 @@ forRoutes({
   path: 'abcd/{*splat}',
   method: RequestMethod.ALL,
 });
+
 ```
 
 #### 中间件消费者
@@ -136,6 +141,7 @@ export class AppModule implements NestModule {
       .forRoutes(CatsController);
   }
 }
+
 ```
 
 :::info 提示
@@ -157,6 +163,7 @@ consumer
     'cats/{*splat}'
   )
   .forRoutes(CatsController);
+
 ```
 
 :::info 提示
@@ -178,6 +185,7 @@ export function logger(req: Request, res: Response, next: NextFunction) {
   console.log(`Request...`);
   next();
 };
+
 ```
 
 并在 `AppModule` 中使用它：
@@ -186,6 +194,7 @@ export function logger(req: Request, res: Response, next: NextFunction) {
 consumer
   .apply(logger)
   .forRoutes(CatsController);
+
 ```
 
 :::info 提示
@@ -198,6 +207,7 @@ consumer
 
 ```typescript
 consumer.apply(cors(), helmet(), logger).forRoutes(CatsController);
+
 ```
 
 #### 全局中间件
@@ -208,6 +218,7 @@ consumer.apply(cors(), helmet(), logger).forRoutes(CatsController);
 const app = await NestFactory.create(AppModule);
 app.use(logger);
 await app.listen(process.env.PORT ?? 3000);
+
 ```
 
 :::info 注意

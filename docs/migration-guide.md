@@ -14,6 +14,7 @@
 npm install -g npm-check-updates
 ncu -u
 npm install
+
 ```
 
 ### Express v5
@@ -37,6 +38,7 @@ findAll() {
   // 虽然它可能仍然有效，但不再建议在 Express v5 中使用此通配符语法。
   return 'This route should not work in Express v5';
 }
+
 ```
 
 要修复此问题，您可以更新路由以使用命名通配符：
@@ -46,6 +48,7 @@ findAll() {
 findAll() {
   return 'This route will work in Express v5';
 }
+
 ```
 
 :::warning 警告
@@ -58,12 +61,14 @@ findAll() {
 // 在 NestJS 11 中，这将自动转换为有效的 Express v5 路由。
 // 虽然它可能仍然有效，但不再建议在 Express v5 中使用此通配符语法。
 forRoutes('*'); // <-- 这在 Express v5 中不应该工作
+
 ```
 
 相反，您可以更新路径以使用命名通配符：
 
 ```typescript
 forRoutes('{*splat}'); // <-- 这在 Express v5 中将工作
+
 ```
 
 注意 `{*splat}` 是一个命名通配符，匹配包括根路径在内的任何路径。外部大括号使路径可选。
@@ -81,6 +86,7 @@ forRoutes('{*splat}'); // <-- 这在 Express v5 中将工作
 ```plaintext
 ?filter[where][name]=John&filter[where][age]=30
 ?item[]=1&item[]=2
+
 ```
 
 将不再按预期解析。要恢复到以前的行为，您可以通过设置 `query parser` 选项为 `extended` 来配置 Express 使用 `extended` 解析器（Express v4 中的默认值）：
@@ -97,6 +103,7 @@ async function bootstrap() {
   await app.listen(3000);
 }
 bootstrap();
+
 ```
 
 ### Fastify v5
@@ -121,6 +128,7 @@ const app = await NestFactory.create<NestFastifyApplication>(
 app.enableCors({
   methods,
 });
+
 ```
 
 ### Fastify 中间件注册
@@ -132,12 +140,14 @@ NestJS 11 现在使用最新版本的 [path-to-regexp](https://www.npmjs.com/pac
 ```typescript
 // 在 NestJS 11 中，即使您不更新它，这也会自动转换为有效的路由。
 .forRoutes('(.*)');
+
 ```
 
 您需要将其更新为使用命名通配符：
 
 ```typescript
 .forRoutes('*splat');
+
 ```
 
 其中 `splat` 只是通配符参数的任意名称。您可以随意命名。
@@ -176,20 +186,26 @@ NestJS 11 对 `Reflector` 类引入了几项改进，增强了其功能和元数
 想象以下场景：
 
 ```
+
 // 其中 A、B 和 C 是模块，"->" 表示模块依赖。
 A -> B -> C
+
 ```
 
 在这种情况下，`OnModuleInit` 钩子按以下顺序执行：
 
 ```
+
 C -> B -> A
+
 ```
 
 而 `OnModuleDestroy` 钩子以相反的顺序执行：
 
 ```
+
 A -> B -> C
+
 ```
 
 :::info 提示
@@ -224,6 +240,7 @@ CacheModule.registerAsync({
     };
   },
 }),
+
 ```
 
 在新版本中，您应该使用 `Keyv` 适配器来配置存储：
@@ -239,6 +256,7 @@ CacheModule.registerAsync({
     };
   },
 }),
+
 ```
 
 其中 `KeyvRedis` 从 `@keyv/redis` 包导入。查看[缓存文档](/techniques/caching.md)了解更多。
@@ -303,6 +321,7 @@ export class DogHealthIndicator extends HealthIndicator {
     );
   }
 }
+
 ```
 
 从版本 11 开始，建议使用新的 `HealthIndicatorService` API，它简化了实现过程。以下是现在可以实现相同健康指示器的方法：
@@ -340,6 +359,7 @@ export class DogHealthIndicator {
     // ...
   }
 }
+
 ```
 
 主要更改：
@@ -368,6 +388,7 @@ Mau 使配置和维护基础设施就像点击几个按钮一样简单。Mau 设
 ```bash
 $ npm install -g @nestjs/mau
 $ mau deploy
+
 ```
 
 您可以在[部署指南](./deployment.md)中了解更多关于部署的信息。

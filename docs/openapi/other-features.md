@@ -10,6 +10,7 @@
 const document = SwaggerModule.createDocument(app, options, {
   ignoreGlobalPrefix: true,
 });
+
 ```
 
 #### 全局参数
@@ -24,6 +25,7 @@ const config = new DocumentBuilder()
   })
   // other configurations
   .build();
+
 ```
 
 #### 全局响应
@@ -38,6 +40,7 @@ const config = new DocumentBuilder()
   })
   // other configurations
   .build();
+
 ```
 
 #### 多规格支持
@@ -97,12 +100,14 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
+
 ```
 
 现在您可以通过以下命令启动服务器：
 
 ```bash
 $ npm run start
+
 ```
 
 导航至 `http://localhost:3000/api/cats` 查看 cats 的 Swagger UI 界面。
@@ -203,6 +208,7 @@ async function bootstrap() {
 }
 
 bootstrap();
+
 ```
 
 在本示例中，我们设置了一个主 API 以及分别针对猫和狗的独立规格，每个规格都可以通过资源管理器栏的下拉菜单访问。

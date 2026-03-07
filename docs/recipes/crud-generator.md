@@ -26,6 +26,7 @@
 
 ```shell
 $ nest g resource
+
 ```
 
 `nest g resource` 命令不仅会生成所有 NestJS 构建块（模块、服务、控制器类），还会生成实体类、DTO 类以及测试文件（`.spec`）。
@@ -62,6 +63,7 @@ export class UsersController {
     return this.usersService.remove(+id);
   }
 }
+
 ```
 
 此外，它会自动为所有 CRUD 端点创建占位符（REST API 的路由、GraphQL 的查询和变更、微服务和 WebSocket 网关的消息订阅）——所有这些都无需手动操作。
@@ -88,6 +90,7 @@ $ nest g resource users
 > CREATE src/users/dto/update-user.input.ts (281 bytes)
 > CREATE src/users/entities/user.entity.ts (187 bytes)
 > UPDATE src/app.module.ts (312 bytes)
+
 ```
 
 :::info 提示
@@ -132,4 +135,5 @@ export class UsersResolver {
     return this.usersService.remove(id);
   }
 }
+
 ```

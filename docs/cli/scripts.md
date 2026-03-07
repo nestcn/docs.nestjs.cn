@@ -40,12 +40,14 @@ Nest 应用是一个**标准**的 TypeScript 应用，需要先编译为 JavaScr
 
 ```bash
 $ npm run build
+
 ```
 
 以及
 
 ```bash
 $ npm run start
+
 ```
 
 这些命令利用 npm 的脚本运行功能，通过**本地安装的** `nest` 二进制文件来执行 `nest build` 或 `nest start`。使用这些内置的包脚本，您可以完全掌控 Nest CLI 命令的依赖管理\*。这意味着，遵循这种**推荐**用法，可以确保组织内的所有成员都运行相同版本的命令。
@@ -66,6 +68,7 @@ $ npm run start
 $ npm install -g @nestjs/cli
 $ cd  /some/project/root/folder
 $ npm install -D @nestjs/cli
+
 ```
 
 随后您可以将 `package.json` 中定义的 `scripts` 替换为以下内容：
@@ -75,4 +78,5 @@ $ npm install -D @nestjs/cli
 "start": "nest start",
 "start:dev": "nest start --watch",
 "start:debug": "nest start --debug --watch",
+
 ```

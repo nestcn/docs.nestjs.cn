@@ -15,21 +15,25 @@ Nest 提供了 `partial` utility 函数，以简化这项任务并减少 boilerp
 `partial` 函数返回一个类型（类），其中所有输入类型的属性都设置为可选。例如，我们假设有一个**create** 类型，如下所示：
 
 ```
+
 class CreateUserInput {
   readonly id: number;
   readonly name: string;
   readonly email: string;
 }
+
 ```
 
 默认情况下，这些字段都是必需的。要创建一个具有相同字段但每个字段可选的类型，使用 `partial` 函数，传入类引用（`CreateUserInput`）作为参数：
 
 ```
+
 class CreateUserInputOptional {
   readonly id?: number;
   readonly name?: string;
   readonly email?: string;
 }
+
 ```
 
 > 提示 **Hint** `partial` 函数来自 `@nestjs/schematics` 包。
@@ -39,6 +43,7 @@ class CreateUserInputOptional {
 `pick` 函数构建一个新类型（类），从输入类型中选择一组属性。例如，我们假设有一个类型，如下所示：
 
 ```
+
 class User {
   readonly id: number;
   readonly name: string;
@@ -52,15 +57,18 @@ class Address {
   readonly state: string;
   readonly zip: string;
 }
+
 ```
 
 我们可以使用 `pick` utility 函数，从 `User` 类中选择一组属性：
 
 ```
+
 class UserPartial {
   readonly name: string;
   readonly email: string;
 }
+
 ```
 
 > 提示 **Hint** `pick` 函数来自 `@nestjs/schematics` 包。
@@ -70,6 +78,7 @@ class UserPartial {
 `omit` 函数构建一个类型，通过从输入类型中选择所有属性，然后删除特定的一组键。例如，我们假设有一个类型，如下所示：
 
 ```
+
 class User {
   readonly id: number;
   readonly name: string;
@@ -83,16 +92,19 @@ class Address {
   readonly state: string;
   readonly zip: string;
 }
+
 ```
 
 我们可以生成一个衍生类型，该类型具有除 `address` 外的所有属性：
 
 ```
+
 class UserWithoutAddress {
   readonly id: number;
   readonly name: string;
   readonly email: string;
 }
+
 ```
 
 > 提示 **Hint** `omit` 函数来自 `@nestjs/schematics` 包。
@@ -102,6 +114,7 @@ class UserWithoutAddress {
 `intersection` 函数将两个类型组合成一个新的类型（类）。例如，我们假设有两个类型，如下所示：
 
 ```
+
 class User {
   readonly id: number;
   readonly name: string;
@@ -111,17 +124,20 @@ class User {
 class Admin {
   readonly role: string;
 }
+
 ```
 
 我们可以生成一个新类型，该类型结合了两个类型中的所有属性：
 
 ```
+
 class UserAdmin {
   readonly id: number;
   readonly name: string;
   readonly email: string;
   readonly role: string;
 }
+
 ```
 
 > 提示 **Hint** `intersection` 函数来自 `@nestjs/schematics` 包。
@@ -131,12 +147,14 @@ class UserAdmin {
 类型映射utility 函数是可组合的。例如，以下将生成一个类型（类），该类型具有 `User` 类的所有属性，但 `address` 属性将被设置为可选：
 
 ```
+
 class UserOptionalAddress {
   readonly id: number;
   readonly name: string;
   readonly email: string;
   readonly address?: Address;
 }
+
 ```
 
 Note: I followed the provided glossary and terminology guidelines to translate the text. I also kept the code examples, variable names, function names, and Markdown formatting unchanged. I translated code comments from English to Chinese and kept relative links and internal anchors unchanged.

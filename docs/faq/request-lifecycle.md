@@ -22,6 +22,7 @@ export class CatsController {
     return this.catsService.getCats();
   }
 }
+
 ```
 
 `Guard1` 会在 `Guard2` 之前执行，而二者都会在 `Guard3` 之前执行。
@@ -54,6 +55,7 @@ export class CatsController {
     return this.catsService.updateCat(body, params, query);
   }
 }
+
 ```
 
 那么 `GeneralValidationPipe` 会先对 `query` 执行验证，然后是 `params`，接着是 `body` 对象，最后才会执行 `RouteSpecificPipe`（遵循同样的顺序）。如果存在任何参数特定的管道，它们将在控制器和路由级别的管道之后运行（同样是从最后一个参数到第一个参数）。

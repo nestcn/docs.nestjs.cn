@@ -13,6 +13,7 @@
 以下示例使用手动实例化的方法作用域管道。与 HTTP 基于应用程序一样，你也可以使用网关作用域管道（即在网关类前缀一个 `@UsePipes()` 装饰器）。
 
 ```typescript
+
 ```
 
 Note: I've kept the code block unchanged, as per the requirements. I've also translated the text and followed the provided glossary.

@@ -13,6 +13,7 @@
 async upvotePost(@Args({ name: 'postId', type: () => Int }) postId: number) {
   return this.postsService.upvoteById({ id: postId });
 }
+
 ```
 
 :::info 提示
@@ -25,6 +26,7 @@ async upvotePost(@Args({ name: 'postId', type: () => Int }) postId: number) {
 type Mutation {
   upvotePost(postId: Int!): Post
 }
+
 ```
 
 `upvotePost()` 方法接收 `postId`（`Int` 类型）作为参数，并返回更新后的 `Post` 实体。出于在 [解析器](/graphql/resolvers-map) 章节中解释的原因，我们必须显式设置预期类型。
@@ -39,6 +41,7 @@ export class UpvotePostInput {
   @Field()
   postId: number;
 }
+
 ```
 
 :::info 提示
@@ -52,6 +55,7 @@ export class UpvotePostInput {
 async upvotePost(
   @Args('upvotePostData') upvotePostData: UpvotePostInput,
 ) {}
+
 ```
 
 #### 模式优先
@@ -63,6 +67,7 @@ async upvotePost(
 async upvotePost(@Args('postId') postId: number) {
   return this.postsService.upvoteById({ id: postId });
 }
+
 ```
 
 请注意，我们假设业务逻辑已移至 `PostsService`（查询帖子并增加其 `votes` 属性）。`PostsService` 类中的逻辑可以根据需要简单或复杂。这个示例的主要目的是展示解析器如何与其他提供者交互。
@@ -90,6 +95,7 @@ type Query {
 type Mutation {
   upvotePost(postId: Int!): Post
 }
+
 ```
 
 《Immersive Translate》 现在可以通过我们应用程序的 GraphQL API 调用 `upvotePost(postId: Int!): Post` 变异操作。

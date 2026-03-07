@@ -15,6 +15,7 @@ export class FileController {
     file.pipe(res);
   }
 }
+
 ```
 
 但这样做会导致你失去对控制器后拦截器逻辑的访问。要处理这种情况，你可以返回一个 `StreamableFile` 实例，框架会在底层自动处理响应流的管道传输。
@@ -48,6 +49,7 @@ export class FileController {
     return new StreamableFile(file);
   }
 }
+
 ```
 
 默认的内容类型（即 HTTP 响应头 `Content-Type` 的值）是 `application/octet-stream`。如需自定义该值，您可以使用 `StreamableFile` 的 `type` 选项，或使用 `res.set` 方法以及 [`@Header()`](/overview/controllers#响应头) 装饰器，如下所示：
@@ -57,6 +59,7 @@ import { Controller, Get, StreamableFile, Res } from '@nestjs/common';
 import { createReadStream } from 'fs';
 import { join } from 'path';
 import type { Response } from 'express'; // 假设我们使用的是 ExpressJS HTTP 适配器
+
 ```typescript
 @Controller('file')
 export class FileController {
@@ -93,4 +96,5 @@ export class FileController {
     return new StreamableFile(file);
   }
 }
+
 ```

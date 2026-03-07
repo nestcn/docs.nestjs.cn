@@ -43,6 +43,7 @@ Nest 提供了一套开箱即用的应用架构，使开发者和团队能够创
 ```bash
 $ npm i -g @nestjs/cli
 $ nest new project-name
+
 ```
 
 :::info 提示
@@ -58,6 +59,7 @@ $ git clone https://github.com/nestjs/typescript-starter.git project
 $ cd project
 $ npm install
 $ npm run start
+
 ```
 
 :::info 提示

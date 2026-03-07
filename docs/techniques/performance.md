@@ -16,6 +16,7 @@
 
 ```bash
 $ npm i --save @nestjs/platform-fastify
+
 ```
 
 #### 适配器
@@ -38,6 +39,7 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
+
 ```
 
 默认情况下，Fastify 仅监听 `localhost 127.0.0.1` 接口（ [了解更多](https://www.fastify.io/docs/latest/Guides/Getting-Started/#your-first-server) ）。若需接受其他主机的连接，应在 `listen()` 调用中指定 `'0.0.0.0'`：
@@ -50,6 +52,7 @@ async function bootstrap() {
   );
   await app.listen(3000, '0.0.0.0');
 }
+
 ```
 
 #### 平台特定包
@@ -65,6 +68,7 @@ Fastify 处理重定向响应的方式与 Express 略有不同。要进行正确
 index(@Res() res) {
   res.status(302).redirect('/login');
 }
+
 ```
 
 #### Fastify 配置选项
@@ -73,6 +77,7 @@ index(@Res() res) {
 
 ```typescript
 new FastifyAdapter({ logger: true });
+
 ```
 
 #### 中间件
@@ -90,6 +95,7 @@ export class LoggerMiddleware implements NestMiddleware {
     next();
   }
 }
+
 ```
 
 #### 路由配置
@@ -102,6 +108,7 @@ export class LoggerMiddleware implements NestMiddleware {
 index(@Req() req) {
   return req.routeConfig.output;
 }
+
 ```
 
 #### 路由约束
@@ -113,6 +120,7 @@ index(@Req() req) {
 newFeature() {
   return 'This works only for version >= 1.2.x';
 }
+
 ```
 
 :::info 提示

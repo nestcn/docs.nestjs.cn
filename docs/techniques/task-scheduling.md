@@ -12,6 +12,7 @@
 
 ```bash
 $ npm install --save @nestjs/schedule
+
 ```
 
 要激活作业调度，将 `ScheduleModule` 导入到根 `AppModule` 中并运行 `forRoot()` 静态方法，如下所示：
@@ -26,6 +27,7 @@ import { ScheduleModule } from '@nestjs/schedule';
   ],
 })
 export class AppModule {}
+
 ```
 
 `.forRoot()` 调用初始化调度程序并注册应用程序中存在的任何声明性 <a href="techniques/task-scheduling#声明式-cron-任务">cron 作业</a>、<a href="techniques/task-scheduling#声明式超时">超时</a> 和 <a href="techniques/task-scheduling#声明式间隔任务">间隔</a>。注册发生在 `onApplicationBootstrap` 生命周期钩子发生时，确保所有模块都已加载并声明了任何计划的作业。
@@ -52,6 +54,7 @@ handleCron() {
     this.logger.debug('Called when the current second is 45');
   }
 }
+
 ```
 
 在这个例子中，`handleCron()` 方法将在当前秒为 `45` 时被调用。换句话说，该方法将每分钟运行一次，在 45 秒标记处。
@@ -117,6 +120,7 @@ handleCron() {
     this.logger.debug('Called every 30 seconds');
   }
 }
+
 ```
 
 在这个例子中，`handleCron()` 方法将每 `30` 秒被调用一次。如果发生异常，它将被记录到控制台，因为每个用 `@Cron()` 注释的方法都会自动包装在 `try-catch` 块中。
@@ -174,6 +178,7 @@ export class NotificationService {
   })
   triggerNotifications() {}
 }
+
 ```
 
 您可以在声明后访问和控制 cron 作业，或使用 <a href="/techniques/task-scheduling#动态调度模块-api">动态 API</a> 动态创建 cron 作业（其 cron 模式在运行时定义）。要通过 API 访问声明式 cron 作业，您必须通过在装饰器的第二个参数的可选选项对象中传递 `name` 属性来将作业与名称相关联。
@@ -187,6 +192,7 @@ export class NotificationService {
 handleInterval() {
   this.logger.debug('Called every 10 seconds');
 }
+
 ```
 
 > info **提示** 此机制在底层使用 JavaScript `setInterval()` 函数。您也可以利用 cron 作业来安排定期作业。
@@ -196,6 +202,7 @@ handleInterval() {
 ```typescript
 @Interval('notifications', 2500)
 handleInterval() {}
+
 ```
 
 如果发生异常，它将被记录到控制台，因为每个用 `@Interval()` 注释的方法都会自动包装在 `try-catch` 块中。
@@ -213,6 +220,7 @@ handleInterval() {}
 handleTimeout() {
   this.logger.debug('Called once after 5 seconds');
 }
+
 ```
 
 > info **提示** 此机制在底层使用 JavaScript `setTimeout()` 函数。
@@ -224,6 +232,7 @@ handleTimeout() {
 ```typescript
 @Timeout('notifications', 2500)
 handleTimeout() {}
+
 ```
 
 <a href="techniques/task-scheduling#动态超时">动态 API</a> 还支持**创建**动态超时，其中超时的属性在运行时定义，以及**列出和删除**它们。
@@ -238,6 +247,7 @@ handleTimeout() {}
 
 ```typescript
 constructor(private schedulerRegistry: SchedulerRegistry) {}
+
 ```
 
 > info **提示** 从 `@nestjs/schedule` 包中导入 `SchedulerRegistry`。
@@ -249,6 +259,7 @@ constructor(private schedulerRegistry: SchedulerRegistry) {}
   name: 'notifications',
 })
 triggerNotifications() {}
+
 ```
 
 使用以下方法访问此作业：
@@ -258,6 +269,7 @@ const job = this.schedulerRegistry.getCronJob('notifications');
 
 job.stop();
 console.log(job.lastDate());
+
 ```
 
 `getCronJob()` 方法返回命名的 cron 作业。返回的 `CronJob` 对象具有以下方法：
@@ -286,6 +298,7 @@ addCronJob(name: string, seconds: string) {
     `job ${name} added for each minute at ${seconds} seconds!`,
   );
 }
+
 ```
 
 在这段代码中，我们使用 `cron` 包中的 `CronJob` 对象来创建 cron 作业。`CronJob` 构造函数的第一个参数是 cron 模式（就像 `@Cron()` <a href="techniques/task-scheduling#声明式-cron-任务">装饰器</a>），第二个参数是当 cron 计时器触发时要执行的回调。`SchedulerRegistry#addCronJob` 方法接受两个参数：`CronJob` 的名称和 `CronJob` 对象本身。
@@ -299,6 +312,7 @@ deleteCron(name: string) {
   this.schedulerRegistry.deleteCronJob(name);
   this.logger.warn(`job ${name} deleted!`);
 }
+
 ```
 
 使用 `SchedulerRegistry#getCronJobs` 方法**列出**所有 cron 作业，如下所示：
@@ -316,6 +330,7 @@ getCrons() {
     this.logger.log(`job: ${key} -> next: ${next}`);
   });
 }
+
 ```
 
 `getCronJobs()` 方法返回一个 `map`。在这段代码中，我们遍历 map 并尝试访问每个 `CronJob` 的 `nextDate()` 方法。在 `CronJob` API 中，如果作业已经触发并且没有未来的触发日期，它会抛出异常。
@@ -326,6 +341,7 @@ getCrons() {
 
 ```typescript
 constructor(private schedulerRegistry: SchedulerRegistry) {}
+
 ```
 
 并如下使用它：
@@ -333,6 +349,7 @@ constructor(private schedulerRegistry: SchedulerRegistry) {}
 ```typescript
 const interval = this.schedulerRegistry.getInterval('notifications');
 clearInterval(interval);
+
 ```
 
 使用 `SchedulerRegistry#addInterval` 方法动态**创建**新的间隔，如下所示：
@@ -346,6 +363,7 @@ addInterval(name: string, milliseconds: number) {
   const interval = setInterval(callback, milliseconds);
   this.schedulerRegistry.addInterval(name, interval);
 }
+
 ```
 
 在这段代码中，我们创建一个标准的 JavaScript 间隔，然后将其传递给 `SchedulerRegistry#addInterval` 方法。
@@ -358,6 +376,7 @@ deleteInterval(name: string) {
   this.schedulerRegistry.deleteInterval(name);
   this.logger.warn(`Interval ${name} deleted!`);
 }
+
 ```
 
 使用 `SchedulerRegistry#getIntervals` 方法**列出**所有间隔，如下所示：
@@ -367,6 +386,7 @@ getIntervals() {
   const intervals = this.schedulerRegistry.getIntervals();
   intervals.forEach(key => this.logger.log(`Interval: ${key}`));
 }
+
 ```
 
 #### 动态超时
@@ -375,6 +395,7 @@ getIntervals() {
 
 ```typescript
 constructor(private readonly schedulerRegistry: SchedulerRegistry) {}
+
 ```
 
 并如下使用它：
@@ -382,6 +403,7 @@ constructor(private readonly schedulerRegistry: SchedulerRegistry) {}
 ```typescript
 const timeout = this.schedulerRegistry.getTimeout('notifications');
 clearTimeout(timeout);
+
 ```
 
 使用 `SchedulerRegistry#addTimeout` 方法动态**创建**新的超时，如下所示：
@@ -395,6 +417,7 @@ addTimeout(name: string, milliseconds: number) {
   const timeout = setTimeout(callback, milliseconds);
   this.schedulerRegistry.addTimeout(name, timeout);
 }
+
 ```
 
 在这段代码中，我们创建一个标准的 JavaScript 超时，然后将其传递给 `SchedulerRegistry#addTimeout` 方法。
@@ -407,6 +430,7 @@ deleteTimeout(name: string) {
   this.schedulerRegistry.deleteTimeout(name);
   this.logger.warn(`Timeout ${name} deleted!`);
 }
+
 ```
 
 使用 `SchedulerRegistry#getTimeouts` 方法**列出**所有超时，如下所示：
@@ -416,6 +440,7 @@ getTimeouts() {
   const timeouts = this.schedulerRegistry.getTimeouts();
   timeouts.forEach(key => this.logger.log(`Timeout: ${key}`));
 }
+
 ```
 
 #### 示例

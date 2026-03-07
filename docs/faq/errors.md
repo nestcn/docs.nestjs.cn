@@ -20,6 +20,7 @@ Potential solutions:
   @Module({
     imports: [ /* the Module containing <unknown_token> */ ]
   })
+
 ```
 
 导致此错误最常见的原因是没有将 `<provider>` 放入模块的 `providers` 数组中。请确保该提供者确实位于 `providers` 数组中，并遵循[标准 NestJS 提供者实践](/fundamentals/dependency-injection#di-基础)。
@@ -45,6 +46,7 @@ Potential solutions:
 Nest can't resolve dependencies of the <provider> (?).
 Please make sure that the argument ModuleRef at index [<index>] is available in the <module> context.
 ...
+
 ```
 
 这种情况通常发生在你的项目最终加载了两个 `@nestjs/core` 包的 Node 模块时，例如：
@@ -61,6 +63,7 @@ Please make sure that the argument ModuleRef at index [<index>] is available in 
 └── node_modules
     ├── (other packages)
     └── @nestjs/core
+
 ```
 
 解决方案：
@@ -82,6 +85,7 @@ Potential causes:
 
 Scope [<module_import_chain>]
 # example chain AppModule -> FooModule
+
 ```
 
 循环依赖可能源于提供者之间相互依赖，或是 TypeScript 文件间因常量而相互依赖（例如从模块文件导出常量并在服务文件中导入）。对于后者，建议为常量创建单独的文件。对于前者，请遵循循环依赖指南，确保模块**和**提供者都使用 `forwardRef` 进行标记。
@@ -101,6 +105,7 @@ Scope [<module_import_chain>]
 ```bash
 XX:XX:XX AM - File change detected. Starting incremental compilation...
 XX:XX:XX AM - Found 0 errors. Watching for file changes.
+
 ```
 
 当您使用 NestJS CLI 以监视模式启动应用程序时，实际上是通过调用 `tsc --watch` 实现的。从 TypeScript 4.9 版本开始，采用了一种 [新的策略](https://devblogs.microsoft.com/typescript/announcing-typescript-4-9/#file-watching-now-uses-file-system-events) 来检测文件变更，这很可能是导致此问题的原因。要解决此问题，您需要在 tsconfig.json 文件的 `"compilerOptions"` 选项后添加如下设置：
@@ -109,6 +114,7 @@ XX:XX:XX AM - Found 0 errors. Watching for file changes.
   "watchOptions": {
     "watchFile": "fixedPollingInterval"
   }
+
 ```
 
 这将指示 TypeScript 使用轮询方法（而非新的默认文件系统事件方法）来检查文件变更，后者在某些机器上可能会引发问题。您可以在 [TypeScript 文档](https://www.typescriptlang.org/tsconfig#watch-watchDirectory) 中阅读更多关于 `"watchFile"` 选项的信息。

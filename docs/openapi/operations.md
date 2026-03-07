@@ -16,6 +16,7 @@
 export class UsersController {
   // 控制器方法
 }
+
 ```
 
 #### 头
@@ -32,6 +33,7 @@ export class UsersController {
 getUsers() {
   // 方法逻辑
 }
+
 ```
 
 #### 响应
@@ -48,6 +50,7 @@ getUsers() {
 getUsers() {
   // 方法逻辑
 }
+
 ```
 
 Nest 提供了一组简洁的 **API 响应** 装饰器，它们继承自 `@ApiResponse` 装饰器：
@@ -80,6 +83,7 @@ Nest 提供了一组简洁的 **API 响应** 装饰器，它们继承自 `@ApiRe
 getUser(@Param('id') id: string) {
   // 方法逻辑
 }
+
 ```
 
 要指定请求的返回模型，我们必须创建一个类并将所有属性注释为 `@ApiProperty()` 装饰器。
@@ -95,6 +99,7 @@ class User {
   @ApiProperty()
   email: string;
 }
+
 ```
 
 然后，`User` 模型可以与 `type` 属性组合使用，以便在响应装饰器中使用。
@@ -108,6 +113,7 @@ class User {
 getUser(@Param('id') id: string) {
   // 方法逻辑
 }
+
 ```
 
 现在，让我们在浏览器中验证生成的 `User` 模型：
@@ -125,6 +131,7 @@ getUser(@Param('id') id: string) {
 export class UsersController {
   // 控制器方法
 }
+
 ```
 
 #### 文件上传
@@ -148,6 +155,7 @@ export class UsersController {
 uploadFile(@UploadedFile() file: Express.Multer.File) {
   // 处理上传的文件
 }
+
 ```
 
 其中 `Express.Multer.File` 定义如下：
@@ -164,6 +172,7 @@ interface File {
   path: string;
   buffer: Buffer;
 }
+
 ```
 
 要处理多个文件上传，可以定义 `files` 字段：
@@ -188,6 +197,7 @@ interface File {
 uploadMultipleFiles(@UploadedFiles() files: Array<Express.Multer.File>) {
   // 处理上传的多个文件
 }
+
 ```
 
 #### 扩展
@@ -203,6 +213,7 @@ uploadMultipleFiles(@UploadedFiles() files: Array<Express.Multer.File>) {
 getUsers() {
   // 方法逻辑
 }
+
 ```
 
 #### 高级：泛型 `ApiResponse`
@@ -220,6 +231,7 @@ class Pagination {
   @ApiProperty()
   total: number;
 }
+
 ```
 
 我们跳过装饰 `Pagination`，因为我们将为其提供 raw 定义。现在，让我们定义另一个 DTO，并将其命名为 `PaginatedResponse`，如下所示：
@@ -232,6 +244,7 @@ class PaginatedResponse<T> {
   @ApiProperty()
   pagination: Pagination;
 }
+
 ```
 
 现在，我们可以定义 `ApiResponse` 响应，如下所示：
@@ -261,6 +274,7 @@ class PaginatedResponse<T> {
 getUsers(@Query('page') page: number, @Query('limit') limit: number) {
   // 方法逻辑
 }
+
 ```
 
 在这个示例中，我们指定响应将有 allOf `PaginatedResponse`，并且 `data` 属性将是类型 `User` 数组。

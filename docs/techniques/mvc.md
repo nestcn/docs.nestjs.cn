@@ -7,12 +7,14 @@
 ```bash
 $ npm i -g @nestjs/cli
 $ nest new project
+
 ```
 
 为了创建一个 MVC 应用，我们还需要一个[模板引擎](https://expressjs.com/en/guide/using-template-engines.html)来渲染 HTML 视图：
 
 ```bash
 $ npm install --save hbs
+
 ```
 
 我们使用了 `hbs`（[Handlebars](https://github.com/pillarjs/hbs#readme)）模板引擎，当然你也可以根据需求选择其他引擎。安装完成后，需要通过以下代码配置 express 实例：
@@ -35,6 +37,7 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
+
 ```
 
 我们告诉 [Express](https://github.com/expressjs/express)：`public` 目录将用于存放静态资源，`views` 目录存放模板文件，并使用 `hbs` 模板引擎来渲染 HTML 输出。
@@ -54,6 +57,7 @@ bootstrap();
     {{ "{{ message }\}" }}
   </body>
 </html>
+
 ```
 
 接下来，打开 `app.controller` 文件，将 `root()` 方法替换为以下代码：
@@ -69,6 +73,7 @@ export class AppController {
     return { message: 'Hello world!' };
   }
 }
+
 ```
 
 在这段代码中，我们通过 `@Render()` 装饰器指定要使用的模板，路由处理方法的返回值会被传递给模板进行渲染。注意返回值是一个包含 `message` 属性的对象，与我们模板中创建的 `message` 占位符相匹配。
@@ -100,6 +105,7 @@ export class AppController {
     );
   }
 }
+
 ```
 
 #### 示例
@@ -112,6 +118,7 @@ export class AppController {
 
 ```bash
 $ npm i --save @fastify/static @fastify/view handlebars
+
 ```
 
 接下来的步骤与 Express 几乎相同，仅存在一些平台特有的细微差异。安装过程完成后，打开 `main.ts` 文件并更新其内容：
@@ -140,6 +147,7 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
+
 ```
 
 Fastify API 存在一些差异，但这些方法调用的最终结果相同。一个显著区别是：使用 Fastify 时，传入 `@Render()` 装饰器的模板名称必须包含文件扩展名。
@@ -157,6 +165,7 @@ export class AppController {
     return { message: 'Hello world!' };
   }
 }
+
 ```
 
 或者，您也可以使用 `@Res()` 装饰器直接注入响应对象并指定要渲染的视图，如下所示：
@@ -169,6 +178,7 @@ import { FastifyReply } from 'fastify';
 root(@Res() res: FastifyReply) {
   return res.view('index.hbs', { title: 'Hello world!' });
 }
+
 ```
 
 应用程序运行时，请打开浏览器并访问 `http://localhost:3000`，您将看到 `Hello world!` 消息。

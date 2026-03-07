@@ -15,6 +15,7 @@
 ```bash
 $ npm install --save sequelize sequelize-typescript mysql2
 $ npm install --save-dev @types/sequelize
+
 ```
 
 第一步是创建一个带有选项对象的 **Sequelize** 实例，并将其传入构造函数。此外，我们需要添加所有模型（另一种方法是使用 `modelPaths` 属性）并 `sync()` 我们的数据库表。
@@ -41,6 +42,7 @@ export const databaseProviders = [
     },
   },
 ];
+
 ```
 
 :::info 提示
@@ -58,6 +60,7 @@ import { databaseProviders } from './database.providers';
   exports: [...databaseProviders],
 })
 export class DatabaseModule {}
+
 ```
 
 现在我们可以使用 `@Inject()` 装饰器注入 `Sequelize` 对象。每个依赖 `Sequelize` 异步提供者的类都将等待 `Promise` 解析完成。
@@ -80,6 +83,7 @@ export class Cat extends Model {
   @Column
   breed: string;
 }
+
 ```
 
 `Cat` 实体属于 `cats` 目录，该目录代表 `CatsModule` 模块。现在该创建一个 **Repository** 提供者了：
@@ -93,6 +97,7 @@ export const catsProviders = [
     useValue: Cat,
   },
 ];
+
 ```
 
 :::warning 注意
@@ -119,6 +124,7 @@ export class CatsService {
     return this.catsRepository.findAll<Cat>();
   }
 }
+
 ```
 
 数据库连接是**异步的** ，但 Nest 使这个过程对终端用户完全透明。`CATS_REPOSITORY` 提供者会等待数据库连接完成，而 `CatsService` 会延迟到存储库准备就绪。整个应用会在所有类实例化完成后启动。
@@ -141,6 +147,7 @@ import { DatabaseModule } from '../database/database.module';
   ],
 })
 export class CatsModule {}
+
 ```
 
 :::info 提示

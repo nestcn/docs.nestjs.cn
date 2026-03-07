@@ -8,6 +8,7 @@
 
 ```bash
 $ npm install --save @sentry/nestjs @sentry/profiling-node
+
 ```
 
 :::info 注意
@@ -38,6 +39,7 @@ Sentry.init({
   // This is relative to tracesSampleRate
   profilesSampleRate: 1.0,
 });
+
 ```
 
 更新您的 `main.ts` 文件，确保在其他导入之前引入 `instrument.ts`：
@@ -56,6 +58,7 @@ async function bootstrap() {
 }
 
 bootstrap();
+
 ```
 
 随后，将 `SentryModule` 作为根模块添加到您的主模块中：
@@ -75,6 +78,7 @@ import { AppService } from "./app.service";
   providers: [AppService],
 })
 export class AppModule {}
+
 ```
 
 #### 异常处理
@@ -92,6 +96,7 @@ export class YourCatchAllExceptionFilter implements ExceptionFilter {
     // your implementation here
   }
 }
+
 ```
 
 默认情况下，只有未被错误过滤器捕获的未处理异常才会报告给 Sentry。`HttpExceptions`（包括[派生类](../overview/exception-filters#内置-http-异常) ）默认也不会被捕获，因为它们主要用作控制流载体。
@@ -117,6 +122,7 @@ import { SentryGlobalFilter } from "@sentry/nestjs/setup";
   ],
 })
 export class AppModule {}
+
 ```
 
 #### 可读的堆栈跟踪
@@ -127,6 +133,7 @@ export class AppModule {}
 
 ```bash
 npx @sentry/wizard@latest -i sourcemaps
+
 ```
 
 #### 测试集成功能
@@ -138,6 +145,7 @@ npx @sentry/wizard@latest -i sourcemaps
 getError() {
   throw new Error("My first Sentry error!");
 }
+
 ```
 
 访问应用程序中的 `/debug-sentry`，您应该能在 Sentry 仪表板中看到该错误。

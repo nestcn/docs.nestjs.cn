@@ -16,6 +16,7 @@ async function bootstrap() {
   // 您的应用程序逻辑在这里...
 }
 bootstrap();
+
 ```
 
 #### 从静态模块检索提供者
@@ -24,12 +25,14 @@ bootstrap();
 
 ```typescript
 const tasksService = app.get(TasksService);
+
 ```
 
 要访问 `TasksService` 实例，我们使用 `get()` 方法。`get()` 方法就像一个**查询**，在每个注册的模块中搜索实例。您可以将任何提供者的令牌传递给它。或者，为了严格的上下文检查，传递一个带有 `strict: true` 属性的选项对象。启用此选项后，您必须导航通过特定模块以从选定的上下文中获取特定实例。
 
 ```typescript
 const tasksService = app.select(TasksModule).get(TasksService, { strict: true });
+
 ```
 
 以下是从独立应用程序对象检索实例引用的可用方法摘要。
@@ -72,12 +75,14 @@ export const dynamicConfigModule = ConfigModule.register({ folder: './config' })
   imports: [dynamicConfigModule],
 })
 export class AppModule {}
+
 ```
 
 然后您可以稍后选择该模块：
 
 ```typescript
 const configService = app.select(dynamicConfigModule).get(ConfigService, { strict: true });
+
 ```
 
 #### 终止阶段
@@ -91,6 +96,7 @@ async function bootstrap() {
   await app.close();
 }
 bootstrap();
+
 ```
 
 如[生命周期事件](/fundamentals/lifecycle-events)章节中所述，这将触发生命周期钩子。

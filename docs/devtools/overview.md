@@ -13,6 +13,7 @@ async function bootstrap() {
   });
   await app.listen(process.env.PORT ?? 3000);
 }
+
 ```
 
 这将指示框架收集必要的元数据，使 Nest Devtools 能够可视化您的应用程序图。
@@ -21,6 +22,7 @@ async function bootstrap() {
 
 ```bash
 $ npm i @nestjs/devtools-integration
+
 ```
 
 :::warning 注意
@@ -40,6 +42,7 @@ $ npm i @nestjs/devtools-integration
   providers: [AppService],
 })
 export class AppModule {}
+
 ```
 
 :::warning 注意
@@ -95,6 +98,7 @@ bootstrap().catch((err) => {
   fs.writeFileSync('graph.json', PartialGraphHost.toString() ?? '');
   process.exit(1);
 });
+
 ```
 
 同时，请确保将 `abortOnError` 设置为 `false`：
@@ -104,6 +108,7 @@ const app = await NestFactory.create(AppModule, {
   snapshot: true,
   abortOnError: false, // <--- THIS
 });
+
 ```
 
 现在每当应用因 **"无法解析依赖项"** 错误而启动失败时，您都会在根目录中找到表示部分依赖图的 `graph.json` 文件。您可以将此文件拖放至开发者工具（请确保将当前模式从"交互式"切换为"预览"）：
@@ -183,6 +188,7 @@ const app = await NestFactory.create(AppModule, {
 ```typescript
 await app.listen(process.env.PORT ?? 3000); // OR await app.init()
 fs.writeFileSync('./graph.json', app.get(SerializedGraph).toString());
+
 ```
 
 :::info 提示

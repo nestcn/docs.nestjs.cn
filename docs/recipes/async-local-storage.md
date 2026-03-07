@@ -36,6 +36,7 @@ import { AsyncLocalStorage } from 'async_hooks';
   exports: [AsyncLocalStorage],
 })
 export class AsyncLocalStorageModule {}
+
 ```
 
 >  info **提示** `AsyncLocalStorage` 从 `async_hooks` 导入。
@@ -55,6 +56,7 @@ export class AsyncLocalStorageMiddleware implements NestMiddleware {
     this.asyncLocalStorage.run(new Map(), next);
   }
 }
+
 ```
 
 3. 现在，在请求的生命周期中任何地方，我们都可以访问本地存储实例。
@@ -79,6 +81,7 @@ export class AppService {
     return store.get('requestId');
   }
 }
+
 ```
 
 4. 这样，我们就有了一种共享请求相关状态的方法，而不需要注入整个 `Request` 对象。
@@ -99,6 +102,7 @@ export class AppService {
 
 ```bash
 $ npm i nestjs-cls
+
 ```
 
 #### 使用
@@ -123,6 +127,7 @@ import { ClsModule } from 'nestjs-cls';
   ],
 })
 export class AppModule {}
+
 ```
 
 2. 然后可以使用 `ClsService` 访问存储值。
@@ -145,6 +150,7 @@ export class AppService {
     return this.cls.get('requestId');
   }
 }
+
 ```
 
 3. 要获得强类型的存储值，使用可选的泛型类型参数注入它。
@@ -177,6 +183,7 @@ export class AppService {
     return this.cls.get('userId');
   }
 }
+
 ```
 
 >  info **提示** 也可以使用 `ClsModule` 自动生成请求 ID，并使用 `ClsService` 获取整个请求对象。
@@ -214,6 +221,7 @@ describe('AppService', () => {
     });
   });
 });
+
 ```
 
 #### 更多信息

@@ -7,6 +7,7 @@
 async create(@Body() createCatDto: CreateCatDto) {
   this.catsService.create(createCatDto);
 }
+
 ```
 
 :::info 提示
@@ -32,6 +33,7 @@ export class CreateCatDto {
   @ApiProperty()
   breed: string;
 }
+
 ```
 
 :::info 提示
@@ -51,6 +53,7 @@ export class CreateCatDto {
   default: 1,
 })
 age: number;
+
 ```
 
 :::info 提示
@@ -64,6 +67,7 @@ age: number;
   type: Number,
 })
 age: number;
+
 ```
 
 #### 数组
@@ -73,6 +77,7 @@ age: number;
 ```typescript
 @ApiProperty({ type: [String] })
 names: string[];
+
 ```
 
 :::info 提示
@@ -88,6 +93,7 @@ names: string[];
 ```typescript
 @ApiProperty({ type: () => Node })
 node: Node;
+
 ```
 
 :::info 提示
@@ -100,6 +106,7 @@ node: Node;
 
 ```typescript
 createBulk(@Body() usersDto: CreateUserDto[])
+
 ```
 
 为了克服这一限制，您可以显式设置类型：
@@ -107,6 +114,7 @@ createBulk(@Body() usersDto: CreateUserDto[])
 ```typescript
 @ApiBody({ type: [CreateUserDto] })
 createBulk(@Body() usersDto: CreateUserDto[])
+
 ```
 
 #### 枚举
@@ -116,6 +124,7 @@ createBulk(@Body() usersDto: CreateUserDto[])
 ```typescript
 @ApiProperty({ enum: ['Admin', 'Moderator', 'User']})
 role: UserRole;
+
 ```
 
 或者，可以像下面这样定义一个实际的 TypeScript 枚举：
@@ -126,6 +135,7 @@ export enum UserRole {
   Moderator = 'Moderator',
   User = 'User',
 }
+
 ```
 
 然后你可以直接在 `@Query()` 参数装饰器中使用该枚举，并与 `@ApiQuery()` 装饰器结合使用。
@@ -133,6 +143,7 @@ export enum UserRole {
 ```typescript
 @ApiQuery({ name: 'role', enum: UserRole })
 async filterByRole(@Query('role') role: UserRole = UserRole.User) {}
+
 ```
 
 ![](/assets/enum_query.gif)
@@ -152,6 +163,7 @@ async filterByRole(@Query('role') role: UserRole = UserRole.User) {}
       - Persian
       - Tabby
       - Siamese
+
 ```
 
 上述规范在大多数情况下都能正常工作。然而，如果您使用的工具将规范作为**输入**并生成**客户端**代码，可能会遇到生成的代码包含重复 `enums` 的问题。请看以下代码片段：
@@ -177,6 +189,7 @@ export enum CatInformationEnum {
   Tabby = 'Tabby',
   Siamese = 'Siamese',
 }
+
 ```
 
 :::info 提示
@@ -190,6 +203,7 @@ export class CatDetail {
   @ApiProperty({ enum: CatBreed, enumName: 'CatBreed' })
   breed: CatBreed;
 }
+
 ```
 
 `enumName` 属性使得 `@nestjs/swagger` 能够将 `CatBreed` 转换为独立的`模式` ，从而使 `CatBreed` 枚举可复用。具体规范如下所示：
@@ -208,6 +222,7 @@ CatBreed:
     - Persian
     - Tabby
     - Siamese
+
 ```
 
 :::info 注意
@@ -223,6 +238,7 @@ CatBreed:
   example: 'persian',
 })
 breed: string;
+
 ```
 
 如需提供多个示例，可以使用 `examples` 键，传入如下结构的对象：
@@ -237,6 +253,7 @@ breed: string;
   },
 })
 breed: string;
+
 ```
 
 #### 原始定义
@@ -254,6 +271,7 @@ breed: string;
   },
 })
 coords: number[][];
+
 ```
 
 您也可以直接指定原始对象模式，如下所示：
@@ -274,6 +292,7 @@ coords: number[][];
   required: ['name', 'status']
 })
 rawDefinition: Record<string, any>;
+
 ```
 
 要在控制器类中手动定义输入/输出内容，请使用 `schema` 属性：
@@ -291,6 +310,7 @@ rawDefinition: Record<string, any>;
   },
 })
 async create(@Body() coords: number[][]) {}
+
 ```
 
 #### 额外模型
@@ -300,6 +320,7 @@ async create(@Body() coords: number[][]) {}
 ```typescript
 @ApiExtraModels(ExtraModel)
 export class CreateCatDto {}
+
 ```
 
 :::info 注意
@@ -313,6 +334,7 @@ const documentFactory = () =>
   SwaggerModule.createDocument(app, options, {
     extraModels: [ExtraModel],
   });
+
 ```
 
 要获取模型的引用 (`$ref`)，请使用 `getSchemaPath(ExtraModel)` 函数：
@@ -321,6 +343,7 @@ const documentFactory = () =>
 'application/vnd.api+json': {
    schema: { $ref: getSchemaPath(ExtraModel) },
 },
+
 ```
 
 #### oneOf、anyOf、allOf
@@ -335,6 +358,7 @@ const documentFactory = () =>
   ],
 })
 pet: Cat | Dog;
+
 ```
 
 如果要定义多态数组（即成员跨越多个模式的数组），应使用原始定义（如上所述）手动定义类型。
@@ -352,6 +376,7 @@ type Pet = Cat | Dog;
   },
 })
 pets: Pet[];
+
 ```
 
 :::info 提示
@@ -369,6 +394,7 @@ pets: Pet[];
 ```typescript
 @ApiSchema({ name: 'CreateCatRequest' })
 class CreateCatDto {}
+
 ```
 
 上述模型将被转换为 `CreateCatRequest` 模式。
@@ -378,6 +404,7 @@ class CreateCatDto {}
 ```typescript
 @ApiSchema({ description: 'Description of the CreateCatDto schema' })
 class CreateCatDto {}
+
 ```
 
 这样，描述就会被包含在架构中，如下所示：
@@ -387,4 +414,5 @@ schemas:
   CreateCatDto:
     type: object
     description: Description of the CreateCatDto schema
+
 ```

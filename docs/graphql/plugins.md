@@ -21,6 +21,7 @@ export class LoggingPlugin implements ApolloServerPlugin {
     };
   }
 }
+
 ```
 
 这样我们就可以将 `LoggingPlugin` 注册为一个提供者。
@@ -30,6 +31,7 @@ export class LoggingPlugin implements ApolloServerPlugin {
   providers: [LoggingPlugin],
 })
 export class CommonModule {}
+
 ```
 
 Nest 会自动实例化插件并将其应用到 Apollo Server。
@@ -43,6 +45,7 @@ GraphQLModule.forRoot({
   // ...
   plugins: [ApolloServerOperationRegistry({ /* options */})]
 }),
+
 ```
 
 :::info 提示
@@ -77,4 +80,5 @@ GraphQLModule.forRoot({
     }
   ]
 }),
+
 ```

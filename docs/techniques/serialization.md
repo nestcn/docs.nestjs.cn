@@ -29,6 +29,7 @@ export class UserEntity {
     Object.assign(this, partial);
   }
 }
+
 ```
 
 现在考虑一个控制器，其中包含返回此类实例的方法处理程序。
@@ -44,6 +45,7 @@ findOne(): UserEntity {
     password: 'password',
   });
 }
+
 ```
 
 :::warning 警告
@@ -62,6 +64,7 @@ findOne(): UserEntity {
   "firstName": "John",
   "lastName": "Doe"
 }
+
 ```
 
 请注意拦截器可以应用于整个应用程序（如[此处](../overview/interceptors#绑定拦截器)所述）。拦截器与实体类声明的组合确保**任何**返回 `UserEntity` 的方法都会移除 `password` 属性。这为您提供了集中执行业务规则的保障。
@@ -75,6 +78,7 @@ findOne(): UserEntity {
 get fullName(): string {
   return `${this.firstName} ${this.lastName}`;
 }
+
 ```
 
 #### 转换
@@ -84,6 +88,7 @@ get fullName(): string {
 ```typescript
 @Transform(({ value }) => value.name)
 role: RoleEntity;
+
 ```
 
 #### 传递选项
@@ -98,6 +103,7 @@ role: RoleEntity;
 findOne(): UserEntity {
   return new UserEntity();
 }
+
 ```
 
 :::info 提示
@@ -133,6 +139,7 @@ findOne(@Query() { id }: { id: number }): UserEntity {
     password: 'password2',
   };
 }
+
 ```
 
 :::info 提示

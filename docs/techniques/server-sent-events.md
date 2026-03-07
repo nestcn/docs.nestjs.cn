@@ -15,6 +15,7 @@
 sse(): Observable<MessageEvent> {
   return interval(1000).pipe(map((_) => ({ data: { hello: 'world' } })));
 }
+
 ```
 
 > info **提示** `@Sse()` 装饰器和 `MessageEvent` 接口是从 `@nestjs/common` 导入的，而 `Observable`、`interval` 和 `map` 是从 `rxjs` 包导入的。

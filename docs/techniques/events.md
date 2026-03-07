@@ -10,6 +10,7 @@
 
 ```shell
 $ npm i --save @nestjs/event-emitter
+
 ```
 
 安装完成后，将 `EventEmitterModule` 导入根模块 `AppModule`，并运行静态方法 `forRoot()`，如下所示：
@@ -24,6 +25,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
   ],
 })
 export class AppModule {}
+
 ```
 
 `.forRoot()` 调用会初始化事件发射器并注册应用中存在的所有声明式事件监听器。注册过程发生在 `onApplicationBootstrap` 生命周期钩子时，确保所有模块都已加载并声明了任何计划任务。
@@ -47,6 +49,7 @@ EventEmitterModule.forRoot({
   // 当错误事件被触发且没有监听器时，禁用抛出 uncaughtException
   ignoreErrors: false,
 });
+
 ```
 
 #### 事件派发
@@ -55,6 +58,7 @@ EventEmitterModule.forRoot({
 
 ```typescript
 constructor(private eventEmitter: EventEmitter2) {}
+
 ```
 
 :::info 提示
@@ -71,6 +75,7 @@ this.eventEmitter.emit(
     payload: {},
   })
 );
+
 ```
 
 #### 监听事件
@@ -82,6 +87,7 @@ this.eventEmitter.emit(
 handleOrderCreatedEvent(payload: OrderCreatedEvent) {
   // 处理和处理 "OrderCreatedEvent" 事件
 }
+
 ```
 
 :::warning 警告
@@ -110,6 +116,7 @@ export type OnEventOptions = OnOptions & {
    */
   suppressErrors?: boolean;
 };
+
 ```
 
 :::info 提示
@@ -121,6 +128,7 @@ export type OnEventOptions = OnOptions & {
 handleOrderCreatedEvent(payload: OrderCreatedEvent) {
   // 处理和处理 "OrderCreatedEvent" 事件
 }
+
 ```
 
 要使用命名空间/通配符，请将 `wildcard` 选项传入 `EventEmitterModule#forRoot()` 方法。启用命名空间/通配符后，事件可以是分隔符分隔的字符串(`foo.bar`)或数组(`['foo', 'bar']`)。分隔符也可作为配置属性(`delimiter`)进行配置。启用命名空间功能后，您可以使用通配符订阅事件：
@@ -130,6 +138,7 @@ handleOrderCreatedEvent(payload: OrderCreatedEvent) {
 handleOrderEvents(payload: OrderCreatedEvent | OrderRemovedEvent | OrderUpdatedEvent) {
   // 处理和处理事件
 }
+
 ```
 
 请注意，此类通配符仅适用于单个区块。参数 `order.*` 将匹配例如事件 `order.created` 和 `order.shipped`，但不会匹配 `order.delayed.out_of_stock`。要监听此类事件，请使用`多级通配符`模式（即 `**`），详见 `EventEmitter2` [文档](https://github.com/EventEmitter2/EventEmitter2#multi-level-wildcards) 。
@@ -141,6 +150,7 @@ handleOrderEvents(payload: OrderCreatedEvent | OrderRemovedEvent | OrderUpdatedE
 handleEverything(payload: any) {
   // 处理和处理事件
 }
+
 ```
 
 :::info 提示
@@ -159,6 +169,7 @@ this.eventEmitter.emit(
   'order.created',
   new OrderCreatedEvent({ orderId: 1, payload: {} })
 );
+
 ```
 
 :::info 注意

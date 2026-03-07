@@ -14,6 +14,7 @@ Nest 通过其跨平台功能如[守卫](/overview/guards)和[拦截器](/overvi
 async getAuthor(@Args('id', ParseIntPipe) id: number) {
   return this.authorsService.findOneById(id);
 }
+
 ```
 
 如你所见，GraphQL 以与 HTTP REST 处理器相同的方式同时支持守卫（guards）和管道（pipes）。正因如此，你可以将认证逻辑移至守卫中，甚至可以在 REST 和 GraphQL 两种 API 接口中复用同一个守卫类。同理，拦截器（interceptors）在这两类应用中的工作方式也完全一致：
@@ -24,6 +25,7 @@ async getAuthor(@Args('id', ParseIntPipe) id: number) {
 async upvotePost(@Args('postId') postId: number) {
   return this.postsService.upvoteById({ id: postId });
 }
+
 ```
 
 #### 执行上下文
@@ -41,6 +43,7 @@ export class AuthGuard implements CanActivate {
     return true;
   }
 }
+
 ```
 
 通过 `GqlExecutionContext.create()` 返回的 GraphQL 上下文对象，为每个解析器参数提供了 **get** 方法（例如 `getArgs()`、`getContext()` 等）。完成转换后，我们就能轻松提取当前请求中的任意 GraphQL 参数。
@@ -57,6 +60,7 @@ export class HttpExceptionFilter implements GqlExceptionFilter {
     return exception;
   }
 }
+
 ```
 
 :::info 注意
@@ -74,6 +78,7 @@ export const User = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) =>
     GqlExecutionContext.create(ctx).getContext().user
 );
+
 ```
 
 按如下方式使用 `@User()` 自定义装饰器：
@@ -84,6 +89,7 @@ async upvotePost(
   @User() user: UserEntity,
   @Args('postId') postId: number,
 ) {}
+
 ```
 
 :::info 提示
@@ -98,6 +104,7 @@ async upvotePost(
 GraphQLModule.forRoot({
   fieldResolverEnhancers: ['interceptors']
 }),
+
 ```
 
 :::warning 警告
@@ -114,6 +121,7 @@ export function isResolvingGraphQLField(context: ExecutionContext): boolean {
   }
   return false;
 }
+
 ```
 
 #### 创建自定义驱动
@@ -142,6 +150,7 @@ class ExpressGraphQLDriver extends AbstractGraphQLDriver {
 
   async stop() {}
 }
+
 ```
 
 并按如下方式使用：
@@ -150,4 +159,5 @@ class ExpressGraphQLDriver extends AbstractGraphQLDriver {
 GraphQLModule.forRoot({
   driver: ExpressGraphQLDriver,
 });
+
 ```

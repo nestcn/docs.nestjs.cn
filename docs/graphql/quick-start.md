@@ -23,6 +23,7 @@ $ npm i @nestjs/graphql @nestjs/apollo @apollo/server @as-integrations/express5 
 
 # 对于 Fastify 和 Mercurius
 # npm i @nestjs/graphql @nestjs/mercurius graphql mercurius
+
 ```
 
 > warning **警告** `@nestjs/graphql@>=9` 和 `@nestjs/apollo^10` 包与 **Apollo v3** 兼容（查看 Apollo Server 3 [迁移指南](https://www.apollographql.com/docs/apollo-server/migration/) 了解更多详情），而 `@nestjs/graphql@^8` 仅支持 **Apollo v2**（例如，`apollo-server-express@2.x.x` 包）。
@@ -56,6 +57,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
   ],
 })
 export class AppModule {}
+
 ```
 
 > info **提示** 对于 `mercurius` 集成，您应该使用 `MercuriusDriver` 和 `MercuriusDriverConfig` 代替。两者都从 `@nestjs/mercurius` 包中导出。
@@ -76,6 +78,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
   ],
 })
 export class AppModule {}
+
 ```
 
 在这种情况下，这些选项将被转发到 `ApolloServer` 构造函数。
@@ -100,6 +103,7 @@ playground 是一个图形化、交互式、浏览器内的 GraphQL IDE，默认
 >   graphiql: true,
 > }),
 > ```
+
 >
 > 如果您的应用程序使用 [订阅](/graphql/subscriptions)，请确保使用 `graphql-ws`，因为 GraphiQL 不支持 `subscriptions-transport-ws`。
 
@@ -114,6 +118,7 @@ GraphQLModule.forRoot<ApolloDriverConfig>({
   driver: ApolloDriver,
   autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
 }),
+
 ```
 
 `autoSchemaFile` 属性值是将创建自动生成的模式的路径。或者，模式可以在内存中动态生成。要启用此功能，将 `autoSchemaFile` 属性设置为 `true`：
@@ -123,6 +128,7 @@ GraphQLModule.forRoot<ApolloDriverConfig>({
   driver: ApolloDriver,
   autoSchemaFile: true,
 }),
+
 ```
 
 默认情况下，生成的模式中的类型将按照它们在包含的模块中定义的顺序排列。要按字典顺序排序模式，将 `sortSchema` 属性设置为 `true`：
@@ -133,6 +139,7 @@ GraphQLModule.forRoot<ApolloDriverConfig>({
   autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
   sortSchema: true,
 }),
+
 ```
 
 #### 示例
@@ -148,6 +155,7 @@ GraphQLModule.forRoot<ApolloDriverConfig>({
   driver: ApolloDriver,
   typePaths: ['./**/*.graphql'],
 }),
+
 ```
 
 您通常还需要具有与 GraphQL SDL 类型相对应的 TypeScript 定义（类和接口）。手动创建相应的 TypeScript 定义是多余且繁琐的。这使我们没有单一的事实来源 - 在 SDL 中进行的每个更改都迫使我们也调整 TypeScript 定义。为了解决这个问题，`@nestjs/graphql` 包可以**自动生成**来自抽象语法树（[AST](https://en.wikipedia.org/wiki/Abstract_syntax_tree)）的 TypeScript 定义。要启用此功能，在配置 `GraphQLModule` 时添加 `definitions` 选项属性。
@@ -160,6 +168,7 @@ GraphQLModule.forRoot<ApolloDriverConfig>({
     path: join(process.cwd(), 'src/graphql.ts'),
   },
 }),
+
 ```
 
 `definitions` 对象的 path 属性指示在哪里保存生成的 TypeScript 输出。默认情况下，所有生成的 TypeScript 类型都创建为接口。要生成类，请指定 `outputAs` 属性，值为 `'class'`。
@@ -173,6 +182,7 @@ GraphQLModule.forRoot<ApolloDriverConfig>({
     outputAs: 'class',
   },
 }),
+
 ```
 
 上述方法在应用程序每次启动时动态生成 TypeScript 定义。或者，构建一个简单的脚本来按需生成这些定义可能更可取。例如，假设我们创建以下脚本作为 `generate-typings.ts`：
@@ -187,12 +197,14 @@ definitionsFactory.generate({
   path: join(process.cwd(), 'src/graphql.ts'),
   outputAs: 'class',
 });
+
 ```
 
 现在您可以按需运行此脚本：
 
 ```bash
 $ ts-node generate-typings
+
 ```
 
 > info **提示** 您可以预先编译脚本（例如，使用 `tsc`）并使用 `node` 执行它。
@@ -206,6 +218,7 @@ definitionsFactory.generate({
   outputAs: 'class',
   watch: true,
 });
+
 ```
 
 要为每个对象类型自动生成额外的 `__typename` 字段，启用 `emitTypenameField` 选项：
@@ -215,6 +228,7 @@ definitionsFactory.generate({
   // ...
   emitTypenameField: true,
 });
+
 ```
 
 要将解析器（查询、变更、订阅）生成为没有参数的普通字段，启用 `skipResolverArgs` 选项：
@@ -224,6 +238,7 @@ definitionsFactory.generate({
   // ...
   skipResolverArgs: true,
 });
+
 ```
 
 要将枚举生成为 TypeScript 联合类型而不是常规 TypeScript 枚举，将 `enumsAsTypes` 选项设置为 `true`：
@@ -233,6 +248,7 @@ definitionsFactory.generate({
   // ...
   enumsAsTypes: true,
 });
+
 ```
 
 #### Apollo Sandbox
@@ -255,6 +271,7 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
   ],
 })
 export class AppModule {}
+
 ```
 
 #### 示例
@@ -269,6 +286,7 @@ export class AppModule {}
 
 ```typescript
 const { schema } = app.get(GraphQLSchemaHost);
+
 ```
 
 > info **提示** 您必须在应用程序初始化后（在通过 `app.listen()` 或 `app.init()` 方法触发 `onModuleInit` 钩子之后）调用 `GraphQLSchemaHost#schema` getter。
@@ -286,6 +304,7 @@ const { schema } = app.get(GraphQLSchemaHost);
     typePaths: ['./**/*.graphql'],
   }),
 }),
+
 ```
 
 与其他工厂提供者一样，我们的工厂函数可以是 <a href="/fundamentals/dependency-injection#factory-providers-usefactory">异步的</a>，并且可以通过 `inject` 注入依赖项。
@@ -299,6 +318,7 @@ GraphQLModule.forRootAsync<ApolloDriverConfig>({
   }),
   inject: [ConfigService],
 }),
+
 ```
 
 或者，您可以使用类而不是工厂来配置 `GraphQLModule`，如下所示：
@@ -308,6 +328,7 @@ GraphQLModule.forRootAsync<ApolloDriverConfig>({
   driver: ApolloDriver,
   useClass: GqlConfigService,
 }),
+
 ```
 
 上面的构造在 `GraphQLModule` 内部实例化 `GqlConfigService`，使用它来创建选项对象。请注意，在此示例中，`GqlConfigService` 必须实现 `GqlOptionsFactory` 接口，如下所示。`GraphQLModule` 将调用所提供类的实例化对象上的 `createGqlOptions()` 方法。
@@ -321,6 +342,7 @@ class GqlConfigService implements GqlOptionsFactory {
     };
   }
 }
+
 ```
 
 如果您想重用现有的选项提供者而不是在 `GraphQLModule` 内部创建私有副本，请使用 `useExisting` 语法。
@@ -330,6 +352,7 @@ GraphQLModule.forRootAsync<ApolloDriverConfig>({
   imports: [ConfigModule],
   useExisting: ConfigService,
 }),
+
 ```
 
 #### Mercurius 集成
@@ -350,6 +373,7 @@ import { MercuriusDriver, MercuriusDriverConfig } from '@nestjs/mercurius';
   ],
 })
 export class AppModule {}
+
 ```
 
 > info **提示** 应用程序运行后，打开浏览器并导航到 `http://localhost:3000/graphiql`。您应该看到 [GraphQL IDE](https://github.com/graphql/graphiql)。
@@ -364,6 +388,7 @@ export class AppModule {}
 GraphQLModule.forRoot({
   include: [CatsModule],
 }),
+
 ```
 
 > warning **警告** 如果您在单个应用程序中使用 `@apollo/server` 和 `@as-integrations/fastify` 包以及多个 GraphQL 端点，请确保在 `GraphQLModule` 配置中启用 `disableHealthCheck` 设置。

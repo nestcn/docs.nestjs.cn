@@ -45,6 +45,7 @@ export function upperDirectiveTransformer(
     },
   });
 }
+
 ```
 
 现在，在 `GraphQLModule#forRoot` 方法中使用 `transformSchema` 函数应用 `upperDirectiveTransformer` 转换函数：
@@ -54,6 +55,7 @@ GraphQLModule.forRoot({
   // ...
   transformSchema: (schema) => upperDirectiveTransformer(schema, 'upper'),
 });
+
 ```
 
 注册后，`@upper` 指令就可以在我们的模式中使用。不过，应用指令的方式会根据你采用的方法（代码优先或模式优先）而有所不同。
@@ -66,6 +68,7 @@ GraphQLModule.forRoot({
 @Directive('@upper')
 @Field()
 title: string;
+
 ```
 
 :::info 提示
@@ -80,6 +83,7 @@ title: string;
 async getAuthor(@Args({ name: 'id', type: () => Int }) id: number) {
   return this.authorsService.findOneById(id);
 }
+
 ```
 
 :::warning 警告
@@ -101,6 +105,7 @@ GraphQLModule.forRoot({
     ],
   },
 }),
+
 ```
 
 :::info 提示
@@ -119,4 +124,5 @@ type Post {
   title: String! @upper
   votes: Int
 }
+
 ```

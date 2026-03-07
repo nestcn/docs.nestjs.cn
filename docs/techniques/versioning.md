@@ -38,13 +38,13 @@ URI 版本控制使用请求 URI 中的版本，例如 `https://example.com/v1/r
 要为您的应用程序启用 URI 版本控制，请执行以下操作：
 
 ```typescript
-@@filename(main)
 const app = await NestFactory.create(AppModule);
 // 或使用 "app.enableVersioning()"
 app.enableVersioning({
   type: VersioningType.URI,
 });
 await app.listen(process.env.PORT ?? 3000);
+
 ```
 
 > warning **注意** URI 中的版本默认会自动加上 `v` 前缀，但可以通过将 `prefix` 键设置为您所需的前缀来配置前缀值，或者如果您希望禁用它，则设置为 `false`。
@@ -60,13 +60,13 @@ Header 版本控制的 HTTP 请求示例：
 要为您的应用程序启用 **Header 版本控制**，请执行以下操作：
 
 ```typescript
-@@filename(main)
 const app = await NestFactory.create(AppModule);
 app.enableVersioning({
   type: VersioningType.HEADER,
   header: 'Custom-Header',
 });
 await app.listen(process.env.PORT ?? 3000);
+
 ```
 
 `header` 属性应该是包含请求版本的标头的名称。
@@ -82,13 +82,13 @@ Media Type 版本控制使用请求的 `Accept` 标头来指定版本。
 要为您的应用程序启用 **Media Type 版本控制**，请执行以下操作：
 
 ```typescript
-@@filename(main)
 const app = await NestFactory.create(AppModule);
 app.enableVersioning({
   type: VersioningType.MEDIA_TYPE,
   key: 'v=',
 });
 await app.listen(process.env.PORT ?? 3000);
+
 ```
 
 `key` 属性应该是包含版本的键值对的键和分隔符。对于示例 `Accept: application/json;v=2`，`key` 属性将被设置为 `v=`。
@@ -112,7 +112,6 @@ await app.listen(process.env.PORT ?? 3000);
 要为您的应用程序启用 **自定义版本控制**，请创建一个 `extractor` 函数并将其传递到您的应用程序中，如下所示：
 
 ```typescript
-@@filename(main)
 // 示例提取器，从自定义标头中提取版本列表并将其转换为排序数组。
 // 本示例使用 Fastify，但 Express 请求的处理方式类似。
 const extractor = (request: FastifyRequest): string | string[] =>
@@ -128,6 +127,7 @@ app.enableVersioning({
   extractor,
 });
 await app.listen(process.env.PORT ?? 3000);
+
 ```
 
 #### 用法
@@ -143,7 +143,6 @@ await app.listen(process.env.PORT ?? 3000);
 要为控制器添加版本，请执行以下操作：
 
 ```typescript
-@@filename(cats.controller)
 @Controller({
   version: '1',
 })
@@ -153,16 +152,7 @@ export class CatsControllerV1 {
     return 'This action returns all cats for version 1';
   }
 }
-@@switch
-@Controller({
-  version: '1',
-})
-export class CatsControllerV1 {
-  @Get('cats')
-  findAll() {
-    return 'This action returns all cats for version 1';
-  }
-}
+
 ```
 
 #### 路由版本
@@ -172,7 +162,6 @@ export class CatsControllerV1 {
 要为单个路由添加版本，请执行以下操作：
 
 ```typescript
-@@filename(cats.controller)
 import { Controller, Get, Version } from '@nestjs/common';
 
 @Controller()
@@ -189,8 +178,7 @@ export class CatsController {
     return 'This action returns all cats for version 2';
   }
 }
-@@switch
-import { Controller, Get, Version } from '@nestjs/common';
+
 
 @Controller()
 export class CatsController {
@@ -206,6 +194,7 @@ export class CatsController {
     return 'This action returns all cats for version 2';
   }
 }
+
 ```
 
 #### 多个版本
@@ -215,7 +204,6 @@ export class CatsController {
 要添加多个版本，请执行以下操作：
 
 ```typescript
-@@filename(cats.controller)
 @Controller({
   version: ['1', '2'],
 })
@@ -225,16 +213,7 @@ export class CatsController {
     return 'This action returns all cats for version 1 or 2';
   }
 }
-@@switch
-@Controller({
-  version: ['1', '2'],
-})
-export class CatsController {
-  @Get('cats')
-  findAll() {
-    return 'This action returns all cats for version 1 or 2';
-  }
-}
+
 ```
 
 #### 版本“Neutral”
@@ -248,7 +227,6 @@ export class CatsController {
 要添加版本 neutral 控制器或路由，请执行以下操作：
 
 ```typescript
-@@filename(cats.controller)
 import { Controller, Get, VERSION_NEUTRAL } from '@nestjs/common';
 
 @Controller({
@@ -260,8 +238,7 @@ export class CatsController {
     return 'This action returns all cats regardless of version';
   }
 }
-@@switch
-import { Controller, Get, VERSION_NEUTRAL } from '@nestjs/common';
+
 
 @Controller({
   version: VERSION_NEUTRAL,
@@ -272,6 +249,7 @@ export class CatsController {
     return 'This action returns all cats regardless of version';
   }
 }
+
 ```
 
 #### 全局默认版本
@@ -279,7 +257,6 @@ export class CatsController {
 如果您不想为每个控制器/或单个路由提供版本，或者如果您希望为每个未指定版本的控制器/路由设置特定版本作为默认版本，您可以如下设置 `defaultVersion`：
 
 ```typescript
-@@filename(main)
 app.enableVersioning({
   // ...
   defaultVersion: '1'
@@ -288,6 +265,7 @@ app.enableVersioning({
   // 或
   defaultVersion: VERSION_NEUTRAL
 });
+
 ```
 
 #### 中间件版本控制
@@ -295,7 +273,6 @@ app.enableVersioning({
 [](/overview/middlewares) 也可以使用版本控制元数据来为特定路由的版本配置中间件。 为此，请将版本号提供为 `MiddlewareConsumer.forRoutes()` 方法的参数之一：
 
 ```typescript
-@@filename(app.module)
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { CatsModule } from './cats/cats.module';
@@ -311,6 +288,7 @@ export class AppModule implements NestModule {
       .forRoutes({ path: 'cats', method: RequestMethod.GET, version: '2' });
   }
 }
+
 ```
 
 使用上面的代码，`LoggerMiddleware` 将仅应用于 `/cats` 端点的版本 '2'。

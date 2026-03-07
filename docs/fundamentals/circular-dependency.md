@@ -22,6 +22,7 @@ export class CatsService {
     private commonService: CommonService,
   ) {}
 }
+
 ```
 
 :::info 提示
@@ -38,6 +39,7 @@ export class CommonService {
     private catsService: CatsService,
   ) {}
 }
+
 ```
 
 :::warning 警告
@@ -57,6 +59,7 @@ export class CommonService {
   imports: [forwardRef(() => CatsModule)],
 })
 export class CommonModule {}
+
 ```
 
 这涵盖了关系的一侧。现在让我们对 `CatsModule` 做同样的事情：
@@ -66,4 +69,5 @@ export class CommonModule {}
   imports: [forwardRef(() => CommonModule)],
 })
 export class CatsModule {}
+
 ```

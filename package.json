@@ -8,21 +8,21 @@
     "build": "npm run check-links && rspress build && node scripts/copy-assets.cjs",
     "dev": "rspress dev",
     "preview": "rspress preview",
-    "fix-code-blocks": "node scripts/fix-code-blocks-v2.cjs",
-    "fix-template-syntax": "node scripts/fix-template-syntax.cjs",
-    "fix-all": "npm run fix-code-blocks && npm run fix-template-syntax",
-    "translate-docs": "node scripts/translate-docs.cjs",
-    "translate-docs:verbose": "node scripts/translate-docs.cjs --verbose",
-    "translate-docs:no-ai": "node scripts/translate-docs.cjs --no-ai",
-    "translate-docs:mistral": "node scripts/translate-docs.cjs --model @cf/mistral/mistral-7b-instruct-v0.1 --verbose",
-    "translate-docs:openchat": "node scripts/translate-docs.cjs --model @cf/chatchat/openchat-3.5-0106 --verbose",
-    "translate-docs:single": "node scripts/translate-single.cjs",
-    "post-translate": "node scripts/post-translate-processor.cjs",
-    "post-translate:verbose": "node scripts/post-translate-processor.cjs --verbose",
+    "fix-code-blocks": "tsx scripts/fix-code-blocks.ts",
+    "fix-links": "tsx scripts/fix-links.ts",
+    "fix-all": "npm run fix-code-blocks && npm run fix-links",
+    "translate-docs": "bun scripts/translate-docs.ts",
+    "translate-docs:verbose": "bun scripts/translate-docs.ts --verbose",
+    "translate-docs:dry-run": "bun scripts/translate-docs.ts --dry-run",
+    "translate-docs:force": "bun scripts/translate-docs.ts --force",
+    "translate-docs:no-ai": "bun scripts/translate-docs.ts --no-ai",
+    "translate-docs:mistral": "bun scripts/translate-docs.ts --model @cf/mistral/mistral-7b-instruct-v0.1 --verbose",
+    "translate-docs:openchat": "bun scripts/translate-docs.ts --model @cf/chatchat/openchat-3.5-0106 --verbose",
+    "translate-docs:single": "bun scripts/translate-single.ts",
+    "check-placeholders": "tsx scripts/check-placeholders.ts",
     "sync-and-translate": "npm run translate-docs && npm run fix-all",
     "sync-and-translate:no-ai": "npm run translate-docs:no-ai && npm run fix-all",
     "update-sync-time": "node scripts/update-sync-time.cjs",
-    "test-cloudflare": "node test-cloudflare-translate.js",
     "check-links": "node scripts/check-links.cjs",
     "check-internal-links": "node scripts/check-internal-links.cjs"
   },
@@ -37,6 +37,8 @@
   },
   "devDependencies": {
     "@types/node": "^24.9.2",
-    "markdown-link-check": "^3.14.2"
+    "markdown-link-check": "^3.14.2",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   }
 }

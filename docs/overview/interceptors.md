@@ -54,6 +54,7 @@ export class LoggingInterceptor implements NestInterceptor {
       );
   }
 }
+
 ```
 
 :::info 提示
@@ -73,6 +74,7 @@ export class LoggingInterceptor implements NestInterceptor {
  ```typescript title="cats.controller.ts"
 @UseInterceptors(LoggingInterceptor)
 export class CatsController {}
+
 ```
 
 :::info 提示
@@ -84,6 +86,7 @@ export class CatsController {}
 ```typescript
 Before...
 After... 1ms
+
 ```
 
 请注意，我们传入的是 `LoggingInterceptor` 类（而不是实例），将实例化的责任交给框架并启用依赖注入。与管道、守卫和异常过滤器一样，我们也可以直接传入一个实例：
@@ -91,6 +94,7 @@ After... 1ms
  ```typescript title="cats.controller.ts"
 @UseInterceptors(new LoggingInterceptor())
 export class CatsController {}
+
 ```
 
 如前所述，上述构建方式将拦截器附加到该控制器声明的每个处理程序上。若要将拦截器的作用域限制在单个方法内，只需在**方法级别**应用装饰器即可。
@@ -100,6 +104,7 @@ export class CatsController {}
 ```typescript
 const app = await NestFactory.create(AppModule);
 app.useGlobalInterceptors(new LoggingInterceptor());
+
 ```
 
 全局拦截器会作用于整个应用程序中的每个控制器和每个路由处理程序。在依赖注入方面，从任何模块外部注册的全局拦截器（如上述示例中使用 `useGlobalInterceptors()`）无法注入依赖项，因为这是在模块上下文之外完成的。为解决此问题，您可以使用以下构造**直接从任何模块中**设置拦截器：
@@ -117,6 +122,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
   ],
 })
 export class AppModule {}
+
 ```
 
 :::info 提示
@@ -148,6 +154,7 @@ export class TransformInterceptor<T> implements NestInterceptor<T, Response<T>> 
     return next.handle().pipe(map(data => ({ data })));
   }
 }
+
 ```
 
 :::info 提示
@@ -160,6 +167,7 @@ Nest 拦截器同时支持同步和异步的 `intercept()` 方法。如果需要
 {
   "data": []
 }
+
 ```
 
 拦截器在创建可重用的解决方案方面具有巨大价值，这些方案可以满足整个应用程序中出现的需求。例如，假设我们需要将每个出现的 `null` 值转换为空字符串 `''`。我们可以用一行代码实现，并将拦截器全局绑定，这样它就会自动被每个已注册的处理程序使用。
@@ -177,6 +185,7 @@ export class ExcludeNullInterceptor implements NestInterceptor {
       .pipe(map(value => value === null ? '' : value ));
   }
 }
+
 ```
 
 #### 异常映射
@@ -204,6 +213,7 @@ export class ErrorsInterceptor implements NestInterceptor {
       );
   }
 }
+
 ```
 
 #### 流覆盖
@@ -224,6 +234,7 @@ export class CacheInterceptor implements NestInterceptor {
     return next.handle();
   }
 }
+
 ```
 
 我们的 `CacheInterceptor` 有一个硬编码的 `isCached` 变量和一个同样硬编码的响应 `[]`。关键要注意的是，我们在这里返回了一个由 RxJS 的 `of()` 操作符创建的新流，因此路由处理程序**根本不会被调用** 。当有人调用使用 `CacheInterceptor` 的端点时，响应（一个硬编码的空数组）会立即返回。为了创建一个通用解决方案，你可以利用 `Reflector` 并创建一个自定义装饰器。`Reflector` 在[守卫](/overview/guards)章节中有详细描述。
@@ -251,6 +262,7 @@ export class TimeoutInterceptor implements NestInterceptor {
     );
   };
 };
+
 ```
 
 5 秒后，请求处理将被取消。您也可以在抛出 `RequestTimeoutException` 之前添加自定义逻辑（例如释放资源）。

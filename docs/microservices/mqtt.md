@@ -8,6 +8,7 @@
 
 ```bash
 $ npm i --save mqtt
+
 ```
 
 #### 概述
@@ -21,6 +22,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
     url: 'mqtt://localhost:1883',
   },
 });
+
 ```
 
 :::info 注意
@@ -52,6 +54,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
   ]
   ...
 })
+
 ```
 
 其他创建客户端的方式（使用 `ClientProxyFactory` 或 `@Client()`）也同样适用。您可以[在此](../microservices/basics#客户端)了解更多相关信息。
@@ -65,6 +68,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 getNotifications(@Payload() data: number[], @Ctx() context: MqttContext) {
   console.log(`Topic: ${context.getTopic()}`);
 }
+
 ```
 
 :::info 提示
@@ -78,6 +82,7 @@ getNotifications(@Payload() data: number[], @Ctx() context: MqttContext) {
 getNotifications(@Payload() data: number[], @Ctx() context: MqttContext) {
   console.log(context.getPacket());
 }
+
 ```
 
 #### 通配符
@@ -89,6 +94,7 @@ getNotifications(@Payload() data: number[], @Ctx() context: MqttContext) {
 getTemperature(@Ctx() context: MqttContext) {
   console.log(`Topic: ${context.getTopic()}`);
 }
+
 ```
 
 #### 服务质量(QoS)
@@ -105,6 +111,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
     },
   },
 });
+
 ```
 
 如需针对特定主题设置 QoS，可考虑创建[自定义传输器](../microservices/custom-transport) 。
@@ -120,6 +127,7 @@ const record = new MqttRecordBuilder(':cat:')
   .setQoS(1)
   .build();
 client.send('replace-emoji', record).subscribe(...);
+
 ```
 
 :::info 提示
@@ -134,6 +142,7 @@ replaceEmoji(@Payload() data: string, @Ctx() context: MqttContext): string {
   const { properties: { userProperties } } = context.getPacket();
   return userProperties['x-version'] === '1.0.0' ? '🐱' : '🐈';
 }
+
 ```
 
 在某些情况下，您可能想为多个请求配置用户属性，可以将这些选项传递给 `ClientProxyFactory`。
@@ -158,6 +167,7 @@ import { ClientProxyFactory, Transport } from '@nestjs/microservices';
   ],
 })
 export class ApiModule {}
+
 ```
 
 #### 实例状态更新
@@ -168,6 +178,7 @@ export class ApiModule {}
 this.client.status.subscribe((status: MqttStatus) => {
   console.log(status);
 });
+
 ```
 
 :::info 提示
@@ -181,6 +192,7 @@ const server = app.connectMicroservice<MicroserviceOptions>(...);
 server.status.subscribe((status: MqttStatus) => {
   console.log(status);
 });
+
 ```
 
 #### 监听 MQTT 事件
@@ -191,6 +203,7 @@ server.status.subscribe((status: MqttStatus) => {
 this.client.on('error', (err) => {
   console.error(err);
 });
+
 ```
 
 同样地，您可以监听服务器的内部事件：
@@ -199,6 +212,7 @@ this.client.on('error', (err) => {
 server.on<MqttEvents>('error', (err) => {
   console.error(err);
 });
+
 ```
 
 :::info 提示
@@ -213,10 +227,12 @@ server.on<MqttEvents>('error', (err) => {
 
 ```typescript
 const mqttClient = this.client.unwrap<import('mqtt').MqttClient>();
+
 ```
 
 同样地，您可以访问服务器的底层驱动实例：
 
 ```typescript
 const mqttClient = server.unwrap<import('mqtt').MqttClient>();
+
 ```

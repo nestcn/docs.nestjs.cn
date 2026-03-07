@@ -47,6 +47,7 @@ export class CatsService {
     return this.cats;
   }
 }
+
 ```
 
 > info **Hint** To create a service using the CLI, simply execute the `$ nest g service cats` command.
@@ -61,6 +62,7 @@ export interface Cat {
   age: number;
   breed: string;
 }
+
 ```
 
 Now that we have a service class to retrieve cats, let's use it inside the `CatsController`:
@@ -104,6 +106,7 @@ export class CatsController {
     return this.catsService.findAll();
   }
 }
+
 ```
 
 The `CatsService` is **injected** through the class constructor. Notice the use of the `private` keyword. This shorthand allows us to both declare and initialize the `catsService` member in the same line, streamlining the process.
@@ -116,6 +119,7 @@ In Nest, thanks to TypeScript's capabilities, managing dependencies is straightf
 
 ```typescript
 constructor(private catsService: CatsService) {}
+
 ```
 
 #### Scopes
@@ -141,6 +145,7 @@ import { Injectable, Optional, Inject } from '@nestjs/common';
 export class HttpService<T> {
   constructor(@Optional() @Inject('HTTP_OPTIONS') private httpClient: T) {}
 }
+
 ```
 
 In the example above, we're using a custom provider, which is why we include the `HTTP_OPTIONS` custom **token**. Previous examples demonstrated constructor-based injection, where a dependency is indicated through a class in the constructor. For more details on custom providers and how their associated tokens work, check out the [Custom Providers](/fundamentals/custom-providers) chapter.
@@ -157,6 +162,7 @@ export class HttpService<T> {
   @Inject('HTTP_OPTIONS')
   private readonly httpClient: T;
 }
+
 ```
 
 > warning **Warning** If your class doesn't extend another class, it's generally better to use **constructor-based** injection. The constructor clearly specifies which dependencies are required, offering better visibility and making the code easier to understand compared to class properties annotated with `@Inject`.
@@ -175,6 +181,7 @@ import { CatsService } from './cats/cats.service';
   providers: [CatsService],
 })
 export class AppModule {}
+
 ```
 
 Nest will now be able to resolve the dependencies of the `CatsController` class.

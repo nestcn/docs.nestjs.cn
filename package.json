@@ -22,9 +22,9 @@
     "check-placeholders": "tsx scripts/check-placeholders.ts",
     "sync-and-translate": "npm run translate-docs && npm run fix-all",
     "sync-and-translate:no-ai": "npm run translate-docs:no-ai && npm run fix-all",
-    "update-sync-time": "node scripts/update-sync-time.cjs",
-    "check-links": "node scripts/check-links.cjs",
-    "check-internal-links": "node scripts/check-internal-links.cjs"
+    "update-sync-time": "bun scripts/update-sync-time.ts",
+    "check-links": "bun scripts/check-links.ts",
+    "check-internal-links": "bun scripts/check-internal-links.ts"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.9",

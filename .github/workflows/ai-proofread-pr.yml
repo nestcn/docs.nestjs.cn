@@ -1,4 +1,4 @@
-name: AI Proofread and Merge PR
+name: AI Proofread and Auto Fix PR
 
 on:
   pull_request:
@@ -20,6 +20,10 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     
+    outputs:
+      needs_fix: ${{ steps.check-issues.outputs.needs_fix }}
+      fix_applied: ${{ steps.auto-fix.outputs.fix_applied }}
+    
     steps:
       - name: Checkout PR
         uses: actions/checkout@v4
@@ -27,6 +31,11 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.ref || format('refs/pull/{0}/head', github.event.inputs.pr_number) }}
+
+      - name: Setup Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
@@ -80,26 +89,14 @@ jobs:
             echo "❌ 发现 $PLACEHOLDER_COUNT 个文件存在占位符问题"
             echo "has_placeholders=true" >> $GITHUB_OUTPUT
             
+            # 保存有问题的文件列表
+            echo "placeholder_files<<EOF" >> $GITHUB_OUTPUT
+            echo "$PLACEHOLDER_FILES" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+            
             # 列出有问题的文件
             echo "📋 存在占位符问题的文件："
             echo "$PLACEHOLDER_FILES"
-            
-            # 创建评论内容
-            COMMENT_BODY="## ⚠️ 占位符检查失败
-
-检测到以下文件存在占位符问题，需要手动修复：
-
-\`\`\`
-$PLACEHOLDER_FILES
-\`\`\`
-
-占位符 \`__LINK_N__\`、\`__HTML_TAG_N__\`、\`__INLINE_CODE_N__\`、\`__CODE_BLOCK_N__\` 未被正确恢复。
-
-请检查翻译脚本或手动修复这些文件。
-"
-            echo "comment_body<<EOF" >> $GITHUB_OUTPUT
-            echo "$COMMENT_BODY" >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
           else
             echo "✅ 未发现占位符问题"
             echo "has_placeholders=false" >> $GITHUB_OUTPUT
@@ -132,17 +129,21 @@ $PLACEHOLDER_FILES
 校对要求：
 1. 检查是否有明显的翻译错误
 2. 检查是否有未翻译的英文内容（代码和专有名词除外）
-3. 检查是否有占位符问题（如 __LINK_N__、__CODE_BLOCK_N__ 等）
-4. 检查是否有格式问题
+3. 检查是否有格式问题
 
-如果发现问题，请列出具体问题和建议的修复方案。
+如果发现问题，请按以下格式回复：
+## 问题列表
+- 文件: xxx.md
+  问题: 具体问题描述
+  建议: 建议的修复方案
+
 如果没有问题，请回复 "✅ 校对通过"。
 
 文件路径: ${filePath}`
                   },
                   {
                     role: 'user',
-                    content: content.substring(0, 4000) // 限制长度
+                    content: content.substring(0, 4000)
                   }
                 ],
                 max_tokens: 1000
@@ -156,12 +157,18 @@ $PLACEHOLDER_FILES
           async function main() {
             const changedFiles = process.env.CHANGED_FILES.split('\n').filter(f => f.trim());
             const results = [];
+            const issues = [];
             
-            for (const file of changedFiles.slice(0, 5)) { // 最多校对5个文件
+            for (const file of changedFiles.slice(0, 5)) {
               try {
                 const content = fs.readFileSync(file, 'utf8');
                 const result = await proofreadWithAI(content, file);
                 results.push({ file, result });
+                
+                if (result.includes('问题') && !result.includes('校对通过')) {
+                  issues.push({ file, result });
+                }
+                
                 console.log(`✅ 校对完成: ${file}`);
               } catch (error) {
                 console.error(`❌ 校对失败: ${file}`, error.message);
@@ -170,6 +177,7 @@ $PLACEHOLDER_FILES
             }
             
             fs.writeFileSync('/tmp/proofread-results.json', JSON.stringify(results, null, 2));
+            fs.writeFileSync('/tmp/proofread-issues.json', JSON.stringify(issues, null, 2));
           }
           
           main().catch(console.error);
@@ -184,16 +192,142 @@ $PLACEHOLDER_FILES
             echo "📋 校对结果："
             cat /tmp/proofread-results.json
             
-            # 检查是否有校对失败的情况
-            FAILED=$(cat /tmp/proofread-results.json | jq -r '.[] | select(.result | contains("校对失败") or contains("问题"))' || true)
+            # 检查是否有问题
+            ISSUES_COUNT=$(cat /tmp/proofread-issues.json | jq 'length' 2>/dev/null || echo "0")
             
-            if [ -n "$FAILED" ]; then
+            if [ "$ISSUES_COUNT" -gt 0 ]; then
               echo "proofread_passed=false" >> $GITHUB_OUTPUT
+              echo "issues_count=$ISSUES_COUNT" >> $GITHUB_OUTPUT
             else
               echo "proofread_passed=true" >> $GITHUB_OUTPUT
+              echo "issues_count=0" >> $GITHUB_OUTPUT
             fi
           else
             echo "proofread_passed=true" >> $GITHUB_OUTPUT
+            echo "issues_count=0" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check if needs fix
+        id: check-issues
+        run: |
+          NEEDS_FIX="false"
+          ISSUES=""
+          
+          # 检查占位符问题
+          if [ "${{ steps.check-placeholders.outputs.has_placeholders }}" == "true" ]; then
+            NEEDS_FIX="true"
+            ISSUES="placeholders"
+          fi
+          
+          # 检查校对问题
+          if [ "${{ steps.ai-proofread.outputs.proofread_passed }}" == "false" ]; then
+            NEEDS_FIX="true"
+            ISSUES="${ISSUES},proofread"
+          fi
+          
+          echo "needs_fix=$NEEDS_FIX" >> $GITHUB_OUTPUT
+          echo "issues=$ISSUES" >> $GITHUB_OUTPUT
+          
+          echo "📋 检查结果: needs_fix=$NEEDS_FIX, issues=$ISSUES"
+
+      - name: Auto fix placeholder issues
+        id: auto-fix-placeholders
+        if: steps.check-placeholders.outputs.has_placeholders == 'true'
+        run: |
+          echo "🔧 自动修复占位符问题..."
+          
+          PLACEHOLDER_FILES="${{ steps.check-placeholders.outputs.placeholder_files }}"
+          FIXED_COUNT=0
+          
+          for file in $PLACEHOLDER_FILES; do
+            if [ -f "$file" ]; then
+              echo "📝 尝试修复: $file"
+              
+              # 获取对应的 content 文件
+              CONTENT_FILE="${file/docs\//content/}"
+              
+              if [ -f "$CONTENT_FILE" ]; then
+                echo "  从源文件重新翻译: $CONTENT_FILE"
+                
+                # 重新翻译该文件
+                bun run translate-docs:single "$CONTENT_FILE" "$file" 2>/dev/null || {
+                  echo "  ⚠️ 翻译失败，尝试从 git 历史恢复"
+                  
+                  # 尝试从最近的好的 commit 恢复
+                  LAST_GOOD_COMMIT=$(git log --oneline --all -- "$file" | grep -v "Sync official" | head -1 | awk '{print $1}')
+                  
+                  if [ -n "$LAST_GOOD_COMMIT" ]; then
+                    echo "  从 commit $LAST_GOOD_COMMIT 恢复"
+                    git checkout "$LAST_GOOD_COMMIT" -- "$file" || echo "  ⚠️ 恢复失败"
+                    FIXED_COUNT=$((FIXED_COUNT + 1))
+                  fi
+                }
+              else
+                echo "  ⚠️ 源文件不存在: $CONTENT_FILE"
+              fi
+            fi
+          done
+          
+          echo "fixed_count=$FIXED_COUNT" >> $GITHUB_OUTPUT
+          echo "✅ 修复了 $FIXED_COUNT 个文件"
+
+      - name: Auto fix proofread issues
+        id: auto-fix-proofread
+        if: steps.ai-proofread.outputs.proofread_passed == 'false'
+        run: |
+          echo "🔧 自动修复校对问题..."
+          
+          if [ -f "/tmp/proofread-issues.json" ]; then
+            ISSUES=$(cat /tmp/proofread-issues.json)
+            FIXED_COUNT=0
+            
+            # 解析问题文件
+            ISSUE_FILES=$(cat /tmp/proofread-issues.json | jq -r '.[].file' 2>/dev/null || true)
+            
+            for file in $ISSUE_FILES; do
+              if [ -f "$file" ]; then
+                echo "📝 尝试重新翻译: $file"
+                
+                # 获取对应的 content 文件
+                CONTENT_FILE="${file/docs\//content/}"
+                
+                if [ -f "$CONTENT_FILE" ]; then
+                  # 重新翻译
+                  bun run translate-docs:single "$CONTENT_FILE" "$file" 2>/dev/null && {
+                    FIXED_COUNT=$((FIXED_COUNT + 1))
+                    echo "  ✅ 重新翻译成功"
+                  } || {
+                    echo "  ⚠️ 重新翻译失败"
+                  }
+                fi
+              fi
+            done
+            
+            echo "fixed_count=$FIXED_COUNT" >> $GITHUB_OUTPUT
+            echo "✅ 修复了 $FIXED_COUNT 个文件"
+          fi
+
+      - name: Commit fixes to PR
+        id: auto-fix
+        if: steps.check-issues.outputs.needs_fix == 'true'
+        run: |
+          # 检查是否有变更
+          git add .
+          if git diff --cached --quiet; then
+            echo "ℹ️ 没有需要提交的修复"
+            echo "fix_applied=false" >> $GITHUB_OUTPUT
+          else
+            echo "📝 提交自动修复..."
+            
+            # 获取当前重试次数
+            PR_NUMBER="${{ steps.changed-files.outputs.pr_number }}"
+            COMMIT_MSG="🔧 Auto-fix: 修复翻译问题 (PR #$PR_NUMBER)"
+            
+            git commit -m "$COMMIT_MSG"
+            git push
+            
+            echo "fix_applied=true" >> $GITHUB_OUTPUT
+            echo "✅ 已提交自动修复，将触发新的校对"
           fi
 
       - name: Create PR comment
@@ -222,10 +356,16 @@ $PLACEHOLDER_FILES
             COMMENT_BODY="${COMMENT_BODY}- ✅ **AI 校对**: 通过
 "
           elif [ "${{ steps.ai-proofread.outputs.proofread_passed }}" == "false" ]; then
-            COMMENT_BODY="${COMMENT_BODY}- ⚠️ **AI 校对**: 发现问题
+            COMMENT_BODY="${COMMENT_BODY}- ⚠️ **AI 校对**: 发现 ${{ steps.ai-proofread.outputs.issues_count }} 个问题
 "
           else
             COMMENT_BODY="${COMMENT_BODY}- ➖ **AI 校对**: 跳过
+"
+          fi
+          
+          # 自动修复状态
+          if [ "${{ steps.auto-fix.outputs.fix_applied }}" == "true" ]; then
+            COMMENT_BODY="${COMMENT_BODY}- 🔄 **自动修复**: 已应用，等待重新校对
 "
           fi
           
@@ -236,7 +376,20 @@ $PLACEHOLDER_FILES
 ### 详细校对结果
 
 \`\`\`json
-$(cat /tmp/proofread-results.json | jq -r '.[] | "📄 \(.file)\n\(.result)\n"')
+$(cat /tmp/proofread-results.json | jq -r '.[] | "📄 \(.file)\n\(.result)\n"' | head -50)
+\`\`\`
+"
+          fi
+          
+          # 添加占位符问题
+          if [ "${{ steps.check-placeholders.outputs.has_placeholders }}" == "true" ]; then
+            COMMENT_BODY="${COMMENT_BODY}
+
+### ⚠️ 占位符问题
+
+以下文件存在占位符问题：
+\`\`\`
+${{ steps.check-placeholders.outputs.placeholder_files }}
 \`\`\`
 "
           fi
@@ -252,8 +405,8 @@ $(cat /tmp/proofread-results.json | jq -r '.[] | "📄 \(.file)\n\(.result)\n"')
 
       - name: Auto merge PR
         if: |
-          steps.check-placeholders.outputs.has_placeholders != 'true' &&
-          (steps.ai-proofread.outputs.proofread_passed == 'true' || steps.ai-proofread.outputs.proofread_passed == '')
+          steps.check-issues.outputs.needs_fix != 'true' &&
+          steps.auto-fix.outputs.fix_applied != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -303,3 +456,4 @@ PR 当前状态无法自动合并：
           echo "- **PR 号**: ${{ steps.changed-files.outputs.pr_number }}" >> $GITHUB_STEP_SUMMARY
           echo "- **占位符检查**: ${{ steps.check-placeholders.outputs.has_placeholders == 'true' && '❌ 失败' || '✅ 通过' }}" >> $GITHUB_STEP_SUMMARY
           echo "- **AI 校对**: ${{ steps.ai-proofread.outputs.proofread_passed == 'true' && '✅ 通过' || (steps.ai-proofread.outputs.proofread_passed == 'false' && '⚠️ 有问题') || '➖ 跳过' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **自动修复**: ${{ steps.auto-fix.outputs.fix_applied == 'true' && '✅ 已应用' || '➖ 无需修复' }}" >> $GITHUB_STEP_SUMMARY

@@ -1,7 +1,3 @@
-<!-- 此文件从 content/faq\keep-alive-connections.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-28T06:24:18.272Z -->
-<!-- 源文件: content/faq\keep-alive-connections.md -->
-
 ### Keep alive connections
 
 By default, the HTTP adapters of NestJS will wait until the response is finished before closing the application. But sometimes, this behavior is not desired, or unexpected. There might be some requests that use `Connection: Keep-Alive` headers that live for a long time.
@@ -26,5 +22,4 @@ async function bootstrap() {
 }
 
 bootstrap();
-
 ```

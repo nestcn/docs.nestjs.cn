@@ -1,7 +1,3 @@
-<!-- 此文件从 content/graphql/index.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-28T11:23:59.619Z -->
-<!-- 源文件: content/graphql/index.md -->
-
 # GraphQL
 
 NestJS 为 GraphQL 提供了一流的支持，让您能够轻松构建强大、高效、可扩展的 GraphQL API。

@@ -1,7 +1,3 @@
-<!-- 此文件从 content/techniques\validation.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T07:09:52.748Z -->
-<!-- 源文件: content/techniques\validation.md -->
-
 ### Validation
 
 It is best practice to validate the correctness of any data sent into a web application. To automatically validate incoming requests, Nest provides several pipes available right out-of-the-box:
@@ -22,16 +18,13 @@ In the [Pipes](/pipes) chapter, we went through the process of building simple p
 
 To begin using it, we first install the required dependency.
 
-
 ```bash
 $ npm i --save class-validator class-transformer
-
 ```
 
 > info **Hint** The `ValidationPipe` is exported from the `@nestjs/common` package.
 
-Because this pipe uses the [`class-validator`](https://github.com/typestack/class-validator) and [`class-transformer`](https://github.com/typestack/class-transformer) libraries, there are many options available. You configure these settings via a configuration object passed to the pipe. Following are the built-in options:
-
+Because this pipe uses the [__INLINE_CODE_37__](https://github.com/typestack/class-validator) and [__INLINE_CODE_38__](https://github.com/typestack/class-transformer) libraries, there are many options available. You configure these settings via a configuration object passed to the pipe. Following are the built-in options:
 
 ```typescript
 export interface ValidationPipeOptions extends ValidatorOptions {
@@ -39,7 +32,6 @@ export interface ValidationPipeOptions extends ValidatorOptions {
   disableErrorMessages?: boolean;
   exceptionFactory?: (errors: ValidationError[]) => any;
 }
-
 ```
 
 In addition to these, all `class-validator` options (inherited from the `ValidatorOptions` interface) are available:
@@ -145,7 +137,6 @@ In addition to these, all `class-validator` options (inherited from the `Validat
 
 We'll start by binding `ValidationPipe` at the application level, thus ensuring all endpoints are protected from receiving incorrect data.
 
-
 ```typescript
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -153,18 +144,15 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
-
 ```
 
 To test our pipe, let's create a basic endpoint.
-
 
 ```typescript
 @Post()
 create(@Body() createUserDto: CreateUserDto) {
   return 'This action adds a new user';
 }
-
 ```
 
 > info **Hint** Since TypeScript does not store metadata about **generics or interfaces**, when you use them in your DTOs, `ValidationPipe` may not be able to properly validate incoming data. For this reason, consider using concrete classes in your DTOs.
@@ -172,7 +160,6 @@ create(@Body() createUserDto: CreateUserDto) {
 > info **Hint** When importing your DTOs, you can't use a type-only import as that would be erased at runtime, i.e. remember to `import {{ '{' }} CreateUserDto {{ '}' }}` instead of `import type {{ '{' }} CreateUserDto {{ '}' }}`.
 
 Now we can add a few validation rules in our `CreateUserDto`. We do this using decorators provided by the `class-validator` package, described in detail [here](https://github.com/typestack/class-validator#validation-decorators). In this fashion, any route that uses the `CreateUserDto` will automatically enforce these validation rules.
-
 
 ```typescript
 import { IsEmail, IsNotEmpty } from 'class-validator';
@@ -184,11 +171,9 @@ export class CreateUserDto {
   @IsNotEmpty()
   password: string;
 }
-
 ```
 
 With these rules in place, if a request hits our endpoint with an invalid `email` property in the request body, the application will automatically respond with a `400 Bad Request` code, along with the following response body:
-
 
 ```json
 {
@@ -196,22 +181,18 @@ With these rules in place, if a request hits our endpoint with an invalid `email
   "error": "Bad Request",
   "message": ["email must be an email"]
 }
-
 ```
 
 In addition to validating request bodies, the `ValidationPipe` can be used with other request object properties as well. Imagine that we would like to accept `:id` in the endpoint path. To ensure that only numbers are accepted for this request parameter, we can use the following construct:
-
 
 ```typescript
 @Get(':id')
 findOne(@Param() params: FindOneParams) {
   return 'This action returns a user';
 }
-
 ```
 
 `FindOneParams`, like a DTO, is simply a class that defines validation rules using `class-validator`. It would look like this:
-
 
 ```typescript
 import { IsNumberString } from 'class-validator';
@@ -220,13 +201,11 @@ export class FindOneParams {
   @IsNumberString()
   id: string;
 }
-
 ```
 
 #### Disable detailed errors
 
 Error messages can be helpful to explain what was incorrect in a request. However, some production environments prefer to disable detailed errors. Do this by passing an options object to the `ValidationPipe`:
-
 
 ```typescript
 app.useGlobalPipes(
@@ -234,7 +213,6 @@ app.useGlobalPipes(
     disableErrorMessages: true,
   }),
 );
-
 ```
 
 As a result, detailed error messages won't be displayed in the response body.
@@ -243,14 +221,12 @@ As a result, detailed error messages won't be displayed in the response body.
 
 Our `ValidationPipe` can also filter out properties that should not be received by the method handler. In this case, we can **whitelist** the acceptable properties, and any property not included in the whitelist is automatically stripped from the resulting object. For example, if our handler expects `email` and `password` properties, but a request also includes an `age` property, this property can be automatically removed from the resulting DTO. To enable such behavior, set `whitelist` to `true`.
 
-
 ```typescript
 app.useGlobalPipes(
   new ValidationPipe({
     whitelist: true,
   }),
 );
-
 ```
 
 When set to true, this will automatically remove non-whitelisted properties (those without any decorator in the validation class).
@@ -263,18 +239,15 @@ Alternatively, you can stop the request from processing when non-whitelisted pro
 
 Payloads coming in over the network are plain JavaScript objects. The `ValidationPipe` can automatically transform payloads to be objects typed according to their DTO classes. To enable auto-transformation, set `transform` to `true`. This can be done at a method level:
 
-
 ```typescript
 @Post()
 @UsePipes(new ValidationPipe({ transform: true }))
 async create(@Body() createCatDto: CreateCatDto) {
   this.catsService.create(createCatDto);
 }
-
 ```
 
 To enable this behavior globally, set the option on a global pipe:
-
 
 ```typescript
 app.useGlobalPipes(
@@ -282,11 +255,9 @@ app.useGlobalPipes(
     transform: true,
   }),
 );
-
 ```
 
 With the auto-transformation option enabled, the `ValidationPipe` will also perform conversion of primitive types. In the following example, the `findOne()` method takes one argument which represents an extracted `id` path parameter:
-
 
 ```typescript
 @Get(':id')
@@ -294,7 +265,6 @@ findOne(@Param('id') id: number) {
   console.log(typeof id === 'number'); // true
   return 'This action returns a user';
 }
-
 ```
 
 By default, every path parameter and query parameter comes over the network as a `string`. In the above example, we specified the `id` type as a `number` (in the method signature). Therefore, the `ValidationPipe` will try to automatically convert a string identifier to a number.
@@ -304,7 +274,6 @@ By default, every path parameter and query parameter comes over the network as a
 In the above section, we showed how the `ValidationPipe` can implicitly transform query and path parameters based on the expected type. However, this feature requires having auto-transformation enabled.
 
 Alternatively (with auto-transformation disabled), you can explicitly cast values using the `ParseIntPipe` or `ParseBoolPipe` (note that `ParseStringPipe` is not needed because, as mentioned earlier, every path parameter and query parameter comes over the network as a `string` by default).
-
 
 ```typescript
 @Get(':id')
@@ -316,7 +285,6 @@ findOne(
   console.log(typeof sort === 'boolean'); // true
   return 'This action returns a user';
 }
-
 ```
 
 > info **Hint** The `ParseIntPipe` and `ParseBoolPipe` are exported from the `@nestjs/common` package.
@@ -333,72 +301,59 @@ Nest provides the `PartialType()` utility function to make this task easier and 
 
 The `PartialType()` function returns a type (class) with all the properties of the input type set to optional. For example, suppose we have a **create** type as follows:
 
-
 ```typescript
 export class CreateCatDto {
   name: string;
   age: number;
   breed: string;
 }
-
 ```
 
 By default, all of these fields are required. To create a type with the same fields, but with each one optional, use `PartialType()` passing the class reference (`CreateCatDto`) as an argument:
 
-
 ```typescript
 export class UpdateCatDto extends PartialType(CreateCatDto) {}
-
 ```
 
 > info **Hint** The `PartialType()` function is imported from the `@nestjs/mapped-types` package.
 
 The `PickType()` function constructs a new type (class) by picking a set of properties from an input type. For example, suppose we start with a type like:
 
-
 ```typescript
 export class CreateCatDto {
   name: string;
   age: number;
   breed: string;
 }
-
 ```
 
 We can pick a set of properties from this class using the `PickType()` utility function:
 
-
 ```typescript
 export class UpdateCatAgeDto extends PickType(CreateCatDto, ['age'] as const) {}
-
 ```
 
 > info **Hint** The `PickType()` function is imported from the `@nestjs/mapped-types` package.
 
 The `OmitType()` function constructs a type by picking all properties from an input type and then removing a particular set of keys. For example, suppose we start with a type like:
 
-
 ```typescript
 export class CreateCatDto {
   name: string;
   age: number;
   breed: string;
 }
-
 ```
 
 We can generate a derived type that has every property **except** `name` as shown below. In this construct, the second argument to `OmitType` is an array of property names.
 
-
 ```typescript
 export class UpdateCatDto extends OmitType(CreateCatDto, ['name'] as const) {}
-
 ```
 
 > info **Hint** The `OmitType()` function is imported from the `@nestjs/mapped-types` package.
 
 The `IntersectionType()` function combines two types into one new type (class). For example, suppose we start with two types like:
-
 
 ```typescript
 export class CreateCatDto {
@@ -409,47 +364,39 @@ export class CreateCatDto {
 export class AdditionalCatInfo {
   color: string;
 }
-
 ```
 
 We can generate a new type that combines all properties in both types.
-
 
 ```typescript
 export class UpdateCatDto extends IntersectionType(
   CreateCatDto,
   AdditionalCatInfo,
 ) {}
-
 ```
 
 > info **Hint** The `IntersectionType()` function is imported from the `@nestjs/mapped-types` package.
 
 The type mapping utility functions are composable. For example, the following will produce a type (class) that has all of the properties of the `CreateCatDto` type except for `name`, and those properties will be set to optional:
 
-
 ```typescript
 export class UpdateCatDto extends PartialType(
   OmitType(CreateCatDto, ['name'] as const),
 ) {}
-
 ```
 
 #### Parsing and validating arrays
 
 TypeScript does not store metadata about generics or interfaces, so when you use them in your DTOs, `ValidationPipe` may not be able to properly validate incoming data. For instance, in the following code, `createUserDtos` won't be correctly validated:
 
-
 ```typescript
 @Post()
 createBulk(@Body() createUserDtos: CreateUserDto[]) {
   return 'This action adds new users';
 }
-
 ```
 
 To validate the array, create a dedicated class which contains a property that wraps the array, or use the `ParseArrayPipe`.
-
 
 ```typescript
 @Post()
@@ -459,11 +406,9 @@ createBulk(
 ) {
   return 'This action adds new users';
 }
-
 ```
 
 In addition, the `ParseArrayPipe` may come in handy when parsing query parameters. Let's consider a `findByIds()` method that returns users based on identifiers passed as query parameters.
-
 
 ```typescript
 @Get()
@@ -473,15 +418,12 @@ findByIds(
 ) {
   return 'This action returns users by ids';
 }
-
 ```
 
 This construction validates the incoming query parameters from an HTTP `GET` request like the following:
 
-
 ```bash
 GET /?ids=1,2,3
-
 ```
 
 #### WebSockets and Microservices

@@ -1,7 +1,3 @@
-<!-- 此文件从 content/openapi/operations.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:15:24.015Z -->
-<!-- 源文件: content/openapi/operations.md -->
-
 ### 操作
 
 在 OpenAPI 规范中，路径是 API 暴露的端点（资源），例如 `/users` 或 `/products`，操作是用来操作这些路径的 HTTP 方法，例如 `GET`、`POST` 或 `PUT`。
@@ -118,7 +114,7 @@ getUser(@Param('id') id: string) {
 
 现在，让我们在浏览器中验证生成的 `User` 模型：
 
-![](/public/assets/swagger-model.png)
+![](/assets/swagger-model.png)
 
 相反，我们可以为所有端点或控制器定义一个全局响应，使用 `@ApiResponse` 类。这种方法很有用，因为我们可以为应用程序中的所有端点定义一个全局响应（例如，用于错误如 400 或 500）。
 

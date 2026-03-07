@@ -409,7 +409,13 @@ Please translate the following English technical documentation to Chinese follow
   async translateFile(contentPath: string): Promise<boolean> {
     try {
       const relativePath = path.relative(this.contentDir, contentPath);
-      const outputPath = path.join(this.docsDir, relativePath);
+      const outputPath = path.resolve(this.docsDir, relativePath);
+
+      // 安全检查：确保目标路径不在源路径目录内
+      const absoluteContentDir = path.resolve(this.contentDir);
+      if (outputPath.startsWith(absoluteContentDir)) {
+        throw new Error(`CRITICAL: Attempted to write to source directory! Target: ${outputPath}`);
+      }
 
       this.processedFiles++;
 

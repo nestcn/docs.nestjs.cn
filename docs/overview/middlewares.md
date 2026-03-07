@@ -1,7 +1,3 @@
-<!-- 此文件从 content/overview/middlewares.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-28T11:23:59.619Z -->
-<!-- 源文件: content/overview/middlewares.md -->
-
 # 中间件
 
 中间件是在路由处理程序**之前**调用的函数。中间件函数可以访问[请求](https://expressjs.com/en/4x/api.html#req)和[响应](https://expressjs.com/en/4x/api.html#res)对象，以及应用程序请求-响应周期中的 `next()` 中间件函数。 **下一个**中间件函数通常由名为 `next` 的变量表示。

@@ -1,7 +1,3 @@
-<!-- 此文件从 content/microservices\rabbitmq.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T07:09:52.814Z -->
-<!-- 源文件: content/microservices\rabbitmq.md -->
-
 ### RabbitMQ
 
 [RabbitMQ](https://www.rabbitmq.com/) 是一个开源的轻量级消息代理，支持多种消息传递协议。它可以部署在分布式和联邦配置中，以满足高规模、高可用性要求。此外，它是部署最广泛的消息代理，在全球范围内被小型创业公司和大型企业使用。

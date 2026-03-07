@@ -80,7 +80,7 @@ Nest cannot create the <module> instance.
 The module at index [<index>] of the <module> "imports" array is undefined.
 
 Potential causes:
-- A circular dependency between modules. Use forwardRef() to avoid it. Read more: https://docs.nestjs.com/fundamentals/circular-dependency
+- A circular dependency between modules. Use forwardRef() to avoid it. Read more: /fundamentals/circular-dependency
 - The module at index [<index>] is of type "undefined". Check your import statements and the type of the module.
 
 Scope [<module_import_chain>]

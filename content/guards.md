@@ -1,4 +1,4 @@
-### Guards (modified for testing)
+### Guards
 
 A guard is a class annotated with the `@Injectable()` decorator, which implements the `CanActivate` interface.
 

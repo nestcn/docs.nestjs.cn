@@ -1,7 +1,3 @@
-<!-- 此文件从 content/recipes\passport.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T07:09:52.789Z -->
-<!-- 源文件: content/recipes\passport.md -->
-
 ### Passport（认证）
 
 [Passport](https://github.com/jaredhanson/passport) 是最流行的 Node.js 认证库，为社区所熟知，并在许多生产应用中成功使用。使用 `@nestjs/passport` 模块，可以轻松地将此库集成到 **Nest** 应用程序中。从高层次上讲，Passport 执行一系列步骤来：

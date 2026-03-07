@@ -1,6 +1,9 @@
 --- | ---
 
-<!-- 此文件从 content/techniques\logger.md 自动生成，请勿直接修改此文件 -->
+
+
+
+
 
 | --- |
 | `logLevels` | 启用的日志级别。 | `['log', 'fatal', 'error', 'warn', 'debug', 'verbose']` |

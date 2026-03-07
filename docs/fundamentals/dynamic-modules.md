@@ -1,7 +1,3 @@
-<!-- 此文件从 content/fundamentals\dynamic-modules.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T07:09:52.873Z -->
-<!-- 源文件: content/fundamentals\dynamic-modules.md -->
-
 ### 动态模块
 
 [模块章节](/modules)涵盖了Nest模块的基础知识，并包括了[动态模块](/modules#动态模块)的简要介绍。本章将详细介绍动态模块的主题。完成本章后，您应该对动态模块是什么、如何使用以及何时使用有很好的理解。

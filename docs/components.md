@@ -1,7 +1,3 @@
-<!-- 此文件从 content/components.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-28T08:43:59.460Z -->
-<!-- 源文件: content/components.md -->
-
 ### Providers
 
 Providers are a core concept in Nest. Many of the basic Nest classes, such as services, repositories, factories, and helpers, can be treated as providers. The key idea behind a provider is that it can be **injected** as a dependency, allowing objects to form various relationships with each other. The responsibility of "wiring up" these objects is largely handled by the Nest runtime system.
@@ -47,7 +43,6 @@ export class CatsService {
     return this.cats;
   }
 }
-
 ```
 
 > info **Hint** To create a service using the CLI, simply execute the `$ nest g service cats` command.
@@ -62,7 +57,6 @@ export interface Cat {
   age: number;
   breed: string;
 }
-
 ```
 
 Now that we have a service class to retrieve cats, let's use it inside the `CatsController`:
@@ -106,7 +100,6 @@ export class CatsController {
     return this.catsService.findAll();
   }
 }
-
 ```
 
 The `CatsService` is **injected** through the class constructor. Notice the use of the `private` keyword. This shorthand allows us to both declare and initialize the `catsService` member in the same line, streamlining the process.
@@ -119,12 +112,11 @@ In Nest, thanks to TypeScript's capabilities, managing dependencies is straightf
 
 ```typescript
 constructor(private catsService: CatsService) {}
-
 ```
 
 #### Scopes
 
-Providers typically have a lifetime ("scope") that aligns with the application lifecycle. When the application is bootstrapped, each dependency must be resolved, meaning every provider gets instantiated. Similarly, when the application shuts down, all providers are destroyed. However, it’s also possible to make a provider **request-scoped**, meaning its lifetime is tied to a specific request rather than the application's lifecycle. You can learn more about these techniques in the [Injection Scopes](/fundamentals/injection-scopes) chapter.
+Providers typically have a lifetime ("scope") that aligns with the application lifecycle. When the application is bootstrapped, each dependency must be resolved, meaning every provider gets instantiated. Similarly, when the application shuts down, all providers are destroyed. However, it’s also possible to make a provider **request-scoped**, meaning its lifetime is tied to a specific request rather than the application's lifecycle. You can learn more about these techniques in the [Injection Scopes](/fundamentals/provider-scopes) chapter.
 
 <app-banner-courses></app-banner-courses>
 
@@ -145,10 +137,9 @@ import { Injectable, Optional, Inject } from '@nestjs/common';
 export class HttpService<T> {
   constructor(@Optional() @Inject('HTTP_OPTIONS') private httpClient: T) {}
 }
-
 ```
 
-In the example above, we're using a custom provider, which is why we include the `HTTP_OPTIONS` custom **token**. Previous examples demonstrated constructor-based injection, where a dependency is indicated through a class in the constructor. For more details on custom providers and how their associated tokens work, check out the [Custom Providers](/fundamentals/custom-providers) chapter.
+In the example above, we're using a custom provider, which is why we include the `HTTP_OPTIONS` custom **token**. Previous examples demonstrated constructor-based injection, where a dependency is indicated through a class in the constructor. For more details on custom providers and how their associated tokens work, check out the [Custom Providers](/fundamentals/dependency-injection) chapter.
 
 #### Property-based injection
 
@@ -162,7 +153,6 @@ export class HttpService<T> {
   @Inject('HTTP_OPTIONS')
   private readonly httpClient: T;
 }
-
 ```
 
 > warning **Warning** If your class doesn't extend another class, it's generally better to use **constructor-based** injection. The constructor clearly specifies which dependencies are required, offering better visibility and making the code easier to understand compared to class properties annotated with `@Inject`.
@@ -181,7 +171,6 @@ import { CatsService } from './cats/cats.service';
   providers: [CatsService],
 })
 export class AppModule {}
-
 ```
 
 Nest will now be able to resolve the dependencies of the `CatsController` class.
@@ -213,5 +202,5 @@ At this point, our directory structure should look like this:
 
 So far, we've covered how Nest automatically handles most of the details of resolving dependencies. However, in some cases, you might need to step outside of the built-in Dependency Injection system and manually retrieve or instantiate providers. Two such techniques are briefly discussed below.
 
-- To retrieve existing instances or instantiate providers dynamically, you can use the [Module reference](/fundamentals/module-ref).
+- To retrieve existing instances or instantiate providers dynamically, you can use the [Module reference](/fundamentals/module-reference).
 - To get providers within the `bootstrap()` function (e.g., for standalone applications or to use a configuration service during bootstrapping), check out [Standalone applications](/standalone-applications).

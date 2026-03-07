@@ -1,7 +1,3 @@
-<!-- 此文件从 content/recipes/suites.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:12:35.770Z -->
-<!-- 源文件: content/recipes/suites.md -->
-
 ### Suites
 
 Suites 是一个用于 TypeScript 依赖注入框架的测试框架，专为 NestJS 设计。它可以作为 `Test.createTestingModule` 的替代品，用于避免手动创建 mock、冗长的测试设置和多个 mock 配置，或使用未类型化的测试 doubles（如 mock 和 stub）。
@@ -260,4 +256,4 @@ describe('UserRepository', () => {
 更多信息：
 - [Suites 官方文档](https://suitesjs.com/)
 - [Suites GitHub 仓库](https://github.com/suitesjs/suites)
-- [NestJS 测试文档](https://docs.nestjs.com/testing)
+- [NestJS 测试文档](/fundamentals/unit-testing)

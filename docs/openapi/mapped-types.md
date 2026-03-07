@@ -1,7 +1,3 @@
-<!-- 此文件从 content/openapi/mapped-types.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-24T02:57:03.354Z -->
-<!-- 源文件: content/openapi/mapped-types.md -->
-
 ### mapped_types
 
 在构建功能时，例如**CRUD**（Create/Read/Update/Delete），构建基于实体类型的变体非常有用。Nest 提供了多种utility 函数，用于实现类型转换，以简化这项任务。

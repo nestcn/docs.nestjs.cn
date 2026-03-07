@@ -1,7 +1,3 @@
-<!-- 此文件从 content/fundamentals/index.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-28T11:23:59.619Z -->
-<!-- 源文件: content/fundamentals/index.md -->
-
 # 基础知识
 
 本章节涵盖了 NestJS 的核心概念和高级特性，帮助您深入理解框架的内部工作原理。

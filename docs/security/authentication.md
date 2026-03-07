@@ -1,7 +1,3 @@
-<!-- 此文件从 content/security/authentication.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:11:20.752Z -->
-<!-- 源文件: content/security/authentication.md -->
-
 ### 认证
 
 认证是大多数应用程序的**必备**组件。有许多不同的approach和策略来处理认证。这个approach取决于项目的特定需求。这章节将介绍几个认证approach，可以适用于不同的需求。

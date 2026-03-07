@@ -1,7 +1,3 @@
-<!-- 此文件从 content/websockets/gateways.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:17:57.612Z -->
-<!-- 源文件: content/websockets/gateways.md -->
-
 ### 网关
 
 本文档其他地方讨论的大多数概念，如依赖注入、装饰器、异常过滤器、管道、守卫和拦截器，也同样适用于网关。只要可能，Nest 就会抽象实现细节，以便相同的组件可以运行在基于 HTTP 的平台、WebSockets 和微服务上。本节涵盖了 Nest 中特定于 WebSockets 的方面。
@@ -172,7 +168,6 @@ onEvent(@MessageBody() data: unknown): Observable<WsResponse<number>> {
     map(data => ({ event, data })),
   );
 }
-
 
   return from(response).pipe(
     map(data => ({ event, data })),

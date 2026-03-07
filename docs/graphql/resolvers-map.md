@@ -1,7 +1,3 @@
-<!-- 此文件从 content/graphql\resolvers-map.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T07:09:52.843Z -->
-<!-- 源文件: content/graphql\resolvers-map.md -->
-
 ### 解析器
 
 解析器提供了将 [GraphQL](https://graphql.org/) 操作（查询、变更或订阅）转换为数据的指令。它们返回与我们在模式中指定的数据相同的形状 - 同步或作为解析为该形状结果的 promise。通常，您手动创建一个**解析器映射**。另一方面，`@nestjs/graphql` 包使用您用于注释类的装饰器提供的元数据自动生成解析器映射。为了演示使用包功能创建 GraphQL API 的过程，我们将创建一个简单的作者 API。

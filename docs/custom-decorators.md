@@ -1,7 +1,3 @@
-<!-- 此文件从 content/custom-decorators.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-28T08:43:59.456Z -->
-<!-- 源文件: content/custom-decorators.md -->
-
 ### Custom route decorators
 
 Nest is built around a language feature called **decorators**. Decorators are a well-known concept in a lot of commonly used programming languages, but in the JavaScript world, they're still relatively new. In order to better understand how decorators work, we recommend reading [this article](https://medium.com/google-developers/exploring-es7-decorators-76ecb65fb841). Here's a simple definition:

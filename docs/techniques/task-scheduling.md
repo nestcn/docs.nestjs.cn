@@ -1,7 +1,3 @@
-<!-- 此文件从 content/techniques\task-scheduling.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T07:09:52.750Z -->
-<!-- 源文件: content/techniques\task-scheduling.md -->
-
 ### 任务调度
 
 任务调度允许您安排任意代码（方法/函数）在固定的日期/时间、重复的间隔或指定的间隔后执行一次。在 Linux 世界中，这通常由操作系统级别的 [cron](https://en.wikipedia.org/wiki/Cron) 等包处理。对于 Node.js 应用程序，有几个包可以模拟类似 cron 的功能。Nest 提供了 `@nestjs/schedule` 包，它与流行的 Node.js [cron](https://github.com/kelektiv/node-cron) 包集成。我们将在本章中介绍这个包。

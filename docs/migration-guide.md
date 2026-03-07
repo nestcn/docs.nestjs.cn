@@ -1,7 +1,3 @@
-<!-- 此文件从 content/migration-guide.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-28T11:23:59.619Z -->
-<!-- 源文件: content/migration-guide.md -->
-
 # 迁移指南
 
 本文提供了从 NestJS 版本 10 迁移到版本 11 的综合指南。要了解 v11 中引入的新功能，请查看[这篇文章](https://trilon.io/blog/announcing-nestjs-11-whats-new)。虽然此更新包含一些小的重大更改，但它们不太可能影响大多数用户。您可以在[这里](https://github.com/nestjs/nest/releases/tag/v11.0.0)查看完整的更改列表。
@@ -259,7 +255,7 @@ CacheModule.registerAsync({
 
 ```
 
-其中 `KeyvRedis` 从 `@keyv/redis` 包导入。查看[缓存文档](/techniques/caching.md)了解更多。
+其中 `KeyvRedis` 从 `@keyv/redis` 包导入。查看[缓存文档](/techniques/caching)了解更多。
 
 :::warning 警告
 在此更新中，Keyv 库处理的缓存数据现在结构化为包含 `value` 和 `expires` 字段的对象，例如：`{"value": "yourData", "expires": 1678901234567}`。虽然 Keyv 在通过其 API 访问数据时会自动检索 `value` 字段，但如果您直接与缓存数据交互（例如，在 cache-manager API 之外）或需要支持使用先前版本的 `@nestjs/cache-manager` 编写的数据，了解这种更改很重要。

@@ -1,6 +1,11 @@
-------
+---
+title: terminus
+---
 
-<!-- 此文件从 content/recipes\terminus.md 自动生成，请勿直接修改此文件 -->
+
+
+
+
 
 |------|------|
 | `status` | 如果任何健康指示器失败，状态将为 `'error'`。如果 NestJS 应用程序正在关闭但仍接受 HTTP 请求，健康检查将具有 `'shutting_down'` 状态。 | `'error' \| 'ok' \| 'shutting_down'` |

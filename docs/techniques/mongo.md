@@ -1,7 +1,3 @@
-<!-- 此文件从 content/techniques\mongo.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T07:09:52.766Z -->
-<!-- 源文件: content/techniques\mongo.md -->
-
 ### Mongo
 
 Nest 支持两种方法与 [MongoDB](https://www.mongodb.com/) 数据库集成。您可以使用[这里](/techniques/sql)描述的内置 [TypeORM](https://github.com/typeorm/typeorm) 模块（它有一个 MongoDB 连接器），或者使用 [Mongoose](https://mongoosejs.com)，最流行的 MongoDB 对象建模工具。在本章中，我们将描述后者，使用专用的 `@nestjs/mongoose` 包。

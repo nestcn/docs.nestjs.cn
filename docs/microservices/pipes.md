@@ -1,7 +1,3 @@
-<!-- 此文件从 content/microservices/pipes.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:15:10.427Z -->
-<!-- 源文件: content/microservices/pipes.md -->
-
 ### 管道
 
 与微服务管道之间没有基本区别。唯一的区别是，您应该使用 `RpcException` 而不是抛出 `HttpException`。

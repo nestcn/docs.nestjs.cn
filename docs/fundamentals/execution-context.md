@@ -1,7 +1,3 @@
-<!-- 此文件从 content/fundamentals/execution-context.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:18:22.316Z -->
-<!-- 源文件: content/fundamentals/execution-context.md -->
-
 ### 执行上下文
 
 Nest 提供了多个实用类，帮助您编写跨多个应用程序上下文（例如，Nest HTTP 服务器、微服务和 WebSocket 应用程序上下文）运行的应用程序。这些实用类提供了当前执行上下文的信息，可以用来构建通用的 __

@@ -1,7 +1,3 @@
-<!-- 此文件从 content/microservices\grpc.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T07:09:52.822Z -->
-<!-- 源文件: content/microservices\grpc.md -->
-
 ### gRPC
 
 [gRPC](https://github.com/grpc/grpc-node) 是一种现代、开源、高性能的 RPC 框架，可以在任何环境中运行。它可以通过对负载均衡、跟踪、健康检查和身份验证的可插拔支持，有效地连接数据中心内和跨数据中心的服务。
@@ -408,7 +404,6 @@ bidiHello(messages: Observable<any>, metadata: Metadata, call: ServerDuplexStrea
     next: onNext,
     complete: onComplete,
   });
-
 
   return subject.asObservable();
 }

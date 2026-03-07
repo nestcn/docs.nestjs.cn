@@ -1,7 +1,3 @@
-<!-- 此文件从 content/security\rate-limiting.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T07:09:52.803Z -->
-<!-- 源文件: content/security\rate-limiting.md -->
-
 ### 速率限制
 
 保护应用程序免受暴力攻击的常见技术是 **速率限制**。要开始使用，您需要安装 `@nestjs/throttler` 包。

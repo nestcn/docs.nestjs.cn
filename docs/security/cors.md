@@ -1,6 +1,11 @@
-------
+---
+title: cors
+---
 
-<!-- 此文件从 content/security/cors.md 自动生成，请勿直接修改此文件 -->
+
+
+
+
 
 |------|------|
 | `origin` | `string \| string[] \| boolean \| function` | 允许的源。可以是字符串、字符串数组、布尔值（`true` 允许所有源）或函数（根据请求动态确定）。 |

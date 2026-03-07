@@ -1,7 +1,3 @@
-<!-- 此文件从 content/recipes/async-local-storage.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:14:49.564Z -->
-<!-- 源文件: content/recipes/async-local-storage.md -->
-
 ### Async Local Storage
 
 `AsyncLocalStorage` 是一个基于 `async_hooks` API 的 Node.js 内置模块，它为应用程序提供了一种不需要显式将局部状态作为函数参数的方式来传播局部状态。它类似于其他语言中的线程本地存储。

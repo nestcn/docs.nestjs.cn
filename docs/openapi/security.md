@@ -1,7 +1,3 @@
-<!-- 此文件从 content/openapi\security.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-28T06:24:18.098Z -->
-<!-- 源文件: content/openapi\security.md -->
-
 ### Security
 
 To define which security mechanisms should be used for a specific operation, use the `@ApiSecurity()` decorator.
@@ -10,7 +6,6 @@ To define which security mechanisms should be used for a specific operation, use
 @ApiSecurity('basic')
 @Controller('cats')
 export class CatsController {}
-
 ```
 
 Before you run your application, remember to add the security definition to your base document using `DocumentBuilder`:
@@ -20,7 +15,6 @@ const options = new DocumentBuilder().addSecurity('basic', {
   type: 'http',
   scheme: 'basic',
 });
-
 ```
 
 Some of the most popular authentication techniques are built-in (e.g., `basic` and `bearer`) and therefore you don't have to define security mechanisms manually as shown above.
@@ -33,14 +27,12 @@ To enable basic authentication, use `@ApiBasicAuth()`.
 @ApiBasicAuth()
 @Controller('cats')
 export class CatsController {}
-
 ```
 
 Before you run your application, remember to add the security definition to your base document using `DocumentBuilder`:
 
 ```typescript
 const options = new DocumentBuilder().addBasicAuth();
-
 ```
 
 #### Bearer authentication
@@ -51,14 +43,12 @@ To enable bearer authentication, use `@ApiBearerAuth()`.
 @ApiBearerAuth()
 @Controller('cats')
 export class CatsController {}
-
 ```
 
 Before you run your application, remember to add the security definition to your base document using `DocumentBuilder`:
 
 ```typescript
 const options = new DocumentBuilder().addBearerAuth();
-
 ```
 
 #### OAuth2 authentication
@@ -69,14 +59,12 @@ To enable OAuth2, use `@ApiOAuth2()`.
 @ApiOAuth2(['pets:write'])
 @Controller('cats')
 export class CatsController {}
-
 ```
 
 Before you run your application, remember to add the security definition to your base document using `DocumentBuilder`:
 
 ```typescript
 const options = new DocumentBuilder().addOAuth2();
-
 ```
 
 #### Cookie authentication
@@ -87,12 +75,10 @@ To enable cookie authentication, use `@ApiCookieAuth()`.
 @ApiCookieAuth()
 @Controller('cats')
 export class CatsController {}
-
 ```
 
 Before you run your application, remember to add the security definition to your base document using `DocumentBuilder`:
 
 ```typescript
 const options = new DocumentBuilder().addCookieAuth('optional-session-id');
-
 ```

@@ -1,7 +1,3 @@
-<!-- 此文件从 content/microservices\kafka.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T07:09:52.818Z -->
-<!-- 源文件: content/microservices\kafka.md -->
-
 ### Kafka
 
 [Kafka](https://kafka.apache.org/) 是一个开源的分布式流处理平台，具有三个关键功能：

@@ -1,7 +1,3 @@
-<!-- 此文件从 content/faq/http-adapter.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:20:24.610Z -->
-<!-- 源文件: content/faq/http-adapter.md -->
-
 ### HTTP 适配器
 
 有时，您可能需要访问底层的 HTTP 服务器，无论是在 Nest 应用程序上下文内部还是外部。

@@ -1,7 +1,3 @@
-<!-- 此文件从 content/techniques/versioning.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:17:57.612Z -->
-<!-- 源文件: content/techniques/versioning.md -->
-
 ### 版本控制
 
 > info **提示** 本章节仅适用于基于 HTTP 的应用程序。
@@ -179,7 +175,6 @@ export class CatsController {
   }
 }
 
-
 @Controller()
 export class CatsController {
   @Version('1')
@@ -238,7 +233,6 @@ export class CatsController {
     return 'This action returns all cats regardless of version';
   }
 }
-
 
 @Controller({
   version: VERSION_NEUTRAL,

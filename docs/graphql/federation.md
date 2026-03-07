@@ -1,7 +1,3 @@
-<!-- 此文件从 content/graphql\federation.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T09:17:29.850Z -->
-<!-- 源文件: content/graphql\federation.md -->
-
 ### Federation
 
 Federation 提供了一种将您的单体 GraphQL 服务器拆分成独立微服务的方法。它由两个组件组成：一个网关和一个或多个联邦微服务。每个微服务持有部分 schema，而网关将这些 schema 组合成一个可以被客户端消费的单个 schema。

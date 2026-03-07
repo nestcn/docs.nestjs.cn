@@ -1,8 +1,9 @@
-------
+### Decorators
 
-<!-- 此文件从 content/openapi\decorators.md 自动生成，请勿直接修改此文件 -->
+All of the available OpenAPI decorators have an `Api` prefix to distinguish them from the core decorators. Below is a full list of the exported decorators along with a designation of the level at which the decorator may be applied.
 
-------------------- | ------------------- |
+|                           |                     |
+| ------------------------- | ------------------- |
 | `@ApiBasicAuth()`         | Method / Controller |
 | `@ApiBearerAuth()`        | Method / Controller |
 | `@ApiBody()`              | Method              |

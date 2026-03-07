@@ -1,7 +1,3 @@
-<!-- 此文件从 content/application-context.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-24T02:49:46.540Z -->
-<!-- 源文件: content/application-context.md -->
-
 ### standalone 应用
 
 Nest 应用程序可以有多种方式进行挂载。您可以创建一个 web 应用程序、一个微服务或只是一个没有网络监听器的 Nest standalone 应用程序（无网络监听器）。Nest standalone 应用程序是一个对 Nest IoC 容器的包装器，它持有所有实例化的类。我们可以从任何导入的模块中使用 standalone 应用程序对象来获取任何已存在的实例的引用。因此，您可以在任何地方使用 Nest 框架，包括例如脚本的 CRON 工作或 CLI。

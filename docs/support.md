@@ -1,7 +1,3 @@
-<!-- 此文件从 content/support.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-28T08:43:59.426Z -->
-<!-- 源文件: content/support.md -->
-
 ### Support
 
 Nest is an MIT-licensed open source project with its ongoing development made possible thanks to the support by the community. This framework is a result of the long road, full of sleepless nights, working **after hours**, and busy weekends.

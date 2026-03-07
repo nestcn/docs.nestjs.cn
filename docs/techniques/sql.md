@@ -1,7 +1,3 @@
-<!-- 此文件从 content/techniques\sql.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T07:09:52.755Z -->
-<!-- 源文件: content/techniques\sql.md -->
-
 ### 数据库
 
 Nest 是数据库无关的，允许您轻松集成任何 SQL 或 NoSQL 数据库。根据您的偏好，您有多种选择。从最一般的层面来说，将 Nest 连接到数据库只是加载适用于该数据库的 Node.js 驱动程序的问题，就像您在 [Express](https://expressjs.com/en/guide/database-integration.html) 或 Fastify 中所做的那样。

@@ -1,7 +1,3 @@
-<!-- 此文件从 content/overview/custom-decorators.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-28T11:23:59.619Z -->
-<!-- 源文件: content/overview/custom-decorators.md -->
-
 ### 自定义路由装饰器
 
 Nest 的核心构建基于一种称为**装饰器**的语言特性。装饰器在许多常用编程语言中是个广为人知的概念，但在 JavaScript 领域仍相对较新。为了更好地理解装饰器的工作原理，我们建议阅读[这篇文章](https://medium.com/google-developers/exploring-es7-decorators-76ecb65fb841) 。这里给出一个简单定义：

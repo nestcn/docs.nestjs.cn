@@ -1,7 +1,3 @@
-<!-- 此文件从 content/graphql\quick-start.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T07:09:52.846Z -->
-<!-- 源文件: content/graphql\quick-start.md -->
-
 ## 利用 TypeScript & GraphQL 的强大功能
 
 [GraphQL](https://graphql.org/) 是一种强大的 API 查询语言和用于使用现有数据实现这些查询的运行时。这是一种优雅的方法，可以解决 REST API 中常见的许多问题。对于背景知识，我们建议阅读这篇 [GraphQL 与 REST 的比较](https://www.apollographql.com/blog/graphql-vs-rest)。GraphQL 与 [TypeScript](https://www.typescriptlang.org/) 结合使用有助于您使用 GraphQL 查询开发更好的类型安全性，为您提供端到端的类型。

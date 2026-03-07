@@ -1,6 +1,8 @@
-------
+---
+title: contributors
+---
 
-<!-- 此文件从 content/contributors.md 自动生成，请勿直接修改此文件 -->
+
 
 |------|------|
 | Controller | 控制器 | 不翻译为"控制器类" |

@@ -1,7 +1,3 @@
-<!-- 此文件从 content/openapi/index.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-28T11:23:59.619Z -->
-<!-- 源文件: content/openapi/index.md -->
-
 # OpenAPI (Swagger)
 
 [OpenAPI](https://swagger.io/specification/) 规范是一种与语言无关的定义格式，用于描述 RESTful API。Nest 提供了一个专门的[模块](https://github.com/nestjs/swagger)，允许通过利用装饰器来生成此类规范。

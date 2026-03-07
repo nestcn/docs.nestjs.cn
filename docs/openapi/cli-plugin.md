@@ -1,7 +1,3 @@
-<!-- 此文件从 content/openapi\cli-plugin.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T07:09:52.835Z -->
-<!-- 源文件: content/openapi\cli-plugin.md -->
-
 ### CLI 插件
 
 [TypeScript](https://www.typescriptlang.org/docs/handbook/decorators.html) 的元数据反射系统有几个限制，例如，无法确定类由哪些属性组成，或识别给定属性是可选的还是必需的。但是，其中一些约束可以在编译时解决。Nest 提供了一个插件，增强了 TypeScript 编译过程，以减少所需的样板代码量。

@@ -1,7 +1,3 @@
-<!-- 此文件从 content/websockets/adapter.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-03T04:17:57.612Z -->
-<!-- 源文件: content/websockets/adapter.md -->
-
 ### 适配器
 
 WebSockets 模块是平台无关的，因此，您可以通过利用 `WebSocketAdapter` 接口引入自己的库（甚至原生实现）。此接口强制实现下表中描述的几种方法：

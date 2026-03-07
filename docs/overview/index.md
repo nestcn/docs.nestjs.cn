@@ -1,7 +1,3 @@
-<!-- 此文件从 content/overview/index.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-02-28T11:23:59.619Z -->
-<!-- 源文件: content/overview/index.md -->
-
 # 概述
 
 NestJS 是一个用于构建高效、可扩展的 Node.js 服务端应用的框架。它采用渐进式 JavaScript，使用 TypeScript 构建并全面支持 TypeScript（同时保持与纯 JavaScript 的兼容性）。NestJS 结合了面向对象编程（OOP）、函数式编程（FP）和响应式编程（FRP）的最佳实践。

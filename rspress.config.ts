@@ -47,7 +47,7 @@ const config: UserConfig = {
           to: '/fundamentals/provider-scopes',
         },
         {
-          from: '/fundamentals/module-ref',
+          from: '^/fundamentals/module-ref$',
           to: '/fundamentals/module-reference',
         },
         {
@@ -55,11 +55,11 @@ const config: UserConfig = {
           to: '/techniques/sql',
         },
         {
-          from: '/providers',
+          from: '^/providers$',
           to: '/overview/providers',
         },
         {
-          from: '/graphql/resolvers',
+          from: '^/graphql/resolvers$',
           to: '/graphql/resolvers-map',
         },
         {

@@ -19,6 +19,7 @@
 ```bash
 $ npm i -g @nestjs/cli
 $ nest new project-name
+
 ```
 
 > info **提示** 要使用 TypeScript 的 [更严格](https://www.typescriptlang.org/tsconfig#strict) 功能集创建新项目，请将 `--strict` 标志传递给 `nest new` 命令。
@@ -49,8 +50,6 @@ $ nest new project-name
 `main.ts` 包含一个异步函数，它将**引导**我们的应用程序：
 
 ```typescript
-@@filename(main)
-
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
@@ -59,15 +58,14 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
-@@switch
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
+
 ```
 
 要创建 Nest 应用程序实例，我们使用核心 `NestFactory` 类。`NestFactory` 公开了几个静态方法，允许创建应用程序实例。`create()` 方法返回一个应用程序对象，该对象满足 `INestApplication` 接口。此对象提供了一组方法，这些方法将在后续章节中描述。在上面的 `main.ts` 示例中，我们简单地启动 HTTP 监听器，让应用程序等待入站 HTTP 请求。
@@ -93,6 +91,7 @@ Nest 旨在成为一个平台无关的框架。平台独立性使得创建可重
 
 ```typescript
 const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
 ```
 
 #### 运行应用程序
@@ -101,6 +100,7 @@ const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
 ```bash
 $ npm run start
+
 ```
 
 > info **提示** 为了加快开发过程（构建速度提高 20 倍），你可以使用 [SWC 构建器](/recipes/swc)，方法是将 `-b swc` 标志传递给 `start` 脚本，如下所示：`npm run start -- -b swc`。
@@ -111,6 +111,7 @@ $ npm run start
 
 ```bash
 $ npm run start:dev
+
 ```
 
 此命令将监视你的文件，自动重新编译和重新加载服务器。
@@ -131,4 +132,5 @@ $ npm run lint
 
 # 使用 prettier 格式化
 $ npm run format
+
 ```

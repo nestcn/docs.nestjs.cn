@@ -18,6 +18,7 @@
 > $ npm install -g @nestjs/mau
 > $ mau deploy
 > ```
+
 >
 > 部署完成后，你的 NestJS 应用程序将在几秒钟内在 AWS 上运行！
 
@@ -27,6 +28,7 @@
 
 ```bash
 $ npm run build
+
 ```
 
 此命令通常在底层运行 `nest build` 命令，这基本上是针对 TypeScript 编译器的包装器，带有一些额外功能（资源复制等）。如果你有自定义构建脚本，可以直接运行它。另外，对于 NestJS CLI 单仓库，请确保将项目名称作为参数传递以进行构建（`npm run build my-app`）。
@@ -56,6 +58,7 @@ $ npm run build
 
 ```bash
 $ NODE_ENV=production node dist/main.js
+
 ```
 
 或者只是在云提供商/Mau 仪表板中设置它。
@@ -66,6 +69,7 @@ $ NODE_ENV=production node dist/main.js
 
 ```bash
 $ node dist/main.js # 根据你的入口点位置调整
+
 ```
 
 此命令启动应用程序，它将监听指定的端口（默认通常为 `3000`）。确保这与你已在应用程序中配置的端口匹配。
@@ -171,6 +175,7 @@ EXPOSE 3000
 
 # 运行应用程序的命令
 CMD ["node", "dist/main"]
+
 ```
 
 > info **提示** 确保将 `node:20` 替换为项目中使用的适当 Node.js 版本。你可以在 [官方 Docker Hub 仓库](https://hub.docker.com/_/node) 上找到可用的 Node.js Docker 镜像。
@@ -185,12 +190,14 @@ dist
 *.log
 *.md
 .git
+
 ```
 
 此文件确保不必要的文件不包含在容器镜像中，保持其轻量级。现在你已设置好 Dockerfile，可以构建 Docker 镜像。打开终端，导航到项目目录，并运行以下命令：
 
 ```bash
 docker build -t my-nestjs-app .
+
 ```
 
 在此命令中：
@@ -202,6 +209,7 @@ docker build -t my-nestjs-app .
 
 ```bash
 docker run -p 3000:3000 my-nestjs-app
+
 ```
 
 在此命令中：
@@ -219,6 +227,7 @@ docker run -p 3000:3000 my-nestjs-app
 docker login # 登录到 Docker 注册表
 docker tag my-nestjs-app your-dockerhub-username/my-nestjs-app # 标记镜像
 docker push your-dockerhub-username/my-nestjs-app # 推送镜像
+
 ```
 
 将 `your-dockerhub-username` 替换为你的 Docker Hub 用户名或适当的注册表 URL。推送镜像后，你可以在任何机器上拉取它并作为容器运行。
@@ -258,6 +267,7 @@ AWS、Azure 和 Google Cloud 等云提供商提供托管容器服务，简化大
 ```bash
 $ npm install -g @nestjs/mau
 $ mau deploy
+
 ```
 
 立即注册并 [使用 Mau 部署](https://mau.nestjs.com/ 'Deploy Nest')，在几分钟内让你的 NestJS 应用程序在 AWS 上运行！

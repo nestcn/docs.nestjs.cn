@@ -22,7 +22,6 @@
 > warning **警告** `Express` 和 `fastify` 处理中间件的方式不同，并提供不同的方法签名，更多信息请阅读 [这里](/techniques/performance#middleware)。
 
 ```typescript
-@@filename(logger.middleware)
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 
@@ -33,8 +32,7 @@ export class LoggerMiddleware implements NestMiddleware {
     next();
   }
 }
-@@switch
-import { Injectable } from '@nestjs/common';
+
 
 @Injectable()
 export class LoggerMiddleware {
@@ -43,6 +41,7 @@ export class LoggerMiddleware {
     next();
   }
 }
+
 ```
 
 #### 依赖注入
@@ -54,7 +53,6 @@ Nest 中间件完全支持依赖注入。与提供者和控制器一样，它们
 `@Module()` 装饰器中没有中间件的位置。相反，我们使用模块类的 `configure()` 方法来设置它们。包含中间件的模块必须实现 `NestModule` 接口。让我们在 `AppModule` 级别设置 `LoggerMiddleware`。
 
 ```typescript
-@@filename(app.module)
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { CatsModule } from './cats/cats.module';
@@ -69,10 +67,7 @@ export class AppModule implements NestModule {
       .forRoutes('cats');
   }
 }
-@@switch
-import { Module } from '@nestjs/common';
-import { LoggerMiddleware } from './common/middleware/logger.middleware';
-import { CatsModule } from './cats/cats.module';
+
 
 @Module({
   imports: [CatsModule],
@@ -84,12 +79,12 @@ export class AppModule {
       .forRoutes('cats');
   }
 }
+
 ```
 
 在上面的示例中，我们为之前在 `CatsController` 中定义的 `/cats` 路由处理程序设置了 `LoggerMiddleware`。我们还可以通过在配置中间件时将包含路由 `path` 和请求 `method` 的对象传递给 `forRoutes()` 方法，进一步将中间件限制为特定的请求方法。在下面的示例中，请注意我们导入 `RequestMethod` 枚举以引用所需的请求方法类型。
 
 ```typescript
-@@filename(app.module)
 import { Module, NestModule, RequestMethod, MiddlewareConsumer } from '@nestjs/common';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { CatsModule } from './cats/cats.module';
@@ -104,10 +99,7 @@ export class AppModule implements NestModule {
       .forRoutes({ path: 'cats', method: RequestMethod.GET });
   }
 }
-@@switch
-import { Module, RequestMethod } from '@nestjs/common';
-import { LoggerMiddleware } from './common/middleware/logger.middleware';
-import { CatsModule } from './cats/cats.module';
+
 
 @Module({
   imports: [CatsModule],
@@ -119,6 +111,7 @@ export class AppModule {
       .forRoutes({ path: 'cats', method: RequestMethod.GET });
   }
 }
+
 ```
 
 > info **提示** `configure()` 方法可以使用 `async/await` 使其异步（例如，你可以在 `configure()` 方法体内部 `await` 异步操作的完成）。
@@ -134,6 +127,7 @@ forRoutes({
   path: 'abcd/*splat',
   method: RequestMethod.ALL,
 });
+
 ```
 
 > info **提示** `splat` 只是通配符参数的名称，没有特殊含义。你可以随意命名，例如 `*wildcard`。
@@ -145,6 +139,7 @@ forRoutes({
   path: 'abcd/{*splat}',
   method: RequestMethod.ALL,
 });
+
 ```
 
 #### 中间件消费者
@@ -152,7 +147,6 @@ forRoutes({
 `MiddlewareConsumer` 是一个辅助类。它提供了几个内置方法来管理中间件。所有这些都可以简单地以 [流畅风格](https://en.wikipedia.org/wiki/Fluent_interface) **链式调用**。`forRoutes()` 方法可以接受单个字符串、多个字符串、`RouteInfo` 对象、控制器类甚至多个控制器类。在大多数情况下，你可能只传递一个以逗号分隔的**控制器**列表。以下是单个控制器的示例：
 
 ```typescript
-@@filename(app.module)
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { CatsModule } from './cats/cats.module';
@@ -168,11 +162,7 @@ export class AppModule implements NestModule {
       .forRoutes(CatsController);
   }
 }
-@@switch
-import { Module } from '@nestjs/common';
-import { LoggerMiddleware } from './common/middleware/logger.middleware';
-import { CatsModule } from './cats/cats.module';
-import { CatsController } from './cats/cats.controller';
+
 
 @Module({
   imports: [CatsModule],
@@ -184,6 +174,7 @@ export class AppModule {
       .forRoutes(CatsController);
   }
 }
+
 ```
 
 > info **提示** `apply()` 方法可以接受单个中间件，或多个参数以指定 <a href="/middleware#multiple-middleware">多个中间件</a>。
@@ -203,6 +194,7 @@ consumer
     'cats/{*splat}',
   )
   .forRoutes(CatsController);
+
 ```
 
 > info **提示** `exclude()` 方法使用 [path-to-regexp](https://github.com/pillarjs/path-to-regexp#parameters) 包支持通配符参数。
@@ -216,27 +208,22 @@ consumer
 我们一直在使用的 `LoggerMiddleware` 类非常简单。它没有成员，没有额外的方法，也没有依赖项。为什么我们不能只是在一个简单的函数中定义它，而不是一个类？事实上，我们可以。这种类型的中间件称为**函数式中间件**。让我们将日志中间件从基于类转换为函数式中间件，以说明区别：
 
 ```typescript
-@@filename(logger.middleware)
 import { Request, Response, NextFunction } from 'express';
 
 export function logger(req: Request, res: Response, next: NextFunction) {
   console.log(`Request...`);
   next();
 };
-@@switch
-export function logger(req, res, next) {
-  console.log(`Request...`);
-  next();
-};
+
 ```
 
 并在 `AppModule` 中使用它：
 
 ```typescript
-@@filename(app.module)
 consumer
   .apply(logger)
   .forRoutes(CatsController);
+
 ```
 
 > info **提示** 每当你的中间件不需要任何依赖项时，考虑使用更简单的**函数式中间件**替代方案。
@@ -247,6 +234,7 @@ consumer
 
 ```typescript
 consumer.apply(cors(), helmet(), logger).forRoutes(CatsController);
+
 ```
 
 #### 全局中间件
@@ -254,10 +242,10 @@ consumer.apply(cors(), helmet(), logger).forRoutes(CatsController);
 如果我们想一次将中间件绑定到每个注册的路由，我们可以使用 `INestApplication` 实例提供的 `use()` 方法：
 
 ```typescript
-@@filename(main)
 const app = await NestFactory.create(AppModule);
 app.use(logger);
 await app.listen(process.env.PORT ?? 3000);
+
 ```
 
 > info **提示** 在全局中间件中访问 DI 容器是不可能的。使用 `app.use()` 时，你可以改用 [函数式中间件](/middlewares#函数式中间件)。或者，你可以使用类中间件并在 `AppModule`（或任何其他模块）中使用 `.forRoutes('*')` 来使用它。

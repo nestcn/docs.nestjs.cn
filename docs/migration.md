@@ -27,6 +27,7 @@ findAll() {
   // 虽然它可能仍然有效，但在 Express v5 中不再建议使用此通配符语法。
   return 'This route should not work in Express v5';
 }
+
 ```
 
 要解决此问题，你可以更新路由以使用命名通配符：
@@ -36,6 +37,7 @@ findAll() {
 findAll() {
   return 'This route will work in Express v5';
 }
+
 ```
 
 > warning **警告** 请注意，`*splat` 是一个命名通配符，匹配除根路径外的任何路径。如果你还需要匹配根路径（`/users`），你可以使用 `/users/{{ '{' }}*splat&#125;`，将通配符用大括号括起来（可选组）。请注意，`splat` 只是通配符参数的名称，没有特殊含义。你可以随意命名，例如 `*wildcard`。
@@ -46,12 +48,14 @@ findAll() {
 // 在 NestJS 11 中，这将自动转换为有效的 Express v5 路由。
 // 虽然它可能仍然有效，但在 Express v5 中不再建议使用此通配符语法。
 forRoutes('*'); // <-- 这在 Express v5 中不应该工作
+
 ```
 
 相反，你可以更新路径以使用命名通配符：
 
 ```typescript
 forRoutes('{*splat}'); // <-- 这将在 Express v5 中工作
+
 ```
 
 请注意，`{{ '{' }}*splat&#125;` 是一个命名通配符，匹配包括根路径在内的任何路径。外部大括号使路径可选。
@@ -67,6 +71,7 @@ forRoutes('{*splat}'); // <-- 这将在 Express v5 中工作
 ```plaintext
 ?filter[where][name]=John&filter[where][age]=30
 ?item[]=1&item[]=2
+
 ```
 
 将不再按预期解析。要恢复到以前的行为，你可以配置 Express 使用 `extended` 解析器（Express v4 中的默认值），通过将 `query parser` 选项设置为 `extended`：
@@ -82,6 +87,7 @@ async function bootstrap() {
   await app.listen(3000);
 }
 bootstrap();
+
 ```
 
 #### Fastify v5
@@ -109,6 +115,7 @@ const app = await NestFactory.create<NestFastifyApplication>(
   new FastifyAdapter(),
 );
 app.enableCors({ methods });
+
 ```
 
 #### Fastify 中间件注册
@@ -120,12 +127,14 @@ NestJS 11 现在使用最新版本的 [path-to-regexp](https://www.npmjs.com/pac
 ```typescript
 // 在 NestJS 11 中，这将自动转换为有效的路由，即使你不更新它。
 .forRoutes('(.*)');
+
 ```
 
 你需要更新它以使用命名通配符：
 
 ```typescript
 .forRoutes('*splat');
+
 ```
 
 其中 `splat` 只是通配符参数的任意名称。你可以随意命名。
@@ -164,18 +173,21 @@ NestJS 11 对 `Reflector` 类引入了几项改进，增强了元数据值的功
 ```plaintext
 // 其中 A、B 和 C 是模块，"->" 表示模块依赖。
 A -> B -> C
+
 ```
 
 在这种情况下，`OnModuleInit` 钩子按以下顺序执行：
 
 ```plaintext
 C -> B -> A
+
 ```
 
 而 `OnModuleDestroy` 钩子以相反的顺序执行：
 
 ```plaintext
 A -> B -> C
+
 ```
 
 > info **提示** 全局模块被视为所有其他模块的依赖项。这意味着全局模块首先初始化，最后销毁。
@@ -208,6 +220,7 @@ CacheModule.registerAsync({
     };
   },
 }),
+
 ```
 
 在新版本中，你应该使用 `Keyv` 适配器来配置存储：
@@ -223,6 +236,7 @@ CacheModule.registerAsync({
     };
   },
 }),
+
 ```
 
 其中 `KeyvRedis` 从 `@keyv/redis` 包导入。请参阅 [缓存文档](/techniques/caching) 了解更多信息。
@@ -285,6 +299,7 @@ export class DogHealthIndicator extends HealthIndicator {
     );
   }
 }
+
 ```
 
 从版本 11 开始，建议使用新的 `HealthIndicatorService` API，它简化了实现过程。现在可以实现相同的健康指示器：
@@ -322,6 +337,7 @@ export class DogHealthIndicator {
     // ...
   }
 }
+
 ```
 
 关键变更：
@@ -349,6 +365,7 @@ Mau 使配置和维护基础设施变得像点击几个按钮一样简单。Mau 
 ```bash
 $ npm install -g @nestjs/mau
 $ mau deploy
+
 ```
 
 你可以在 [本章](/deployment#easy-deployment-with-mau) 中了解有关 Mau 的更多信息。

@@ -35,7 +35,6 @@
 我们看的第一个用例是使用拦截器记录用户交互（例如，存储用户调用、异步调度事件或计算时间戳）。我们在下面展示一个简单的 `LoggingInterceptor`：
 
 ```typescript
-@@filename(logging.interceptor)
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
@@ -53,10 +52,7 @@ export class LoggingInterceptor implements NestInterceptor {
       );
   }
 }
-@@switch
-import { Injectable } from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+
 
 @Injectable()
 export class LoggingInterceptor {
@@ -71,6 +67,7 @@ export class LoggingInterceptor {
       );
   }
 }
+
 ```
 
 > info **提示** `NestInterceptor<T, R>` 是一个泛型接口，其中 `T` 表示 `Observable<T>` 的类型（支持响应流），`R` 是 `Observable<R>` 包装的值的类型。
@@ -84,9 +81,9 @@ export class LoggingInterceptor {
 为了设置拦截器，我们使用从 `@nestjs/common` 包导入的 `@UseInterceptors()` 装饰器。与[管道](/pipes)和[守卫](/guards)一样，拦截器可以是控制器范围、方法范围或全局范围。
 
 ```typescript
-@@filename(cats.controller)
 @UseInterceptors(LoggingInterceptor)
 export class CatsController {}
+
 ```
 
 > info **提示** `@UseInterceptors()` 装饰器从 `@nestjs/common` 包导入。
@@ -96,14 +93,15 @@ export class CatsController {}
 ```typescript
 Before...
 After... 1ms
+
 ```
 
 请注意，我们传递了 `LoggingInterceptor` 类（而不是实例），将实例化责任留给框架并启用依赖注入。与管道、守卫和异常过滤器一样，我们也可以传递一个就地实例：
 
 ```typescript
-@@filename(cats.controller)
 @UseInterceptors(new LoggingInterceptor())
 export class CatsController {}
+
 ```
 
 如前所述，上面的构造将拦截器附加到此控制器声明的每个处理程序。如果我们想将拦截器的范围限制为单个方法，我们只需在**方法级别**应用装饰器。
@@ -113,12 +111,12 @@ export class CatsController {}
 ```typescript
 const app = await NestFactory.create(AppModule);
 app.useGlobalInterceptors(new LoggingInterceptor());
+
 ```
 
 全局拦截器用于整个应用程序，用于每个控制器和每个路由处理程序。在依赖注入方面，从任何模块外部注册的全局拦截器（使用 `useGlobalInterceptors()`，如上面的示例）无法注入依赖项，因为这是在任何模块上下文之外完成的。为了解决这个问题，你可以使用以下构造**直接从任何模块**设置拦截器：
 
 ```typescript
-@@filename(app.module)
 import { Module } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 
@@ -131,6 +129,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
   ],
 })
 export class AppModule {}
+
 ```
 
 > info **提示** 当使用此方法为拦截器执行依赖注入时，请注意无论使用此构造的模块是什么，拦截器实际上是全局的。这应该在哪里做？选择定义拦截器的模块（上面示例中的 `LoggingInterceptor`）。此外，`useClass` 不是处理自定义提供者注册的唯一方式。在[此处](/fundamentals/dependency-injection)了解更多。
@@ -144,7 +143,6 @@ export class AppModule {}
 让我们创建 `TransformInterceptor`，它将以简单的方式修改每个响应以演示该过程。它将使用 RxJS 的 `map()` 操作符将响应对象分配给新创建对象的 `data` 属性，将新对象返回给客户端。
 
 ```typescript
-@@filename(transform.interceptor)
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -159,9 +157,7 @@ export class TransformInterceptor<T> implements NestInterceptor<T, Response<T>> 
     return next.handle().pipe(map(data => ({ data })));
   }
 }
-@@switch
-import { Injectable } from '@nestjs/common';
-import { map } from 'rxjs/operators';
+
 
 @Injectable()
 export class TransformInterceptor {
@@ -169,6 +165,7 @@ export class TransformInterceptor {
     return next.handle().pipe(map(data => ({ data })));
   }
 }
+
 ```
 
 > info **提示** Nest 拦截器适用于同步和异步 `intercept()` 方法。如有必要，你可以简单地将方法切换为 `async`。
@@ -179,13 +176,13 @@ export class TransformInterceptor {
 {
   "data": []
 }
+
 ```
 
 拦截器在为整个应用程序中出现的需求创建可重用解决方案方面具有巨大价值。
 例如，假设我们需要将每个 `null` 值的出现转换为空字符串 `''`。我们可以用一行代码完成，并全局绑定拦截器，以便每个注册的处理程序自动使用它。
 
 ```typescript
-@@filename()
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -198,9 +195,7 @@ export class ExcludeNullInterceptor implements NestInterceptor {
       .pipe(map(value => value === null ? '' : value ));
   }
 }
-@@switch
-import { Injectable } from '@nestjs/common';
-import { map } from 'rxjs/operators';
+
 
 @Injectable()
 export class ExcludeNullInterceptor {
@@ -210,6 +205,7 @@ export class ExcludeNullInterceptor {
       .pipe(map(value => value === null ? '' : value ));
   }
 }
+
 ```
 
 #### 异常映射
@@ -217,7 +213,6 @@ export class ExcludeNullInterceptor {
 另一个有趣的用例是利用 RxJS 的 `catchError()` 操作符来覆盖抛出的异常：
 
 ```typescript
-@@filename(errors.interceptor)
 import {
   Injectable,
   NestInterceptor,
@@ -238,10 +233,7 @@ export class ErrorsInterceptor implements NestInterceptor {
       );
   }
 }
-@@switch
-import { Injectable, BadGatewayException } from '@nestjs/common';
-import { throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+
 
 @Injectable()
 export class ErrorsInterceptor {
@@ -253,6 +245,7 @@ export class ErrorsInterceptor {
       );
   }
 }
+
 ```
 
 #### 流覆盖
@@ -260,7 +253,6 @@ export class ErrorsInterceptor {
 有时我们可能想完全阻止调用处理程序并返回不同的值，这有几个原因。一个明显的例子是实现缓存以提高响应时间。让我们看一个简单的**缓存拦截器**，它从缓存中返回其响应。在现实示例中，我们需要考虑其他因素，如 TTL、缓存失效、缓存大小等，但这超出了本文讨论的范围。这里我们将提供一个演示主要概念的基本示例。
 
 ```typescript
-@@filename(cache.interceptor)
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 import { Observable, of } from 'rxjs';
 
@@ -274,9 +266,7 @@ export class CacheInterceptor implements NestInterceptor {
     return next.handle();
   }
 }
-@@switch
-import { Injectable } from '@nestjs/common';
-import { of } from 'rxjs';
+
 
 @Injectable()
 export class CacheInterceptor {
@@ -288,6 +278,7 @@ export class CacheInterceptor {
     return next.handle();
   }
 }
+
 ```
 
 我们的 `CacheInterceptor` 有一个硬编码的 `isCached` 变量和一个硬编码的响应 `[]`。需要注意的关键点是，我们在这里返回一个由 RxJS `of()` 操作符创建的新流，因此路由处理程序**根本不会被调用**。当有人调用使用 `CacheInterceptor` 的端点时，响应（一个硬编码的空数组）将立即返回。为了创建通用解决方案，你可以利用 `Reflector` 并创建自定义装饰器。`Reflector` 在[守卫](/guards)章节中有详细描述。
@@ -297,7 +288,6 @@ export class CacheInterceptor {
 使用 RxJS 操作符操作流的可能性给了我们许多能力。让我们考虑另一个常见用例。想象一下，你想处理路由请求的**超时**。当你的端点在一段时间后没有返回任何内容时，你想以错误响应终止。以下构造实现了这一点：
 
 ```typescript
-@@filename(timeout.interceptor)
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler, RequestTimeoutException } from '@nestjs/common';
 import { Observable, throwError, TimeoutError } from 'rxjs';
 import { catchError, timeout } from 'rxjs/operators';
@@ -316,10 +306,7 @@ export class TimeoutInterceptor implements NestInterceptor {
     );
   };
 };
-@@switch
-import { Injectable, RequestTimeoutException } from '@nestjs/common';
-import { Observable, throwError, TimeoutError } from 'rxjs';
-import { catchError, timeout } from 'rxjs/operators';
+
 
 @Injectable()
 export class TimeoutInterceptor {
@@ -335,6 +322,7 @@ export class TimeoutInterceptor {
     );
   };
 };
+
 ```
 
 5 秒后，请求处理将被取消。你还可以在抛出 `RequestTimeoutException` 之前添加自定义逻辑（例如释放资源）。

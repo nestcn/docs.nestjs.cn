@@ -181,7 +181,7 @@ jobs:
           }
           
           main().catch(console.error);
-SCRIPT
+          SCRIPT
 
           # 运行校对脚本
           CHANGED_FILES="${{ steps.changed-files.outputs.changed_files }}" \
@@ -340,65 +340,65 @@ SCRIPT
           # 构建评论内容
           COMMENT_BODY="## 🤖 AI 校对报告
 
-### 校对状态
+          ### 校对状态
 
-"
+          "
           
           if [ "${{ steps.check-placeholders.outputs.has_placeholders }}" == "true" ]; then
             COMMENT_BODY="${COMMENT_BODY}- ❌ **占位符检查**: 发现问题
-"
+          "
           else
             COMMENT_BODY="${COMMENT_BODY}- ✅ **占位符检查**: 通过
-"
+          "
           fi
           
           if [ "${{ steps.ai-proofread.outputs.proofread_passed }}" == "true" ]; then
             COMMENT_BODY="${COMMENT_BODY}- ✅ **AI 校对**: 通过
-"
+          "
           elif [ "${{ steps.ai-proofread.outputs.proofread_passed }}" == "false" ]; then
             COMMENT_BODY="${COMMENT_BODY}- ⚠️ **AI 校对**: 发现 ${{ steps.ai-proofread.outputs.issues_count }} 个问题
-"
+          "
           else
             COMMENT_BODY="${COMMENT_BODY}- ➖ **AI 校对**: 跳过
-"
+          "
           fi
           
           # 自动修复状态
           if [ "${{ steps.auto-fix.outputs.fix_applied }}" == "true" ]; then
             COMMENT_BODY="${COMMENT_BODY}- 🔄 **自动修复**: 已应用，等待重新校对
-"
+          "
           fi
           
           # 添加校对结果
           if [ -f "/tmp/proofread-results.json" ]; then
             COMMENT_BODY="${COMMENT_BODY}
 
-### 详细校对结果
+          ### 详细校对结果
 
-\`\`\`json
-$(cat /tmp/proofread-results.json | jq -r '.[] | "📄 \(.file)\n\(.result)\n"' | head -50)
-\`\`\`
-"
+          \`\`\`json
+          $(cat /tmp/proofread-results.json | jq -r '.[] | "📄 \(.file)\n\(.result)\n"' | head -50)
+          \`\`\`
+          "
           fi
           
           # 添加占位符问题
           if [ "${{ steps.check-placeholders.outputs.has_placeholders }}" == "true" ]; then
             COMMENT_BODY="${COMMENT_BODY}
 
-### ⚠️ 占位符问题
+          ### ⚠️ 占位符问题
 
-以下文件存在占位符问题：
-\`\`\`
-${{ steps.check-placeholders.outputs.placeholder_files }}
-\`\`\`
-"
+          以下文件存在占位符问题：
+          \`\`\`
+          ${{ steps.check-placeholders.outputs.placeholder_files }}
+          \`\`\`
+          "
           fi
           
           COMMENT_BODY="${COMMENT_BODY}
 
----
-*此评论由 AI 校对工作流自动生成*
-"
+          ---
+          *此评论由 AI 校对工作流自动生成*
+          "
           
           # 发布评论
           echo "$COMMENT_BODY" | gh pr comment "$PR_NUMBER" --body-file -
@@ -439,13 +439,13 @@ ${{ steps.check-placeholders.outputs.placeholder_files }}
             # 添加评论说明原因
             gh pr comment "$PR_NUMBER" --body "## ⚠️ 无法自动合并
 
-PR 当前状态无法自动合并：
-- **状态**: $STATE
-- **可合并**: $MERGEABLE
-- **合并状态**: $MERGE_STATE
+            PR 当前状态无法自动合并：
+            - **状态**: $STATE
+            - **可合并**: $MERGEABLE
+            - **合并状态**: $MERGE_STATE
 
-请手动检查并合并此 PR。
-"
+            请手动检查并合并此 PR。
+            "
           fi
 
       - name: Create summary

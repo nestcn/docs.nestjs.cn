@@ -317,7 +317,7 @@ export class HeroKilledDragonHandler implements IEventHandler<HeroKilledDragonEv
 
 > info **Hint** Be aware that when you start using event handlers you get out of the traditional HTTP web context.
 >
-> - Errors in `CommandHandlers` can still be caught by built-in [Exception filters](/exception-filters).
+> - Errors in `CommandHandlers` can still be caught by built-in [Exception filters](/overview/exception-filters).
 > - Errors in `EventHandlers` can't be caught by Exception filters: you will have to handle them manually. Either by a simple `try/catch`, using [Sagas](/recipes/cqrs#sagas) by triggering a compensating event, or whatever other solution you choose.
 > - HTTP Responses in `CommandHandlers` can still be sent back to the client.
 > - HTTP Responses in `EventHandlers` cannot. If you want to send information to the client you could use [WebSocket](/websockets/gateways), [SSE](/techniques/server-sent-events), or whatever other solution you choose.
@@ -668,7 +668,7 @@ export class HeroKilledDragonHandler implements IEventHandler<HeroKilledDragonEv
 
 > info **Hint** Be aware that when you start using event handlers you get out of the traditional HTTP web context.
 >
-> - Errors in `CommandHandlers` can still be caught by built-in [Exception filters](/exception-filters).
+> - Errors in `CommandHandlers` can still be caught by built-in [Exception filters](/overview/exception-filters).
 > - Errors in `EventHandlers` can't be caught by Exception filters: you will have to handle them manually. Either by a simple `try/catch`, using [Sagas](/recipes/cqrs#sagas) by triggering a compensating event, or whatever other solution you choose.
 > - HTTP Responses in `CommandHandlers` can still be sent back to the client.
 > - HTTP Responses in `EventHandlers` cannot. If you want to send information to the client you could use [WebSocket](/websockets/gateways), [SSE](/techniques/server-sent-events), or whatever other solution you choose.
@@ -799,7 +799,7 @@ onModuleDestroy() {
 
 For those coming from different programming language backgrounds, it may be surprising to learn that in Nest, most things are shared across incoming requests. This includes a connection pool to the database, singleton services with global state, and more. Keep in mind that Node.js does not follow the request/response multi-threaded stateless model, where each request is processed by a separate thread. As a result, using singleton instances is **safe** for our applications.
 
-However, there are edge cases where a request-based lifetime for the handler might be desirable. This could include scenarios like per-request caching in GraphQL applications, request tracking, or multi-tenancy. You can learn more about how to control scopes [here](/fundamentals/injection-scopes).
+However, there are edge cases where a request-based lifetime for the handler might be desirable. This could include scenarios like per-request caching in GraphQL applications, request tracking, or multi-tenancy. You can learn more about how to control scopes [here](/fundamentals/provider-scopes).
 
 Using request-scoped providers alongside CQRS can be complex because the `CommandBus`, `QueryBus`, and `EventBus` are singletons. Thankfully, the `@nestjs/cqrs` package simplifies this by automatically creating a new instance of request-scoped handlers for each processed command, query, or event.
 

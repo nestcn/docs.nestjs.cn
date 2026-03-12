@@ -1,31 +1,88 @@
---- | ---
 <!-- 此文件从 content/techniques/logger.md 自动生成，请勿直接修改此文件 -->
 <!-- 生成时间: 2026-03-12T13:42:20.337Z -->
 <!-- 源文件: content/techniques/logger.md -->
 
+### 日志记录器
 
-<!-- 此文件从 content/techniques/logger.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-12T12:02:41.449Z -->
-<!-- 源文件: content/techniques/logger.md -->
+Nest 附带一个内置的基于文本的日志记录器，在应用程序引导期间和其他几种情况下（如显示捕获的异常（即系统日志记录））使用。此功能通过 `@nestjs/common` 包中的 `Logger` 类提供。您可以完全控制日志记录系统的行为，包括以下任何内容：
 
-<!-- 此文件从 content/techniques/logger.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-12T12:02:29.089Z -->
-<!-- 源文件: content/techniques/logger.md -->
+- 完全禁用日志记录
+- 指定日志详细级别（例如，显示错误、警告、调试信息等）
+- 配置日志消息的格式（原始、json、彩色等）
+- 覆盖默认日志记录器中的时间戳（例如，使用 ISO8601 标准作为日期格式）
+- 完全覆盖默认日志记录器
+- 通过扩展自定义默认日志记录器
+- 利用依赖注入简化应用程序的组合和测试
 
-| --- |
-| `logLevels` | 启用的日志级别。 | `['log', 'fatal', 'error', 'warn', 'debug', 'verbose']` |
-| `timestamp` | 如果启用，将打印当前和前一条日志消息之间的时间戳（时间差）。注意：当 `json` 启用时，此选项不使用。 | `false` |
-| `prefix` | 用于每个日志消息的前缀。注意：当 `json` 启用时，此选项不使用。 | `Nest` |
-| `json` | 如果启用，将以 JSON 格式打印日志消息。 | `false` |
-| `colors` | 如果启用，将以彩色打印日志消息。默认情况下，如果禁用 json，则为 true，否则为 false。 | `true` |
-| `context` | 日志记录器的上下文。 | `undefined` |
-| `compact` | 如果启用，将在一行中打印日志消息，即使它是具有多个属性的对象。如果设置为数字，最多 n 个内部元素将在一行上联合，只要所有属性都适合 breakLength。短数组元素也会被分组在一起。 | `true` |
-| `maxArrayLength` | 指定格式化时要包含的 Array、TypedArray、Map、Set、WeakMap 和 WeakSet 元素的最大数量。设置为 null 或 Infinity 以显示所有元素。设置为 0 或负数以不显示元素。当 `json` 启用、颜色禁用且 `compact` 设置为 true 时被忽略，因为它会产生可解析的 JSON 输出。 | `100` |
-| `maxStringLength` | 指定格式化时要包含的最大字符数。设置为 null 或 Infinity 以显示所有元素。设置为 0 或负数以不显示字符。当 `json` 启用、颜色禁用且 `compact` 设置为 true 时被忽略，因为它会产生可解析的 JSON 输出。 | `10000` |
-| `sorted` | 如果启用，将在格式化对象时对键进行排序。也可以是自定义排序函数。当 `json` 启用、颜色禁用且 `compact` 设置为 true 时被忽略，因为它会产生可解析的 JSON 输出。 | `false` |
-| `depth` | 指定格式化对象时递归的次数。这对于检查大型对象很有用。要递归到最大调用堆栈大小，请传递 Infinity 或 null。当 `json` 启用、颜色禁用且 `compact` 设置为 true 时被忽略，因为它会产生可解析的 JSON 输出。 | `5` |
-| `showHidden` | 如果为 true，则对象的不可枚举符号和属性会包含在格式化结果中。WeakMap 和 WeakSet 条目以及用户定义的原型属性也会包含在内 | `false` |
-| `breakLength` | 输入值跨多行分割的长度。设置为 Infinity 以将输入格式化为单行（与 "compact" 设置为 true 结合使用）。当 "compact" 为 true 时默认为 Infinity，否则为 80。当 `json` 启用、颜色禁用且 `compact` 设置为 true 时被忽略，因为它会产生可解析的 JSON 输出。 | `Infinity` |
+您还可以使用内置日志记录器或创建自己的自定义实现来记录自己的应用程序级事件和消息。
+
+如果您的应用程序需要与外部日志系统集成、自动基于文件的日志记录或将日志转发到集中式日志服务，您可以使用 Node.js 日志库实现完全自定义的日志解决方案。一个流行的选择是 [Pino](https://github.com/pinojs/pino)，以其高性能和灵活性而闻名。
+
+#### 基本自定义
+
+要禁用日志记录，请在作为第二个参数传递给 `NestFactory.create()` 方法的（可选）Nest 应用程序选项对象中将 `logger` 属性设置为 `false`。
+
+```typescript
+const app = await NestFactory.create(AppModule, {
+  logger: false,
+});
+await app.listen(process.env.PORT ?? 3000);
+
+```
+
+要启用特定的日志级别，请将 `logger` 属性设置为指定要显示的日志级别的字符串数组，如下所示：
+
+```typescript
+const app = await NestFactory.create(AppModule, {
+  logger: ['error', 'warn'],
+});
+await app.listen(process.env.PORT ?? 3000);
+
+```
+
+数组中的值可以是 `'log'`、`'fatal'`、`'error'`、`'warn'`、`'debug'` 和 `'verbose'` 的任意组合。
+
+> info **提示** Nest 中的日志级别是级联的（继承的）。这意味着提供特定的日志级别（如 `'log'`）将自动包括所有更高严重性的级别（例如 `'warn'`、`'error'` 和 `'fatal'`）。
+
+要禁用彩色输出，请传递 `ConsoleLogger` 对象，并将 `colors` 属性设置为 `false` 作为 `logger` 属性的值。
+
+```typescript
+const app = await NestFactory.create(AppModule, {
+  logger: new ConsoleLogger({
+    colors: false,
+  }),
+});
+
+```
+
+要为每个日志消息配置前缀，请传递 `ConsoleLogger` 对象，并设置 `prefix` 属性：
+
+```typescript
+const app = await NestFactory.create(AppModule, {
+  logger: new ConsoleLogger({
+    prefix: 'MyApp', // 默认为 "Nest"
+  }),
+});
+
+```
+
+下表列出了所有可用选项：
+
+| 选项               | 描述                                                                                                                                                                                                                                                                         | 默认值                                         |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| `logLevels`       | 启用的日志级别。                                                                                                                                                                                                                                                                   | `['log', 'fatal', 'error', 'warn', 'debug', 'verbose']` |
+| `timestamp`       | 如果启用，将打印当前和前一条日志消息之间的时间戳（时间差）。注意：当 `json` 启用时，此选项不使用。                                                                                                                                                                                                                     | `false`                                        |
+| `prefix`          | 用于每个日志消息的前缀。注意：当 `json` 启用时，此选项不使用。                                                                                                                                                                                                                                        | `Nest`                                         |
+| `json`            | 如果启用，将以 JSON 格式打印日志消息。                                                                                                                                                                                                                                                      | `false`                                        |
+| `colors`          | 如果启用，将以彩色打印日志消息。默认情况下，如果禁用 json，则为 true，否则为 false。                                                                                                                                                                                                                          | `true`                                         |
+| `context`         | 日志记录器的上下文。                                                                                                                                                                                                                                                                 | `undefined`                                    |
+| `compact`         | 如果启用，将在一行中打印日志消息，即使它是具有多个属性的对象。如果设置为数字，最多 n 个内部元素将在一行上联合，只要所有属性都适合 breakLength。短数组元素也会被分组在一起。                                                                                                                                                                             | `true`                                         |
+| `maxArrayLength`  | 指定格式化时要包含的 Array、TypedArray、Map、Set、WeakMap 和 WeakSet 元素的最大数量。设置为 null 或 Infinity 以显示所有元素。设置为 0 或负数以不显示元素。当 `json` 启用、颜色禁用且 `compact` 设置为 true 时被忽略，因为它会产生可解析的 JSON 输出。                                                                                                       | `100`                                          |
+| `maxStringLength` | 指定格式化时要包含的最大字符数。设置为 null 或 Infinity 以显示所有元素。设置为 0 或负数以不显示字符。当 `json` 启用、颜色禁用且 `compact` 设置为 true 时被忽略，因为它会产生可解析的 JSON 输出。                                                                                                                                                       | `10000`                                        |
+| `sorted`          | 如果启用，将在格式化对象时对键进行排序。也可以是自定义排序函数。当 `json` 启用、颜色禁用且 `compact` 设置为 true 时被忽略，因为它会产生可解析的 JSON 输出。                                                                                                                                                                                | `false`                                        |
+| `depth`           | 指定格式化对象时递归的次数。这对于检查大型对象很有用。要递归到最大调用堆栈大小，请传递 Infinity 或 null。当 `json` 启用、颜色禁用且 `compact` 设置为 true 时被忽略，因为它会产生可解析的 JSON 输出。                                                                                                                                                 | `5`                                            |
+| `showHidden`      | 如果为 true，则对象的不可枚举符号和属性会包含在格式化结果中。WeakMap 和 WeakSet 条目以及用户定义的原型属性也会包含在内                                                                                                                                                                                                                   | `false`                                        |
+| `breakLength`     | 输入值跨多行分割的长度。设置为 Infinity 以将输入格式化为单行（与 "compact" 设置为 true 结合使用）。当 "compact" 为 true 时默认为 Infinity，否则为 80。当 `json` 启用、颜色禁用且 `compact` 设置为 true 时被忽略，因为它会产生可解析的 JSON 输出。                                                                                                     | `Infinity`                                     |
 
 #### JSON 日志记录
 
@@ -206,7 +263,7 @@ export class MyLogger extends ConsoleLogger {
 
 您可以在功能模块中使用这样的扩展日志记录器，如下面的 <a href="techniques/logger#将记录器用于应用程序日志记录">将记录器用于应用程序日志记录</a> 部分所述。
 
-您可以通过应用程序选项对象的 `logger` 属性传递其实例（如上面的 <a href="techniques/logger#custom-logger-implementation">自定义实现</a> 部分所示），或使用下面的 <a href="techniques/logger#依赖注入">依赖注入</a> 部分所示的技术，告诉 Nest 使用您的扩展日志记录器进行系统日志记录。如果这样做，您应该注意调用 `super`，如上面的示例代码所示，将特定的日志方法调用委托给父（内置）类，以便 Nest 可以依赖它期望的内置功能。
+您可以通过应用程序选项对象的 `logger` 属性传递其实例（如上面的 <a href="techniques/logger#自定义实现">自定义实现</a> 部分所示），或使用下面的 <a href="techniques/logger#依赖注入">依赖注入</a> 部分所示的技术，告诉 Nest 使用您的扩展日志记录器进行系统日志记录。如果这样做，您应该注意调用 `super`，如上面的示例代码所示，将特定的日志方法调用委托给父（内置）类，以便 Nest 可以依赖它期望的内置功能。
 
 <app-banner-courses></app-banner-courses>
 
@@ -252,7 +309,7 @@ await app.listen(process.env.PORT ?? 3000);
 
 #### 注入自定义日志记录器
 
-首先，使用如下代码扩展内置日志记录器。我们提供 `scope` 选项作为 `ConsoleLogger` 类的配置元数据，指定一个 [瞬态](/fundamentals/provider-scopes) 作用域，以确保我们在每个功能模块中都有 `MyLogger` 的唯一实例。在这个例子中，我们没有扩展各个 `ConsoleLogger` 方法（如 `log()`、`warn()` 等），尽管您可以选择这样做。
+首先，使用如下代码扩展内置日志记录器。我们提供 `scope` 选项作为 `ConsoleLogger` 类的配置元数据，指定一个 [瞬态](/fundamentals/injection-scopes) 作用域，以确保我们在每个功能模块中都有 `MyLogger` 的唯一实例。在这个例子中，我们没有扩展各个 `ConsoleLogger` 方法（如 `log()`、`warn()` 等），尽管您可以选择这样做。
 
 ```typescript
 import { Injectable, Scope, ConsoleLogger } from '@nestjs/common';

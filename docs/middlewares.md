@@ -177,7 +177,7 @@ export class AppModule {
 
 ```
 
-> info **提示** `apply()` 方法可以接受单个中间件，或多个参数以指定 <a href="/middleware#multiple-middleware">多个中间件</a>。
+> info **提示** `apply()` 方法可以接受单个中间件，或多个参数以指定 <a href="/middlewares#多个中间件">多个中间件</a>。
 
 #### 排除路由
 

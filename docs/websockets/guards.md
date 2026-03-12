@@ -19,4 +19,5 @@ handleEvent(client: Client, data: unknown): WsResponse<unknown> {
   const event = 'events';
   return { event, data };
 }
+
 ```

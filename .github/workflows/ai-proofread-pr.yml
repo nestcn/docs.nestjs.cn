@@ -181,8 +181,8 @@ jobs:
           }
           
           main().catch(console.error);
-          SCRIPT
-          
+SCRIPT
+
           # 运行校对脚本
           CHANGED_FILES="${{ steps.changed-files.outputs.changed_files }}" \
           node /tmp/proofread.js || true

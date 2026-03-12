@@ -403,7 +403,7 @@ $(git diff --cached --name-status)
             "message": "$SYNC_TIME",
             "color": "$COLOR"
           }
-          EOF
+EOF
           gist_id="b3a004684a48178741a9ab9e1a90ab3e"
           file_name="nestjscn-sync-time.json"
           

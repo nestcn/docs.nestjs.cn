@@ -260,4 +260,4 @@ app.use(logger);
 await app.listen(process.env.PORT ?? 3000);
 ```
 
-> info **提示** 在全局中间件中访问 DI 容器是不可能的。使用 `app.use()` 时，你可以改用 [函数式中间件](middleware#functional-middleware)。或者，你可以使用类中间件并在 `AppModule`（或任何其他模块）中使用 `.forRoutes('*')` 来使用它。
+> info **提示** 在全局中间件中访问 DI 容器是不可能的。使用 `app.use()` 时，你可以改用 [函数式中间件](/middlewares#函数式中间件)。或者，你可以使用类中间件并在 `AppModule`（或任何其他模块）中使用 `.forRoutes('*')` 来使用它。

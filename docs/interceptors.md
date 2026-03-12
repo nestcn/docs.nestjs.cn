@@ -133,7 +133,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 export class AppModule {}
 ```
 
-> info **提示** 当使用此方法为拦截器执行依赖注入时，请注意无论使用此构造的模块是什么，拦截器实际上是全局的。这应该在哪里做？选择定义拦截器的模块（上面示例中的 `LoggingInterceptor`）。此外，`useClass` 不是处理自定义提供者注册的唯一方式。在[此处](/fundamentals/custom-providers)了解更多。
+> info **提示** 当使用此方法为拦截器执行依赖注入时，请注意无论使用此构造的模块是什么，拦截器实际上是全局的。这应该在哪里做？选择定义拦截器的模块（上面示例中的 `LoggingInterceptor`）。此外，`useClass` 不是处理自定义提供者注册的唯一方式。在[此处](/fundamentals/dependency-injection)了解更多。
 
 #### 响应映射
 

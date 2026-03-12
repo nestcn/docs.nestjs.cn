@@ -20,6 +20,7 @@ import { ExampleService } from './example.service';
   providers: [ExampleService],
 })
 export class ExampleModule {}
+
 ```
 
 Once the module is set up, `DiscoveryService` can be injected into any provider or service where dynamic discovery is required.
@@ -29,6 +30,7 @@ Once the module is set up, `DiscoveryService` can be injected into any provider 
 export class ExampleService {
   constructor(private readonly discoveryService: DiscoveryService) {}
 }
+
 ```
 
 #### Discovering providers and controllers
@@ -38,6 +40,7 @@ One of the key capabilities of `DiscoveryService` is retrieving all registered p
 ```typescript
 const providers = this.discoveryService.getProviders();
 console.log(providers);
+
 ```
 
 Each provider object contains information such as its instance, token, and metadata. Similarly, if you need to retrieve all registered controllers within the application, you can do so with:
@@ -45,6 +48,7 @@ Each provider object contains information such as its instance, token, and metad
 ```typescript
 const controllers = this.discoveryService.getControllers();
 console.log(controllers);
+
 ```
 
 This feature is particularly beneficial for scenarios where controllers need to be processed dynamically, such as analytics tracking, or automatic registration mechanisms.
@@ -59,6 +63,7 @@ For example, consider a case where a custom decorator is used to tag providers w
 import { DiscoveryService } from '@nestjs/core';
 
 export const FeatureFlag = DiscoveryService.createDecorator();
+
 ```
 
 Applying this decorator to a service allows it to store metadata that can later be queried:
@@ -70,6 +75,7 @@ import { FeatureFlag } from './custom-metadata.decorator';
 @Injectable()
 @FeatureFlag('experimental')
 export class CustomService {}
+
 ```
 
 Once metadata is attached to providers in this way, `DiscoveryService` makes it easy to filter providers based on assigned metadata. The following code snippet demonstrates how to retrieve providers that have been tagged with a specific metadata value:
@@ -87,6 +93,7 @@ console.log(
   'Providers with the "experimental" feature flag metadata:',
   provider,
 );
+
 ```
 
 #### Conclusion

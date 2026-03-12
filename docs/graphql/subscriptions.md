@@ -17,6 +17,7 @@ GraphQLModule.forRoot<ApolloDriverConfig>({
   driver: ApolloDriver,
   installSubscriptionHandlers: true,
 }),
+
 ```
 
 > warning **Warning** The `installSubscriptionHandlers` configuration option has been removed from the latest version of Apollo server and will be soon deprecated in this package as well. By default, `installSubscriptionHandlers` will fallback to use the `subscriptions-transport-ws` ([read more](https://github.com/apollographql/subscriptions-transport-ws)) but we strongly recommend using the `graphql-ws`([read more](https://github.com/enisdenjo/graphql-ws)) library instead.
@@ -30,6 +31,7 @@ GraphQLModule.forRoot<ApolloDriverConfig>({
     'graphql-ws': true
   },
 }),
+
 ```
 
 > info **Hint** You can also use both packages (`subscriptions-transport-ws` and `graphql-ws`) at the same time, for example, for backward compatibility.
@@ -51,6 +53,7 @@ export class AuthorResolver {
     return pubSub.asyncIterableIterator('commentAdded');
   }
 }
+
 ```
 
 > info **Hint** All decorators are exported from the `@nestjs/graphql` package, while the `PubSub` class is exported from the `graphql-subscriptions` package.
@@ -63,6 +66,7 @@ This will result in generating the following part of the GraphQL schema in SDL:
 type Subscription {
   commentAdded(): Comment!
 }
+
 ```
 
 Note that subscriptions, by definition, return an object with a single top level property whose key is the name of the subscription. This name is either inherited from the name of the subscription handler method (i.e., `commentAdded` above), or is provided explicitly by passing an option with the key `name` as the second argument to the `@Subscription()` decorator, as shown below.
@@ -74,6 +78,7 @@ Note that subscriptions, by definition, return an object with a single top level
 subscribeToCommentAdded() {
   return pubSub.asyncIterableIterator('commentAdded');
 }
+
 ```
 
 This construct produces the same SDL as the previous code sample, but allows us to decouple the method name from the subscription.
@@ -92,6 +97,7 @@ async addComment(
   pubSub.publish('commentAdded', { commentAdded: newComment });
   return newComment;
 }
+
 ```
 
 The `PubSub#publish` method takes a `triggerName` (again, think of this as an event topic name) as the first parameter, and an event payload as the second parameter. As mentioned, the subscription, by definition, returns a value and that value has a shape. Look again at the generated SDL for our `commentAdded` subscription:
@@ -100,6 +106,7 @@ The `PubSub#publish` method takes a `triggerName` (again, think of this as an ev
 type Subscription {
   commentAdded(): Comment!
 }
+
 ```
 
 This tells us that the subscription must return an object with a top-level property name of `commentAdded` that has a value which is a `Comment` object. The important point to note is that the shape of the event payload emitted by the `PubSub#publish` method must correspond to the shape of the value expected to return from the subscription. So, in our example above, the `pubSub.publish('commentAdded', {{ '{' }} commentAdded: newComment {{ '}' }})` statement publishes a `commentAdded` event with the appropriately shaped payload. If these shapes don't match, your subscription will fail during the GraphQL validation phase.
@@ -116,6 +123,7 @@ To filter out specific events, set the `filter` property to a filter function. T
 commentAdded(@Args('title') title: string) {
   return pubSub.asyncIterableIterator('commentAdded');
 }
+
 ```
 
 #### Mutating subscription payloads
@@ -129,6 +137,7 @@ To mutate the published event payload, set the `resolve` property to a function.
 commentAdded() {
   return pubSub.asyncIterableIterator('commentAdded');
 }
+
 ```
 
 > warning **Note** If you use the `resolve` option, you should return the unwrapped payload (e.g., with our example, return a `newComment` object directly, not a `{{ '{' }} commentAdded: newComment {{ '}' }}` object).
@@ -145,6 +154,7 @@ If you need to access injected providers (e.g., use an external service to valid
 commentAdded() {
   return pubSub.asyncIterableIterator('commentAdded');
 }
+
 ```
 
 The same construction works with filters:
@@ -159,6 +169,7 @@ The same construction works with filters:
 commentAdded() {
   return pubSub.asyncIterableIterator('commentAdded');
 }
+
 ```
 
 #### Schema first
@@ -176,6 +187,7 @@ export class AuthorResolver {
     return pubSub.asyncIterableIterator('commentAdded');
   }
 }
+
 ```
 
 To filter out specific events based on context and arguments, set the `filter` property.
@@ -188,6 +200,7 @@ To filter out specific events based on context and arguments, set the `filter` p
 commentAdded() {
   return pubSub.asyncIterableIterator('commentAdded');
 }
+
 ```
 
 To mutate the published payload, we can use a `resolve` function.
@@ -199,6 +212,7 @@ To mutate the published payload, we can use a `resolve` function.
 commentAdded() {
   return pubSub.asyncIterableIterator('commentAdded');
 }
+
 ```
 
 If you need to access injected providers (e.g., use an external service to validate the data), use the following construction:
@@ -213,6 +227,7 @@ If you need to access injected providers (e.g., use an external service to valid
 commentAdded() {
   return pubSub.asyncIterableIterator('commentAdded');
 }
+
 ```
 
 The same construction works with filters:
@@ -227,6 +242,7 @@ The same construction works with filters:
 commentAdded() {
   return pubSub.asyncIterableIterator('commentAdded');
 }
+
 ```
 
 The last step is to update the type definitions file.
@@ -257,6 +273,7 @@ type Comment {
 type Subscription {
   commentAdded(title: String!): Comment
 }
+
 ```
 
 With this, we've created a single `commentAdded(title: String!): Comment` subscription. You can find a full sample implementation [here](https://github.com/nestjs/nest/blob/master/sample/12-graphql-schema-first).
@@ -270,6 +287,7 @@ We instantiated a local `PubSub` instance above. The preferred approach is to de
   provide: 'PUB_SUB',
   useValue: new PubSub(),
 }
+
 ```
 
 #### Customize subscriptions server
@@ -285,6 +303,7 @@ GraphQLModule.forRoot<ApolloDriverConfig>({
     },
   }
 }),
+
 ```
 
 If you're using the `graphql-ws` package for subscriptions, replace the `subscriptions-transport-ws` key with `graphql-ws`, as follows:
@@ -298,6 +317,7 @@ GraphQLModule.forRoot<ApolloDriverConfig>({
     },
   }
 }),
+
 ```
 
 #### Authentication over WebSockets
@@ -327,6 +347,7 @@ GraphQLModule.forRoot<ApolloDriverConfig>({
     // connection.context will be equal to what was returned by the "onConnect" callback
   },
 }),
+
 ```
 
 The `authToken` in this example is only sent once by the client, when the connection is first established.
@@ -353,6 +374,7 @@ GraphQLModule.forRoot<ApolloDriverConfig>({
     // you can now access your additional context value through the extra field
   },
 });
+
 ```
 
 #### Enable subscriptions with Mercurius driver
@@ -364,6 +386,7 @@ GraphQLModule.forRoot<MercuriusDriverConfig>({
   driver: MercuriusDriver,
   subscription: true,
 }),
+
 ```
 
 > info **Hint** You can also pass the options object to set up a custom emitter, validate incoming connections, etc. Read more [here](https://github.com/mercurius-js/mercurius/blob/master/docs/api/options.md#plugin-options) (see `subscription`).
@@ -383,6 +406,7 @@ export class AuthorResolver {
     return pubSub.subscribe('commentAdded');
   }
 }
+
 ```
 
 > info **Hint** All decorators used in the example above are exported from the `@nestjs/graphql` package, while the `PubSub` class is exported from the `mercurius` package.
@@ -395,6 +419,7 @@ This will result in generating the following part of the GraphQL schema in SDL:
 type Subscription {
   commentAdded(): Comment!
 }
+
 ```
 
 Note that subscriptions, by definition, return an object with a single top level property whose key is the name of the subscription. This name is either inherited from the name of the subscription handler method (i.e., `commentAdded` above), or is provided explicitly by passing an option with the key `name` as the second argument to the `@Subscription()` decorator, as shown below.
@@ -406,6 +431,7 @@ Note that subscriptions, by definition, return an object with a single top level
 subscribeToCommentAdded(@Context('pubsub') pubSub: PubSub) {
   return pubSub.subscribe('commentAdded');
 }
+
 ```
 
 This construct produces the same SDL as the previous code sample, but allows us to decouple the method name from the subscription.
@@ -430,6 +456,7 @@ async addComment(
   });
   return newComment;
 }
+
 ```
 
 As mentioned, the subscription, by definition, returns a value and that value has a shape. Look again at the generated SDL for our `commentAdded` subscription:
@@ -438,6 +465,7 @@ As mentioned, the subscription, by definition, returns a value and that value ha
 type Subscription {
   commentAdded(): Comment!
 }
+
 ```
 
 This tells us that the subscription must return an object with a top-level property name of `commentAdded` that has a value which is a `Comment` object. The important point to note is that the shape of the event payload emitted by the `PubSub#publish` method must correspond to the shape of the value expected to return from the subscription. So, in our example above, the `pubSub.publish({{ '{' }} topic: 'commentAdded', payload: {{ '{' }} commentAdded: newComment {{ '}' }} {{ '}' }})` statement publishes a `commentAdded` event with the appropriately shaped payload. If these shapes don't match, your subscription will fail during the GraphQL validation phase.
@@ -454,6 +482,7 @@ To filter out specific events, set the `filter` property to a filter function. T
 commentAdded(@Args('title') title: string, @Context('pubsub') pubSub: PubSub) {
   return pubSub.subscribe('commentAdded');
 }
+
 ```
 
 If you need to access injected providers (e.g., use an external service to validate the data), use the following construction.
@@ -468,6 +497,7 @@ If you need to access injected providers (e.g., use an external service to valid
 commentAdded(@Args('title') title: string, @Context('pubsub') pubSub: PubSub) {
   return pubSub.subscribe('commentAdded');
 }
+
 ```
 
 #### Schema first
@@ -485,6 +515,7 @@ export class AuthorResolver {
     return pubSub.subscribe('commentAdded');
   }
 }
+
 ```
 
 To filter out specific events based on context and arguments, set the `filter` property.
@@ -497,6 +528,7 @@ To filter out specific events based on context and arguments, set the `filter` p
 commentAdded(@Context('pubsub') pubSub: PubSub) {
   return pubSub.subscribe('commentAdded');
 }
+
 ```
 
 If you need to access injected providers (e.g., use an external service to validate the data), use the following construction:
@@ -511,6 +543,7 @@ If you need to access injected providers (e.g., use an external service to valid
 commentAdded(@Context('pubsub') pubSub: PubSub) {
   return pubSub.subscribe('commentAdded');
 }
+
 ```
 
 The last step is to update the type definitions file.
@@ -541,6 +574,7 @@ type Comment {
 type Subscription {
   commentAdded(title: String!): Comment
 }
+
 ```
 
 With this, we've created a single `commentAdded(title: String!): Comment` subscription.
@@ -560,6 +594,7 @@ GraphQLModule.forRoot<MercuriusDriverConfig>({
     }),
   },
 });
+
 ```
 
 #### Authentication over WebSockets
@@ -581,4 +616,5 @@ GraphQLModule.forRoot<MercuriusDriverConfig>({
     },
   }
 }),
+
 ```

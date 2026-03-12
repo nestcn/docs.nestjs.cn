@@ -12,6 +12,7 @@ First we need to install the required package:
 
 ```bash
 $ npm install --save @nestjs/serve-static
+
 ```
 
 #### Bootstrap
@@ -35,6 +36,7 @@ import { join } from 'path';
   providers: [AppService],
 })
 export class AppModule {}
+
 ```
 
 With this in place, build the static website and place its content in the location specified by the `rootPath` property.

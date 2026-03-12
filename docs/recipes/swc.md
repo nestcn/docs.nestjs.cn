@@ -1,3 +1,7 @@
+<!-- 此文件从 content/recipes/swc.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-12T12:02:29.228Z -->
+<!-- 源文件: content/recipes/swc.md -->
+
 ### SWC
 
 [SWC](https://swc.rs/)（Speedy Web Compiler）是一个基于 Rust 的可扩展平台，可用于编译和打包。将 SWC 与 Nest CLI 结合使用是显著加速开发流程的绝佳且简单的方式。

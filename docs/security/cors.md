@@ -1,11 +1,14 @@
 ---
 title: cors
 ---
+<!-- 此文件从 content/security/cors.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-12T12:02:41.436Z -->
+<!-- 源文件: content/security/cors.md -->
 
 
-
-
-
+<!-- 此文件从 content/security/cors.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-12T12:02:29.197Z -->
+<!-- 源文件: content/security/cors.md -->
 
 |------|------|
 | `origin` | `string \| string[] \| boolean \| function` | 允许的源。可以是字符串、字符串数组、布尔值（`true` 允许所有源）或函数（根据请求动态确定）。 |

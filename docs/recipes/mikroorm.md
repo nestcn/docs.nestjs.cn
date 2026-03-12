@@ -1,3 +1,7 @@
+<!-- 此文件从 content/recipes/mikroorm.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-12T12:02:29.223Z -->
+<!-- 源文件: content/recipes/mikroorm.md -->
+
 ### MikroORM
 
 MikroORM 是一个 TypeScript ORM，基于 Data Mapper、Unit of Work 和 Identity Map 模式。它是 TypeORM 的一个优秀替代品，提供了更简洁的 API 和更好的性能。

@@ -24,7 +24,9 @@
     "sync-and-translate:no-ai": "npm run translate-docs:no-ai && npm run fix-all",
     "update-sync-time": "bun scripts/update-sync-time.ts",
     "check-links": "bun scripts/check-links.ts",
-    "check-internal-links": "bun scripts/check-internal-links.ts"
+    "check-internal-links": "bun scripts/check-internal-links.ts",
+    "check-translation-integrity": "bun scripts/check-translation-integrity.ts",
+    "check-translation-integrity:verbose": "bun scripts/check-translation-integrity.ts --verbose"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.10",

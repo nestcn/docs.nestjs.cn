@@ -1,3 +1,7 @@
+<!-- 此文件从 content/openapi/decorators.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-12T12:02:41.479Z -->
+<!-- 源文件: content/openapi/decorators.md -->
+
 ### Decorators
 
 All of the available OpenAPI decorators have an `Api` prefix to distinguish them from the core decorators. Below is a full list of the exported decorators along with a designation of the level at which the decorator may be applied.

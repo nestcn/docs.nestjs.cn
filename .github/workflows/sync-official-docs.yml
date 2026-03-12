@@ -213,6 +213,20 @@ jobs:
           bun run fix-all
           echo "✅ 代码格式化完成"
 
+      - name: Check translation integrity
+        id: check-integrity
+        if: steps.translate-content.outputs.translation_changed == 'true'
+        run: |
+          echo "🔍 正在检查翻译完整性..."
+          if bun run check-translation-integrity; then
+            echo "✅ 翻译完整性检查通过"
+            echo "integrity_passed=true" >> $GITHUB_OUTPUT
+          else
+            echo "⚠️ 翻译完整性检查发现问题"
+            echo "integrity_passed=false" >> $GITHUB_OUTPUT
+            echo "📋 将在 PR 中标记需要人工校对"
+          fi
+
       - name: Check for placeholders
         id: check-placeholders
         run: |
@@ -311,6 +325,19 @@ jobs:
 
 ### ⚠️ 警告
 检测到翻译文件中存在占位符问题，请在校对时注意检查。
+"
+          fi
+
+          if [ "${{ steps.check-integrity.outputs.integrity_passed }}" == "false" ]; then
+            PR_BODY="${PR_BODY}
+
+### ⚠️ 翻译完整性警告
+检测到部分翻译可能不完整，请在校对时重点检查以下文件：
+- 内容行数比例过低
+- 代码块数量不匹配
+- 中文字符数量不足
+
+建议运行 \`bun run check-translation-integrity:verbose\` 查看详细信息。
 "
           fi
           

@@ -1,3 +1,7 @@
+<!-- 此文件从 content/interceptors.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-12T12:02:29.072Z -->
+<!-- 源文件: content/interceptors.md -->
+
 ### 拦截器
 
 拦截器是一类使用 `@Injectable()` 装饰器注解的类，它实现了 `NestInterceptor` 接口。

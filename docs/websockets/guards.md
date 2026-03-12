@@ -1,3 +1,7 @@
+<!-- 此文件从 content/websockets/guards.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-12T12:02:41.490Z -->
+<!-- 源文件: content/websockets/guards.md -->
+
 ### Guards
 
 There is no fundamental difference between web sockets guards and [regular HTTP application guards](/guards). The only difference is that instead of throwing `HttpException`, you should use `WsException`.
@@ -15,5 +19,4 @@ handleEvent(client: Client, data: unknown): WsResponse<unknown> {
   const event = 'events';
   return { event, data };
 }
-
 ```

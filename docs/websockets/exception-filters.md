@@ -1,3 +1,7 @@
+<!-- 此文件从 content/websockets/exception-filters.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-12T12:02:29.178Z -->
+<!-- 源文件: content/websockets/exception-filters.md -->
+
 ### 异常过滤器
 
 HTTP [异常过滤器](/overview/exception-filters) 层和相应的 web sockets 层之间的唯一区别是，您应该使用 `WsException` 而不是抛出 `HttpException`。

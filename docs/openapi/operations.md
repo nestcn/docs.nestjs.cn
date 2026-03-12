@@ -1,3 +1,7 @@
+<!-- 此文件从 content/openapi/operations.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-12T12:02:29.209Z -->
+<!-- 源文件: content/openapi/operations.md -->
+
 ### 操作
 
 在 OpenAPI 规范中，路径是 API 暴露的端点（资源），例如 `/users` 或 `/products`，操作是用来操作这些路径的 HTTP 方法，例如 `GET`、`POST` 或 `PUT`。

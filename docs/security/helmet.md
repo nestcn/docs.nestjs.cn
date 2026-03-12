@@ -1,3 +1,7 @@
+<!-- 此文件从 content/security/helmet.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-12T12:02:29.198Z -->
+<!-- 源文件: content/security/helmet.md -->
+
 ### Helmet
 
 [Helmet](https://github.com/helmetjs/helmet) 可以通过适当设置 HTTP 头部来帮助保护您的应用程序免受一些已知的 Web 漏洞的攻击。一般来说，Helmet 只是一个较小中间件函数的集合，这些函数设置与安全相关的 HTTP 头部（阅读[更多](https://github.com/helmetjs/helmet#how-it-works)）。

@@ -1,3 +1,7 @@
+<!-- 此文件从 content/graphql/mapped-types.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-12T12:02:29.203Z -->
+<!-- 源文件: content/graphql/mapped-types.md -->
+
 ### Mapped types
 
 > warning **Warning** This chapter applies only to the code first approach.

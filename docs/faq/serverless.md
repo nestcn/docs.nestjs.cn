@@ -1,11 +1,14 @@
 ---
 title: serverless
 ---
+<!-- 此文件从 content/faq/serverless.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-12T12:02:41.471Z -->
+<!-- 源文件: content/faq/serverless.md -->
 
 
-
-
-
+<!-- 此文件从 content/faq/serverless.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-12T12:02:29.170Z -->
+<!-- 源文件: content/faq/serverless.md -->
 
 ------------------------------ | ----------------- |
 | Express                              | 0.0079s (7.9ms)   |

@@ -25,6 +25,7 @@ interface TranslatorOptions {
   apiToken?: string;
   accountId?: string;
   maxTokens?: number;
+  force?: boolean;
 }
 
 interface TranslationError {
@@ -47,6 +48,7 @@ class DocumentTranslator {
   private verbose: boolean;
   private concurrency: number;
   private translateEnglish: boolean;
+  private force: boolean;
 
   private useAI: boolean;
   private aiProvider = 'cloudflare';
@@ -69,6 +71,7 @@ class DocumentTranslator {
     this.verbose = options.verbose || false;
     this.concurrency = options.concurrency || 5;
     this.translateEnglish = options.translateEnglish || false;
+    this.force = options.force || false;
 
     this.useAI = options.useAI !== false;
     this.apiToken = options.apiToken || process.env.CLOUDFLARE_API_TOKEN;
@@ -362,14 +365,58 @@ Please translate the following English technical documentation to Chinese follow
   }
 
   private needsUpdate(sourcePath: string, targetPath: string): boolean {
+    if (this.force) {
+      console.log(`  🔄 Force mode: will re-translate`);
+      return true;
+    }
+    
     if (!fs.existsSync(targetPath)) return true;
+    
+    const sourceContent = fs.readFileSync(sourcePath, 'utf8');
+    const targetContent = fs.readFileSync(targetPath, 'utf8');
+    
     if (this.translateEnglish) {
-      const targetContent = fs.readFileSync(targetPath, 'utf8');
       if (!this.hasChineseContent(targetContent)) return true;
     }
+    
     const sourceStats = fs.statSync(sourcePath);
     const targetStats = fs.statSync(targetPath);
-    return sourceStats.mtime > targetStats.mtime;
+    if (sourceStats.mtime > targetStats.mtime) return true;
+    
+    if (!this.isTranslationComplete(sourceContent, targetContent)) {
+      console.log(`  ⚠️ Incomplete translation detected, will re-translate`);
+      return true;
+    }
+    
+    return false;
+  }
+
+  private isTranslationComplete(sourceContent: string, targetContent: string): boolean {
+    const sourceLines = sourceContent.split('\n').filter(line => line.trim().length > 0);
+    const targetLines = targetContent.split('\n').filter(line => line.trim().length > 0);
+    
+    const sourceCodeBlocks = (sourceContent.match(/```[\s\S]*?```/g) || []).length;
+    const targetCodeBlocks = (targetContent.match(/```[\s\S]*?```/g) || []).length;
+    
+    if (sourceCodeBlocks !== targetCodeBlocks) {
+      return false;
+    }
+    
+    const minRatio = 0.5;
+    const ratio = targetLines.length / sourceLines.length;
+    if (ratio < minRatio) {
+      return false;
+    }
+    
+    const targetWithoutComments = targetContent.replace(/<!--[\s\S]*?-->/g, '');
+    const chineseChars = targetWithoutComments.match(/[\u4e00-\u9fa5]/g);
+    const chineseCount = chineseChars ? chineseChars.length : 0;
+    
+    if (chineseCount < 50 && sourceLines.length > 20) {
+      return false;
+    }
+    
+    return true;
   }
 
   private hasChineseContent(content: string): boolean {
@@ -539,7 +586,8 @@ const options: TranslatorOptions = {
   useAI: !args.includes('--no-ai'),
   model: '@cf/meta/llama-3-8b-instruct',
   concurrency: 5,
-  translateEnglish: args.includes('--translate-english')
+  translateEnglish: args.includes('--translate-english'),
+  force: args.includes('--force')
 };
 
 const getArgValue = (flag: string) => {
@@ -568,6 +616,7 @@ if (args.includes('--help') || args.includes('-h')) {
   --account-id <id>       Cloudflare Account ID
   --no-ai                 禁用 AI 翻译，仅处理格式
   --translate-english     翻译 docs 目录下的英文文件
+  --force                 强制重新翻译所有文件
   --verbose, -v           显示详细信息
   --help, -h              显示帮助信息
 `);

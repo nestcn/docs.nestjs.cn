@@ -1,3 +1,7 @@
+<!-- 此文件从 content/middlewares.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-12T12:02:29.083Z -->
+<!-- 源文件: content/middlewares.md -->
+
 ### Middleware
 
 Middleware is a function which is called **before** the route handler.

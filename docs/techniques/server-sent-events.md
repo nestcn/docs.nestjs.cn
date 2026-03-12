@@ -1,3 +1,7 @@
+<!-- 此文件从 content/techniques/server-sent-events.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-12T12:02:29.156Z -->
+<!-- 源文件: content/techniques/server-sent-events.md -->
+
 ### 服务器发送事件
 
 服务器发送事件（SSE）是一个服务器推送技术，允许客户端在 HTTP 连接时从服务器接收自动更新。每个更新都作为一个由新行终止的代码块发送（[查看更多](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events)）。

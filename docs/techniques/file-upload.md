@@ -1,3 +1,7 @@
+<!-- 此文件从 content/techniques/file-upload.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-12T12:02:29.102Z -->
+<!-- 源文件: content/techniques/file-upload.md -->
+
 ### 文件上传
 
 为处理文件上传，Nest 提供了一个基于 Express 的 [multer](https://github.com/expressjs/multer) 中间件包的内置模块。Multer 处理以 `multipart/form-data` 格式发布的数据，该格式主要用于通过 HTTP `POST` 请求上传文件。该模块完全可配置，您可以根据应用程序需求调整其行为。

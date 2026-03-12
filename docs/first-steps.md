@@ -1,5 +1,5 @@
 <!-- 此文件从 content/first-steps.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-12T12:02:41.435Z -->
+<!-- 生成时间: 2026-03-12T13:42:20.318Z -->
 <!-- 源文件: content/first-steps.md -->
 
 ### First steps
@@ -23,7 +23,6 @@ Setting up a new project is quite simple with the [Nest CLI](/cli/overview). Wit
 ```bash
 $ npm i -g @nestjs/cli
 $ nest new project-name
-
 ```
 
 > info **Hint** To create a new project with TypeScript's [stricter](https://www.typescriptlang.org/tsconfig#strict) feature set, pass the `--strict` flag to the `nest new` command.
@@ -68,7 +67,6 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
-
 ```
 
 To create a Nest application instance, we use the core `NestFactory` class. `NestFactory` exposes a few static methods that allow creating an application instance. The `create()` method returns an application object, which fulfills the `INestApplication` interface. This object provides a set of methods which are described in the coming chapters. In the `main.ts` example above, we simply start up our HTTP listener, which lets the application await inbound HTTP requests.
@@ -94,7 +92,6 @@ When you pass a type to the `NestFactory.create()` method, as in the example bel
 
 ```typescript
 const app = await NestFactory.create<NestExpressApplication>(AppModule);
-
 ```
 
 #### Running the application
@@ -103,7 +100,6 @@ Once the installation process is complete, you can run the following command at 
 
 ```bash
 $ npm run start
-
 ```
 
 > info **Hint** To speed up the development process (x20 times faster builds), you can use the [SWC builder](/recipes/swc) by passing the `-b swc` flag to the `start` script, as follows `npm run start -- -b swc`.
@@ -114,7 +110,6 @@ To watch for changes in your files, you can run the following command to start t
 
 ```bash
 $ npm run start:dev
-
 ```
 
 This command will watch your files, automatically recompiling and reloading the server.
@@ -135,5 +130,4 @@ $ npm run lint
 
 # Format with prettier
 $ npm run format
-
 ```

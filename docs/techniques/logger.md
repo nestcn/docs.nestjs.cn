@@ -1,8 +1,12 @@
 --- | ---
 <!-- 此文件从 content/techniques/logger.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-12T12:02:41.449Z -->
+<!-- 生成时间: 2026-03-12T13:42:20.337Z -->
 <!-- 源文件: content/techniques/logger.md -->
 
+
+<!-- 此文件从 content/techniques/logger.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-12T12:02:41.449Z -->
+<!-- 源文件: content/techniques/logger.md -->
 
 <!-- 此文件从 content/techniques/logger.md 自动生成，请勿直接修改此文件 -->
 <!-- 生成时间: 2026-03-12T12:02:29.089Z -->

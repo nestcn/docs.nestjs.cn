@@ -1,5 +1,5 @@
 <!-- 此文件从 content/graphql/schema-generator.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-12T12:02:41.440Z -->
+<!-- 生成时间: 2026-03-12T13:42:20.369Z -->
 <!-- 源文件: content/graphql/schema-generator.md -->
 
 ### Generating SDL
@@ -17,7 +17,6 @@ async function generateSchema() {
   const schema = await gqlSchemaFactory.create([RecipesResolver]);
   console.log(printSchema(schema));
 }
-
 ```
 
 > info **Hint** The `GraphQLSchemaBuilderModule` and `GraphQLSchemaFactory` are imported from the `@nestjs/graphql` package. The `printSchema` function is imported from the `graphql` package.
@@ -32,7 +31,6 @@ const schema = await gqlSchemaFactory.create([
   AuthorsResolver,
   PostsResolvers,
 ]);
-
 ```
 
 It also takes a second optional argument with an array of scalar classes:
@@ -42,7 +40,6 @@ const schema = await gqlSchemaFactory.create(
   [RecipesResolver, AuthorsResolver, PostsResolvers],
   [DurationScalar, DateScalar],
 );
-
 ```
 
 Lastly, you can pass an options object:
@@ -52,7 +49,6 @@ const schema = await gqlSchemaFactory.create([RecipesResolver], {
   skipCheck: true,
   orphanedTypes: [],
 });
-
 ```
 
 - `skipCheck`: ignore schema validation; boolean, defaults to `false`

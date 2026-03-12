@@ -1,5 +1,5 @@
 <!-- 此文件从 content/recipes/prisma.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-12T12:02:41.510Z -->
+<!-- 生成时间: 2026-03-12T13:42:20.329Z -->
 <!-- 源文件: content/recipes/prisma.md -->
 
 ### Prisma
@@ -25,7 +25,6 @@ To get started, install the NestJS CLI and create your app skeleton with the fol
 ```bash
 $ npm install -g @nestjs/cli
 $ nest new hello-prisma
-
 ```
 
 See the [First steps](/first-steps) page to learn more about the project files created by this command. Note also that you can now run `npm start` to start your application. The REST API running at `http://localhost:3000/` currently serves a single route that's implemented in `src/app.controller.ts`. Over the course of this guide, you'll implement additional routes to store and retrieve data about _users_ and _posts_.
@@ -37,14 +36,12 @@ Start by installing the Prisma CLI as a development dependency in your project:
 ```bash
 $ cd hello-prisma
 $ npm install prisma --save-dev
-
 ```
 
 In the following steps, we'll be utilizing the [Prisma CLI](https://www.prisma.io/docs/orm/tools/prisma-cli). As a best practice, it's recommended to invoke the CLI locally by prefixing it with `npx`:
 
 ```bash
 $ npx prisma
-
 ```
 
 <details><summary>Expand if you're using Yarn</summary>
@@ -53,14 +50,12 @@ If you're using Yarn, then you can install the Prisma CLI as follows:
 
 ```bash
 $ yarn add prisma --dev
-
 ```
 
 Once installed, you can invoke it by prefixing it with `yarn`:
 
 ```bash
 $ yarn prisma
-
 ```
 
 </details>
@@ -69,7 +64,6 @@ Now create your initial Prisma setup using the `init` command of the Prisma CLI:
 
 ```bash
 $ npx prisma init
-
 ```
 
 This command creates a new `prisma` directory with the following contents:
@@ -87,7 +81,6 @@ generator client {
   provider        = "prisma-client"
   output          = "../src/generated/prisma"
 }
-
 ```
 
 #### Configure the module format
@@ -100,7 +93,6 @@ generator client {
   output          = "../src/generated/prisma"
   moduleFormat    = "cjs"
 }
-
 ```
 
 > info **Note** The `moduleFormat` configuration is required because Prisma v7 ships as an ES module by default, which does not work with NestJS's CommonJS setup. Setting `moduleFormat` to `cjs` forces Prisma to generate a CommonJS module instead of ESM.
@@ -119,14 +111,12 @@ generator client {
   output        = "../src/generated/prisma"
   moduleFormat  = "cjs"
 }
-
 ```
 
 Now, open up `.env` and adjust the `DATABASE_URL` environment variable to look as follows:
 
 ```bash
 DATABASE_URL="file:./dev.db"
-
 ```
 
 Make sure you have a [ConfigModule](/techniques/configuration) configured, otherwise the `DATABASE_URL` variable will not be picked up from `.env`.
@@ -153,21 +143,18 @@ generator client {
   output          = "../src/generated/prisma"
   moduleFormat  = "cjs"
 }
-
 ```
 
 **`.env`**
 
 ```bash
 DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=SCHEMA"
-
 ```
 
 Replace the placeholders spelled in all uppercase letters with your database credentials. Note that if you're unsure what to provide for the `SCHEMA` placeholder, it's most likely the default value `public`:
 
 ```bash
 DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public"
-
 ```
 
 If you want to learn how to set up a PostgreSQL database, you can follow this guide on [setting up a free PostgreSQL database on Heroku](https://dev.to/prisma/how-to-setup-a-free-postgresql-database-on-heroku-1dc1).
@@ -188,14 +175,12 @@ generator client {
   output          = "../src/generated/prisma"
   moduleFormat  = "cjs"
 }
-
 ```
 
 **`.env`**
 
 ```bash
 DATABASE_URL="mysql://USER:PASSWORD@HOST:PORT/DATABASE"
-
 ```
 
 Replace the placeholders spelled in all uppercase letters with your database credentials.
@@ -216,7 +201,6 @@ generator client {
   output          = "../src/generated/prisma"
   moduleFormat  = "cjs"
 }
-
 ```
 
 **`.env`**
@@ -225,7 +209,6 @@ Replace the placeholders spelled in all uppercase letters with your database cre
 
 ```bash
 DATABASE_URL="sqlserver://HOST:PORT;database=DATABASE;user=USER;password=PASSWORD;encrypt=true"
-
 ```
 
 </details>
@@ -252,14 +235,12 @@ model Post {
   author    User?    @relation(fields: [authorId], references: [id])
   authorId  Int?
 }
-
 ```
 
 With your Prisma models in place, you can generate your SQL migration files and run them against the database. Run the following commands in your terminal:
 
 ```bash
 $ npx prisma migrate dev --name init
-
 ```
 
 This `prisma migrate dev` command generates SQL files and directly runs them against the database. In this case, the following migration files was created in the existing `prisma` directory:
@@ -272,7 +253,6 @@ prisma
 │   └── 20201207100915_init
 │       └── migration.sql
 └── schema.prisma
-
 ```
 
 <details><summary>Expand to view the generated SQL statements</summary>
@@ -300,7 +280,6 @@ CREATE TABLE "Post" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User.email_unique" ON "User"("email");
-
 ```
 
 </details>
@@ -313,21 +292,18 @@ To install Prisma Client in your project, run the following command in your term
 
 ```bash
 $ npm install @prisma/client
-
 ```
 
 Once installed, you can run the generate command to generate the types and Client needed for your project. If any changes are made to your schema, you will need to rerun the `generate` command to keep those types in sync.
 
 ```bash
 $ npx prisma generate
-
 ```
 
 In addition to Prisma Client, you also need to a driver adapter for the type of database you are working with. For SQLite, you can install the `@prisma/adapter-better-sqlite3` driver.
 
 ```bash
 npm install @prisma/adapter-better-sqlite3
-
 ```
 
 <details> <summary>Expand if you're using PostgreSQL, MySQL, MsSQL, or AzureSQL</summary>
@@ -336,14 +312,12 @@ npm install @prisma/adapter-better-sqlite3
 
 ```bash
 npm install @prisma/adapter-pg
-
 ```
 
 - For MySQL, MsSQL, AzureSQL:
 
 ```bash
 npm install @prisma/adapter-mariadb
-
 ```
 
 </details>
@@ -368,7 +342,6 @@ export class PrismaService extends PrismaClient {
     super({ adapter });
   }
 }
-
 ```
 
 Next, you can write services that you can use to make database calls for the `User` and `Post` models from your Prisma schema.
@@ -432,7 +405,6 @@ export class UsersService {
     });
   }
 }
-
 ```
 
 Notice how you're using Prisma Client's generated types to ensure that the methods that are exposed by your service are properly typed. You therefore save the boilerplate of typing your models and creating additional interface or DTO files.
@@ -498,7 +470,6 @@ export class PostsService {
     });
   }
 }
-
 ```
 
 Your `UsersService` and `PostsService` currently wrap the CRUD queries that are available in Prisma Client. In a real world application, the service would also be the place to add business logic to your application. For example, you could have a method called `updatePassword` inside the `UsersService` that would be responsible for updating the password of a user.
@@ -596,7 +567,6 @@ export class AppController {
     return this.postService.deletePost({ id: Number(id) });
   }
 }
-
 ```
 
 This controller implements the following routes:

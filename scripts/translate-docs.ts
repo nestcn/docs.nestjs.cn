@@ -375,6 +375,12 @@ Please translate the following English technical documentation to Chinese follow
     const sourceContent = fs.readFileSync(sourcePath, 'utf8');
     const targetContent = fs.readFileSync(targetPath, 'utf8');
     
+    // 首先检查翻译完整性，这是最重要的检查
+    if (!this.isTranslationComplete(sourceContent, targetContent)) {
+      console.log(`  ⚠️ Incomplete translation detected, will re-translate`);
+      return true;
+    }
+    
     if (this.translateEnglish) {
       if (!this.hasChineseContent(targetContent)) return true;
     }
@@ -382,11 +388,6 @@ Please translate the following English technical documentation to Chinese follow
     const sourceStats = fs.statSync(sourcePath);
     const targetStats = fs.statSync(targetPath);
     if (sourceStats.mtime > targetStats.mtime) return true;
-    
-    if (!this.isTranslationComplete(sourceContent, targetContent)) {
-      console.log(`  ⚠️ Incomplete translation detected, will re-translate`);
-      return true;
-    }
     
     return false;
   }

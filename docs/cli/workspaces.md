@@ -2,9 +2,13 @@
 title: workspaces
 ---
 <!-- 此文件从 content/cli/workspaces.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-12T12:02:41.445Z -->
+<!-- 生成时间: 2026-03-12T13:42:20.364Z -->
 <!-- 源文件: content/cli/workspaces.md -->
 
+
+<!-- 此文件从 content/cli/workspaces.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-12T12:02:41.445Z -->
+<!-- 源文件: content/cli/workspaces.md -->
 
 <!-- 此文件从 content/cli/workspaces.md 自动生成，请勿直接修改此文件 -->
 <!-- 生成时间: 2026-03-12T12:02:29.163Z -->

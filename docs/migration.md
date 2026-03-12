@@ -1,5 +1,5 @@
 <!-- 此文件从 content/migration.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-12T12:02:41.431Z -->
+<!-- 生成时间: 2026-03-12T13:42:20.313Z -->
 <!-- 源文件: content/migration.md -->
 
 ### Migration guide
@@ -31,7 +31,6 @@ findAll() {
   // While it may still work, it's no longer advisable to use this wildcard syntax in Express v5.
   return 'This route should not work in Express v5';
 }
-
 ```
 
 To fix this issue, you can update the route to use a named wildcard:
@@ -41,7 +40,6 @@ To fix this issue, you can update the route to use a named wildcard:
 findAll() {
   return 'This route will work in Express v5';
 }
-
 ```
 
 > warning **Warning** Note that `*splat` is a named wildcard that matches any path without the root path. If you need to match the root path as well (`/users`), you can use `/users/{{ '{' }}*splat&#125;`, wrapping the wildcard in braces (optional group). Note that `splat` is simply the name of the wildcard parameter and has no special meaning. You can name it anything you like, for example, `*wildcard`.
@@ -52,14 +50,12 @@ Similarly, if you have a middleware that runs on all routes, you may need to upd
 // In NestJS 11, this will be automatically converted to a valid Express v5 route.
 // While it may still work, it's no longer advisable to use this wildcard syntax in Express v5.
 forRoutes('*'); // <-- This should not work in Express v5
-
 ```
 
 Instead, you can update the path to use a named wildcard:
 
 ```typescript
 forRoutes('{*splat}'); // <-- This will work in Express v5
-
 ```
 
 Note that `{{ '{' }}*splat&#125;` is a named wildcard that matches any path including the root path. Outer braces make path optional.
@@ -75,7 +71,6 @@ As a result, query strings like these:
 ```plaintext
 ?filter[where][name]=John&filter[where][age]=30
 ?item[]=1&item[]=2
-
 ```
 
 will no longer be parsed as expected. To revert to the previous behavior, you can configure Express to use the `extended` parser (the default in Express v4) by setting the `query parser` option to `extended`:
@@ -91,7 +86,6 @@ async function bootstrap() {
   await app.listen(3000);
 }
 bootstrap();
-
 ```
 
 #### Fastify v5
@@ -119,7 +113,6 @@ const app = await NestFactory.create<NestFastifyApplication>(
   new FastifyAdapter(),
 );
 app.enableCors({ methods });
-
 ```
 
 #### Fastify middleware registration
@@ -131,14 +124,12 @@ For example, if you have a middleware that applies to all routes:
 ```typescript
 // In NestJS 11, this will automatically be converted to a valid route, even if you don't update it.
 .forRoutes('(.*)');
-
 ```
 
 You'll need to update it to use a named wildcard instead:
 
 ```typescript
 .forRoutes('*splat');
-
 ```
 
 Where `splat` is just an arbitrary name for the wildcard parameter. You can name it anything you like.
@@ -177,21 +168,18 @@ Imagine the following scenario:
 ```plaintext
 // Where A, B, and C are modules and "->" represents the module dependency.
 A -> B -> C
-
 ```
 
 In this case, the `OnModuleInit` hooks are executed in the following order:
 
 ```plaintext
 C -> B -> A
-
 ```
 
 While the `OnModuleDestroy` hooks are executed in the reverse order:
 
 ```plaintext
 A -> B -> C
-
 ```
 
 > info **Hint** Global modules are treated as a dependency of all other modules. This means that global modules are initialized first and destroyed last.
@@ -224,7 +212,6 @@ CacheModule.registerAsync({
     };
   },
 }),
-
 ```
 
 In the new version, you should use the `Keyv` adapter to configure the store:
@@ -240,7 +227,6 @@ CacheModule.registerAsync({
     };
   },
 }),
-
 ```
 
 Where `KeyvRedis` is imported from the `@keyv/redis` package. See the [Caching documentation](/techniques/caching) to learn more.
@@ -303,7 +289,6 @@ export class DogHealthIndicator extends HealthIndicator {
     );
   }
 }
-
 ```
 
 Starting with version 11, it is recommended to use the new `HealthIndicatorService` API, which streamlines the implementation process. Here's how the same health indicator can now be implemented:
@@ -341,7 +326,6 @@ export class DogHealthIndicator {
     // ...
   }
 }
-
 ```
 
 Key changes:
@@ -369,7 +353,6 @@ Mau makes provisioning and maintaining your infrastructure as simple as clicking
 ```bash
 $ npm install -g @nestjs/mau
 $ mau deploy
-
 ```
 
 You can learn more about Mau [in this chapter](/deployment#easy-deployment-with-mau).

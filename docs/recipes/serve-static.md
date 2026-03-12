@@ -1,5 +1,5 @@
 <!-- 此文件从 content/recipes/serve-static.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-12T12:02:41.507Z -->
+<!-- 生成时间: 2026-03-12T13:42:20.326Z -->
 <!-- 源文件: content/recipes/serve-static.md -->
 
 ### Serve Static
@@ -12,7 +12,6 @@ First we need to install the required package:
 
 ```bash
 $ npm install --save @nestjs/serve-static
-
 ```
 
 #### Bootstrap
@@ -36,7 +35,6 @@ import { join } from 'path';
   providers: [AppService],
 })
 export class AppModule {}
-
 ```
 
 With this in place, build the static website and place its content in the location specified by the `rootPath` property.

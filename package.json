@@ -34,7 +34,7 @@
     "@rspress/plugin-client-redirects": "^2.0.4",
     "dotenv": "^17.3.1",
     "glob": "^11.1.0",
-    "hono": "^4.12.5",
+    "hono": "^4.12.7",
     "p-limit": "^7.2.0"
   },
   "devDependencies": {

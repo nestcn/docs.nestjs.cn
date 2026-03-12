@@ -295,62 +295,62 @@ jobs:
           # 生成 PR 描述
           PR_BODY="## 📋 同步摘要
 
-### 同步信息
-- **同步日期**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
-- **源仓库**: https://github.com/nestjs/docs.nestjs.com
+          ### 同步信息
+          - **同步日期**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+          - **源仓库**: https://github.com/nestjs/docs.nestjs.com
 
-### 变更类型
-"
+          ### 变更类型
+          "
           
           if [ "${{ steps.sync-content.outputs.content_changed }}" == "true" ]; then
             PR_BODY="${PR_BODY}
-- ✅ 内容同步：检测到变更并已翻译
-"
+          - ✅ 内容同步：检测到变更并已翻译
+          "
           fi
           
           if [ "${{ steps.translate-content.outputs.translation_changed }}" == "true" ]; then
             PR_BODY="${PR_BODY}
-- ✅ 翻译更新：使用 Cloudflare Workers AI 更新
-"
+          - ✅ 翻译更新：使用 Cloudflare Workers AI 更新
+          "
           fi
           
           if [ "${{ steps.sync-assets.outputs.assets_changed }}" == "true" ]; then
             PR_BODY="${PR_BODY}
-- ✅ 资源同步：检测到变更并已同步
-"
+          - ✅ 资源同步：检测到变更并已同步
+          "
           fi
 
           if [ "${{ steps.check-placeholders.outputs.has_placeholders }}" == "true" ]; then
             PR_BODY="${PR_BODY}
 
-### ⚠️ 警告
-检测到翻译文件中存在占位符问题，请在校对时注意检查。
-"
+          ### ⚠️ 警告
+          检测到翻译文件中存在占位符问题，请在校对时注意检查。
+          "
           fi
 
           if [ "${{ steps.check-integrity.outputs.integrity_passed }}" == "false" ]; then
             PR_BODY="${PR_BODY}
 
-### ⚠️ 翻译完整性警告
-检测到部分翻译可能不完整，请在校对时重点检查以下文件：
-- 内容行数比例过低
-- 代码块数量不匹配
-- 中文字符数量不足
+          ### ⚠️ 翻译完整性警告
+          检测到部分翻译可能不完整，请在校对时重点检查以下文件：
+          - 内容行数比例过低
+          - 代码块数量不匹配
+          - 中文字符数量不足
 
-建议运行 \`bun run check-translation-integrity:verbose\` 查看详细信息。
-"
+          建议运行 \`bun run check-translation-integrity:verbose\` 查看详细信息。
+          "
           fi
           
           PR_BODY="${PR_BODY}
 
-### 变更文件
-\`\`\`
-$(git diff --cached --name-status)
-\`\`\`
+          ### 变更文件
+          \`\`\`
+          $(git diff --cached --name-status)
+          \`\`\`
 
----
-*此 PR 由自动化工作流创建，请在校对后合并。*
-"
+          ---
+          *此 PR 由自动化工作流创建，请在校对后合并。*
+          "
           
           # 创建分支名
           BRANCH_NAME="sync/docs-${SYNC_DATE}"
@@ -403,7 +403,7 @@ $(git diff --cached --name-status)
             "message": "$SYNC_TIME",
             "color": "$COLOR"
           }
-EOF
+          EOF
           gist_id="b3a004684a48178741a9ab9e1a90ab3e"
           file_name="nestjscn-sync-time.json"
           

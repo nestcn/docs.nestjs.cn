@@ -1,84 +1,75 @@
-<!-- 此文件从 content/migration.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-12T13:42:20.313Z -->
-<!-- 源文件: content/migration.md -->
+### 迁移指南
 
-### Migration guide
+本文提供了从 NestJS 版本 10 迁移到版本 11 的综合指南。要探索 v11 中引入的新功能，请查看 [这篇文章](https://trilon.io/blog/announcing-nestjs-11-whats-new)。虽然更新包含一些次要的破坏性变更，但它们不太可能影响大多数用户。你可以在 [这里](https://github.com/nestjs/nest/releases/tag/v11.0.0) 查看完整的变更列表。
 
-This article offers a comprehensive guide for migrating from NestJS version 10 to version 11. To explore the new features introduced in v11, take a look at [this article](https://trilon.io/blog/announcing-nestjs-11-whats-new). While the update includes a few minor breaking changes, they are unlikely to impact most users. You can review the complete list of changes [here](https://github.com/nestjs/nest/releases/tag/v11.0.0).
+#### 升级包
 
-#### Upgrading packages
-
-Although you can manually upgrade your packages, we recommend using [npm-check-updates (ncu)](https://npmjs.com/package/npm-check-updates) for a more streamlined process.
+虽然你可以手动升级包，但我们推荐使用 [npm-check-updates (ncu)](https://npmjs.com/package/npm-check-updates) 以获得更流畅的过程。
 
 #### Express v5
 
-After years of development, Express v5 was officially released in 2024 and became a stable version in 2025. With NestJS 11, Express v5 is now the default version integrated into the framework. While this update is seamless for most users, it’s important to be aware that Express v5 introduces some breaking changes. For detailed guidance, refer to the [Express v5 migration guide](https://expressjs.com/en/guide/migrating-5.html).
+经过多年的开发，Express v5 于 2024 年正式发布，并在 2025 年成为稳定版本。随着 NestJS 11 的发布，Express v5 现在是框架中集成的默认版本。虽然此更新对大多数用户来说是天衣无缝的，但重要的是要注意 Express v5 引入了一些破坏性变更。有关详细指导，请参阅 [Express v5 迁移指南](https://expressjs.com/en/guide/migrating-5.html)。
 
-One of the most notable updates in Express v5 is the revised path route matching algorithm. The following changes have been introduced to how path strings are matched with incoming requests:
+Express v5 最显著的更新之一是修订的路径路由匹配算法。以下变更已引入到路径字符串如何与传入请求匹配的方式：
 
-- The wildcard `*` must have a name, matching the behavior of parameters: use `/*splat` or `/{{ '{' }}*splat&#125;` instead of `/*`. `splat` is simply the name of the wildcard parameter and has no special meaning. You can name it anything you like, for example, `*wildcard`
-- The optional character `?` is no longer supported, use braces instead: `/:file{{ '{' }}.:ext&#125;`.
-- Regexp characters are not supported.
-- Some characters have been reserved to avoid confusion during upgrade `(()[]?+!)`, use `\` to escape them.
-- Parameter names now support valid JavaScript identifiers, or quoted like `:"this"`.
+- 通配符 `*` 必须具有名称，与参数的行为匹配：使用 `/*splat` 或 `/{{ '{' }}*splat&#125;` 而不是 `/*`。`splat` 只是通配符参数的名称，没有特殊含义。你可以随意命名，例如 `*wildcard`
+- 可选字符 `?` 不再受支持，使用大括号代替：`/:file{{ '{' }}.:ext&#125;`。
+- 正则表达式字符不受支持。
+- 一些字符已保留以避免升级期间混淆 `(()[]?+!)`，使用 `\` 转义它们。
+- 参数名称现在支持有效的 JavaScript 标识符，或用引号括起来如 `:"this"`。
 
-That said, routes that previously worked in Express v4 may not work in Express v5. For example:
+也就是说，之前在 Express v4 中工作的路由在 Express v5 中可能无法工作。例如：
 
 ```typescript
 @Get('users/*')
 findAll() {
-  // In NestJS 11, this will be automatically converted to a valid Express v5 route.
-  // While it may still work, it's no longer advisable to use this wildcard syntax in Express v5.
+  // 在 NestJS 11 中，这将自动转换为有效的 Express v5 路由。
+  // 虽然它可能仍然有效，但在 Express v5 中不再建议使用此通配符语法。
   return 'This route should not work in Express v5';
 }
-
 ```
 
-To fix this issue, you can update the route to use a named wildcard:
+要解决此问题，你可以更新路由以使用命名通配符：
 
 ```typescript
 @Get('users/*splat')
 findAll() {
   return 'This route will work in Express v5';
 }
-
 ```
 
-> warning **Warning** Note that `*splat` is a named wildcard that matches any path without the root path. If you need to match the root path as well (`/users`), you can use `/users/{{ '{' }}*splat&#125;`, wrapping the wildcard in braces (optional group). Note that `splat` is simply the name of the wildcard parameter and has no special meaning. You can name it anything you like, for example, `*wildcard`.
+> warning **警告** 请注意，`*splat` 是一个命名通配符，匹配除根路径外的任何路径。如果你还需要匹配根路径（`/users`），你可以使用 `/users/{{ '{' }}*splat&#125;`，将通配符用大括号括起来（可选组）。请注意，`splat` 只是通配符参数的名称，没有特殊含义。你可以随意命名，例如 `*wildcard`。
 
-Similarly, if you have a middleware that runs on all routes, you may need to update the path to use a named wildcard:
+类似地，如果你有一个在所有路由上运行的中间件，你可能需要更新路径以使用命名通配符：
 
 ```typescript
-// In NestJS 11, this will be automatically converted to a valid Express v5 route.
-// While it may still work, it's no longer advisable to use this wildcard syntax in Express v5.
-forRoutes('*'); // <-- This should not work in Express v5
-
+// 在 NestJS 11 中，这将自动转换为有效的 Express v5 路由。
+// 虽然它可能仍然有效，但在 Express v5 中不再建议使用此通配符语法。
+forRoutes('*'); // <-- 这在 Express v5 中不应该工作
 ```
 
-Instead, you can update the path to use a named wildcard:
+相反，你可以更新路径以使用命名通配符：
 
 ```typescript
-forRoutes('{*splat}'); // <-- This will work in Express v5
-
+forRoutes('{*splat}'); // <-- 这将在 Express v5 中工作
 ```
 
-Note that `{{ '{' }}*splat&#125;` is a named wildcard that matches any path including the root path. Outer braces make path optional.
+请注意，`{{ '{' }}*splat&#125;` 是一个命名通配符，匹配包括根路径在内的任何路径。外部大括号使路径可选。
 
-#### Query parameters parsing
+#### 查询参数解析
 
-> info **Note** This change only applies to Express v5.
+> info **注意** 此变更仅适用于 Express v5。
 
-In Express v5, query parameters are no longer parsed using the `qs` library by default. Instead, the `simple` parser is used, which does not support nested objects or arrays.
+在 Express v5 中，查询参数不再默认使用 `qs` 库解析。相反，使用 `simple` 解析器，它不支持嵌套对象或数组。
 
-As a result, query strings like these:
+因此，像这样的查询字符串：
 
 ```plaintext
 ?filter[where][name]=John&filter[where][age]=30
 ?item[]=1&item[]=2
-
 ```
 
-will no longer be parsed as expected. To revert to the previous behavior, you can configure Express to use the `extended` parser (the default in Express v4) by setting the `query parser` option to `extended`:
+将不再按预期解析。要恢复到以前的行为，你可以配置 Express 使用 `extended` 解析器（Express v4 中的默认值），通过将 `query parser` 选项设置为 `extended`：
 
 ```typescript
 import { NestFactory } from '@nestjs/core';
@@ -86,26 +77,25 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule); // <-- Make sure to use <NestExpressApplication>
-  app.set('query parser', 'extended'); // <-- Add this line
+  const app = await NestFactory.create<NestExpressApplication>(AppModule); // <-- 确保使用 <NestExpressApplication>
+  app.set('query parser', 'extended'); // <-- 添加此行
   await app.listen(3000);
 }
 bootstrap();
-
 ```
 
 #### Fastify v5
 
-`@nestjs/platform-fastify` v11 now finally supports Fastify v5. This update should be seamless for most users; however, Fastify v5 introduces a few breaking changes, though these are unlikely to affect the majority of NestJS users. For more detailed information, refer to the [Fastify v5 migration guide](https://fastify.dev/docs/v5.1.x/Guides/Migration-Guide-V5/).
+`@nestjs/platform-fastify` v11 现在终于支持 Fastify v5。此更新对大多数用户来说应该是无缝的；但是，Fastify v5 引入了一些破坏性变更，尽管这些不太可能影响大多数 NestJS 用户。有关更详细的信息，请参阅 [Fastify v5 迁移指南](https://fastify.dev/docs/v5.1.x/Guides/Migration-Guide-V5/)。
 
-> info **Hint** There have been no changes to path matching in Fastify v5 (except for middleware, see the section below), so you can continue using the wildcard syntax as you did before. The behavior remains the same, and routes defined with wildcards (like `*`) will still work as expected.
+> info **提示** Fastify v5 中路径匹配没有变化（中间件除外，请参见下面的部分），因此你可以继续使用之前的通配符语法。行为保持不变，使用通配符（如 `*`）定义的路由仍将按预期工作。
 
 #### Fastify CORS
 
-By default, only [CORS-safelisted methods](https://fetch.spec.whatwg.org/#methods) are allowed. If you need to enable additional methods (such as `PUT`, `PATCH`, or `DELETE`), you must explicitly define them in the `methods` option.
+默认情况下，只允许 [CORS 安全列出的方法](https://fetch.spec.whatwg.org/#methods)。如果你需要启用其他方法（如 `PUT`、`PATCH` 或 `DELETE`），你必须在 `methods` 选项中显式定义它们。
 
 ```typescript
-const methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']; // OR comma-delimited string 'GET,POST,PUT,PATH,DELETE'
+const methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']; // 或逗号分隔的字符串 'GET,POST,PUT,PATH,DELETE'
 
 const app = await NestFactory.create<NestFastifyApplication>(
   AppModule,
@@ -113,103 +103,97 @@ const app = await NestFactory.create<NestFastifyApplication>(
   { cors: { methods } },
 );
 
-// OR alternatively, you can use the `enableCors` method
+// 或者，你也可以使用 `enableCors` 方法
 const app = await NestFactory.create<NestFastifyApplication>(
   AppModule,
   new FastifyAdapter(),
 );
 app.enableCors({ methods });
-
 ```
 
-#### Fastify middleware registration
+#### Fastify 中间件注册
 
-NestJS 11 now uses the latest version of the [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) package to match **middleware paths** in `@nestjs/platform-fastify`. As a result, the `(.*)` syntax for matching all paths is no longer supported. Instead, you should use named wildcards.
+NestJS 11 现在使用最新版本的 [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) 包来匹配 `@nestjs/platform-fastify` 中的**中间件路径**。因此，`(.*)` 语法用于匹配所有路径不再受支持。相反，你应该使用命名通配符。
 
-For example, if you have a middleware that applies to all routes:
+例如，如果你有一个应用于所有路由的中间件：
 
 ```typescript
-// In NestJS 11, this will automatically be converted to a valid route, even if you don't update it.
+// 在 NestJS 11 中，这将自动转换为有效的路由，即使你不更新它。
 .forRoutes('(.*)');
-
 ```
 
-You'll need to update it to use a named wildcard instead:
+你需要更新它以使用命名通配符：
 
 ```typescript
 .forRoutes('*splat');
-
 ```
 
-Where `splat` is just an arbitrary name for the wildcard parameter. You can name it anything you like.
+其中 `splat` 只是通配符参数的任意名称。你可以随意命名。
 
-#### Module resolution algorithm
+#### 模块解析算法
 
-Starting with NestJS 11, the module resolution algorithm has been improved to enhance performance and reduce memory usage for most applications. This change does not require any manual intervention, but there are some edge cases where the behavior may differ from previous versions.
+从 NestJS 11 开始，模块解析算法已得到改进，以提高大多数应用程序的性能并减少内存使用。此变更不需要任何手动干预，但在某些边缘情况下，行为可能与以前的版本不同。
 
-In NestJS v10 and earlier, dynamic modules were assigned a unique opaque key generated from the module's dynamic metadata. This key was used to identify the module in the module registry. For example, if you included `TypeOrmModule.forFeature([User])` in multiple modules, NestJS would deduplicate the modules and treat them as a single module node in the registry. This process is known as node deduplication.
+在 NestJS v10 及更早版本中，动态模块被分配一个从模块的动态元数据生成的唯一不透明密钥。此密钥用于在模块注册表中识别模块。例如，如果你在多个模块中包含 `TypeOrmModule.forFeature([User])`，NestJS 将去重模块并将它们视为注册表中的单个模块节点。此过程称为节点去重。
 
-With the release of NestJS v11, we no longer generate predictable hashes for dynamic modules. Instead, object references are now used to determine if one module is equivalent to another. To share the same dynamic module across multiple modules, simply assign it to a variable and import it wherever needed. This new approach provides more flexibility and ensures that dynamic modules are handled more efficiently.
+随着 NestJS v11 的发布，我们不再为动态模块生成可预测的哈希。相反，现在使用对象引用来确定一个模块是否等同于另一个模块。要在多个模块之间共享相同的动态模块，只需将其分配给变量并在需要时导入它。这种新方法提供了更大的灵活性，并确保更高效地处理动态模块。
 
-This new algorithm might impact your integration tests if you use a lot of dynamic modules, because without the manually deduplication mentioned above, your TestingModule could have multiple instances of a dependency. This makes it a bit trickier to stub a method, because you'll need to target the correct instance. Your options are to either:
+如果你使用大量动态模块，此新算法可能会影响你的集成测试，因为如果没有上述手动去重，你的 TestingModule 可能有多个依赖项实例。这使得存根方法变得有点棘手，因为你需要定位正确的实例。你的选项是：
 
-- Deduplicate the dynamic module you'd like to stub
-- Use `module.select(ParentModule).get(Target)` to find the correct instance
-- Stub all instances using `module.get(Target, {{ '{' }} each: true &#125;)`
-- Or switch your test back to the old algorithm using `Test.createTestingModule({{ '{' }}&#125;, {{ '{' }} moduleIdGeneratorAlgorithm: 'deep-hash' &#125;)`
+- 去重你想要存根的动态模块
+- 使用 `module.select(ParentModule).get(Target)` 查找正确的实例
+- 使用 `module.get(Target, {{ '{' }} each: true &#125;)` 存根所有实例
+- 或者使用 `Test.createTestingModule({{ '{' }}&#125;, {{ '{' }} moduleIdGeneratorAlgorithm: 'deep-hash' &#125;)` 将测试切换回旧算法
 
-#### Reflector type inference
+#### Reflector 类型推断
 
-NestJS 11 introduces several improvements to the `Reflector` class, enhancing its functionality and type inference for metadata values. These updates provide a more intuitive and robust experience when working with metadata.
+NestJS 11 对 `Reflector` 类引入了几项改进，增强了元数据值的功能和类型推断。这些更新提供了更直观和强大的元数据工作体验。
 
-1. `getAllAndMerge` now returns an object rather than an array containing a single element when there is only one metadata entry, and the `value` is of type `object`. This change improves consistency when dealing with object-based metadata.
-2. The `getAllAndOverride` return type has been updated to `T | undefined` instead of `T`. This update better reflects the possibility of no metadata being found and ensures proper handling of undefined cases.
-3. The `ReflectableDecorator`'s transformed type argument is now properly inferred across all methods.
+1. `getAllAndMerge` 现在在只有一个元数据条目且 `value` 是 `object` 类型时返回对象而不是包含单个元素的数组。此变更提高了处理基于对象的元数据时的一致性。
+2. `getAllAndOverride` 返回类型已更新为 `T | undefined` 而不是 `T`。此更新更好地反映了未找到元数据的可能性，并确保正确处理未定义的情况。
+3. `ReflectableDecorator` 的转换类型参数现在在所有方法中都能正确推断。
 
-These enhancements improve the overall developer experience by providing better type safety and handling of metadata in NestJS 11.
+这些增强功能通过提供更好的类型安全性和 NestJS 11 中的元数据处理，改善了整体开发人员体验。
 
-#### Lifecycle hooks execution order
+#### 生命周期钩子执行顺序
 
-Termination lifecycle hooks are now executed in the reverse order to their initialization counterparts. That said, hooks like `OnModuleDestroy`, `BeforeApplicationShutdown`, and `OnApplicationShutdown` are now executed in the reverse order.
+终止生命周期钩子现在以与初始化钩子相反的顺序执行。也就是说，`OnModuleDestroy`、`BeforeApplicationShutdown` 和 `OnApplicationShutdown` 钩子现在以相反的顺序执行。
 
-Imagine the following scenario:
+想象以下场景：
 
 ```plaintext
-// Where A, B, and C are modules and "->" represents the module dependency.
+// 其中 A、B 和 C 是模块，"->" 表示模块依赖。
 A -> B -> C
-
 ```
 
-In this case, the `OnModuleInit` hooks are executed in the following order:
+在这种情况下，`OnModuleInit` 钩子按以下顺序执行：
 
 ```plaintext
 C -> B -> A
-
 ```
 
-While the `OnModuleDestroy` hooks are executed in the reverse order:
+而 `OnModuleDestroy` 钩子以相反的顺序执行：
 
 ```plaintext
 A -> B -> C
-
 ```
 
-> info **Hint** Global modules are treated as a dependency of all other modules. This means that global modules are initialized first and destroyed last.
+> info **提示** 全局模块被视为所有其他模块的依赖项。这意味着全局模块首先初始化，最后销毁。
 
-#### Middleware registration order
+#### 中间件注册顺序
 
-In NestJS v11, the behavior of middleware registration has been updated. Previously, the order of middleware registration was determined by the topological sort of the module dependency graph, where the distance from the root module defined the order of middleware registration, regardless of whether the middleware was registered in a global module or a regular module. Global modules were treated like regular modules in this respect, which led to inconsistent behavior, especially when compared to other framework features.
+在 NestJS v11 中，中间件注册的行为已更新。以前，中间件注册的顺序由模块依赖图的拓扑排序决定，其中距根模块的距离定义了中间件注册的顺序，无论中间件是在全局模块还是常规模块中注册。在这方面，全局模块被视为常规模块，这导致了不一致的行为，尤其是与其他框架功能相比时。
 
-From v11 onwards, middleware registered in global modules is now **executed first**, regardless of its position in the module dependency graph. This change ensures that global middleware always runs before any middleware from imported modules, maintaining a consistent and predictable order.
+从 v11 开始，在全局模块中注册的中间件现在**首先执行**，无论其在模块依赖图中的位置如何。此变更确保全局中间件始终在来自导入模块的任何中间件之前运行，保持一致和可预测的顺序。
 
-#### Cache module
+#### 缓存模块
 
-The `CacheModule` (from the `@nestjs/cache-manager` package) has been updated to support the latest version of the `cache-manager` package. This update brings a few breaking changes, including a migration to [Keyv](https://keyv.org/), which offers a unified interface for key-value storage across multiple backend stores through storage adapters.
+`CacheModule`（来自 `@nestjs/cache-manager` 包）已更新以支持最新版本的 `cache-manager` 包。此更新带来了一些破坏性变更，包括迁移到 [Keyv](https://keyv.org/)，它通过存储适配器为多个后端存储提供统一的键值存储接口。
 
-The key difference between the previous version and the new version lies in the configuration of external stores. In the previous version, to register a Redis store, you would have likely configured it like this:
+先前版本和新版本之间的关键区别在于外部存储的配置。在以前的版本中，要注册 Redis 存储，你可能会这样配置：
 
 ```ts
-// Old version - no longer supported
+// 旧版本 - 不再支持
 CacheModule.registerAsync({
   useFactory: async () => {
     const store = await redisStore({
@@ -224,13 +208,12 @@ CacheModule.registerAsync({
     };
   },
 }),
-
 ```
 
-In the new version, you should use the `Keyv` adapter to configure the store:
+在新版本中，你应该使用 `Keyv` 适配器来配置存储：
 
 ```ts
-// New version - supported
+// 新版本 - 支持
 CacheModule.registerAsync({
   useFactory: async () => {
     return {
@@ -240,32 +223,31 @@ CacheModule.registerAsync({
     };
   },
 }),
-
 ```
 
-Where `KeyvRedis` is imported from the `@keyv/redis` package. See the [Caching documentation](/techniques/caching) to learn more.
+其中 `KeyvRedis` 从 `@keyv/redis` 包导入。请参阅 [缓存文档](/techniques/caching) 了解更多信息。
 
-> warning **Warning** In this update, cached data handled by the Keyv library is now structured as an object containing `value` and `expires` fields, for example: `{{ '{' }}"value": "yourData", "expires": 1678901234567{{ '}' }}`. While Keyv automatically retrieves the `value` field when accessing data through its API, it’s important to note this change if you interact with the cache data directly (e.g., outside of the cache-manager API) or need to support data written using the previous version of `@nestjs/cache-manager`.
+> warning **警告** 在此更新中，由 Keyv 库处理的缓存数据现在被构造为包含 `value` 和 `expires` 字段的对象，例如：`{{ '{' }}"value": "yourData", "expires": 1678901234567{{ '}' }}`。虽然 Keyv 在通过其 API 访问数据时自动检索 `value` 字段，但如果你直接与缓存数据交互（例如，在 cache-manager API 之外）或需要支持使用以前版本的 `@nestjs/cache-manager` 写入的数据，请注意此变更。
 
-#### Config module
+#### 配置模块
 
-If you're using the `ConfigModule` from the `@nestjs/config` package, be aware of several breaking changes introduced in `@nestjs/config@4.0.0`. Most notably, the order in which configuration variables are read by the `ConfigService#get` method has been updated. The new order is:
+如果你使用 `@nestjs/config` 包的 `ConfigModule`，请注意 `@nestjs/config@4.0.0` 中引入的几个破坏性变更。最值得注意的是，`ConfigService#get` 方法读取配置变量的顺序已更新。新顺序是：
 
-- Internal configuration (config namespaces and custom config files)
-- Validated environment variables (if validation is enabled and a schema is provided)
-- The `process.env` object
+- 内部配置（配置命名空间和自定义配置文件）
+- 已验证的环境变量（如果启用了验证并提供了模式）
+- `process.env` 对象
 
-Previously, validated environment variables and the `process.env` object were read first, preventing them from being overridden by internal configuration. With this update, internal configuration will now always take precedence over environment variables.
+以前，已验证的环境变量和 `process.env` 对象首先读取，防止它们被内部配置覆盖。使用此更新，内部配置现在将始终优先于环境变量。
 
-Additionally, the `ignoreEnvVars` configuration option, which previously allowed disabling validation of the `process.env` object, has been deprecated. Instead, use the `validatePredefined` option (set to `false` to disable validation of predefined environment variables). Predefined environment variables refer to `process.env` variables that were set before the module was imported. For example, if you start your application with `PORT=3000 node main.js`, the `PORT` variable is considered predefined. However, variables loaded by the `ConfigModule` from a `.env` file are not classified as predefined.
+此外，`ignoreEnvVars` 配置选项（以前允许禁用 `process.env` 对象的验证）已弃用。相反，使用 `validatePredefined` 选项（设置为 `false` 以禁用预定义环境变量的验证）。预定义环境变量是指在导入模块之前设置的 `process.env` 变量。例如，如果你使用 `PORT=3000 node main.js` 启动应用程序，`PORT` 变量被视为预定义。但是，由 `ConfigModule` 从 `.env` 文件加载的变量不被归类为预定义。
 
-A new `skipProcessEnv` option has also been introduced. This option allows you to prevent the `ConfigService#get` method from accessing the `process.env` object entirely, which can be helpful when you want to restrict the service from reading environment variables directly.
+还引入了一个新的 `skipProcessEnv` 选项。此选项允许你完全阻止 `ConfigService#get` 方法访问 `process.env` 对象，当你想限制服务直接读取环境变量时，这可能很有帮助。
 
-#### Terminus module
+#### Terminus 模块
 
-If you are using the `TerminusModule` and have built your own custom health indicator, a new API has been introduced in version 11. The new `HealthIndicatorService` is designed to enhance the readability and testability of custom health indicators.
+如果你使用 `TerminusModule` 并构建了自己的自定义健康指示器，版本 11 中引入了一个新的 API。新的 `HealthIndicatorService` 旨在提高自定义健康指示器的可读性和可测试性。
 
-Before version 11, a health indicator might have looked like this:
+在版本 11 之前，健康指示器可能如下所示：
 
 ```typescript
 @Injectable()
@@ -303,22 +285,21 @@ export class DogHealthIndicator extends HealthIndicator {
     );
   }
 }
-
 ```
 
-Starting with version 11, it is recommended to use the new `HealthIndicatorService` API, which streamlines the implementation process. Here's how the same health indicator can now be implemented:
+从版本 11 开始，建议使用新的 `HealthIndicatorService` API，它简化了实现过程。现在可以实现相同的健康指示器：
 
 ```typescript
 @Injectable()
 export class DogHealthIndicator {
   constructor(
     private readonly httpService: HttpService,
-    //  Inject the `HealthIndicatorService` provided by the `TerminusModule`
+    // 注入由 `TerminusModule` 提供的 `HealthIndicatorService`
     private readonly healthIndicatorService: HealthIndicatorService,
   ) {}
 
   async isHealthy(key: string) {
-    // Start the health indicator check for the given key
+    // 开始给定键的健康指示器检查
     const indicator = this.healthIndicatorService.check(key);
 
     try {
@@ -326,11 +307,11 @@ export class DogHealthIndicator {
       const isHealthy = badboys.length === 0;
 
       if (!isHealthy) {
-        // Mark the indicator as "down" and add additional info to the response
+        // 将指示器标记为"down"并向响应添加额外信息
         return indicator.down({ badboys: badboys.length });
       }
 
-      // Mark the health indicator as up
+      // 将健康指示器标记为 up
       return indicator.up();
     } catch (error) {
       return indicator.down('Unable to retrieve dogs');
@@ -341,35 +322,33 @@ export class DogHealthIndicator {
     // ...
   }
 }
-
 ```
 
-Key changes:
+关键变更：
 
-- The `HealthIndicatorService` replaces the legacy `HealthIndicator` and `HealthCheckError` classes, providing a cleaner API for health checks.
-- The `check` method allows for easy state tracking (`up` or `down`) while supporting the inclusion of additional metadata in health check responses.
+- `HealthIndicatorService` 取代了传统的 `HealthIndicator` 和 `HealthCheckError` 类，为健康检查提供更清晰的 API。
+- `check` 方法允许轻松的状态跟踪（`up` 或 `down`），同时支持在健康检查响应中包含额外的元数据。
 
-> info **Info** Please note that the `HealthIndicator` and `HealthCheckError` classes have been marked as deprecated and are scheduled for removal in the next major release.
+> info **信息** 请注意，`HealthIndicator` 和 `HealthCheckError` 类已标记为弃用，并计划在下一个主要版本中删除。
 
-#### Node.js v16 and v18 no longer supported
+#### 不再支持 Node.js v16 和 v18
 
-Starting with NestJS 11, Node.js v16 is no longer supported, as it reached its end-of-life (EOL) on September 11, 2023. Likewise, the security support is scheduled to end on April 30, 2025 for Node.js v18, so we went ahead and dropped support for it as well.
+从 NestJS 11 开始，不再支持 Node.js v16，因为它已于 2023 年 9 月 11 日达到生命周期结束（EOL）。同样，Node.js v18 的安全支持计划于 2025 年 4 月 30 日结束，因此我们提前放弃了对它的支持。
 
-NestJS 11 now requires **Node.js v20 or higher**.
+NestJS 11 现在需要 **Node.js v20 或更高版本**。
 
-To ensure the best experience, we strongly recommend using the latest LTS version of Node.js.
+为确保最佳体验，我们强烈建议使用最新 LTS 版本的 Node.js。
 
-#### Mau official deployment platform
+#### Mau 官方部署平台
 
-In case you missed the announcement, we launched our official deployment platform, [Mau](https://www.mau.nestjs.com/), in 2024.
-Mau is a fully managed platform that simplifies the deployment process for NestJS applications. With Mau, you can deploy your applications to the cloud (**AWS**; Amazon Web Services) with a single command, manage your environment variables, and monitor your application's performance in real-time.
+如果你错过了公告，我们在 2024 年推出了官方部署平台 [Mau](https://www.mau.nestjs.com/)。
+Mau 是一个完全托管的平台，简化了 NestJS 应用程序的部署过程。使用 Mau，你可以通过单个命令将应用程序部署到云（**AWS**；Amazon Web Services），管理环境变量，并实时监控应用程序的性能。
 
-Mau makes provisioning and maintaining your infrastructure as simple as clicking just a few buttons. Mau is designed to be simple and intuitive, so you can focus on building your applications and not worry about the underlying infrastructure. Under the hood, we use Amazon Web Services to provide you with a powerful and reliable platform, while abstracting away all the complexity of AWS. We take care of all the heavy lifting for you, so you can focus on building your applications and growing your business.
+Mau 使配置和维护基础设施变得像点击几个按钮一样简单。Mau 设计得简单易用，因此你可以专注于构建应用程序，而不必担心底层基础设施。在底层，我们使用 Amazon Web Services 为你提供强大可靠的平台，同时抽象掉 AWS 的所有复杂性。我们为你处理所有繁重的工作，因此你可以专注于构建应用程序和发展业务。
 
 ```bash
 $ npm install -g @nestjs/mau
 $ mau deploy
-
 ```
 
-You can learn more about Mau [in this chapter](/deployment#easy-deployment-with-mau).
+你可以在 [本章](/deployment#easy-deployment-with-mau) 中了解有关 Mau 的更多信息。

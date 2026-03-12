@@ -1,22 +1,19 @@
-<!-- 此文件从 content/components.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-12T13:42:20.316Z -->
-<!-- 源文件: content/components.md -->
+### 提供者
 
-### Providers
-
-Providers are a core concept in Nest. Many of the basic Nest classes, such as services, repositories, factories, and helpers, can be treated as providers. The key idea behind a provider is that it can be **injected** as a dependency, allowing objects to form various relationships with each other. The responsibility of "wiring up" these objects is largely handled by the Nest runtime system.
+提供者是 Nest 中的核心概念。许多基本的 Nest 类，如服务、存储库、工厂和助手，都可以被视为提供者。提供者背后的关键思想是它可以**被注入**为依赖项，允许对象之间形成各种关系。"连接"这些对象的责任在很大程度上由 Nest 运行时系统处理。
 
 <figure><img class="illustrative-image" src="/assets/Components_1.png" /></figure>
 
-In the previous chapter, we created a simple `CatsController`. Controllers should handle HTTP requests and delegate more complex tasks to **providers**. Providers are plain JavaScript classes declared as `providers` in a NestJS module. For more details, refer to the "Modules" chapter.
+在上一章中，我们创建了一个简单的 `CatsController`。控制器应该处理 HTTP 请求并将更复杂的任务委托给**提供者**。提供者是在 NestJS 模块中声明为 `providers` 的普通 JavaScript 类。有关更多详细信息，请参阅"模块"章节。
 
-> info **Hint** Since Nest enables you to design and organize dependencies in an object-oriented manner, we strongly recommend following the [SOLID principles](https://en.wikipedia.org/wiki/SOLID).
+> info **提示** 由于 Nest 使你能够以面向对象的方式设计和组织依赖项，我们强烈建议遵循 [SOLID 原则](https://en.wikipedia.org/wiki/SOLID)。
 
-#### Services
+#### 服务
 
-Let's begin by creating a simple `CatsService`. This service will handle data storage and retrieval, and it will be used by the `CatsController`. Because of its role in managing the application's logic, it’s an ideal candidate to be defined as a provider.
+让我们首先创建一个简单的 `CatsService`。此服务将处理数据存储和检索，它将被 `CatsController` 使用。由于其在管理应用程序逻辑中的作用，它是被定义为提供者的理想候选者。
 
 ```typescript
+@@filename(cats.service)
 import { Injectable } from '@nestjs/common';
 import { Cat } from './interfaces/cat.interface';
 
@@ -32,6 +29,8 @@ export class CatsService {
     return this.cats;
   }
 }
+@@switch
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CatsService {
@@ -47,27 +46,27 @@ export class CatsService {
     return this.cats;
   }
 }
-
 ```
 
-> info **Hint** To create a service using the CLI, simply execute the `$ nest g service cats` command.
+> info **提示** 要使用 CLI 创建服务，只需执行 `$ nest g service cats` 命令。
 
-Our `CatsService` is a basic class with one property and two methods. The key addition here is the `@Injectable()` decorator. This decorator attaches metadata to the class, signaling that `CatsService` is a class that can be managed by the Nest [IoC](https://en.wikipedia.org/wiki/Inversion_of_control) container.
+我们的 `CatsService` 是一个基本类，具有一个属性和两个方法。这里的关键添加是 `@Injectable()` 装饰器。此装饰器将元数据附加到类，表明 `CatsService` 是一个可以由 Nest [IoC](https://en.wikipedia.org/wiki/Inversion_of_control) 容器管理的类。
 
-Additionally, this example makes use of a `Cat` interface, which likely looks something like this:
+此外，此示例使用了 `Cat` 接口，它可能如下所示：
 
 ```typescript
+@@filename(interfaces/cat.interface)
 export interface Cat {
   name: string;
   age: number;
   breed: string;
 }
-
 ```
 
-Now that we have a service class to retrieve cats, let's use it inside the `CatsController`:
+现在我们有了一个服务类来检索猫，让我们在 `CatsController` 中使用它：
 
 ```typescript
+@@filename(cats.controller)
 import { Controller, Get, Post, Body } from '@nestjs/common';
 import { CreateCatDto } from './dto/create-cat.dto';
 import { CatsService } from './cats.service';
@@ -87,6 +86,9 @@ export class CatsController {
     return this.catsService.findAll();
   }
 }
+@@switch
+import { Controller, Get, Post, Body, Bind, Dependencies } from '@nestjs/common';
+import { CatsService } from './cats.service';
 
 @Controller('cats')
 @Dependencies(CatsService)
@@ -106,112 +108,129 @@ export class CatsController {
     return this.catsService.findAll();
   }
 }
-
 ```
 
-The `CatsService` is **injected** through the class constructor. Notice the use of the `private` keyword. This shorthand allows us to both declare and initialize the `catsService` member in the same line, streamlining the process.
+我们使用**构造函数注入**来注入 `CatsService`。在 TypeScript 中，这是通过在构造函数参数上添加类型注解来完成的。在 JavaScript 中，我们使用 `@Dependencies()` 装饰器来指定依赖项。
 
-#### Dependency injection
+#### 依赖注入
 
-Nest is built around the powerful design pattern known as **Dependency Injection**. We highly recommend reading a great article about this concept in the official [Angular documentation](https://angular.dev/guide/di).
+Nest 是建立在强大的设计模式基础上的，主要是**依赖注入**。我们建议在官方 [Angular](https://angular.dev/guide/dependency-injection) 文档中阅读有关此概念的更多信息，因为其原理在 Nest 中非常相似。
 
-In Nest, thanks to TypeScript's capabilities, managing dependencies is straightforward because they are resolved based on their type. In the example below, Nest will resolve the `catsService` by creating and returning an instance of `CatsService` (or, in the case of a singleton, returning the existing instance if it has already been requested elsewhere). This dependency is then injected into your controller's constructor (or assigned to the specified property):
+在 Nest 中，依赖项通常在构造函数中注入，如上面的示例所示。Nest 会解析关系图并在需要时自动注入这些依赖项。
 
-```typescript
-constructor(private catsService: CatsService) {}
+#### 注册提供者
 
-```
-
-#### Scopes
-
-Providers typically have a lifetime ("scope") that aligns with the application lifecycle. When the application is bootstrapped, each dependency must be resolved, meaning every provider gets instantiated. Similarly, when the application shuts down, all providers are destroyed. However, it’s also possible to make a provider **request-scoped**, meaning its lifetime is tied to a specific request rather than the application's lifecycle. You can learn more about these techniques in the [Injection Scopes](/fundamentals/provider-scopes) chapter.
-
-<app-banner-courses></app-banner-courses>
-
-#### Custom providers
-
-Nest comes with a built-in inversion of control ("IoC") container that manages the relationships between providers. This feature is the foundation of dependency injection, but it’s actually much more powerful than we've covered so far. There are several ways to define a provider: you can use plain values, classes, and both asynchronous or synchronous factories. For more examples of defining providers, check out the [Dependency Injection](/fundamentals/dependency-injection) chapter.
-
-#### Optional providers
-
-Occasionally, you may have dependencies that don't always need to be resolved. For example, your class might depend on a **configuration object**, but if none is provided, default values should be used. In such cases, the dependency is considered optional, and the absence of the configuration provider should not result in an error.
-
-To mark a provider as optional, use the `@Optional()` decorator in the constructor's signature.
+现在我们有了服务类，我们需要在 Nest 中注册它，以便它可以被注入。我们通过在模块的 `providers` 数组中声明它来做到这一点：
 
 ```typescript
-import { Injectable, Optional, Inject } from '@nestjs/common';
-
-@Injectable()
-export class HttpService<T> {
-  constructor(@Optional() @Inject('HTTP_OPTIONS') private httpClient: T) {}
-}
-
-```
-
-In the example above, we're using a custom provider, which is why we include the `HTTP_OPTIONS` custom **token**. Previous examples demonstrated constructor-based injection, where a dependency is indicated through a class in the constructor. For more details on custom providers and how their associated tokens work, check out the [Custom Providers](/fundamentals/dependency-injection) chapter.
-
-#### Property-based injection
-
-The technique we've used so far is called constructor-based injection, where providers are injected through the constructor method. In certain specific cases, **property-based injection** can be useful. For example, if your top-level class depends on one or more providers, passing them all the way up through `super()` in sub-classes can become cumbersome. To avoid this, you can use the `@Inject()` decorator directly at the property level.
-
-```typescript
-import { Injectable, Inject } from '@nestjs/common';
-
-@Injectable()
-export class HttpService<T> {
-  @Inject('HTTP_OPTIONS')
-  private readonly httpClient: T;
-}
-
-```
-
-> warning **Warning** If your class doesn't extend another class, it's generally better to use **constructor-based** injection. The constructor clearly specifies which dependencies are required, offering better visibility and making the code easier to understand compared to class properties annotated with `@Inject`.
-
-#### Provider registration
-
-Now that we've defined a provider (`CatsService`) and a consumer (`CatsController`), we need to register the service with Nest so that it can handle the injection. This is done by editing the module file (`app.module.ts`) and adding the service to the `providers` array in the `@Module()` decorator.
-
-```typescript
+@@filename(cats.module)
 import { Module } from '@nestjs/common';
-import { CatsController } from './cats/cats.controller';
-import { CatsService } from './cats/cats.service';
+import { CatsController } from './cats.controller';
+import { CatsService } from './cats.service';
 
 @Module({
   controllers: [CatsController],
   providers: [CatsService],
 })
-export class AppModule {}
-
+export class CatsModule {}
 ```
 
-Nest will now be able to resolve the dependencies of the `CatsController` class.
+#### 自定义提供者
 
-At this point, our directory structure should look like this:
+Nest 有一个内置的依赖注入系统，我们在上面的示例中看到了它的基本用法。在 Nest 中，提供者不仅限于类，还可以是各种不同的提供者，如值、工厂、异步工厂等。更多关于这一点的信息，以及如何创建自定义提供者的详细信息，可以在 [自定义提供者](/fundamentals/dependency-injection) 章节中找到。
 
-<div class="file-tree">
-<div class="item">src</div>
-<div class="children">
-<div class="item">cats</div>
-<div class="children">
-<div class="item">dto</div>
-<div class="children">
-<div class="item">create-cat.dto.ts</div>
-</div>
-<div class="item">interfaces</div>
-<div class="children">
-<div class="item">cat.interface.ts</div>
-</div>
-<div class="item">cats.controller.ts</div>
-<div class="item">cats.service.ts</div>
-</div>
-<div class="item">app.module.ts</div>
-<div class="item">main.ts</div>
-</div>
-</div>
+#### 可选提供者
 
-#### Manual instantiation
+有时，你可能需要处理依赖项可能不存在的情况。例如，当你想为可选配置提供默认值时，或者当你想仅在特定条件下注册提供者时。在这种情况下，你可以将依赖项标记为**可选**。
 
-So far, we've covered how Nest automatically handles most of the details of resolving dependencies. However, in some cases, you might need to step outside of the built-in Dependency Injection system and manually retrieve or instantiate providers. Two such techniques are briefly discussed below.
+```typescript
+@@filename(cats.service)
+import { Injectable, Optional, Inject } from '@nestjs/common';
+import { Cat } from './interfaces/cat.interface';
+import { CREATE_CAT_OPTIONS } from './cats.constants';
 
-- To retrieve existing instances or instantiate providers dynamically, you can use the [Module reference](/fundamentals/module-reference).
-- To get providers within the `bootstrap()` function (e.g., for standalone applications or to use a configuration service during bootstrapping), check out [Standalone applications](/standalone-applications).
+@Injectable()
+export class CatsService {
+  private readonly cats: Cat[] = [];
+
+  constructor(@Optional() @Inject(CREATE_CAT_OPTIONS) private readonly options: object) {}
+
+  create(cat: Cat) {
+    this.cats.push(cat);
+  }
+
+  findAll(): Cat[] {
+    return this.cats;
+  }
+}
+@@switch
+import { Injectable, Optional, Inject } from '@nestjs/common';
+
+@Injectable()
+export class CatsService {
+  constructor(@Optional() @Inject('CREATE_CAT_OPTIONS') options) {
+    this.cats = [];
+    this.options = options;
+  }
+
+  create(cat) {
+    this.cats.push(cat);
+  }
+
+  findAll() {
+    return this.cats;
+  }
+}
+```
+
+在此示例中，`CREATE_CAT_OPTIONS` 是一个提供者令牌，我们使用 `@Optional()` 装饰器将其标记为可选。如果该令牌的提供者不存在，`options` 参数将是 `undefined`。
+
+#### 基于属性的注入
+
+在某些非常特殊的情况下，基于属性的注入可能很有用。例如，当顶级类依赖于一个或多个提供者时，而你不想在子类中通过构造函数传递它们。要使用基于属性的注入，你可以使用 `@Inject()` 装饰器：
+
+```typescript
+@@filename(base.service)
+import { Injectable, Inject } from '@nestjs/common';
+
+@Injectable()
+export class BaseService {
+  @Inject()
+  protected httpService: HttpService;
+}
+```
+
+但是，这种技术通常不推荐，因为它使你的代码更难测试，并且可能使依赖关系变得不那么明确。
+
+#### 提供者作用域
+
+提供者通常具有与应用程序生命周期对齐的生命周期（"作用域"）。当应用程序引导时，必须解析每个依赖项，这意味着每个提供者都会被实例化。同样，当应用程序关闭时，所有提供者都会被销毁。然而，也可以使提供者**请求作用域**，这意味着其生命周期与特定请求而不是应用程序的生命周期相关联。你可以在 [依赖注入](/fundamentals/dependency-injection) 章节中了解更多关于这些技术的信息。
+
+#### 模块引用
+
+在某些情况下，你可能需要在运行时动态获取提供者的实例，而不是在构造函数中注入它。例如，当你需要根据某些条件或配置动态选择提供者时。在这种情况下，你可以使用 `ModuleRef` 类：
+
+```typescript
+@@filename(cats.service)
+import { Injectable, ModuleRef } from '@nestjs/common';
+import { Cat } from './interfaces/cat.interface';
+
+@Injectable()
+export class CatsService {
+  private readonly cats: Cat[] = [];
+
+  constructor(private moduleRef: ModuleRef) {}
+
+  create(cat: Cat) {
+    this.cats.push(cat);
+  }
+
+  findAll(): Cat[] {
+    return this.cats;
+  }
+}
+```
+
+`ModuleRef` 提供了一个 `get()` 方法，允许你获取已注册提供者的实例。这在动态模块或需要基于某些条件解析提供者的场景中特别有用。
+
+> info **提示** 有关 `ModuleRef` 的更多信息，请参阅 [执行上下文](/fundamentals/execution-context) 章节。

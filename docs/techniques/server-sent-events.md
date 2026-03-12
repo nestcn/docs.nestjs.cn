@@ -11,6 +11,7 @@
 sse(): Observable<MessageEvent> {
   return interval(1000).pipe(map((_) => ({ data: { hello: 'world' } })));
 }
+
 ```
 
 > info **提示** `@Sse()` 装饰器和 `MessageEvent` 接口从 `@nestjs/common` 导入，而 `Observable`、`interval` 和 `map` 从 `rxjs` 包导入。
@@ -28,6 +29,7 @@ export interface MessageEvent {
   type?: string;
   retry?: number;
 }
+
 ```
 
 有了这个，我们现在可以在客户端应用程序中创建 `EventSource` 类的实例，将 `/sse` 路由（与我们在上面的 `@Sse()` 装饰器中传递的端点匹配）作为构造函数参数传递。
@@ -41,6 +43,7 @@ const eventSource = new EventSource('/sse');
 eventSource.onmessage = ({ data }) => {
   console.log('New message', JSON.parse(data));
 };
+
 ```
 
 #### 示例

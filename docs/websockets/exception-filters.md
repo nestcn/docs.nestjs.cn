@@ -8,6 +8,7 @@ HTTP [异常过滤器](/exception-filters)层与相应的 WebSocket 层之间的
 
 ```typescript
 throw new WsException('Invalid credentials.');
+
 ```
 
 > info **提示** `WsException` 类从 `@nestjs/websockets` 包导入。
@@ -19,6 +20,7 @@ throw new WsException('Invalid credentials.');
   status: 'error',
   message: 'Invalid credentials.'
 }
+
 ```
 
 #### 过滤器
@@ -32,6 +34,7 @@ onEvent(client, data: any): WsResponse<any> {
   const event = 'events';
   return { event, data };
 }
+
 ```
 
 #### 继承
@@ -41,7 +44,6 @@ onEvent(client, data: any): WsResponse<any> {
 为了将异常处理委托给基础过滤器，你需要扩展 `BaseWsExceptionFilter` 并调用继承的 `catch()` 方法。
 
 ```typescript
-@@filename()
 import { Catch, ArgumentsHost } from '@nestjs/common';
 import { BaseWsExceptionFilter } from '@nestjs/websockets';
 
@@ -51,9 +53,7 @@ export class AllExceptionsFilter extends BaseWsExceptionFilter {
     super.catch(exception, host);
   }
 }
-@@switch
-import { Catch } from '@nestjs/common';
-import { BaseWsExceptionFilter } from '@nestjs/websockets';
+
 
 @Catch()
 export class AllExceptionsFilter extends BaseWsExceptionFilter {
@@ -61,6 +61,7 @@ export class AllExceptionsFilter extends BaseWsExceptionFilter {
     super.catch(exception, host);
   }
 }
+
 ```
 
 上面的实现只是一个外壳，演示了该方法。扩展异常过滤器的实现将包括你定制的**业务逻辑**（例如，处理各种条件）。

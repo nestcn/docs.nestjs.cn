@@ -13,7 +13,6 @@
 首先，我们定义一个提供者。`@Injectable()` 装饰器将 `CatsService` 类标记为提供者。
 
 ```typescript
-@@filename(cats.service)
 import { Injectable } from '@nestjs/common';
 import { Cat } from './interfaces/cat.interface';
 
@@ -25,8 +24,7 @@ export class CatsService {
     return this.cats;
   }
 }
-@@switch
-import { Injectable } from '@nestjs/common';
+
 
 @Injectable()
 export class CatsService {
@@ -38,12 +36,12 @@ export class CatsService {
     return this.cats;
   }
 }
+
 ```
 
 然后我们请求 Nest 将提供者注入到我们的控制器类中：
 
 ```typescript
-@@filename(cats.controller)
 import { Controller, Get } from '@nestjs/common';
 import { CatsService } from './cats.service';
 import { Cat } from './interfaces/cat.interface';
@@ -57,9 +55,7 @@ export class CatsController {
     return this.catsService.findAll();
   }
 }
-@@switch
-import { Controller, Get, Bind, Dependencies } from '@nestjs/common';
-import { CatsService } from './cats.service';
+
 
 @Controller('cats')
 @Dependencies(CatsService)
@@ -73,12 +69,12 @@ export class CatsController {
     return this.catsService.findAll();
   }
 }
+
 ```
 
 最后，我们向 Nest IoC 容器注册提供者：
 
 ```typescript
-@@filename(app.module)
 import { Module } from '@nestjs/common';
 import { CatsController } from './cats/cats.controller';
 import { CatsService } from './cats/cats.service';
@@ -88,6 +84,7 @@ import { CatsService } from './cats/cats.service';
   providers: [CatsService],
 })
 export class AppModule {}
+
 ```
 
 到底发生了什么使这成为可能？过程中有三个关键步骤：
@@ -97,6 +94,7 @@ export class AppModule {}
 
 ```typescript
   constructor(private catsService: CatsService)
+
 ```
 
 3. 在 `app.module.ts` 中，我们将令牌 `CatsService` 与 `cats.service.ts` 文件中的 `CatsService` 类关联。我们将在<a href="/fundamentals/custom-providers#standard-providers">下面</a>看到这种关联（也称为_注册_）是如何发生的。
@@ -116,6 +114,7 @@ export class AppModule {}
   controllers: [CatsController],
   providers: [CatsService],
 })
+
 ```
 
 `providers` 属性接受一个 `providers` 数组。到目前为止，我们通过类名列表提供了这些提供者。实际上，语法 `providers: [CatsService]` 是更完整语法的简写：
@@ -127,6 +126,7 @@ providers: [
     useClass: CatsService,
   },
 ];
+
 ```
 
 现在我们看到了这个显式构造，我们可以理解注册过程。在这里，我们明确地将令牌 `CatsService` 与类 `CatsService` 关联。简写符号只是为了简化最常见用例的便利，其中令牌用于请求同名类的实例。
@@ -166,6 +166,7 @@ const mockCatsService = {
   ],
 })
 export class AppModule {}
+
 ```
 
 在这个例子中，`CatsService` 令牌将解析为 `mockCatsService` 模拟对象。`useValue` 需要一个值 - 在这种情况下是一个与它替换的 `CatsService` 类具有相同接口的字面对象。由于 TypeScript 的[结构类型](https://www.typescriptlang.org/docs/handbook/type-compatibility.html)，你可以使用任何具有兼容接口的对象，包括字面对象或使用 `new` 实例化的类实例。
@@ -186,6 +187,7 @@ import { connection } from './connection';
   ],
 })
 export class AppModule {}
+
 ```
 
 在这个例子中，我们将字符串值令牌（`'CONNECTION'`）与我们从外部文件导入的预先存在的 `connection` 对象关联。
@@ -195,17 +197,11 @@ export class AppModule {}
 我们之前已经看到了如何使用标准[基于构造函数的注入](https://docs.nestjs.com/providers#dependency-injection)模式注入提供者。此模式**要求**依赖项用类名声明。`'CONNECTION'` 自定义提供者使用字符串值令牌。让我们看看如何注入这样的提供者。为此，我们使用 `@Inject()` 装饰器。此装饰器接受单个参数 - 令牌。
 
 ```typescript
-@@filename()
 @Injectable()
 export class CatsRepository {
   constructor(@Inject('CONNECTION') connection: Connection) {}
 }
-@@switch
-@Injectable()
-@Dependencies('CONNECTION')
-export class CatsRepository {
-  constructor(connection) {}
-}
+
 ```
 
 > info **提示** `@Inject()` 装饰器从 `@nestjs/common` 包导入。
@@ -229,6 +225,7 @@ const configServiceProvider = {
   providers: [configServiceProvider],
 })
 export class AppModule {}
+
 ```
 
 让我们看看这个代码示例中的几个细节。你会注意到我们首先用字面对象定义 `configServiceProvider`，然后在模块装饰器的 `providers` 属性中传递它。这只是代码组织的一点，但在功能上等同于我们到目前为止在本章中使用的例子。
@@ -243,7 +240,6 @@ export class AppModule {}
 2. （可选）`inject` 属性接受一个提供者数组，Nest 将在实例化过程中解析并作为参数传递给工厂函数。此外，这些提供者可以标记为可选。两个列表应该相关：Nest 将以相同的顺序将 `inject` 列表中的实例作为参数传递给工厂函数。下面的示例演示了这一点。
 
 ```typescript
-@@filename()
 const connectionProvider = {
   provide: 'CONNECTION',
   useFactory: (optionsProvider: MyOptionsProvider, optionalProvider?: string) => {
@@ -263,17 +259,7 @@ const connectionProvider = {
   ],
 })
 export class AppModule {}
-@@switch
-const connectionProvider = {
-  provide: 'CONNECTION',
-  useFactory: (optionsProvider, optionalProvider) => {
-    const options = optionsProvider.get();
-    return new DatabaseConnection(options);
-  },
-  inject: [MyOptionsProvider, { token: 'SomeOptionalProvider', optional: true }],
-  //       \______________/            \__________________/
-  //        此提供者是必需的。           具有此令牌的提供者可以解析为 `undefined`。
-};
+
 
 @Module({
   providers: [
@@ -283,6 +269,7 @@ const connectionProvider = {
   ],
 })
 export class AppModule {}
+
 ```
 
 #### 别名提供者：`useExisting`
@@ -304,6 +291,7 @@ const loggerAliasProvider = {
   providers: [LoggerService, loggerAliasProvider],
 })
 export class AppModule {}
+
 ```
 
 #### 非基于服务的提供者
@@ -322,6 +310,7 @@ const configFactory = {
   providers: [configFactory],
 })
 export class AppModule {}
+
 ```
 
 #### 导出自定义提供者
@@ -331,7 +320,6 @@ export class AppModule {}
 以下示例显示使用令牌导出：
 
 ```typescript
-@@filename()
 const connectionFactory = {
   provide: 'CONNECTION',
   useFactory: (optionsProvider: OptionsProvider) => {
@@ -346,27 +334,19 @@ const connectionFactory = {
   exports: ['CONNECTION'],
 })
 export class AppModule {}
-@@switch
-const connectionFactory = {
-  provide: 'CONNECTION',
-  useFactory: (optionsProvider) => {
-    const options = optionsProvider.get();
-    return new DatabaseConnection(options);
-  },
-  inject: [OptionsProvider],
-};
+
 
 @Module({
   providers: [connectionFactory],
   exports: ['CONNECTION'],
 })
 export class AppModule {}
+
 ```
 
 或者，使用完整的提供者对象导出：
 
 ```typescript
-@@filename()
 const connectionFactory = {
   provide: 'CONNECTION',
   useFactory: (optionsProvider: OptionsProvider) => {
@@ -381,19 +361,12 @@ const connectionFactory = {
   exports: [connectionFactory],
 })
 export class AppModule {}
-@@switch
-const connectionFactory = {
-  provide: 'CONNECTION',
-  useFactory: (optionsProvider) => {
-    const options = optionsProvider.get();
-    return new DatabaseConnection(options);
-  },
-  inject: [OptionsProvider],
-};
+
 
 @Module({
   providers: [connectionFactory],
   exports: [connectionFactory],
 })
 export class AppModule {}
+
 ```

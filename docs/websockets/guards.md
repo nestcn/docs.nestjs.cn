@@ -1,23 +1,26 @@
-<!-- 此文件从 content/websockets/guards.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-12T13:42:20.363Z -->
-<!-- 源文件: content/websockets/guards.md -->
+### 守卫
 
-### Guards
+WebSocket 守卫与[常规 HTTP 应用程序守卫](/guards)没有根本区别。唯一的区别是，不应该抛出 `HttpException`，而应该使用 `WsException`。
 
-There is no fundamental difference between web sockets guards and [regular HTTP application guards](/guards). The only difference is that instead of throwing `HttpException`, you should use `WsException`.
+> info **提示** `WsException` 类从 `@nestjs/websockets` 包导出。
 
-> info **Hint** The `WsException` class is exposed from `@nestjs/websockets` package.
+#### 绑定守卫
 
-#### Binding guards
-
-The following example uses a method-scoped guard. Just as with HTTP based applications, you can also use gateway-scoped guards (i.e., prefix the gateway class with a `@UseGuards()` decorator).
+以下示例使用方法范围的守卫。与基于 HTTP 的应用程序一样，你也可以使用网关范围的守卫（即在网关类前加上 `@UseGuards()` 装饰器）。
 
 ```typescript
+@@filename()
 @UseGuards(AuthGuard)
 @SubscribeMessage('events')
 handleEvent(client: Client, data: unknown): WsResponse<unknown> {
   const event = 'events';
   return { event, data };
 }
-
+@@switch
+@UseGuards(AuthGuard)
+@SubscribeMessage('events')
+handleEvent(client, data) {
+  const event = 'events';
+  return { event, data };
+}
 ```

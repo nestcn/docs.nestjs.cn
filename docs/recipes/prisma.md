@@ -4,23 +4,23 @@
 
 ### Prisma
 
-[Prisma](https://www.prisma.io) is an [open-source](https://github.com/prisma/prisma) ORM for Node.js and TypeScript. It is used as an **alternative** to writing plain SQL, or using another database access tool such as SQL query builders (like [knex.js](https://knexjs.org/)) or ORMs (like [TypeORM](https://typeorm.io/) and [Sequelize](https://sequelize.org/)). Prisma currently supports PostgreSQL, MySQL, SQL Server, SQLite, MongoDB and CockroachDB ([Preview](https://www.prisma.io/docs/orm/reference/supported-databases)).
+[Prisma](https://www.prisma.io) 是一个用于 Node.js 和 TypeScript 的[开源](https://github.com/prisma/prisma) ORM。它被用作编写纯 SQL 或使用其他数据库访问工具（如 SQL 查询构建器（如 [knex.js](https://knexjs.org/)）或 ORM（如 [TypeORM](https://typeorm.io/) 和 [Sequelize](https://sequelize.org/)））的**替代方案**。Prisma 目前支持 PostgreSQL、MySQL、SQL Server、SQLite、MongoDB 和 CockroachDB（[预览版](https://www.prisma.io/docs/orm/reference/supported-databases)）。
 
-While Prisma can be used with plain JavaScript, it embraces TypeScript and provides a level to type-safety that goes beyond the guarantees other ORMs in the TypeScript ecosystem. You can find an in-depth comparison of the type-safety guarantees of Prisma and TypeORM [here](https://www.prisma.io/docs/orm/more/comparisons/prisma-and-typeorm#type-safety).
+虽然 Prisma 可以与纯 JavaScript 一起使用，但它拥抱 TypeScript，并提供了超越 TypeScript 生态系统中其他 ORM 保证的类型安全级别。你可以在[这里](https://www.prisma.io/docs/orm/more/comparisons/prisma-and-typeorm#type-safety)找到 Prisma 和 TypeORM 类型安全保证的深入比较。
 
-> info **Note** If you want to get a quick overview of how Prisma works, you can follow the [Quickstart](https://www.prisma.io/docs/getting-started/prisma-orm/quickstart/prisma-postgres) or read the [Introduction](https://www.prisma.io/docs/orm/overview/introduction/what-is-prisma) in the [documentation](https://www.prisma.io/docs). There also are ready-to-run examples for [REST](https://github.com/prisma/prisma-examples/tree/b53fad046a6d55f0090ddce9fd17ec3f9b95cab3/orm/nest) and [GraphQL](https://github.com/prisma/prisma-examples/tree/b53fad046a6d55f0090ddce9fd17ec3f9b95cab3/orm/nest-graphql) in the [__INLINE_CODE_30__](https://github.com/prisma/prisma-examples/) repo.
+> info **注意** 如果你想快速了解 Prisma 的工作原理，可以遵循[快速入门](https://www.prisma.io/docs/getting-started/prisma-orm/quickstart/prisma-postgres)或阅读[文档](https://www.prisma.io/docs)中的[介绍](https://www.prisma.io/docs/orm/overview/introduction/what-is-prisma)。在 [prisma-examples](https://github.com/prisma/prisma-examples/) 仓库中还有[REST](https://github.com/prisma/prisma-examples/tree/b53fad046a6d55f0090ddce9fd17ec3f9b95cab3/orm/nest) 和 [GraphQL](https://github.com/prisma/prisma-examples/tree/b53fad046a6d55f0090ddce9fd17ec3f9b95cab3/orm/nest-graphql) 的可运行示例。
 
-#### Getting started
+#### 入门
 
-In this recipe, you'll learn how to get started with NestJS and Prisma from scratch. You are going to build a sample NestJS application with a REST API that can read and write data in a database.
+在本指南中，你将学习如何从头开始使用 NestJS 和 Prisma。你将构建一个示例 NestJS 应用程序，该应用程序具有可以在数据库中读取和写入数据的 REST API。
 
-For the purpose of this guide, you'll use a [SQLite](https://sqlite.org/) database to save the overhead of setting up a database server. Note that you can still follow this guide, even if you're using PostgreSQL or MySQL – you'll get extra instructions for using these databases at the right places.
+出于本指南的目的，你将使用 [SQLite](https://sqlite.org/) 数据库，以节省设置数据库服务器的开销。请注意，即使你使用的是 PostgreSQL 或 MySQL，你仍然可以遵循本指南——你将在适当的位置获得使用这些数据库的额外说明。
 
-> info **Note** If you already have an existing project and consider migrating to Prisma, you can follow the guide for [adding Prisma to an existing project](https://www.prisma.io/docs/getting-started/setup-prisma/add-to-existing-project-typescript-postgres). If you are migrating from TypeORM, you can read the guide [Migrating from TypeORM to Prisma](https://www.prisma.io/docs/guides/migrate-from-typeorm).
+> info **注意** 如果你已经有一个现有项目并考虑迁移到 Prisma，可以遵循[将 Prisma 添加到现有项目](https://www.prisma.io/docs/getting-started/setup-prisma/add-to-existing-project-typescript-postgres)的指南。如果你从 TypeORM 迁移，可以阅读[从 TypeORM 迁移到 Prisma](https://www.prisma.io/docs/guides/migrate-from-typeorm) 的指南。
 
-#### Create your NestJS project
+#### 创建 NestJS 项目
 
-To get started, install the NestJS CLI and create your app skeleton with the following commands:
+首先，安装 NestJS CLI 并使用以下命令创建你的应用程序骨架：
 
 ```bash
 $ npm install -g @nestjs/cli
@@ -28,11 +28,11 @@ $ nest new hello-prisma
 
 ```
 
-See the [First steps](/first-steps) page to learn more about the project files created by this command. Note also that you can now run `npm start` to start your application. The REST API running at `http://localhost:3000/` currently serves a single route that's implemented in `src/app.controller.ts`. Over the course of this guide, you'll implement additional routes to store and retrieve data about _users_ and _posts_.
+请参阅[入门](/first-steps)页面，了解此命令创建的项目文件的更多信息。还要注意，你现在可以运行 `npm start` 来启动你的应用程序。运行在 `http://localhost:3000/` 的 REST API 目前提供一个在 `src/app.controller.ts` 中实现的路由。在本指南的过程中，你将实现额外的路由来存储和检索关于_用户_和_文章_的数据。
 
-#### Set up Prisma
+#### 设置 Prisma
 
-Start by installing the Prisma CLI as a development dependency in your project:
+首先在你的项目中将 Prisma CLI 安装为开发依赖项：
 
 ```bash
 $ cd hello-prisma
@@ -40,23 +40,23 @@ $ npm install prisma --save-dev
 
 ```
 
-In the following steps, we'll be utilizing the [Prisma CLI](https://www.prisma.io/docs/orm/tools/prisma-cli). As a best practice, it's recommended to invoke the CLI locally by prefixing it with `npx`:
+在接下来的步骤中，我们将使用 [Prisma CLI](https://www.prisma.io/docs/orm/tools/prisma-cli)。作为最佳实践，建议通过在前面加上 `npx` 来本地调用 CLI：
 
 ```bash
 $ npx prisma
 
 ```
 
-<details><summary>Expand if you're using Yarn</summary>
+<details><summary>如果你使用 Yarn，请展开</summary>
 
-If you're using Yarn, then you can install the Prisma CLI as follows:
+如果你使用 Yarn，那么你可以按如下方式安装 Prisma CLI：
 
 ```bash
 $ yarn add prisma --dev
 
 ```
 
-Once installed, you can invoke it by prefixing it with `yarn`:
+安装后，你可以通过在前面加上 `yarn` 来调用它：
 
 ```bash
 $ yarn prisma
@@ -65,22 +65,22 @@ $ yarn prisma
 
 </details>
 
-Now create your initial Prisma setup using the `init` command of the Prisma CLI:
+现在使用 Prisma CLI 的 `init` 命令创建你的初始 Prisma 设置：
 
 ```bash
 $ npx prisma init
 
 ```
 
-This command creates a new `prisma` directory with the following contents:
+此命令创建一个新的 `prisma` 目录，其中包含以下内容：
 
-- `schema.prisma`: Specifies your database connection and contains the database schema
-- `prisma.config.ts`: A configuration file for your projects
-- `.env`: A [dotenv](https://github.com/motdotla/dotenv) file, typically used to store your database credentials in a group of environment variables
+- `schema.prisma`：指定你的数据库连接并包含数据库架构
+- `prisma.config.ts`：你的项目的配置文件
+- `.env`：一个 [dotenv](https://github.com/motdotla/dotenv) 文件，通常用于在一组环境变量中存储你的数据库凭据
 
-#### Set the generator output path
+#### 设置生成器输出路径
 
-Specify your output `path` for the generated Prisma client either by passing `--output ../src/generated/prisma` during prisma init, or directly in your Prisma schema:
+通过在 prisma init 期间传递 `--output ../src/generated/prisma`，或直接在你的 Prisma 架构中指定生成的 Prisma 客户端的输出 `path`：
 
 ```groovy
 generator client {
@@ -90,9 +90,9 @@ generator client {
 
 ```
 
-#### Configure the module format
+#### 配置模块格式
 
-Set `moduleFormat` in the generator to `cjs`:
+在生成器中将 `moduleFormat` 设置为 `cjs`：
 
 ```groovy
 generator client {
@@ -103,11 +103,11 @@ generator client {
 
 ```
 
-> info **Note** The `moduleFormat` configuration is required because Prisma v7 ships as an ES module by default, which does not work with NestJS's CommonJS setup. Setting `moduleFormat` to `cjs` forces Prisma to generate a CommonJS module instead of ESM.
+> info **注意** 需要 `moduleFormat` 配置，因为 Prisma v7 默认作为 ES 模块发布，这与 NestJS 的 CommonJS 设置不兼容。将 `moduleFormat` 设置为 `cjs` 会强制 Prisma 生成 CommonJS 模块而不是 ESM。
 
-#### Set the database connection
+#### 设置数据库连接
 
-Your database connection is configured in the `datasource` block in your `schema.prisma` file. By default it's set to `postgresql`, but since you're using a SQLite database in this guide you need to adjust the `provider` field of the `datasource` block to `sqlite`:
+你的数据库连接在 `schema.prisma` 文件的 `datasource` 块中配置。默认情况下它设置为 `postgresql`但由于你在本指南中使用 SQLite 数据库，你需要将 `datasource` 块的 `provider` 字段调整为 `sqlite`：
 
 ```groovy
 datasource db {
@@ -122,24 +122,24 @@ generator client {
 
 ```
 
-Now, open up `.env` and adjust the `DATABASE_URL` environment variable to look as follows:
+现在，打开 `.env` 并将 `DATABASE_URL` 环境变量调整如下：
 
 ```bash
 DATABASE_URL="file:./dev.db"
 
 ```
 
-Make sure you have a [ConfigModule](/techniques/configuration) configured, otherwise the `DATABASE_URL` variable will not be picked up from `.env`.
+确保你已配置 [ConfigModule](/techniques/configuration)，否则 `DATABASE_URL` 变量将不会从 `.env` 中获取。
 
-SQLite databases are simple files; no server is required to use a SQLite database. So instead of configuring a connection URL with a _host_ and _port_, you can just point it to a local file which in this case is called `dev.db`. This file will be created in the next step.
+SQLite 数据库是简单的文件；使用 SQLite 数据库不需要服务器。因此，你不需要配置带有_主机_和_端口_的连接 URL，只需将其指向一个本地文件，在本例中称为 `dev.db`。此文件将在下一步中创建。
 
-<details><summary>Expand if you're using PostgreSQL, MySQL, MsSQL or Azure SQL</summary>
+<details><summary>如果你使用 PostgreSQL、MySQL、MsSQL 或 Azure SQL，请展开</summary>
 
-With PostgreSQL and MySQL, you need to configure the connection URL to point to the _database server_. You can learn more about the required connection URL format [here](https://www.prisma.io/docs/orm/reference/connection-urls).
+使用 PostgreSQL 和 MySQL，你需要配置连接 URL 以指向_数据库服务器_。你可以在[这里](https://www.prisma.io/docs/orm/reference/connection-urls)了解更多关于所需连接 URL 格式的信息。
 
 **PostgreSQL**
 
-If you're using PostgreSQL, you have to adjust the `schema.prisma` and `.env` files as follows:
+如果你使用 PostgreSQL，你需要按如下方式调整 `schema.prisma` 和 `.env` 文件：
 
 **`schema.prisma`**
 
@@ -163,18 +163,18 @@ DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=SCHEMA"
 
 ```
 
-Replace the placeholders spelled in all uppercase letters with your database credentials. Note that if you're unsure what to provide for the `SCHEMA` placeholder, it's most likely the default value `public`:
+将所有大写字母拼写的占位符替换为你的数据库凭据。请注意，如果你不确定 `SCHEMA` 占位符应该提供什么，它很可能是默认值 `public`：
 
 ```bash
 DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public"
 
 ```
 
-If you want to learn how to set up a PostgreSQL database, you can follow this guide on [setting up a free PostgreSQL database on Heroku](https://dev.to/prisma/how-to-setup-a-free-postgresql-database-on-heroku-1dc1).
+如果你想了解如何设置 PostgreSQL 数据库，可以遵循这篇关于[在 Heroku 上设置免费 PostgreSQL 数据库](https://dev.to/prisma/how-to-setup-a-free-postgresql-database-on-heroku-1dc1)的指南。
 
 **MySQL**
 
-If you're using MySQL, you have to adjust the `schema.prisma` and `.env` files as follows:
+如果你使用 MySQL，你需要按如下方式调整 `schema.prisma` 和 `.env` 文件：
 
 **`schema.prisma`**
 
@@ -198,11 +198,11 @@ DATABASE_URL="mysql://USER:PASSWORD@HOST:PORT/DATABASE"
 
 ```
 
-Replace the placeholders spelled in all uppercase letters with your database credentials.
+将所有大写字母拼写的占位符替换为你的数据库凭据。
 
 **Microsoft SQL Server / Azure SQL Server**
 
-If you're using Microsoft SQL Server or Azure SQL Server, you have to adjust the `schema.prisma` and `.env` files as follows:
+如果你使用 Microsoft SQL Server 或 Azure SQL Server，你需要按如下方式调整 `schema.prisma` 和 `.env` 文件：
 
 **`schema.prisma`**
 
@@ -221,7 +221,7 @@ generator client {
 
 **`.env`**
 
-Replace the placeholders spelled in all uppercase letters with your database credentials. Note that if you're unsure what to provide for the `encrypt` placeholder, it's most likely the default value `true`:
+将所有大写字母拼写的占位符替换为你的数据库凭据。请注意，如果你不确定 `encrypt` 占位符应该提供什么，它很可能是默认值 `true`：
 
 ```bash
 DATABASE_URL="sqlserver://HOST:PORT;database=DATABASE;user=USER;password=PASSWORD;encrypt=true"
@@ -230,11 +230,11 @@ DATABASE_URL="sqlserver://HOST:PORT;database=DATABASE;user=USER;password=PASSWOR
 
 </details>
 
-#### Create two database tables with Prisma Migrate
+#### 使用 Prisma Migrate 创建两个数据库表
 
-In this section, you'll create two new tables in your database using [Prisma Migrate](https://www.prisma.io/docs/orm/prisma-migrate/getting-started). Prisma Migrate generates SQL migration files for your declarative data model definition in the Prisma schema. These migration files are fully customizable so that you can configure any additional features of the underlying database or include additional commands, e.g. for seeding.
+在本节中，你将使用 [Prisma Migrate](https://www.prisma.io/docs/orm/prisma-migrate/getting-started) 在数据库中创建两个新表。Prisma Migrate 为 Prisma 架构中的声明式数据模型定义生成 SQL 迁移文件。这些迁移文件完全可定制，以便你可以配置底层数据库的任何附加功能或包含附加命令，例如用于种子数据。
 
-Add the following two models to your `schema.prisma` file:
+将以下两个模型添加到你的 `schema.prisma` 文件中：
 
 ```groovy
 model User {
@@ -255,14 +255,14 @@ model Post {
 
 ```
 
-With your Prisma models in place, you can generate your SQL migration files and run them against the database. Run the following commands in your terminal:
+有了 Prisma 模型，你可以生成 SQL 迁移文件并针对数据库运行它们。在终端中运行以下命令：
 
 ```bash
 $ npx prisma migrate dev --name init
 
 ```
 
-This `prisma migrate dev` command generates SQL files and directly runs them against the database. In this case, the following migration files was created in the existing `prisma` directory:
+此 `prisma migrate dev` 命令生成 SQL 文件并直接针对数据库运行它们。在这种情况下，在现有的 `prisma` 目录中创建了以下迁移文件：
 
 ```bash
 $ tree prisma
@@ -275,9 +275,9 @@ prisma
 
 ```
 
-<details><summary>Expand to view the generated SQL statements</summary>
+<details><summary>展开查看生成的 SQL 语句</summary>
 
-The following tables were created in your SQLite database:
+在你的 SQLite 数据库中创建了以下表：
 
 ```sql
 -- CreateTable
@@ -305,41 +305,41 @@ CREATE UNIQUE INDEX "User.email_unique" ON "User"("email");
 
 </details>
 
-#### Install and generate Prisma Client
+#### 安装和生成 Prisma Client
 
-Prisma Client is a type-safe database client that's _generated_ from your Prisma model definition. Because of this approach, Prisma Client can expose [CRUD](https://www.prisma.io/docs/orm/prisma-client/queries/crud) operations that are _tailored_ specifically to your models.
+Prisma Client 是一个类型安全的数据库客户端，它是从你的 Prisma 模型定义_生成_的。由于这种方法，Prisma Client 可以暴露专门为你的模型_定制_的 [CRUD](https://www.prisma.io/docs/orm/prisma-client/queries/crud) 操作。
 
-To install Prisma Client in your project, run the following command in your terminal:
+要在你的项目中安装 Prisma Client，请在终端中运行以下命令：
 
 ```bash
 $ npm install @prisma/client
 
 ```
 
-Once installed, you can run the generate command to generate the types and Client needed for your project. If any changes are made to your schema, you will need to rerun the `generate` command to keep those types in sync.
+安装后，你可以运行 generate 命令来生成项目所需的类型和客户端。如果对架构进行了任何更改，你需要重新运行 `generate` 命令以保持这些类型同步。
 
 ```bash
 $ npx prisma generate
 
 ```
 
-In addition to Prisma Client, you also need to a driver adapter for the type of database you are working with. For SQLite, you can install the `@prisma/adapter-better-sqlite3` driver.
+除了 Prisma Client，你还需要为你正在使用的数据库类型安装驱动程序适配器。对于 SQLite，你可以安装 `@prisma/adapter-better-sqlite3` 驱动程序。
 
 ```bash
 npm install @prisma/adapter-better-sqlite3
 
 ```
 
-<details> <summary>Expand if you're using PostgreSQL, MySQL, MsSQL, or AzureSQL</summary>
+<details> <summary>如果你使用 PostgreSQL、MySQL、MsSQL 或 AzureSQL，请展开</summary>
 
-- For PostgreSQL
+- 对于 PostgreSQL
 
 ```bash
 npm install @prisma/adapter-pg
 
 ```
 
-- For MySQL, MsSQL, AzureSQL:
+- 对于 MySQL、MsSQL、AzureSQL：
 
 ```bash
 npm install @prisma/adapter-mariadb
@@ -348,13 +348,13 @@ npm install @prisma/adapter-mariadb
 
 </details>
 
-#### Use Prisma Client in your NestJS services
+#### 在 NestJS 服务中使用 Prisma Client
 
-You're now able to send database queries with Prisma Client. If you want to learn more about building queries with Prisma Client, check out the [API documentation](https://www.prisma.io/docs/orm/reference/prisma-client-reference).
+你现在可以使用 Prisma Client 发送数据库查询。如果你想了解更多关于使用 Prisma Client 构建查询的信息，请查看 [API 文档](https://www.prisma.io/docs/orm/reference/prisma-client-reference)。
 
-When setting up your NestJS application, you'll want to abstract away the Prisma Client API for database queries within a service. To get started, you can create a new `PrismaService` that takes care of instantiating `PrismaClient` and connecting to your database.
+在设置 NestJS 应用程序时，你需要将 Prisma Client API 用于数据库查询抽象到服务中。首先，你可以创建一个新的 `PrismaService`，负责实例化 `PrismaClient` 并连接到你的数据库。
 
-Inside the `src` directory, create a new file called `prisma.service.ts` and add the following code to it:
+在 `src` 目录中，创建一个名为 `prisma.service.ts` 的新文件，并向其添加以下代码：
 
 ```typescript
 import { Injectable } from '@nestjs/common';
@@ -371,9 +371,9 @@ export class PrismaService extends PrismaClient {
 
 ```
 
-Next, you can write services that you can use to make database calls for the `User` and `Post` models from your Prisma schema.
+接下来，你可以编写服务，用于从 Prisma 架构中对 `User` 和 `Post` 模型进行数据库调用。
 
-Still inside the `src` directory, create a new file called `user.service.ts` and add the following code to it:
+仍在 `src` 目录中，创建一个名为 `user.service.ts` 的新文件，并向其添加以下代码：
 
 ```typescript
 import { Injectable } from '@nestjs/common';
@@ -435,11 +435,11 @@ export class UsersService {
 
 ```
 
-Notice how you're using Prisma Client's generated types to ensure that the methods that are exposed by your service are properly typed. You therefore save the boilerplate of typing your models and creating additional interface or DTO files.
+注意你是如何使用 Prisma Client 生成的类型来确保服务暴露的方法正确类型化的。因此，你节省了为模型类型化和创建额外接口或 DTO 文件的样板代码。
 
-Now do the same for the `Post` model.
+现在对 `Post` 模型做同样的操作。
 
-Still inside the `src` directory, create a new file called `post.service.ts` and add the following code to it:
+仍在 `src` 目录中，创建一个名为 `post.service.ts` 的新文件，并向其添加以下代码：
 
 ```typescript
 import { Injectable } from '@nestjs/common';
@@ -501,15 +501,15 @@ export class PostsService {
 
 ```
 
-Your `UsersService` and `PostsService` currently wrap the CRUD queries that are available in Prisma Client. In a real world application, the service would also be the place to add business logic to your application. For example, you could have a method called `updatePassword` inside the `UsersService` that would be responsible for updating the password of a user.
+你的 `UsersService` 和 `PostsService` 目前包装了 Prisma Client 中可用的 CRUD 查询。在实际应用程序中，服务也是向应用程序添加业务逻辑的地方。例如，你可以在 `UsersService` 中有一个名为 `updatePassword` 的方法，负责更新用户的密码。
 
-Remember to register the new services in the app module.
+记得在 app 模块中注册新服务。
 
-##### Implement your REST API routes in the main app controller
+##### 在主 app 控制器中实现 REST API 路由
 
-Finally, you'll use the services you created in the previous sections to implement the different routes of your app. For the purpose of this guide, you'll put all your routes into the already existing `AppController` class.
+最后，你将使用你在前面章节中创建的服务来实现应用程序的不同路由。出于本指南的目的，你将把所有路由放入已经存在的 `AppController` 类中。
 
-Replace the contents of the `app.controller.ts` file with the following code:
+将 `app.controller.ts` 文件的内容替换为以下代码：
 
 ```typescript
 import {
@@ -599,41 +599,41 @@ export class AppController {
 
 ```
 
-This controller implements the following routes:
+此控制器实现以下路由：
 
 ###### `GET`
 
-- `/post/:id`: Fetch a single post by its `id`
-- `/feed`: Fetch all _published_ posts
-- `/filter-posts/:searchString`: Filter posts by `title` or `content`
+- `/post/:id`：通过 `id` 获取单个文章
+- `/feed`：获取所有_已发布_的文章
+- `/filter-posts/:searchString`：按 `title` 或 `content` 过滤文章
 
 ###### `POST`
 
-- `/post`: Create a new post
-  - Body:
-    - `title: String` (required): The title of the post
-    - `content: String` (optional): The content of the post
-    - `authorEmail: String` (required): The email of the user that creates the post
-- `/user`: Create a new user
-  - Body:
-    - `email: String` (required): The email address of the user
-    - `name: String` (optional): The name of the user
+- `/post`：创建新文章
+  - 正文：
+    - `title: String`（必需）：文章标题
+    - `content: String`（可选）：文章内容
+    - `authorEmail: String`（必需）：创建文章的用户的电子邮件
+- `/user`：创建新用户
+  - 正文：
+    - `email: String`（必需）：用户的电子邮件地址
+    - `name: String`（可选）：用户名
 
 ###### `PUT`
 
-- `/publish/:id`: Publish a post by its `id`
+- `/publish/:id`：通过 `id` 发布文章
 
 ###### `DELETE`
 
-- `/post/:id`: Delete a post by its `id`
+- `/post/:id`：通过 `id` 删除文章
 
-#### Summary
+#### 总结
 
-In this recipe, you learned how to use Prisma along with NestJS to implement a REST API. The controller that implements the routes of the API is calling a `PrismaService` which in turn uses Prisma Client to send queries to a database to fulfill the data needs of incoming requests.
+在本指南中，你学习了如何将 Prisma 与 NestJS 一起使用来实现 REST API。实现 API 路由的控制器调用 `PrismaService`，后者又使用 Prisma Client 向数据库发送查询以满足传入请求的数据需求。
 
-If you want to learn more about using NestJS with Prisma, be sure to check out the following resources:
+如果你想了解更多关于在 NestJS 中使用 Prisma 的信息，请务必查看以下资源：
 
 - [NestJS & Prisma](https://www.prisma.io/nestjs)
-- [Ready-to-run example projects for REST & GraphQL](https://github.com/prisma/prisma-examples/)
-- [Production-ready starter kit](https://github.com/notiz-dev/nestjs-prisma-starter#instructions)
-- [Video: Accessing Databases using NestJS with Prisma (5min)](https://www.youtube.com/watch?v=UlVJ340UEuk&ab_channel=Prisma) by [Marc Stammerjohann](https://github.com/marcjulian)
+- [REST 和 GraphQL 的可运行示例项目](https://github.com/prisma/prisma-examples/)
+- [生产就绪的入门套件](https://github.com/notiz-dev/nestjs-prisma-starter#instructions)
+- [视频：使用 NestJS 和 Prisma 访问数据库（5分钟）](https://www.youtube.com/watch?v=UlVJ340UEuk&ab_channel=Prisma) 由 [Marc Stammerjohann](https://github.com/marcjulian) 制作

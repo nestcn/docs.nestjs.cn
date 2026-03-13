@@ -1,17 +1,19 @@
+<!-- 此文件从 content/microservices/exception-filters.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-13T05:03:58.935Z -->
+<!-- 源文件: content/microservices/exception-filters.md -->
+
 ### 异常过滤器
 
-HTTP [异常过滤器](/overview/exception-filters)层与对应微服务层的唯一区别在于，不应抛出 `HttpException`，而应使用 `RpcException`。
+HTTP [exception filter](/exception-filters) 层和相应的微服务层之间唯一的区别是，在抛出 `HttpException` 时，而不是抛出 `RpcException`。
 
 ```typescript
 throw new RpcException('Invalid credentials.');
 
 ```
 
-:::info 提示
-`RpcException` 类是从 `@nestjs/microservices` 包导入的。
-:::
+> info **提示** `RpcException` 类来自 `@nestjs/microservices` 包。
 
-使用上述示例时，Nest 将处理抛出的异常并返回具有以下结构的 `error` 对象：
+Nest 将处理抛出的异常，并返回 `error` 对象，具有以下结构：
 
 ```json
 {
@@ -23,9 +25,9 @@ throw new RpcException('Invalid credentials.');
 
 #### 过滤器
 
-微服务异常过滤器的行为与 HTTP 异常过滤器类似，只有一个小区别。`catch()` 方法必须返回一个 `Observable`。
+微服务异常过滤器与 HTTP 异常过滤器类似，只是有一点不同。`catch()` 方法必须返回 `Observable`。
 
- ```typescript title="rpc-exception.filter.ts"
+```typescript
 import { Catch, RpcExceptionFilter, ArgumentsHost } from '@nestjs/common';
 import { Observable, throwError } from 'rxjs';
 import { RpcException } from '@nestjs/microservices';
@@ -37,13 +39,18 @@ export class ExceptionFilter implements RpcExceptionFilter<RpcException> {
   }
 }
 
+@Catch(RpcException)
+export class ExceptionFilter {
+  catch(exception, host) {
+    return throwError(() => exception.getError());
+  }
+}
+
 ```
 
-:::warning 警告
-使用[混合应用](/faq/hybrid-application)时，全局微服务异常过滤器默认未启用。
-:::
+> warning **警告** 使用 [hybrid application](/faq/hybrid-application) 时，global 微服务异常过滤器默认不启用。
 
-以下示例使用了手动实例化的方法作用域过滤器。与基于 HTTP 的应用类似，您也可以使用控制器作用域过滤器（即在控制器类前添加 `@UseFilters()` 装饰器）。
+以下示例使用手动实例化的方法作用域过滤器。与 HTTP 基于应用程序一样，你也可以使用控制器作用域过滤器（即将控制器类前缀为 `@UseFilters()` 装饰器）。
 
 ```typescript
 @UseFilters(new ExceptionFilter())
@@ -56,9 +63,9 @@ accumulate(data: number[]): number {
 
 #### 继承
 
-通常，您会创建完全自定义的异常过滤器来满足应用程序需求。但在某些情况下，您可能希望直接扩展**核心异常过滤器** ，并根据特定因素覆盖其行为。
+通常，您将创建完全自定义的异常过滤器，以满足应用程序需求。然而，有些情况下，您可能想简单地继承 **核心异常过滤器**，并根据某些因素Override行为。
 
-要将异常处理委托给基础过滤器，需要扩展 `BaseExceptionFilter` 并调用继承的 `catch()` 方法。
+要将异常处理委托给基过滤器，您需要继承 `BaseExceptionFilter` 并调用继承的 `catch()` 方法。
 
 ```typescript
 import { Catch, ArgumentsHost } from '@nestjs/common';
@@ -71,6 +78,13 @@ export class AllExceptionsFilter extends BaseRpcExceptionFilter {
   }
 }
 
+@Catch()
+export class AllExceptionsFilter extends BaseRpcExceptionFilter {
+  catch(exception, host) {
+    return super.catch(exception, host);
+  }
+}
+
 ```
 
-上述实现仅是一个展示方法的框架。您对扩展异常过滤器的实现将包含您定制的**业务逻辑** （例如处理各种条件）。
+上述实现只是一个 shell，演示了方法。您的扩展异常过滤器实现将包括您自己的 **业务逻辑**（例如，处理各种情况）。

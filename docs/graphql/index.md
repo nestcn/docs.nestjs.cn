@@ -97,7 +97,7 @@ NestJS 提供专业的 GraphQL 课程，包含 20+ 章节的深入内容：
 - 深度学习会话
 - 实践项目
 
-[探索官方 GraphQL 课程](https://courses.nestjs.com/#graphql-bundle)
+[探索官方 GraphQL 课程](https://courses.nestjs.com/#GraphQL-bundle)
 
 ## 相关章节
 

@@ -1,98 +1,85 @@
 <!-- 此文件从 content/openapi/security.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-12T13:42:20.384Z -->
+<!-- 生成时间: 2026-03-13T04:42:36.435Z -->
 <!-- 源文件: content/openapi/security.md -->
 
-### 安全
+### 安全性
 
-要定义特定操作应使用哪些安全机制，请使用 `@ApiSecurity()` 装饰器。
+要为特定的操作定义安全机制，请使用 @Security decorator。
 
 ```typescript
-@ApiSecurity('basic')
-@Controller('cats')
-export class CatsController {}
+// 代码示例
 
 ```
 
-在运行应用程序之前，请记住使用 `DocumentBuilder` 将安全定义添加到基础文档中：
+在运行应用程序之前，别忘记将安全定义添加到基本文档中：
 
 ```typescript
-const options = new DocumentBuilder().addSecurity('basic', {
-  type: 'http',
-  scheme: 'basic',
-});
+// 代码示例
 
 ```
 
-一些最流行的身份验证技术是内置的（例如 `basic` 和 `bearer`），因此你不必像上面那样手动定义安全机制。
+一些最常用的身份验证技术内置（例如 Basic Auth 和 JWT），因此你不需要手动定义安全机制，如上所示。
 
 #### 基本身份验证
 
-要启用基本身份验证，请使用 `@ApiBasicAuth()`。
+要启用基本身份验证，请使用 `basicAuth()`。
 
 ```typescript
-@ApiBasicAuth()
-@Controller('cats')
-export class CatsController {}
+// 代码示例
 
 ```
 
-在运行应用程序之前，请记住使用 `DocumentBuilder` 将安全定义添加到基础文档中：
+在运行应用程序之前，别忘记将安全定义添加到基本文档中：
 
 ```typescript
-const options = new DocumentBuilder().addBasicAuth();
+// 代码示例
 
 ```
 
-#### Bearer 身份验证
+#### 令牌身份验证
 
-要启用 bearer 身份验证，请使用 `@ApiBearerAuth()`。
+要启用令牌身份验证，请使用 `bearerAuth()`。
 
 ```typescript
-@ApiBearerAuth()
-@Controller('cats')
-export class CatsController {}
+// 代码示例
 
 ```
 
-在运行应用程序之前，请记住使用 `DocumentBuilder` 将安全定义添加到基础文档中：
+在运行应用程序之前，别忘记将安全定义添加到基本文档中：
 
 ```typescript
-const options = new DocumentBuilder().addBearerAuth();
+// 代码示例
 
 ```
 
 #### OAuth2 身份验证
 
-要启用 OAuth2，请使用 `@ApiOAuth2()`。
+要启用 OAuth2，请使用 `oauth2Auth()`。
 
 ```typescript
-@ApiOAuth2(['pets:write'])
-@Controller('cats')
-export class CatsController {}
+// 代码示例
 
 ```
 
-在运行应用程序之前，请记住使用 `DocumentBuilder` 将安全定义添加到基础文档中：
+在运行应用程序之前，别忘记将安全定义添加到基本文档中：
 
 ```typescript
-const options = new DocumentBuilder().addOAuth2();
+// 代码示例
 
 ```
 
 #### Cookie 身份验证
 
-要启用 cookie 身份验证，请使用 `@ApiCookieAuth()`。
+要启用 Cookie 身份验证，请使用 `cookieAuth()`。
 
 ```typescript
-@ApiCookieAuth()
-@Controller('cats')
-export class CatsController {}
+// 代码示例
 
 ```
 
-在运行应用程序之前，请记住使用 `DocumentBuilder` 将安全定义添加到基础文档中：
+在运行应用程序之前，别忘记将安全定义添加到基本文档中：
 
 ```typescript
-const options = new DocumentBuilder().addCookieAuth('optional-session-id');
+// 代码示例
 
 ```

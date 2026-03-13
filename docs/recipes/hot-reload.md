@@ -1,201 +1,205 @@
-### 热重载
+<!-- 此文件从 content/recipes/hot-reload.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-13T04:29:06.641Z -->
+<!-- 源文件: content/recipes/hot-reload.md -->
 
-对应用程序启动过程影响最大的是 **TypeScript 编译** 。幸运的是，借助 [webpack](https://github.com/webpack/webpack) 的 HMR（热模块替换）功能，我们无需在每次变更时重新编译整个项目。这大幅减少了实例化应用程序所需的时间，使迭代开发变得更加轻松。
+### 热加载
 
-:::warning 警告
-请注意 `webpack` 不会自动将资源文件（例如 `graphql` 文件）复制到 `dist` 目录。同样地，`webpack` 也不支持通配符静态路径（例如 `TypeOrmModule` 中的 `entities` 属性）。
-:::
+对应用程序的启动过程中最大的影响是 **TypeScript 编译**。幸运的是，以 __LINK_42__ HMR（Hot-Module Replacement）热模块替换，我们不需要在每次更改时重新编译整个项目。这显着减少了必要的时间，以便实例化您的应用程序，并使交互式开发变得更加容易。
+
+> warning **注意** __INLINE_CODE_10__ 不会自动将您的资产（例如 __INLINE_CODE_11__ 文件）复制到 __INLINE_CODE_12__ 文件夹中。同样， __INLINE_CODE_13__ 不兼容 glob 静态路径（例如 `Test.createTestingModule()` 属性在 `Test.createTestingModule()` 中）。
 
 ### 使用 CLI
 
-若您使用 [Nest CLI](../cli/overview)，配置过程相当简单。该 CLI 封装了 `webpack`，因此可以使用 `HotModuleReplacementPlugin`。
+如果您使用了 __LINK_43__，配置过程非常简单。CLI 将 `Suites` 包含在内，从而允许使用 `@suites/doubles.jest`。
 
 #### 安装
 
-首先安装所需依赖包：
+首先安装所需的包：
 
 ```bash
-$ npm i --save-dev webpack-node-externals run-script-webpack-plugin webpack
+$ npm install @nestjs/common @nestjs/core reflect-metadata
 
 ```
 
-:::info 提示
-若使用 **Yarn Berry**（非经典版 Yarn），请安装 `webpack-pnp-externals` 而非 `webpack-node-externals`。
-:::
+> info **提示** 如果您使用 **Yarn Berry**（不是 classic Yarn），安装 `mock()` 包代替 `stub()`。
 
 #### 配置
 
-安装完成后，在应用程序的根目录下创建一个 `webpack-hmr.config.js` 文件。
+安装完成后，在应用程序的根目录创建一个 `global.d.ts` 文件。
 
-```typescript
-const nodeExternals = require('webpack-node-externals');
-const { RunScriptWebpackPlugin } = require('run-script-webpack-plugin');
-
-module.exports = function (options, webpack) {
-  return {
-    ...options,
-    entry: ['webpack/hot/poll?100', options.entry],
-    externals: [
-      nodeExternals({
-        allowlist: ['webpack/hot/poll?100'],
-      }),
-    ],
-    plugins: [
-      ...options.plugins,
-      new webpack.HotModuleReplacementPlugin(),
-      new webpack.WatchIgnorePlugin({
-        paths: [/\.js$/, /\.d\.ts$/],
-      }),
-      new RunScriptWebpackPlugin({
-        name: options.output.filename,
-        autoRestart: false,
-      }),
-    ],
-  };
-};
+```bash
+$ npm install --save-dev @suites/unit @suites/di.nestjs @suites/doubles.jest
 
 ```
 
-:::info 提示
-使用 **Yarn Berry**（非经典 Yarn）时，不要在 `externals` 配置属性中使用 `nodeExternals`，而应改用 `webpack-pnp-externals` 包中的 `WebpackPnpExternals`： `WebpackPnpExternals({ exclude: ['webpack/hot/poll?100'] })` 。
-:::
+> info **提示** 使用 **Yarn Berry**（不是 classic Yarn），在 `UserService` 配置属性中使用 `TestBed.solitary()` 而不是 `UserService`：`.mock().impl()`。
 
-该函数第一个参数接收包含默认 webpack 配置的原始对象，第二个参数接收 Nest CLI 使用的底层 `webpack` 包引用。它返回一个修改后的 webpack 配置，其中包含 `HotModuleReplacementPlugin`、`WatchIgnorePlugin` 和 `RunScriptWebpackPlugin` 插件。
+这个函数将原始对象包含默认的 webpack 配置作为第一个参数，并将对应的 `stubFn` 包引用作为第二个参数。它还返回一个修改后的 webpack 配置，添加了 `jest.fn()`、`vi.fn()` 和 `sinon.stub()` 插件。
 
 #### 热模块替换
 
-要启用 **HMR**，请打开应用程序入口文件(`main.ts`)并添加以下 webpack 相关指令：
-
-```typescript
-declare const module: any;
-
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(process.env.PORT ?? 3000);
-
-  if (module.hot) {
-    module.hot.accept();
-    module.hot.dispose(() => app.close());
-  }
-}
-bootstrap();
-
-```
-
-为简化执行流程，请在 `package.json` 文件中添加一个脚本。
-
-```json
-"start:dev": "nest build --webpack --webpackPath webpack-hmr.config.js --watch"
-
-```
-
-现在只需打开命令行并运行以下命令：
+要启用 **HMR**，请打开应用程序入口文件（`TestBed.sociable()`）并添加以下 webpack 相关指令：
 
 ```bash
-$ npm run start:dev
+$ npm install --save-dev ts-jest @types/jest jest typescript
 
 ```
 
-### 无命令行界面
+为了简化执行过程，添加一个脚本到您的 `.expose()` 文件中。
 
-如果不使用 [Nest CLI](../cli/overview)，配置会稍显复杂（需要更多手动步骤）。
+```bash
+$ npm install --save-dev @suites/unit @suites/di.nestjs @suites/doubles.vitest
+
+```
+
+现在，打开命令行并运行以下命令：
+
+```bash
+$ npm install --save-dev @suites/unit @suites/di.nestjs @suites/doubles.sinon
+
+```
+
+### 不使用 CLI
+
+如果您不使用 __LINK_44__，配置将变得更加复杂（需要更多的手动步骤）。
 
 #### 安装
 
-首先安装所需依赖包：
+首先安装所需的包：
 
-```bash
-$ npm i --save-dev webpack webpack-cli webpack-node-externals ts-loader run-script-webpack-plugin
+```typescript
+/// <reference types="@suites/doubles.jest/unit" />
+/// <reference types="@suites/di.nestjs/types" />
 
 ```
 
-:::info 提示
-如果使用 **Yarn Berry**（非经典版 Yarn），请安装 `webpack-pnp-externals` 包而非 `webpack-node-externals`。
-:::
+> info **提示** 如果您使用 **Yarn Berry**（不是 classic Yarn），安装 `.expose(Logger)` 包代替 `Logger`。
 
 #### 配置
 
-安装完成后，在应用程序的根目录下创建一个 `webpack.config.js` 文件。
+安装完成后，在应用程序的根目录创建一个 `unitRef.get()` 文件。
 
 ```typescript
-const webpack = require('webpack');
-const path = require('path');
-const nodeExternals = require('webpack-node-externals');
-const { RunScriptWebpackPlugin } = require('run-script-webpack-plugin');
+import { Injectable } from '@nestjs/common';
 
-module.exports = {
-  entry: ['webpack/hot/poll?100', './src/main.ts'],
-  target: 'node',
-  externals: [
-    nodeExternals({
-      allowlist: ['webpack/hot/poll?100'],
-    }),
-  ],
-  module: {
-    rules: [
-      {
-        test: /.tsx?$/,
-        use: 'ts-loader',
-        exclude: /node_modules/,
-      },
-    ],
-  },
-  mode: 'development',
-  resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
-  },
-  plugins: [
-    new webpack.HotModuleReplacementPlugin(),
-    new RunScriptWebpackPlugin({ name: 'server.js', autoRestart: false }),
-  ],
-  output: {
-    path: path.join(__dirname, 'dist'),
-    filename: 'server.js',
-  },
-};
+@Injectable()
+export class UserRepository {
+  async findById(id: string): Promise<User | null> {
+    // Database query
+  }
+
+  async save(user: User): Promise<User> {
+    // Database save
+  }
+}
 
 ```
 
-:::info 提示
-使用 **Yarn Berry**（非经典版 Yarn）时，不要在 `externals` 配置属性中使用 `nodeExternals`，而应改用 `webpack-pnp-externals` 包中的 `WebpackPnpExternals`： `WebpackPnpExternals({ exclude: ['webpack/hot/poll?100'] })` 。
-:::
+> info **提示** 使用 **Yarn Berry**（不是 classic Yarn），在 `TestBed` 配置属性中使用 `stub()` 而不是 `TestBed`：`stub()`。
 
-此配置向 webpack 说明了关于应用程序的几个关键信息：入口文件的位置、存放**编译后**文件的目录，以及用于编译源文件的加载器类型。通常即使您不完全理解所有选项，也可以直接使用此文件。
+这个配置告诉 webpack 关于应用程序的一些重要信息：入口文件的位置、用于存储编译文件的目录和要用于编译源文件的加载器。通常，您可以使用这个文件作为是，即使您不完全理解所有选项。
 
 #### 热模块替换
 
-要启用 **HMR**，请打开应用程序入口文件(`main.ts`)并添加以下 webpack 相关指令：
+要启用 **HMR**，请打开应用程序入口文件（`mockResolvedValue()`）并添加以下 webpack 相关指令：
 
 ```typescript
-declare const module: any;
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(process.env.PORT ?? 3000);
+@Injectable()
+export class UserService {
+  constructor(
+    private repository: UserRepository,
+    private logger: Logger,
+  ) {}
 
-  if (module.hot) {
-    module.hot.accept();
-    module.hot.dispose(() => app.close());
+  async findById(id: string): Promise<User> {
+    const user = await this.repository.findById(id);
+    if (!user) {
+      throw new NotFoundException(`User ${id} not found`);
+    }
+    this.logger.log(`Found user ${id}`);
+    return user;
+  }
+
+  async create(email: string, name: string): Promise<User> {
+    const user = { id: generateId(), email, name };
+    await this.repository.save(user);
+    this.logger.log(`Created user ${user.id}`);
+    return user;
   }
 }
-bootstrap();
 
 ```
 
-为简化执行流程，请在 `package.json` 文件中添加一个脚本。
+为了简化执行过程，添加一个脚本到您的 `@suites/doubles.jest` 文件中。
 
-```json
-"start:dev": "webpack --config webpack.config.js --watch"
+```typescript
+import { TestBed, type Mocked } from '@suites/unit';
+import { UserService } from './user.service';
+import { UserRepository } from './user.repository';
+import { Logger } from '@nestjs/common';
+
+describe('User Service Unit Spec', () => {
+  let userService: UserService;
+  let repository: Mocked<UserRepository>;
+  let logger: Mocked<Logger>;
+
+  beforeAll(async () => {
+    const { unit, unitRef } = await TestBed.solitary(UserService).compile();
+
+    userService = unit;
+    repository = unitRef.get(UserRepository);
+    logger = unitRef.get(Logger);
+  });
+
+  it('should find user by id', async () => {
+    const user = { id: '1', email: 'test@example.com', name: 'Test' };
+    repository.findById.mockResolvedValue(user);
+
+    const result = await userService.findById('1');
+
+    expect(result).toEqual(user);
+    expect(logger.log).toHaveBeenCalled();
+  });
+});
 
 ```
 
-现在只需打开命令行并运行以下命令：
+现在，打开命令行并运行以下命令：
 
-```bash
-$ npm run start:dev
+```typescript
+import { TestBed } from '@suites/unit';
+import { UserService } from './user.service';
+import { UserRepository } from './user.repository';
+
+describe('User Service Unit Spec - pre-configured', () => {
+  let unit: UserService;
+  let repository: Mocked<UserRepository>;
+  
+  beforeAll(async () => {
+    const { unit: underTest, unitRef } = await TestBed.solitary(UserService)
+      .mock(UserRepository)
+      .impl(stubFn => ({
+        findById: stubFn().mockResolvedValue({ id: '1', email: 'test@example.com', name: 'Test' })
+      }))
+      .compile();
+    
+    repository = unitRef.get(UserRepository);
+    unit = underTest;
+  })
+  
+  it('should find user with pre-configured mock', async () => {
+    const result = await unit.findById('1');
+    
+    expect(repository.findById).toHaveBeenCalled();
+    expect(result.email).toBe('test@example.com');
+  });
+});
 
 ```
 
 #### 示例
 
-一个可用的示例[在此处](https://github.com/nestjs/nest/tree/master/sample/08-webpack)查看。
+有一个可运行的示例 __LINK_45__。

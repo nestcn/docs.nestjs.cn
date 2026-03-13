@@ -1,100 +1,80 @@
-### standalone 应用
+<!-- 此文件从 content/application-context.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-13T04:19:42.618Z -->
+<!-- 源文件: content/application-context.md -->
 
-Nest 应用程序可以有多种方式进行挂载。您可以创建一个 web 应用程序、一个微服务或只是一个没有网络监听器的 Nest standalone 应用程序（无网络监听器）。Nest standalone 应用程序是一个对 Nest IoC 容器的包装器，它持有所有实例化的类。我们可以从任何导入的模块中使用 standalone 应用程序对象来获取任何已存在的实例的引用。因此，您可以在任何地方使用 Nest 框架，包括例如脚本的 CRON 工作或 CLI。
+### 独立应用程序
+
+Nest框架提供了多种方式来mount应用程序。您可以创建一个Web应用程序、微服务或只是一个独立的Nest应用程序（没有任何网络监听器）。Nest独立应用程序是一个对Nest依赖注入容器的包装，它持有所有实例化的类。我们可以从任何已导入的模块中直接使用独立应用程序对象获得对任何现有实例的引用。因此，您可以在任何地方使用Nest框架，包括例如脚本CRON作业。您甚至可以构建一个基于它的CLI。
 
 #### 入门
 
-创建一个 Nest standalone 应用程序请使用以下构造：
+要创建一个Nest独立应用程序，请使用以下构建：
 
 ```typescript
-async function bootstrap() {
-  const app = await NestFactory.createApplicationContext(AppModule);
-  // your application logic here ...
-}
-bootstrap();
+const app = new NestApplication();
 
 ```
 
 #### 从静态模块中获取提供者
 
-standalone 应用程序对象允许您获取 Nest 应用程序中注册的任何实例的引用。让我们假设我们在 `TasksService` 模块中有一个 `TasksModule` 提供者，该模块被我们的 `AppModule` 模块导入。这类提供者提供了一组方法，我们想从 CRON 工作中调用这些方法。
+独立应用程序对象允许您获得对Nest应用程序中注册的任何实例的引用。让我们假设我们在__INLINE_CODE_6__模块中有一个__INLINE_CODE_7__提供者，该模块被我们的__INLINE_CODE_8__模块导入。这个类提供了一组方法，我们想从CRON作业中调用这些方法。
 
 ```typescript
-const tasksService = app.get(TasksService);
+const instance = app.get<Instance>(InlineCode9);
 
 ```
 
-要访问 `TasksService` 实例，我们使用 `get()` 方法。`get()` 方法像一个查询一样搜索每个注册模块中的实例。您可以将任何提供者的令牌传递给它。或者，在严格上下文检查的情况下，传递一个包含 `strict: true` 属性的选项对象。使用该选项，您需要在特定的模块中导航以获取特定的实例。
+要访问__INLINE_CODE_9__实例，我们使用`dist`方法。`nest build`方法类似于一个查询，它在每个已注册的模块中搜索实例。您可以将任何提供者的令牌传递给它。Alternatively, for strict context checking, pass an options object with the `npm run build my-app` property. With this option in effect, you have to navigate through specific modules to obtain a particular instance from the selected context.
 
 ```typescript
-const tasksService = app.select(TasksModule).get(TasksService, { strict: true });
+const instance = app.get<Instance>(InlineCode9, { scope: InlineCode8 });
 
 ```
 
-以下是从 standalone 应用程序对象中获取实例引用方法的总结。
+以下是从独立应用程序对象中获取实例引用方法的总结。
 
-<table>
-  <tr>
-    <td>
-      <code>get()</code>
-    </td>
-    <td>
-      Retrieves an instance of a controller or provider (including guards, filters, and so on) available in the application context.
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <code>select()</code>
-    </td>
-    <td>
-      Navigates through the module's graph to pull out a specific instance of the selected module (used together with strict mode as described above).
-    </td>
-  </tr>
-</table>
+**表 1**
 
-> info **Hint** 在非严格模式下，root 模块默认被选择。在选择其他模块时，您需要手动导航模块图。
+| 方法名            | 描述         |
+| ----------------- | ------------- |
+| get()          | 获取controller或提供者的实例（包括guards、filters等） |
+| select()      | 在模块图中导航到特定的实例 |
 
-请注意，standalone 应用程序没有网络监听器，因此与 HTTP 相关的 Nest 功能（例如中间件、拦截器、管道、守卫等）在这个上下文中不可用。
+> 提示 **Hint** 在非严格模式下，根模块将被选择为默认值。要选择其他模块，您需要手动导航模块图，步骤由步。
 
-例如，即使您在应用程序中注册了一个全局拦截器，然后使用 `app.get()` 方法获取控制器的实例，拦截器将不会被执行。
+请注意，独立应用程序不具有任何网络监听器，所以Nest框架中的任何HTTP相关特性（例如中间件、拦截器、管道、guards等）在这个上下文中不可用。
+
+例如，即使您在应用程序中注册了全局拦截器，然后使用`dist`方法检索控制器的实例，拦截器也将不会被执行。
 
 #### 从动态模块中获取提供者
 
-在处理 [dynamic modules](/fundamentals/dynamic-modules) 时，我们需要向 `app.select` 传递相同的对象，该对象表示应用程序中注册的动态模块。例如：
+当处理__LINK_35__时，我们需要将同一个对象传递给`main.js`，该对象表示注册的动态模块在应用程序中的表示。例如：
 
 ```typescript
-export const dynamicConfigModule = ConfigModule.register({ folder: './config' });
-
-@Module({
-  imports: [dynamicConfigModule],
-})
-export class AppModule {}
+const dynamicModule = new DynamicModule();
+app.registerModule(dynamicModule);
+const instance = app.get<Instance>(InlineCode9, dynamicModule);
 
 ```
 
 然后，您可以在后续选择该模块：
 
 ```typescript
-const configService = app.select(dynamicConfigModule).get(ConfigService, { strict: true });
+app.select(dynamicModule);
 
 ```
 
 #### 终止阶段
 
-如果您想在 Node 应用程序关闭后（例如在 CRON 工作中）结束脚本，必须在 `bootstrap` 函数的末尾调用 `app.close()` 方法，如下所示：
+如果您想在脚本完成后让Node应用程序关闭（例如，在CRON作业中），您必须在`tsconfig.json`函数的末尾调用`.ts`方法：
 
 ```typescript
-async function bootstrap() {
-  const app = await NestFactory.createApplicationContext(AppModule);
-  // application logic...
-  await app.close();
-}
-bootstrap();
+app.close();
 
 ```
 
-正如在 [Lifecycle events](/fundamentals/lifecycle-events) 章节中所述，这将触发生命周期钩子。
+并且，如在__LINK_36__章节中所述，这将触发生命周期钩子。
 
 #### 示例
 
-有一个可工作的示例可在 [here](https://github.com/nestjs/nest/tree/master/sample/18-context) 中找到。
+有一个可用的__LINK_37__示例。

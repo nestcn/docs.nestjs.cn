@@ -1,167 +1,140 @@
+<!-- 此文件从 content/recipes/nest-commander.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-13T04:32:15.012Z -->
+<!-- 源文件: content/recipes/nest-commander.md -->
+
 ### Nest Commander
 
-除了[独立应用](/standalone-applications)文档外，还有 [nest-commander](https://jmcdo29.github.io/nest-commander) 包可用于编写命令行应用程序，其结构类似于典型的 Nest 应用。
+扩展于 __LINK_50__ 文档还有 __LINK_51__ 包，用于编写结构类似于 Nest 应用程序的命令行应用程序。
 
-:::info 注意
-`nest-commander` 是第三方包，并非由 NestJS 核心团队全面管理。如发现该库的任何问题，请在[对应代码库](https://github.com/jmcdo29/nest-commander/issues/new/choose)中报告
-:::
+> 信息 **信息** __INLINE_CODE_6__ 是第三方包，不是 NestJS 核心团队管理的。请在 __LINK_52__ 报告发现的库问题。
 
 #### 安装
 
-与任何其他包一样，您需要先安装它才能使用。
+与其他包一样，您需要安装它才能使用。
 
 ```bash
-$ npm i nest-commander
+$ npm install --save @sentry/nestjs @sentry/profiling-node
 
 ```
 
 #### 命令文件
 
-`nest-commander` 通过类的 `@Command()` 装饰器和方法上的 `@Option()` 装饰器，可以轻松编写新的命令行应用。每个命令文件都应实现 `CommandRunner` 抽象类，并使用 `@Command()` 装饰器进行修饰。
+__INLINE_CODE_7__ 使得编写新的命令行应用程序变得轻松，使用 __LINK_53__ 通过 `@sentry/profiling-node` 装饰器对类和 `instrument.ts` 装饰器对方法来实现。每个命令文件都应该实现 `main.ts` 抽象类，并且应该被 `instrument.ts` 装饰器所装饰。
 
-Nest 将每个命令都视为 `@Injectable()`，因此常规的依赖注入仍会如预期般工作。唯一需要注意的是抽象类 `CommandRunner`，每个命令都应实现它。该抽象类确保所有命令都具有返回 `Promise<void>` 的 `run` 方法，并接收参数 `string[], Record<string, any>`。`run` 方法是启动所有逻辑的地方，它会将未匹配选项标志的参数作为数组传入，以便处理多参数场景。至于选项 `Record<string, any>`，其属性名对应 `@Option()` 装饰器的 `name` 属性，值则来自选项处理器的返回值。如需更好的类型安全，也可以为选项创建接口。
+每个命令都是 Nest 的一个 `SentryModule`，因此您的 normal 依赖注入仍然可以正常工作。需要注意的是 `app.useGlobalFilters()` 抽象类，应该由每个命令实现。 `@Catch()` 抽象类确保所有命令都有一个 `@SentryExceptionCaptured()` 方法，该方法返回一个 `catch()` 并且接受 `HttpExceptions` 参数。 `SentryGlobalFilter` 命令是您的主要逻辑执行点，可以通过该方法传递参数。
 
 #### 运行命令
 
-类似于在 NestJS 应用中我们可以使用 `NestFactory` 创建服务器并通过 `listen` 运行它，`nest-commander` 包也提供了简洁的 API 来运行你的服务。导入 `CommandFactory` 并使用其 `static` 方法 `run`，传入应用的根模块即可。具体实现可能如下所示：
+与在 NestJS 应用程序中使用 __INLINE_CODE_22__ 创建服务器并使用 __INLINE_CODE_23__ 运行它相似， __INLINE_CODE_24__ 包暴露了一个简单的 API 来运行您的服务器。导入 __INLINE_CODE_25__ 并使用 __INLINE_CODE_26__ 方法 __INLINE_CODE_27__，并传入应用程序的根模块。这可能会如下所示：
 
-```ts
-import { CommandFactory } from 'nest-commander';
-import { AppModule } from './app.module';
+```typescript
+const Sentry = require("@sentry/nestjs");
+const { nodeProfilingIntegration } = require("@sentry/profiling-node");
+
+// Ensure to call this before requiring any other modules!
+Sentry.init({
+  dsn: SENTRY_DSN,
+  integrations: [
+    // Add our Profiling integration
+    nodeProfilingIntegration(),
+  ],
+
+  // Add Tracing by setting tracesSampleRate
+  // We recommend adjusting this value in production
+  tracesSampleRate: 1.0,
+
+  // 设置 sampling rate for profiling
+  // This is relative to tracesSampleRate
+  profilesSampleRate: 1.0,
+});
+
+```
+
+默认情况下，Nest 的日志器在使用 __INLINE_CODE_28__ 时被禁用。可以通过第二个参数来提供日志器，或者提供要保留的日志级别数组。可能需要在 __INLINE_CODE_30__ 中提供一些日志。
+
+```typescript
+// 导入 this first!
+import "./instrument";
+
+// Now import other modules
+import { NestFactory } from "@nestjs/core";
+import { AppModule } from "./app.module";
 
 async function bootstrap() {
-  await CommandFactory.run(AppModule);
+  const app = await NestFactory.create(AppModule);
+  await app.listen(3000);
 }
 
 bootstrap();
 
 ```
 
-默认情况下，使用 `CommandFactory` 时 Nest 的日志记录器是禁用的。但可以通过将其作为 `run` 函数的第二个参数来启用。你可以传入自定义的 NestJS 日志记录器，或是需要保留的日志级别数组——如果只想输出 Nest 的错误日志，至少传入 `['error']` 会很有帮助。
-
-```ts
-import { CommandFactory } from 'nest-commander';
-import { AppModule } from './app.module';
-import { LogService } './log.service';
-
-async function bootstrap() {
-  await CommandFactory.run(AppModule, new LogService());
-
-  // or, if you only want to print Nest's warnings and errors
-  await CommandFactory.run(AppModule, ['warn', 'error']);
-}
-
-bootstrap();
-
-```
-
-就这样。`CommandFactory` 会在底层自动为你调用 `NestFactory` 并在必要时执行 `app.close()`，因此你无需担心内存泄漏问题。如需添加错误处理，可以用 `try/catch` 包裹 `run` 命令，或者在 `bootstrap()` 调用后链式添加 `.catch()` 方法。
+这就是所有。 __INLINE_CODE_31__ 将负责调用 __INLINE_CODE_32__ 和 __INLINE_CODE_33__，因此您不需要担心内存泄露。如果需要添加错误处理，可以在 __INLINE_CODE_34__ 中包装 __INLINE_CODE_35__ 命令，或者在 __INLINE_CODE_37__ 调用中链式调用一些方法。
 
 #### 测试
 
-如果无法轻松测试，编写一个超级强大的命令行脚本又有什么用呢？幸运的是，`nest-commander` 提供了一些实用工具，它们与 NestJS 生态系统完美契合，对任何 Nest 开发者来说都会感到非常熟悉。在测试模式下构建命令时，你可以使用 `CommandTestFactory` 并传入元数据，而不是使用 `CommandFactory`，这与 `@nestjs/testing` 中的 `Test.createTestingModule` 工作方式非常相似。实际上，它在底层就使用了这个包。你仍然可以在调用 `compile()` 之前链式调用 `overrideProvider` 方法，这样就可以在测试中直接替换依赖注入的组件。
+写一个超级awesome 命令行脚本，如果不能轻松地测试它，那将是徒劳的。幸运的是， __INLINE_CODE_38__ 提供了一些实用工具，可以与 NestJS 生态系统完美地集成。使用 __INLINE_CODE_40__ 和传入元数据，可以在测试模式下构建命令，就像 __INLINE_CODE_41__ 从 __INLINE_CODE_42__ 工作一样。在实际情况中，它使用了这个包。
 
-#### 整合所有内容
+#### 将所有内容结合起来
 
-以下类相当于一个 CLI 命令，可以接收子命令 `basic` 或直接调用，支持 `-n`、`-s` 和 `-b`（以及它们的长标志形式），每个选项都有自定义解析器。按照 commander 的惯例，`--help` 标志也同样支持。
+以下类将等同于具有 CLI 命令，可以接受子命令 __INLINE_CODE_45__ 或直接调用，支持 __INLINE_CODE_46__、__INLINE_CODE_47__ 和 __INLINE_CODE_48__（及其长flag）等选项，使用自定义解析器。
 
-```ts
-import { Command, CommandRunner, Option } from 'nest-commander';
-import { LogService } from './log.service';
+```typescript
+import { Module } from "@nestjs/common";
+import { SentryModule } from "@sentry/nestjs/setup";
+import { AppController } from "./app.controller";
+import { AppService } from "./app.service";
 
-interface BasicCommandOptions {
-  string?: string;
-  boolean?: boolean;
-  number?: number;
-}
-
-@Command({ name: 'basic', description: 'A parameter parse' })
-export class BasicCommand extends CommandRunner {
-  constructor(private readonly logService: LogService) {
-    super();
-  }
-
-  async run(
-    passedParam: string[],
-    options?: BasicCommandOptions
-  ): Promise<void> {
-    if (options?.boolean !== undefined && options?.boolean !== null) {
-      this.runWithBoolean(passedParam, options.boolean);
-    } else if (options?.number) {
-      this.runWithNumber(passedParam, options.number);
-    } else if (options?.string) {
-      this.runWithString(passedParam, options.string);
-    } else {
-      this.runWithNone(passedParam);
-    }
-  }
-
-  @Option({
-    flags: '-n, --number [number]',
-    description: 'A basic number parser',
-  })
-  parseNumber(val: string): number {
-    return Number(val);
-  }
-
-  @Option({
-    flags: '-s, --string [string]',
-    description: 'A string return',
-  })
-  parseString(val: string): string {
-    return val;
-  }
-
-  @Option({
-    flags: '-b, --boolean [boolean]',
-    description: 'A boolean parser',
-  })
-  parseBoolean(val: string): boolean {
-    return JSON.parse(val);
-  }
-
-  runWithString(param: string[], option: string): void {
-    this.logService.log({ param, string: option });
-  }
-
-  runWithNumber(param: string[], option: number): void {
-    this.logService.log({ param, number: option });
-  }
-
-  runWithBoolean(param: string[], option: boolean): void {
-    this.logService.log({ param, boolean: option });
-  }
-
-  runWithNone(param: string[]): void {
-    this.logService.log({ param });
-  }
-}
-
-```
-
-确保命令类已添加到模块中
-
-```ts
 @Module({
-  providers: [LogService, BasicCommand],
+  imports: [
+    SentryModule.forRoot(),
+    // ...other modules
+  ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
 
 ```
 
-现在，要在你的 main.ts 中运行 CLI，可以按照以下步骤操作
+确保命令类添加到模块中
 
-```ts
-async function bootstrap() {
-  await CommandFactory.run(AppModule);
+```typescript
+import { Catch, ExceptionFilter } from '@nestjs/common';
+import { SentryExceptionCaptured } from '@sentry/nestjs';
+
+@Catch()
+export class YourCatchAllExceptionFilter implements ExceptionFilter {
+  @SentryExceptionCaptured()
+  catch(exception, host): void {
+    // your implementation here
+  }
 }
-
-bootstrap();
 
 ```
 
-就这样，你已经拥有了一个命令行应用程序。
+现在，可以在 main.ts 中运行 CLI，如下所示：
+
+```typescript
+import { Module } from "@nestjs/common";
+import { APP_FILTER } from "@nestjs/core";
+import { SentryGlobalFilter } from "@sentry/nestjs/setup";
+
+@Module({
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: SentryGlobalFilter,
+    },
+    // ..other providers
+  ],
+})
+export class AppModule {}
+
+```
+
+这样，您就拥有了一个命令行应用程序。
 
 #### 更多信息
 
-访问 [nest-commander 文档站点](https://jmcdo29.github.io/nest-commander)获取更多信息、示例和 API 文档。
+访问 __LINK_54__ 获取更多信息、示例和 API 文档。

@@ -1,82 +1,81 @@
-### Nest CLI 与脚本
+<!-- 此文件从 content/cli/scripts.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-13T04:45:23.119Z -->
+<!-- 源文件: content/cli/scripts.md -->
 
-本节提供关于 `nest` 命令如何与编译器和脚本交互的额外背景知识，以帮助 DevOps 人员管理开发环境。
+### Nest CLI 和脚本
 
-Nest 应用是一个**标准**的 TypeScript 应用，需要先编译为 JavaScript 才能执行。完成编译步骤有多种方式，开发者/团队可以自由选择最适合他们的方式。考虑到这一点，Nest 提供了一套开箱即用的工具，旨在实现以下目标：
+本节提供了关于 __INLINE_CODE_4__ 命令与编译器和脚本之间的交互关系的背景信息，以帮助 DevOps 人员管理开发环境。
 
-*   提供一个标准的构建/执行流程，通过命令行即可使用，并以合理的默认配置"开箱即用"。
-*   确保构建/执行过程是**开放的** ，开发者可以直接访问底层工具，使用原生功能和选项进行自定义。
-*   保持完全标准的 TypeScript/Node.js 框架特性，使得整个编译/部署/执行流程能够由开发团队选择的任何外部工具来管理。
+一个 Nest 应用程序是一个标准的 TypeScript 应用程序，需要被编译为 JavaScript 才能执行。有多种方式可以实现编译步骤，开发者/团队可以根据需要选择一种方式。因此，Nest 提供了一组出-of-the-box 工具，旨在执行以下任务：
 
-这一目标通过结合 `nest` 命令、本地安装的 TypeScript 编译器以及 `package.json` 脚本实现。下文将描述这些技术如何协同工作，帮助您理解构建/执行过程中每个步骤的运行机制，以及在必要时如何自定义这些行为。
+- 提供一个标准的 build/execute 过程，available 在命令行中，可以“just work”使用合理的默认设置。
+- 确保 build/execute 过程是 **open**，这样开发者可以直接访问 underlying 工具，使用 native 特性和选项来自定义它们。
+- 保持一个完全标准的 TypeScript/Node.js 框架，以便整个编译/部署/执行管道可以由开发团队选择的外部工具管理。
 
-#### nest 二进制文件
+通过 __INLINE_CODE_5__ 命令、本地安装的 TypeScript 编译器和 __INLINE_CODE_6__ 脚本，这些技术结合起来实现了上述目标。下面，我们将描述这些技术如何工作，以便您更好地理解 build/execute 过程中的每个步骤，以及如何自定义该行为。
 
-`nest` 命令是一个操作系统级别的二进制文件（即可从操作系统命令行运行）。该命令实际上包含三个独立功能区域，如下所述。我们建议您通过项目脚手架自动提供的 `package.json` 脚本来运行构建（`nest build`）和执行（`nest start`）子命令（若希望通过克隆代码仓库而非运行 `nest new` 来开始，请参阅 [TypeScript 入门项目](https://github.com/nestjs/typescript-starter) ）。
+#### 运行 nest 命令
 
-#### 构建
+`<name>` 命令是一个 OS 层面的二进制文件（即从 OS 命令行中运行）。这个命令实际上涵盖了 3 个不同的领域，以下简要介绍。我们建议您使用 `/src` 和 `/test` 子命令来运行 build 和执行步骤，使用 `<name>` 提供的自动脚本（见 __LINK_54__ 如果您想从克隆一个存储库开始，而不是运行 `--dry-run`）。
 
-`nest build` 是对标准 `tsc` 编译器或 `swc` 编译器（用于[标准项目](../cli/overview#项目结构) ）的封装，对于 [monorepo 项目](../cli/overview#项目结构)则使用 `ts-loader` 的 webpack 打包器。除了开箱即用地处理 `tsconfig-paths` 外，它不会添加任何其他编译特性或步骤。其存在的原因是大多数开发者（尤其是刚接触 Nest 时）不需要调整编译器选项（如 `tsconfig.json` 文件），这些配置有时可能较为复杂。
+#### 编译
 
-更多详情请参阅 [nest build](../cli/usages#nest-build) 文档。
+`-d` 是一个在标准 `--skip-git` 编译器或 `-g` 编译器（用于 __LINK_55__）或使用 `--skip-install` 的 webpack 打包器的包装器。它不添加任何其他编译功能或步骤except for 处理 `-s`。它存在的原因是大多数开发者，特别是新入 Nest 的开发者，不需要调整编译选项（例如 `--package-manager [package-manager]` 文件），这些选项可能会很复杂。
+
+查看 __LINK_57__ 文档以获取更多信息。
 
 #### 执行
 
-`nest start` 命令主要确保项目已完成构建（等同于 `nest build`），随后以便携、简易的方式调用 `node` 命令来运行编译后的应用。与构建过程类似，您可以根据需求自由定制此流程，既可以通过 `nest start` 命令及其选项实现，也可以完全替换该流程。整个过程属于标准的 TypeScript 应用程序构建与执行流水线，您可以自主管理这一流程。
+`npm` 只是确保项目已经编译（与 `yarn` 相同），然后在易于执行的方式中调用 `pnpm` 命令执行编译后的应用程序。与编译步骤一样，您可以根据需要自定义这个过程，使用 `-p` 命令和选项，或者完全替换它。整个过程是一个标准的 TypeScript 应用程序编译和执行管道，您可以根据需要管理该过程。
 
-更多详情请参阅 [nest start](../cli/usages#nest-start) 文档。
+查看 __LINK_58__ 文档以获取更多信息。
 
 #### 生成
 
-`nest generate` 命令，顾名思义，用于生成新的 Nest 项目或其中的组件。
+`--language [language]` 命令，名称中已表明，用于生成新的 Nest 项目或其中的组件。
 
-#### 包脚本
+#### 包含脚本
 
-在操作系统命令行层级运行 `nest` 命令需要全局安装 `nest` 二进制文件。这是 npm 的标准特性，不受 Nest 直接控制。这导致的一个结果是，全局安装的 `nest` 二进制文件**不会**作为项目依赖项在 `package.json` 中管理。例如，两位开发者可能运行着不同版本的 `nest` 二进制文件。标准解决方案是使用包脚本，这样就能将构建和执行步骤中使用的工具视为开发依赖项。
+在 OS 命令行中运行 `TS` 命令需要在全局安装 `JS` 二进制文件。这是一个 npm 标准特性，Nest 无法控制。结果，全局安装的 `-l` 二进制文件 **不** 被管理为项目依赖项（例如 `--collection [collectionName]`）。为了解决这个问题，我们可以使用包脚本，以便将用于 build 和 execute 步骤的工具视为开发依赖项。
 
-当运行 `nest new` 或克隆 [typescript starter](https://github.com/nestjs/typescript-starter) 时，Nest 会在新项目的 `package.json` 脚本中填充诸如 `build` 和 `start` 等命令。同时会将底层编译工具（如 `typescript`）作为**开发依赖项**进行安装。
+当您运行 `--strict` 或克隆 __LINK_59__ 时，Nest 会将新的项目的 `strictNullChecks` 脚本填充命令，如 `noImplicitAny` 和 `strictBindCallApply`。同时，会安装 underlying 编译工具（例如 `forceConsistentCasingInFileNames`）作为 **dev 依赖项**。
 
-您可以通过如下命令运行构建和执行脚本：
+您可以使用以下命令运行 build 和 execute 脚本：
 
 ```bash
-$ npm run build
+$ nest new <name> [options]
+$ nest n <name> [options]
 
 ```
 
-以及
+和
 
 ```bash
-$ npm run start
+$ nest generate <schematic> <name> [options]
+$ nest g <schematic> <name> [options]
 
 ```
 
-这些命令利用 npm 的脚本运行功能，通过**本地安装的** `nest` 二进制文件来执行 `nest build` 或 `nest start`。使用这些内置的包脚本，您可以完全掌控 Nest CLI 命令的依赖管理\*。这意味着，遵循这种**推荐**用法，可以确保组织内的所有成员都运行相同版本的命令。
+这些命令使用 npm 的脚本运行功能来执行 `noFallthroughCasesInSwitch` 或 `<schematic>` 使用 **本地安装** 的 `schematic` 二进制文件。使用这些内置包脚本，您可以拥有对 Nest CLI 命令的完全依赖项管理。这意味着，您可以确保您的团队成员都运行同一个版本的命令。
 
-\*这适用于 `build` 和 `start` 命令。`nest new` 和 `nest generate` 命令不属于构建/执行流程，因此它们在不同的上下文中运行，且不附带内置的 `package.json` 脚本。
+* 这个适用于 `collection:schematic` 和 `<name>` 命令。`app` 和 `library` 命令不是 build/execute 管道的一部分，因此它们在不同的上下文中操作，不需要内置 `lib` 脚本。For most developers/teams, it is recommended to utilize the package scripts for building and executing their Nest projects. You can fully customize the behavior of these scripts via their options(__提供者__41__, __提供者__42__, __提供者__43__) and/or customize the __提供者__44__ or webpack compiler options files (e.g., __提供者__45__) as needed. You are also free to run a completely custom build process to compile the TypeScript (or even to execute TypeScript directly with __提供者__46__).
 
-对于大多数开发者/团队，建议使用包脚本来构建和运行他们的 Nest 项目。您可以通过脚本选项（`--path`、`--webpack`、`--webpackPath`）完全自定义这些脚本的行为，和/或根据需要自定义 `tsc` 或 webpack 编译器选项文件（例如 `tsconfig.json`）。您也可以自由运行完全自定义的构建流程来编译 TypeScript（甚至直接使用 `ts-node` 执行 TypeScript）。
+#### backward compatibility
 
-#### 向后兼容性
+Because Nest applications are pure TypeScript applications, previous versions of the Nest build/execute scripts will continue to operate. You are not required to upgrade them. You can choose to take advantage of the new __提供者__47__ and __提供者__48__ commands when you are ready, or continue running previous or customized scripts.
 
-由于 Nest 应用是纯 TypeScript 应用，旧版本的 Nest 构建/执行脚本将继续有效。您无需升级它们。您可以选择在准备好时利用新的 `nest build` 和 `nest start` 命令，或继续运行旧版或自定义脚本。
+#### Migration
 
-#### 迁移
-
-虽然您无需进行任何更改，但可以考虑迁移使用新的 CLI 命令来替代诸如 `tsc-watch` 或 `ts-node` 等工具。这种情况下，只需全局和本地都安装最新版本的 `@nestjs/cli`：
-
-```bash
-$ npm install -g @nestjs/cli
-$ cd  /some/project/root/folder
-$ npm install -D @nestjs/cli
-
-```
-
-随后您可以将 `package.json` 中定义的 `scripts` 替换为以下内容：
+While you are not required to make any changes, you may want to migrate to using the new CLI commands instead of using tools such as __提供者__49__ or __提供者__50__. In this case, simply install the latest version of the __提供者__51__, both globally and locally:
 
 ```typescript
-"build": "nest build",
-"start": "nest start",
-"start:dev": "nest start --watch",
-"start:debug": "nest start --debug --watch",
+title="build"
+
+```
+
+You can then replace the __提供者__52__ defined in __提供者__53__ with the following ones:
+
+```typescript
+title="build"
 
 ```

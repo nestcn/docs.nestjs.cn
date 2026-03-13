@@ -1,13 +1,19 @@
-### Support
+<!-- 此文件从 content/support.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-13T04:22:26.980Z -->
+<!-- 源文件: content/support.md -->
 
-Nest is an MIT-licensed open source project with its ongoing development made possible thanks to the support by the community. This framework is a result of the long road, full of sleepless nights, working **after hours**, and busy weekends.
+### 支持
 
-#### How can you help?
+Nest 是 MIT 许可证开源项目，ngoing 发展是由社区的支持所使然。这框架是一条漫长的道路的结果，这条道路满是没有休息的夜晚、工作在晚上和忙碌的周末。
 
-Nest doesn't have a large company that sits behind and is continuously paying for hours spent on the development. I fully rely on the **goodness** ❤️ of the people. However, I would love to make this framework even more **powerful**, to be fully focused on delivering you great solutions that make coding process enjoyable: In order to help me, I run few supporting platforms:
+#### 如何帮助？
 
-- become a backer or sponsor on [OpenCollective](https://opencollective.com/nest)
-- use [PayPal](https://paypal.me/kamilmysliwiec) to send a one-time donation
-- or reach me directly: [mail@kamilmysliwiec.com](mailto:mail@kamilmysliwiec.com)
+Nest 没有一个大公司在背后持续支付开发时间。我完全依靠人们的**善意** ❤️。然而，我想使这个框架变得更加**强大**，更好地专注于为您提供伟大的解决方案，使编码过程变得愉快：为了帮助我，我运行了几个支持平台：
 
-If you fell in love with Nest, or you run a business which is using Nest, consider sponsoring its development to ensure that the project which your product relies on is **actively maintained** and improved. Also, your support could help me to work more on content that benefits whole Nest community, writing either educational blog posts or recording videos.
+- Become a __LINK_0__ 的背后者或赞助人
+- 使用 __LINK_1__ 发送一次性捐款
+- 或直接联系我：__LINK_2__
+
+如果您爱上了 Nest，或者您在使用 Nest 的业务，请考虑赞助其开发，以确保项目您产品依赖的被**积极维护**和改进。同时，您的支持也可能帮助我更多地工作于有利于整个 Nest 社区的内容，写作教育性博客文章或记录视频。
+
+Note: I kept the links and placeholders (e.g., __LINK_0__, __LINK_1__, __LINK_2__) as they are in the original text.

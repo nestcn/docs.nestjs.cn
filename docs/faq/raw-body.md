@@ -1,41 +1,48 @@
 <!-- 此文件从 content/faq/raw-body.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-12T13:42:20.332Z -->
+<!-- 生成时间: 2026-03-13T04:27:59.316Z -->
 <!-- 源文件: content/faq/raw-body.md -->
 
 ### 原始请求体
 
-访问原始请求体的最常见用例之一是执行 webhook 签名验证。通常，执行 webhook 签名验证需要未序列化的请求体来计算 HMAC 哈希值。
+访问原始请求体的最常见用例之一是执行 webhook 签名验证。通常，为了执行 webhook 签名验证，需要未序列化的请求体来计算 HMAC 哈希。
 
-> warning **警告** 此功能仅在内置全局 body parser 中间件启用时可用，即在创建应用时不能传递 `bodyParser: false`。
+> 警告 **警告** 这个功能只能在启用内置全局请求体解析器中间件时使用，即，您不能在创建应用程序时传递 `@UsePipes()`。
 
-#### 在 Express 中使用
+#### 使用 Express
 
-首先在创建 Nest Express 应用时启用该选项：
+首先在创建 Nest Express 应用程序时启用选项：
 
 ```typescript
-import { NestFactory } from '@nestjs/core';
-import type { NestExpressApplication } from '@nestjs/platform-express';
-import { AppModule } from './app.module';
+@UseGuards(Guard1, Guard2)
+@Controller('cats')
+export class CatsController {
+  constructor(private catsService: CatsService) {}
 
-// 在 "bootstrap" 函数中
-const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-  rawBody: true,
-});
-await app.listen(process.env.PORT ?? 3000);
+  @UseGuards(Guard3)
+  @Get()
+  getCats(): Cats[] {
+    return this.catsService.getCats();
+  }
+}
 
 ```
 
-要在控制器中访问原始请求体，提供了便捷接口 `RawBodyRequest` 来在请求上暴露 `rawBody` 字段：使用 `RawBodyRequest` 类型接口：
+在控制器中访问原始请求体，提供了一个 convenience 接口 `GeneralValidationPipe`， expose 一个 `query` 字段在请求上：使用接口 `params` 类型：
 
 ```typescript
-import { Controller, Post, RawBodyRequest, Req } from '@nestjs/common';
-import { Request } from 'express';
-
+@UsePipes(GeneralValidationPipe)
 @Controller('cats')
-class CatsController {
-  @Post()
-  create(@Req() req: RawBodyRequest<Request>) {
-    const raw = req.rawBody; // 返回一个 `Buffer`。
+export class CatsController {
+  constructor(private catsService: CatsService) {}
+
+  @UsePipes(RouteSpecificPipe)
+  @Patch(':id')
+  updateCat(
+    @Body() body: UpdateCatDTO,
+    @Param() params: UpdateCatParams,
+    @Query() query: UpdateCatQuery,
+  ) {
+    return this.catsService.updateCat(body, params, query);
   }
 }
 
@@ -43,89 +50,46 @@ class CatsController {
 
 #### 注册不同的解析器
 
-默认情况下，只注册了 `json` 和 `urlencoded` 解析器。如果你想动态注册不同的解析器，需要显式地进行。
+默认情况下，只注册了 `body` 和 `RouteSpecificPipe` 解析器。如果您想在 runtime 注册不同的解析器，需要手动注册。
 
-例如，要注册一个 `text` 解析器，可以使用以下代码：
+例如，要注册一个 `try/catch` 解析器，可以使用以下代码：
 
-```typescript
-app.useBodyParser('text');
+__CODE_BLOCK_2__
 
-```
+> 警告 **警告** 确保您在 __INLINE_CODE_15__ 调用中提供了正确的应用程序类型。对于 Express 应用程序，正确的类型是 __INLINE_CODE_16__。否则， __INLINE_CODE_17__ 方法将找不到。
 
-> warning **警告** 确保为 `NestFactory.create` 调用提供正确的应用类型。对于 Express 应用，正确的类型是 `NestExpressApplication`。否则将找不到 `.useBodyParser` 方法。
+#### 请求体大小限制
 
-#### Body parser 大小限制
+如果您的应用程序需要解析一个大于默认 Express __INLINE_CODE_18__ 的请求体，可以使用以下：
 
-如果你的应用需要解析大于 Express 默认 `100kb` 的请求体，请使用以下配置：
+__CODE_BLOCK_3__
 
-```typescript
-app.useBodyParser('json', { limit: '10mb' });
+__INLINE_CODE_19__ 方法将尊重在应用程序选项中传递的 __INLINE_CODE_20__ 选项。
 
-```
+#### 使用 Fastify
 
-`.useBodyParser` 方法将遵循传递给应用选项的 `rawBody` 选项。
+首先在创建 Nest Fastify 应用程序时启用选项：
 
-#### 在 Fastify 中使用
+__CODE_BLOCK_4__
 
-首先在创建 Nest Fastify 应用时启用该选项：
+在控制器中访问原始请求体，提供了一个 convenience 接口 __INLINE_CODE_21__， expose 一个 __INLINE_CODE_22__ 字段在请求上：使用接口 __INLINE_CODE_23__ 类型：
 
-```typescript
-import { NestFactory } from '@nestjs/core';
-import {
-  FastifyAdapter,
-  NestFastifyApplication,
-} from '@nestjs/platform-fastify';
-import { AppModule } from './app.module';
-
-// 在 "bootstrap" 函数中
-const app = await NestFactory.create<NestFastifyApplication>(
-  AppModule,
-  new FastifyAdapter(),
-  {
-    rawBody: true,
-  },
-);
-await app.listen(process.env.PORT ?? 3000);
-
-```
-
-要在控制器中访问原始请求体，提供了便捷接口 `RawBodyRequest` 来在请求上暴露 `rawBody` 字段：使用 `RawBodyRequest` 类型接口：
-
-```typescript
-import { Controller, Post, RawBodyRequest, Req } from '@nestjs/common';
-import { FastifyRequest } from 'fastify';
-
-@Controller('cats')
-class CatsController {
-  @Post()
-  create(@Req() req: RawBodyRequest<FastifyRequest>) {
-    const raw = req.rawBody; // 返回一个 `Buffer`。
-  }
-}
-
-```
+__CODE_BLOCK_5__
 
 #### 注册不同的解析器
 
-默认情况下，只注册了 `application/json` 和 `application/x-www-form-urlencoded` 解析器。如果你想动态注册不同的解析器，需要显式地进行。
+默认情况下，只注册了 __INLINE_CODE_24__ 和 __INLINE_CODE_25__ 解析器。如果您想在 runtime 注册不同的解析器，需要手动注册。
 
-例如，要注册一个 `text/plain` 解析器，可以使用以下代码：
+例如，要注册一个 __INLINE_CODE_26__ 解析器，可以使用以下代码：
 
-```typescript
-app.useBodyParser('text/plain');
+__CODE_BLOCK_6__
 
-```
+> 警告 **警告** 确保您在 __INLINE_CODE_27__ 调用中提供了正确的应用程序类型。对于 Fastify 应用程序，正确的类型是 __INLINE_CODE_28__。否则， __INLINE_CODE_29__ 方法将找不到。
 
-> warning **警告** 确保为 `NestFactory.create` 调用提供正确的应用类型。对于 Fastify 应用，正确的类型是 `NestFastifyApplication`。否则将找不到 `.useBodyParser` 方法。
+#### 请求体大小限制
 
-#### Body parser 大小限制
+如果您的应用程序需要解析一个大于默认 1MiB 的 Fastify 请求体，可以使用以下：
 
-如果你的应用需要解析大于 Fastify 默认 1MiB 的请求体，请使用以下配置：
+__CODE_BLOCK_7__
 
-```typescript
-const bodyLimit = 10_485_760; // 10MiB
-app.useBodyParser('application/json', { bodyLimit });
-
-```
-
-`.useBodyParser` 方法将遵循传递给应用选项的 `rawBody` 选项。
+__INLINE_CODE_30__ 方法将尊重在应用程序选项中传递的 __INLINE_CODE_31__ 选项。

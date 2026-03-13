@@ -372,12 +372,26 @@ jobs:
             gh pr edit "$EXISTING_PR" --title "$PR_TITLE" --body "$PR_BODY"
           else
             echo "📝 创建新的 PR"
+            
+            # 确保标签存在
+            for label in sync translation; do
+              if ! gh label list --json name --jq '.[].name' | grep -q "^${label}$"; then
+                echo "📌 创建标签: $label"
+                gh label create "$label" --color "0e8a16" --description "自动同步相关" || true
+              fi
+            done
+            
             gh pr create \
               --title "$PR_TITLE" \
               --body "$PR_BODY" \
               --base main \
               --head "$BRANCH_NAME" \
-              --label "sync,translation"
+              --label "sync,translation" || \
+            gh pr create \
+              --title "$PR_TITLE" \
+              --body "$PR_BODY" \
+              --base main \
+              --head "$BRANCH_NAME"
           fi
 
       - name: Update sync time badge JSON (Gist) - Always run

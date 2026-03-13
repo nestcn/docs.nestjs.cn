@@ -25,7 +25,6 @@ export class CatsService {
   }
 }
 
-
 @Injectable()
 export class CatsService {
   constructor() {
@@ -55,7 +54,6 @@ export class CatsController {
     return this.catsService.findAll();
   }
 }
-
 
 @Controller('cats')
 @Dependencies(CatsService)
@@ -260,7 +258,6 @@ const connectionProvider = {
 })
 export class AppModule {}
 
-
 @Module({
   providers: [
     connectionProvider,
@@ -335,7 +332,6 @@ const connectionFactory = {
 })
 export class AppModule {}
 
-
 @Module({
   providers: [connectionFactory],
   exports: ['CONNECTION'],
@@ -361,7 +357,6 @@ const connectionFactory = {
   exports: [connectionFactory],
 })
 export class AppModule {}
-
 
 @Module({
   providers: [connectionFactory],

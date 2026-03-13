@@ -54,7 +54,6 @@ export class AllExceptionsFilter extends BaseWsExceptionFilter {
   }
 }
 
-
 @Catch()
 export class AllExceptionsFilter extends BaseWsExceptionFilter {
   catch(exception, host) {

@@ -12,6 +12,7 @@
 
 ```bash
 $ npm i csrf-csrf
+
 ```
 
 > warning **警告** 如 [csrf-csrf 文档](https://github.com/Psifi-Solutions/csrf-csrf?tab=readme-ov-file#getting-started)中所述，此中间件需要事先初始化会话中间件或 `cookie-parser`。请参阅文档了解更多详细信息。
@@ -29,6 +30,7 @@ const {
   doubleCsrfProtection, // 这是默认的 CSRF 保护中间件。
 } = doubleCsrf(doubleCsrfOptions);
 app.use(doubleCsrfProtection);
+
 ```
 
 #### 在 Fastify 中使用
@@ -37,6 +39,7 @@ app.use(doubleCsrfProtection);
 
 ```bash
 $ npm i --save @fastify/csrf-protection
+
 ```
 
 安装完成后，按如下方式注册 `@fastify/csrf-protection` 插件：
@@ -46,6 +49,7 @@ import fastifyCsrf from '@fastify/csrf-protection';
 // ...
 // 在注册某些存储插件后的初始化文件中
 await app.register(fastifyCsrf);
+
 ```
 
 > warning **警告** 如 `@fastify/csrf-protection` 文档[这里](https://github.com/fastify/csrf-protection#usage)所述，此插件需要先初始化存储插件。请参阅该文档以获取更多说明。

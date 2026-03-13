@@ -14,6 +14,7 @@
 
 ```bash
 $ npm i --save helmet
+
 ```
 
 安装完成后，将其应用为全局中间件。
@@ -22,6 +23,7 @@ $ npm i --save helmet
 import helmet from 'helmet';
 // 在你的初始化文件中
 app.use(helmet());
+
 ```
 
 > warning **警告** 当使用 `helmet`、`@apollo/server` (4.x) 和 [Apollo Sandbox](https://docs.nestjs.com/graphql/quick-start#apollo-sandbox) 时，Apollo Sandbox 上的 [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) 可能会出现问题。要解决此问题，请按如下所示配置 CSP：
@@ -46,6 +48,7 @@ app.use(helmet());
 
 ```bash
 $ npm i --save @fastify/helmet
+
 ```
 
 [fastify-helmet](https://github.com/fastify/fastify-helmet) 不应作为中间件使用，而应作为 [Fastify 插件](https://www.fastify.io/docs/latest/Reference/Plugins/)使用，即使用 `app.register()`：
@@ -54,6 +57,7 @@ $ npm i --save @fastify/helmet
 import helmet from '@fastify/helmet'
 // 在你的初始化文件中
 await app.register(helmet)
+
 ```
 
 > warning **警告** 当使用 `apollo-server-fastify` 和 `@fastify/helmet` 时，GraphQL playground 上的 [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) 可能会出现问题，要解决此冲突，请按如下所示配置 CSP：

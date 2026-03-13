@@ -2,8 +2,6 @@
 title: Hello world
 ---
 
-
-
 ```
 
 > 注意：默认情况下，Rspress 使用 h1 标题作为 HTML 标题。

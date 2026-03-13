@@ -54,7 +54,6 @@ export class UsersService {
   }
 }
 
-
 @Injectable()
 export class UsersService {
   constructor() {
@@ -91,7 +90,6 @@ import { UsersService } from './users.service';
 })
 export class UsersModule {}
 
-
 @Module({
   providers: [UsersService],
   exports: [UsersService],
@@ -123,7 +121,6 @@ export class AuthService {
     return result;
   }
 }
-
 
 @Injectable()
 @Dependencies(UsersService)
@@ -162,7 +159,6 @@ import { UsersModule } from '../users/users.module';
   controllers: [AuthController],
 })
 export class AuthModule {}
-
 
 @Module({
   imports: [UsersModule],
@@ -243,7 +239,6 @@ export class AuthService {
   }
 }
 
-
 @Dependencies(UsersService, JwtService)
 @Injectable()
 export class AuthService {
@@ -309,7 +304,6 @@ import { jwtConstants } from './constants';
   exports: [AuthService],
 })
 export class AuthModule {}
-
 
 @Module({
   imports: [

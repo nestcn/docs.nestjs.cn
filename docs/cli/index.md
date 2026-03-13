@@ -2,8 +2,6 @@
 title: index
 ---
 
-
-
 |----------|---------------|
 | 多个项目 | 独立的文件系统结构 | 单一文件系统结构 |
 | node_modules 和 package.json | 独立实例 | 在 monorepo 间共享 |

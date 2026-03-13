@@ -53,7 +53,6 @@ export class LoggingInterceptor implements NestInterceptor {
   }
 }
 
-
 @Injectable()
 export class LoggingInterceptor {
   intercept(context, next) {
@@ -158,7 +157,6 @@ export class TransformInterceptor<T> implements NestInterceptor<T, Response<T>> 
   }
 }
 
-
 @Injectable()
 export class TransformInterceptor {
   intercept(context, next) {
@@ -195,7 +193,6 @@ export class ExcludeNullInterceptor implements NestInterceptor {
       .pipe(map(value => value === null ? '' : value ));
   }
 }
-
 
 @Injectable()
 export class ExcludeNullInterceptor {
@@ -234,7 +231,6 @@ export class ErrorsInterceptor implements NestInterceptor {
   }
 }
 
-
 @Injectable()
 export class ErrorsInterceptor {
   intercept(context, next) {
@@ -266,7 +262,6 @@ export class CacheInterceptor implements NestInterceptor {
     return next.handle();
   }
 }
-
 
 @Injectable()
 export class CacheInterceptor {
@@ -306,7 +301,6 @@ export class TimeoutInterceptor implements NestInterceptor {
     );
   };
 };
-
 
 @Injectable()
 export class TimeoutInterceptor {

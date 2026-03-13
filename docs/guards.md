@@ -28,7 +28,6 @@ export class AuthGuard implements CanActivate {
   }
 }
 
-
 @Injectable()
 export class AuthGuard {
   async canActivate(context) {
@@ -72,7 +71,6 @@ export class RolesGuard implements CanActivate {
     return true;
   }
 }
-
 
 @Injectable()
 export class RolesGuard {
@@ -192,7 +190,6 @@ export class RolesGuard implements CanActivate {
     return matchRoles(roles, user.roles);
   }
 }
-
 
 @Injectable()
 @Dependencies(Reflector)

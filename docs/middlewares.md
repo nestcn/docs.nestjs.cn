@@ -33,7 +33,6 @@ export class LoggerMiddleware implements NestMiddleware {
   }
 }
 
-
 @Injectable()
 export class LoggerMiddleware {
   use(req, res, next) {
@@ -68,7 +67,6 @@ export class AppModule implements NestModule {
   }
 }
 
-
 @Module({
   imports: [CatsModule],
 })
@@ -99,7 +97,6 @@ export class AppModule implements NestModule {
       .forRoutes({ path: 'cats', method: RequestMethod.GET });
   }
 }
-
 
 @Module({
   imports: [CatsModule],
@@ -162,7 +159,6 @@ export class AppModule implements NestModule {
       .forRoutes(CatsController);
   }
 }
-
 
 @Module({
   imports: [CatsModule],

@@ -118,7 +118,6 @@ export const User = createParamDecorator(
   },
 );
 
-
 export const User = createParamDecorator((data, ctx) => {
   const request = ctx.switchToHttp().getRequest();
   const user = request.user;
@@ -174,7 +173,6 @@ export function Auth(...roles: Role[]) {
     ApiUnauthorizedResponse({ description: 'Unauthorized' }),
   );
 }
-
 
 export function Auth(...roles) {
   return applyDecorators(

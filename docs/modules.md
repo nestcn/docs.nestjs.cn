@@ -135,7 +135,6 @@ export class CatsModule {
   constructor(private catsService: CatsService) {}
 }
 
-
 @Module({
   controllers: [CatsController],
   providers: [CatsService],
@@ -199,7 +198,6 @@ export class DatabaseModule {
     };
   }
 }
-
 
 @Module({
   providers: [Connection],

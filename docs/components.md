@@ -29,7 +29,6 @@ export class CatsService {
   }
 }
 
-
 @Injectable()
 export class CatsService {
   constructor() {
@@ -84,7 +83,6 @@ export class CatsController {
     return this.catsService.findAll();
   }
 }
-
 
 @Controller('cats')
 @Dependencies(CatsService)
@@ -159,7 +157,6 @@ export class CatsService {
     return this.cats;
   }
 }
-
 
 @Injectable()
 export class CatsService {

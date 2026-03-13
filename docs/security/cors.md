@@ -5,7 +5,6 @@ title: cors
 <!-- 生成时间: 2026-03-12T13:42:20.352Z -->
 <!-- 源文件: content/security/cors.md -->
 
-
 <!-- 此文件从 content/security/cors.md 自动生成，请勿直接修改此文件 -->
 <!-- 生成时间: 2026-03-12T12:02:41.436Z -->
 <!-- 源文件: content/security/cors.md -->

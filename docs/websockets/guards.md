@@ -1,3 +1,7 @@
+<!-- 此文件从 content/websockets/guards.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-12T13:42:20.326Z -->
+<!-- 源文件: content/websockets/guards.md -->
+
 ### 守卫
 
 WebSocket 守卫与[常规 HTTP 应用程序守卫](/guards)没有根本区别。唯一的区别是，不应该抛出 `HttpException`，而应该使用 `WsException`。

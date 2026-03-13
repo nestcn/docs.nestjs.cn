@@ -41,5 +41,3 @@ footer:
   copyright: "© 2025 NestJS 中文文档 | 由社区维护 | Apache 2.0 许可证"
 ---
 
-
-

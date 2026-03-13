@@ -2,8 +2,6 @@
 title: contributors
 ---
 
-
-
 |------|------|
 | Controller | 控制器 | 不翻译为"控制器类" |
 | Provider | 提供者 | 不翻译为"提供商" |

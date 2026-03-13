@@ -1,263 +1,308 @@
-<!-- 此文件从 content/recipes/suites.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-12T12:02:29.229Z -->
-<!-- 源文件: content/recipes/suites.md -->
-
 ### Suites
 
-Suites 是一个用于 TypeScript 依赖注入框架的测试框架，专为 NestJS 设计。它可以作为 `Test.createTestingModule` 的替代品，用于避免手动创建 mock、冗长的测试设置和多个 mock 配置，或使用未类型化的测试 doubles（如 mock 和 stub）。
+[Suites](https://suites.dev) 是一个用于 TypeScript 依赖注入框架的[开源](https://github.com/suites-dev/suites)单元测试框架。它作为手动创建模拟、使用多个模拟配置进行冗长测试设置或使用非类型化测试替身（如模拟和存根）的**替代方案**。
 
-Suites 可以从 NestJS 服务的元数据中读取，并自动生成完全类型化的 mock 对象，以减少 mock 设置的样板代码并确保类型安全的测试。
+Suites 在运行时从 NestJS 服务中读取元数据，并自动为所有依赖项生成完全类型化的模拟对象。
+这消除了样板模拟设置，并确保类型安全的测试。虽然 Suites 可以与 `Test.createTestingModule()` 一起使用，但它擅长于专注的单元测试。
+使用 `Test.createTestingModule()` 来验证模块连接、装饰器、守卫和拦截器。
+使用 Suites 进行具有自动模拟生成的快速单元测试。
 
-> 信息 **信息** Suites 是一个第三方包，不是 NestJS 核心团队维护的。请将任何问题报告到 [Suites GitHub 仓库](https://github.com/suitesjs/suites)。
+有关基于模块的测试的更多信息，请参阅[测试基础](/fundamentals/testing)章节。
 
-#### 开始使用
+> info **注意** `Suites` 是第三方包，不由 NestJS 核心团队维护。请在[相应的仓库](https://github.com/suites-dev/suites)中报告任何问题。
 
-本指南展示了如何使用 Suites 测试 NestJS 服务。它涵盖了孤立测试（所有依赖项 mock）和集成测试（选择实际实现）。
+#### 入门
+
+本指南演示如何使用 Suites 测试 NestJS 服务。它涵盖了隔离测试（所有依赖项都被模拟）和社交测试（选定的真实实现）。
 
 #### 安装 Suites
 
-首先，安装必要的依赖：
+验证 NestJS 运行时依赖项是否已安装：
 
 ```bash
-npm install --save-dev @suitesjs/core @suitesjs/nestjs @suitesjs/doubles-jest
-
+$ npm install @nestjs/common @nestjs/core reflect-metadata
 ```
 
-如果使用 Vitest 而不是 Jest：
+安装 Suites 核心、NestJS 适配器和测试替身适配器：
 
 ```bash
-npm install --save-dev @suitesjs/core @suitesjs/nestjs @suitesjs/doubles-vitest
-
+$ npm install --save-dev @suites/unit @suites/di.nestjs @suites/doubles.jest
 ```
 
-如果使用 Sinon：
+测试替身适配器（`@suites/doubles.jest`）提供了 Jest 模拟功能的封装。它暴露了 `mock()` 和 `stub()` 函数，用于创建类型安全的测试替身。
+
+确保 Jest 和 TypeScript 可用：
 
 ```bash
-npm install --save-dev @suitesjs/core @suitesjs/nestjs @suitesjs/doubles-sinon
-
+$ npm install --save-dev ts-jest @types/jest jest typescript
 ```
+
+<details><summary>如果您使用 Vitest，请展开</summary>
+
+```bash
+$ npm install --save-dev @suites/unit @suites/di.nestjs @suites/doubles.vitest
+```
+
+</details>
+
+<details><summary>如果您使用 Sinon，请展开</summary>
+
+```bash
+$ npm install --save-dev @suites/unit @suites/di.nestjs @suites/doubles.sinon
+```
+
+</details>
 
 #### 设置类型定义
 
-在项目根目录创建 `suites.d.ts` 文件：
+在项目根目录创建 `global.d.ts`：
 
 ```typescript
-import '@suitesjs/core';
-import '@suitesjs/nestjs';
-import '@suitesjs/doubles-jest'; // 或其他 doubles 适配器
-
+/// <reference types="@suites/doubles.jest/unit" />
+/// <reference types="@suites/di.nestjs/types" />
 ```
 
 #### 创建示例服务
 
-本指南使用一个简单的 `UserService`，具有两个依赖项：
+本指南使用一个具有两个依赖项的简单 `UserService`：
 
 ```typescript
 import { Injectable } from '@nestjs/common';
-import { UserRepository } from './user.repository';
-import { EmailService } from './email.service';
+
+@Injectable()
+export class UserRepository {
+  async findById(id: string): Promise<User | null> {
+    // 数据库查询
+  }
+
+  async save(user: User): Promise<User> {
+    // 数据库保存
+  }
+}
+```
+
+```typescript
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class UserService {
   constructor(
-    private readonly userRepository: UserRepository,
-    private readonly emailService: EmailService,
+    private repository: UserRepository,
+    private logger: Logger,
   ) {}
 
-  async createUser(name: string, email: string): Promise<{ id: number; name: string; email: string }> {
-    const user = await this.userRepository.create({ name, email });
-    await this.emailService.sendWelcomeEmail(user.email);
+  async findById(id: string): Promise<User> {
+    const user = await this.repository.findById(id);
+    if (!user) {
+      throw new NotFoundException(`User ${id} not found`);
+    }
+    this.logger.log(`Found user ${id}`);
     return user;
   }
 
-  async getUserById(id: number): Promise<{ id: number; name: string; email: string } | null> {
-    return this.userRepository.findById(id);
+  async create(email: string, name: string): Promise<User> {
+    const user = { id: generateId(), email, name };
+    await this.repository.save(user);
+    this.logger.log(`Created user ${user.id}`);
+    return user;
   }
 }
-
 ```
 
 #### 编写单元测试
 
-使用 Suites 创建孤立测试，所有依赖项 mock：
+使用 `TestBed.solitary()` 创建所有依赖项都被模拟的隔离测试：
 
 ```typescript
-import { describe, it, expect } from '@jest/globals';
-import { suite } from '@suitesjs/core';
+import { TestBed, type Mocked } from '@suites/unit';
 import { UserService } from './user.service';
+import { UserRepository } from './user.repository';
+import { Logger } from '@nestjs/common';
 
-describe('UserService', () => {
-  const { unit, mock } = suite(UserService);
+describe('User Service Unit Spec', () => {
+  let userService: UserService;
+  let repository: Mocked<UserRepository>;
+  let logger: Mocked<Logger>;
 
-  it('should create user and send welcome email', async () => {
-    // 配置 mock 行为
-    mock.userRepository.create.mockResolvedValue({ id: 1, name: 'John', email: 'john@example.com' });
-    mock.emailService.sendWelcomeEmail.mockResolvedValue(undefined);
+  beforeAll(async () => {
+    const { unit, unitRef } = await TestBed.solitary(UserService).compile();
 
-    // 调用被测方法
-    const result = await unit.createUser('John', 'john@example.com');
-
-    // 验证结果
-    expect(result).toEqual({ id: 1, name: 'John', email: 'john@example.com' });
-    expect(mock.userRepository.create).toHaveBeenCalledWith({ name: 'John', email: 'john@example.com' });
-    expect(mock.emailService.sendWelcomeEmail).toHaveBeenCalledWith('john@example.com');
+    userService = unit;
+    repository = unitRef.get(UserRepository);
+    logger = unitRef.get(Logger);
   });
 
-  it('should get user by id', async () => {
-    // 配置 mock 行为
-    mock.userRepository.findById.mockResolvedValue({ id: 1, name: 'John', email: 'john@example.com' });
+  it('should find user by id', async () => {
+    const user = { id: '1', email: 'test@example.com', name: 'Test' };
+    repository.findById.mockResolvedValue(user);
 
-    // 调用被测方法
-    const result = await unit.getUserById(1);
+    const result = await userService.findById('1');
 
-    // 验证结果
-    expect(result).toEqual({ id: 1, name: 'John', email: 'john@example.com' });
-    expect(mock.userRepository.findById).toHaveBeenCalledWith(1);
+    expect(result).toEqual(user);
+    expect(logger.log).toHaveBeenCalled();
   });
 });
-
 ```
 
-`suite()` 函数分析构造函数，创建类型安全的 mock 对象。`mock` 对象提供 IntelliSense 支持用于 mock 配置。
+`TestBed.solitary()` 分析构造函数并为所有依赖项创建类型化模拟对象。
+`Mocked<T>` 类型为模拟配置提供 IntelliSense 支持。
 
-#### 预编译 mock 配置
+#### 预编译模拟配置
 
-在编译前配置 mock 行为使用 `mock()` 函数：
+在编译前使用 `.mock().impl()` 配置模拟行为：
 
 ```typescript
-import { describe, it, expect } from '@jest/globals';
-import { suite, mock } from '@suitesjs/core';
+import { TestBed } from '@suites/unit';
 import { UserService } from './user.service';
 import { UserRepository } from './user.repository';
 
-describe('UserService', () => {
-  const { unit } = suite(UserService, {
-    userRepository: mock<UserRepository>({
-      create: jest.fn().mockResolvedValue({ id: 1, name: 'John', email: 'john@example.com' }),
-      findById: jest.fn().mockResolvedValue({ id: 1, name: 'John', email: 'john@example.com' }),
-    }),
-  });
-
-  it('should create user', async () => {
-    const result = await unit.createUser('John', 'john@example.com');
-    expect(result).toEqual({ id: 1, name: 'John', email: 'john@example.com' });
+describe('User Service Unit Spec - pre-configured', () => {
+  let unit: UserService;
+  let repository: Mocked<UserRepository>;
+  
+  beforeAll(async () => {
+    const { unit: underTest, unitRef } = await TestBed.solitary(UserService)
+      .mock(UserRepository)
+      .impl(stubFn => ({
+        findById: stubFn().mockResolvedValue({ id: '1', email: 'test@example.com', name: 'Test' })
+      }))
+      .compile();
+    
+    repository = unitRef.get(UserRepository);
+    unit = underTest;
+  })
+  
+  it('should find user with pre-configured mock', async () => {
+    const result = await unit.findById('1');
+    
+    expect(repository.findById).toHaveBeenCalled();
+    expect(result.email).toBe('test@example.com');
   });
 });
-
 ```
 
-`mock()` 参数对应于安装的 doubles 适配器（`@suitesjs/doubles-jest`、`@suitesjs/doubles-vitest`、`@suitesjs/doubles-sinon`）。
+`stubFn` 参数对应于已安装的测试替身适配器（Jest 使用 `jest.fn()`，Vitest 使用 `vi.fn()`，Sinon 使用 `sinon.stub()`）。
 
-#### 使用实际依赖项测试
+#### 使用真实依赖项进行测试
 
-使用 `use()` 和 `useValue()` 使用实际实现的依赖项：
+使用 `TestBed.sociable()` 和 `.expose()` 为特定依赖项使用真实实现：
 
 ```typescript
-import { describe, it, expect } from '@jest/globals';
-import { suite, use } from '@suitesjs/core';
+import { TestBed, Mocked } from '@suites/unit';
 import { UserService } from './user.service';
 import { UserRepository } from './user.repository';
-import { EmailService } from './email.service';
+import { Logger } from '@nestjs/common';
 
-describe('UserService', () => {
-  const { unit } = suite(UserService, {
-    userRepository: use(new UserRepository()),
-    // emailService 仍然是 mock
+describe('UserService - with real logger', () => {
+  let userService: UserService;
+  let repository: Mocked<UserRepository>;
+
+  beforeAll(async () => {
+    const { unit, unitRef } = await TestBed.sociable(UserService)
+      .expose(Logger)
+      .compile();
+
+    userService = unit;
+    repository = unitRef.get(UserRepository);
   });
 
-  it('should create user', async () => {
-    const result = await unit.createUser('John', 'john@example.com');
-    expect(result).toHaveProperty('id');
-    expect(result.name).toBe('John');
-    expect(result.email).toBe('john@example.com');
+  it('should log when finding user', async () => {
+    const user = { id: '1', email: 'test@example.com' };
+    repository.findById.mockResolvedValue(user);
+
+    await userService.findById('1');
+
+    // Logger 实际执行，无需模拟
   });
 });
-
 ```
 
-`use()` 创建 `UserRepository` 的实际实现实例，同时保持其他依赖项 mock。
+`.expose(Logger)` 使用真实实现实例化 `Logger`，同时保持其他依赖项被模拟。
 
 #### 基于令牌的依赖项
 
 Suites 处理自定义注入令牌（字符串或符号）：
 
 ```typescript
-import { Inject, Injectable, Module, Provider } from '@nestjs/common';
-import { suite, useValue } from '@suitesjs/core';
+import { Injectable, Inject } from '@nestjs/common';
 
-const CONFIG_TOKEN = 'CONFIG';
-
-interface Config {
-  apiKey: string;
-  apiUrl: string;
-}
+export const CONFIG_OPTIONS = 'CONFIG_OPTIONS';
 
 @Injectable()
-export class ApiService {
-  constructor(@Inject(CONFIG_TOKEN) private readonly config: Config) {}
+export class ConfigService {
+  constructor(
+    @Inject(CONFIG_OPTIONS) private options: { apiKey: string },
+  ) {}
 
-  getApiUrl(): string {
-    return this.config.apiUrl;
+  getApiKey(): string {
+    return this.options.apiKey;
   }
 }
-
-describe('ApiService', () => {
-  const { unit } = suite(ApiService, {
-    [CONFIG_TOKEN]: useValue({ apiKey: 'test-key', apiUrl: 'https://api.example.com' }),
-  });
-
-  it('should return api url', () => {
-    expect(unit.getApiUrl()).toBe('https://api.example.com');
-  });
-});
-
 ```
 
-使用 `useValue()` 访问令牌依赖项。
+使用 `unitRef.get()` 访问基于令牌的依赖项：
+
+```typescript
+import { TestBed } from '@suites/unit';
+import { ConfigService, CONFIG_OPTIONS, ConfigOptions } from './config.service';
+
+describe('Config Service Unit Spec', () => {
+  let configService: ConfigService;
+  let options: ConfigOptions;
+
+  beforeAll(async () => {
+    const { unit, unitRef } = await TestBed.solitary(ConfigService).compile();
+    configService = unit;
+
+    options = unitRef.get<ConfigOptions>(CONFIG_OPTIONS);
+  });
+
+  it('should return api key', () => { ... });
+});
+```
 
 #### 直接使用 mock() 和 stub()
 
-对于那些喜欢直接控制而不是使用 `suite()`，doubles 适配器包提供了 `mock()` 和 `stub()` 函数：
+对于那些更喜欢不使用 `TestBed` 而直接控制的人，测试替身适配器包提供了 `mock()` 和 `stub()` 函数：
 
 ```typescript
-import { describe, it, expect } from '@jest/globals';
-import { mock } from '@suitesjs/doubles-jest';
+import { mock } from '@suites/unit';
 import { UserRepository } from './user.repository';
 
-describe('UserRepository', () => {
-  const userRepository = mock<UserRepository>();
+describe('User Service Unit Spec', () => {
+  it('should work with direct mocks', async () => {
+    const repository = mock<UserRepository>();
+    const logger = mock<Logger>();
 
-  it('should call findById', async () => {
-    userRepository.findById.mockResolvedValue({ id: 1, name: 'John', email: 'john@example.com' });
-    const result = await userRepository.findById(1);
-    expect(result).toEqual({ id: 1, name: 'John', email: 'john@example.com' });
+    const service = new UserService(repository, logger);
+
+    // ...
   });
 });
-
 ```
 
-`mock()` 创建类型安全的 mock 对象，`stub()` 将底层 mocking 库（Jest 在本例中）封装为提供方法 like `mockResolvedValue`。
+`mock()` 创建一个类型化的模拟对象，`stub()` 封装底层模拟库（本例中为 Jest）以提供 `mockResolvedValue()` 等方法。
+这些函数来自已安装的测试替身适配器（`@suites/doubles.jest`），它适配测试框架的原生模拟功能。
 
-这些函数来自安装的 doubles 适配器（`@suitesjs/doubles-jest`），该适配器适配了测试框架的 native mocking 能力。
-
-> 提示 **提示** `mock()` 函数是 `jest.mock()` 函数的替代品，来自 `@suitesjs/doubles-jest`。两者创建类型安全的 mock 对象。
+> info **提示** `mock()` 函数是 `@golevelup/ts-jest` 中 `createMock` 的替代方案。两者都创建类型化的模拟对象。有关 `createMock` 的更多信息，请参阅[测试基础](/fundamentals/testing#auto-mocking)章节。
 
 #### 总结
 
-**使用 `Test.createTestingModule` 用于：**
-- 验证模块配置和提供者 wiring
+**使用 `Test.createTestingModule()` 用于：**
+- 验证模块配置和提供者连接
 - 测试装饰器、守卫、拦截器和管道
-- 验证跨模块的依赖项注入
-- 测试完整应用程序上下文中的中间件
+- 验证跨模块的依赖注入
+- 使用中间件测试完整的应用程序上下文
 
 **使用 Suites 用于：**
-- 快速单元测试，集中在业务逻辑上
-- 自动生成多个依赖项的 mock
-- 类型安全的测试 doubles 有 IntelliSense 支持
+- 专注于业务逻辑的快速单元测试
+- 为多个依赖项自动生成模拟
+- 具有 IntelliSense 的类型安全测试替身
 
-根据测试目的组织测试：使用 Suites 进行单元测试，验证单个服务行为，并使用 `Test.createTestingModule` 进行集成测试，验证模块配置。
+按目的组织测试：使用 Suites 进行验证单个服务行为的单元测试，使用 `Test.createTestingModule()` 进行验证模块配置的集成测试。
 
 更多信息：
-- [Suites 官方文档](https://suitesjs.com/)
-- [Suites GitHub 仓库](https://github.com/suitesjs/suites)
-- [NestJS 测试文档](/fundamentals/unit-testing)
+- [Suites 文档](https://suites.dev/docs)
+- [Suites GitHub 仓库](https://github.com/suites-dev/suites)
+- [NestJS 测试文档](/fundamentals/testing)

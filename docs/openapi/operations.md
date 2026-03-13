@@ -1,95 +1,85 @@
-<!-- 此文件从 content/openapi/operations.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-12T12:02:29.209Z -->
-<!-- 源文件: content/openapi/operations.md -->
-
 ### 操作
 
-在 OpenAPI 规范中，路径是 API 暴露的端点（资源），例如 `/users` 或 `/products`，操作是用来操作这些路径的 HTTP 方法，例如 `GET`、`POST` 或 `PUT`。
+在 OpenAPI 术语中，路径是您的 API 暴露的端点（资源），例如 `/users` 或 `/reports/summary`，操作是用于操作这些路径的 HTTP 方法，例如 `GET`、`POST` 或 `DELETE`。
 
 #### 标签
 
-要将控制器附加到特定标签上，使用 `@ApiTags()` 装饰器。
+要将控制器附加到特定标签，请使用 `@ApiTags(...tags)` 装饰器。
 
 ```typescript
-@ApiTags('users')
-@Controller('users')
-export class UsersController {
-  // 控制器方法
-}
-
+@ApiTags('cats')
+@Controller('cats')
+export class CatsController {}
 ```
 
-#### 头
+#### 请求头
 
-要定义自定义的请求头，使用 `@ApiHeader()` 装饰器。
+要定义作为请求一部分的预期自定义请求头，请使用 `@ApiHeader()`。
 
 ```typescript
 @ApiHeader({
-  name: 'X-API-Key',
-  description: 'API key for authentication',
-  required: true,
+  name: 'X-MyHeader',
+  description: 'Custom header',
 })
-@Get()
-getUsers() {
-  // 方法逻辑
-}
-
+@Controller('cats')
+export class CatsController {}
 ```
 
 #### 响应
 
-要定义自定义的 HTTP 响应，使用 `@ApiResponse()` 装饰器。
+要定义自定义 HTTP 响应，请使用 `@ApiResponse()` 装饰器。
 
 ```typescript
-@ApiResponse({
-  status: 200,
-  description: '成功获取用户列表',
-  type: [User],
-})
-@Get()
-getUsers() {
-  // 方法逻辑
+@Post()
+@ApiResponse({ status: 201, description: 'The record has been successfully created.'})
+@ApiResponse({ status: 403, description: 'Forbidden.'})
+async create(@Body() createCatDto: CreateCatDto) {
+  this.catsService.create(createCatDto);
 }
-
 ```
 
-Nest 提供了一组简洁的 **API 响应** 装饰器，它们继承自 `@ApiResponse` 装饰器：
+Nest 提供了一组继承自 `@ApiResponse` 装饰器的简写 **API 响应** 装饰器：
 
-- `@ApiOkResponse()` - 200 响应
-- `@ApiCreatedResponse()` - 201 响应
-- `@ApiAcceptedResponse()` - 202 响应
-- `@ApiNoContentResponse()` - 204 响应
-- `@ApiPartialContentResponse()` - 206 响应
-- `@ApiBadRequestResponse()` - 400 响应
-- `@ApiUnauthorizedResponse()` - 401 响应
-- `@ApiForbiddenResponse()` - 403 响应
-- `@ApiNotFoundResponse()` - 404 响应
-- `@ApiMethodNotAllowedResponse()` - 405 响应
-- `@ApiConflictResponse()` - 409 响应
-- `@ApiPayloadTooLargeResponse()` - 413 响应
-- `@ApiUnsupportedMediaTypeResponse()` - 415 响应
-- `@ApiUnprocessableEntityResponse()` - 422 响应
-- `@ApiInternalServerErrorResponse()` - 500 响应
+- `@ApiOkResponse()`
+- `@ApiCreatedResponse()`
+- `@ApiAcceptedResponse()`
+- `@ApiNoContentResponse()`
+- `@ApiMovedPermanentlyResponse()`
+- `@ApiFoundResponse()`
+- `@ApiBadRequestResponse()`
+- `@ApiUnauthorizedResponse()`
+- `@ApiNotFoundResponse()`
+- `@ApiForbiddenResponse()`
+- `@ApiMethodNotAllowedResponse()`
+- `@ApiNotAcceptableResponse()`
+- `@ApiRequestTimeoutResponse()`
+- `@ApiConflictResponse()`
+- `@ApiPreconditionFailedResponse()`
+- `@ApiTooManyRequestsResponse()`
+- `@ApiGoneResponse()`
+- `@ApiPayloadTooLargeResponse()`
+- `@ApiUnsupportedMediaTypeResponse()`
+- `@ApiUnprocessableEntityResponse()`
+- `@ApiInternalServerErrorResponse()`
+- `@ApiNotImplementedResponse()`
+- `@ApiBadGatewayResponse()`
+- `@ApiServiceUnavailableResponse()`
+- `@ApiGatewayTimeoutResponse()`
+- `@ApiDefaultResponse()`
 
 ```typescript
-@ApiOkResponse({
-  description: '成功获取用户列表',
-  type: [User],
-})
-@ApiNotFoundResponse({
-  description: '用户不存在',
-})
-@Get(':id')
-getUser(@Param('id') id: string) {
-  // 方法逻辑
+@Post()
+@ApiCreatedResponse({ description: 'The record has been successfully created.'})
+@ApiForbiddenResponse({ description: 'Forbidden.'})
+async create(@Body() createCatDto: CreateCatDto) {
+  this.catsService.create(createCatDto);
 }
-
 ```
 
-要指定请求的返回模型，我们必须创建一个类并将所有属性注释为 `@ApiProperty()` 装饰器。
+要为请求指定返回模型，我们必须创建一个类并使用 `@ApiProperty()` 装饰器注释所有属性。
 
 ```typescript
-class User {
+export class Cat {
   @ApiProperty()
   id: number;
 
@@ -97,187 +87,249 @@ class User {
   name: string;
 
   @ApiProperty()
-  email: string;
-}
+  age: number;
 
+  @ApiProperty()
+  breed: string;
+}
 ```
 
-然后，`User` 模型可以与 `type` 属性组合使用，以便在响应装饰器中使用。
+然后可以将 `Cat` 模型与响应装饰器的 `type` 属性结合使用。
 
 ```typescript
-@ApiOkResponse({
-  description: '成功获取用户',
-  type: User,
-})
-@Get(':id')
-getUser(@Param('id') id: string) {
-  // 方法逻辑
+@ApiTags('cats')
+@Controller('cats')
+export class CatsController {
+  @Post()
+  @ApiCreatedResponse({
+    description: 'The record has been successfully created.',
+    type: Cat,
+  })
+  async create(@Body() createCatDto: CreateCatDto): Promise<Cat> {
+    return this.catsService.create(createCatDto);
+  }
 }
-
 ```
 
-现在，让我们在浏览器中验证生成的 `User` 模型：
+让我们打开浏览器并验证生成的 `Cat` 模型：
 
-![](/assets/swagger-model.png)
+<figure><img src="/assets/swagger-response-type.png" /></figure>
 
-相反，我们可以为所有端点或控制器定义一个全局响应，使用 `@ApiResponse` 类。这种方法很有用，因为我们可以为应用程序中的所有端点定义一个全局响应（例如，用于错误如 400 或 500）。
+与其为每个端点或控制器单独定义响应，您可以使用 `DocumentBuilder` 类为所有端点定义全局响应。当您想为应用程序中的所有端点定义全局响应（例如，对于 `401 Unauthorized` 或 `500 Internal Server Error` 等错误）时，此方法很有用。
 
 ```typescript
-@ApiResponse({
-  status: 500,
-  description: '内部服务器错误',
-})
-@Controller('users')
-export class UsersController {
-  // 控制器方法
-}
-
+const config = new DocumentBuilder()
+  .addGlobalResponse({
+    status: 500,
+    description: 'Internal server error',
+  })
+  // 其他配置
+  .build();
 ```
 
 #### 文件上传
 
-可以使用 `@ApiConsumes()` 装饰器与 `@ApiBody()` 一起启用文件上传。以下是一个使用 `multer` 技术的完整示例：
+您可以使用 `@ApiBody` 装饰器结合 `@ApiConsumes()` 为特定方法启用文件上传。以下是使用[文件上传](/techniques/file-upload)技术的完整示例：
 
 ```typescript
+@UseInterceptors(FileInterceptor('file'))
 @ApiConsumes('multipart/form-data')
 @ApiBody({
-  schema: {
-    type: 'object',
-    properties: {
-      file: {
-        type: 'string',
-        format: 'binary',
-      },
-    },
-  },
+  description: 'List of cats',
+  type: FileUploadDto,
 })
-@Post('upload')
-uploadFile(@UploadedFile() file: Express.Multer.File) {
-  // 处理上传的文件
-}
-
+uploadFile(@UploadedFile() file: Express.Multer.File) {}
 ```
 
-其中 `Express.Multer.File` 定义如下：
+其中 `FileUploadDto` 定义如下：
 
 ```typescript
-interface File {
-  fieldname: string;
-  originalname: string;
-  encoding: string;
-  mimetype: string;
-  size: number;
-  destination: string;
-  filename: string;
-  path: string;
-  buffer: Buffer;
+class FileUploadDto {
+  @ApiProperty({ type: 'string', format: 'binary' })
+  file: any;
 }
-
 ```
 
-要处理多个文件上传，可以定义 `files` 字段：
+要处理多个文件上传，您可以如下定义 `FilesUploadDto`：
 
 ```typescript
-@ApiConsumes('multipart/form-data')
-@ApiBody({
-  schema: {
-    type: 'object',
-    properties: {
-      files: {
-        type: 'array',
-        items: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-  },
-})
-@Post('upload-multiple')
-uploadMultipleFiles(@UploadedFiles() files: Array<Express.Multer.File>) {
-  // 处理上传的多个文件
+class FilesUploadDto {
+  @ApiProperty({ type: 'array', items: { type: 'string', format: 'binary' } })
+  files: any[];
 }
-
 ```
 
 #### 扩展
 
-要添加扩展到请求中，使用 `@ApiExtension()` 装饰器。扩展名必须以 `x-` 开头。
+要向请求添加扩展，请使用 `@ApiExtension()` 装饰器。扩展名必须以 `x-` 为前缀。
 
 ```typescript
-@ApiExtension('x-custom-extension', {
-  value: 'custom-value',
-  description: '自定义扩展描述',
-})
-@Get()
-getUsers() {
-  // 方法逻辑
-}
-
+@ApiExtension('x-foo', { hello: 'world' })
 ```
 
 #### 高级：泛型 `ApiResponse`
 
-使用 `ApiResponse`，我们可以为 Swagger UI 定义泛型 schema。假设我们有以下 DTO：
+通过提供[原始定义](/openapi/types-and-parameters#raw-definitions)的能力，我们可以为 Swagger UI 定义泛型模式。假设我们有以下 DTO：
 
-```typescript
-class Pagination {
+```ts
+export class PaginatedDto<TData> {
   @ApiProperty()
-  page: number;
+  total: number;
 
   @ApiProperty()
   limit: number;
 
   @ApiProperty()
-  total: number;
-}
+  offset: number;
 
+  results: TData[];
+}
 ```
 
-我们跳过装饰 `Pagination`，因为我们将为其提供 raw 定义。现在，让我们定义另一个 DTO，并将其命名为 `PaginatedResponse`，如下所示：
+我们跳过装饰 `results`，因为稍后我们将为其提供原始定义。现在，让我们定义另一个 DTO 并将其命名为 `CatDto`，如下所示：
 
-```typescript
-class PaginatedResponse<T> {
+```ts
+export class CatDto {
   @ApiProperty()
-  data: T;
+  name: string;
 
   @ApiProperty()
-  pagination: Pagination;
+  age: number;
+
+  @ApiProperty()
+  breed: string;
 }
-
 ```
 
-现在，我们可以定义 `ApiResponse` 响应，如下所示：
+有了这些，我们可以定义一个 `PaginatedDto<CatDto>` 响应，如下所示：
 
-```typescript
+```ts
 @ApiOkResponse({
-  description: '成功获取分页用户列表',
   schema: {
     allOf: [
-      {
-        $ref: getSchemaPath(PaginatedResponse),
-      },
+      { $ref: getSchemaPath(PaginatedDto) },
       {
         properties: {
-          data: {
+          results: {
             type: 'array',
-            items: {
-              $ref: getSchemaPath(User),
-            },
+            items: { $ref: getSchemaPath(CatDto) },
           },
         },
       },
     ],
   },
 })
-@Get()
-getUsers(@Query('page') page: number, @Query('limit') limit: number) {
-  // 方法逻辑
-}
-
+async findAll(): Promise<PaginatedDto<CatDto>> {}
 ```
 
-在这个示例中，我们指定响应将有 allOf `PaginatedResponse`，并且 `data` 属性将是类型 `User` 数组。
+在此示例中，我们指定响应将具有 `PaginatedDto` 的 allOf，并且 `results` 属性将是 `Array<CatDto>` 类型。
 
-- `getSchemaPath()` 函数返回 OpenAPI Schema 路径从 OpenAPI Spec 文件中获取的模型。
-- 这种方法允许我们创建灵活的泛型响应结构，适用于各种数据类型。
+- `getSchemaPath()` 函数返回给定模型的 OpenAPI 规范文件中的 OpenAPI Schema 路径。
+- `allOf` 是 OAS 3 提供的概念，用于涵盖各种继承相关用例。
+
+最后，由于 `PaginatedDto` 没有被任何控制器直接引用，`SwaggerModule` 尚无法生成相应的模型定义。在这种情况下，我们必须将其添加为[额外模型](/openapi/types-and-parameters#extra-models)。例如，我们可以在控制器级别使用 `@ApiExtraModels()` 装饰器，如下所示：
+
+```ts
+@Controller('cats')
+@ApiExtraModels(PaginatedDto)
+export class CatsController {}
+```
+
+如果您现在运行 Swagger，为此特定端点生成的 `swagger.json` 应该有以下定义的响应：
+
+```json
+"responses": {
+  "200": {
+    "description": "",
+    "content": {
+      "application/json": {
+        "schema": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/PaginatedDto"
+            },
+            {
+              "properties": {
+                "results": {
+                  "$ref": "#/components/schemas/CatDto"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
+```
+
+为了使其可重用，我们可以为 `PaginatedDto` 创建自定义装饰器，如下所示：
+
+```ts
+export const ApiPaginatedResponse = <TModel extends Type<any>>(
+  model: TModel,
+) => {
+  return applyDecorators(
+    ApiExtraModels(PaginatedDto, model),
+    ApiOkResponse({
+      schema: {
+        allOf: [
+          { $ref: getSchemaPath(PaginatedDto) },
+          {
+            properties: {
+              results: {
+                type: 'array',
+                items: { $ref: getSchemaPath(model) },
+              },
+            },
+          },
+        ],
+      },
+    }),
+  );
+};
+```
+
+> info **提示** `Type<any>` 接口和 `applyDecorators` 函数是从 `@nestjs/common` 包导入的。
+
+为了确保 `SwaggerModule` 为我们的模型生成定义，我们必须将其添加为额外模型，就像我们之前在控制器中对 `PaginatedDto` 所做的那样。
+
+有了这些，我们可以在端点上使用自定义 `@ApiPaginatedResponse()` 装饰器：
+
+```ts
+@ApiPaginatedResponse(CatDto)
+async findAll(): Promise<PaginatedDto<CatDto>> {}
+```
+
+对于客户端生成工具，这种方法在如何为客户端生成 `PaginatedResponse<TModel>` 方面存在歧义。以下代码片段是上述 `GET /` 端点的客户端生成器结果示例。
+
+```typescript
+// Angular
+findAll(): Observable<{ total: number, limit: number, offset: number, results: CatDto[] }>
+```
+
+如您所见，这里的**返回类型**是模糊的。要解决此问题，您可以为 `ApiPaginatedResponse` 的 `schema` 添加 `title` 属性：
+
+```typescript
+export const ApiPaginatedResponse = <TModel extends Type<any>>(
+  model: TModel,
+) => {
+  return applyDecorators(
+    ApiOkResponse({
+      schema: {
+        title: `PaginatedResponseOf${model.name}`,
+        allOf: [
+          // ...
+        ],
+      },
+    }),
+  );
+};
+```
+
+现在客户端生成器工具的结果将变为：
+
+```ts
+// Angular
+findAll(): Observable<PaginatedResponseOfCatDto>
+```

@@ -58,6 +58,7 @@ async function bootstrap() {
   console.log('Hello world!');
 }
 bootstrap();
+
 ```
 
 对于所有这些脚本，我们使用了 `tsc` (TypeScript) 编译器，因此代码保持未打包状态（未使用 `webpack`）。
@@ -101,6 +102,7 @@ module.exports = (options, webpack) => {
     ],
   };
 };
+
 ```
 
 > info **提示** 要指示 Nest CLI 使用此配置，请在项目的根目录中创建一个新的 `webpack.config.js` 文件。
@@ -146,6 +148,7 @@ if (request.method === RequestMethod[RequestMethod.GET]) {
 
   return cacheService.get(ENDPOINT_KEY);
 }
+
 ```
 
 另一个很好的例子是 webhook 或工作程序，根据某些特定条件（例如输入参数），可能执行不同的操作。
@@ -161,6 +164,7 @@ if (workerType === WorkerType.A) {
   const moduleRef = await this.lazyModuleLoader.load(() => WorkerBModule);
   // ...
 }
+
 ```
 
 #### 示例集成
@@ -178,6 +182,7 @@ if (workerType === WorkerType.A) {
 ```bash
 $ npm i @codegenie/serverless-express aws-lambda
 $ npm i -D @types/aws-lambda serverless-offline
+
 ```
 
 > info **提示** 为了加快开发周期，我们安装了 `serverless-offline` 插件，它模拟 AWS λ 和 API Gateway。
@@ -204,6 +209,7 @@ functions:
       - http:
           method: ANY
           path: '{proxy+}'
+
 ```
 
 > info **提示** 要了解有关 Serverless 框架的更多信息，请访问[官方文档](https://www.serverless.com/framework/docs/)。
@@ -234,6 +240,7 @@ export const handler: Handler = async (
   server = server ?? (await bootstrap());
   return server(event, context, callback);
 };
+
 ```
 
 > info **提示** 要创建多个 serverless 函数并在它们之间共享公共模块，我们建议使用 [CLI Monorepo 模式](/cli/monorepo#monorepo-mode)。
@@ -249,6 +256,7 @@ export const handler: Handler = async (
     "esModuleInterop": true
   }
 }
+
 ```
 
 现在我们可以构建应用程序（使用 `nest build` 或 `tsc`）并使用 `serverless` CLI 在本地启动我们的 lambda 函数：
@@ -256,6 +264,7 @@ export const handler: Handler = async (
 ```bash
 $ npm run build
 $ npx serverless offline
+
 ```
 
 应用程序运行后，打开浏览器并导航到 `http://localhost:3000/dev/[ANY_ROUTE]`（其中 `[ANY_ROUTE]` 是您应用程序中注册的任何端点）。
@@ -274,6 +283,7 @@ return {
   },
   // ... 其余配置
 };
+
 ```
 
 有了这些，您现在可以使用 `$ nest build --webpack` 编译函数代码（然后使用 `$ npx serverless offline` 测试它）。
@@ -301,6 +311,7 @@ return {
   },
   // ... 其余配置
 };
+
 ```
 
 #### 使用独立应用程序功能
@@ -328,6 +339,7 @@ export const handler: Handler = async (
     statusCode: HttpStatus.OK,
   };
 };
+
 ```
 
 > info **提示** 请注意，`NestFactory.createApplicationContext` 不会用增强器（守卫、拦截器等）包装控制器方法。为此，您必须使用 `NestFactory.create` 方法。
@@ -344,4 +356,5 @@ export const handler: Handler = async (
   const eventsService = appContext.get(EventsService);
   return eventsService.process(event);
 };
+
 ```

@@ -11,6 +11,7 @@
 ```bash
 $ nest new <name> [options]
 $ nest n <name> [options]
+
 ```
 
 ##### 描述
@@ -47,6 +48,7 @@ $ nest n <name> [options]
 ```bash
 $ nest generate <schematic> <name> [options]
 $ nest g <schematic> <name> [options]
+
 ```
 
 ##### 参数
@@ -101,6 +103,7 @@ $ nest g <schematic> <name> [options]
 
 ```bash
 $ nest build <name> [options]
+
 ```
 
 ##### 参数
@@ -131,6 +134,7 @@ $ nest build <name> [options]
 
 ```bash
 $ nest start <name> [options]
+
 ```
 
 ##### 参数
@@ -164,6 +168,7 @@ $ nest start <name> [options]
 
 ```bash
 $ nest add <name> [options]
+
 ```
 
 ##### 参数
@@ -178,6 +183,7 @@ $ nest add <name> [options]
 
 ```bash
 $ nest info
+
 ```
 
 ```bash
@@ -197,4 +203,5 @@ websockets version : 10.0.0
 testing version : 10.0.0
 common version : 10.0.0
 core version : 10.0.0
+
 ```

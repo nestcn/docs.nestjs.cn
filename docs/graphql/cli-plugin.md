@@ -34,6 +34,7 @@ export class Author {
   @Field(type => [Post])
   posts: Post[];
 }
+
 ```
 
 虽然对于中型项目来说这不是一个大问题，但一旦您有大量类，它就会变得冗长且难以维护。
@@ -49,6 +50,7 @@ export class Author {
   lastName?: string;
   posts: Post[];
 }
+
 ```
 
 插件根据**抽象语法树**动态添加适当的装饰器。因此，您不必为分散在代码中的 `@Field` 装饰器而烦恼。
@@ -69,6 +71,7 @@ export class Author {
   description: `A list of user's roles`
 })
 roles: string[];
+
 ```
 
 您必须复制描述值。启用 `introspectComments` 后，CLI 插件可以提取这些注释并自动为属性提供描述。现在，上述字段可以简单地声明如下：
@@ -78,6 +81,7 @@ roles: string[];
  * A list of user's roles
  */
 roles: string[];
+
 ```
 
 #### 使用 CLI 插件
@@ -92,6 +96,7 @@ roles: string[];
     "plugins": ["@nestjs/graphql"]
   }
 }
+
 ```
 
 您可以使用 `options` 属性自定义插件的行为。
@@ -113,6 +118,7 @@ roles: string[];
   }
 
 }
+
 ```
 
 `options` 属性必须满足以下接口：
@@ -122,6 +128,7 @@ export interface PluginOptions {
   typeFileNameSuffix?: string[];
   introspectComments?: boolean;
 }
+
 ```
 
 <table>
@@ -148,6 +155,7 @@ export interface PluginOptions {
 getCustomTransformers: (program: any) => ({
   before: [require('@nestjs/graphql/plugin').before({}, program)]
 }),
+
 ```
 
 #### SWC 构建器
@@ -156,6 +164,7 @@ getCustomTransformers: (program: any) => ({
 
 ```bash
 $ nest start -b swc --type-check
+
 ```
 
 对于 monorepo 设置，请按照[此处](/recipes/swc#monorepo-and-cli-plugins)的说明操作。
@@ -163,6 +172,7 @@ $ nest start -b swc --type-check
 ```bash
 $ npx ts-node src/generate-metadata.ts
 # 或 npx ts-node apps/{YOUR_APP}/src/generate-metadata.ts
+
 ```
 
 现在，序列化的元数据文件必须由 `GraphQLModule` 方法加载，如下所示：
@@ -174,6 +184,7 @@ GraphQLModule.forRoot<...>({
   ..., // 其他选项
   metadata,
 }),
+
 ```
 
 #### 与 `ts-jest` 集成（e2e 测试）
@@ -182,6 +193,7 @@ GraphQLModule.forRoot<...>({
 
 ```json
 Object type <name> must define one or more fields.
+
 ```
 
 这是因为 `jest` 配置没有在任何地方导入 `@nestjs/graphql/plugin` 插件。
@@ -203,6 +215,7 @@ module.exports.factory = (cs) => {
     cs.program, // 对于旧版本的 Jest (<= v27)，使用 "cs.tsCompiler.program"
   );
 };
+
 ```
 
 有了这些，在您的 `jest` 配置文件中导入 AST 转换器。默认情况下（在入门应用程序中），e2e 测试配置文件位于 `test` 文件夹下，名为 `jest-e2e.json`。
@@ -218,6 +231,7 @@ module.exports.factory = (cs) => {
     }
   }
 }
+
 ```
 
 如果您使用 `jest@^29`，请使用以下代码片段，因为以前的方法已被弃用。
@@ -236,4 +250,5 @@ module.exports.factory = (cs) => {
     ]
   }
 }
+
 ```

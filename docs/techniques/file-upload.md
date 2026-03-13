@@ -12,6 +12,7 @@
 
 ```shell
 $ npm i -D @types/multer
+
 ```
 
 安装此包后，我们现在可以使用 `Express.Multer.File` 类型（你可以按如下方式导入此类型：`import {{ '{' }} Express {{ '}' }} from 'express'`）。
@@ -26,6 +27,7 @@ $ npm i -D @types/multer
 uploadFile(@UploadedFile() file: Express.Multer.File) {
   console.log(file);
 }
+
 ```
 
 > info **提示** `FileInterceptor()` 装饰器从 `@nestjs/platform-express` 包导出。`@UploadedFile()` 装饰器从 `@nestjs/common` 导出。
@@ -52,6 +54,7 @@ export class FileSizeValidationPipe implements PipeTransform {
     return value.size < oneKb;
   }
 }
+
 ```
 
 这可以与 `FileInterceptor` 结合使用，如下所示：
@@ -65,6 +68,7 @@ uploadFileAndValidate(@UploadedFile(
 ) file: Express.Multer.File, ) {
   return file;
 }
+
 ```
 
 Nest 提供了一个内置管道来处理常见用例，并促进/标准化新用例的添加。此管道称为 `ParseFilePipe`，你可以按如下方式使用它：
@@ -87,6 +91,7 @@ uploadFileAndPassValidation(
     file: file.buffer.toString(),
   };
 }
+
 ```
 
 如你所见，需要指定将由 `ParseFilePipe` 执行的文件验证器数组。我们将讨论验证器的接口，但值得一提的是，此管道还有两个额外的**可选**选项：
@@ -120,6 +125,7 @@ export abstract class FileValidator<TValidationOptions = Record<string, any>> {
    */
   abstract buildErrorMessage(file: any): string;
 }
+
 ```
 
 > info **提示** `FileValidator` 接口通过其 `isValid` 函数支持异步验证。为了利用类型安全性，如果你使用 express（默认）作为驱动程序，你还可以将 `file` 参数类型化为 `Express.Multer.File`。
@@ -141,6 +147,7 @@ export abstract class FileValidator<TValidationOptions = Record<string, any>> {
   }),
 )
 file: Express.Multer.File,
+
 ```
 
 > info **提示** 如果验证器数量大幅增加或其选项使文件混乱，你可以在单独的文件中定义此数组，并在此处作为命名常量导入，如 `fileValidators`。
@@ -161,6 +168,7 @@ file: Express.Multer.File,
     }),
 )
 file: Express.Multer.File,
+
 ```
 
 > info **提示** 默认情况下需要文件存在，但你可以通过在 `build` 函数选项中添加 `fileIsRequired: false` 参数（与 `errorHttpStatusCode` 同级）使其成为可选。
@@ -181,6 +189,7 @@ file: Express.Multer.File,
 uploadFile(@UploadedFiles() files: Array<Express.Multer.File>) {
   console.log(files);
 }
+
 ```
 
 > info **提示** `FilesInterceptor()` 装饰器从 `@nestjs/platform-express` 包导出。`@UploadedFiles()` 装饰器从 `@nestjs/common` 导出。
@@ -203,6 +212,7 @@ uploadFile(@UploadedFiles() files: Array<Express.Multer.File>) {
 uploadFile(@UploadedFiles() files: { avatar?: Express.Multer.File[], background?: Express.Multer.File[] }) {
   console.log(files);
 }
+
 ```
 
 #### 任意文件
@@ -217,6 +227,7 @@ uploadFile(@UploadedFiles() files: { avatar?: Express.Multer.File[], background?
 uploadFile(@UploadedFiles() files: Array<Express.Multer.File>) {
   console.log(files);
 }
+
 ```
 
 #### 无文件
@@ -229,6 +240,7 @@ uploadFile(@UploadedFiles() files: Array<Express.Multer.File>) {
 handleMultiPartData(@Body() body) {
   console.log(body)
 }
+
 ```
 
 #### 默认选项
@@ -239,6 +251,7 @@ handleMultiPartData(@Body() body) {
 MulterModule.register({
   dest: './upload',
 });
+
 ```
 
 > info **提示** `MulterModule` 类从 `@nestjs/platform-express` 包导出。
@@ -255,6 +268,7 @@ MulterModule.registerAsync({
     dest: './upload',
   }),
 });
+
 ```
 
 与其他[工厂提供者](https://docs.nestjs.com/fundamentals/custom-providers#factory-providers-usefactory)一样，我们的工厂函数可以是 `async`，并且可以通过 `inject` 注入依赖项。
@@ -267,6 +281,7 @@ MulterModule.registerAsync({
   }),
   inject: [ConfigService],
 });
+
 ```
 
 或者，你可以使用类而不是工厂来配置 `MulterModule`，如下所示：
@@ -275,6 +290,7 @@ MulterModule.registerAsync({
 MulterModule.registerAsync({
   useClass: MulterConfigService,
 });
+
 ```
 
 上面的构造在 `MulterModule` 内部实例化 `MulterConfigService`，使用它创建所需的选项对象。请注意，在此示例中，`MulterConfigService` 必须实现 `MulterOptionsFactory` 接口，如下所示。`MulterModule` 将在提供的类的实例化对象上调用 `createMulterOptions()` 方法。
@@ -288,6 +304,7 @@ class MulterConfigService implements MulterOptionsFactory {
     };
   }
 }
+
 ```
 
 如果你想重用现有的选项提供者，而不是在 `MulterModule` 内部创建私有副本，请使用 `useExisting` 语法。
@@ -297,6 +314,7 @@ MulterModule.registerAsync({
   imports: [ConfigModule],
   useExisting: ConfigService,
 });
+
 ```
 
 你还可以将所谓的 `extraProviders` 传递给 `registerAsync()` 方法。这些提供者将与模块提供者合并。
@@ -307,6 +325,7 @@ MulterModule.registerAsync({
   useClass: ConfigService,
   extraProviders: [MyAdditionalProvider],
 });
+
 ```
 
 当你想向工厂函数或类构造函数提供额外的依赖项时，这很有用。

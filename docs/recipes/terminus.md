@@ -14,6 +14,7 @@ Terminus 集成为你提供**就绪/存活**健康检查。在复杂的后端设
 
 ```bash
 $ npm install --save @nestjs/terminus
+
 ```
 
 #### 设置健康检查
@@ -43,12 +44,14 @@ import { TerminusModule } from '@nestjs/terminus';
   imports: [TerminusModule]
 })
 export class HealthModule {}
+
 ```
 
 我们的健康检查可以使用[控制器](/controllers)执行，可以使用 [Nest CLI](cli/overview) 轻松设置。
 
 ```bash
 $ nest g controller health
+
 ```
 
 > info **信息** 强烈建议在你的应用程序中启用关闭钩子。如果启用，Terminus 集成会利用此生命周期事件。在[这里](fundamentals/lifecycle-events#application-shutdown)阅读有关关闭钩子的更多信息。
@@ -61,6 +64,7 @@ $ nest g controller health
 
 ```bash
 $ npm i --save @nestjs/axios axios
+
 ```
 
 现在我们可以设置我们的 `HealthController`：
@@ -84,6 +88,7 @@ export class HealthController {
     ]);
   }
 }
+
 ```
 
 ```typescript
@@ -97,6 +102,7 @@ import { HealthController } from './health.controller';
   controllers: [HealthController],
 })
 export class HealthModule {}
+
 ```
 
 我们的健康检查现在将向 `https://docs.nestjs.com` 地址发送 _GET_ 请求。如果我们从该地址收到健康响应，我们在 `http://localhost:3000/health` 的路由将返回以下对象，状态代码为 200。
@@ -116,6 +122,7 @@ export class HealthModule {}
     }
   }
 }
+
 ```
 
 可以使用 `HealthCheckResult` 接口从 `@nestjs/terminus` 包访问此响应对象的接口。
@@ -148,6 +155,7 @@ check() {
       ),
   ]);
 }
+
 ```
 
 #### TypeOrm 健康指标
@@ -172,6 +180,7 @@ export class HealthController {
     ]);
   }
 }
+
 ```
 
 如果你的数据库可访问，你现在应该在使用 `GET` 请求请求 `http://localhost:3000/health` 时看到以下 JSON 结果：
@@ -191,6 +200,7 @@ export class HealthController {
     }
   }
 }
+
 ```
 
 如果你的应用程序使用[多个数据库](techniques/database#multiple-databases)，你需要将每个连接注入到你的 `HealthController` 中。然后，你可以简单地将连接引用传递给 `TypeOrmHealthIndicator`。
@@ -216,6 +226,7 @@ export class HealthController {
     ]);
   }
 }
+
 ```
 
 #### 磁盘健康指标
@@ -238,6 +249,7 @@ export class HealthController {
     ]);
   }
 }
+
 ```
 
 使用 `DiskHealthIndicator.checkStorage` 函数，你还可以检查固定数量的空间。如果路径 `/my-app/` 超过 250GB，以下示例将不健康。
@@ -252,6 +264,7 @@ check() {
     () => this.disk.checkStorage('storage', {  path: '/', threshold: 250 * 1024 * 1024 * 1024, })
   ]);
 }
+
 ```
 
 #### 内存健康指标
@@ -278,6 +291,7 @@ export class HealthController {
     ]);
   }
 }
+
 ```
 
 还可以使用 `MemoryHealthIndicator.checkRSS` 验证进程的内存 RSS。如果你的进程确实分配了超过 150MB，此示例将返回不健康的响应代码。
@@ -294,6 +308,7 @@ check() {
     () => this.memory.checkRSS('memory_rss', 150 * 1024 * 1024),
   ]);
 }
+
 ```
 
 #### 自定义健康指标
@@ -334,6 +349,7 @@ export class DogHealthIndicator {
     return indicator.up();
   }
 }
+
 ```
 
 接下来我们需要做的是将健康指标注册为提供者。
@@ -349,6 +365,7 @@ import { DogHealthIndicator } from './dog.health';
   providers: [DogHealthIndicator]
 })
 export class HealthModule { }
+
 ```
 
 > info **提示** 在实际应用程序中，`DogHealthIndicator` 应该在单独的模块中提供，例如 `DogModule`，然后由 `HealthModule` 导入。
@@ -375,6 +392,7 @@ export class HealthController {
     ])
   }
 }
+
 ```
 
 #### 日志记录
@@ -401,6 +419,7 @@ export class TerminusLogger extends ConsoleLogger {
     // 在这里覆盖错误消息应如何记录
   }
 }
+
 ```
 
 创建自定义日志记录器后，你需要做的就是将其传递给 `TerminusModule.forRoot()`。
@@ -414,6 +433,7 @@ imports: [
 ],
 })
 export class HealthModule {}
+
 ```
 
 要完全禁止来自 Terminus 的任何日志消息，包括错误消息，请按如下方式配置 Terminus。
@@ -427,6 +447,7 @@ imports: [
 ],
 })
 export class HealthModule {}
+
 ```
 
 Terminus 允许你配置健康检查错误应如何在日志中显示。
@@ -447,6 +468,7 @@ Terminus 允许你配置健康检查错误应如何在日志中显示。
   ]
 })
 export class HealthModule {}
+
 ```
 
 #### 优雅关闭超时
@@ -462,6 +484,7 @@ export class HealthModule {}
   ]
 })
 export class HealthModule {}
+
 ```
 
 #### 更多示例

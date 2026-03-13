@@ -24,12 +24,14 @@ Nest 库是一个 Nest 项目，与应用程序的不同之处在于它不能独
 
 ```bash
 $ nest g library my-library
+
 ```
 
 运行命令时，`library` 原理会提示你输入库的前缀（也称为别名）：
 
 ```bash
 What prefix would you like to use for the library (default: @app)?
+
 ```
 
 这将在你的工作区中创建一个名为 `my-library` 的新项目。
@@ -68,6 +70,7 @@ What prefix would you like to use for the library (default: @app)?
       }
 }
 ...
+
 ```
 
 库和应用程序在 `nest-cli.json` 元数据中有两个区别：
@@ -83,6 +86,7 @@ What prefix would you like to use for the library (default: @app)?
 
 ```bash
 $ nest build my-library
+
 ```
 
 #### 使用库
@@ -103,6 +107,7 @@ import { MyLibraryModule } from '@app/my-library';
   providers: [AppService],
 })
 export class AppModule {}
+
 ```
 
 注意上面我们在 ES 模块 `import` 行中使用了 `@app` 路径别名，这是我们在上面的 `nest g library` 命令中提供的 `prefix`。在底层，Nest 通过 tsconfig 路径映射处理此问题。添加库时，Nest 会更新全局（monorepo）`tsconfig.json` 文件的 `"paths"` 键，如下所示：
@@ -116,6 +121,7 @@ export class AppModule {}
         "libs/my-library/src/*"
     ]
 }
+
 ```
 
 简而言之，monorepo 和库功能的结合使得将库模块包含到应用程序中变得简单直观。

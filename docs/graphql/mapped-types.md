@@ -24,6 +24,7 @@ class CreateUserInput {
   @Field()
   firstName: string;
 }
+
 ```
 
 默认情况下，所有这些字段都是必需的。要创建一个具有相同字段但每个字段都是可选的类型，请使用 `PartialType()` 传递类引用（`CreateUserInput`）作为参数：
@@ -31,6 +32,7 @@ class CreateUserInput {
 ```typescript
 @InputType()
 export class UpdateUserInput extends PartialType(CreateUserInput) {}
+
 ```
 
 > info **提示** `PartialType()` 函数是从 `@nestjs/graphql` 包导入的。
@@ -40,6 +42,7 @@ export class UpdateUserInput extends PartialType(CreateUserInput) {}
 ```typescript
 @InputType()
 export class UpdateUserInput extends PartialType(User, InputType) {}
+
 ```
 
 #### Pick
@@ -58,6 +61,7 @@ class CreateUserInput {
   @Field()
   firstName: string;
 }
+
 ```
 
 我们可以使用 `PickType()` 实用函数从此类中选择一组属性：
@@ -67,6 +71,7 @@ class CreateUserInput {
 export class UpdateEmailInput extends PickType(CreateUserInput, [
   'email',
 ] as const) {}
+
 ```
 
 > info **提示** `PickType()` 函数是从 `@nestjs/graphql` 包导入的。
@@ -87,6 +92,7 @@ class CreateUserInput {
   @Field()
   firstName: string;
 }
+
 ```
 
 我们可以生成一个派生类型，该类型具有**除** `email` 之外的每个属性，如下所示。在此构造中，`OmitType` 的第二个参数是属性名称数组。
@@ -96,6 +102,7 @@ class CreateUserInput {
 export class UpdateUserInput extends OmitType(CreateUserInput, [
   'email',
 ] as const) {}
+
 ```
 
 > info **提示** `OmitType()` 函数是从 `@nestjs/graphql` 包导入的。
@@ -122,6 +129,7 @@ export class AdditionalUserInfo {
   @Field()
   lastName: string;
 }
+
 ```
 
 我们可以生成一个组合两种类型中所有属性的新类型。
@@ -132,6 +140,7 @@ export class UpdateUserInput extends IntersectionType(
   CreateUserInput,
   AdditionalUserInfo,
 ) {}
+
 ```
 
 > info **提示** `IntersectionType()` 函数是从 `@nestjs/graphql` 包导入的。
@@ -145,4 +154,5 @@ export class UpdateUserInput extends IntersectionType(
 export class UpdateUserInput extends PartialType(
   OmitType(CreateUserInput, ['email'] as const),
 ) {}
+
 ```

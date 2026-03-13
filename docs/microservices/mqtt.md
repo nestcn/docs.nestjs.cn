@@ -8,6 +8,7 @@
 
 ```bash
 $ npm i --save mqtt
+
 ```
 
 #### 概述
@@ -21,6 +22,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
     url: 'mqtt://localhost:1883',
   },
 });
+
 ```
 
 > info **提示** `Transport` 枚举是从 `@nestjs/microservices` 包导入的。
@@ -50,6 +52,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
   ]
   ...
 })
+
 ```
 
 创建客户端的其他选项（`ClientProxyFactory` 或 `@Client()`）也可以使用。您可以在<a href="https://docs.nestjs.com/microservices/basics#client">这里</a>阅读有关它们的信息。
@@ -63,6 +66,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 getNotifications(@Payload() data: number[], @Ctx() context: MqttContext) {
   console.log(`Topic: ${context.getTopic()}`);
 }
+
 ```
 
 > info **提示** `@Payload()`、`@Ctx()` 和 `MqttContext` 是从 `@nestjs/microservices` 包导入的。
@@ -74,6 +78,7 @@ getNotifications(@Payload() data: number[], @Ctx() context: MqttContext) {
 getNotifications(@Payload() data: number[], @Ctx() context: MqttContext) {
   console.log(context.getPacket());
 }
+
 ```
 
 #### 通配符
@@ -85,6 +90,7 @@ getNotifications(@Payload() data: number[], @Ctx() context: MqttContext) {
 getTemperature(@Ctx() context: MqttContext) {
   console.log(`Topic: ${context.getTopic()}`);
 }
+
 ```
 
 #### 服务质量 (QoS)
@@ -101,6 +107,7 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
     },
   },
 });
+
 ```
 
 #### 每模式 QoS
@@ -117,6 +124,7 @@ handleCriticalEvent(@Payload() data: any) {
 handleMetrics(@Payload() data: any) {
   // 此订阅使用 QoS 0
 }
+
 ```
 
 > info **提示** 每模式 QoS 配置不影响现有行为。当未指定 `extras.qos` 时，订阅使用全局 `subscribeOptions.qos` 值。
@@ -132,6 +140,7 @@ const record = new MqttRecordBuilder(':cat:')
   .setQoS(1)
   .build();
 client.send('replace-emoji', record).subscribe(...);
+
 ```
 
 > info **提示** `MqttRecordBuilder` 类是从 `@nestjs/microservices` 包导出的。
@@ -144,6 +153,7 @@ replaceEmoji(@Payload() data: string, @Ctx() context: MqttContext): string {
   const { properties: { userProperties } } = context.getPacket();
   return userProperties['x-version'] === '1.0.0' ? '🐱' : '🐈';
 }
+
 ```
 
 在某些情况下，您可能希望为多个请求配置用户属性，您可以将这些选项传递给 `ClientProxyFactory`。
@@ -168,6 +178,7 @@ import { ClientProxyFactory, Transport } from '@nestjs/microservices';
   ],
 })
 export class ApiModule {}
+
 ```
 
 #### 实例状态更新
@@ -178,6 +189,7 @@ export class ApiModule {}
 this.client.status.subscribe((status: MqttStatus) => {
   console.log(status);
 });
+
 ```
 
 > info **提示** `MqttStatus` 类型是从 `@nestjs/microservices` 包导入的。
@@ -189,6 +201,7 @@ const server = app.connectMicroservice<MicroserviceOptions>(...);
 server.status.subscribe((status: MqttStatus) => {
   console.log(status);
 });
+
 ```
 
 #### 监听 MQTT 事件
@@ -199,6 +212,7 @@ server.status.subscribe((status: MqttStatus) => {
 this.client.on('error', (err) => {
   console.error(err);
 });
+
 ```
 
 同样，您可以监听服务器的内部事件：
@@ -207,6 +221,7 @@ this.client.on('error', (err) => {
 server.on<MqttEvents>('error', (err) => {
   console.error(err);
 });
+
 ```
 
 > info **提示** `MqttEvents` 类型是从 `@nestjs/microservices` 包导入的。
@@ -219,10 +234,12 @@ server.on<MqttEvents>('error', (err) => {
 
 ```typescript
 const mqttClient = this.client.unwrap<import('mqtt').MqttClient>();
+
 ```
 
 同样，您可以访问服务器的底层驱动程序实例：
 
 ```typescript
 const mqttClient = server.unwrap<import('mqtt').MqttClient>();
+
 ```

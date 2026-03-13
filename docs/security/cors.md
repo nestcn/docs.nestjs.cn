@@ -14,6 +14,7 @@
 const app = await NestFactory.create(AppModule);
 app.enableCors();
 await app.listen(process.env.PORT ?? 3000);
+
 ```
 
 `enableCors()` 方法接受一个可选的配置对象参数。此对象的可用属性在官方 [CORS](https://github.com/expressjs/cors#configuration-options) 文档中描述。另一种方法是传递一个[回调函数](https://github.com/expressjs/cors#configuring-cors-asynchronously)，让你可以根据请求（即时）异步定义配置对象。
@@ -23,4 +24,5 @@ await app.listen(process.env.PORT ?? 3000);
 ```typescript
 const app = await NestFactory.create(AppModule, { cors: true });
 await app.listen(process.env.PORT ?? 3000);
+
 ```

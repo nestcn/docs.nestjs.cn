@@ -34,7 +34,7 @@ $ npm install --save @nestjs/terminus
 
 要开始我们的第一个健康检查，让我们创建 `HealthModule` 并在其导入数组中导入 `TerminusModule`。
 
-> info **提示** 要使用 [Nest CLI](cli/overview) 创建模块，只需执行 `$ nest g module health` 命令。
+> info **提示** 要使用 [Nest CLI](/cli/overview) 创建模块，只需执行 `$ nest g module health` 命令。
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -47,14 +47,14 @@ export class HealthModule {}
 
 ```
 
-我们的健康检查可以使用[控制器](/controllers)执行，可以使用 [Nest CLI](cli/overview) 轻松设置。
+我们的健康检查可以使用[控制器](/controllers)执行，可以使用 [Nest CLI](/cli/overview) 轻松设置。
 
 ```bash
 $ nest g controller health
 
 ```
 
-> info **信息** 强烈建议在你的应用程序中启用关闭钩子。如果启用，Terminus 集成会利用此生命周期事件。在[这里](fundamentals/lifecycle-events#application-shutdown)阅读有关关闭钩子的更多信息。
+> info **信息** 强烈建议在你的应用程序中启用关闭钩子。如果启用，Terminus 集成会利用此生命周期事件。在[这里](/fundamentals/lifecycle-events#application-shutdown)阅读有关关闭钩子的更多信息。
 
 #### HTTP 健康检查
 
@@ -203,7 +203,7 @@ export class HealthController {
 
 ```
 
-如果你的应用程序使用[多个数据库](techniques/database#multiple-databases)，你需要将每个连接注入到你的 `HealthController` 中。然后，你可以简单地将连接引用传递给 `TypeOrmHealthIndicator`。
+如果你的应用程序使用[多个数据库](/techniques/database#multiple-databases)，你需要将每个连接注入到你的 `HealthController` 中。然后，你可以简单地将连接引用传递给 `TypeOrmHealthIndicator`。
 
 ```typescript
 @Controller('health')

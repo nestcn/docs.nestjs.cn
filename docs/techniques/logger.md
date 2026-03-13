@@ -243,7 +243,7 @@ await app.listen(process.env.PORT ?? 3000);
 
 ```
 
-这种技术虽然简单，但不利用 `MyLogger` 类的依赖注入。这可能会带来一些挑战，特别是对于测试，并限制 `MyLogger` 的可重用性。有关更好的解决方案，请参见下面的 <a href="techniques/logger#依赖注入">依赖注入</a> 部分。
+这种技术虽然简单，但不利用 `MyLogger` 类的依赖注入。这可能会带来一些挑战，特别是对于测试，并限制 `MyLogger` 的可重用性。有关更好的解决方案，请参见下面的 <a href="/techniques/logger#依赖注入">依赖注入</a> 部分。
 
 #### 扩展内置日志记录器
 
@@ -261,9 +261,9 @@ export class MyLogger extends ConsoleLogger {
 
 ```
 
-您可以在功能模块中使用这样的扩展日志记录器，如下面的 <a href="techniques/logger#将记录器用于应用程序日志记录">将记录器用于应用程序日志记录</a> 部分所述。
+您可以在功能模块中使用这样的扩展日志记录器，如下面的 <a href="/techniques/logger#将记录器用于应用程序日志记录">将记录器用于应用程序日志记录</a> 部分所述。
 
-您可以通过应用程序选项对象的 `logger` 属性传递其实例（如上面的 <a href="techniques/logger#自定义实现">自定义实现</a> 部分所示），或使用下面的 <a href="techniques/logger#依赖注入">依赖注入</a> 部分所示的技术，告诉 Nest 使用您的扩展日志记录器进行系统日志记录。如果这样做，您应该注意调用 `super`，如上面的示例代码所示，将特定的日志方法调用委托给父（内置）类，以便 Nest 可以依赖它期望的内置功能。
+您可以通过应用程序选项对象的 `logger` 属性传递其实例（如上面的 <a href="/techniques/logger#自定义实现">自定义实现</a> 部分所示），或使用下面的 <a href="/techniques/logger#依赖注入">依赖注入</a> 部分所示的技术，告诉 Nest 使用您的扩展日志记录器进行系统日志记录。如果这样做，您应该注意调用 `super`，如上面的示例代码所示，将特定的日志方法调用委托给父（内置）类，以便 Nest 可以依赖它期望的内置功能。
 
 <app-banner-courses></app-banner-courses>
 
@@ -305,7 +305,7 @@ await app.listen(process.env.PORT ?? 3000);
 
 在这里，我们使用 `NestApplication` 实例上的 `get()` 方法来检索 `MyLogger` 对象的单例实例。这种技术本质上是一种为 Nest 使用的日志记录器实例"注入"的方法。`app.get()` 调用检索 `MyLogger` 的单例实例，并依赖于该实例首先在另一个模块中注入，如上所述。
 
-您还可以在功能类中注入此 `MyLogger` 提供者，从而确保 Nest 系统日志记录和应用程序日志记录之间的一致日志记录行为。有关更多信息，请参见下面的 <a href="techniques/logger#将记录器用于应用程序日志记录">将记录器用于应用程序日志记录</a> 和 <a href="techniques/logger#注入自定义日志记录器">注入自定义日志记录器</a>。
+您还可以在功能类中注入此 `MyLogger` 提供者，从而确保 Nest 系统日志记录和应用程序日志记录之间的一致日志记录行为。有关更多信息，请参见下面的 <a href="/techniques/logger#将记录器用于应用程序日志记录">将记录器用于应用程序日志记录</a> 和 <a href="/techniques/logger#注入自定义日志记录器">注入自定义日志记录器</a>。
 
 #### 注入自定义日志记录器
 

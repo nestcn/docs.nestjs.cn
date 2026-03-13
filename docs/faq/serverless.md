@@ -128,7 +128,7 @@ module.exports = (options, webpack) => {
 
 到目前为止，我们涵盖了编译时优化。这些与您定义提供者和在应用程序中加载 Nest 模块的方式无关，而随着应用程序变大，这起着重要作用。
 
-例如，假设有一个数据库连接定义为[异步提供者](/fundamentals/async-providers)。异步提供者旨在延迟应用程序启动，直到完成一个或多个异步任务。
+例如，假设有一个数据库连接定义为[异步提供者](/fundamentals/async-components)。异步提供者旨在延迟应用程序启动，直到完成一个或多个异步任务。
 这意味着，如果您的 serverless 函数平均需要 2 秒连接数据库（在引导时），您的端点将需要至少额外两秒（因为它必须等待连接建立）才能发回响应（当它是冷启动且您的应用程序尚未运行时）。
 
 如您所见，在引导时间很重要的 **serverless 环境**中，您构建提供者的方式有些不同。
@@ -243,7 +243,7 @@ export const handler: Handler = async (
 
 ```
 
-> info **提示** 要创建多个 serverless 函数并在它们之间共享公共模块，我们建议使用 [CLI Monorepo 模式](/cli/monorepo#monorepo-mode)。
+> info **提示** 要创建多个 serverless 函数并在它们之间共享公共模块，我们建议使用 [CLI Monorepo 模式](/cli/workspaces#monorepo-模式)。
 
 > warning **警告** 如果您使用 `@nestjs/swagger` 包，在 serverless 函数上下文中使其正常工作需要一些额外的步骤。查看此[线程](https://github.com/nestjs/swagger/issues/199)了解更多信息。
 

@@ -309,7 +309,7 @@ await app.listen(process.env.PORT ?? 3000);
 
 #### 注入自定义日志记录器
 
-首先，使用如下代码扩展内置日志记录器。我们提供 `scope` 选项作为 `ConsoleLogger` 类的配置元数据，指定一个 [瞬态](/fundamentals/injection-scopes) 作用域，以确保我们在每个功能模块中都有 `MyLogger` 的唯一实例。在这个例子中，我们没有扩展各个 `ConsoleLogger` 方法（如 `log()`、`warn()` 等），尽管您可以选择这样做。
+首先，使用如下代码扩展内置日志记录器。我们提供 `scope` 选项作为 `ConsoleLogger` 类的配置元数据，指定一个 [瞬态](/fundamentals/provider-scopes) 作用域，以确保我们在每个功能模块中都有 `MyLogger` 的唯一实例。在这个例子中，我们没有扩展各个 `ConsoleLogger` 方法（如 `log()`、`warn()` 等），尽管您可以选择这样做。
 
 ```typescript
 import { Injectable, Scope, ConsoleLogger } from '@nestjs/common';

@@ -203,7 +203,7 @@ export class HealthController {
 
 ```
 
-如果你的应用程序使用[多个数据库](/techniques/database#multiple-databases)，你需要将每个连接注入到你的 `HealthController` 中。然后，你可以简单地将连接引用传递给 `TypeOrmHealthIndicator`。
+如果你的应用程序使用[多个数据库](/techniques/sql#多个数据库)，你需要将每个连接注入到你的 `HealthController` 中。然后，你可以简单地将连接引用传递给 `TypeOrmHealthIndicator`。
 
 ```typescript
 @Controller('health')

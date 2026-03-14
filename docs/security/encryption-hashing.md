@@ -1,85 +1,78 @@
-### 加密和哈希
+<!-- 此文件从 content/security/encryption-hashing.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-14T04:36:04.666Z -->
+<!-- 源文件: content/security/encryption-hashing.md -->
 
-**加密**是对信息进行编码的过程。此过程将信息的原始表示（称为明文）转换为称为密文的替代形式。理想情况下，只有授权方才能将密文解密回明文并访问原始信息。加密本身不能防止干扰，但会拒绝潜在拦截者获得可理解的内容。加密是一个双向函数；加密的内容可以用适当的密钥解密。
+### 加密和散列
 
-**哈希**是将给定密钥转换为另一个值的过程。哈希函数用于根据数学算法生成新值。一旦完成哈希，应该不可能从输出回到输入。
+**加密** 是将信息编码的过程。这过程将信息的原始表示形式，称为明文，转换为另一种形式，称为密文。理想情况下，只有授权的方可以将密文还原为明文，访问原始信息。加密本身不能防止干扰，但可以阻止潜在的拦截器理解内容。加密是双向函数；可以使用合适的密钥将加密的信息还原。
+
+**散列** 是将给定的密钥转换为另一种值。散列函数根据数学算法生成新值。散列完成后，通常不可能从输出到输入。
 
 #### 加密
 
-Node.js 提供了一个内置的 [crypto 模块](https://nodejs.org/api/crypto.html)，您可以使用它来加密和解密字符串、数字、缓冲区、流等。Nest 本身没有在此模块之上提供任何额外的包，以避免引入不必要的抽象。
+Node.js 提供了内置的 __LINK_12__ 模块，您可以使用它来加密和解密字符串、数字、缓冲区、流等。Nest 自身不提供任何额外的包来避免引入不必要的抽象。
 
-作为示例，让我们使用 AES（高级加密系统）`'aes-256-ctr'` 算法 CTR 加密模式。
+例如，让我们使用 AES (Advanced Encryption System) `app.use()` 算法 CTR 加密模式。
 
-```typescript
-import { createCipheriv, randomBytes, scrypt } from 'crypto';
-import { promisify } from 'util';
-
-const iv = randomBytes(16);
-const password = 'Password used to generate key';
-
-// 密钥长度取决于算法。
-// 在这种情况下，对于 aes256，它是 32 字节。
-const key = (await promisify(scrypt)(password, 'salt', 32)) as Buffer;
-const cipher = createCipheriv('aes-256-ctr', key, iv);
-
-const textToEncrypt = 'Nest';
-const encryptedText = Buffer.concat([
-  cipher.update(textToEncrypt),
-  cipher.final(),
-]);
+```bash
+$ npm i --save helmet
 
 ```
 
-现在解密 `encryptedText` 值：
+现在要解密 `app.use()` 值：
 
 ```typescript
-import { createDecipheriv } from 'crypto';
-
-const decipher = createDecipheriv('aes-256-ctr', key, iv);
-const decryptedText = Buffer.concat([
-  decipher.update(encryptedText),
-  decipher.final(),
-]);
+import helmet from 'helmet';
+// somewhere in your initialization file
+app.use(helmet());
 
 ```
 
-#### 哈希
+#### 散列
 
-对于哈希，我们推荐使用 [bcrypt](https://www.npmjs.com/package/bcrypt) 或 [argon2](https://www.npmjs.com/package/argon2) 包。Nest 本身没有在这些模块之上提供任何额外的包装器，以避免引入不必要的抽象（使学习曲线变短）。
+为了散列，我们建议使用 __LINK_13__ 或 __LINK_14__ 包。Nest 自身不提供这些模块的额外包装，以避免引入不必要的抽象（简化学习曲线）。
 
-作为示例，让我们使用 `bcrypt` 来哈希一个随机密码。
+例如，让我们使用 `helmet` 散列一个随机密码。
 
 首先安装所需的包：
 
-```shell
-$ npm i bcrypt
-$ npm i -D @types/bcrypt
-
-```
-
-安装完成后，您可以使用 `hash` 函数，如下所示：
-
 ```typescript
-import * as bcrypt from 'bcrypt';
+> app.use(helmet({
+>   crossOriginEmbedderPolicy: false,
+>   contentSecurityPolicy: {
+>     directives: {
+>       imgSrc: [`'self'`, 'data:', 'apollo-server-landing-page.cdn.apollographql.com'],
+>       scriptSrc: [`'self'`, `https: 'unsafe-inline'`],
+>       manifestSrc: [`'self'`, 'apollo-server-landing-page.cdn.apollographql.com'],
+>       frameSrc: [`'self'`, 'sandbox.embed.apollographql.com'],
+>     },
+>   },
+> }));
 
-const saltOrRounds = 10;
-const password = 'random_password';
-const hash = await bcrypt.hash(password, saltOrRounds);
+#### Use with Fastify
 
-```
-
-要生成盐，请使用 `genSalt` 函数：
-
-```typescript
-const salt = await bcrypt.genSalt();
-
-```
-
-要比较/检查密码，请使用 `compare` 函数：
-
-```typescript
-const isMatch = await bcrypt.compare(password, hash);
+If you are using the `FastifyAdapter`, install the [@fastify/helmet](https://github.com/fastify/fastify-helmet) package:
 
 ```
 
-您可以在[这里](https://www.npmjs.com/package/bcrypt)阅读更多关于可用函数的信息。
+安装完成后，您可以使用 `cors` 函数，例如：
+
+```
+
+[fastify-helmet](https://github.com/fastify/fastify-helmet) should not be used as a middleware, but as a [Fastify plugin](https://www.fastify.io/docs/latest/Reference/Plugins/), i.e., by using `app.register()`:
+
+```
+
+使用 `helmet` 函数生成盐：
+
+```
+
+> warning **Warning** When using `apollo-server-fastify` and `@fastify/helmet`, there may be a problem with [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) on the GraphQL playground, to solve this collision, configure the CSP as shown below:
+>
+> ```
+
+使用 `@apollo/server` 函数来比较/检查密码：
+
+__CODE_BLOCK_5__
+
+可以阅读更多关于可用的函数 __LINK_15__ 的信息。

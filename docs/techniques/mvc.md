@@ -1,188 +1,261 @@
-### 模型-视图-控制器
+<!-- 此文件从 content/techniques/mvc.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-14T04:44:53.312Z -->
+<!-- 源文件: content/techniques/mvc.md -->
 
-默认情况下，Nest 底层使用了 [Express](https://github.com/expressjs/express) 库。因此，所有在 Express 中使用 MVC（模型-视图-控制器）模式的技术同样适用于 Nest。
+### Model-View-Controller
 
-首先，我们使用 [CLI](https://github.com/nestjs/nest-cli) 工具搭建一个简单的 Nest 应用：
+Nest 默认使用 __LINK_34__ 库，故所有使用 Express MVC 模式的技术也适用于 Nest。
+
+首先，让我们使用 __LINK_35__ 工具创建一个简单的 Nest 应用程序：
 
 ```bash
-$ npm i -g @nestjs/cli
-$ nest new project
+$ npm install --save @nestjs/typeorm typeorm mysql2
 
 ```
 
-为了创建一个 MVC 应用，我们还需要一个[模板引擎](https://expressjs.com/en/guide/using-template-engines.html)来渲染 HTML 视图：
+为了创建一个 MVC 应用程序，我们还需要一个 __LINK_36__ 来渲染 HTML 视图：
 
-```bash
-$ npm install --save hbs
+```typescript
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+@Module({
+  imports: [
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: 'localhost',
+      port: 3306,
+      username: 'root',
+      password: 'root',
+      database: 'test',
+      entities: [],
+      synchronize: true,
+    }),
+  ],
+})
+export class AppModule {}
 
 ```
 
-我们使用了 `hbs`（[Handlebars](https://github.com/pillarjs/hbs#readme)）模板引擎，当然你也可以根据需求选择其他引擎。安装完成后，需要通过以下代码配置 express 实例：
+我们使用了 __INLINE_CODE_10__ (__LINK_37__) 引擎，但您可以使用适合需求的任何引擎。安装过程完成后，我们需要使用以下代码配置 Express 实例：
 
- ```typescript title="main.ts"
-import { NestFactory } from '@nestjs/core';
-import { NestExpressApplication } from '@nestjs/platform-express';
-import { join } from 'path';
-import { AppModule } from './app.module';
+```typescript
+import { DataSource } from 'typeorm';
 
-async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(
-    AppModule,
-  );
-
-  app.useStaticAssets(join(__dirname, '..', 'public'));
-  app.setBaseViewsDir(join(__dirname, '..', 'views'));
-  app.setViewEngine('hbs');
-
-  await app.listen(process.env.PORT ?? 3000);
+@Module({
+  imports: [TypeOrmModule.forRoot(), UsersModule],
+})
+export class AppModule {
+  constructor(private dataSource: DataSource) {}
 }
-bootstrap();
+
+@Dependencies(DataSource)
+@Module({
+  imports: [TypeOrmModule.forRoot(), UsersModule],
+})
+export class AppModule {
+  constructor(dataSource) {
+    this.dataSource = dataSource;
+  }
+}
 
 ```
 
-我们告诉 [Express](https://github.com/expressjs/express)：`public` 目录将用于存放静态资源，`views` 目录存放模板文件，并使用 `hbs` 模板引擎来渲染 HTML 输出。
+我们告诉 __LINK_38__ 使用 __INLINE_CODE_11__ 目录存储静态资产，__INLINE_CODE_12__ 目录包含模板，使用 __INLINE_CODE_13__ 模板引擎渲染 HTML 输出。
 
 #### 模板渲染
 
-现在让我们创建 `views` 目录并在其中新建 `index.hbs` 模板文件。在模板中，我们将输出从控制器传递过来的 `message` 变量：
+现在，让我们创建一个 __INLINE_CODE_14__ 目录和 __INLINE_CODE_15__ 模板。 在模板中，我们将打印来自控制器的 __INLINE_CODE_16__ :
 
-```html
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>App</title>
-  </head>
-  <body>
-    {{ "{{ message }\}" }}
-  </body>
-</html>
+```typescript
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-```
+@Entity()
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-接下来，打开 `app.controller` 文件，将 `root()` 方法替换为以下代码：
+  @Column()
+  firstName: string;
 
- ```typescript title="app.controller.ts"
-import { Get, Controller, Render } from '@nestjs/common';
+  @Column()
+  lastName: string;
 
-@Controller()
-export class AppController {
-  @Get()
-  @Render('index')
-  root() {
-    return { message: 'Hello world!' };
-  }
+  @Column({ default: true })
+  isActive: boolean;
 }
 
 ```
 
-在这段代码中，我们通过 `@Render()` 装饰器指定要使用的模板，路由处理方法的返回值会被传递给模板进行渲染。注意返回值是一个包含 `message` 属性的对象，与我们模板中创建的 `message` 占位符相匹配。
+然后，打开 __INLINE_CODE_17__ 文件，并将 __INLINE_CODE_18__ 方法替换为以下代码：
 
-当应用运行时，打开浏览器并访问 `http://localhost:3000`，你将看到 `Hello world!` 消息。
+```typescript
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './users/user.entity';
+
+@Module({
+  imports: [
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: 'localhost',
+      port: 3306,
+      username: 'root',
+      password: 'root',
+      database: 'test',
+      entities: [User],
+      synchronize: true,
+    }),
+  ],
+})
+export class AppModule {}
+
+```
+
+在这段代码中，我们指定了使用的模板在 __INLINE_CODE_19__ 装饰器中，并将路由处理方法的返回值传递给模板进行渲染。注意，返回值是一个对象，其中的 __INLINE_CODE_20__ 属性匹配了模板中的 __INLINE_CODE_21__ placeholder。
+
+应用程序正在运行时，打开浏览器，导航到 __INLINE_CODE_22__。您应该看到 __INLINE_CODE_23__ 消息。
 
 #### 动态模板渲染
 
-如果应用逻辑需要动态决定渲染哪个模板，则应使用 `@Res()` 装饰器，并在路由处理器中提供视图名称，而非在 `@Render()` 装饰器中指定：
+如果应用逻辑需要动态决定渲染哪个模板，那么我们应该使用 __INLINE_CODE_24__ 装饰器，并在路由处理方法中提供视图名称，而不是在 __INLINE_CODE_25__ 装饰器中：
 
-:::info 提示
-当 Nest 检测到 `@Res()` 装饰器时，会注入特定库的 `response` 对象。我们可以利用该对象动态渲染模板。了解更多关于 `response` 对象 API 的信息请[点击此处](https://expressjs.com/en/api.html) 。
-:::
+> info **提示** 当 Nest 检测到 __INLINE_CODE_26__ 装饰器时，它将注入库特定的 __INLINE_CODE_27__ 对象。我们可以使用这个对象来动态渲染模板。了解更多关于 __INLINE_CODE_28__ 对象 API 的信息 __LINK_39__。
 
- ```typescript title="app.controller.ts"
-import { Get, Controller, Res } from '@nestjs/common';
-import { Response } from 'express';
-import { AppService } from './app.service';
+```typescript
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersService } from './users.service';
+import { UsersController } from './users.controller';
+import { User } from './user.entity';
 
-@Controller()
-export class AppController {
-  constructor(private appService: AppService) {}
-
-  @Get()
-  root(@Res() res: Response) {
-    return res.render(
-      this.appService.getViewName(),
-      { message: 'Hello world!' },
-    );
-  }
-}
+@Module({
+  imports: [TypeOrmModule.forFeature([User])],
+  providers: [UsersService],
+  controllers: [UsersController],
+})
+export class UsersModule {}
 
 ```
 
 #### 示例
 
-一个可用的示例[在此处](https://github.com/nestjs/nest/tree/master/sample/15-mvc)查看。
+可用的工作示例 __LINK_40__。
 
 #### Fastify
 
-如本[章节](/techniques/performance)所述，我们可以将任何兼容的 HTTP 提供程序与 Nest 配合使用。[Fastify](https://github.com/fastify/fastify) 就是这样一个库。要使用 Fastify 创建 MVC 应用，需要安装以下包：
+如 __LINK_41__ 所述，我们可以使用任何兼容 HTTP 提供商一起使用 Nest。一个这样的库是 __LINK_42__。要创建一个 Fastify MVC 应用程序，我们需要安装以下包：
 
-```bash
-$ npm i --save @fastify/static @fastify/view handlebars
+```typescript
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from './user.entity';
 
-```
+@Injectable()
+export class UsersService {
+  constructor(
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
+  ) {}
 
-接下来的步骤与 Express 几乎相同，仅存在一些平台特有的细微差异。安装过程完成后，打开 `main.ts` 文件并更新其内容：
+  findAll(): Promise<User[]> {
+    return this.usersRepository.find();
+  }
 
- ```typescript title="main.ts"
-import { NestFactory } from '@nestjs/core';
-import { NestFastifyApplication, FastifyAdapter } from '@nestjs/platform-fastify';
-import { AppModule } from './app.module';
-import { join } from 'path';
+  findOne(id: number): Promise<User | null> {
+    return this.usersRepository.findOneBy({ id });
+  }
 
-async function bootstrap() {
-  const app = await NestFactory.create<NestFastifyApplication>(
-    AppModule,
-    new FastifyAdapter(),
-  );
-  app.useStaticAssets({
-    root: join(__dirname, '..', 'public'),
-    prefix: '/public/',
-  });
-  app.setViewEngine({
-    engine: {
-      handlebars: require('handlebars'),
-    },
-    templates: join(__dirname, '..', 'views'),
-  });
-  await app.listen(process.env.PORT ?? 3000);
+  async remove(id: number): Promise<void> {
+    await this.usersRepository.delete(id);
+  }
 }
-bootstrap();
 
-```
+@Injectable()
+@Dependencies(getRepositoryToken(User))
+export class UsersService {
+  constructor(usersRepository) {
+    this.usersRepository = usersRepository;
+  }
 
-Fastify API 存在一些差异，但这些方法调用的最终结果相同。一个显著区别是：使用 Fastify 时，传入 `@Render()` 装饰器的模板名称必须包含文件扩展名。
+  findAll() {
+    return this.usersRepository.find();
+  }
 
-配置方式如下：
+  findOne(id) {
+    return this.usersRepository.findOneBy({ id });
+  }
 
- ```typescript title="app.controller.ts"
-import { Get, Controller, Render } from '@nestjs/common';
-
-@Controller()
-export class AppController {
-  @Get()
-  @Render('index.hbs')
-  root() {
-    return { message: 'Hello world!' };
+  async remove(id) {
+    await this.usersRepository.delete(id);
   }
 }
 
 ```
 
-或者，您也可以使用 `@Res()` 装饰器直接注入响应对象并指定要渲染的视图，如下所示：
+下一步将涵盖与 Expressalmost相同的过程，只是 Fastify 平台有一些小差异。安装过程完成后，打开 __INLINE_CODE_29__ 文件，并更新其内容：
 
- ```typescript title="app.controller.ts"
-import { Res } from '@nestjs/common';
-import { FastifyReply } from 'fastify';
+```typescript
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './user.entity';
 
-@Get()
-root(@Res() res: FastifyReply) {
-  return res.view('index.hbs', { title: 'Hello world!' });
+@Module({
+  imports: [TypeOrmModule.forFeature([User])],
+  exports: [TypeOrmModule]
+})
+export class UsersModule {}
+
+```
+
+Fastify API 有一些差异，但最终结果是相同的。一个值得注意的差异是，使用 Fastify 时，您必须在 __INLINE_CODE_30__ 装饰器中传递模板名称包括文件扩展名。
+
+以下是如何设置：
+
+```typescript
+import { Module } from '@nestjs/common';
+import { UsersModule } from './users.module';
+import { UsersService } from './users.service';
+import { UsersController } from './users.controller';
+
+@Module({
+  imports: [UsersModule],
+  providers: [UsersService],
+  controllers: [UsersController]
+})
+export class UserHttpModule {}
+
+```
+
+或者，您可以使用 __INLINE_CODE_31__ 装饰器直接注入响应，并指定要渲染的视图，如下所示：
+
+```typescript
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Photo } from '../photos/photo.entity';
+
+@Entity()
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  firstName: string;
+
+  @Column()
+  lastName: string;
+
+  @Column({ default: true })
+  isActive: boolean;
+
+  @OneToMany(type => Photo, photo => photo.user)
+  photos: Photo[];
 }
 
 ```
 
-应用程序运行时，请打开浏览器并访问 `http://localhost:3000`，您将看到 `Hello world!` 消息。
+应用程序正在运行时，打开浏览器，导航到 __INLINE_CODE_32__。您应该看到 __INLINE_CODE_33__ 消息。
 
 #### 示例
 
-一个可用的示例[在此处](https://github.com/nestjs/nest/tree/master/sample/17-mvc-fastify)查看。
+可用的工作示例 __LINK_43__。

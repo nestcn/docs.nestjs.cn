@@ -1,314 +1,260 @@
+<!-- 此文件从 content/microservices/custom-transport.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-14T04:55:09.106Z -->
+<!-- 源文件: content/microservices/custom-transport.md -->
+
 ### 自定义传输器
 
-Nest 提供了多种开箱即用的**传输器** ，同时提供了允许开发者构建新自定义传输策略的 API。传输器让你能够通过可插拔的通信层和非常简单的应用级消息协议（阅读完整[文章](https://dev.to/nestjs/integrate-nestjs-with-external-services-using-microservice-transporters-part-1-p3) ）在网络中连接组件。
+Nest 提供了多种自定义传输策略，可以帮助您在网络上连接组件使用可插拔的通信层和简单的应用级消息协议（请阅读完整的 __LINK_79__）。
 
-:::info 注意
-使用 Nest 构建微服务并不一定意味着你必须使用 `@nestjs/microservices` 包。例如，如果你需要与外部服务通信（比如用其他语言编写的微服务），可能并不需要 `@nestjs/microservices` 库提供的所有功能。实际上，如果你不需要通过装饰器（`@EventPattern` 或 `@MessagePattern`）来声明式定义订阅者，运行一个[独立应用](/standalone-applications)并手动维护连接/订阅通道对大多数用例来说已经足够，还能提供更大的灵活性。
-:::
+> 信息 **提示** 建立使用 Nest 的微服务并不一定需要使用 __INLINE_CODE_18__ 包。例如，如果您想与外部服务（例如其他使用不同语言编写的微服务）通信，您可能不需要 `createMicroservice()` 库中的所有功能。
+> 实际上，如果您不需要使用装饰器（`Transport` 或 `@nestjs/microservices`），那么手动维护连接/订阅通道的 __LINK_80__ 就足够了，这将提供更多的灵活性。
 
-通过自定义传输器，您可以集成任何消息系统/协议（包括 Google Cloud Pub/Sub、Amazon Kinesis 等），或在现有基础上扩展功能（例如为 MQTT 添加 [QoS](https://github.com/mqttjs/MQTT.js/blob/master/README.md#qos)）。
+使用自定义传输器，您可以集成任何消息系统/协议（包括 Google Cloud Pub/Sub、Amazon Kinesis 等）或扩展现有的一些功能（例如 __LINK_81__）。
 
-:::info 建议
- 为了更好地理解 Nest 微服务的工作原理以及如何扩展现有传输器的功能，我们推荐阅读 [《NestJS 微服务实战》](https://dev.to/johnbiundo/series/4724) 和 [《NestJS 高级微服务》](https://dev.to/nestjs/part-1-introduction-and-setup-1a2l) 系列文章。
-:::
+> 信息 **提示** 如果您想更好地理解 Nest 微服务的工作原理和如何扩展现有传输器的功能，我们建议阅读 __LINK_82__ 和 __LINK_83__ 文章系列。
 
 #### 创建策略
 
-首先，我们定义一个表示自定义传输器的类。
+首先，让我们定义一个代表自定义传输器的类。
+
+```bash
+$ npm i --save amqplib amqp-connection-manager
+
+```
+
+> 警告 **警告** 请注意，我们将不会在这个章节中实现一个完整的 Google Cloud Pub/Sub 服务器，因为这将需要深入传输器的技术细节。
+
+在我们的示例中，我们声明了 `options` 类，并提供了 `ClientProxy` 和 `ClientsModule` 方法，这些方法是 `ClientsModule` 接口强制实现的。
+此外，我们的类继承自 `register()` 类，从 `createMicroservice()` 包中导入的，该类提供了一些有用的方法，例如 Nest 运行时用于注册消息处理程序的方法。或者，如果您想扩展现有传输策略的功能，可以继承相应的服务器类，例如 `name`。
+ conventionally，我们添加了 `ClientsModule` 后缀到我们的类，因为它将负责订阅消息/事件（如果必要）并回应。
+
+现在，我们可以使用我们的自定义策略，而不是使用内置传输器，例如：
 
 ```typescript
-import { CustomTransportStrategy, Server } from '@nestjs/microservices';
+const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
+  transport: Transport.RMQ,
+  options: {
+    urls: ['amqp://localhost:5672'],
+    queue: 'cats_queue',
+    queueOptions: {
+      durable: false
+    },
+  },
+});
 
-class GoogleCloudPubSubServer
-  extends Server
-  implements CustomTransportStrategy
-{
-  /**
-   * Triggered when you run "app.listen()".
-   */
-  listen(callback: () => void) {
-    callback();
-  }
+```
 
-  /**
-   * Triggered on application shutdown.
-   */
-  close() {}
+基本上，我们将传递一个普通传输器选项对象 `ClientProxyFactory` 和 `@Client()` 属性，而不是传递一个单个属性 `RmqContext`，其值是一个自定义传输器类的实例。
 
-  /**
-   * You can ignore this method if you don't want transporter users
-   * to be able to register event listeners. Most custom implementations
-   * will not need this.
-   */
-  on(event: string, callback: Function) {
-    throw new Error('Method not implemented.');
-  }
+回到我们的 `@Payload()` 类，在实际应用中，我们将建立连接到消息中间件/外部服务，并在 `@Ctx()` 方法中注册订阅人/监听特定通道（然后在 `RmqContext` tear-down 方法中移除订阅和关闭连接），但是这需要对 Nest 微服务之间的通信方式有很好的理解，我们建议阅读 __LINK_84__。
+在这个章节中，我们将集中讨论 `@nestjs/microservices` 类提供的功能和如何使用它们来构建自定义策略。
 
-  /**
-   * You can ignore this method if you don't want transporter users
-   * to be able to retrieve the underlying native server. Most custom implementations
-   * will not need this.
-   */
-  unwrap<T = never>(): T {
-    throw new Error('Method not implemented.');
-  }
+例如，让我们说某个地方在我们的应用程序中定义了以下消息处理程序：
+
+```typescript
+@Module({
+  imports: [
+    ClientsModule.register([
+      {
+        name: 'MATH_SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: ['amqp://localhost:5672'],
+          queue: 'cats_queue',
+          queueOptions: {
+            durable: false
+          },
+        },
+      },
+    ]),
+  ]
+  ...
+})
+
+```
+
+这个消息处理程序将被 Nest 运行时自动注册。使用 `properties` 类，您可以看到已注册的消息模式和访问并执行实际方法。
+
+要测试这个，请在 `content` 方法中添加一个简单的 `fields`：
+
+```typescript
+@MessagePattern('notifications')
+getNotifications(@Payload() data: number[], @Ctx() context: RmqContext) {
+  console.log(`Pattern: ${context.getPattern()}`);
 }
 
 ```
 
-:::warning 注意
- 请注意，本章节不会实现一个功能完整的 Google Cloud Pub/Sub 服务器，因为这需要深入探讨传输器相关的技术细节。
-:::
-
-在上述示例中，我们声明了 `GoogleCloudPubSubServer` 类，并提供了由 `CustomTransportStrategy` 接口强制要求的 `listen()` 和 `close()` 方法。此外，我们的类继承自 `@nestjs/microservices` 包导入的 `Server` 类，该类提供了一些实用方法，例如 Nest 运行时用于注册消息处理器的方法。或者，如果您想扩展现有传输策略的功能，可以继承对应的服务器类，例如 `ServerRedis`。按照惯例，我们为类添加了 `"Server"` 后缀，因为它将负责订阅消息/事件（并在必要时响应它们）。
-
-完成这些设置后，我们现在可以像下面这样使用自定义策略来代替内置传输器：
+当您的应用程序重启时，您将在终端中看到以下日志：
 
 ```typescript
-const app = await NestFactory.createMicroservice<MicroserviceOptions>(
-  AppModule,
-  {
-    strategy: new GoogleCloudPubSubServer(),
-  }
-);
-
-```
-
-本质上，我们不再传递包含 `transport` 和 `options` 属性的常规传输器选项对象，而是传递一个单独的 `strategy` 属性，其值是我们自定义传输器类的实例。
-
-回到我们的 `GoogleCloudPubSubServer` 类，在实际应用中，我们会在 `listen()` 方法中建立与消息代理/外部服务的连接并注册订阅者/监听特定通道（然后在 `close()` 拆卸方法中移除订阅并关闭连接）。但由于这需要深入理解 Nest 微服务间的通信机制，我们建议阅读这篇[系列文章](https://dev.to/nestjs/part-1-introduction-and-setup-1a2l) 。本章将重点介绍 `Server` 类提供的功能，以及如何利用它们构建自定义策略。
-
-例如，假设我们应用的某处定义了以下消息处理程序：
-
-```typescript
-@MessagePattern('echo')
-echo(@Payload() data: object) {
-  return data;
+@MessagePattern('notifications')
+getNotifications(@Payload() data: number[], @Ctx() context: RmqContext) {
+  console.log(context.getMessage());
 }
 
 ```
 
-该消息处理器将由 Nest 运行时自动注册。通过 `Server` 类，您可以查看已注册的消息模式，并访问和执行分配给它们的实际方法。为了测试这一点，让我们在 `listen()` 方法中的 `callback` 函数被调用前添加一个简单的 `console.log`：
+> 信息 **提示** 如果我们使用了 `RmqContext` 装饰器，您将看到同样的输出，但是 `getChannelRef` 属性将设置为 `RmqContext`。
+
+如您所见，`noAck` 属性是一个 `false` 集合，其中模式作为键使用。
+现在，您可以使用一个键（例如 `RmqRecordBuilder`）来接收消息处理程序的引用：
 
 ```typescript
-listen(callback: () => void) {
-  console.log(this.messageHandlers);
-  callback();
+@MessagePattern('notifications')
+getNotifications(@Payload() data: number[], @Ctx() context: RmqContext) {
+  console.log(context.getChannelRef());
 }
 
 ```
 
-当应用重启后，您将在终端看到以下日志：
+一旦我们执行 `headers`，并将一个任意字符串作为参数传递（`priority` 在这里），我们应该在控制台中看到它：
 
 ```typescript
-Map { 'echo' => [AsyncFunction] { isEventHandler: false } }
+options: {
+  urls: ['amqp://localhost:5672'],
+  queue: 'cats_queue',
+  noAck: false,
+  queueOptions: {
+    durable: false
+  },
+},
 
 ```
 
-:::info 提示
-如果我们使用 `@EventPattern` 装饰器，您会看到相同的输出，但 `isEventHandler` 属性会被设置为 `true`。
-:::
+这意味着我们的方法处理程序被正确执行。
 
-如您所见，`messageHandlers` 属性是一个包含所有消息（和事件）处理器的 `Map` 集合，其中模式被用作键。现在，您可以使用键（例如 `"echo"`）来获取消息处理器的引用：
+使用 `setOptions` with __LINK_85__，handlers 将被包装成 RxJS 流。因此，您需要订阅它们以执行流的底层逻辑（例如，在拦截器执行后继续执行控制器逻辑）。
 
-```typescript
-async listen(callback: () => void) {
-  const echoHandler = this.messageHandlers.get('echo');
-  console.log(await echoHandler('Hello world!'));
-  callback();
-}
+一个示例可以在以下处看到：
 
-```
-
-当我们执行传递任意字符串作为参数的 `echoHandler`（此处为 `"Hello world!"`）时，应该在控制台中看到它：
-
-```json
-Hello world!
-
-```
-
-这意味着我们的方法处理程序已正确执行。
-
-当使用带有[拦截器](/overview/interceptors)的 `CustomTransportStrategy` 时，处理程序会被包装成 RxJS 流。这意味着你需要订阅它们才能执行流的底层逻辑（例如在拦截器执行后继续进入控制器逻辑）。
-
-下面可以看到一个示例：
-
-```typescript
-async listen(callback: () => void) {
-  const echoHandler = this.messageHandlers.get('echo');
-  const streamOrResult = await echoHandler('Hello World');
-  if (isObservable(streamOrResult)) {
-    streamOrResult.subscribe();
-  }
-  callback();
-}
-
-```
+(To be continued)Here is the translation of the provided English technical documentation to Chinese:
 
 #### 客户端代理
 
-正如我们在第一节中提到的，您不一定需要使用 `@nestjs/microservices` 包来创建微服务，但如果决定这样做且需要集成自定义策略，您还需要提供一个"客户端"类。
+正如我们在第一部分中所提到的，你不一定需要使用 `RmqRecordBuilder` 包来创建微服务，但如果你决定这样做并需要集成自定义策略，你需要提供一个“客户”类。
 
-:::info 提示
-再次说明，要实现一个与所有 `@nestjs/microservices` 功能（例如流式传输）兼容的全功能客户端类，需要深入理解框架使用的通信技术。了解更多信息，请查看这篇[文章](https://dev.to/nestjs/part-4-basic-client-component-16f9) 。
-:::
+> 信息 **提示** 再次，实现完全兼容 `@nestjs/microservices` 功能的客户类（例如，流式传输）需要对框架通信技术有很好的理解。要了解更多，请查看这个 __LINK_86__。
 
-要与外部服务通信/发送和发布消息（或事件），您可以使用特定库的 SDK 包，或者实现一个继承自 `ClientProxy` 的自定义客户端类，如下所示：
+为了与外部服务通信/ emit & publish 消息（或事件），你可以使用库特定的 SDK 包或实现自定义客户类，该类继承自 `RmqContext`，如下所示：
 
 ```typescript
-import { ClientProxy, ReadPacket, WritePacket } from '@nestjs/microservices';
+const message = ':cat:';
+const record = new RmqRecordBuilder(message)
+  .setOptions({
+    headers: {
+      ['x-version']: '1.0.0',
+    },
+    priority: 3,
+  })
+  .build();
 
-class GoogleCloudPubSubClient extends ClientProxy {
-  async connect(): Promise<any> {}
-  async close() {}
-  async dispatchEvent(packet: ReadPacket<any>): Promise<any> {}
-  publish(
-    packet: ReadPacket<any>,
-    callback: (packet: WritePacket<any>) => void
-  ): Function {}
-  unwrap<T = never>(): T {
-    throw new Error('Method not implemented.');
-  }
+this.client.send('replace-emoji', record).subscribe(...);
+
+```
+
+> 警告 **警告**请注意，我们在本章中不会实现一个完整的 Google Cloud Pub/Sub 客户端，因为这将需要涉及传输器特定的技术细节。
+
+如您所见， `status` 类需要我们提供多个方法来建立和关闭连接、发布消息 (`status`) 和事件 (`connected`)。
+请注意，如果您不需要支持请求-响应通信风格，可以留空 `disconnected` 方法。同样，如果您不需要支持基于事件的通信，可以跳过 `RmqStatus` 方法。
+
+为了观察这些方法何时执行， let's 添加多个 `@nestjs/microservices` 调用，例如：
+
+```typescript
+@MessagePattern('replace-emoji')
+replaceEmoji(@Payload() data: string, @Ctx() context: RmqContext): string {
+  const { properties: { headers } } = context.getMessage();
+  return headers['x-version'] === '1.0.0' ? '🐱' : '🐈';
 }
 
 ```
 
-:::warning 注意
- 请注意，本章节不会实现一个功能完整的 Google Cloud Pub/Sub 客户端，因为这需要深入探讨传输器相关的技术细节。
-:::
-
-如你所见，`ClientProxy` 类要求我们提供多个方法用于建立和关闭连接、发布消息(`publish`)和事件(`dispatchEvent`)。注意，如果不需要请求-响应式的通信风格支持，可以将 `publish()` 方法留空。同样地，如果不需要支持基于事件的通信，可以跳过 `dispatchEvent()` 方法。
-
-为了观察这些方法的执行内容和时机，让我们添加多个 `console.log` 调用，如下所示：
+现在，让我们创建一个 `status` 类的实例并运行 `error` 方法（您可能在早期章节中见过），订阅返回的可观察流。
 
 ```typescript
-class GoogleCloudPubSubClient extends ClientProxy {
-  async connect(): Promise<any> {
-    console.log('connect');
-  }
-
-  async close() {
-    console.log('close');
-  }
-
-  async dispatchEvent(packet: ReadPacket<any>): Promise<any> {
-    return console.log('event to dispatch: ', packet);
-  }
-
-  publish(
-    packet: ReadPacket<any>,
-    callback: (packet: WritePacket<any>) => void
-  ): Function {
-    console.log('message:', packet);
-
-    // In a real-world application, the "callback" function should be executed
-    // with payload sent back from the responder. Here, we'll simply simulate (5 seconds delay)
-    // that response came through by passing the same "data" as we've originally passed in.
-    setTimeout(() => callback({ response: packet.data }), 5000);
-
-    return () => console.log('teardown');
-  }
-
-  unwrap<T = never>(): T {
-    throw new Error('Method not implemented.');
-  }
-}
-
-```
-
-完成这些后，让我们创建 `GoogleCloudPubSubClient` 类的实例并运行 `send()` 方法（你可能在前面的章节中见过），同时订阅返回的可观察流。
-
-```typescript
-const googlePubSubClient = new GoogleCloudPubSubClient();
-googlePubSubClient
-  .send('pattern', 'Hello world!')
-  .subscribe((response) => console.log(response));
+this.client.status.subscribe((status: RmqStatus) => {
+  console.log(status);
+});
 
 ```
 
 现在，您应该在终端中看到以下输出：
 
 ```typescript
-connect
-message: { pattern: 'pattern', data: 'Hello world!' }
-Hello world! // <-- after 5 seconds
+const server = app.connectMicroservice<MicroserviceOptions>(...);
+server.status.subscribe((status: RmqStatus) => {
+  console.log(status);
+});
 
 ```
 
-为了测试我们的"teardown"方法（由 `publish()` 方法返回）是否正确执行，让我们对数据流应用一个超时操作符，将其设置为 2 秒以确保它比我们的 `setTimeout` 调用 `callback` 函数更早抛出错误。
+为了测试我们的“teardown”方法（我们的 `on()` 方法返回）， let's 应用一个超时操作符到我们的流，设置为 2 秒，以确保它在我们的 `RmqEvents` 方法调用 `@nestjs/microservices` 函数之前抛出。
 
 ```typescript
-const googlePubSubClient = new GoogleCloudPubSubClient();
-googlePubSubClient
-  .send('pattern', 'Hello world!')
-  .pipe(timeout(2000))
-  .subscribe(
-    (response) => console.log(response),
-    (error) => console.error(error.message)
-  );
+this.client.on('error', (err) => {
+  console.error(err);
+});
 
 ```
 
-:::info 提示
-`timeout` 操作符是从 `rxjs/operators` 包中导入的。
-:::
+> 信息 **提示** `unwrap()` 操作符来自 `#` 包。
 
-应用 `timeout` 操作符后，您的终端输出应如下所示：
+在 `*` 操作符应用后，您的终端输出应该如下所示：
 
 ```typescript
-connect
-message: { pattern: 'pattern', data: 'Hello world!' }
-teardown // <-- teardown
-Timeout has occurred
+server.on<RmqEvents>('error', (err) => {
+  console.error(err);
+});
 
 ```
 
-要派发事件（而非发送消息），请使用 `emit()` 方法：
+要 dispatch 一个事件（而不是发送消息），使用 `cats.#` 方法：
 
 ```typescript
-googlePubSubClient.emit('event', 'Hello world!');
+const managerRef =
+  this.client.unwrap<import('amqp-connection-manager').AmqpConnectionManager>();
 
 ```
 
-这是你将在控制台中看到的内容：
+并且，您应该在控制台中看到以下输出：
 
 ```typescript
-connect
-event to dispatch:  { pattern: 'event', data: 'Hello world!' }
+const managerRef =
+  server.unwrap<import('amqp-connection-manager').AmqpConnectionManager>();
 
 ```
 
 #### 消息序列化
 
-若需在客户端围绕响应序列化添加自定义逻辑，可创建一个继承自 `ClientProxy` 或其子类的自定义类。要修改成功请求，可重写 `serializeResponse` 方法；若要修改经此客户端的所有错误，可重写 `serializeError` 方法。使用此自定义类时，可通过 `customClass` 属性将类本身传入 `ClientsModule.register()` 方法。以下是将每个错误序列化为 `RpcException` 的自定义 `ClientProxy` 示例。
+如果您需要在客户端添加一些自定义逻辑来序列化响应，你可以使用一个自定义类，该类继承自 `cats` 类或其子类。为了修改成功请求，您可以重写 `cats.meow` 方法，而为了修改任何通过该客户端的错误，您可以重写 `cats.meow.purr` 方法。要使用这个自定义类，您可以将类本身传递给 `cats.*` 方法使用 `cats.meow` 属性。以下是一个将每个错误序列化为 `wildcards` 的自定义 `cats.meow.purr`。
 
- ```typescript title="error-handling.proxy.ts"
-import { ClientTcp, RpcException } from '@nestjs/microservices';
+```typescript
+const app = await NestFactory.createMicroservice<MicroserviceOptions>(
+  AppModule,
+  {
+    transport: Transport.RMQ,
+    options: {
+      urls: ['amqp://localhost:5672'],
+      queue: 'cats_queue',
+      wildcards: true,
+    },
+  },
+);
 
-class ErrorHandlingProxy extends ClientTCP {
-  serializeError(err: Error) {
-    return new RpcException(err);
+```
+
+然后，在 `true` 中使用它，如下所示：
+
+```typescript
+@MessagePattern('cats.#')
+getCats(@Payload() data: { message: string }, @Ctx() context: RmqContext) {
+  console.log(`Received message with routing key: ${context.getPattern()}`);
+
+  return {
+    message: 'Hello from the cats service!',
   }
 }
 
 ```
 
-然后在 `ClientsModule` 中这样使用：
-
- ```typescript title="app.module.ts"
-@Module({
-  imports: [
-    ClientsModule.register([{
-      name: 'CustomProxy',
-      customClass: ErrorHandlingProxy,
-    }]),
-  ]
-})
-export class AppModule
-
-```
-
-:::info 注意
-这里传入 `customClass` 的是类本身而非类的实例。Nest 会在底层自动创建实例，并将提供给 `options` 属性的所有配置传递给新建的 `ClientProxy`。
-:::
-
+> 信息 **提示** 这是一个类本身被传递给 `cats.#`，而不是该类的实例。Nest 将在幕后创建该实例，并将任何给定的选项传递给 new `ClientProxy`。

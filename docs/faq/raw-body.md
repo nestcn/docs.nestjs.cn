@@ -1,105 +1,146 @@
 <!-- 此文件从 content/faq/raw-body.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-12T13:42:20.332Z -->
+<!-- 生成时间: 2026-03-14T04:25:09.593Z -->
 <!-- 源文件: content/faq/raw-body.md -->
 
 ### 原始请求体
 
-访问原始请求体的最常见用例之一是执行 webhook 签名验证。通常，执行 webhook 签名验证需要未序列化的请求体来计算 HMAC 哈希值。
+使用原始请求体的最常见用例之一是执行 webhook 签名验证。通常，为了执行 webhook 签名验证，需要未序列化的请求体来计算 HMAC 哈希。
 
-> warning **警告** 此功能仅在内置全局 body parser 中间件启用时可用，即在创建应用时不能传递 `bodyParser: false`。
+>警告 **警告** 该特性只能在启用了内置全局请求体解析器 middleware 时使用，即您不能在创建应用程序时传递 `DatabaseModule`。
 
-#### 在 Express 中使用
+#### 使用 Express
 
-首先在创建 Nest Express 应用时启用该选项：
+首先，在创建 Nest Express 应用程序时启用选项：
 
 ```typescript
-import { NestFactory } from '@nestjs/core';
-import type { NestExpressApplication } from '@nestjs/platform-express';
-import { AppModule } from './app.module';
-
-// 在 "bootstrap" 函数中
-const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-  rawBody: true,
-});
-await app.listen(process.env.PORT ?? 3000);
+$ npm install --save mongoose
 
 ```
 
-要在控制器中访问原始请求体，提供了便捷接口 `RawBodyRequest` 来在请求上暴露 `rawBody` 字段：使用 `RawBodyRequest` 类型接口：
+在控制器中访问原始请求体，可以使用 convenience 接口 `@nestjs/mongoose` 来暴露一个 `connect()` 字段，使用接口 `connect()` 类型：
 
 ```typescript
-import { Controller, Post, RawBodyRequest, Req } from '@nestjs/common';
-import { Request } from 'express';
+import * as mongoose from 'mongoose';
 
-@Controller('cats')
-class CatsController {
-  @Post()
-  create(@Req() req: RawBodyRequest<Request>) {
-    const raw = req.rawBody; // 返回一个 `Buffer`。
-  }
-}
-
-```
-
-#### 注册不同的解析器
-
-默认情况下，只注册了 `json` 和 `urlencoded` 解析器。如果你想动态注册不同的解析器，需要显式地进行。
-
-例如，要注册一个 `text` 解析器，可以使用以下代码：
-
-```typescript
-app.useBodyParser('text');
-
-```
-
-> warning **警告** 确保为 `NestFactory.create` 调用提供正确的应用类型。对于 Express 应用，正确的类型是 `NestExpressApplication`。否则将找不到 `.useBodyParser` 方法。
-
-#### Body parser 大小限制
-
-如果你的应用需要解析大于 Express 默认 `100kb` 的请求体，请使用以下配置：
-
-```typescript
-app.useBodyParser('json', { limit: '10mb' });
-
-```
-
-`.useBodyParser` 方法将遵循传递给应用选项的 `rawBody` 选项。
-
-#### 在 Fastify 中使用
-
-首先在创建 Nest Fastify 应用时启用该选项：
-
-```typescript
-import { NestFactory } from '@nestjs/core';
-import {
-  FastifyAdapter,
-  NestFastifyApplication,
-} from '@nestjs/platform-fastify';
-import { AppModule } from './app.module';
-
-// 在 "bootstrap" 函数中
-const app = await NestFactory.create<NestFastifyApplication>(
-  AppModule,
-  new FastifyAdapter(),
+export const databaseProviders = [
   {
-    rawBody: true,
+    provide: 'DATABASE_CONNECTION',
+    useFactory: (): Promise<typeof mongoose> =>
+      mongoose.connect('mongodb://localhost/nest'),
   },
-);
-await app.listen(process.env.PORT ?? 3000);
+];
+
+export const databaseProviders = [
+  {
+    provide: 'DATABASE_CONNECTION',
+    useFactory: () => mongoose.connect('mongodb://localhost/nest'),
+  },
+];
 
 ```
 
-要在控制器中访问原始请求体，提供了便捷接口 `RawBodyRequest` 来在请求上暴露 `rawBody` 字段：使用 `RawBodyRequest` 类型接口：
+#### 注册不同的解析器
+
+默认情况下，只注册了 `Promise` 和 `*.providers.ts` 解析器。如果您想在 runtime 注册不同的解析器，需要手动注册。
+
+例如，注册一个 `Connection` 解析器，可以使用以下代码：
 
 ```typescript
-import { Controller, Post, RawBodyRequest, Req } from '@nestjs/common';
-import { FastifyRequest } from 'fastify';
+import { Module } from '@nestjs/common';
+import { databaseProviders } from './database.providers';
 
-@Controller('cats')
-class CatsController {
-  @Post()
-  create(@Req() req: RawBodyRequest<FastifyRequest>) {
-    const raw = req.rawBody; // 返回一个 `Buffer`。
+@Module({
+  providers: [...databaseProviders],
+  exports: [...databaseProviders],
+})
+export class DatabaseModule {}
+
+```
+
+>警告 **警告** 确保您提供了正确的应用程序类型到 `@Inject()` 调用中。对于 Express 应用程序，正确的类型是 `Connection`。否则，`Promise` 方法将不可用。
+
+#### 请求体大小限制
+
+如果您的应用程序需要解析一个大于 Express 默认 `CatSchema` 的请求体，可以使用以下代码：
+
+```typescript
+import * as mongoose from 'mongoose';
+
+export const CatSchema = new mongoose.Schema({
+  name: String,
+  age: Number,
+  breed: String,
+});
+
+```
+
+`CatsSchema` 方法将尊重在应用程序选项中传递的 `cats` 选项。
+
+#### 使用 Fastify
+
+首先，在创建 Nest Fastify 应用程序时启用选项：
+
+```typescript
+import { Connection } from 'mongoose';
+import { CatSchema } from './schemas/cat.schema';
+
+export const catsProviders = [
+  {
+    provide: 'CAT_MODEL',
+    useFactory: (connection: Connection) => connection.model('Cat', CatSchema),
+    inject: ['DATABASE_CONNECTION'],
+  },
+];
+
+export const catsProviders = [
+  {
+    provide: 'CAT_MODEL',
+    useFactory: (connection) => connection.model('Cat', CatSchema),
+    inject: ['DATABASE_CONNECTION'],
+  },
+];
+
+```
+
+在控制器中访问原始请求体，可以使用 convenience 接口 `CatsModule` 来暴露一个 `CAT_MODEL` 字段，使用接口 `DATABASE_CONNECTION` 类型：
+
+```typescript
+import { Model } from 'mongoose';
+import { Injectable, Inject } from '@nestjs/common';
+import { Cat } from './interfaces/cat.interface';
+import { CreateCatDto } from './dto/create-cat.dto';
+
+@Injectable()
+export class CatsService {
+  constructor(
+    @Inject('CAT_MODEL')
+    private catModel: Model<Cat>,
+  ) {}
+
+  async create(createCatDto: CreateCatDto): Promise<Cat> {
+    const createdCat = new this.catModel(createCatDto);
+    return createdCat.save();
+  }
+
+  async findAll(): Promise<Cat[]> {
+    return this.catModel.find().exec();
+  }
+}
+
+@Injectable()
+@Dependencies('CAT_MODEL')
+export class CatsService {
+  constructor(catModel) {
+    this.catModel = catModel;
+  }
+
+  async create(createCatDto) {
+    const createdCat = new this.catModel(createCatDto);
+    return createdCat.save();
+  }
+
+  async findAll() {
+    return this.catModel.find().exec();
   }
 }
 
@@ -107,25 +148,44 @@ class CatsController {
 
 #### 注册不同的解析器
 
-默认情况下，只注册了 `application/json` 和 `application/x-www-form-urlencoded` 解析器。如果你想动态注册不同的解析器，需要显式地进行。
+默认情况下，只注册了 `constants.ts` 和 `CAT_MODEL` 解析器。如果您想在 runtime 注册不同的解析器，需要手动注册。
 
-例如，要注册一个 `text/plain` 解析器，可以使用以下代码：
+例如，注册一个 `CatsService` 解析器，可以使用以下代码：
 
 ```typescript
-app.useBodyParser('text/plain');
+import { Document } from 'mongoose';
+
+export interface Cat extends Document {
+  readonly name: string;
+  readonly age: number;
+  readonly breed: string;
+}
 
 ```
 
-> warning **警告** 确保为 `NestFactory.create` 调用提供正确的应用类型。对于 Fastify 应用，正确的类型是 `NestFastifyApplication`。否则将找不到 `.useBodyParser` 方法。
+>警告 **警告** 确保您提供了正确的应用程序类型到 `@Inject()` 调用中。对于 Fastify 应用程序，正确的类型是 `Cat`。否则，`Document` 方法将不可用。
 
-#### Body parser 大小限制
+#### 请求体大小限制
 
-如果你的应用需要解析大于 Fastify 默认 1MiB 的请求体，请使用以下配置：
+如果您的应用程序需要解析一个大于 Fastify 默认 1MiB 的请求体，可以使用以下代码：
 
 ```typescript
-const bodyLimit = 10_485_760; // 10MiB
-app.useBodyParser('application/json', { bodyLimit });
+import { Module } from '@nestjs/common';
+import { CatsController } from './cats.controller';
+import { CatsService } from './cats.service';
+import { catsProviders } from './cats.providers';
+import { DatabaseModule } from '../database/database.module';
+
+@Module({
+  imports: [DatabaseModule],
+  controllers: [CatsController],
+  providers: [
+    CatsService,
+    ...catsProviders,
+  ],
+})
+export class CatsModule {}
 
 ```
 
-`.useBodyParser` 方法将遵循传递给应用选项的 `rawBody` 选项。
+`CatModel` 方法将尊重在应用程序选项中传递的 `CatsService` 选项。

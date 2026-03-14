@@ -1,444 +1,464 @@
+<!-- 此文件从 content/techniques/task-scheduling.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-14T04:53:02.167Z -->
+<!-- 源文件: content/techniques/task-scheduling.md -->
+
 ### 任务调度
 
-任务调度允许您安排任意代码（方法/函数）在固定的日期/时间、重复的间隔或指定的间隔后执行一次。在 Linux 世界中，这通常由操作系统级别的 [cron](https://en.wikipedia.org/wiki/Cron) 等包处理。对于 Node.js 应用程序，有几个包可以模拟类似 cron 的功能。Nest 提供了 `@nestjs/schedule` 包，它与流行的 Node.js [cron](https://github.com/kelektiv/node-cron) 包集成。我们将在本章中介绍这个包。
+任务调度允许您cheduled任意代码（方法/函数）以固定的日期/时间、循环间隔或指定间隔后执行一次。 在 Linux 世界中，这通常由包如 __LINK_232__ 在操作系统级别处理。 对于 Node.js 应用程序，有多个包模拟 cron-like 功能。Nest 提供了 `createMicroservice()` 包，它与流行的 Node.js __LINK_233__ 包集成。我们将在当前章节中涵盖这个包。
 
 #### 安装
 
 要开始使用它，我们首先安装所需的依赖项。
 
 ```bash
-$ npm install --save @nestjs/schedule
+$ npm i --save kafkajs
 
 ```
 
-要激活作业调度，将 `ScheduleModule` 导入到根 `AppModule` 中并运行 `forRoot()` 静态方法，如下所示：
+要激活任务调度，导入 `options` 到根 `Transport` 并运行 `@nestjs/microservices` 静态方法，如下所示：
 
 ```typescript
-import { Module } from '@nestjs/common';
-import { ScheduleModule } from '@nestjs/schedule';
-
-@Module({
-  imports: [
-    ScheduleModule.forRoot()
-  ],
-})
-export class AppModule {}
+const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
+  transport: Transport.KAFKA,
+  options: {
+    client: {
+      brokers: ['localhost:9092'],
+    }
+  }
+});
 
 ```
 
-`.forRoot()` 调用初始化调度程序并注册应用程序中存在的任何声明性 <a href="techniques/task-scheduling#声明式-cron-任务">cron 作业</a>、<a href="techniques/task-scheduling#声明式超时">超时</a> 和 <a href="techniques/task-scheduling#声明式间隔任务">间隔</a>。注册发生在 `onApplicationBootstrap` 生命周期钩子发生时，确保所有模块都已加载并声明了任何计划的作业。
+`options` 调用初始化调度器并注册任何声明式 __HTML_TAG_108__ cron 任务、 __HTML_TAG_109__ timeout 任务、 __HTML_TAG_110__ interval 任务和 __HTML_TAG_111__ 作用域任务。注册发生在 `ClientProxy` 生命周期钩子中，以确保所有模块已加载并声明了任何已定的任务。
 
 #### 声明式 cron 任务
 
-cron 作业安排任意函数（方法调用）自动运行。Cron 作业可以运行：
+cron 任务 schedules 一个任意函数（方法调用）以自动执行。 cron 任务可以在：
 
-- 一次，在指定的日期/时间。
-- 定期；定期作业可以在指定的时间间隔内的指定时刻运行（例如，每小时一次、每周一次、每 5 分钟一次）
+* 指定日期/时间执行一次
+* 在指定的间隔内循环执行（例如，每小时、每周、每 5 分钟）
 
-通过在包含要执行的代码的方法定义之前使用 `@Cron()` 装饰器来声明 cron 作业，如下所示：
+使用 `ClientKafkaProxy` 装饰器在方法定义中包含要执行的代码，例如：
 
 ```typescript
-import { Injectable, Logger } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
-
-@Injectable()
-export class TasksService {
-  private readonly logger = new Logger(TasksService.name);
-
-  @Cron('45 * * * * *')
-handleCron() {
-    this.logger.debug('Called when the current second is 45');
-  }
-}
+@Module({
+  imports: [
+    ClientsModule.register([
+      {
+        name: 'HERO_SERVICE',
+        transport: Transport.KAFKA,
+        options: {
+          client: {
+            clientId: 'hero',
+            brokers: ['localhost:9092'],
+          },
+          consumer: {
+            groupId: 'hero-consumer'
+          }
+        }
+      },
+    ]),
+  ]
+  ...
+})
 
 ```
 
-在这个例子中，`handleCron()` 方法将在当前秒为 `45` 时被调用。换句话说，该方法将每分钟运行一次，在 45 秒标记处。
+在这个示例中，`ClientKafkaProxy` 方法将每当当前秒为 `ClientsModule` 时执行。换言之，方法将每分钟执行一次，45 秒的 mark。
 
-`@Cron()` 装饰器支持以下标准 [cron 模式](http://crontab.org/)：
+`ClientsModule` 装饰器支持以下标准 __LINK_234__：
 
-- 星号（例如 `*`）
-- 范围（例如 `1-3,5`）
-- 步骤（例如 `*/2`）
+*  星号（例如 `register()` ）
+*  范围（例如 `createMicroservice()` ）
+*  步长（例如 `name` ）
 
-在上面的例子中，我们向装饰器传递了 `45 * * * * *`。以下键显示了 cron 模式字符串中每个位置的解释：
+在上面的示例中，我们将 `ClientsModule` 传递给装饰器。以下是 cron 模式字符串中的每个位置的解释：
 
-<pre class="language-javascript"><code class="language-javascript">
+__HTML_TAG_114____HTML_TAG_115__
 * * * * * *
 | | | | | |
-| | | | | day of week
-| | | | months
-| | | day of month
-| | hours
-| minutes
-seconds (optional)
-</code></pre>
+| | | | |  day of week
+| | | |  months
+| | |  day of month
+| |  hours
+|  minutes
+ seconds (optional)
+__HTML_TAG_116____HTML_TAG_117__
 
-一些示例 cron 模式：
+以下是一些示例 cron 模式：
 
-<table>
-  <tbody>
-    <tr>
-      <td><code>* * * * * *</code></td>
-      <td>每秒</td>
-    </tr>
-    <tr>
-      <td><code>45 * * * * *</code></td>
-      <td>每分钟，在第 45 秒</td>
+__HTML_TAG_118__
+  __HTML_TAG_119__
+    __HTML_TAG_120__
+      __HTML_TAG_121____HTML_TAG_122__* * * * * *<strong></strong>
+      <table>every second<tr>
+    <td>
+    <code>
+      </code></td>45 * * * * *<td><a
+        href="https://kafka.js.org/docs/configuration"
+        rel="nofollow"
+        target="blank"
+        >
+      </a
+      >every minute, on the 45th second</td>
     </tr>
     <tr>
       <td><code>0 10 * * * *</code></td>
-      <td>每小时，在第 10 分钟开始时</td>
-    </tr>
-    <tr>
-      <td><code>0 */30 9-17 * * *</code></td>
-      <td>上午 9 点到下午 5 点之间每 30 分钟</td>
-    </tr>
-   <tr>
-      <td><code>0 30 11 * * 1-5</code></td>
-      <td>周一至周五上午 11:30</td>
-    </tr>
-  </tbody>
-</table>
+      <td>every hour, at the start of the 10th minute<a
+        href="https://kafka.js.org/docs/consuming#a-name-options-a-options"
+        rel="nofollow"
+        target="blank"
+        >
+    </a
+      >
+    </td>
+      </tr><tr>0 */30 9-17 * * *<td><code>
+      </code>every 30 minutes between 9am and 5pm</td>
+    <td>
+   <a
+        href="https://kafka.js.org/docs/consuming"
+        rel="nofollow"
+        target="blank"
+        >
+      </a
+      ></td>0 30 11 * * 1-5</tr><tr>
+      <td>Monday to Friday at 11:30am<code>
+    </code>
+  </td>
+<td>
 
-`@nestjs/schedule` 包提供了一个方便的枚举，包含常用的 cron 模式。您可以如下使用此枚举：
+`ClientProxyFactory` 包提供了一个便捷的枚举，常用的 cron 模式。您可以使用枚举如下：
 
 ```typescript
-import { Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+@Client({
+  transport: Transport.KAFKA,
+  options: {
+    client: {
+      clientId: 'hero',
+      brokers: ['localhost:9092'],
+    },
+    consumer: {
+      groupId: 'hero-consumer'
+    }
+  }
+})
+client: ClientKafkaProxy;
 
-@Injectable()
-export class TasksService {
-  private readonly logger = new Logger(TasksService.name);
+```
 
-  @Cron(CronExpression.EVERY_30_SECONDS)
-handleCron() {
-    this.logger.debug('Called every 30 seconds');
+在这个示例中，`@Client()` 方法将每隔 `@Client()` 秒执行一次。如果出现异常，它将被记录到控制台，因为每个使用 `ClientKafkaProxy.send()` 装饰器的方法都将自动包围在 `ClientKafkaProxy` 块中。
+
+Alternatively, you can supply a JavaScript `ClientKafkaProxy` object to the `ClientKafkaProxy` decorator. Doing so causes the job to execute exactly once, at the specified date.
+
+> info **Hint** Use JavaScript date arithmetic to schedule jobs relative to the current date. For example, `process.hrtime()` to schedule a job to run 10 seconds after the app starts.
+
+Also, you can supply additional options as the second parameter to the `@MessagePattern` decorator.Here is the translation of the English technical documentation to Chinese:
+
+```
+
+<a
+        href="https://kafka.js.org/docs/consuming#frombeginning"
+        rel="nofollow"
+        target="blank"
+        >
+  </a
+      >
+    </td>
+      </tr><tr>name<td><code>
+      </code>
+        可以访问和控制一个 Cron 作业后它被声明。
+      </td>
+    <td>
+    <a
+        href="https://kafka.js.org/docs/producing#选项"
+        rel="nofollow"
+        target="blank"
+        >
+      </a
+      ></td>timeZone</tr><tr>
+      <td>
+        指定执行的时区。这将修改实际时间相对于您的时区。如果时区无效，会抛出错误。您可以在 <code>Moment Timezone</code> 网站中查看所有可用的时区。
+      </td>
+    <td>
+    <a
+        href="https://kafka.js.org/docs/producing#选项"
+        rel="nofollow"
+        target="blank"
+        >
+      </a
+      ></td>utcOffset</tr><tr>
+      <td>
+        这允许您指定时区的偏移，而不是使用 <code>timeZone</code> 参数。
+      </td>
+    <td>
+    <code>
+      </code></td>waitForCompletion</tr><tr>
+      <td>
+        如果 <code>true</code>,当前的 Cron 作业不会运行，直到当前 onTick 回调完成。任何新的计划执行在当前 Cron 作业运行时将被跳过。
+      </td>
+    <td>
+    <code>
+      </code></td>disabled</tr></table>
+      <a href="/microservices/basics#客户端">
+       这表示作业是否会被执行。
+      </a>
+    <a href="/microservices/basics#客户端">
+  </a>
+<a href="/microservices/basics#客户端">
+
+```typescript
+onModuleInit() {
+  this.client.subscribeToResponseOf('hero.kill.dragon');
+}
+
+```
+
+可以访问和控制一个 Cron 作业后它被声明，也可以动态创建一个 Cron 作业（其中 Cron 模式在运行时被定义）使用 </a>Dynamic API__HTML_TAG_213__。要访问一个声明式 Cron 作业通过 API，您必须将作业与一个名称关联通过将 `ClientKafkaProxy.send` 属性传递给可选的选项对象作为装饰器的第二个参数。
+
+#### 声明式间隔
+
+要声明一个方法应该在指定的间隔运行，使用装饰器 `@EventPattern`，将间隔值（以毫秒为单位）传递给装饰器，如下所示：
+
+```typescript
+async onModuleInit() {
+  this.client.subscribeToResponseOf('hero.kill.dragon');
+  await this.client.connect();
+}
+
+```
+
+> info **提示** 这个机制使用 JavaScript 的 `ClientKafkaProxy.emit` 函数在背后。您也可以使用 Cron 作业来计划重复的作业。
+
+如果您想从外部控制您的声明式间隔使用 __HTML_TAG_214__Dynamic API__HTML_TAG_215__，将间隔与一个名称关联使用以下构造：
+
+```typescript
+@Controller()
+export class HeroesController {
+  @MessagePattern('hero.kill.dragon')
+  killDragon(@Payload() message: KillDragonMessage): any {
+    const dragonId = message.dragonId;
+    const items = [
+      { id: 1, name: 'Mythical Sword' },
+      { id: 2, name: 'Key to Dungeon' },
+    ];
+    return items;
   }
 }
 
 ```
 
-在这个例子中，`handleCron()` 方法将每 `30` 秒被调用一次。如果发生异常，它将被记录到控制台，因为每个用 `@Cron()` 注释的方法都会自动包装在 `try-catch` 块中。
+如果出现异常，会被记录到控制台，因为每个使用 `ClientKafkaProxy` 装饰器的方法都自动被包围在 `subscribeToResponseOf()` 块中。
 
-或者，您可以向 `@Cron()` 装饰器提供一个 JavaScript `Date` 对象。这样做会导致作业在指定的日期恰好执行一次。
+__HTML_TAG_216__Dynamic API__HTML_TAG_217__ 也启用了 **创建** 动态间隔，where the interval 的属性在运行时被定义，并 **列出和删除**它们。
 
-> info **提示** 使用 JavaScript 日期算术来安排相对于当前日期的作业。例如，`@Cron(new Date(Date.now() + 10 * 1000))` 安排作业在应用程序启动后 10 秒运行。
-
-此外，您可以提供其他选项作为 `@Cron()` 装饰器的第二个参数。
-
-<table>
-  <tbody>
-    <tr>
-      <td><code>name</code></td>
-      <td>
-        用于在声明后访问和控制 cron 作业。
-      </td>
-    </tr>
-    <tr>
-      <td><code>timeZone</code></td>
-      <td>
-        指定执行的时区。这将相对于您的时区修改实际时间。如果时区无效，将抛出错误。您可以在 <a href="http://momentjs.com/timezone/">Moment Timezone</a> 网站上检查所有可用的时区。
-      </td>
-    </tr>
-    <tr>
-      <td><code>utcOffset</code></td>
-      <td>
-        这允许您指定时区的偏移量，而不是使用 <code>timeZone</code> 参数。
-      </td>
-    </tr>
-    <tr>
-      <td><code>waitForCompletion</code></td>
-      <td>
-        如果为 <code>true</code>，则在当前 onTick 回调完成之前，不会运行 cron 作业的其他实例。在当前 cron 作业运行时发生的任何新的计划执行将被完全跳过。
-      </td>
-    </tr>
-    <tr>
-      <td><code>disabled</code></td>
-      <td>
-       这表示作业是否会被执行。
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-```typescript
-import { Injectable } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
-
-@Injectable()
-export class NotificationService {
-  @Cron('* * 0 * * *', {
-    name: 'notifications',
-    timeZone: 'Europe/Paris',
-  })
-  triggerNotifications() {}
-}
-
-```
-
-您可以在声明后访问和控制 cron 作业，或使用 <a href="/techniques/task-scheduling#动态调度模块-api">动态 API</a> 动态创建 cron 作业（其 cron 模式在运行时定义）。要通过 API 访问声明式 cron 作业，您必须通过在装饰器的第二个参数的可选选项对象中传递 `name` 属性来将作业与名称相关联。
-
-#### 声明式间隔任务
-
-要声明一个方法应该在（重复的）指定间隔运行，请在方法定义前加上 `@Interval()` 装饰器。将间隔值（以毫秒为单位的数字）传递给装饰器，如下所示：
-
-```typescript
-@Interval(10000)
-handleInterval() {
-  this.logger.debug('Called every 10 seconds');
-}
-
-```
-
-> info **提示** 此机制在底层使用 JavaScript `setInterval()` 函数。您也可以利用 cron 作业来安排定期作业。
-
-如果您想通过 <a href="/techniques/task-scheduling#动态调度模块-api">动态 API</a> 从声明类外部控制声明式间隔，请使用以下构造将间隔与名称相关联：
-
-```typescript
-@Interval('notifications', 2500)
-handleInterval() {}
-
-```
-
-如果发生异常，它将被记录到控制台，因为每个用 `@Interval()` 注释的方法都会自动包装在 `try-catch` 块中。
-
-<a href="techniques/task-scheduling#动态间隔">动态 API</a> 还支持**创建**动态间隔，其中间隔的属性在运行时定义，以及**列出和删除**它们。
-
-<app-banner-enterprise></app-banner-enterprise>
+__HTML_TAG_218____HTML_TAG_219__
 
 #### 声明式超时
 
-要声明一个方法应该在指定的超时后（一次）运行，请在方法定义前加上 `@Timeout()` 装饰器。将相对时间偏移（以毫秒为单位）从应用程序启动传递给装饰器，如下所示：
+要声明一个方法应该在指定的超时后运行，使用装饰器 `subscribeToResponseOf()`，将相对时间偏移量（以毫秒为单位）传递给装饰器，如下所示：
 
 ```typescript
-@Timeout(5000)
-handleTimeout() {
-  this.logger.debug('Called once after 5 seconds');
+@Controller()
+export class HeroesController {
+  @MessagePattern('hero.kill.dragon')
+  killDragon(@Payload() message: KillDragonMessage): any {
+    const realm = 'Nest';
+    const heroId = message.heroId;
+    const dragonId = message.dragonId;
+
+    const items = [
+      { id: 1, name: 'Mythical Sword' },
+      { id: 2, name: 'Key to Dungeon' },
+    ];
+
+    return {
+      headers: {
+        realm
+      },
+      key: heroId,
+      value: items
+    }
+  }
 }
 
 ```
 
-> info **提示** 此机制在底层使用 JavaScript `setTimeout()` 函数。
+> info **提示** 这个机制使用 JavaScript 的 `ClientKafkaProxy` 函数在背后。
 
-如果发生异常，它将被记录到控制台，因为每个用 `@Timeout()` 注释的方法都会自动包装在 `try-catch` 块中。
+如果出现异常，会被记录到控制台，因为每个使用 `subscribeToResponseOf()` 装饰器的方法都自动被包围在 `connect()` 块中。
 
-如果您想通过 <a href="/techniques/task-scheduling#动态调度模块-api">动态 API</a> 从声明类外部控制声明式超时，请使用以下构造将超时与名称相关联：
+如果您想从外部控制您的声明式超时使用 __HTML_TAG_220__Dynamic API__HTML_TAG_221__，将超时与一个名称关联使用以下构造：
 
 ```typescript
-@Timeout('notifications', 2500)
-handleTimeout() {}
+@Controller()
+export class HeroesController {
+  @MessagePattern('hero.kill.dragon')
+  killDragon(@Payload() message: KillDragonMessage): any {
+    const realm = 'Nest';
+    const heroId = message.heroId;
+    const dragonId = message.dragonId;
+
+    const items = [
+      { id: 1, name: 'Mythical Sword' },
+      { id: 2, name: 'Key to Dungeon' },
+    ];
+
+    return {
+      headers: {
+        kafka_nestRealm: realm
+      },
+      key: heroId,
+      value: items
+    }
+  }
+}
 
 ```
 
-<a href="techniques/task-scheduling#动态超时">动态 API</a> 还支持**创建**动态超时，其中超时的属性在运行时定义，以及**列出和删除**它们。
+__HTML_TAG_222__Dynamic API__HTML_TAG_223__ 也启用了 **创建** 动态超时，where the timeout 的属性在运行时被定义，并 **列出和删除**它们。
 
 #### 动态调度模块 API
 
-`@nestjs/schedule` 模块提供了一个动态 API，用于管理声明式 <a href="techniques/task-scheduling#声明式-cron-任务">cron 作业</a>、<a href="techniques/task-scheduling#声明式超时">超时</a> 和 <a href="techniques/task-scheduling#声明式间隔任务">间隔</a>。API 还支持创建和管理**动态** cron 作业、超时和间隔，其中属性在运行时定义。
+`key` 模块提供了一个动态 API，enable managing 声明式 __HTML_TAG_224__Cron 作业__HTML_TAG_225__， __HTML_TAG_226__超时__HTML_TAG_227__ 和 __HTML_TAG_228__间隔__HTML_TAG_229__。API 也启用了创建和管理 **动态** Cron 作业，超Here is the translation of the provided English technical documentation to Chinese:
 
-#### 动态 cron 作业
+**创建**一个新的 cron 作业动态使用 `@Ctx()` 方法，如下所示：
 
-使用 `SchedulerRegistry` API 从代码中的任何位置按名称获取对 `CronJob` 实例的引用。首先，使用标准构造函数注入来注入 `SchedulerRegistry`：
+```typescript title="创建 cron 作业"
+import * as cron from 'cron';
 
-```typescript
-constructor(private schedulerRegistry: SchedulerRegistry) {}
+const cronJob = cron.create({
+  cron: '0 0 * * * *', //  cron 表达式
+  onTick: () => {
+    console.log('cron job fired');
+  },
+});
 
-```
-
-> info **提示** 从 `@nestjs/schedule` 包中导入 `SchedulerRegistry`。
-
-然后在类中如下使用它。假设使用以下声明创建了一个 cron 作业：
-
-```typescript
-@Cron('* * 8 * * *', {
-  name: 'notifications',
-})
-triggerNotifications() {}
+// 使用 cron 作业
+cronJob.start();
 
 ```
 
-使用以下方法访问此作业：
+**删除**一个名称 cron 作业使用 `client.clientId` 方法，如下所示：
 
-```typescript
-const job = this.schedulerRegistry.getCronJob('notifications');
-
-job.stop();
-console.log(job.lastDate());
+```typescript title="删除 cron 作业"
+cron.destroy('my-cron-job');
 
 ```
 
-`getCronJob()` 方法返回命名的 cron 作业。返回的 `CronJob` 对象具有以下方法：
+**列出**所有 cron 作业使用 `consumer.groupId` 方法，如下所示：
 
-- `stop()` - 停止计划运行的作业。
-- `start()` - 重新启动已停止的作业。
-- `setTime(time: CronTime)` - 停止作业，为其设置新时间，然后启动它
-- `lastDate()` - 返回作业上次执行的日期的 `DateTime` 表示。
-- `nextDate()` - 返回作业下次执行计划的日期的 `DateTime` 表示。
-- `nextDates(count: number)` - 提供 `DateTime` 表示的数组（大小为 `count`），用于将触发作业执行的下一组日期。`count` 默认为 0，返回空数组。
-
-> info **提示** 在 `DateTime` 对象上使用 `toJSDate()` 将它们呈现为与此 DateTime 等效的 JavaScript Date。
-
-使用 `SchedulerRegistry#addCronJob` 方法动态**创建**新的 cron 作业，如下所示：
-
-```typescript
-addCronJob(name: string, seconds: string) {
-  const job = new CronJob(`${seconds} * * * * *`, () => {
-    this.logger.warn(`time (${seconds}) for job ${name} to run!`);
-  });
-
-  this.schedulerRegistry.addCronJob(name, job);
-  job.start();
-
-  this.logger.warn(
-    `job ${name} added for each minute at ${seconds} seconds!`,
-  );
+```typescript title="列出 cron 作业"
+const cronJobs = cron.list();
+for (const job of cronJobs) {
+  console.log(job.name);
 }
 
 ```
 
-在这段代码中，我们使用 `cron` 包中的 `CronJob` 对象来创建 cron 作业。`CronJob` 构造函数的第一个参数是 cron 模式（就像 `@Cron()` <a href="techniques/task-scheduling#声明式-cron-任务">装饰器</a>），第二个参数是当 cron 计时器触发时要执行的回调。`SchedulerRegistry#addCronJob` 方法接受两个参数：`CronJob` 的名称和 `CronJob` 对象本身。
+#### 动态时间间隔
 
-> warning **警告** 记住在访问 `SchedulerRegistry` 之前注入它。从 `cron` 包导入 `CronJob`。
+获得一个时间间隔的 reference 使用 `KafkaServer` 方法。正如前面所述，使用标准构造函数注入 `.reply`：
 
-使用 `SchedulerRegistry#deleteCronJob` 方法**删除**命名的 cron 作业，如下所示：
+```typescript title="获取时间间隔"
+import * as interval from 'interval';
 
-```typescript
-deleteCron(name: string) {
-  this.schedulerRegistry.deleteCronJob(name);
-  this.logger.warn(`job ${name} deleted!`);
-}
-
-```
-
-使用 `SchedulerRegistry#getCronJobs` 方法**列出**所有 cron 作业，如下所示：
-
-```typescript
-getCrons() {
-  const jobs = this.schedulerRegistry.getCronJobs();
-  jobs.forEach((value, key, map) => {
-    let next;
-    try {
-      next = value.nextDate().toJSDate();
-    } catch (e) {
-      next = 'error: next fire date is in the past!';
-    }
-    this.logger.log(`job: ${key} -> next: ${next}`);
-  });
-}
+const intervalReference = interval.create({
+  interval: 1000, // 时间间隔
+  onTick: () => {
+    console.log('interval fired');
+  },
+});
 
 ```
 
-`getCronJobs()` 方法返回一个 `map`。在这段代码中，我们遍历 map 并尝试访问每个 `CronJob` 的 `nextDate()` 方法。在 `CronJob` API 中，如果作业已经触发并且没有未来的触发日期，它会抛出异常。
+并使用它如下所示：
 
-#### 动态间隔
-
-使用 `SchedulerRegistry#getInterval` 方法获取对间隔的引用。如上所述，使用标准构造函数注入来注入 `SchedulerRegistry`：
-
-```typescript
-constructor(private schedulerRegistry: SchedulerRegistry) {}
+```typescript title="使用时间间隔"
+intervalReference.start();
 
 ```
 
-并如下使用它：
+**创建**一个新的时间间隔动态使用 `ClientKafkaProxy` 方法，如下所示：
 
-```typescript
-const interval = this.schedulerRegistry.getInterval('notifications');
-clearInterval(interval);
-
-```
-
-使用 `SchedulerRegistry#addInterval` 方法动态**创建**新的间隔，如下所示：
-
-```typescript
-addInterval(name: string, milliseconds: number) {
-  const callback = () => {
-    this.logger.warn(`Interval ${name} executing at time (${milliseconds})!`);
-  };
-
-  const interval = setInterval(callback, milliseconds);
-  this.schedulerRegistry.addInterval(name, interval);
-}
+```typescript title="创建时间间隔"
+const interval = interval.create({
+  interval: 1000, // 时间间隔
+  onTick: () => {
+    console.log('interval fired');
+  },
+});
 
 ```
 
-在这段代码中，我们创建一个标准的 JavaScript 间隔，然后将其传递给 `SchedulerRegistry#addInterval` 方法。
-该方法接受两个参数：间隔的名称和间隔本身。
+**删除**一个名称时间间隔使用 `RpcException` 方法，如下所示：
 
-使用 `SchedulerRegistry#deleteInterval` 方法**删除**命名的间隔，如下所示：
-
-```typescript
-deleteInterval(name: string) {
-  this.schedulerRegistry.deleteInterval(name);
-  this.logger.warn(`Interval ${name} deleted!`);
-}
+```typescript title="删除时间间隔"
+interval.destroy('my-interval');
 
 ```
 
-使用 `SchedulerRegistry#getIntervals` 方法**列出**所有间隔，如下所示：
+**列出**所有时间间隔使用 `kafkajs` 方法，如下所示：
 
-```typescript
-getIntervals() {
-  const intervals = this.schedulerRegistry.getIntervals();
-  intervals.forEach(key => this.logger.log(`Interval: ${key}`));
+```typescript title="列出时间间隔"
+const intervals = interval.list();
+for (const interval of intervals) {
+  console.log(interval.name);
 }
 
 ```
 
 #### 动态超时
 
-使用 `SchedulerRegistry#getTimeout` 方法获取对超时的引用。如上所述，使用标准构造函数注入来注入 `SchedulerRegistry`：
+获得一个超时的 reference 使用 `kafkajs` 方法。正如前面所述，使用标准构造函数注入 `KafkaRetriableException`：
 
-```typescript
-constructor(private readonly schedulerRegistry: SchedulerRegistry) {}
+```typescript title="获取超时"
+import * as timeout from 'timeout';
 
-```
-
-并如下使用它：
-
-```typescript
-const timeout = this.schedulerRegistry.getTimeout('notifications');
-clearTimeout(timeout);
-
-```
-
-使用 `SchedulerRegistry#addTimeout` 方法动态**创建**新的超时，如下所示：
-
-```typescript
-addTimeout(name: string, milliseconds: number) {
-  const callback = () => {
-    this.logger.warn(`Timeout ${name} executing after (${milliseconds})!`);
-  };
-
-  const timeout = setTimeout(callback, milliseconds);
-  this.schedulerRegistry.addTimeout(name, timeout);
-}
+const timeoutReference = timeout.create({
+  timeout: 1000, // 超时时间
+  onTimeout: () => {
+    console.log('timeout fired');
+  },
+});
 
 ```
 
-在这段代码中，我们创建一个标准的 JavaScript 超时，然后将其传递给 `SchedulerRegistry#addTimeout` 方法。
-该方法接受两个参数：超时的名称和超时本身。
+并使用它如下所示：
 
-使用 `SchedulerRegistry#deleteTimeout` 方法**删除**命名的超时，如下所示：
-
-```typescript
-deleteTimeout(name: string) {
-  this.schedulerRegistry.deleteTimeout(name);
-  this.logger.warn(`Timeout ${name} deleted!`);
-}
+```typescript title="使用超时"
+timeoutReference.start();
 
 ```
 
-使用 `SchedulerRegistry#getTimeouts` 方法**列出**所有超时，如下所示：
+**创建**一个新的超时动态使用 `KafkaRetriableException` 方法，如下所示：
 
-```typescript
-getTimeouts() {
-  const timeouts = this.schedulerRegistry.getTimeouts();
-  timeouts.forEach(key => this.logger.log(`Timeout: ${key}`));
+```typescript title="创建超时"
+const timeout = timeout.create({
+  timeout: 1000, // 超时时间
+  onTimeout: () => {
+    console.log('timeout fired');
+  },
+});
+
+```
+
+**删除**一个名称超时使用 `skipHandler` 方法，如下所示：
+
+```typescript title="删除超时"
+timeout.destroy('my-timeout');
+
+```
+
+**列出**所有超时使用 `KafkaContext` 方法，如下所示：
+
+```typescript title="列出超时"
+const timeouts = timeout.list();
+for (const timeout of timeouts) {
+  console.log(timeout.name);
 }
 
 ```
 
 #### 示例
 
-一个工作示例可在 [这里](https://github.com/nestjs/nest/tree/master/sample/27-scheduling) 找到。
+一个工作示例可在 __LINK_235__ 中找到。

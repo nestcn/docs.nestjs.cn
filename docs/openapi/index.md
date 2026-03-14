@@ -49,7 +49,7 @@ bootstrap();
 ```
 
 :::info 提示
-工厂方法 `SwaggerModule.createDocument()` 专门用于在您请求时生成 Swagger 文档。这种方法有助于节省一些初始化时间，结果文档是符合 [OpenAPI 文档](https://swagger.io/specification/#openapi-document)规范的可序列化对象。
+工厂方法 `SwaggerModule.createDocument()` 专门用于在您请求时生成 Swagger 文档。这种方法有助于节省一些初始化时间，结果文档是符合 [OpenAPI 文档](https://swagger.io/specification/#OpenAPI-document)规范的可序列化对象。
 :::
 
 `DocumentBuilder` 帮助构建符合 OpenAPI 规范的基础文档。它提供了几种方法，允许设置标题、描述、版本等属性。为了创建完整的文档（包含所有定义的 HTTP 路由），我们使用 `SwaggerModule` 类的 `createDocument()` 方法。此方法接受两个参数：应用程序实例和 Swagger 选项对象。

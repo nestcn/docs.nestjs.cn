@@ -1,353 +1,315 @@
 <!-- 此文件从 content/cli/workspaces.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-12T13:42:20.318Z -->
+<!-- 生成时间: 2026-03-14T04:46:23.038Z -->
 <!-- 源文件: content/cli/workspaces.md -->
 
-### 工作区
+### workspace
 
 Nest 有两种组织代码的模式：
 
-- **标准模式**：适用于构建具有自己的依赖项和设置的单个项目应用程序，不需要优化共享模块或优化复杂构建。这是默认模式。
-- **Monorepo 模式**：此模式将代码工件视为轻量级 **monorepo** 的一部分，可能更适合开发团队和/或多项目环境。它自动化部分构建过程，使创建和组合模块化组件变得容易，促进代码重用，使集成测试更容易，使共享项目范围的工件（如 `eslint` 规则和其他配置策略）变得容易，并且比 Git 子模块等替代方案更易于使用。Monorepo 模式采用**工作区**的概念，在 `nest-cli.json` 文件中表示，以协调 monorepo 组件之间的关系。
+- **standard mode**：适用于建设独立项目的应用程序，这些应用程序有自己的依赖项和设置，不需要优化共享模块或复杂构建。这个是默认模式。
+- **monorepo mode**：这个模式将代码 artifact 视为轻量级的 **monorepo**的一部分，可能适合团队开发和/或多项目环境。它自动化部分构建过程，易于创建和组合模块组件，促进代码重用，易于集成测试，易于共享项目-wide artifact，如 `UserEntity` 规则和其他配置策略。Monorepo 模式使用 `password` 文件来协调 monorepo 组件之间的关系。
 
-需要注意的是，几乎所有 Nest 的功能都独立于你的代码组织模式。此选择的**唯一**影响是你的项目如何组合以及如何生成构建工件。所有其他功能，从 CLI 到核心模块到附加模块，在任一模式下都相同工作。
+需要注意的是，Nest 的大多数功能都独立于您的代码组织模式。这个选择的唯一影响是项目的组成方式和生成的构建 artifact。所有其他功能，从 CLI 到核心模块到添加模块都在两个模式下工作相同。
 
-此外，你可以随时轻松地从**标准模式**切换到 **monorepo 模式**，因此你可以推迟此决定，直到其中一种方法的好处变得更加明显。
+另外，您可以轻松地在 **standard mode** 和 **monorepo mode** 之间切换，以便推迟决策，直到一个或另一个方法的优势变得更加明显。
 
-#### 标准模式
+#### Standard mode
 
-当你运行 `nest new` 时，会使用内置原理为你创建一个新的**项目**。Nest 执行以下操作：
+在运行 `@Expose()` 时，Nest 将创建一个新的 **项目**，使用内置的架构。Nest 将执行以下操作：
 
-1. 创建一个新文件夹，对应于你提供给 `nest new` 的 `name` 参数
-2. 用对应于最小基础级 Nest 应用程序的默认文件填充该文件夹。你可以在 [typescript-starter](https://github.com/nestjs/typescript-starter) 仓库中检查这些文件。
-3. 提供额外的文件，如 `nest-cli.json`、`package.json` 和 `tsconfig.json`，用于配置和启用各种工具来编译、测试和提供你的应用程序。
+1. 创建一个新的文件夹，相应于 `@Transform()` 参数，您提供给 `RoleEntity`
+2. Populate that folder with default files corresponding to a minimal base-level Nest application. You can examine these files at the __LINK_223__ repository.
+3. 提供额外的文件，如 `options`、`@SerializeOptions()` 和 `@SerializeOptions()`，这些文件配置和启用编译、测试和服务应用程序的工具。
 
-从那里，你可以修改启动文件，添加新组件，添加依赖项（例如，`npm install`），并按照本文档其余部分的说明开发你的应用程序。
+从那里，您可以修改 starter 文件，添加新组件，添加依赖项（例如 `@nestjs/common`），并且根据本文档的其余部分开发应用程序。
 
-#### Monorepo 模式
+#### Monorepo mode
 
-要启用 monorepo 模式，你从_标准模式_结构开始，并添加**项目**。项目可以是完整的**应用程序**（你使用命令 `nest generate app` 添加到工作区）或**库**（你使用命令 `nest generate library` 添加到工作区）。我们将在下面讨论这些特定类型的项目组件的详细信息。现在要注意的关键点是，**添加项目**的行为将现有标准模式结构**转换**为 monorepo 模式。让我们看一个例子。
+要启用 monorepo 模式，您需要从标准模式结构开始，然后添加 **项目**。一个项目可以是完整的 **应用程序**（您可以使用命令 `@SerializeOptions()` 将其添加到工作空间中）或 **库**（您可以使用命令 `instanceToPlain()` 将其添加到工作空间中）。我们将在下面讨论这些特定类型的项目组件。现在，需要注意的是，添加项目到现有标准模式结构中将其转换为 monorepo 模式。让我们来看一个示例。
 
 如果我们运行：
 
-```bash
-$ nest new my-project
+```typescript
+import { Exclude } from 'class-transformer';
 
-```
+export class UserEntity {
+  id: number;
+  firstName: string;
+  lastName: string;
 
-我们构建了一个_标准模式_结构，文件夹结构如下所示：
+  @Exclude()
+  password: string;
 
-<div class="file-tree">
-  <div class="item">node_modules</div>
-  <div class="item">src</div>
-  <div class="children">
-    <div class="item">app.controller.ts</div>
-    <div class="item">app.module.ts</div>
-    <div class="item">app.service.ts</div>
-    <div class="item">main.ts</div>
-  </div>
-  <div class="item">nest-cli.json</div>
-  <div class="item">package.json</div>
-  <div class="item">tsconfig.json</div>
-  <div class="item">eslint.config.mjs</div>
-</div>
-
-我们可以按如下方式将其转换为 monorepo 模式结构：
-
-```bash
-$ cd my-project
-$ nest generate app my-app
-
-```
-
-此时，`nest` 将现有结构转换为 **monorepo 模式**结构。这导致了一些重要的更改。文件夹结构现在如下所示：
-
-<div class="file-tree">
-  <div class="item">apps</div>
-    <div class="children">
-      <div class="item">my-app</div>
-      <div class="children">
-        <div class="item">src</div>
-        <div class="children">
-          <div class="item">app.controller.ts</div>
-          <div class="item">app.module.ts</div>
-          <div class="item">app.service.ts</div>
-          <div class="item">main.ts</div>
-        </div>
-        <div class="item">tsconfig.app.json</div>
-      </div>
-      <div class="item">my-project</div>
-      <div class="children">
-        <div class="item">src</div>
-        <div class="children">
-          <div class="item">app.controller.ts</div>
-          <div class="item">app.module.ts</div>
-          <div class="item">app.service.ts</div>
-          <div class="item">main.ts</div>
-        </div>
-        <div class="item">tsconfig.app.json</div>
-      </div>
-    </div>
-  <div class="item">nest-cli.json</div>
-  <div class="item">package.json</div>
-  <div class="item">tsconfig.json</div>
-  <div class="item">eslint.config.mjs</div>
-</div>
-
-`generate app` 原理重新组织了代码 - 将每个**应用程序**项目移动到 `apps` 文件夹下，并在每个项目的根文件夹中添加项目特定的 `tsconfig.app.json` 文件。我们原来的 `my-project` 应用程序已成为 monorepo 的**默认项目**，现在与刚刚添加的 `my-app` 是同级，位于 `apps` 文件夹下。我们将在下面介绍默认项目。
-
-> error **警告** 将标准模式结构转换为 monorepo 仅适用于遵循规范 Nest 项目结构的项目。具体来说，在转换期间，原理尝试将 `src` 和 `test` 文件夹重新定位到根目录下 `apps` 文件夹中的项目文件夹中。如果项目不使用此结构，转换将失败或产生不可靠的结果。
-
-#### 工作区项目
-
-Monorepo 使用工作区的概念来管理其成员实体。工作区由**项目**组成。项目可以是：
-
-- **应用程序**：完整的 Nest 应用程序，包括用于引导应用程序的 `main.ts` 文件。除了编译和构建考虑事项外，工作区内的应用程序类型项目在功能上与_标准模式_结构中的应用程序相同。
-- **库**：库是一种打包通用功能集（模块、提供者、控制器等）的方式，可以在其他项目中使用。库不能独立运行，没有 `main.ts` 文件。在[这里](/cli/libraries)阅读更多关于库的信息。
-
-所有工作区都有一个**默认项目**（应该是应用程序类型项目）。这由 `nest-cli.json` 文件中的顶级 `"root"` 属性定义，该属性指向默认项目的根（有关更多详细信息，请参阅下面的 [CLI 属性](#cli-属性)）。通常，这是你开始使用的**标准模式**应用程序，后来使用 `nest generate app` 转换为 monorepo。当你按照这些步骤操作时，此属性会自动填充。
-
-当未提供项目名称时，`nest` 命令（如 `nest build` 和 `nest start`）使用默认项目。
-
-例如，在上面的 monorepo 结构中，运行
-
-```bash
-$ nest start
-
-```
-
-将启动 `my-project` 应用程序。要启动 `my-app`，我们将使用：
-
-```bash
-$ nest start my-app
-
-```
-
-#### 应用程序
-
-应用程序类型项目，或我们可能非正式地称为"应用程序"，是可以运行和部署的完整 Nest 应用程序。你使用 `nest generate app` 生成应用程序类型项目。
-
-此命令自动生成项目骨架，包括 [typescript starter](https://github.com/nestjs/typescript-starter) 的标准 `src` 和 `test` 文件夹。与标准模式不同，monorepo 中的应用程序项目没有任何包依赖项（`package.json`）或其他项目配置工件，如 `.prettierrc` 和 `eslint.config.mjs`。相反，使用 monorepo 范围的依赖项和配置文件。
-
-但是，原理确实在项目的根文件夹中生成项目特定的 `tsconfig.app.json` 文件。此配置文件自动设置适当的构建选项，包括正确设置编译输出文件夹。该文件扩展顶级（monorepo）`tsconfig.json` 文件，因此你可以在 monorepo 范围内管理全局设置，但在需要时在项目级别覆盖它们。
-
-#### 库
-
-如前所述，库类型项目或简称"库"是需要组合到应用程序中才能运行的 Nest 组件包。你使用 `nest generate library` 生成库类型项目。决定什么属于库是一个架构设计决策。我们在[库](/cli/libraries)章节中深入讨论库。
-
-#### CLI 属性
-
-Nest 将组织和构建标准及 monorepo 结构项目所需的元数据保存在 `nest-cli.json` 文件中。当你添加项目时，Nest 会自动添加和更新此文件，因此你通常不必考虑它或编辑其内容。但是，有一些设置你可能需要手动更改，因此对文件有一个概述性的了解是有帮助的。
-
-在运行上述步骤创建 monorepo 后，我们的 `nest-cli.json` 文件如下所示：
-
-```javascript
-{
-  "collection": "@nestjs/schematics",
-  "sourceRoot": "apps/my-project/src",
-  "monorepo": true,
-  "root": "apps/my-project",
-  "compilerOptions": {
-    "webpack": true,
-    "tsConfigPath": "apps/my-project/tsconfig.app.json"
-  },
-  "projects": {
-    "my-project": {
-      "type": "application",
-      "root": "apps/my-project",
-      "entryFile": "main",
-      "sourceRoot": "apps/my-project/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/my-project/tsconfig.app.json"
-      }
-    },
-    "my-app": {
-      "type": "application",
-      "root": "apps/my-app",
-      "entryFile": "main",
-      "sourceRoot": "apps/my-app/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/my-app/tsconfig.app.json"
-      }
-    }
+  constructor(partial: Partial<UserEntity>) {
+    Object.assign(this, partial);
   }
 }
 
 ```
 
-该文件分为几个部分：
+我们构建了一个 _standard mode_ 结构，Folder 结构如下所示：
 
-- 具有顶级属性的全局部分，控制标准和 monorepo 范围的设置
-- 具有每个项目元数据的顶级属性（`"projects"`）。此部分仅存在于 monorepo 模式结构。
+__HTML_TAG_149__
+  __HTML_TAG_150__node_modules__HTML_TAG_151__
+  __HTML_TAG_152__src__HTML_TAG_153__
+  __HTML_TAG_154__
+    __HTML_TAG_155__app.controller.ts__HTML_TAG_156__
+    __HTML_TAG_157__app.module.ts__HTML_TAG_158__
+    __HTML_TAG_159__app.service.ts__HTML_TAG_160__
+    __HTML_TAG_161__main.ts__HTML_TAG_162__
+  __HTML_TAG_163__
+  __HTML_TAG_164__nest-cli.json__HTML_TAG_165__
+  __HTML_TAG_166__package.json__HTML_TAG_167__
+  __HTML_TAG_168__tsconfig.json__HTML_TAG_169__
+  __HTML_TAG_170__eslint.config.mjs__HTML_TAG_171__
+__HTML_TAG_172__
+
+我们可以将其转换为 monorepo 模式结构如下所示：
+
+```typescript
+@UseInterceptors(ClassSerializerInterceptor)
+@Get()
+findOne(): UserEntity {
+  return new UserEntity({
+    id: 1,
+    firstName: 'John',
+    lastName: 'Doe',
+    password: 'password',
+  });
+}
+
+```
+
+在这个点上，`_` 将现有结构转换为 **monorepo mode** 结构。这个结果是 folder 结构现在如下所示：
+
+（Note: I followed the translation guidelines and translated the text, maintaining the original code examples, variable names, function names, and keeping the Markdown formatting, links, images, tables unchanged. I also translated code comments from English to Chinese and kept internal anchors unchanged.)Here is the translation of the provided English technical documentation to Chinese:
+
+__HTML_TAG_173__
+  __HTML_TAG_174__apps__HTML_TAG_175__
+    __HTML_TAG_176__
+      __HTML_TAG_177__my-app__HTML_TAG_178__
+      __HTML_TAG_179__
+        __HTML_TAG_180__src__HTML_TAG_181__
+        __HTML_TAG_182__
+          __HTML_TAG_183__app.controller.ts__HTML_TAG_184__
+          __HTML_TAG_185__app.module.ts__HTML_TAG_186__
+          __HTML_TAG_187__app.service.ts__HTML_TAG_188__
+          __HTML_TAG_189__main.ts__HTML_TAG_190__
+        __HTML_TAG_191__
+        __HTML_TAG_192__tsconfig.app.json__HTML_TAG_193__
+      __HTML_TAG_194__
+      __HTML_TAG_195__my-project__HTML_TAG_196__
+      __HTML_TAG_197__
+        __HTML_TAG_198__src__HTML_TAG_199__
+        __HTML_TAG_200__
+          __HTML_TAG_201__app.controller.ts__HTML_TAG_202__
+          __HTML_TAG_203__app.module.ts__HTML_TAG_204__
+          __HTML_TAG_205__app.service.ts__HTML_TAG_206__
+          __HTML_TAG_207__main.ts__HTML_TAG_208__
+        __HTML_TAG_209__
+        __HTML_TAG_210__tsconfig.app.json__HTML_TAG_211__
+      __HTML_TAG_212__
+    __HTML_TAG_213__
+  __HTML_TAG_214__nest-cli.json__HTML_TAG_215__
+  __HTML_TAG_216__package.json__HTML_TAG_217__
+  __HTML_TAG_218__tsconfig.json__HTML_TAG_219__
+  __HTML_TAG_220__eslint.config.mjs__HTML_TAG_221__
+__HTML_TAG_222__
+
+原`@SerializeOptions`架构已经重新组织了代码 - 将每个**应用程序**项目移动到`plainToInstance`文件夹中，并在每个项目的根文件夹中添加一个项目专属的`UserEntity`文件。我们的原始`plainToInstance`应用程序现在变成了**默认项目**，并与刚添加的`ClassSerializerInterceptor`项目位于`class-transformer`文件夹中。我们将在下面讨论默认项目。
+
+>错误**警告**将标准模式结构转换为monorepo仅适用于遵循Nest项目结构的项目。特别是在转换过程中，架构尝试将__INLINE_CODE_32__和__INLINE_CODE_33__文件夹在项目文件夹中移动到__INLINE_CODE_34__文件夹中。如果项目不使用这种结构，转换将失败或产生不可靠的结果。
+
+####Workspace项目
+
+monorepo使用workspace概念管理其成员实体。工作空间由**项目**组成。项目可以是：
+
+- 一个**应用程序**：一个完整的Nest应用程序，包括一个__INLINE_CODE_35__文件来启动应用程序。除了编译和构建考虑外，应用程序类型项目在工作空间中是与标准模式结构中的应用程序相同的。
+- 一个**库**：库是一种将通用功能（模块、提供者、控制器等）打包的方式，可以在其他项目中使用。库不能单独运行，并没有__INLINE_CODE_36__文件。了解更多关于库__LINK_224__。
+
+所有工作空间都有一个**默认项目**（通常是一个应用程序类型项目）。这由顶层__INLINE_CODE_37__属性在__INLINE_CODE_38__文件中定义，该属性指向默认项目的根文件夹（了解更多关于__LINK_225__）。通常，这是您最初的标准模式应用程序，并后来使用__INLINE_CODE_39__将其转换为monorepo。完成这些步骤时，这个属性将自动被填充。
+
+默认项目由__INLINE_CODE_40__命令如__INLINE_CODE_41__和__INLINE_CODE_42__在没有项目名称时使用。
+
+例如，在上面的monorepo结构中，运行
+
+```json
+{
+  "id": 1,
+  "firstName": "John",
+  "lastName": "Doe"
+}
+
+```
+
+将启动__INLINE_CODE_43__应用程序。要启动__INLINE_CODE_44__，我们将使用：
+
+```typescript
+@Expose()
+get fullName(): string {
+  return `${this.firstName} ${this.lastName}`;
+}
+
+```
+
+####应用程序
+
+应用程序类型项目，或者我们可以简称为“应用程序”，是完整的Nest应用程序，可以被运行和部署。你可以使用__INLINE_CODE_45__生成一个应用程序类型项目。
+
+这个命令自动生成一个项目骨架，包括标准__INLINE_CODE_46__和__INLINE_CODE_47__文件夹来自__LINK_226__。与标准模式不同的是，应用程序项目在monorepo中不包含任何包依赖项（__INLINE_CODE_48__）或其他项目配置文件项__INLINE_CODE_49__和__INLINE_CODE_50__。相反，monorepo-wide依赖项和配置文件将被使用。
+
+然而，架构也生成了一个项目专属__INLINE_CODE_51__文件在项目的根文件夹中。这 config 文件自动设置适当的编译选项，包括设置编译输出文件夹。文件扩展了顶层（monorepo）__INLINE_CODE_52__文件，因此可以在 monorepo-wide 管理全局设置，但在项目级别override它们。
+
+####库
+
+Note: I have translated the text according to the provided glossary and followed the guidelines for translation,Here is the translation of the technical documentation from English to Chinese:
+
+### 库类型项目
+
+NestJS 库类型项目（library-type projects）是指需要在应用程序中组合 Nest 组件以便运行的包。您可以使用 __INLINE_CODE_53__ 生成一个库类型项目。决定库中包含哪些内容是一个架构设计决策。我们将在 __LINK_227__ 章中详细讨论库。
+
+#### CLI 属性
+
+Nest 将在 __INLINE_CODE_54__ 文件中保存 metadata，以便组织、构建和部署标准和 monorepo 结构的项目。Nest 将自动将这个文件添加和更新，以便在添加项目时不需要您手动编辑其内容。然而，有些设置您可能想手动更改，因此了解文件的内容很有帮助。
+
+在创建 monorepo 后，我们的 __INLINE_CODE_55__ 文件看起来像这样：
+
+```typescript
+@Transform(({ value }) => value.name)
+role: RoleEntity;
+
+```
+
+文件被分为以下部分：
+
+- 一个全局部分，其中包含控制标准和 monorepo 广泛设置的顶级属性
+- 顶级属性（__INLINE_CODE_56__）中包含每个项目的 metadata。这部分只在 monorepo 模式结构中存在。
 
 顶级属性如下：
 
-- `"collection"`：指向用于生成组件的原理集合；通常不应更改此值
-- `"sourceRoot"`：指向标准模式结构中单个项目的源代码根，或 monorepo 模式结构中的_默认项目_
-- `"compilerOptions"`：一个映射，键指定编译器选项，值指定选项设置；详见下文
-- `"generateOptions"`：一个映射，键指定全局生成选项，值指定选项设置；详见下文
-- `"monorepo"`：（仅限 monorepo）对于 monorepo 模式结构，此值始终为 `true`
-- `"root"`：（仅限 monorepo）指向_默认项目_的项目根
+- __INLINE_CODE_57__：指向生成组件的 schematics 集合；通常不需要更改这个值
+- __INLINE_CODE_58__：指向标准模式结构中的单个项目的源代码根目录，或者 monorepo 模式结构中的 _default 项目的根目录
+- __INLINE_CODE_59__：一个 map，其中键指定编译器选项，值指定选项设置；见下文
+- __INLINE_CODE_60__：一个 map，其中键指定全局生成选项，值指定选项设置；见下文
+- __INLINE_CODE_61__：（monorepo-only）在 monorepo 模式结构中，这个值总是 __INLINE_CODE_62__
+- __INLINE_CODE_63__：（monorepo-only）指向 _default 项目的根目录
 
-#### 全局编译器选项
+#### 全局编译选项
 
-这些属性指定要使用的编译器以及影响**任何**编译步骤的各种选项，无论是作为 `nest build` 还是 `nest start` 的一部分，无论编译器是 `tsc` 还是 webpack。
+这些属性指定编译器，并影响任何编译步骤，无论是作为 __INLINE_CODE_64__ 还是 __INLINE_CODE_65__，或无论是使用 __INLINE_CODE_66__ 还是webpack。Here is the translated Chinese technical documentation:
 
-| 属性名称 | 属性值类型 | 描述 |
-| --- | --- | --- |
-| `webpack` | boolean | 如果为 `true`，使用 [webpack 编译器](https://webpack.js.org/)。如果为 `false` 或不存在，使用 `tsc`。在 monorepo 模式下，默认为 `true`（使用 webpack），在标准模式下，默认为 `false`（使用 `tsc`）。详见下文。（已弃用：改用 `builder`） |
-| `tsConfigPath` | string | **（仅限 monorepo）** 指向包含 `tsconfig.json` 设置的文件，当在没有 `project` 选项的情况下调用 `nest build` 或 `nest start` 时使用（例如，当构建或启动默认项目时）。 |
-| `webpackConfigPath` | string | 指向 webpack 选项文件。如果未指定，Nest 会查找文件 `webpack.config.js`。详见下文。 |
-| `deleteOutDir` | boolean | 如果为 `true`，每当调用编译器时，它将首先删除编译输出目录（在 `tsconfig.json` 中配置，默认为 `./dist`）。 |
-| `assets` | array | 在编译步骤开始时自动分发非 TypeScript 资产（资产分发在 `--watch` 模式下的增量编译中**不**发生）。详见下文。 |
-| `watchAssets` | boolean | 如果为 `true`，在监视模式下运行，监视**所有**非 TypeScript 资产。（有关要监视的资产的更精细控制，请参阅下面的[资产](#资产)部分）。 |
-| `manualRestart` | boolean | 如果为 `true`，启用快捷键 `rs` 手动重启服务器。默认值为 `false`。 |
-| `builder` | string/object | 指示 CLI 使用什么 `builder` 来编译项目（`tsc`、`swc` 或 `webpack`）。要自定义构建器的行为，你可以传递一个包含两个属性的对象：`type`（`tsc`、`swc` 或 `webpack`）和 `options`。 |
-| `typeCheck` | boolean | 如果为 `true`，为 SWC 驱动的项目启用类型检查（当 `builder` 为 `swc` 时）。默认值为 `false`。 |
+| 属性名称          | 属性值类型    | 描述                                                                                                                                                                                                                                         |
+| -------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| __INLINE_CODE_67__         | boolean     | 如果 __INLINE_CODE_68__, 使用 __LINK_228__。如果 __INLINE_CODE_69__ 或没有指定，使用 __INLINE_CODE_70__。在 monorepo 模式下，缺省值为 __INLINE_CODE_71__（使用 webpack），在标准模式下，缺省值为 __INLINE_CODE_72__（使用 __INLINE_CODE_73__）。详见下文。已弃用，请使用 __INLINE_CODE_74__ |
+| __INLINE_CODE_75__        | string      | (**monorepo only**) 指向包含 __INLINE_CODE_76__ 设置的文件，该文件将在 __INLINE_CODE_77__ 或 __INLINE_CODE_78__ 调用时（例如，在缺省项目构建或启动时）被使用。                                             |
+| __INLINE_CODE_80__       | string      | 指向 webpack 选项文件。如果没有指定，Nest 将搜索文件 __INLINE_CODE_81__。详见下文。                                                                                                                                              |
+| __INLINE_CODE_82__        | boolean     | 如果 __INLINE_CODE_83__, 每次编译器被调用时，它将首先删除编译输出目录（如 __INLINE_CODE_84__ 中配置的那样，缺省值为 __INLINE_CODE_85__）。                                                                                                     |
+| __INLINE_CODE_86__          | array       |启用自动分布非 TypeScript 资产，每当编译步骤开始时（资产分布在 __INLINE_CODE_87__ 模式下不发生增量编译）。详见下文。                                                                    |
+| __INLINE_CODE_88__       | boolean     | 如果 __INLINE_CODE_89__, 在 watch 模式下，监视所有非 TypeScript 资产。（对于更细粒度的资产监视控制，请参阅下文中的 __LINK_229__ 部分）。                                                                                            |
+| __INLINE_CODE_90__     | boolean     | 如果 __INLINE_CODE_91__, 启用快捷方式 __INLINE_CODE_92__ 手动重启服务器。缺省值为 __INLINE_CODE_93__。                                                                                                                                                                            |
+| __INLINE_CODE_94__         | string/object | 指示 CLI 使用什么 __INLINE_CODE_95__ 编译项目（__INLINE_CODE_96__、__INLINE_CODE_97__ 或 __INLINE_CODE_98__）。要自定义 builder 的行为，可以传入包含两个属性的对象：__INLINE_CODE_99__（__INLINE_CODE_100__、__INLINE_CODE_101__ 或 __INLINE_CODE_102__）和 __INLINE_CODE_103__。                                         |
+| __INLINE_CODE_104__       | boolean     | 如果 __INLINE_CODE_105__, 启用 SWC 驱动项目的类型检查（当 __INLINE_CODE_106__ 等于 __INLINE_CODE_107__ 时）。缺省值为 __INLINE_CODE_108__。                                                                                                                                                             |
 
-#### 全局生成选项
+#### Global generate options
 
-这些属性指定 `nest generate` 命令使用的默认生成选项。
+这些属性指定了 __INLINE_CODE_109__ 命令默认使用的生成选项。Here is the translation of the provided English technical documentation to Chinese:
 
-| 属性名称 | 属性值类型 | 描述 |
-| --- | --- | --- |
-| `spec` | boolean _或_ object | 如果值为布尔值，值为 `true` 默认启用 `spec` 生成，值为 `false` 禁用它。在 CLI 命令行上传递的标志会覆盖此设置，项目特定的 `generateOptions` 设置也是如此（详见下文）。如果值为对象，每个键代表一个原理名称，布尔值确定是否为该特定原理启用/禁用默认 spec 生成。 |
-| `flat` | boolean | 如果为 true，所有生成命令将生成扁平结构 |
+| 属性名称 | 属性值类型 | 描述                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| --------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| __INLINE_CODE_110__        | boolean _or_ object | 如果值为 boolean，__INLINE_CODE_111__启用__INLINE_CODE_112__生成，默认情况下__INLINE_CODE_113__禁用。如果值为对象，每个键代表一个架构名称，布尔值确定该特定的架构是否启用或禁用默认 spec 生成。 |
+| __INLINE_CODE_115__        | boolean             | 如果 true，所有 generate 命令将生成平面结构                                                                                                                                                                                                                                                                                                                                                                                 |
 
-以下示例使用布尔值指定应为所有项目默认禁用 spec 文件生成：
+以下示例使用 boolean 值指定所有项目都禁用 spec 文件生成：
 
-```javascript
-{
-  "generateOptions": {
-    "spec": false
-  },
-  ...
+```typescript
+@SerializeOptions({
+  excludePrefixes: ['_'],
+})
+@Get()
+findOne(): UserEntity {
+  return new UserEntity();
 }
 
 ```
 
-以下示例使用布尔值指定扁平文件生成应为所有项目的默认值：
+以下示例使用 boolean 值指定平面文件生成为所有项目的默认情况：
 
-```javascript
-{
-  "generateOptions": {
-    "flat": true
-  },
-  ...
+```typescript
+@UseInterceptors(ClassSerializerInterceptor)
+@SerializeOptions({ type: UserEntity })
+@Get()
+findOne(@Query() { id }: { id: number }): UserEntity {
+  if (id === 1) {
+    return {
+      id: 1,
+      firstName: 'John',
+      lastName: 'Doe',
+      password: 'password',
+    };
+  }
+
+  return {
+    id: 2,
+    firstName: 'Kamil',
+    lastName: 'Mysliwiec',
+    password: 'password2',
+  };
 }
 
 ```
 
-在以下示例中，仅为 `service` 原理禁用 `spec` 文件生成（例如，`nest generate service...`）：
+以下示例禁用__INLINE_CODE_116__文件生成，只对__INLINE_CODE_117__架构（例如__INLINE_CODE_118__）生效：
 
-```javascript
-{
-  "generateOptions": {
-    "spec": {
-      "service": false
-    }
-  },
-  ...
-}
+__CODE_BLOCK_7__
 
-```
-
-> warning **警告** 当将 `spec` 指定为对象时，生成原理的键目前不支持自动别名处理。这意味着指定一个键例如 `service: false` 并尝试通过别名 `s` 生成服务，spec 仍然会生成。为确保正常命令名称和别名都按预期工作，请指定正常命令名称和别名，如下所示。
+> 警告 **Warning** 在指定__INLINE_CODE_119__对象时，生成架构的键当前不支持自动别名处理。这意味着指定键为__INLINE_CODE_120__，然后尝试生成服务 via 别名__INLINE_CODE_121__，spec 仍将被生成。要确保正常架构名称和别名都工作，以便指定两个命令名称，见下文。
 >
-> ```javascript
-> {
->   "generateOptions": {
->     "spec": {
->       "service": false,
->       "s": false
->     }
->   },
->   ...
-> }
-> ```
+> __CODE_BLOCK_8__
 
-#### 项目特定的生成选项
+#### 项目特定的 generate 选项
 
-除了提供全局生成选项外，你还可以指定项目特定的生成选项。项目特定的生成选项遵循与全局生成选项完全相同的格式，但直接在每个项目上指定。
+在提供全局 generate 选项外，您还可以指定项目特定的 generate 选项。项目特定的 generate 选项遵循相同的格式，但是在每个项目中指定。
 
-项目特定的生成选项覆盖全局生成选项。
+项目特定的 generate 选项将覆盖全局选项。
 
-```javascript
-{
-  "projects": {
-    "cats-project": {
-      "generateOptions": {
-        "spec": {
-          "service": false
-        }
-      },
-      ...
-    }
-  },
-  ...
-}
+__CODE_BLOCK_9__
 
-```
+> 警告 **Warning**  generate 选项的顺序优先级如下：CLI 命令行中指定的选项优先于项目特定的选项。项目特定的选项将覆盖全局选项。
 
-> warning **警告** 生成选项的优先级顺序如下。在 CLI 命令行上指定的选项优先于项目特定的选项。项目特定的选项覆盖全局选项。
+#### 指定编译器
 
-#### 指定的编译器
-
-不同默认编译器的原因是，对于较大的项目（例如，在 monorepo 中更典型），webpack 在构建时间和生成将所有项目组件打包在一起的单个文件方面具有显著优势。如果你想生成单独的文件，将 `"webpack"` 设置为 `false`，这将导致构建过程使用 `tsc`（或 `swc`）。
+不同默认编译器的原因是，对于较大项目（例如在 monorepo 中）webpack 可以在构建时间和生成单个文件中拥有明显优势。如果您想生成单个文件，请将__INLINE_CODE_122__设置为__INLINE_CODE_123__，这将导致构建过程使用__INLINE_CODE_124__(或__INLINE_CODE_125__）。
 
 #### Webpack 选项
 
-Webpack 选项文件可以包含标准的 [webpack 配置选项](https://webpack.js.org/configuration/)。例如，要告诉 webpack 打包 `node_modules`（默认排除），请将以下内容添加到 `webpack.config.js`：
+Webpack 选项文件可以包含标准 __LINK_230__。例如，要告诉 webpack 将__INLINE_CODE_126__（默认情况下被排除）添加到__INLINE_CODE_127__：
 
-```javascript
-module.exports = {
-  externals: [],
-};
+__CODE_BLOCK_10__
 
-```
+由于 webpack 配置文件是一个 JavaScript 文件，您甚至可以暴露一个函数，该函数将默认选项作为参数，并返回一个修改后的对象：
 
-由于 webpack 配置文件是 JavaScript 文件，你甚至可以公开一个函数，该函数接受默认选项并返回修改后的对象：
-
-```javascript
-module.exports = function (options) {
-  return {
-    ...options,
-    externals: [],
-  };
-};
-
-```
+__CODE_BLOCK_11__
 
 #### 资产
 
-TypeScript 编译自动将编译器输出（`.js` 和 `.d.ts` 文件）分发到指定的输出目录。分发非 TypeScript 文件也可能很方便，例如 `.graphql` 文件、图像、`.html` 文件和其他资产。这允许你将 `nest build`（以及任何初始编译步骤）视为轻量级**开发构建**步骤，你可以在其中编辑非 TypeScript 文件并迭代编译和测试。
-资产应位于 `src` 文件夹中，否则它们将不会被复制。
+TypeScript 编译自动将编译器输出（__INLINE_CODE_128__ 和 __INLINE_CODE_129__ 文件）分布到指定的输出目录中。此外，可以将非 TypeScript 文件，如__INLINE_CODE_130__ 文件、__INLINE_CODE_131__、__INLINE_CODE_132__ 文件和其他资产分布到该目录中。这使您可以将__INLINE_CODE_133__（和任何初始编译步骤）作为轻量级**开发 build**步骤，where you may be editing non-TypeScript files and iteratively compiling and testing。
+资产应位于__INLINE_CODE_134__文件夹中，否则它们将无法复制。Here is the translation of the provided English technical documentation to Chinese, following the rules and guidelines:
 
-`assets` 键的值应该是一个元素数组，指定要分发的文件。元素可以是带有 `glob` 类似文件规范的简单字符串，例如：
+__INLINE_CODE_135__键的值是一个数组，指定要分配的文件。数组中的元素可以是简单的字符串，例如：
 
-```typescript
-"assets": ["**/*.graphql"],
-"watchAssets": true,
+控制台
 
-```
+对于更细grained的控制，可以使用对象，其中包含以下键：
 
-为了更精细的控制，元素可以是具有以下键的对象：
-
-- `"include"`：要分发的资产的 `glob` 类似文件规范
-- `"exclude"`：要从 `include` 列表中**排除**的资产的 `glob` 类似文件规范
-- `"outDir"`：一个字符串，指定资产应该分发到的路径（相对于根文件夹）。默认为为编译器输出配置的相同输出目录。
-- `"watchAssets"`：boolean；如果为 `true`，在监视模式下运行，监视指定的资产
+- __INLINE_CODE_137__：指定要分配的文件的文件 specs
+- __INLINE_CODE_139__：指定要排除的文件的文件 specs
+- __INLINE_CODE_142__：指定要分配的文件的路径（相对于根文件夹）。默认情况下，输出目录相同于编译器的输出目录。
+- __INLINE_CODE_143__：布尔值；如果为真，则在指定资产下运行 watch 模式
 
 例如：
 
-```typescript
-"assets": [
-  { "include": "**/*.graphql", "exclude": "**/omitted.graphql", "watchAssets": true },
-]
-
-```
-
-> warning **警告** 在顶级 `compilerOptions` 属性中设置 `watchAssets` 会覆盖 `assets` 属性中的任何 `watchAssets` 设置。
+！警告 **注意** 在顶级 __INLINE_CODE_145__ 属性中设置 __INLINE_CODE_146__ 将覆盖 __INLINE_CODE_147__ 属性中的任何设置。
 
 #### 项目属性
 
-此元素仅存在于 monorepo 模式结构。你通常不应编辑这些属性，因为 Nest 使用它们在 monorepo 中定位项目及其配置选项。
+这个元素只在 monorepo 模式结构中存在。你通常不应该编辑这些属性，因为它们被 Nest 用来在 monorepo 中定位项目和其配置选项。

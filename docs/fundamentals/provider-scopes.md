@@ -1,257 +1,277 @@
+<!-- 此文件从 content/fundamentals/provider-scopes.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-14T04:35:00.073Z -->
+<!-- 源文件: content/fundamentals/provider-scopes.md -->
+
 ### 注入作用域
 
-对于来自不同编程语言背景的人来说，了解到在Nest中几乎所有东西都是跨传入请求共享的可能会出乎意料。我们有数据库连接池、具有全局状态的单例服务等。请记住，Node.js不遵循请求/响应多线程无状态模型，其中每个请求由单独的线程处理。因此，对我们的应用程序使用单例实例是完全**安全**的。
+来自不同编程语言背景的人可能会感到惊讶，学习 Nest 中几乎所有内容都在 Incoming 请求中共享。我们拥有数据库连接池、全局状态的单例服务等。请记住，Node.js 不遵循请求/响应多线程无状态模型，每个请求都由单独的线程处理。因此，使用单例实例完全是安全的。
 
-然而，在某些边缘情况下，基于请求的生命周期可能是期望的行为，例如，GraphQL应用程序中的每个请求缓存、请求跟踪和多租户。注入作用域提供了一种机制来获得所需的提供者生命周期行为。
+然而，在某些边缘情况下，可能需要请求 lifetime，例如 GraphQL 应用中的请求缓存、请求跟踪和多租户 Injection scopes 提供了一个机制来获得所需的提供者 lifetime 行为。
 
 #### 提供者作用域
 
-提供者可以有以下任何作用域：
+提供者可以具有以下作用域：
 
-<table>
-  <tr>
-    <td><code>DEFAULT</code></td>
-    <td>提供者的单个实例在整个应用程序中共享。实例生命周期直接与应用程序生命周期相关联。一旦应用程序启动，所有单例提供者都已实例化。默认使用单例作用域。</td>
-  </tr>
-  <tr>
-    <td><code>REQUEST</code></td>
-    <td>提供者的新实例是为每个传入的<strong>请求</strong>专门创建的。实例在请求处理完成后被垃圾回收。</td>
-  </tr>
-  <tr>
-    <td><code>TRANSIENT</code></td>
-    <td>瞬态提供者不在消费者之间共享。每个注入瞬态提供者的消费者将收到一个新的、专用的实例。</td>
-  </tr>
-</table>
+```html
+<div>
+    <span>DEFAULT</span>
+    <span>单一实例在整个应用程序中共享，实例 lifetime 与应用程序 lifecycle 相绑定。应用程序启动后，所有单例提供者都已被实例化。</span>
+</div>
 
-> info **提示** 对于大多数用例，**推荐**使用单例作用域。跨消费者和跨请求共享提供者意味着实例可以被缓存，并且其初始化仅在应用程序启动期间发生一次。
+<div>
+    <span>REQUEST</span>
+    <span>为每个 incoming 请求创建一个新的实例，实例在请求处理完成后被垃圾回收。</span>
+</div>
+
+<div>
+    <span>TRANSIENT</span>
+    <span>提供者不在消费者之间共享，每个消费者都将收到一个新的、专门的实例。</span>
+</div>
+
+```
+
+> 提示 **Hint** 使用单例作用域是大多数用例的推荐做法。将提供者共享在消费者之间和请求之间意味着实例可以被缓存，并且在应用程序启动时只会进行一次初始化。
 
 #### 使用
 
-通过将`scope`属性传递给`@Injectable()`装饰器选项对象来指定注入作用域：
+使用注入作用域通过将 __INLINE_CODE_12__ 属性传递给 __INLINE_CODE_13__ 装饰器选项对象：
 
 ```typescript
-import { Injectable, Scope } from '@nestjs/common';
-
-@Injectable({ scope: Scope.REQUEST })
-export class CatsService {}
-
-```
-
-同样，对于[自定义提供者](/fundamentals/dependency-injection)，在提供者注册的长表单中设置`scope`属性：
-
-```typescript
-{
-  provide: 'CACHE_MANAGER',
-  useClass: CacheManager,
-  scope: Scope.TRANSIENT,
+@UseGuards(RequestGuard)
+export class MyController {
+  // ...
 }
 
 ```
 
-> info **提示** 从`@nestjs/common`导入`Scope`枚举
+类似地，在长形式中，为提供者注册时设置 __INLINE_CODE_14__ 属性：
 
-默认使用单例作用域，不需要声明。如果您确实想将提供者声明为单例作用域，请为`scope`属性使用`Scope.DEFAULT`值。
+```typescript
+@UseGuards(RequestGuard)
+export class MyController {
+  // ...
+}
 
-> warning **注意** WebSocket网关不应使用请求作用域的提供者，因为它们必须作为单例运行。每个网关封装一个真实的套接字，不能多次实例化。此限制也适用于其他一些提供者，如[_Passport策略_](../security/authentication#请求作用域策略)或_Cron控制器_。
+@UseGuards(RequestGuard)
+export class MyService {
+  // ...
+}
+
+```
+
+> 提示 **Hint** 从 __INLINE_CODE_15__ 枚举中导入 __INLINE_CODE_16__
+
+如果你想声明提供者为单例作用域，可以使用 __INLINE_CODE_17__ 值为 __INLINE_CODE_18__ 属性。
+
+> 警告 **Notice** Websocket Gateway 不应该使用请求作用域提供者，因为它们必须是单例。每个网关都封装了一个真实的套接字，并不能被实例化多次。该限制也适用于一些其他提供者，例如 __LINK_97__ 或 _Cron controllers_。
 
 #### 控制器作用域
 
-控制器也可以有作用域，适用于该控制器中声明的所有请求方法处理程序。与提供者作用域一样，控制器的作用域声明了其生命周期。对于请求作用域的控制器，为每个入站请求创建一个新实例，并在请求处理完成后垃圾回收。
+控制器也可以具有作用域，这个作用域将应用于控制器中所有请求方法处理程序。像提供者作用域一样，控制器作用域声明了实例的 lifetime。对于请求作用域控制器，每个 incoming 请求都将创建一个新的实例，并在请求处理完成后被垃圾回收。
 
-使用`ControllerOptions`对象的`scope`属性声明控制器作用域：
+使用控制器作用域通过将 __INLINE_CODE_19__ 属性传递给 __INLINE_CODE_20__ 对象：
 
 ```typescript
-@Controller({
-  path: 'cats',
-  scope: Scope.REQUEST,
-})
-export class CatsController {}
+@UseGuards(RequestGuard)
+export class MyController {
+  // ...
+}
 
 ```
 
-#### 作用域层次结构
+#### 作用域继承
 
-`REQUEST`作用域会在注入链中向上冒泡。依赖于请求作用域提供者的控制器本身将是请求作用域的。
+__INLINE_CODE_21__ 作用域会沿着注入链向上冒泡。一个控制器，如果依赖于请求作用域提供者，就将自己变为请求作用域。
 
-想象以下依赖图：`CatsController <- CatsService <- CatsRepository`。如果`CatsService`是请求作用域的（而其他是默认单例），`CatsController`将成为请求作用域的，因为它依赖于注入的服务。不依赖的`CatsRepository`将保持单例作用域。
+想象以下依赖图： __INLINE_CODE_22__。如果 __INLINE_CODE_23__ 是请求作用域（其他的是默认单例），那么 __INLINE_CODE_24__ 将变为请求作用域，因为它依赖于注入的服务。 __INLINE_CODE_25__，它不依赖于注入的服务，将保持单例作用域。
 
-瞬态作用域的依赖项不遵循该模式。如果单例作用域的`DogsService`注入瞬态`LoggerService`提供者，它将接收一个新实例。然而，`DogsService`将保持单例作用域，因此在任何地方注入它都不会解析为`DogsService`的新实例。如果这是期望的行为，`DogsService`也必须显式标记为`TRANSIENT`。
+Transient 作用域不遵循这个模式。如果单例作用域的 __INLINE_CODE_26__ 注入一个 transient __INLINE_CODE_27__ 提供者，它将收到一个新的实例。但是， `UsersModule` 将保持单例作用域，所以注入它任何地方将不会解决到新的实例。如果需要这种行为， `UsersModule` 必须被显式标记为 `UsersService`。
 
-<app-banner-courses></app-banner-courses>
+```html
+<div>
+    <span>DEFAULT</span>
+    <span>单一实例在整个应用程序中共享，实例 lifetime 与应用程序 lifecycle 相绑定。应用程序启动后，所有单例提供者都已被实例化。</span>
+</div>
+
+<div>
+    <span>REQUEST</span>
+    <span>为每个 incoming 请求创建一个新的实例，实例在请求处理完成后被垃圾回收。</span>
+</div>
+
+<div>
+    <span>TRANSIENT</span>
+    <span>提供者不在消费者之间共享，每个消费者都将收到一个新的、专门的实例。</span>
+</div>
+
+```
 
 #### 请求提供者
 
-在基于HTTP服务器的应用程序中（例如，使用`@nestjs/platform-express`或`@nestjs/platform-fastify`），当使用请求作用域的提供者时，您可能希望访问原始请求对象的引用。您可以通过注入`REQUEST`对象来做到这一点。
-
-`REQUEST`提供者本质上是请求作用域的，这意味着当使用它时，您不需要显式指定`REQUEST`作用域。此外，即使您尝试这样做，它也会被忽略。任何依赖于请求作用域提供者的提供者都会自动采用请求作用域，并且此行为无法更改。
+在 HTTP 服务器基于的应用程序（例如使用 `AuthModule` 或 `UsersModule`）中，你可能想要访问原始请求对象的引用，以使用请求作用域提供者。你可以通过注入 `UsersModule` 对象来实现。
 
 ```typescript
-import { Injectable, Scope, Inject } from '@nestjs/common';
-import { REQUEST } from '@nestjs/core';
-import { Request } from 'express';
-
-@Injectable({ scope: Scope.REQUEST })
-export class CatsService {
-  constructor(@Inject(REQUEST) private request: Request) {}
+export class MyController {
+  constructor(private request: Request) {
+    // ...
+  }
 }
+
+```以下是翻译后的中文文档：
+
+`AuthModule` 提供器天然地是请求 Scoped 的，这意味着您不需要在使用时明确指定 `UsersService` 范围，因为它将被忽略。任何依赖于请求 Scoped 提供器的提供器都会自动继承请求 Scope，这种行为无法改变。
+
+```typescript
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { ConfigModule } from './config/config.module';
+
+@Module({
+  imports: [ConfigModule],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
 
 ```
 
-由于底层平台/协议差异，您在Microservice或GraphQL应用程序中访问入站请求的方式略有不同。在[GraphQL](/graphql/quick-start)应用程序中，您注入`CONTEXT`而不是`REQUEST`：
+由于平台/协议的差异，您在 Microservice 或 GraphQL 应用程序中访问入站请求的方式不同。在 __LINK_98__ 应用程序中，您将注入 `AuthService` 而不是 `AuthModule`：
 
 ```typescript
-import { Injectable, Scope, Inject } from '@nestjs/common';
-import { CONTEXT } from '@nestjs/graphql';
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { ConfigModule } from './config/config.module';
 
-@Injectable({ scope: Scope.REQUEST })
-export class CatsService {
-  constructor(@Inject(CONTEXT) private context) {}
-}
+@Module({
+  imports: [ConfigModule.register({ folder: './config' })],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
 
 ```
 
-然后，您配置`context`值（在`GraphQLModule`中）以包含`request`作为其属性。
+然后，您将配置 `UsersService` 值（在 `AuthModule` 中）包含 `UsersModule` 作为其属性。
 
-#### 询问者提供者
+#### Inquiry 提供器
 
-如果您想获取提供者被构造的类，例如在日志记录或指标提供者中，您可以注入`INQUIRER`令牌。
+如果您想获取提供器构造的类，例如在日志或指标提供器中，您可以注入 `UsersModule` 令牌。
 
 ```typescript
-import { Inject, Injectable, Scope } from '@nestjs/common';
-import { INQUIRER } from '@nestjs/core';
+@Module({
+  imports: [DogsModule],
+  controllers: [CatsController],
+  providers: [CatsService],
+  exports: [CatsService]
+})
 
-@Injectable({ scope: Scope.TRANSIENT })
-export class HelloService {
-  constructor(@Inject(INQUIRER) private parentClass: object) {}
+```
 
-  sayHello(message: string) {
-    console.log(`${this.parentClass?.constructor?.name}: ${message}`);
+然后，您可以按照以下方式使用它：
+
+```typescript
+import { DynamicModule, Module } from '@nestjs/common';
+import { ConfigService } from './config.service';
+
+@Module({})
+export class ConfigModule {
+  static register(): DynamicModule {
+    return {
+      module: ConfigModule,
+      providers: [ConfigService],
+      exports: [ConfigService],
+    };
   }
 }
 
 ```
 
-然后按如下方式使用它：
-
-```typescript
-import { Injectable } from '@nestjs/common';
-import { HelloService } from './hello.service';
-
-@Injectable()
-export class AppService {
-  constructor(private helloService: HelloService) {}
-
-  getRoot(): string {
-    this.helloService.sayHello('My name is getRoot');
-
-    return 'Hello world!';
-  }
-}
-
-```
-
-在上面的示例中，当调用`AppService#getRoot`时，`"AppService: My name is getRoot"`将被记录到控制台。
+在上面的示例中，当 `AuthModule` 被调用时,`UsersModule` 将被记录到控制台。
 
 #### 性能
 
-使用请求作用域的提供者会对应用程序性能产生影响。虽然Nest尝试缓存尽可能多的元数据，但它仍然必须在每个请求上创建类的实例。因此，它会减慢您的平均响应时间和整体基准测试结果。除非提供者必须是请求作用域的，否则强烈建议您使用默认的单例作用域。
+使用请求 Scoped 提供器将对应用程序性能产生影响。虽然 Nest 尝试缓存尽量多的元数据，但是它仍然需要在每个请求中创建您的类的实例。这将导致您的平均响应时间和总体基准测试结果增加。除非提供器必须是请求 Scoped，否则强烈建议您使用默认的单例 Scope。
 
-> info **提示** 尽管这一切听起来相当令人生畏，但一个正确设计的利用请求作用域提供者的应用程序在延迟方面不应减慢超过~5%。
+> info **提示** 虽然一切听起来非常吓人，但是正确设计的应用程序可以使用请求 Scoped 提供器而不增加 latency。
 
-#### 持久提供者
+#### 持久提供器
 
-如上面部分所述，请求作用域的提供者可能会导致延迟增加，因为至少有1个请求作用域的提供者（注入到控制器实例中，或更深层次 - 注入到其提供者之一中）会使控制器也成为请求作用域的。这意味着它必须在每个单独的请求上重新创建（实例化）（并在之后垃圾回收）。现在，这也意味着，对于例如30k并行请求，将有30k个控制器（及其请求作用域提供者）的临时实例。
+请求 Scoped 提供器，如上所述，可能会增加 latency，因为至少有一个请求 Scoped 提供器（注入到控制器实例中或更深处 - 注入到其中的提供器中）使控制器请求 Scoped 的话，它必须在每个个体请求中被重新创建（实例化）并在完成后被垃圾回收。现在，这意味着，在 30k 个并发请求中将有 30k 个短暂的控制器实例（和请求 Scoped 提供器）。
 
-让大多数提供者依赖的公共提供者（想想数据库连接或日志服务）会自动将所有这些提供者也转换为请求作用域的提供者。这在**多租户应用程序**中可能构成挑战，特别是对于那些具有中央请求作用域"数据源"提供者的应用程序，该提供者从请求对象中获取标头/令牌，并基于其值检索相应的数据库连接/架构（特定于该租户）。
+有一个公共提供器，这些提供器都依赖于（例如数据库连接或日志服务），这将自动将所有这些提供器转换为请求 Scoped 提供器。这可以在 **多租户应用程序** 中 pose 一个挑战，特别是那些具有 central 请求 Scoped "数据源" 提供器的应用程序，这个提供器根据请求对象中的值来确定当前租户并获取相应的数据库连接/架构（特定于该租户）。
 
-例如，假设您有一个由10个不同客户交替使用的应用程序。每个客户都有自己的**专用数据源**，您希望确保客户A永远无法访问客户B的数据库。实现这一点的一种方法是声明一个请求作用域的"数据源"提供者，该提供者基于请求对象确定"当前客户"并检索其相应的数据库。通过这种方法，您可以在几分钟内将应用程序转变为多租户应用程序。但是，这种方法的一个主要缺点是，由于您的应用程序组件很可能大部分依赖于"数据源"提供者，它们将隐式成为"请求作用域"的，因此您无疑会看到应用程序性能的影响。
+例如，让我们假设您有一个由 10 个不同的客户端使用的应用程序。每个客户端都有其 **自己的专用数据源**，并且您想确保客户 A 不会访问客户 B 的数据库。一种实现方法是声明一个请求 Scoped "数据源" 提供器，这个提供器根据请求对象来确定当前租户并获取相应的数据库。使用这种方法，您可以在几分钟内将应用程序转换为多租户应用程序。但是，这种方法的主要缺点是，因为大多数您的应用程序组件都依赖于 "数据源" 提供器，所以它们将隐式地变为 "请求 Scoped"，因此您的应用程序性能将受到影响。
 
-但是，如果我们有更好的解决方案呢？既然我们只有10个客户，我们难道不能为每个客户拥有10个单独的[DI子树](/fundamentals/module-reference#解析作用域提供者)（而不是每个请求重新创建每个树）吗？如果您的提供者不依赖于每个连续请求真正唯一的任何属性（例如，请求UUID），而是有一些特定的属性让我们聚合（分类）它们，那么就没有理由在每个传入请求上**重新创建DI子树**。
+但是，我们是否有更好的解决方案？因为我们只有 10 个客户端，我们不能在每个请求中重新创建每个树，而是可以有 10 个个体 __LINK_99__ per 客户端（而不是重新创建每个树）。如果您的提供器不依赖于每个连续请求的唯一属性（例如请求 UUID），而是有特定的属性可以将它们聚合（分类），那么没有理由在每个请求中重新创建 DI 子树。
 
-而这正是**持久提供者**派上用场的时候。
+正是在这里 durable 提供器出场。
 
-在我们开始将提供者标记为持久之前，我们必须首先注册一个**策略**，该策略指示Nest什么是那些"公共请求属性"，提供分组请求的逻辑 - 将它们与其相应的DI子树相关联。
+在注册 durable 提供器前，我们必须首先注册一个 **策略**，该策略 instructs Nest 什么是这些 "公共请求属性"，提供逻辑来分组请求 - 将它们与相应的 DI 子树关联。
 
 ```typescript
-import {
-  HostComponentInfo,
-  ContextId,
-  ContextIdFactory,
-  ContextIdStrategy,
-} from '@nestjs/core';
-import { Request } from 'express';
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { ConfigModule } from './config/config.module';
 
-const tenants = new Map<string, ContextId>();
+@Module({
+  imports: [ConfigModule.register({ folder: './config' })],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
 
-export class AggregateByTenantContextIdStrategy implements ContextIdStrategy {
-  attach(contextId: ContextId, request: Request) {
-    const tenantId = request.headers['x-tenant-id'] as string;
-    let tenantSubTreeId: ContextId;
+```
 
-    if (tenants.has(tenantId)) {
-      tenantSubTreeId = tenants.get(tenantId);
-    } else {
-      tenantSubTreeId = ContextIdFactory.create();
-      tenants.set(tenantId, tenantSubTreeId);
-    }
+> info **提示** 类似于请求 Scope，耐用性会向上冒泡。这意味着如果 A 依赖于 B，而 B 是标记为 `AuthModule` 的话，A 也隐式地变为耐用（除非 `AuthModule` 对 A 提供器的 `UsersService` 类型被明确设置）。
 
-    // 如果树不持久，返回原始的 "contextId" 对象
-    return (info: HostComponentInfo) =>
-      info.isTreeDurable ? tenantSubTreeId : contextId;
+> warning **警告** 请注意，这种策略对操作大规模租户的应用程序不太理想。以下是翻译后的中文技术文档：
+
+Nest应用中，`AuthService`方法返回的值确定了给定主机的上下文标识符。在这里，我们指定使用`ConfigModule`而不是原始的自动生成的`options`对象，任何标记为耐用的主机组件（例如，请求作用域控制器）时。另外，在上面的示例中，**无载荷**将被注册（其中载荷是`.env`/`.env`提供者，它代表“根”-父节点）。
+
+如果您想要为耐用树注册载荷，请使用以下构造：
+
+```typescript
+@Provider()
+export class DurableProvider {
+  provide() {
+    return `.env`;
   }
 }
 
 ```
 
-> info **提示** 类似于请求作用域，持久性会在注入链中向上冒泡。这意味着如果A依赖于B，而B被标记为`durable`，A也会隐式变得持久（除非A提供者的`durable`显式设置为`false`）。
+现在，每当使用`src`/`ConfigModule`将`.env`提供者（或GraphQL应用程序中的`config`提供者）注入时，将注入`ConfigModule`对象（包含单个属性`imports`）。
 
-> warning **警告** 请注意，此策略不适合具有大量租户的应用程序。
-
-从`attach`方法返回的值指示Nest对于给定的主机应该使用什么上下文标识符。在这种情况下，我们指定当主机组件（例如，请求作用域控制器）被标记为持久时（您可以在下面学习如何将提供者标记为持久），应该使用`tenantSubTreeId`而不是原始的、自动生成的`contextId`对象。此外，在上面的示例中，**没有有效负载**会被注册（其中有效负载 = 代表子树"根" - 父级的`REQUEST`/`CONTEXT`提供者）。
-
-如果您想为持久树注册有效负载，请使用以下构造：
+因此，在这种策略中，您可以将其注册到您的代码中（因为它总是应用于全局），例如，您可以将其放在`@Module()`文件中：
 
 ```typescript
-// `AggregateByTenantContextIdStrategy#attach` 方法的返回：
-return {
-  resolve: (info: HostComponentInfo) =>
-    info.isTreeDurable ? tenantSubTreeId : contextId,
-  payload: { tenantId },
-};
+@Module({
+  providers: [DurableProvider]
+})
+export class AppModule {}
 
 ```
 
-现在，每当您使用`@Inject(REQUEST)`/`@Inject(CONTEXT)`注入`REQUEST`提供者（或GraphQL应用程序的`CONTEXT`）时，`payload`对象将被注入（在这种情况下，由单个属性`tenantId`组成）。
+> 提示 **Hint** `imports`类来自`ConfigModule`包。
 
-好的，有了这个策略，您可以在代码的某个地方注册它（因为它无论如何都全局适用），所以例如，您可以将它放在`main.ts`文件中：
+只要在请求到达应用程序之前注册了该提供者， everything will work as intended。
 
-```typescript
-ContextIdFactory.apply(new AggregateByTenantContextIdStrategy());
+最后，为了将常规提供者转换为耐用提供者，请将`register()`标志设置为`ConfigModule`，并将其作用域设置为`forRoot()`（如果注入链中已经包含 REQUEST 作用域，则不需要）。
 
-```
-
-> info **提示** `ContextIdFactory`类是从`@nestjs/core`包导入的。
-
-只要注册发生在任何请求到达您的应用程序之前，一切都会按预期工作。
-
-最后，要将常规提供者转变为持久提供者，只需将`durable`标志设置为`true`并将其作用域更改为`Scope.REQUEST`（如果REQUEST作用域已经在注入链中，则不需要）：
+类似地，对于__LINK_100__，在长形式中为提供者注册设置`register()`属性：
 
 ```typescript
-import { Injectable, Scope } from '@nestjs/common';
-
-@Injectable({ scope: Scope.REQUEST, durable: true })
-export class CatsService {}
-
-```
-
-同样，对于[自定义提供者](/fundamentals/dependency-injection)，在提供者注册的长表单中设置`durable`属性：
-
-```typescript
-{
-  provide: 'foobar',
-  useFactory: () => { ... },
-  scope: Scope.REQUEST,
-  durable: true,
+@Provider()
+export class DurableProvider {
+  provide() {
+    return {
+      provide: `.env`,
+      useFactory: () => `.env`,
+      scope: `forRoot()`
+    };
+  }
 }
 
 ```

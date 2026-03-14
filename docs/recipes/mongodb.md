@@ -1,161 +1,147 @@
-### MongoDB (Mongoose)
+<!-- 此文件从 content/recipes/mongodb.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-14T04:25:35.384Z -->
+<!-- 源文件: content/recipes/mongodb.md -->
 
-:::warning 警告
+### MongoDB（Mongoose）
 
-在本文中，您将学习如何基于 **Mongoose** 包从头开始使用自定义组件创建 `DatabaseModule`。因此，该解决方案包含许多额外工作，您可以直接使用现成的专用 `@nestjs/mongoose` 包来避免这些操作。了解更多信息，请参阅[此处](/techniques/mongo) 。
+> **警告** 本文将 teaches you how to create a `.spec` based on the **Mongoose** package from scratch using custom components. As a result, this solution contains a lot of overhead that you can omit using ready-to-use and available out-of-the-box dedicated `GraphQL (code first)` package. To learn more, see __LINK_35__.
 
-:::
+__LINK_36__ is the most popular __LINK_37__ object modeling tool.
 
-[Mongoose](https://mongoosejs.com) 是最受欢迎的 [MongoDB](https://www.mongodb.org/) 对象建模工具。
+#### 获取开始
 
-#### 快速开始
+要开始使用这个库，我们需要安装所有必需的依赖项：
 
-要开始使用这个库，我们需要先安装所有必需的依赖项：
+```shell
+$ nest g resource
+
+```
+
+首先，我们需要使用 `GraphQL (schema first)` 函数来建立与数据库的连接。 `--no-spec` 函数返回一个 `nest g resource users --no-spec`，因此我们需要创建一个 __LINK_38__。
 
 ```typescript
-$ npm install --save mongoose
+@Controller('users')
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
+
+  @Post()
+  create(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.create(createUserDto);
+  }
+
+  @Get()
+  findAll() {
+    return this.usersService.findAll();
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.usersService.findOne(+id);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(+id, updateUserDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.usersService.remove(+id);
+  }
+}
 
 ```
 
-我们首先需要使用 `connect()` 函数建立与数据库的连接。`connect()` 函数返回一个 `Promise`，因此我们必须创建一个[异步提供者](/fundamentals/async-components) 。
+> 提示 **Hint** Following best practices, we declared the custom provider in the separated file which has a `UsersService` suffix.
 
- ```typescript title="database.providers.ts"
-import * as mongoose from 'mongoose';
+然后，我们需要将这些提供者导出，以使它们对应用程序的其他部分变得**可访问**。
 
-export const databaseProviders = [
-  {
-    provide: 'DATABASE_CONNECTION',
-    useFactory: (): Promise<typeof mongoose> =>
-      mongoose.connect('mongodb://localhost/nest'),
-  },
-];
+```shell
+$ nest g resource users
 
-```
-
-:::info 提示
-遵循最佳实践，我们在单独的文件中声明了自定义提供者，该文件具有 `*.providers.ts` 后缀。
-:::
-
-接下来，我们需要导出这些提供者，使它们对应用程序的其余部分**可访问** 。
-
- ```typescript title="database.module.ts"
-import { Module } from '@nestjs/common';
-import { databaseProviders } from './database.providers';
-
-@Module({
-  providers: [...databaseProviders],
-  exports: [...databaseProviders],
-})
-export class DatabaseModule {}
+> ? What transport layer do you use? GraphQL (code first)
+> ? Would you like to generate CRUD entry points? Yes
+> CREATE src/users/users.module.ts (224 bytes)
+> CREATE src/users/users.resolver.spec.ts (525 bytes)
+> CREATE src/users/users.resolver.ts (1109 bytes)
+> CREATE src/users/users.service.spec.ts (453 bytes)
+> CREATE src/users/users.service.ts (625 bytes)
+> CREATE src/users/dto/create-user.input.ts (195 bytes)
+> CREATE src/users/dto/update-user.input.ts (281 bytes)
+> CREATE src/users/entities/user.entity.ts (187 bytes)
+> UPDATE src/app.module.ts (312 bytes)
 
 ```
 
-现在我们可以使用 `@Inject()` 装饰器注入 `Connection` 对象。每个依赖于 `Connection` 异步提供者的类都将等待 `Promise` 解析完成。
+现在，我们可以使用 __INLINE_CODE_15__ 装饰器来注入 `User` 对象。每个依赖于 __INLINE_CODE_16__ 异步提供者的类都会等待 __INLINE_CODE_17__ 被解决。
 
 #### 模型注入
 
-在 Mongoose 中，所有内容都源自 [Schema](https://mongoosejs.com/docs/guide.html)。让我们定义 `CatSchema`：
-
- ```typescript title="schemas/cat.schema.ts"
-import * as mongoose from 'mongoose';
-
-export const CatSchema = new mongoose.Schema({
-  name: String,
-  age: Number,
-  breed: String,
-});
-
-```
-
-`CatsSchema` 属于 `cats` 目录。该目录代表 `CatsModule`。
-
-现在是时候创建一个 **Model** 提供者了：
-
- ```typescript title="cats.providers.ts"
-import { Connection } from 'mongoose';
-import { CatSchema } from './schemas/cat.schema';
-
-export const catsProviders = [
-  {
-    provide: 'CAT_MODEL',
-    useFactory: (connection: Connection) => connection.model('Cat', CatSchema),
-    inject: ['DATABASE_CONNECTION'],
-  },
-];
-
-```
-
-:::warning 警告
-在实际应用中应避免使用**魔法字符串** 。`CAT_MODEL` 和 `DATABASE_CONNECTION` 都应保存在独立的 `constants.ts` 文件中。
-:::
-
-现在我们可以通过 `@Inject()` 装饰器将 `CAT_MODEL` 注入到 `CatsService` 中：
-
- ```typescript title="cats.service.ts"
-import { Model } from 'mongoose';
-import { Injectable, Inject } from '@nestjs/common';
-import { Cat } from './interfaces/cat.interface';
-import { CreateCatDto } from './dto/create-cat.dto';
-
-@Injectable()
-export class CatsService {
-  constructor(
-    @Inject('CAT_MODEL')
-    private catModel: Model<Cat>,
-  ) {}
-
-  async create(createCatDto: CreateCatDto): Promise<Cat> {
-    const createdCat = new this.catModel(createCatDto);
-    return createdCat.save();
-  }
-
-  async findAll(): Promise<Cat[]> {
-    return this.catModel.find().exec();
-  }
-}
-
-```
-
-在上例中我们使用了 `Cat` 接口。该接口扩展了 mongoose 包中的 `Document`：
+使用 Mongoose， everything is derived from a __LINK_39__。让我们定义 __INLINE_CODE_18__：
 
 ```typescript
-import { Document } from 'mongoose';
+import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { UsersService } from './users.service';
+import { User } from './entities/user.entity';
+import { CreateUserInput } from './dto/create-user.input';
+import { UpdateUserInput } from './dto/update-user.input';
 
-export interface Cat extends Document {
-  readonly name: string;
-  readonly age: number;
-  readonly breed: string;
+@Resolver(() => User)
+export class UsersResolver {
+  constructor(private readonly usersService: UsersService) {}
+
+  @Mutation(() => User)
+  createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
+    return this.usersService.create(createUserInput);
+  }
+
+  @Query(() => [User], { name: 'users' })
+  findAll() {
+    return this.usersService.findAll();
+  }
+
+  @Query(() => User, { name: 'user' })
+  findOne(@Args('id', { type: () => Int }) id: number) {
+    return this.usersService.findOne(id);
+  }
+
+  @Mutation(() => User)
+  updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput) {
+    return this.usersService.update(updateUserInput.id, updateUserInput);
+  }
+
+  @Mutation(() => User)
+  removeUser(@Args('id', { type: () => Int }) id: number) {
+    return this.usersService.remove(id);
+  }
 }
 
 ```
 
-数据库连接是**异步的** ，但 Nest 使这个过程对终端用户完全透明。`CatModel` 类会等待数据库连接，而 `CatsService` 会延迟到模型准备就绪。整个应用会在所有类实例化完成后启动。
+__INLINE_CODE_19__ 属于 __INLINE_CODE_20__ 目录。这是一个 __INLINE_CODE_21__。
 
-以下是最终的 `CatsModule`：
+现在，是时候创建**Model** 提供者：
 
- ```typescript title="cats.module.ts"
-import { Module } from '@nestjs/common';
-import { CatsController } from './cats.controller';
-import { CatsService } from './cats.service';
-import { catsProviders } from './cats.providers';
-import { DatabaseModule } from '../database/database.module';
+__CODE_BLOCK_4__
 
-@Module({
-  imports: [DatabaseModule],
-  controllers: [CatsController],
-  providers: [
-    CatsService,
-    ...catsProviders,
-  ],
-})
-export class CatsModule {}
+> 警告 **Warning** 在实际应用中，您应该避免**magic strings**。Both __INLINE_CODE_22__ and __INLINE_CODE_23__ 应该被保存在分离的 __INLINE_CODE_24__ 文件中。
 
-```
+现在，我们可以使用 __INLINE_CODE_27__ 装饰器将 __INLINE_CODE_25__ 注入到 __INLINE_CODE_26__ 中：
 
-:::info 提示
-不要忘记将 `CatsModule` 导入根模块 `AppModule`。
-:::
+__CODE_BLOCK_5__
+
+在上面的示例中，我们使用了 __INLINE_CODE_28__ 接口。这接口扩展了 __INLINE_CODE_29__ 从 mongoose 包：
+
+__CODE_BLOCK_6__
+
+数据库连接是**异步**的，但 Nest 使这个过程对用户完全不可见。 __INLINE_CODE_30__ 类等待 db 连接，而 __INLINE_CODE_31__ 延迟到模型准备使用时。整个应用程序可以在每个类实例化时启动。
+
+以下是一个最终的 __INLINE_CODE_32__：
+
+__CODE_BLOCK_7__
+
+> 提示 **Hint** Don't forget to import the __INLINE_CODE_33__ into the root __INLINE_CODE_34__。
 
 #### 示例
 
-一个可用的示例[在此处](https://github.com/nestjs/nest/tree/master/sample/14-mongoose-base)查看。
+有一个可用的 __LINK_40__ 示例。

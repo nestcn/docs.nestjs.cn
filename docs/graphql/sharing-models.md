@@ -1,29 +1,25 @@
-### 共享模型
+<!-- 此文件从 content/graphql/sharing-models.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-14T05:02:54.972Z -->
+<!-- 源文件: content/graphql/sharing-models.md -->
 
-:::warning 警告
-本章仅适用于代码优先方法。
-:::
+### 分享模型
 
-在项目后端使用 TypeScript 的最大优势之一，是能够通过共享 TypeScript 包，在基于 TypeScript 的前端应用中复用相同的模型。
+> 警告 **警告** 本章仅适用于代码优先_APPROACH。
 
-但存在一个问题：采用代码优先方法创建的模型被大量 GraphQL 相关装饰器修饰。这些装饰器在前端毫无用处，反而会影响性能。
+使用 TypeScript 作为项目的后端之一大优势是可以在使用 TypeScript 的前端应用程序中重用相同的模型，通过使用共同的 TypeScript 包。
 
-#### 使用模型垫片
+但是，使用代码优先 APPROACH 创建的模型被 heavilly 装饰了 GraphQL 相关的装饰器。这些建筑物在前端中是无关紧要的，会影响性能。
 
-为解决此问题，NestJS 提供了一个"垫片"（shim），允许您通过配置 `webpack`（或类似工具）将原始装饰器替换为惰性代码。要使用此垫片，需在 `@nestjs/graphql` 包与垫片之间配置别名。
+#### 使用模型 shim
 
-例如，在 webpack 中可通过以下方式解决：
+解决这个问题，NestJS 提供了一个“shim”，允许你将原始装饰器替换为 inert 代码，使用 `webpack` (或类似的) 配置。
+要使用这个 shim，配置一个别名 между `@nestjs/graphql` 包和 shim。
+
+例如，对于 webpack，这是 resolved 这样：
 
 ```typescript
-resolve: { // see: https://webpack.js.org/configuration/resolve/
-  alias: {
-    "@nestjs/graphql": path.resolve(__dirname, "../node_modules/@nestjs/graphql/dist/extra/graphql-model-shim")
-  }
-}
+title="使用模型 shim"
 
 ```
 
-:::info 注意
-[TypeORM](/techniques/sql) 包也有类似的垫片，可在此处[查看](https://github.com/typeorm/typeorm/blob/master/extra/typeorm-model-shim.js) 。
-:::
-
+> 提示 **提示** [TypeORM](/techniques/database) 包含一个类似的 shim，可以在 [here](https://github.com/typeorm/typeorm/blob/master/extra/typeorm-model-shim.js) 找到。

@@ -51,7 +51,7 @@
 
 - [🛠️ NestJS DevTools](https://devtools.nestjs.com) - 应用程序图可视化和调试工具
 - [⚙️ NestJS CLI](https://github.com/nestjs/nest-cli) - 官方命令行工具
-- [📊 CI/CD 集成](https://docs.nestjs.com/devtools/ci-cd) - 持续集成和部署工具
+- [📊 CI/CD 集成](/devtools/ci-cd) - 持续集成和部署工具
 
 ### 示例项目
 
@@ -96,8 +96,8 @@
 ### 在线教程
 
 - [📖 官方文档教程](https://docs.nestjs.com) - 完整的官方学习路径
-- [🎯 快速开始指南](https://docs.nestjs.com/first-steps) - 新手入门指南
-- [🔧 CLI 工具指南](https://docs.nestjs.com/cli/overview) - 命令行工具使用教程
+- [🎯 快速开始指南](/first-steps) - 新手入门指南
+- [🔧 CLI 工具指南](/cli/overview) - 命令行工具使用教程
 
 ### 文档资源
 
@@ -179,7 +179,7 @@
 
 ### WebSocket
 
-- [`@nestjs/websockets`](https://docs.nestjs.com/websockets/gateways)
+- [`@nestjs/websockets`](/websockets/gateways)
 - ![](https://img.shields.io/github/stars/samchon/tgrid?style=flat-square) [`tgrid`](https://github.com/samchon/tgrid) - 支持 WebSocket 和 Worker 协议的 TypeScript RPC 框架
 
 ### 缓存
@@ -274,7 +274,7 @@
 
 ## 💰 支持我们
 
-NestJS 是一个采用 MIT 许可证的开源项目，它能够持续发展得益于这些出色人员的支持。如果您也想加入他们，请阅读[更多信息](https://docs.nestjs.com/support)。
+NestJS 是一个采用 MIT 许可证的开源项目，它能够持续发展得益于这些出色人员的支持。如果您也想加入他们，请阅读[更多信息](/support)。
 
 ### 主要赞助商
 

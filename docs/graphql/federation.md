@@ -1,907 +1,382 @@
+<!-- 此文件从 content/graphql/federation.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-15T05:11:50.937Z -->
+<!-- 源文件: content/graphql/federation.md -->
+
 ### Federation
 
-Federation 提供了一种将您的单体 GraphQL 服务器拆分成独立微服务的方法。它由两个组件组成：一个网关和一个或多个联邦微服务。每个微服务持有部分 schema，而网关将这些 schema 组合成一个可以被客户端消费的单个 schema。
+Federation 提供了一个将你的 monolithic GraphQL 服务器拆分成独立微服务的方式。它由两个组件组成：一个网关和一个或多个联邦微服务。每个微服务都持有部分 schema，并且网关将这些 schema合并成一个可以被客户端消费的单个 schema。
 
-根据 [Apollo 文档](https://blog.apollographql.com/apollo-federation-f260cf525d21)，Federation 的设计原则是：
+按照 __LINK_127__ 的引用，Federation 是基于以下核心原则设计的：
 
-- 构建图形应该是 **声明式** 的。通过 Federation，您可以从 schema 中声明构建图形，而不是编写命令式的 schema Stitching 代码。
-- 代码应该根据 **关注点** 分离，而不是根据类型。通常，单个团队不控制重要类型的每个方面，因此这些类型的定义应该分布在多个团队和代码库中，而不是集中在一个地方。
-- 图形应该是简单的，可以供客户端消费。联邦服务可以形成一个完整的、产品-关注的图形，该图形准确反映了客户端的消费方式。
-- 这只是一种 **GraphQL**，使用了语言规范的特性。任何语言，不只是 JavaScript，可以实现 Federation。
+- 构建图表应该是 **declarative** 的。使用 federation，可以从 schema 中声明地构建图表，而不是编写 imperative schema stitching 代码。
+- 代码应该根据 **concern** 分离，而不是根据类型。通常，一个重要的类型，如 User 或 Product，不会由单个团队控制，因此这些类型的定义应该分布在多个团队和代码库中，而不是集中在一个地方。
+- 图表应该是简单的，可以被客户端消费。联邦服务可以一起形成一个完整的产品集中图表，这个图表反映了客户端的实际消费方式。
+- 它只是 **GraphQL**，使用语言规范的特性。任何语言，除了 JavaScript， 都可以实现 federation。
 
-> warning **警告** Federation 目前不支持订阅。
+> warning Federation 当前不支持订阅。
 
-在以下部分，我们将设置一个演示应用程序，包含一个网关和两个联邦端点：Users 服务和 Posts 服务。
+接下来，我们将设置一个 demo 应用程序，它包含一个网关和两个联邦端点：用户服务和文章服务。
 
-#### 使用 Apollo 实现 Federation
+#### Federation with Apollo
 
 首先，安装所需的依赖项：
 
 ```bash
-$ npm install --save @apollo/subgraph
+$ npm i -g @nestjs/cli
+$ nest new project
 
 ```
 
-#### Schema First 模式
+#### Schema First
 
-"Users 服务" 提供了一个简单的 schema。注意 `@key` 指令：它告诉 Apollo 查询计划器，如果指定了 `id`，可以获取特定的 `User` 实例。此外，我们 `extend` 了 `Query` 类型。
-
-```graphql
-type User @key(fields: "id") {
-  id: ID!
-  name: String!
-}
-
-extend type Query {
-  getUser(id: ID!): User
-}
-
-```
-
-Resolver 提供了一个额外的方法名为 `resolveReference()`。这个方法在 Apollo 网关执行时被触发，我们将在 Posts 服务中看到这个示例。请注意，这个方法必须被 `@ResolveReference()` 装饰器标注。
-
-```typescript
-import { Args, Query, Resolver, ResolveReference } from '@nestjs/graphql';
-import { UsersService } from './users.service';
-
-@Resolver('User')
-export class UsersResolver {
-  constructor(private usersService: UsersService) {}
-
-  @Query()
-  getUser(@Args('id') id: string) {
-    return this.usersService.findById(id);
-  }
-
-  @ResolveReference()
-  resolveReference(reference: { __typename: string; id: string }) {
-    return this.usersService.findById(reference.id);
-  }
-}
-
-```
-
-最后，我们将所有组件连接起来，通过在配置对象中注册 `GraphQLModule`，并将 `ApolloFederationDriver` 驱动器作为参数传递：
-
-```typescript
-import {
-  ApolloFederationDriver,
-  ApolloFederationDriverConfig,
-} from '@nestjs/apollo';
-import { Module } from '@nestjs/common';
-import { GraphQLModule } from '@nestjs/graphql';
-import { UsersResolver } from './users.resolver';
-
-@Module({
-  imports: [
-    GraphQLModule.forRoot<ApolloFederationDriverConfig>({
-      driver: ApolloFederationDriver,
-      typePaths: ['**/*.graphql'],
-    }),
-  ],
-  providers: [UsersResolver],
-})
-export class AppModule {}
-
-```
-
-#### Code First 模式
-
-首先，让我们为 `User` 实体添加一些额外的装饰器。
-
-```ts
-import { Directive, Field, ID, ObjectType } from '@nestjs/graphql';
-
-@ObjectType()
-@Directive('@key(fields: "id")')
-export class User {
-  @Field(() => ID)
-  id: number;
-
-  @Field()
-  name: string;
-}
-
-```
-
-Resolver 提供了一个额外的方法名为 `resolveReference()`。这个方法在 Apollo 网关执行时被触发，我们将在 Posts 服务中看到这个示例。请注意，这个方法必须被 `@ResolveReference()` 装饰器标注。
-
-```ts
-import { Args, Query, Resolver, ResolveReference } from '@nestjs/graphql';
-import { User } from './user.entity';
-import { UsersService } from './users.service';
-
-@Resolver(() => User)
-export class UsersResolver {
-  constructor(private usersService: UsersService) {}
-
-  @Query(() => User)
-  getUser(@Args('id') id: number): User {
-    return this.usersService.findById(id);
-  }
-
-  @ResolveReference()
-  resolveReference(reference: { __typename: string; id: number }): User {
-    return this.usersService.findById(reference.id);
-  }
-}
-
-```
-
-最后，我们将所有组件连接起来，通过在配置对象中注册 `GraphQLModule`，并将 `ApolloFederationDriver` 驱动器作为参数传递：
-
-```typescript
-import {
-  ApolloFederationDriver,
-  ApolloFederationDriverConfig,
-} from '@nestjs/apollo';
-import { Module } from '@nestjs/common';
-import { UsersResolver } from './users.resolver';
-import { UsersService } from './users.service'; // Not included in this example
-
-@Module({
-  imports: [
-    GraphQLModule.forRoot<ApolloFederationDriverConfig>({
-      driver: ApolloFederationDriver,
-      autoSchemaFile: true,
-    }),
-  ],
-  providers: [UsersResolver, UsersService],
-})
-export class AppModule {}
-
-```
-
-工作示例可在 [这里](https://github.com/nestjs/nest/tree/master/sample/31-graphql-federation-code-first/users-application) 找到（Code First 模式），或在 [这里](https://github.com/nestjs/nest/tree/master/sample/32-graphql-federation-schema-first/users-application) 找到（Schema First 模式）。
-
-#### 联邦示例：Posts 服务
-
-Posts 服务应该通过 `getPosts` 查询提供聚合的 posts，同时扩展我们的 `User` 类型，以添加 `user.posts` 字段。
-
-#### Schema First 模式
-
-"Posts 服务" 在其 schema 中引用了 `User` 类型，使用 `extend` 关键字标记。此外，它还声明了 `User` 类型的一个额外属性（`posts`）。注意 `@key` 指令用于匹配 User 实例，和 `@external` 指令指示 `id` 字段在其他地方管理。
-
-```graphql
-type Post @key(fields: "id") {
-  id: ID!
-  title: String!
-  body: String!
-  user: User
-}
-
-extend type User @key(fields: "id") {
-  id: ID! @external
-  posts: [Post]
-}
-
-extend type Query {
-  getPosts: [Post]
-}
-
-```
-
-在以下示例中，`PostsResolver` 提供了 `getUser()` 方法，该方法返回包含 `__typename` 和一些应用程序可能需要来解析引用的额外属性，在这里是 `id`。`__typename` 由 GraphQL 网关使用，以确定负责 User 类型的微服务，并在执行 `resolveReference()` 方法时请求对应的实例。 "Users 服务" 在上一部分中描述。
-
-```typescript
-import { Query, Resolver, Parent, ResolveField } from '@nestjs/graphql';
-import { PostsService } from './posts.service';
-import { Post } from './posts.interfaces';
-
-@Resolver('Post')
-export class PostsResolver {
-  constructor(private postsService: PostsService) {}
-
-  @Query('getPosts')
-  getPosts() {
-    return this.postsService.findAll();
-  }
-
-  @ResolveField('user')
-  getUser(@Parent() post: Post) {
-    return { __typename: 'User', id: post.userId };
-  }
-}
-
-```
-
-最后，我们必须注册 `GraphQLModule`，与在 "Users 服务" 部分中一样。
-
-```typescript
-import {
-  ApolloFederationDriver,
-  ApolloFederationDriverConfig,
-} from '@nestjs/apollo';
-import { Module } from '@nestjs/common';
-import { GraphQLModule } from '@nestjs/graphql';
-import { PostsResolver } from './posts.resolver';
-
-@Module({
-  imports: [
-    GraphQLModule.forRoot<ApolloFederationDriverConfig>({
-      driver: ApolloFederationDriver,
-      typePaths: ['**/*.graphql'],
-    }),
-  ],
-  providers: [PostsResolvers],
-})
-export class AppModule {}
-
-```
-
-#### Code First 模式
-
-首先，我们将声明一个表示 `User` 实体的类。虽然实体本身生活在另一个服务中，但我们将在这里使用它（扩展其定义）。注意 `@extends` 和 `@external` 指令。
-
-```ts
-import { Directive, ObjectType, Field, ID } from '@nestjs/graphql';
-import { Post } from './post.entity';
-
-@ObjectType()
-@Directive('@extends')
-@Directive('@key(fields: "id")')
-export class User {
-  @Field(() => ID)
-  @Directive('@external')
-  id: number;
-
-  @Field(() => [Post])
-  posts?: Post[];
-}
-
-```
-
-现在，让我们为 `User` 实体的扩展创建相应的 resolver：
-
-```ts
-import { Parent, ResolveField, Resolver } from '@nestjs/graphql';
-import { PostsService } from './posts.service';
-import { Post } from './post.entity';
-import { User } from './user.entity';
-
-@Resolver(() => User)
-export class UsersResolver {
-  constructor(private readonly postsService: PostsService) {}
-
-  @ResolveField(() => [Post])
-  public posts(@Parent() user: User): Post[] {
-    return this.postsService.forAuthor(user.id);
-  }
-}
-
-```
-
-我们还需要定义 `Post` 实体类：
-
-```ts
-import { Directive, Field, ID, Int, ObjectType } from '@nestjs/graphql';
-import { User } from './user.entity';
-
-@ObjectType()
-@Directive('@key(fields: "id")')
-export class Post {
-  @Field(() => ID)
-  id: number;
-
-  @Field()
-  title: string;
-
-  @Field(() => Int)
-  authorId: number;
-
-  @Field(() => User)
-  user?: User;
-}
-
-```
-
-及其 resolver：
-
-```ts
-import { Query, Args, ResolveField, Resolver, Parent } from '@nestjs/graphql';
-import { PostsService } from './posts.service';
-import { Post } from './post.entity';
-import { User } from './user.entity';
-
-@Resolver(() => Post)
-export class PostsResolver {
-  constructor(private readonly postsService: PostsService) {}
-
-  @Query(() => Post)
-  findPost(@Args('id') id: number): Post {
-    return this.postsService.findOne(id);
-  }
-
-  @Query(() => [Post])
-  getPosts(): Post[] {
-    return this.postsService.all();
-  }
-
-  @ResolveField(() => User)
-  user(@Parent() post: Post): any {
-    return { __typename: 'User', id: post.authorId };
-  }
-}
-
-```
-
-最后，让我们将所有组件连接起来，在模块中。请注意架构构建选项，我们指定了 `User` 是一个孤立的（外部）类型。
-
-```ts
-import {
-  ApolloFederationDriver,
-  ApolloFederationDriverConfig,
-} from '@nestjs/apollo';
-import { Module } from '@nestjs/common';
-import { User } from './user.entity';
-import { PostsResolvers } from './posts.resolvers';
-import { UsersResolvers } from './users.resolvers';
-import { PostsService } from './posts.service'; // Not included in example
-
-@Module({
-  imports: [
-    GraphQLModule.forRoot<ApolloFederationDriverConfig>({
-      driver: ApolloFederationDriver,
-      autoSchemaFile: true,
-      buildSchemaOptions: {
-        orphanedTypes: [User],
-      },
-    }),
-  ],
-  providers: [PostsResolver, UsersResolver, PostsService],
-})
-export class AppModule {}
-
-```
-
-可用的工作示例在 [这里](https://github.com/nestjs/nest/tree/master/sample/31-graphql-federation-code-first/posts-application) 和 [这里](https://github.com/nestjs/nest/tree/master/sample/32-graphql-federation-schema-first/posts-application) 中。
-
-#### 联邦示例：Gateway
-
-首先安装所需的依赖项：
+“用户服务”提供了一个简单的 schema。注意 __INLINE_CODE_38__ 指令：它 instructs Apollo 查询规划器在指定的 __INLINE_CODE_39__ 实例可以被fetch，如果你指定了 __INLINE_CODE_40__。此外，我们 __INLINE_CODE_41__ 了 __INLINE_CODE_42__ 类型。
 
 ```bash
-$ npm install --save @apollo/gateway
+$ npm install --save hbs
 
 ```
 
-Gateway 需要指定的端点列表，并且将自动发现相应的架构。因此，Gateway 服务的实现将保持 code 和 schema 两种模式相同。
+Resolver 提供了一个额外的方法名为 __INLINE_CODE_43__。这个方法是 Apollo 网关在相关资源需要 User 实例时触发的。我们将在文章服务中看到这个示例。请注意，方法必须被 __INLINE_CODE_44__ 装饰器注解。
 
 ```typescript
-import { IntrospectAndCompose } from '@apollo/gateway';
-import { ApolloGatewayDriver, ApolloGatewayDriverConfig } from '@nestjs/apollo';
-import { Module } from '@nestjs/common';
-import { GraphQLModule } from '@nestjs/graphql';
+import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'node:path';
+import { AppModule } from './app.module';
 
-@Module({
-  imports: [
-    GraphQLModule.forRoot<ApolloGatewayDriverConfig>({
-      driver: ApolloGatewayDriver,
-      server: {
-        // ... Apollo server options
-        cors: true,
-      },
-      gateway: {
-        supergraphSdl: new IntrospectAndCompose({
-          subgraphs: [
-            { name: 'users', url: 'http://user-service/graphql' },
-            { name: 'posts', url: 'http://post-service/graphql' },
-          ],
-        }),
-      },
-    }),
-  ],
-})
-export class AppModule {}
+async function bootstrap() {
+  const app = await NestFactory.create<NestExpressApplication>(
+    AppModule,
+  );
+
+  app.useStaticAssets(join(__dirname, '..', 'public'));
+  app.setBaseViewsDir(join(__dirname, '..', 'views'));
+  app.setViewEngine('hbs');
+
+  await app.listen(process.env.PORT ?? 3000);
+}
+bootstrap();
+
+async function bootstrap() {
+  const app = await NestFactory.create(
+    AppModule,
+  );
+
+  app.useStaticAssets(join(__dirname, '..', 'public'));
+  app.setBaseViewsDir(join(__dirname, '..', 'views'));
+  app.setViewEngine('hbs');
+
+  await app.listen(process.env.PORT ?? 3000);
+}
+bootstrap();
 
 ```
 
-可用的工作示例在 [这里](https://github.com/nestjs/nest/tree/master/sample/31-graphql-federation-code-first/gateway) 和 [这里](https://github.com/nestjs/nest/tree/master/sample/32-graphql-federation-schema-first/gateway) 中。
+最后，我们hook everything up 通过注册 __INLINE_CODE_45__，并将 __INLINE_CODE_46__ 驱动器传递到配置对象中：
 
-#### 使用 Mercurius 实现 Federation
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>App</title>
+  </head>
+  <body>
+    {{ "{{ message }\}" }}
+  </body>
+</html>
 
-首先安装所需的依赖项：
+```
+
+#### Code First
+
+首先，我们添加一些额外的装饰器到 __INLINE_CODE_47__ 实体。
+
+```typescript
+import { Get, Controller, Render } from '@nestjs/common';
+
+@Controller()
+export class AppController {
+  @Get()
+  @Render('index')
+  root() {
+    return { message: 'Hello world!' };
+  }
+}
+
+```
+
+Resolver 提供了一个额外的方法名为 __INLINE_CODE_48__。这个方法是 Apollo 网关在相关资源需要 User 实例时触发的。我们将在文章服务中看到这个示例。请注意，方法必须被 __INLINE_CODE_49__ 装饰器注解。
+
+```typescript
+import { Get, Controller, Res, Render } from '@nestjs/common';
+import { Response } from 'express';
+import { AppService } from './app.service';
+
+@Controller()
+export class AppController {
+  constructor(private appService: AppService) {}
+
+  @Get()
+  root(@Res() res: Response) {
+    return res.render(
+      this.appService.getViewName(),
+      { message: 'Hello world!' },
+    );
+  }
+}
+
+```
+
+最后，我们hook everything up 通过注册 __INLINE_CODE_50__，并将 __INLINE_CODE_51__ 驱动器传递到配置对象中：
 
 ```bash
-$ npm install --save @apollo/subgraph @nestjs/mercurius
+$ npm i --save @fastify/static @fastify/view handlebars
 
 ```
 
-> info **注意** 需要 `@apollo/subgraph` 包来构建子图架构 (`buildSubgraphSchema`、`printSubgraphSchema` 函数)。
+一个工作示例可以在 __LINK_128__ 和 __LINK_129__ 中找到，分别在 schema first 和 code first 模式下。
 
-#### Schema First 模式
+#### Federated Example: Posts
 
-"用户服务" 提供了一个简单的架构。注意 `@key` 指令：它告诉 Mercurius 查询计划器，如果您指定了 `id`，可以获取 `User` 的实例。另外，我们 `extend` 了 `Query` 类型。
+文章服务旨在通过 __INLINE_CODE_52__ 查询提供聚合的文章，但是也将 __INLINE_CODE_53__ 类型扩展到 __INLINE_CODE_54__ 字段。
 
-```graphql
-type User @key(fields: "id") {
-  id: ID!
-  name: String!
-}
+#### Schema First
 
-extend type Query {
-  getUser(id: ID!): User
-}
-
-```
-
-Resolver 提供了一个额外的方法名为 `resolveReference()`。这个方法在 Mercurius Gateway 执行时被触发，我们将在 Posts 服务中看到这个例子。请注意，这个方法必须被 `@ResolveReference()` 装饰器标注。
+“文章服务”在其 schema 中引用了 __INLINE_CODE_55__ 类型，并将其标记为 __INLINE_CODE_56__ 关键字。它还声明了 __INLINE_CODE_57__ 类型上的一个额外属性（__INLINE_CODE_58__）。注意 __INLINE_CODE_59__ 指令用于匹配 User 实例的实例，并且 __INLINE_CODE_60__ 指令指示 __INLINE_CODE_61__ 字段在其他地方管理。
 
 ```typescript
-import { Args, Query, Resolver, ResolveReference } from '@nestjs/graphql';
-import { UsersService } from './users.service';
+import { NestFactory } from '@nestjs/core';
+import { NestFastifyApplication, FastifyAdapter } from '@nestjs/platform-fastify';
+import { AppModule } from './app.module';
+import { join } from 'node:path';
 
-@Resolver('User')
-export class UsersResolver {
-  constructor(private usersService: UsersService) {}
-
-  @Query()
-  getUser(@Args('id') id: string) {
-    return this.usersService.findById(id);
-  }
-
-  @ResolveReference()
-  resolveReference(reference: { __typename: string; id: string }) {
-    return this.usersService.findById(reference.id);
-  }
+async function bootstrap() {
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    new FastifyAdapter(),
+  );
+  app.useStaticAssets({
+    root: join(__dirname, '..', 'public'),
+    prefix: '/public/',
+  });
+  app.setViewEngine({
+    engine: {
+      handlebars: require('handlebars'),
+    },
+    templates: join(__dirname, '..', 'views'),
+  });
+  await app.listen(process.env.PORT ?? 3000);
 }
+bootstrap();
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule, new FastifyAdapter());
+  app.useStaticAssets({
+    root: join(__dirname, '..', 'public'),
+    prefix: '/public/',
+  });
+  app.setViewEngine({
+    engine: {
+      handlebars: require('handlebars'),
+    },
+    templates: join(__dirname, '..', 'views'),
+  });
+  await app.listen(process.env.PORT ?? 3000);
+}
+bootstrap();
 
 ```
 
-最后，我们将所有内容连接起来，通过在配置对象中注册 `GraphQLModule`，并将 `MercuriusFederationDriver` 驱动器传递给它：
+在以下示例中，__INLINE_CODE_62__ 提供了 __INLINE_CODE_63__ 方法，该方法返回一个包含 __INLINE_CODE_64__ 和一些额外属性的引用，这些属性可能需要在应用程序中解析该引用，例如 __INLINE_CODE_65__。__INLINE_CODE_66__ 是 GraphQL 网关用于 pinpoint 联邦服务负责 User 类型的实例并获取相应实例的方法。前面描述的 “用户服务”将在 __INLINE_CODE_67__ 方法执行时被请求。
 
 ```typescript
-import {
-  MercuriusFederationDriver,
-  MercuriusFederationDriverConfig,
-} from '@nestjs/mercurius';
-import { Module } from '@nestjs/common';
-import { GraphQLModule } from '@nestjs/graphql';
-import { UsersResolver } from './users.resolver';
+import { Get, Controller, Render } from '@nestjs/common';
 
-@Module({
-  imports: [
-    GraphQLModule.forRoot<MercuriusFederationDriverConfig>({
-      driver: MercuriusFederationDriver,
-      typePaths: ['**/*.graphql'],
-      federationMetadata: true,
-    }),
-  ],
-  providers: [UsersResolver],
-})
-export class AppModule {}
-
-```
-
-#### Code First 模式
-
-首先，让我们为 `User` 实体添加一些额外的装饰器。
-
-```ts
-import { Directive, Field, ID, ObjectType } from '@nestjs/graphql';
-
-@ObjectType()
-@Directive('@key(fields: "id")')
-export class User {
-  @Field(() => ID)
-  id: number;
-
-  @Field()
-  name: string;
-}
-
-```
-
-Resolver 提供了一个额外的方法名为 `resolveReference()`。这个方法在 Mercurius Gateway 执行时被触发，我们将在 Posts 服务中看到这个例子。请注意，这个方法必须被 `@ResolveReference()` 装饰器标注。
-
-```ts
-import { Args, Query, Resolver, ResolveReference } from '@nestjs/graphql';
-import { User } from './user.entity';
-import { UsersService } from './users.service';
-
-@Resolver(() => User)
-export class UsersResolver {
-  constructor(private usersService: UsersService) {}
-
-  @Query(() => User)
-  getUser(@Args('id') id: number): User {
-    return this.usersService.findById(id);
-  }
-
-  @ResolveReference()
-  resolveReference(reference: { __typename: string; id: number }): User {
-    return this.usersService.findById(reference.id);
+@Controller()
+export class AppController {
+  @Get()
+  @Render('index.hbs')
+  root() {
+    return { message: 'Hello world!' };
   }
 }
 
 ```
 
-最后，我们将所有内容连接起来，通过在配置对象中注册 `GraphQLModule`，并将 `MercuriusFederationDriver` 驱动器传递给它：
+最后，我们必须注册 __INLINE_CODE_68__，类似于在 “用户服务” 部分所做的。
 
 ```typescript
-import {
-  MercuriusFederationDriver,
-  MercuriusFederationDriverConfig,
-} from '@nestjs/mercurius';
-import { Module } from '@nestjs/common';
-import { UsersResolver } from './users.resolver';
-import { UsersService } from './users.service'; // Not included in this example
+import { Res } from '@nestjs/common';
+import { FastifyReply } from 'fastify';
 
-@Module({
-  imports: [
-    GraphQLModule.forRoot<MercuriusFederationDriverConfig>({
-      driver: MercuriusFederationDriver,
-      autoSchemaFile: true,
-      federationMetadata: true,
-    }),
-  ],
-  providers: [UsersResolver, UsersService],
-})
-export class AppModule {}
-
-```
-
-#### 联邦示例：Posts 服务
-
-Posts 服务应该通过 `getPosts` 查询提供聚合的 posts，同时扩展我们的 `User` 类型，以添加 `user.posts` 字段。
-
-#### Schema First 模式
-
-"Posts 服务" 在其 schema 中引用了 `User` 类型，使用 `extend` 关键字标记。此外，它还声明了 `User` 类型的一个额外属性（`posts`）。注意 `@key` 指令用于匹配 User 实例，和 `@external` 指令指示 `id` 字段在其他地方管理。
-
-```graphql
-type Post @key(fields: "id") {
-  id: ID!
-  title: String!
-  body: String!
-  user: User
-}
-
-extend type User @key(fields: "id") {
-  id: ID! @external
-  posts: [Post]
-}
-
-extend type Query {
-  getPosts: [Post]
+@Get()
+root(@Res() res: FastifyReply) {
+  return res.view('index.hbs', { title: 'Hello world!' });
 }
 
 ```
 
-在以下示例中，`PostsResolver` 提供了 `getUser()` 方法，该方法返回包含 `__typename` 和一些应用程序可能需要来解析引用的额外属性，在这里是 `id`。`__typename` 由 GraphQL 网关使用，以确定负责 User 类型的微服务，并在执行 `resolveReference()` 方法时请求对应的实例。 "Users 服务" 在上一部分中描述。
+#### Code First
 
-```typescript
-import { Query, Resolver, Parent, ResolveField } from '@nestjs/graphql';
-import { PostsService } from './posts.service';
-import { Post } from './posts.interfaces';
+首先，我们将声明一个表示 __INLINE_CODE_69__ 实体的类。虽然实体本身在另一个服务中，但是我们将在这里扩展它的定义。注意 __INLINE_CODE_70__ 和 __INLINE_CODE_71__ 指令。
 
-@Resolver('Post')
-export class PostsResolver {
-  constructor(private postsService: PostsService) {}
+__CODE_BLOCK_10__
 
-  @Query('getPosts')
-  getPosts() {
-    return this.postsService.findAll();
-  }
+现在，让我们创建 __INLINE_CODE_72__ 实体的对应解析器：
 
-  @ResolveField('user')
-  getUser(@Parent() post: Post) {
-    return { __typename: 'User', id: post.userId };
-  }
-}
+__CODE_BLOCK_11__
 
-```
+我们还需要定义 __INLINE_CODE_73__ 实体类：
 
-最后，我们必须注册 `GraphQLModule`，与在 "Users 服务" 部分中一样。
+__CODE_BLOCK_12__
 
-```typescript
-import {
-  MercuriusFederationDriver,
-  MercuriusFederationDriverConfig,
-} from '@nestjs/mercurius';
-import { Module } from '@nestjs/common';
-import { GraphQLModule } from '@nestjs/graphql';
-import { PostsResolver } from './posts.resolver';
+And its resolver:
 
-@Module({
-  imports: [
-    GraphQLModule.forRoot<MercuriusFederationDriverConfig>({
-      driver: MercuriusFederationDriver,
-      federationMetadata: true,
-      typePaths: ['**/*.graphql'],
-    }),
-  ],
-  providers: [PostsResolvers],
-})
-export class AppModule {}
+__CODE_BLOCK_13__
 
-```
+And finally, tie it together in a module. Note the schema build options, where we specify that __INLINE_CODE_74__ is an orphaned (external) type.
 
-#### Code First 模式
+__CODE_BLOCK_14__以下是翻译后的中文文档：
 
-首先，我们将声明一个表示 `User` 实体的类。虽然实体本身生活在另一个服务中，但我们将在这里使用它（扩展其定义）。注意 `@extends` 和 `@external` 指令。
+####  Federation 示例：Gateway
 
-```ts
-import { Directive, ObjectType, Field, ID } from '@nestjs/graphql';
-import { Post } from './post.entity';
+要查看代码第一种模式的示例，请访问 __LINK_130__，要查看模式第一种模式的示例，请访问 __LINK_131__。
 
-@ObjectType()
-@Directive('@extends')
-@Directive('@key(fields: "id")')
-export class User {
-  @Field(() => ID)
-  @Directive('@external')
-  id: number;
+####  Gateway
 
-  @Field(() => [Post])
-  posts?: Post[];
-}
+开始安装所需的依赖项：
 
-```
+__CODE_BLOCK_15__
 
-现在，让我们为 `User` 实体的扩展创建相应的 resolver：
+Gateway 需要指定端点列表，它将自动发现相应的模式，因此 Gateway 服务的实现将保持不变，无论是代码第一种模式还是模式第一种模式。
 
-```ts
-import { Parent, ResolveField, Resolver } from '@nestjs/graphql';
-import { PostsService } from './posts.service';
-import { Post } from './post.entity';
-import { User } from './user.entity';
+__CODE_BLOCK_16__
 
-@Resolver(() => User)
-export class UsersResolver {
-  constructor(private readonly postsService: PostsService) {}
+要查看代码第一种模式的示例，请访问 __LINK_132__，要查看模式第一种模式的示例，请访问 __LINK_133__。
 
-  @ResolveField(() => [Post])
-  public posts(@Parent() user: User): Post[] {
-    return this.postsService.forAuthor(user.id);
-  }
-}
+####  Federation with Mercurius
 
-```
+开始安装所需的依赖项：
 
-我们还需要定义 `Post` 实体类：
+__CODE_BLOCK_17__
 
-```ts
-import { Directive, Field, ID, Int, ObjectType } from '@nestjs/graphql';
-import { User } from './user.entity';
+> info **注意** __INLINE_CODE_75__ 包含在 Mercurius 查询规划器中，以便构建子图模式 (__INLINE_CODE_76__、__INLINE_CODE_77__ 函数)。
 
-@ObjectType()
-@Directive('@key(fields: "id")')
-export class Post {
-  @Field(() => ID)
-  id: number;
+####  Schema-first
 
-  @Field()
-  title: string;
+“用户服务”提供了一个简单的模式。请注意 __INLINE_CODE_78__ 指令：它指示 Mercurius 查询规划器，如果指定了 __INLINE_CODE_80__，可以 fetch __INLINE_CODE_79__ 的实例。此外，我们 __INLINE_CODE_81__ __INLINE_CODE_82__ 类型。
 
-  @Field(() => Int)
-  authorId: number;
+__CODE_BLOCK_18__
 
-  @Field(() => User)
-  user?: User;
-}
+Resolver 提供了一个额外的方法名 __INLINE_CODE_83__。这个方法在 Mercurius Gateway 中被触发 whenever 一个相关资源需要一个 User 实例。我们将在 Posts 服务中看到这个示例。请注意，该方法需要被 __INLINE_CODE_84__ 装饰器注解。
 
-```
+__CODE_BLOCK_19__
 
-及其 resolver：
+最后，我们将所有内容连接起来，通过在配置对象中注册 __INLINE_CODE_85__，并将 __INLINE_CODE_86__ 驱动器作为参数传递：
 
-```ts
-import { Query, Args, ResolveField, Resolver, Parent } from '@nestjs/graphql';
-import { PostsService } from './posts.service';
-import { Post } from './post.entity';
-import { User } from './user.entity';
+__CODE_BLOCK_20__
 
-@Resolver(() => Post)
-export class PostsResolver {
-  constructor(private readonly postsService: PostsService) {}
+####  Code-first
 
-  @Query(() => Post)
-  findPost(@Args('id') id: number): Post {
-    return this.postsService.findOne(id);
-  }
+首先，添加一些额外的装饰器到 __INLINE_CODE_87__ 实体中。
 
-  @Query(() => [Post])
-  getPosts(): Post[] {
-    return this.postsService.all();
-  }
+__CODE_BLOCK_21__
 
-  @ResolveField(() => User)
-  user(@Parent() post: Post): any {
-    return { __typename: 'User', id: post.authorId };
-  }
-}
+Resolver 提供了一个额外的方法名 __INLINE_CODE_88__。这个方法在 Mercurius Gateway 中被触发 whenever 一个相关资源需要一个 User 实例。我们将在 Posts 服务中看到这个示例。请注意，该方法需要被 __INLINE_CODE_89__ 装饰器注解。
 
-```
+__CODE_BLOCK_22__
 
-最后，让我们将所有组件连接起来，在模块中。请注意架构构建选项，我们指定了 `User` 是一个孤立的（外部）类型。
+最后，我们将所有内容连接起来，通过在配置对象中注册 __INLINE_CODE_90__，并将 __INLINE_CODE_91__ 驱动器作为参数传递：
 
-```ts
-import {
-  MercuriusFederationDriver,
-  MercuriusFederationDriverConfig,
-} from '@nestjs/mercurius';
-import { Module } from '@nestjs/common';
-import { User } from './user.entity';
-import { PostsResolvers } from './posts.resolvers';
-import { UsersResolvers } from './users.resolvers';
-import { PostsService } from './posts.service'; // Not included in example
+__CODE_BLOCK_23__
 
-@Module({
-  imports: [
-    GraphQLModule.forRoot<MercuriusFederationDriverConfig>({
-      driver: MercuriusFederationDriver,
-      autoSchemaFile: true,
-      federationMetadata: true,
-      buildSchemaOptions: {
-        orphanedTypes: [User],
-      },
-    }),
-  ],
-  providers: [PostsResolver, UsersResolver, PostsService],
-})
-export class AppModule {}
+####  Federated 示例：Posts
 
-```
+Posts 服务旨在通过 __INLINE_CODE_92__ 查询来提供聚合的文章，同时也将 __INLINE_CODE_93__ 类型扩展到 __INLINE_CODE_94__ 字段中。
 
-#### 联邦示例：Gateway
+####  Schema-first
 
-Gateway 需要指定的端点列表，并且将自动发现相应的架构。因此，Gateway 服务的实现将保持 code 和 schema 两种模式相同。
+“Posts 服务”在其模式中引用 __INLINE_CODE_95__ 类型，并将其标记为 __INLINE_CODE_96__ 关键字。此外，它还声明了 __INLINE_CODE_97__ 类型的一个额外属性 (__INLINE_CODE_98__)。请注意 __INLINE_CODE_99__ 指令用于匹配 User 实例的实例，并且 __INLINE_CODE_100__ 指令指示 __INLINE_CODE_101__ 字段是由其他地方管理的。
 
-```typescript
-import {
-  MercuriusGatewayDriver,
-  MercuriusGatewayDriverConfig,
-} from '@nestjs/mercurius';
-import { Module } from '@nestjs/common';
-import { GraphQLModule } from '@nestjs/graphql';
+__CODE_BLOCK_24__
 
-@Module({
-  imports: [
-    GraphQLModule.forRoot<MercuriusGatewayDriverConfig>({
-      driver: MercuriusGatewayDriver,
-      gateway: {
-        services: [
-          { name: 'users', url: 'http://user-service/graphql' },
-          { name: 'posts', url: 'http://post-service/graphql' },
-        ],
-      },
-    }),
-  ],
-})
-export class AppModule {}
+在以下示例中，__INLINE_CODE_102__ 提供了 __INLINE_CODE_103__ 方法，该方法返回一个包含 __INLINE_CODE_104__ 和其他应用程序可能需要的属性的引用。在这个示例中，__INLINE_CODE_106__ 是由 GraphQL Gateway 使用来 pinpoint 微服务负责 User 类型的实例，并在执行 __INLINE_CODE_107__ 方法时请求 “Users 服务”。
 
-```
+__CODE_BLOCK_25__
+
+最后，我们必须注册 __INLINE_CODE_108__，同样在 “Users 服务” 部分中注册。
+
+__CODE_BLOCK_26__
+
+####  Code-first
+
+首先，我们将声明一个表示 __INLINE_CODE_109__ 实体的类。虽然实体本身在另一个服务中，但是我们在这里使用它（扩展其定义）。请注意 __INLINE_CODE_110__ 和 __INLINE_CODE_111__ 指令。
+
+__CODE_BLOCK_27__
+
+现在，让我们创建对应的 resolver для我们的对 __INLINE_CODE_112__ 实体的扩展：
+
+__CODE_BLOCK_28__
+
+我们还需要定义 __INLINE_CODE_113__ 实体类：
+
+__CODE_BLOCK_29__
+
+And its resolver：
+
+__CODE_BLOCK_30__
+
+And finally，tie it together in a module。请注意 schema build 选项，我们指定 __INLINE_CODE_114__ 是一个孤立的（外部）类型。
+
+__CODE_BLOCK_31__
+
+####  Federated 示例：Gateway
+
+Gateway 需要指定端点列表，它将自动发现相应的模式。因此，Gateway 服务的实现将保持不变，无论是代码第一种模式还是模式第一种模式。
+
+__CODE_BLOCK_32__
 
 ### Federation 2
 
-根据 [Apollo 文档](https://www.apollographql.com/docs/federation/federation-2/new-in-federation-2)，Federation 2 改进了原始 Apollo Federation（本文档中称为 Federation 1）的开发体验，它与大多数原始 supergraph 向后兼容。
+引用 __LINK_134__，Federation 2 改进了 Apollo Federation（称为 Federation 1 在本文档中）的开发体验，且保持了与原始超图的向后兼容性。
 
-> warning **警告** Mercurius 不完全支持 Federation 2。您可以在 [这里](https://www.apollographql.com/docs/federation/supported-subgraphs#javascript--typescript) 查看支持 Federation 2 的库列表。
+> warning **注意** Mercurius 不完全支持 Federation 2。您可以查看支持 Federation 2 的库列表 __LINK_135__。
 
 在以下部分中，我们将升级之前的示例到 Federation 2。
 
-#### 联邦示例：Users 服务
+####  Federated 示例：UsersHere is the translation of the provided English technical documentation to Chinese:
 
-Federation 2 中的一个变化是，实体没有原始子图，因此我们不再需要扩展 `Query`。更多详细信息请参考 [Apollo Federation 2 文档](https://www.apollographql.com/docs/federation/federation-2/new-in-federation-2#entities) 中的实体主题。
+Federation 2 中的一個變化是，實體沒有起源子圖，所以不需要再擴展 __INLINE_CODE_115__ anymore。更多信息，請參考 __LINK_136__ 在 Apollo Federation 2 文件中。
 
-#### Schema First 模式
+#### Schema first
 
-我们可以简单地从 schema 中删除 `extend` 关键字。
+我們可以簡單地從 schema 中刪除 __INLINE_CODE_116__ 关键字。
 
-```graphql
-type User @key(fields: "id") {
-  id: ID!
-  name: String!
-}
+__CODE_BLOCK_33__
 
-type Query {
-  getUser(id: ID!): User
-}
+#### Code first
 
-```
+要使用 Federation 2，我們需要在 __INLINE_CODE_117__ 選項中指定聯邦版本。
 
-#### Code First 模式
+__CODE_BLOCK_34__
 
-要使用 Federation 2，我们需要在 `autoSchemaFile` 选项中指定联邦版本。
+#### Federated example: Posts
 
-```ts
-import {
-  ApolloFederationDriver,
-  ApolloFederationDriverConfig,
-} from '@nestjs/apollo';
-import { Module } from '@nestjs/common';
-import { UsersResolver } from './users.resolver';
-import { UsersService } from './users.service'; // Not included in this example
+與上述理由相同，我們不需要再擴展 __INLINE_CODE_118__ 和 __INLINE_CODE_119__ anymore。
 
-@Module({
-  imports: [
-    GraphQLModule.forRoot<ApolloFederationDriverConfig>({
-      driver: ApolloFederationDriver,
-      autoSchemaFile: {
-        federation: 2,
-      },
-    }),
-  ],
-  providers: [UsersResolver, UsersService],
-})
-export class AppModule {}
+#### Schema first
 
-```
+我們可以簡單地從 schema 中刪除 __INLINE_CODE_120__ 和 __INLINE_CODE_121__ 指令。
 
-#### 联邦示例：Posts 服务
+__CODE_BLOCK_35__
 
-与上面的原因相同，我们不再需要扩展 `User` 和 `Query`。
+#### Code first
 
-#### Schema First 模式
+因為我們不再擴展 __INLINE_CODE_122__ 实体，故可以簡單地刪除 __INLINE_CODE_123__ 和 __INLINE_CODE_124__ 指令自 __INLINE_CODE_125__。
 
-我们可以简单地从 schema 中删除 `extend` 和 `external` 指令。
+__CODE_BLOCK_36__
 
-```graphql
-type Post @key(fields: "id") {
-  id: ID!
-  title: String!
-  body: String!
-  user: User
-}
+此外，類似於 User 服務，我們需要在 __INLINE_CODE_126__ 中指定使用 Federation 2。
 
-type User @key(fields: "id") {
-  id: ID!
-  posts: [Post]
-}
-
-type Query {
-  getPosts: [Post]
-}
-
-```
-
-#### Code First 模式
-
-因为我们不再扩展 `User` 实体，我们可以简单地从 `User` 中删除 `extends` 和 `external` 指令。
-
-```ts
-import { Directive, ObjectType, Field, ID } from '@nestjs/graphql';
-import { Post } from './post.entity';
-
-@ObjectType()
-@Directive('@key(fields: "id")')
-export class User {
-  @Field(() => ID)
-  id: number;
-
-  @Field(() => [Post])
-  posts?: Post[];
-}
-
-```
-
-此外，与 User 服务相同，我们需要在 `GraphQLModule` 中指定使用 Federation 2。
-
-```ts
-import {
-  ApolloFederationDriver,
-  ApolloFederationDriverConfig,
-} from '@nestjs/apollo';
-import { Module } from '@nestjs/common';
-import { User } from './user.entity';
-import { PostsResolvers } from './posts.resolvers';
-import { UsersResolvers } from './users.resolvers';
-import { PostsService } from './posts.service'; // Not included in example
-
-@Module({
-  imports: [
-    GraphQLModule.forRoot<ApolloFederationDriverConfig>({
-      driver: ApolloFederationDriver,
-      autoSchemaFile: {
-        federation: 2,
-      },
-      buildSchemaOptions: {
-        orphanedTypes: [User],
-      },
-    }),
-  ],
-  providers: [PostsResolver, UsersResolver, PostsService],
-})
-export class AppModule {}
-
-```
+__CODE_BLOCK_37__

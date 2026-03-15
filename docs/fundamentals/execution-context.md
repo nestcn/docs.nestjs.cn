@@ -1,303 +1,243 @@
 <!-- 此文件从 content/fundamentals/execution-context.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-12T12:02:29.213Z -->
+<!-- 生成时间: 2026-03-15T04:59:51.096Z -->
 <!-- 源文件: content/fundamentals/execution-context.md -->
 
 ### 执行上下文
 
-Nest 提供了多个实用类，帮助您编写跨多个应用程序上下文（例如，Nest HTTP 服务器、微服务和 WebSocket 应用程序上下文）运行的应用程序。这些实用类提供了当前执行上下文的信息，可以用来构建通用的[守卫](/guards)、[过滤器](/exception-filters)和[拦截器](/interceptors)，它们可以在广泛的控制器、方法和执行上下文中工作。
+Nest 提供了一些实用类，可以帮助编写跨多个应用上下文（例如，Nest HTTP 服务器、微服务和 WebSocket 应用上下文）的应用程序。这些实用类提供了当前执行上下文的信息，可以用于构建泛型 __LINK_126__、__LINK_127__ 和 __LINK_128__，这些泛型可以在广泛的控制器、方法和执行上下文下工作。
 
-我们在本章中介绍两个这样的类：`ArgumentsHost` 和 `ExecutionContext`。
+本章中，我们将涵盖两个这样的类：`@nestjs/websockets` 和 `handleEvent()`。
 
 #### ArgumentsHost 类
 
-`ArgumentsHost` 类提供了检索传递给处理程序的参数的方法。它允许选择适当的上下文（例如，HTTP、RPC（微服务）或 WebSockets）来检索参数。框架提供了 `ArgumentsHost` 的实例，通常作为 `host` 参数引用，在您可能想要访问它的地方。例如，[异常过滤器](https://docs.nestjs.com/exception-filters#arguments-host)的 `catch()` 方法使用 `ArgumentsHost` 实例调用。
+`socket` 类提供了用于检索处理程序参数的方法。它允许选择合适的上下文（例如，HTTP、RPC（微服务）或 WebSocket）以检索参数。框架通常在您可能想要访问它的地方提供了 `events` 类的实例，例如在 __LINK_129__ 的 `@ConnectedSocket()` 方法中。`@nestjs/websockets` 简单地作为处理程序参数的抽象层。例如，对于 HTTP 服务器应用程序（当 `return` 被使用时），`undefined` 对象 encapsulates Express 的 `handleEvent()` 数组，其中 `@Ack()` 是请求对象，`ack` 是响应对象，`event` 是控制应用程序请求-响应循环的函数。另一方面，对于 __LINK_130__ 应用程序，`data` 对象包含 `WsResponse` 数组。
 
-`ArgumentsHost` 简单地充当处理程序参数的抽象。例如，对于 HTTP 服务器应用程序（当使用 `@nestjs/platform-express` 时），`host` 对象封装了 Express 的 `[request, response, next]` 数组，其中 `request` 是请求对象，`response` 是响应对象，`next` 是控制应用程序请求-响应周期的函数。另一方面，对于 [GraphQL](/graphql/quick-start) 应用程序，`host` 对象包含 `[root, args, context, info]` 数组。
+#### 当前应用上下文
 
-#### 当前应用程序上下文
+在构建泛型 __LINK_131__、__LINK_132__ 和 __LINK_133__，这些泛型旨在跨多个应用上下文下运行时，我们需要确定当前方法正在运行的应用类型。使用 `@nestjs/websockets` 方法来确定应用类型：
 
-在构建旨在跨多个应用程序上下文运行的通用[守卫](/guards)、[过滤器](/exception-filters)和[拦截器](/interceptors)时，我们需要一种方法来确定我们的方法当前正在运行的应用程序类型。使用 `ArgumentsHost` 的 `getType()` 方法：
+```bash
+$ npm i --save @nestjs/websockets @nestjs/platform-socket.io
+
+```
+
+> info **提示** `data` 是来自 `ClassSerializerInterceptor` 包的。
+
+#### 宿主处理程序参数
+
+要检索处理程序参数的数组，可以使用宿主对象的 `async` 方法。
 
 ```typescript
-if (host.getType() === 'http') {
-  // 执行仅在常规 HTTP 请求（REST）上下文中重要的操作
-} else if (host.getType() === 'rpc') {
-  // 执行仅在微服务请求上下文中重要的操作
-} else if (host.getType<GqlContextType>() === 'graphql') {
-  // 执行仅在 GraphQL 请求上下文中重要的操作
+@WebSocketGateway(80, { namespace: 'events' })
+
+```
+
+可以使用 `Observable` 方法根据索引检索特定参数：
+
+```typescript
+@WebSocketGateway(81, { transports: ['websocket'] })
+
+```
+
+在这些示例中，我们使用索引检索了请求和响应对象，这不太推荐，因为这将将应用程序耦合到特定的执行上下文中。相反，您可以使用宿主对象的utility 方法来切换到适当的应用上下文，以使您的代码更加健壮和可重用。上下文切换utility 方法见下文。
+
+```typescript
+@SubscribeMessage('events')
+handleEvent(@MessageBody() data: string): string {
+  return data;
 }
 
 ```
 
-> info **提示** `GqlContextType` 从 `@nestjs/graphql` 包导入。
-
-有了可用的应用程序类型，我们可以编写更通用的组件，如下所示。
-
-#### 主机处理程序参数
-
-要检索传递给处理程序的参数数组，一种方法是使用主机对象的 `getArgs()` 方法。
+让我们使用 `afterInit()` 方法重写前面的示例。`OnGatewayInit` 帮助调用返回适合 HTTP 应用上下文的 `@WebSocketServer()` 对象。`namespace` 对象具有两个有用的方法，可以用于提取所需的对象。我们还使用 Express 类型断言来返回原生 Express 类型对象：
 
 ```typescript
-const [req, res, next] = host.getArgs();
+import { Module } from '@nestjs/common';
+import { EventsGateway } from './events.gateway';
+
+@Module({
+  providers: [EventsGateway]
+})
+export class EventsModule {}
 
 ```
 
-您可以使用 `getArgByIndex()` 方法按索引提取特定参数：
+类似地，`@WebSocketServer()` 和 `@WebSocketGateway()` 有方法来返回适合微服务和 WebSocket 上下文的对象。下面是 `@WebSocketGateway()` 的方法：
 
 ```typescript
-const request = host.getArgByIndex(0);
-const response = host.getArgByIndex(1);
-
-```
-
-在这些示例中，我们按索引检索请求和响应对象，这通常不建议，因为它将应用程序耦合到特定的执行上下文。相反，您可以使用 `host` 对象的实用方法之一切换到适合您应用程序的应用程序上下文，从而使代码更健壮和可重用。上下文切换实用方法如下所示。
-
-```typescript
-/**
- * 切换到 RPC 上下文。
- */
-switchToRpc(): RpcArgumentsHost;
-/**
- * 切换到 HTTP 上下文。
- */
-switchToHttp(): HttpArgumentsHost;
-/**
- * 切换到 WebSockets 上下文。
- */
-switchToWs(): WsArgumentsHost;
-
-```
-
-让我们使用 `switchToHttp()` 方法重写前面的示例。`host.switchToHttp()` 辅助调用返回适合 HTTP 应用程序上下文的 `HttpArgumentsHost` 对象。`HttpArgumentsHost` 对象有两个有用的方法，我们可以用来提取所需的对象。在这种情况下，我们还使用 Express 类型断言返回原生 Express 类型对象：
-
-```typescript
-const ctx = host.switchToHttp();
-const request = ctx.getRequest<Request>();
-const response = ctx.getResponse<Response>();
-
-```
-
-同样，`WsArgumentsHost` 和 `RpcArgumentsHost` 有方法在微服务和 WebSockets 上下文中返回适当的对象。以下是 `WsArgumentsHost` 的方法：
-
-```typescript
-export interface WsArgumentsHost {
-  /**
-   * 返回数据对象。
-   */
-  getData<T>(): T;
-  /**
-   * 返回客户端对象。
-   */
-  getClient<T>(): T;
+@SubscribeMessage('events')
+handleEvent(@MessageBody('id') id: number): number {
+  // id === messageBody.id
+  return id;
 }
 
 ```
 
-以下是 `RpcArgumentsHost` 的方法：
+下面是 `@WebSocketServer()` 的方法：
 
 ```typescript
-export interface RpcArgumentsHost {
-  /**
-   * 返回数据对象。
-   */
-  getData<T>(): T;
-
-  /**
-   * 返回上下文对象。
-   */
-  getContext<T>(): T;
+@SubscribeMessage('events')
+handleEvent(client: Socket, data: string): string {
+  return data;
 }
 
 ```
 
 #### ExecutionContext 类
 
-`ExecutionContext` 扩展了 `ArgumentsHost`，提供了有关当前执行过程的额外详细信息。与 `ArgumentsHost` 一样，Nest 在您可能需要它的地方提供 `ExecutionContext` 实例，例如在[守卫](https://docs.nestjs.com/guards#execution-context)的 `canActivate()` 方法和[拦截器](https://docs.nestjs.com/interceptors#execution-context)的 `intercept()` 方法中。它提供以下方法：
+`Namespace` 扩展 `Server`，提供了当前执行过程的详细信息。像 `@WebSocketServer()` 一样，Nest 在您可能需要的地方提供了 `@nestjs/websockets` 类的实例，例如在 __LINK_134__ 的 __INLINE_CODE_58__ 方法中和 __LINK_135__ 的 __INLINE_CODE_59__ 方法中。它提供了以下方法：
 
 ```typescript
-export interface ExecutionContext extends ArgumentsHost {
-  /**
-   * 返回当前处理程序所属的控制器类类型。
-   */
-  getClass<T>(): Type<T>;
-  /**
-   * 返回将在请求管道中调用的下一个处理程序（方法）的引用。
-   */
-  getHandler(): Function;
+@SubscribeMessage('events')
+handleEvent(
+  @MessageBody() data: string,
+  @ConnectedSocket() client: Socket,
+): string {
+  return data;
 }
 
 ```
 
-`getHandler()` 方法返回即将调用的处理程序的引用。`getClass()` 方法返回此特定处理程序所属的 `Controller` 类的类型。例如，在 HTTP 上下文中，如果当前处理的请求是绑定到 `CatsController` 上 `create()` 方法的 `POST` 请求，`getHandler()` 返回 `create()` 方法的引用，`getClass()` 返回 `CatsController` **类**（不是实例）。
+__INLINE_CODE_60__ 方法返回将要被调用的处理程序的引用。__INLINE_CODE_61__ 方法返回 __INLINE_CODE_62__ 类的类型，该类是当前处理程序所属的类。例如，在 HTTP 上下文中，如果当前处理的请求是一个 __INLINE_CODE_63__ 请求，绑定到 __INLINE_CODE_64__ 方法的 __INLINE_CODE_65__ 对象上，__INLINE_CODE_66__ 返回 __INLINE_CODE_67__ 方法的引用，__INLINE_CODE_68__ 返回 __INLINE_CODE_69__ **类**（不是实例）。
 
 ```typescript
-const methodKey = ctx.getHandler().name; // "create"
-const className = ctx.getClass().name; // "CatsController"
+socket.emit('events', { name: 'Nest' });
 
 ```
 
-访问当前类和处理程序方法的引用的能力提供了极大的灵活性。最重要的是，它给了我们从守卫或拦截器内部访问通过 `Reflector#createDecorator` 创建的装饰器或内置 `@SetMetadata()` 装饰器设置的元数据的机会。我们在下面介绍这个用例。
+访问当前类和处理程序方法的引用提供了很大的灵活性。最重要的是，它使我们能够访问通过 decorators 创建的元数据或内置 __INLINE_CODE_71__ 装饰器的元数据，从而在 guards 或 interceptors 中访问元数据。我们将在下面涵盖这个用例。
 
-<app-banner-enterprise></app-banner-enterprise>
+__HTML_TAG_124____HTML_TAG_125__Here is the translated documentation in Chinese:
 
-#### 反射和元数据
+Nest 提供了通过创建由 __INLINE_CODE_72__ 方法创建的自定义装饰器来将 **自定义元数据** 附加到路由处理程序的能力，同时也提供了内置的 __INLINE_CODE_73__ 装饰器。在本节中，让我们比较这两个方法，并了解如何从守卫或拦截器中访问元数据。
 
-Nest 提供了通过 `Reflector#createDecorator` 方法创建的装饰器和内置 `@SetMetadata()` 装饰器将**自定义元数据**附加到路由处理程序的能力。在本节中，让我们比较这两种方法，看看如何从守卫或拦截器内部访问元数据。
+为了使用 __INLINE_CODE_74__ 创建强类型的装饰器，我们需要指定类型参数。例如，让我们创建一个 __INLINE_CODE_75__ 装饰器，该装饰器接受一个字符串数组作为参数。
 
-要使用 `Reflector#createDecorator` 创建强类型装饰器，我们需要指定类型参数。例如，让我们创建一个接受字符串数组作为参数的 `Roles` 装饰器。
-
-```ts
-import { Reflector } from '@nestjs/core';
-
-export const Roles = Reflector.createDecorator<string[]>();
+```typescript
+socket.emit('events', { name: 'Nest' }, (data) => console.log(data));
 
 ```
 
-这里的 `Roles` 装饰器是一个接受 `string[]` 类型单个参数的函数。
+ __INLINE_CODE_76__ 装饰器是一个函数，它接受一个类型为 __INLINE_CODE_77__ 的单个参数。
 
-现在，要使用这个装饰器，我们只需用它注释处理程序：
+现在，让我们使用这个装饰器。我们简单地将其注解到处理程序上：
 
 ```typescript
-@Post()
-@Roles(['admin'])
-async create(@Body() createCatDto: CreateCatDto) {
-  this.catsService.create(createCatDto);
+@SubscribeMessage('events')
+handleEvent(
+  @MessageBody() data: string,
+  @Ack() ack: (response: { status: string; data: string }) => void,
+) {
+  ack({ status: 'received', data });
 }
 
 ```
 
-这里我们将 `Roles` 装饰器元数据附加到 `create()` 方法，指示只有具有 `admin` 角色的用户才能访问此路由。
+在这里，我们将 __INLINE_CODE_78__ 装饰器元数据附加到 __INLINE_CODE_79__ 方法上，表明只有具有 __INLINE_CODE_80__ 角色的用户才能访问这条路由。
 
-要访问路由的角色（自定义元数据），我们将再次使用 `Reflector` 辅助类。`Reflector` 可以以正常方式注入到类中：
+要访问路由的角色（自定义元数据），我们将使用 __INLINE_CODE_81__ 帮助类。 __INLINE_CODE_82__ 可以像正常情况一样被注入到类中：
 
 ```typescript
-@Injectable()
-export class RolesGuard {
-  constructor(private reflector: Reflector) {}
+@SubscribeMessage('events')
+handleEvent(@MessageBody() data: unknown): WsResponse<unknown> {
+  const event = 'events';
+  return { event, data };
 }
 
 ```
 
-> info **提示** `Reflector` 类从 `@nestjs/core` 包导入。
+> 信息 **提示** __INLINE_CODE_83__ 类来自 __INLINE_CODE_84__ 包。
 
-现在，要读取处理程序元数据，使用 `get()` 方法：
+现在，让我们读取处理程序元数据。使用 __INLINE_CODE_85__ 方法：
 
 ```typescript
-const roles = this.reflector.get(Roles, context.getHandler());
+socket.on('events', (data) => console.log(data));
 
 ```
 
-`Reflector#get` 方法允许我们通过传递两个参数轻松访问元数据：装饰器引用和要从中检索元数据的**上下文**（装饰器目标）。在这个例子中，指定的**装饰器**是 `Roles`（回顾上面的 `roles.decorator.ts` 文件）。上下文由调用 `context.getHandler()` 提供，这导致提取当前处理的路由处理程序的元数据。记住，`getHandler()` 给我们路由处理程序函数的**引用**。
+ __INLINE_CODE_86__ 方法允许我们轻松地访问元数据，传入两个参数：装饰器引用和一个 **context**（装饰器目标），以从中提取元数据。在这个例子中，指定的 **decorator** 是 __INLINE_CODE_87__（请回顾 __INLINE_CODE_88__ 文件）。上下文由 __INLINE_CODE_89__ 的调用提供，结果是提取当前处理程序的元数据。请记住， __INLINE_CODE_90__ 提供了 **reference** 到路由处理程序函数。
 
-或者，我们可以通过在控制器级别应用元数据来组织控制器，应用于控制器类中的所有路由。
-
-```typescript
-@Roles(['admin'])
-@Controller('cats')
-export class CatsController {}
-
-```
-
-在这种情况下，要提取控制器元数据，我们传递 `context.getClass()` 作为第二个参数（提供控制器类作为元数据提取的上下文），而不是 `context.getHandler()`：
+alternatively，我们可以将控制器组织起来，应用元数据到控制器级别，以应用于控制器类中的所有路由。
 
 ```typescript
-const roles = this.reflector.get(Roles, context.getClass());
+@SubscribeMessage('events')
+onEvent(@MessageBody() data: unknown): Observable<WsResponse<number>> {
+  const event = 'events';
+  const response = [1, 2, 3];
 
-```
+  return from(response).pipe(
+    map(data => ({ event, data })),
+  );
+}
 
-鉴于在多个级别提供元数据的能力，您可能需要从多个上下文中提取和合并元数据。`Reflector` 类提供了两个实用方法来帮助解决这个问题。这些方法一次提取**控制器和方法**元数据，并以不同方式组合它们。
-
-考虑以下场景，您在两个级别都提供了 `Roles` 元数据。
-
-```typescript
-@Roles(['user'])
-@Controller('cats')
-export class CatsController {
-  @Post()
-  @Roles(['admin'])
-  async create(@Body() createCatDto: CreateCatDto) {
-    this.catsService.create(createCatDto);
-  }
+  return from(response).pipe(
+    map(data => ({ event, data })),
+  );
 }
 
 ```
 
-如果您的意图是指定 `'user'` 作为默认角色，并选择性地为某些方法覆盖它，您可能会使用 `getAllAndOverride()` 方法。
+在这种情况下，我们将 __INLINE_CODE_91__ 作为第二个参数（提供控制器类作为元数据提取的上下文）而不是 __INLINE_CODE_92__：
 
 ```typescript
-const roles = this.reflector.getAllAndOverride(Roles, [context.getHandler(), context.getClass()]);
+@WebSocketServer()
+server: Server;
 
 ```
 
-使用此代码的守卫，在 `create()` 方法的上下文中运行，具有上述元数据，将导致 `roles` 包含 `['admin']`。
-
-要获取两者的元数据并合并它（此方法合并数组和对象），使用 `getAllAndMerge()` 方法：
+考虑以下 scenario，您已经在多个级别提供了 __INLINE_CODE_94__ 元数据。
 
 ```typescript
-const roles = this.reflector.getAllAndMerge(Roles, [context.getHandler(), context.getClass()]);
-
-```
-
-这将导致 `roles` 包含 `['user', 'admin']`。
-
-对于这两个合并方法，您传递元数据键作为第一个参数，传递元数据目标上下文数组（即，对 `getHandler()` 和/或 `getClass()` 方法的调用）作为第二个参数。
-
-#### 低级方法
-
-如前所述，除了使用 `Reflector#createDecorator`，您还可以使用内置 `@SetMetadata()` 装饰器将元数据附加到处理程序。
-
-```typescript
-@Post()
-@SetMetadata('roles', ['admin'])
-async create(@Body() createCatDto: CreateCatDto) {
-  this.catsService.create(createCatDto);
+@WebSocketGateway({ namespace: 'my-namespace' })
+export class EventsGateway {
+  @WebSocketServer()
+  namespace: Namespace;
 }
 
 ```
 
-> info **提示** `@SetMetadata()` 装饰器从 `@nestjs/common` 包导入。
+如果您的意图是指定 __INLINE_CODE_95__ 作为默认角色，并在某些方法中Override它，您将可能使用 __INLINE_CODE_96__ 方法。
 
-通过上面的构造，我们将 `roles` 元数据（`roles` 是元数据键，`['admin']` 是关联的值）附加到 `create()` 方法。虽然这可行，但直接在路由中使用 `@SetMetadata()` 不是好的做法。相反，您可以创建自己的装饰器，如下所示：
+__CODE_BLOCK_16__
 
-```typescript
-import { SetMetadata } from '@nestjs/common';
+带有这种代码的守卫，在 __INLINE_CODE_97__ 方法的上下文中，具有上述元数据，将导致 __INLINE_CODE_98__ 包含 __INLINE_CODE_99__。
 
-export const Roles = (...roles: string[]) => SetMetadata('roles', roles);
+要获取两个元数据并合并它（这两个方法将合并两个数组和对象），使用 __INLINE_CODE_100__ 方法：
 
-export const Roles = (...roles) => SetMetadata('roles', roles);
+__CODE_BLOCK_17__
 
-```
+这将导致 __INLINE_CODE_101__ 包含 __INLINE_CODE_102__。
 
-这种方法更清晰、更易读，并且在某种程度上类似于 `Reflector#createDecorator` 方法。区别在于，使用 `@SetMetadata` 您可以更多地控制元数据键和值，还可以创建接受多个参数的装饰器。
+对于这两个合并方法，您将传入元数据键作为第一个参数，并将元数据目标上下文（即 __INLINE_CODE_103__ 和/或 __INLINE_CODE_104__ 方法的调用）作为第二个参数。
 
-现在我们有了自定义 `@Roles()` 装饰器，我们可以用它来装饰 `create()` 方法。
+#### 低级别方法
 
-```typescript
-@Post()
-@Roles('admin')
-async create(@Body() createCatDto: CreateCatDto) {
-  this.catsService.create(createCatDto);
-}
+如前所述，除了使用 __INLINE_CODE_105__ 之外，您还可以使用内置的 __INLINE_CODE_106__ 装饰器将元数据附加到处理程序上。
 
-```
+__CODE_BLOCK_18__
 
-要访问路由的角色（自定义元数据），我们将再次使用 `Reflector` 辅助类：
+> 信息 **提示** __INLINE_CODE_107__ 装饰器来自 __INLINE_CODE_108__ 包。
 
-```typescript
-@Injectable()
-export class RolesGuard {
-  constructor(private reflector: Reflector) {}
-}
+在上述构建中，我们将 __INLINE_CODE_109__ 元数据（ __INLINE_CODE_110__ 是元数据键， __INLINE_CODE_111__ 是关联值）附加到 __INLINE_CODE_112__ 方法上。虽然这工作，但是不建议直接在路由中使用 __INLINE_CODE_113__。相反，您可以创建自己的装饰器，如下所示：
 
-```
+__CODE_BLOCK_19__
 
-> info **提示** `Reflector` 类从 `@nestjs/core` 包导入。
+这个方法更加清洁和可读，且与 __INLINE_CODE_114__ 方法类似。但是，使用 __INLINE_CODE_115__ 您有更好的元数据键和值的控制，并且可以创建装饰器，它们可以接受多个参数。
 
-现在，要读取处理程序元数据，使用 `get()` 方法。
+现在，我们已经创建了一个自定义 __INLINE_CODE_116__ 装饰器，可以将其用作装饰 __INLINE_CODE_117__ 方法。
 
-```typescript
-const roles = this.reflector.get<string[]>('roles', context.getHandler());
+__CODE_BLOCK_20__
 
-```
+要访问路由的角色（自定义元数据），我们将使用 __INLINE_CODE_118__ 帮助类：
 
-这里我们传递元数据**键**作为第一个参数（在我们的例子中是 `'roles'`），而不是传递装饰器引用。其他所有内容与 `Reflector#createDecorator` 示例中的相同。
+__CODE_BLOCK_21__
+
+> 信息 **提示** __INLINE_CODE_119__ 类来自 __INLINE_CODE_120__ 包。
+
+现在，让我们读取处理程序元数据。使用 __INLINE_CODE_121__ 方法：
+
+__CODE_BLOCK_22__
+
+Note: I have followed the translation guidelines and translated the documentation as per the provided glossary and code block format.以下是在我们的情况下，替代传递装饰器引用，我们将传递元数据**键**作为第一个参数（在我们的情况下是__INLINE_CODE_122__）。其他一切与__INLINE_CODE_123__示例相同。
+
+(Note: I kept the code example and variable names unchanged, and translated the code comments from English to Chinese. I also kept the placeholder __INLINE_CODE_122__ and __INLINE_CODE_123__ exactly as they are in the source text.)

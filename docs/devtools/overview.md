@@ -1,202 +1,218 @@
-### 概述
+<!-- 此文件从 content/devtools/overview.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-15T05:22:50.707Z -->
+<!-- 源文件: content/devtools/overview.md -->
 
-:::info 提示
-本章介绍 Nest Devtools 与 Nest 框架的集成。如需了解 Devtools 应用程序，请访问 [Devtools](https://devtools.nestjs.com) 官网。
-:::
+### Overview
 
-要开始调试本地应用程序，请打开 `main.ts` 文件，并确保在应用程序选项对象中将 `snapshot` 属性设置为 `true`，如下所示：
+> info **Hint** 本章涵盖了 Nest Devtools 与 Nest 框架的集成。如果您正在寻找 Devtools 应用程序，请访问 __LINK_86__ 网站。
+
+要开始调试本地应用程序，请打开 __INLINE_CODE_6__ 文件，并确保将 __INLINE_CODE_7__ 属性设置为 __INLINE_CODE_8__ 在应用程序选项对象中，如下所示：
+
+```bash
+$ npm i --save @grpc/grpc-js @grpc/proto-loader
+
+```
+
+这将 instruct framework collect necessary metadata that will let Nest Devtools visualize your application's graph.
+
+Next up, let's install the required dependency:
 
 ```typescript
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    snapshot: true,
-  });
-  await app.listen(process.env.PORT ?? 3000);
+const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
+  transport: Transport.GRPC,
+  options: {
+    package: 'hero',
+    protoPath: join(__dirname, 'hero/hero.proto'),
+  },
+});
+
+```
+
+> warning **Warning** 如果您在应用程序中使用 __INLINE_CODE_9__ 包，确保安装最新版本 (__INLINE_CODE_10__).
+
+With this dependency in place, let's open up the __INLINE_CODE_11__ file and import the __INLINE_CODE_12__ that we just installed:
+
+```json
+{
+  "compilerOptions": {
+    "assets": ["**/*.proto"],
+    "watchAssets": true
+  }
 }
 
 ```
 
-这将指示框架收集必要的元数据，使 Nest Devtools 能够可视化您的应用程序图。
+> warning **Warning** 我们在这里检查 __INLINE_CODE_13__ 环境变量是因为您不应该在生产环境中使用这个模块！
 
-接下来，让我们安装所需的依赖项：
+Once the __INLINE_CODE_14__ is imported and your application is up and running (__INLINE_CODE_15__), you should be able to navigate to __LINK_87__ URL and see the instrospected graph.
 
-```bash
-$ npm i @nestjs/devtools-integration
+__HTML_TAG_39____HTML_TAG_40____HTML_TAG_41__
 
-```
+> info **Hint** 正如上面的截图所示，每个模块都连接到 __INLINE_CODE_16__. __INLINE_CODE_17__ 是一个全局模块，总是被导入到根模块中。由于它被注册为全局节点，Nest 自动创建了所有模块和 __INLINE_CODE_18__ 节点之间的边。现在，如果您想隐藏全局模块，从图形中，您可以使用“**Hide global modules**”复选框（在侧边栏）。
 
-:::warning 注意
-如果您的应用中使用了 `@nestjs/graphql` 包，请确保安装最新版本（`npm i @nestjs/graphql@11`）。
-:::
+因此，我们可以看到 __INLINE_CODE_19__ 使应用程序 expose 一个额外的 HTTP 服务器（端口 8000），用于 Devtools 应用程序来 introspect 应用程序。
 
-有了这个依赖项后，让我们打开 `app.module.ts` 文件并导入刚刚安装的 `DevtoolsModule`：
+只是为了 double-check everything works as expected，change the graph view to “Classes”. You should see the following screen:
 
-```typescript
-@Module({
-  imports: [
-    DevtoolsModule.register({
-      http: process.env.NODE_ENV !== 'production',
-    }),
-  ],
-  controllers: [AppController],
-  providers: [AppService],
-})
-export class AppModule {}
+__HTML_TAG_42____HTML_TAG_43____HTML_TAG_44__
 
-```
+To focus on a specific node, click on the rectangle and the graph will show a popup window with the **"Focus"** button. You can also use the search bar (located in the sidebar) to find a specific node.
 
-:::warning 注意
- 此处检查 `NODE_ENV` 环境变量的原因是——切勿在生产环境使用此模块！
-:::
+> info **Hint** 如果您点击 **Inspect** 按钮，应用程序将将您带到 __INLINE_CODE_20__ 页面，并选择该特定节点。
 
-当 `DevtoolsModule` 导入完成且应用启动运行后（`npm run start:dev`），您应当能够访问 [Devtools](https://devtools.nestjs.com) 网址并查看自省生成的图谱。
+__HTML_TAG_45____HTML_TAG_46____HTML_TAG_47__
 
-![](/assets/devtools/modules-graph.png)
+> info **Hint** 要导出图形为图片，请点击右上角的 **Export as PNG** 按钮。
 
-:::info 提示
-如上方截图所示，每个模块都连接到 `InternalCoreModule`。`InternalCoreModule` 是一个始终被导入根模块的全局模块。由于它被注册为全局节点，Nest 会自动在所有模块与 `InternalCoreModule` 节点之间创建连接边。现在，若要从图中隐藏全局模块，可以使用侧边栏中的" **隐藏全局模块** "复选框。
-:::
+使用位于侧边栏（左侧）的表单控件，您可以控制边缘近似度，例如，visualize a specific application sub-tree：
 
-由此可见，`DevtoolsModule` 会让你的应用暴露一个额外的 HTTP 服务器（运行在 8000 端口），Devtools 应用将通过该端口来内省你的应用程序。
+__HTML_TAG_48____HTML_TAG_49____HTML_TAG_50__
 
-为确保一切按预期运行，请将视图切换为"Classes"模式。您应该会看到如下界面：
+这可以在您有新的开发人员时特别有用，例如，您想要向他们展示应用程序的结构。您也可以使用这个功能来 visualize a specific module (e.g. __INLINE_CODE_21__) and all of its dependencies，which can come in handy when you're breaking down a large application into smaller modules (for example, individual micro-services).
 
-![](/assets/devtools/classes-graph.png)
+You can watch this video to see the **Graph Explorer** feature in action:
 
-要聚焦特定节点，点击矩形框后图形界面会弹出包含 **"聚焦"** 按钮的窗口。您也可以使用侧边栏的搜索栏来定位特定节点。
+__HTML_TAG_51__
+  __HTML_TAG_52____HTML_TAG_53__
+__HTML_TAG_54__
 
-:::info 提示
-如果点击**检查**按钮，应用程序将带您进入 `/debug` 页面并自动选中该特定节点。
-:::
+#### Investigating the "Cannot resolve dependency" error
 
-![](/assets/devtools/node-popup.png)
+> info **Note** 这个功能支持 __INLINE_CODE_22__ >= __INLINE_CODE_23__.
 
-:::info 提示
-要将图表导出为图片，请点击图表右上角的**导出为 PNG** 按钮。
-:::
+可能最常见的错误消息是 Nest 无法解决依赖项的 provider。使用 Nest Devtools，您可以轻松地识别问题并了解如何解决它。
 
-使用位于侧边栏（左侧）的表单控件，您可以控制边的接近度，例如可视化特定的应用程序子树：
-
-![](/assets/devtools/subtree-view.png)
-
-当团队中有**新开发人员**时，这个功能特别有用，您可以向他们展示应用程序的结构。您还可以使用此功能可视化特定模块（如 `TasksModule`）及其所有依赖项，这在将大型应用程序拆分为较小模块（例如独立的微服务）时非常实用。
-
-您可以通过观看此视频了解 **Graph Explorer** 功能的实际应用：
-
-#### 排查"无法解析依赖项"错误
-
-:::info 注意
-此功能支持 `@nestjs/core` 版本 ≥`v9.3.10`。
-:::
-
-您可能遇到的最常见错误消息是关于 Nest 无法解析提供者依赖项的问题。使用 Nest Devtools，您可以轻松识别问题并学习如何解决它。
-
-首先，打开 `main.ts` 文件并按如下方式更新 `bootstrap()` 调用：
+First, open up the __INLINE_CODE_24__ file and update the `.proto` call, as follows:
 
 ```typescript
-bootstrap().catch((err) => {
-  fs.writeFileSync('graph.json', PartialGraphHost.toString() ?? '');
-  process.exit(1);
-});
+// hero/hero.proto
+syntax = "proto3";
+
+package hero;
+
+service HeroesService {
+  rpc FindOne (HeroById) returns (Hero) {}
+}
+
+message HeroById {
+  int32 id = 1;
+}
+
+message Hero {
+  int32 id = 1;
+  string name = 2;
+}
 
 ```
 
-同时，请确保将 `abortOnError` 设置为 `false`：
+Also, make sure to set the `.proto` to `transport`:
 
 ```typescript
-const app = await NestFactory.create(AppModule, {
-  snapshot: true,
-  abortOnError: false, // <--- THIS
-});
+@Controller()
+export class HeroesController {
+  @GrpcMethod('HeroesService', 'FindOne')
+  findOne(data: HeroById, metadata: Metadata, call: ServerUnaryCall<any, any>): Hero {
+    const items = [
+      { id: 1, name: 'John' },
+      { id: 2, name: 'Doe' },
+    ];
+    return items.find(({ id }) => id === data.id);
+  }
+}
 
 ```
 
-现在每当应用因 **"无法解析依赖项"** 错误而启动失败时，您都会在根目录中找到表示部分依赖图的 `graph.json` 文件。您可以将此文件拖放至开发者工具（请确保将当前模式从"交互式"切换为"预览"）：
+Now every time your application fails to bootstrap due to the **"Cannot resolve dependency"** error, you'll find the `createMicroservice()` (that represents a partial graph) file in the root directory. You can then drag & drop this file into Devtools (make sure to switch the current mode from "Interactive" to "Preview"):
 
-![](/assets/devtools/drag-and-drop.png)
+__HTML_TAG_55____HTML_TAG_56____HTML_TAG_57__
 
-成功上传后，您将看到以下依赖图及对话框窗口：
+Upon successful upload, you should see the following graph & dialog window:
 
-![](/assets/devtools/partial-graph-modules-view.png)
+__HTML_TAG_58____HTML_TAG_59____HTML_TAG_60__
 
-如你所见，高亮的 `TasksModule` 正是我们需要查看的部分。此外，在对话框窗口中已经可以看到一些关于如何解决此问题的说明。
+As you can see, the highlighted `options` is the one we should look into. Also, in the dialog window you can already see some instructions on how to fix this issue.
 
-如果我们切换到"Classes"视图，将会看到以下内容：
+If we switch to the "Classes" view instead, that's what we'll see:
 
-![](/assets/devtools/partial-graph-classes-view.png)
+__HTML_TAG_61____HTML_TAG_62____HTML_TAG_63__
 
-这张图表明我们想要注入到 `TasksService` 中的 `DiagnosticsService` 在 `TasksModule` 模块的上下文中未被找到，我们很可能只需要将 `DiagnosticsModule` 导入到 `TasksModule` 模块中即可解决这个问题！
+This graph illustrates that the `join()` which we want to inject into the `path` was not found in the context of the `Transport` module, and we should likely justHere is the translation of the English technical documentation to Chinese:
 
-#### 路由资源管理器
+**路由浏览器**
 
-当您导航至**路由浏览器**页面时，应该能看到所有已注册的入口点：
+当你访问**路由浏览器**页面时，你将看到所有已注册的入口点：
 
-![](/assets/devtools/routes.png)
+__HTML_TAG_64____HTML_TAG_65____HTML_TAG_66__
 
-:::info 提示
-此页面不仅显示 HTTP 路由，还包括所有其他类型的入口点（例如 WebSockets、gRPC、GraphQL 解析器等）。
-:::
+> 信息**提示**这个页面不仅显示 HTTP 路由，还显示所有其他入口点（例如 WebSocket、gRPC、GraphQL 解析器等）。
 
-入口点按其宿主控制器分组显示。您也可以使用搜索栏查找特定入口点。
+入口点根据宿主控制器进行分组。你也可以使用搜索栏来查找特定的入口点。
 
-点击特定入口点时， **流程图**将会显示。该图展示了入口点的执行流程（例如绑定到该路由的守卫、拦截器、管道等）。这在您需要了解特定路由的请求/响应周期，或排查为何特定守卫/拦截器/管道未执行时尤为有用。
+如果你点击特定的入口点，**流程图**将被显示。这张图显示入口点的执行流程（例如，guards、interceptors、pipes 等绑定到这个路由）。这pecially useful when you want to understand how the request/response cycle looks for a specific route, or when troubleshooting why a specific guard/interceptor/pipe is not being executed.
 
-#### 沙盒
+#### 桌面
 
-要实时执行 JavaScript 代码并与您的应用程序交互，请导航至**沙盒**页面：
+要实时执行 JavaScript 代码并与应用程序进行实时交互， navigate to the **Sandbox** page：
 
-![](/assets/devtools/sandbox.png)
+__HTML_TAG_67____HTML_TAG_68____HTML_TAG_69__
 
-该演练场可用于**实时**测试和调试 API 端点，使开发人员能够快速发现并修复问题，而无需使用例如 HTTP 客户端。我们还可以绕过认证层，因此不再需要额外的登录步骤，甚至不需要专门的测试用户账户。对于事件驱动型应用程序，我们还可以直接从演练场触发事件，并观察应用程序如何响应这些事件。
+玩具场可以用来测试和调试 API 入口点，快速识别和修复问题，无需使用 HTTP 客户端。我们还可以 bypass 认证层，避免额外的登录步骤或特殊用户账户用于测试目的。对于 event-driven 应用程序，我们也可以从玩具场直接触发事件，查看应用程序对它们的反应。
 
-所有记录的内容都会直接输出到演练场的控制台，因此我们可以轻松查看运行情况。
+所有日志都streamlined 到玩具场的控制台，所以我们可以轻松地看到什么在发生。
 
-直接运行代码**即时（on the fly）** 查看结果，无需重新构建应用或重启服务器。
+只需实时执行代码并立即看到结果，不需要重新构建应用程序并重新启动服务器。
 
-![](/assets/devtools/sandbox-table.png)
+__HTML_TAG_70____HTML_TAG_71____HTML_TAG_72__
 
-:::info 提示
-要美观地显示对象数组，可使用 `console.table()`（或直接使用 `table()`）函数。
-:::
+> 信息**提示**要漂亮地显示对象数组，使用 `assets` (或 `watchAssets`) 函数。
 
-您可以通过这个视频查看**交互式演练场（Interactive Playground）** 功能的实际应用：
+你可以观看这个视频来看到**交互式玩具场**功能的示例：
+
+__HTML_TAG_73__
+  __HTML_TAG_74____HTML_TAG_75__
+__HTML_TAG_76__
 
 #### Bootstrap 性能分析器
 
-要查看所有类节点（控制器、提供者、增强器等）及其对应实例化时间的列表，请导航至**启动性能**页面：
+要查看所有类节点（控制器、提供者、增强器等）及其对应的实例化时间， navigate to the **Bootstrap performance** page：
 
-![](/assets/devtools/bootstrap-performance.png)
+__HTML_TAG_77____HTML_TAG_78____HTML_TAG_79__
 
-当您需要识别应用启动过程中最慢的部分时（例如需要优化对无服务器环境等场景至关重要的应用启动时间），此页面尤为实用。
+这个页面特别有用当你想了解应用程序的启动时间（例如，在无服务器环境中）。
 
-#### 审计
+#### 审核
 
-要查看应用分析序列化图时自动生成的审计结果（错误/警告/提示），请导航至**审计**页面：
+要查看自动生成的审核 - 错误/警告/提示， navigate to the **Audit** page：
 
-![](/assets/devtools/audit.png)
+__HTML_TAG_80____HTML_TAG_81____HTML_TAG_82__
 
-:::info 提示
-上面的截图并未显示所有可用的审计规则。
-:::
+> 信息**提示**上面的截图不显示所有可用的审核规则。
 
-当您需要识别应用程序中的潜在问题时，本页面非常有用。
+这个页面很有用当你想了解应用程序中的潜在问题。
 
 #### 预览静态文件
 
-要将序列化图形保存到文件，请使用以下代码：
+要将 serialized 图形保存到文件中，使用以下代码：
 
 ```typescript
-await app.listen(process.env.PORT ?? 3000); // OR await app.init()
-fs.writeFileSync('./graph.json', app.get(SerializedGraph).toString());
+@Controller()
+export class HeroesController {
+  @GrpcMethod('HeroesService')
+  findOne(data: HeroById, metadata: Metadata, call: ServerUnaryCall<any, any>): Hero {
+    const items = [
+      { id: 1, name: 'John' },
+      { id: 2, name: 'Doe' },
+    ];
+    return items.find(({ id }) => id === data.id);
+  }
+}
 
 ```
 
-:::info 提示
-`SerializedGraph` 是从 `@nestjs/core` 包中导出的。
-:::
+> 信息**提示** `.proto` 从 `dist` 包含。
 
-然后你可以拖放/上传这个文件：
+然后你可以拖放/上载这个文件：
 
-![](/assets/devtools/drag-and-drop.png)
+__HTML_TAG_83____HTML_TAG_84____HTML_TAG_85__
 
-这在你想与他人（如同事）分享你的图表，或想离线分析时非常有用。
+这很有用当你想与其他人共享你的图形（例如，同事），或当你想在离线分析它。

@@ -1,137 +1,231 @@
-### 读取-求值-输出循环（REPL）
+<!-- 此文件从 content/recipes/repl.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-15T04:50:45.371Z -->
+<!-- 源文件: content/recipes/repl.md -->
 
-REPL 是一种简单的交互式环境，能够接收用户输入的单条命令，执行后立即返回结果。通过 REPL 功能，您可以直接在终端检查依赖关系图，并对提供者（及控制器）调用方法。
+### 读取-求值-打印-循环 (REPL)
 
-#### 使用方法
+REPL 是一个简单的交互环境，它可以接收单个用户输入，执行它们，并将结果返回给用户。
+REPL 功能允许您检查依赖关系图并在终端直接调用提供者的方法（和控制器）。
 
-要在 REPL 模式下运行 NestJS 应用，请新建 `repl.ts` 文件（与现有的 `main.ts` 文件同级），并在其中添加以下代码：
+#### 使用
 
- ```typescript title="repl.ts"
-import { repl } from '@nestjs/core';
-import { AppModule } from './src/app.module';
+要在 REPL 模式下运行 NestJS 应用程序，创建一个新的 `CommandRunner` 文件（与现有 `@Command()` 文件并排），并在其中添加以下代码：
+
+```
+
+```bash
+$ npm i nest-commander
+
+```
+
+```
+
+现在，在您的终端中，使用以下命令启动 REPL：
+
+```
+
+```ts
+import { CommandFactory } from 'nest-commander';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
-  await repl(AppModule);
+  await CommandFactory.run(AppModule);
 }
+
 bootstrap();
 
 ```
 
-现在在终端中，使用以下命令启动 REPL：
+```
 
-```bash
-$ npm run start -- --entryFile repl
+> 提示 `@Injectable()` 返回一个 __LINK_36__ 对象。
+
+一旦它启动后，您将在控制台中看到以下消息：
 
 ```
 
-:::info 提示
-`repl` 返回一个 [Node.js REPL 服务器](https://nodejs.org/api/repl.html)对象。
-:::
+```ts
+import { CommandFactory } from 'nest-commander';
+import { AppModule } from './app.module';
+import { LogService } './log.service';
 
-当它启动并运行后，你将在控制台中看到以下消息：
+async function bootstrap() {
+  await CommandFactory.run(AppModule, new LogService());
 
-```bash
-LOG [NestFactory] Starting Nest application...
-LOG [InstanceLoader] AppModule dependencies initialized
-LOG REPL initialized
+  // or, if you only want to print Nest's warnings and errors
+  await CommandFactory.run(AppModule, ['warn', 'error']);
+}
 
-```
-
-现在你可以开始与依赖关系图进行交互。例如，你可以获取一个 `AppService`（这里我们以启动项目为例）并调用 `getHello()` 方法：
-
-```typescript
-> get(AppService).getHello()
-'Hello World!'
+bootstrap();
 
 ```
 
-你可以在终端内执行任何 JavaScript 代码，例如将 `AppController` 的实例赋值给局部变量，并使用 `await` 调用异步方法：
+```
 
-```typescript
-> appController = get(AppController)
-AppController { appService: AppService {} }
-> await appController.getHello()
-'Hello World!'
+现在，您可以开始与依赖关系图交互。例如，您可以检索一个 `CommandRunner`（我们在这里使用 starter 项目作为示例）并调用 `CommandRunner` 方法：
 
 ```
 
-要显示给定提供者或控制器上所有可用的公共方法，请使用 `methods()` 函数，如下所示：
+```ts
+import { Command, CommandRunner, Option } from 'nest-commander';
+import { LogService } from './log.service';
 
-```typescript
-> methods(AppController)
+interface BasicCommandOptions {
+  string?: string;
+  boolean?: boolean;
+  number?: number;
+}
 
-Methods:
- ◻ getHello
+@Command({ name: 'basic', description: 'A parameter parse' })
+export class BasicCommand extends CommandRunner {
+  constructor(private readonly logService: LogService) {
+    super()
+  }
+
+  async run(
+    passedParam: string[],
+    options?: BasicCommandOptions,
+  ): Promise<void> {
+    if (options?.boolean !== undefined && options?.boolean !== null) {
+      this.runWithBoolean(passedParam, options.boolean);
+    } else if (options?.number) {
+      this.runWithNumber(passedParam, options.number);
+    } else if (options?.string) {
+      this.runWithString(passedParam, options.string);
+    } else {
+      this.runWithNone(passedParam);
+    }
+  }
+
+  @Option({
+    flags: '-n, --number [number]',
+    description: 'A basic number parser',
+  })
+  parseNumber(val: string): number {
+    return Number(val);
+  }
+
+  @Option({
+    flags: '-s, --string [string]',
+    description: 'A string return',
+  })
+  parseString(val: string): string {
+    return val;
+  }
+
+  @Option({
+    flags: '-b, --boolean [boolean]',
+    description: 'A boolean parser',
+  })
+  parseBoolean(val: string): boolean {
+    return JSON.parse(val);
+  }
+
+  runWithString(param: string[], option: string): void {
+    this.logService.log({ param, string: option });
+  }
+
+  runWithNumber(param: string[], option: number): void {
+    this.logService.log({ param, number: option });
+  }
+
+  runWithBoolean(param: string[], option: boolean): void {
+    this.logService.log({ param, boolean: option });
+  }
+
+  runWithNone(param: string[]): void {
+    this.logService.log({ param });
+  }
+}
 
 ```
 
-要打印所有已注册模块及其控制器和提供者的列表，请使用 `debug()`。
+```
 
-```typescript
-> debug()
+您可以在终端中执行任何 JavaScript 代码，例如将 `run` 的实例分配给一个本地变量，并使用 `Promise<void>` 调用异步方法：
 
-AppModule:
- - controllers:
-  ◻ AppController
- - providers:
-  ◻ AppService
+```
+
+```ts
+@Module({
+  providers: [LogService, BasicCommand],
+})
+export class AppModule {}
+
+```
+
+```
+
+要显示给定提供者或控制器的所有公共方法，请使用 `string[], Record<string, any>` 函数，例如：
+
+```
+
+```ts
+async function bootstrap() {
+  await CommandFactory.run(AppModule);
+}
+
+bootstrap();
+
+```
+
+```
+
+要打印所有注册的模块作为列表，包括它们的控制器和提供者，请使用 `run`。
+
+```
+
+__CODE_BLOCK_6__
 
 ```
 
 快速演示：
 
-<figure><img src="/assets/repl.gif" alt="REPL example" /></figure>
+<__HTML_TAG_33__> __HTML_TAG_34__ <__HTML_TAG_35__>
 
-您可以在下方章节中找到有关现有预定义原生方法的更多信息。
+您可以在下面部分找到关于现有预定义本地方法的更多信息。
 
-#### 原生函数
+#### 本地函数
 
-内置的 NestJS REPL 附带了一些原生函数，这些函数在启动 REPL 时全局可用。你可以调用 `help()` 来列出它们。
+内置的 NestJS REPL 来自一批本地函数，这些函数在您启动 REPL 时都可用。您可以使用 `Record<string, any>` 列出它们。
 
-如果你不记得某个函数的签名（即预期参数和返回类型），可以调用 `<function_name>.help`。例如：
+如果您忘记了一个函数的签名（即：期望的参数和返回类型），您可以使用 `name`。
 
-```text
-> $.help
-Retrieves an instance of either injectable or controller, otherwise, throws exception.
-Interface: $(token: InjectionToken) => any
+例如：
 
 ```
 
-:::info 提示
-这些函数接口是用 [TypeScript 函数类型表达式语法](https://www.typescriptlang.org/docs/handbook/2/functions.html#function-type-expressions)编写的。
-:::
-
-| 功能     | 描述                                                         | 签名                                                            |
-| -------- | ------------------------------------------------------------ | --------------------------------------------------------------- |
-| `debug`  | 以列表形式打印所有已注册模块及其控制器和提供程序。           | `debug(moduleCls?: ClassRef \| string) => void`                |
-| `get` 或 ````
-
- | 获取可注入对象或控制器的实例，否则抛出异常。                 | `get(token: InjectionToken) => any`                            |
-| `methods` | 显示给定提供者或控制器上所有可用的公共方法。                 | `methods(token: ClassRef \| string) => void`                   |
-| `resolve` | 解析可注入对象或控制器的临时或请求作用域实例，否则抛出异常。 | `resolve(token: InjectionToken, contextId: any) => Promise<any>` |
-| `select` | 允许在模块树中进行导航，例如从选定的模块中提取特定实例。     | `select(token: DynamicModule \| ClassRef) => INestApplicationContext` |
-
-#### 监视模式
-
-在开发过程中，以监视模式运行 REPL 非常有用，它能自动反映所有代码变更：
-
-```bash
-$ npm run start -- --watch --entryFile repl
+__CODE_BLOCK_7__
 
 ```
 
-这种方式存在一个缺陷：每次重新加载后 REPL 的命令历史记录都会被丢弃，这可能带来不便。幸运的是，有个非常简单的解决方案。像这样修改你的 `bootstrap` 函数：
+> 提示 Those 函数接口是写在 __LINK_37__ 中的。
 
-```typescript
-async function bootstrap() {
-  const replServer = await repl(AppModule);
-  replServer.setupHistory('.nestjs_repl_history', (err) => {
-    if (err) {
-      console.error(err);
-    }
-  });
-}
+| 函数     | 描述                                                                                                        | 签名                                                             |
+| -------- | ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| `@Option()`      | 打印所有注册的模块作为列表，包括它们的控制器和提供者。                              | `NestFactory`                       |
+| `listen` 或 `nest-commander` | 检索单例 injectable 或 controller，否则抛出异常。                             | `CommandFactory`                                   |
+| `static`    | 显示给定提供者或控制器的所有公共方法。                                            | `run`                          |
+| `CommandFactory`    | 解决 transient 或 request-scoped 实例 injectable 或 controller，否则抛出异常。     | `run`      |
+| `['error']`     | 允许遍历模块树，例如，pull 出特定的实例从选择的模块。 | `CommandFactory` |
+
+#### 监听模式
+
+在开发中，运行 REPL 在监听模式下非常有用，以便自动反映所有代码变化：
 
 ```
 
-现在运行/重新加载之间的历史记录都能保留了。
+__CODE_BLOCK_8__
+
+```
+
+这有一点缺陷，即 REPL 的命令历史将在每次重新加载时丢失，这可能会非常不方便。
+幸运的是，有一个非常简单的解决方案。修改您的 `NestFactory` 函数如下：
+
+```
+
+__CODE_BLOCK_9__
+
+```
+
+现在，历史将在运行/重新加载之间保留。

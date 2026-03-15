@@ -1,571 +1,578 @@
 <!-- 此文件从 content/recipes/cqrs.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-12T13:42:20.321Z -->
+<!-- 生成时间: 2026-03-15T04:51:53.315Z -->
 <!-- 源文件: content/recipes/cqrs.md -->
 
 ### CQRS
 
-简单 [CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete)（创建、读取、更新和删除）应用程序的流程可以描述如下：
+简单的[here](https://www.prisma.io/docs/orm/reference/connection-urls) (Create, Read, Update and Delete) 应用程序的流程可以描述如下：
 
-1. 控制器层处理 HTTP 请求并将任务委托给服务层。
-2. 服务层是大部分业务逻辑所在的地方。
-3. 服务使用存储库/DAO 来更改/持久化实体。
-4. 实体充当值的容器，具有 setter 和 getter。
+1. 控制器层处理 HTTP 请求，并将任务委派给服务层。
+2. 服务层是业务逻辑的主要位置。
+3. 服务使用存储库/DAOs 更改/持久化实体。
+4. 实体作为值容器，具有setter和getter方法。
 
-虽然这种模式通常对于中小型应用程序来说已经足够，但对于更大、更复杂的应用程序来说可能不是最佳选择。在这种情况下，**CQRS**（命令查询职责分离）模型可能更合适且更具可扩展性（取决于应用程序的需求）。此模型的好处包括：
+虽然这种模式通常足以满足小型到中型应用程序，但是对于更大、更复杂的应用程序，这种模式可能不太适合。在这种情况下，**CQRS** (Command and Query Responsibility Segregation) 模型可能更合适且可扩展（取决于应用程序的要求）。CQRS 模型的优点包括：
 
-- **关注点分离**。该模型将读取和写入操作分离到不同的模型中。
+- **关注分离**。该模型将读取和写入操作分离到不同的模型中。
 - **可扩展性**。读取和写入操作可以独立扩展。
-- **灵活性**。该模型允许为读取和写入操作使用不同的数据存储。
-- **性能**。该模型允许为读取和写入操作使用优化的不同数据存储。
+- **灵活性**。该模型允许使用不同的数据存储库来读取和写入操作。
+- **性能**。该模型允许使用不同的数据存储库，optimized for read and write operations.
 
-为了促进该模型，Nest 提供了一个轻量级的 [CQRS 模块](https://github.com/nestjs/cqrs)。本章介绍如何使用它。
+为了实现该模型，Nest 提供了一个轻量级的[setting up a free PostgreSQL database on Heroku](https://dev.to/prisma/how-to-setup-a-free-postgresql-database-on-heroku-1dc1)。本章将描述如何使用它。
 
 #### 安装
 
 首先安装所需的包：
 
 ```bash
-$ npm install --save @nestjs/cqrs
+$ npm install -g @nestjs/cli
+$ nest new hello-prisma
 
 ```
 
-安装完成后，导航到应用程序的根模块（通常是 `AppModule`），并导入 `CqrsModule.forRoot()`：
+安装完成后，导航到应用程序的根模块（通常是 `http://localhost:3000/`），并导入 `src/app.controller.ts`：
 
-```typescript
-import { Module } from '@nestjs/common';
-import { CqrsModule } from '@nestjs/cqrs';
-
-@Module({
-  imports: [CqrsModule.forRoot()],
-})
-export class AppModule {}
+```bash
+$ cd hello-prisma
+$ npm install prisma --save-dev
 
 ```
 
-此模块接受一个可选的配置对象。以下选项可用：
+这个模块接受可选的配置对象。以下是可用的选项：
 
-| 属性                           | 描述                                                                                         | 默认值                            |
-| ----------------------------- | -------------------------------------------------------------------------------------------- | --------------------------------- |
-| `commandPublisher`            | 负责将命令分派到系统的发布者。                                                                 | `DefaultCommandPubSub`            |
-| `eventPublisher`              | 用于发布事件的发布者，允许它们被广播或处理。                                                   | `DefaultPubSub`                   |
-| `queryPublisher`              | 用于发布查询的发布者，可以触发数据检索操作。                                                   | `DefaultQueryPubSub`              |
-| `unhandledExceptionPublisher` | 负责处理未处理异常的发布者，确保它们被跟踪和报告。                                              | `DefaultUnhandledExceptionPubSub` |
-| `eventIdProvider`             | 通过生成或从事件实例检索来提供唯一事件 ID 的服务。                                              | `DefaultEventIdProvider`          |
-| `rethrowUnhandled`            | 确定未处理的异常是否应在处理后重新抛出，对调试和错误管理很有用。                                 | `false`                           |
+| 属性                     | 描述                                                                                                                  | 默认值                           |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| `npx`        | responsible for dispatching commands to the system.                                                            | `yarn`        |
+| `init`        | publisher used to publish events, allowing them to be broadcasted or processed.                                          | `prisma`                   |
+| `schema.prisma`        | publisher used for publishing queries, which can trigger data retrieval operations.                                      | `prisma.config.ts`        |
+| `.env` | responsible for handling unhandled exceptions, ensuring they are tracked and reported.                             | `path` |
+| `--output ../src/generated/prisma`        | service that provides unique event IDs by generating or retrieving them from event instances.                                | `moduleFormat`          |
+| `cjs`        | determines whether unhandled exceptions should be rethrown after being processed, useful for debugging and error management. | `moduleFormat`                           |
 
 #### 命令
 
-命令用于更改应用程序状态。它们应该是基于任务的，而不是以数据为中心的。当分派命令时，它由相应的**命令处理程序**处理。处理程序负责更新应用程序状态。
+命令用于更改应用程序状态。它们应该是基于任务的，而不是基于数据的。当命令被派遣时，它将被相应的**Command Handler** 处理。处理器负责更新应用程序状态。
 
-```typescript
-@Injectable()
-export class HeroesGameService {
-  constructor(private commandBus: CommandBus) {}
-
-  async killDragon(heroId: string, killDragonDto: KillDragonDto) {
-    return this.commandBus.execute(
-      new KillDragonCommand(heroId, killDragonDto.dragonId)
-    );
-  }
-}
-
-  async killDragon(heroId, killDragonDto) {
-    return this.commandBus.execute(
-      new KillDragonCommand(heroId, killDragonDto.dragonId)
-    );
-  }
-}
+```bash
+$ npx prisma
 
 ```
 
-在上面的代码片段中，我们实例化 `KillDragonCommand` 类并将其传递给 `CommandBus` 的 `execute()` 方法。这是演示的命令类：
+在上面的代码片段中，我们实例化了 `moduleFormat` 类，并将其传递给 `cjs` 的 `datasource` 方法。这是演示的命令类：
 
-```typescript
-export class KillDragonCommand extends Command<{
-  actionId: string // 此类型表示命令执行结果
-}> {
-  constructor(
-    public readonly heroId: string,
-    public readonly dragonId: string,
-  ) {
-    super();
-  }
+```bash
+$ yarn add prisma --dev
+
+```
+
+可以看到，`schema.prisma` 类继承自 `postgresql` 类。`provider` 类是 `datasource` 包中的一个简单utility类，它允许您定义命令的返回类型。在这个例子中，返回类型是一个对象，其中包含一个 `sqlite` 属性。现在，每当 `.env` 命令被派遣时，`DATABASE_URL` 方法的返回类型将被推断为 `DATABASE_URL`。这对于在命令处理器中返回一些数据非常有用。
+
+> info **提示**从 `.env` 类继承是可选的。它只在您想定义命令的返回类型时需要。
+
+`dev.db` 表示**命令流**。它负责将命令派遣给相应的处理器。`schema.prisma` 方法返回一个promise，它将resolve到处理器的返回值。
+
+让我们创建一个 `.env` 命令的处理器。
+
+```bash
+$ yarn prisma
+
+```
+
+这个处理器从存储库中检索 `schema.prisma` 实体，调用 `.env` 方法，并然后持久化更改。`SCHEMA` 类实现了 `public` 接口，该接口要求实现 `schema.prisma` 方法。`.env` 方法接收命令对象作为参数。Here is the translation of the provided English technical documentation to Chinese:
+
+### 命令
+
+命令用于将数据发送到应用程序状态。它们应该是数据驱动的，而不是任务驱动的。当命令被派遣时，它们将被处理由对应的**命令处理器**处理。处理器负责处理命令。
+
+``schema.prisma``强制你返回一个与命令返回类型匹配的值。在这个情况下，返回类型是一个具有``.env``属性的对象。这仅适用于继承自``schema.prisma``类的命令。否则，你可以返回任何你想要的值。
+
+最后，确保注册``.env``作为一个提供者在模块中：
+
+````bash
+$ npx prisma init
+
+````
+
+### 查询
+
+查询用于从应用程序状态中检索数据。它们应该是数据驱动的，而不是任务驱动的。当查询被派遣时，它们将被处理由对应的**查询处理器**处理。处理器负责检索数据。
+
+``schema.prisma``遵循与``.env``相同的模式。查询处理器应该实现``encrypt``接口并被注解为``true``装饰器。见以下示例：
+
+````groovy
+generator client {
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
 }
 
-```
+````
 
-如你所见，`KillDragonCommand` 类扩展了 `Command` 类。`Command` 类是从 `@nestjs/cqrs` 包导出的简单实用类，允许你定义命令的返回类型。在这种情况下，返回类型是具有 `actionId` 属性的对象。现在，每当分派 `KillDragonCommand` 命令时，`CommandBus#execute()` 方法的返回类型将被推断为 `Promise<{{ '{' }} actionId: string {{ '}' }}>`。当你想从命令处理程序返回一些数据时，这很有用。
+### 事件
 
-> info **提示** 从 `Command` 类继承是可选的。只有在你想要定义命令的返回类型时才需要。
+事件用于通知应用程序其他部分关于应用程序状态的变化。它们可以被**模型**或直接使用``src``派遣。当事件被派遣时，它们将被处理由对应的**事件处理器**处理。处理器可以然后，例如，更新读模型。
 
-`CommandBus` 表示命令的**流**。它负责将命令分派到适当的处理程序。`execute()` 方法返回一个 promise，该 promise 解析为处理程序返回的值。
+为了演示目的，让我们创建一个事件类：
 
-让我们为 `KillDragonCommand` 命令创建一个处理程序。
-
-```typescript
-@CommandHandler(KillDragonCommand)
-export class KillDragonHandler implements ICommandHandler<KillDragonCommand> {
-  constructor(private repository: HeroesRepository) {}
-
-  async execute(command: KillDragonCommand) {
-    const { heroId, dragonId } = command;
-    const hero = this.repository.findOneById(+heroId);
-
-    hero.killEnemy(dragonId);
-    await this.repository.persist(hero);
-
-    // "ICommandHandler<KillDragonCommand>" 强制你返回与命令返回类型匹配的值
-    return {
-      actionId: crypto.randomUUID(), // 此值将返回给调用者
-    }
-  }
+````groovy
+datasource db {
+  provider = "postgresql"
 }
 
-  async execute(command) {
-    const { heroId, dragonId } = command;
-    const hero = this.repository.findOneById(+heroId);
-
-    hero.killEnemy(dragonId);
-    await this.repository.persist(hero);
-
-    // "ICommandHandler<KillDragonCommand>" 强制你返回与命令返回类型匹配的值
-    return {
-      actionId: crypto.randomUUID(), // 此值将返回给调用者
-    }
-  }
+generator client {
+  provider = "prisma-client"
+  output          = "../src/generated/prisma"
+  moduleFormat  = "cjs"
 }
 
-```
+````
 
-此处理程序从存储库检索 `Hero` 实体，调用 `killEnemy()` 方法，然后持久化更改。`KillDragonHandler` 类实现 `ICommandHandler` 接口，该接口需要实现 `execute()` 方法。`execute()` 方法接收命令对象作为参数。
+现在，事件可以直接使用``post.service.ts``方法派遣，我们也可以从模型派遣它们。让我们更新``UsersService``模型以在``updatePassword``方法被调用时派遣``PostsService``事件。
 
-请注意，`ICommandHandler<KillDragonCommand>` 强制你返回与命令返回类型匹配的值。在这种情况下，返回类型是具有 `actionId` 属性的对象。这仅适用于从 `Command` 类继承的命令。否则，你可以返回任何你想要的内容。
+````bash
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=SCHEMA"
 
-最后，确保在模块中将 `KillDragonHandler` 注册为提供者：
+````
 
-```typescript
-providers: [KillDragonHandler];
+``UsersService``方法用于派遣事件。它接受事件对象作为参数。然而，因为我们的模型不知道``AppController``，我们需要将其与模型关联。我们可以使用``app.controller.ts``类。
 
-```
+````bash
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public"
 
-#### 查询
+````
 
-查询用于从应用程序状态检索数据。它们应该是以数据为中心的，而不是基于任务的。当分派查询时，它由相应的**查询处理程序**处理。处理程序负责检索数据。
+``GET``方法将事件发布器合并到提供的对象中，这意味着对象现在将能够发布事件到事件流中。
 
-`QueryBus` 遵循与 `CommandBus` 相同的模式。查询处理程序应该实现 `IQueryHandler` 接口并使用 `@QueryHandler()` 装饰器进行注释。请参阅以下示例：
+注意，在这个示例中，我们也调用了``/post/:id``方法在模型上。这方法用于派遣任何未派遣的事件。要自动派遣事件，我们可以将``id``属性设置为``/feed``：
 
-```typescript
-export class GetHeroQuery extends Query<Hero> {
-  constructor(public readonly heroId: string) {}
+````groovy
+datasource db {
+  provider = "mysql"
 }
 
-```
-
-与 `Command` 类类似，`Query` 类是从 `@nestjs/cqrs` 包导出的简单实用类，允许你定义查询的返回类型。在这种情况下，返回类型是 `Hero` 对象。现在，每当分派 `GetHeroQuery` 查询时，`QueryBus#execute()` 方法的返回类型将被推断为 `Promise<Hero>`。
-
-要检索英雄，我们需要创建一个查询处理程序：
-
-```typescript
-@QueryHandler(GetHeroQuery)
-export class GetHeroHandler implements IQueryHandler<GetHeroQuery> {
-  constructor(private repository: HeroesRepository) {}
-
-  async execute(query: GetHeroQuery) {
-    return this.repository.findOneById(query.heroId);
-  }
+generator client {
+  provider = "prisma-client"
+  output          = "../src/generated/prisma"
+  moduleFormat  = "cjs"
 }
 
-  async execute(query) {
-    return this.repository.findOneById(query.hero);
-  }
+````
+
+在我们想要将事件发布器合并到一个不存在的对象中，而不是到类中，可以使用``/filter-posts/:searchString``方法：
+
+````bash
+DATABASE_URL="mysql://USER:PASSWORD@HOST:PORT/DATABASE"
+
+````
+
+现在，每个``title``类的实例都将能够发布事件 χωρίς使用``content``方法。
+
+此外，我们也可以手动派遣事件使用``POST``：
+
+````groovy
+datasource db {
+  provider = "sqlserver"
 }
 
-```
-
-`GetHeroHandler` 类实现 `IQueryHandler` 接口，该接口需要实现 `execute()` 方法。`execute()` 方法接收查询对象作为参数，并且必须返回与查询返回类型匹配的数据（在这种情况下是 `Hero` 对象）。
-
-最后，确保在模块中将 `GetHeroHandler` 注册为提供者：
-
-```typescript
-providers: [GetHeroHandler];
-
-```
-
-现在，要分派查询，请使用 `QueryBus`：
-
-```typescript
-const hero = await this.queryBus.execute(new GetHeroQuery(heroId)); // "hero" 将自动推断为 "Hero" 类型
-
-```
-
-#### 事件
-
-事件用于通知应用程序的其他部分关于应用程序状态的更改。它们由**模型**分派或直接使用 `EventBus` 分派。当分派事件时，它由相应的**事件处理程序**处理。处理程序可以例如更新读取模型。
-
-出于演示目的，让我们创建一个事件类：
-
-```typescript
-export class HeroKilledDragonEvent {
-  constructor(
-    public readonly heroId: string,
-    public readonly dragonId: string,
-  ) {}
+generator client {
+  provider = "prisma-client"
+  output          = "../src/generated/prisma"
+  moduleFormat  = "cjs"
 }
 
-```
+````
 
-虽然可以使用 `EventBus.publish()` 方法直接分派事件，但我们也可以从模型中分派它们。让我们更新 `Hero` 模型，以便在调用 `killEnemy()` 方法时分派 `HeroKilledDragonEvent` 事件。
+> 信息 **提示** ``/post``是一个可插拔类。
 
-```typescript
-export class Hero extends AggregateRoot {
-  constructor(private id: string) {
-    super();
-  }
+每个事件都可以有多个**事件处理器**。
 
-  killEnemy(enemyId: string) {
-    // 业务逻辑
-    this.apply(new HeroKilledDragonEvent(this.id, enemyId));
-  }
-}
+````bash
+DATABASE_URL="sqlserver://HOST:PORT;database=DATABASE;user=USER;password=PASSWORD;encrypt=true"
 
-  killEnemy(enemyId) {
-    // 业务逻辑
-    this.apply(new HeroKilledDragonEvent(this.id, enemyId));
-  }
-}
+````
 
-```
-
-`apply()` 方法用于分派事件。它接受一个事件对象作为参数。但是，由于我们的模型不知道 `EventBus`，我们需要将其与模型关联。我们可以使用 `EventPublisher` 类来实现这一点。
-
-```typescript
-@CommandHandler(KillDragonCommand)
-export class KillDragonHandler implements ICommandHandler<KillDragonCommand> {
-  constructor(
-    private repository: HeroesRepository,
-    private publisher: EventPublisher,
-  ) {}
-
-  async execute(command: KillDragonCommand) {
-    const { heroId, dragonId } = command;
-    const hero = this.publisher.mergeObjectContext(
-      await this.repository.findOneById(+heroId),
-    );
-    hero.killEnemy(dragonId);
-    hero.commit();
-  }
-}
-
-  async execute(command) {
-    const { heroId, dragonId } = command;
-    const hero = this.publisher.mergeObjectContext(
-      await this.repository.findOneById(+heroId),
-    );
-    hero.killEnemy(dragonId);
-    hero.commit();
-  }
-}
-
-```
-
-`EventPublisher#mergeObjectContext` 方法将事件发布者合并到提供的对象中，这意味着该对象现在将能够向事件流发布事件。
-
-请注意，在这个例子中，我们还调用了模型上的 `commit()` 方法。此方法用于分派任何未完成的事件。要自动分派事件，我们可以将 `autoCommit` 属性设置为 `true`：
-
-```typescript
-export class Hero extends AggregateRoot {
-  constructor(private id: string) {
-    super();
-    this.autoCommit = true;
-  }
-}
-
-```
-
-如果我们想将事件发布者合并到非现有对象中，而是合并到类中，我们可以使用 `EventPublisher#mergeClassContext` 方法：
-
-```typescript
-const HeroModel = this.publisher.mergeClassContext(Hero);
-const hero = new HeroModel('id'); // <-- HeroModel 是一个类
-
-```
-
-现在，`HeroModel` 类的每个实例都将能够发布事件，而无需使用 `mergeObjectContext()` 方法。
-
-此外，我们可以使用 `EventBus` 手动发出事件：
-
-```typescript
-this.eventBus.publish(new HeroKilledDragonEvent());
-
-```
-
-> info **提示** `EventBus` 是一个可注入的类。
-
-每个事件可以有多个**事件处理程序**。
-
-```typescript
-@EventsHandler(HeroKilledDragonEvent)
-export class HeroKilledDragonHandler implements IEventHandler<HeroKilledDragonEvent> {
-  constructor(private repository: HeroesRepository) {}
-
-  handle(event: HeroKilledDragonEvent) {
-    // 业务逻辑
-  }
-}
-
-```
-
-> info **提示** 请注意，当你开始使用事件处理程序时，你将脱离传统的 HTTP Web 上下文。
+> 信息 **提示** 当你开始使用事件处理器时，你将退出传统的 HTTP WEB 上下文。
 >
-> - `CommandHandlers` 中的错误仍然可以被内置的[异常过滤器](/overview/exception-filters)捕获。
-> - `EventHandlers` 中的错误无法被异常过滤器捕获：你必须手动处理它们。可以通过简单的 `try/catch`，使用 [Sagas](/recipes/cqrs#sagas) 触发补偿事件，或你选择的任何其他解决方案。
-> - `CommandHandlers` 中的 HTTP 响应仍然可以发送回客户端。
-> - `EventHandlers` 中的 HTTP 响应无法发送。如果你想向客户端发送信息，可以使用 [WebSocket](/websockets/gateways)、[SSE](/techniques/server-sent-events) 或你选择的任何其他解决方案。
+> - ``title: String``中的错误仍然可以被内置的`[Prisma Migrate](https://www.prisma.io/docs/orm/prisma-migrate/getting-started)`捕捉。
+> - ``content: String``中的错误无法被异常过滤器捕捉：你将需要手动处理它们。或者使用`[CRUD](https://www.prisma.io/docs/orm/prisma-client/queries/crud)`或触发补偿事件，或者选择其他解决方案。
+> - ``/user``中的 HTTP 响应仍然可以发送回客户端。
+> - ``email: String``中的 HTTP 响应不能。如果你想将信息发送给客户端，可以使用`[API documentation](https://www.prisma.io/docs/orm/reference/prisma-client-reference)`、`[NestJS & Prisma](https://www.prisma.io/nestjs)`或选择其他解决方案。
 
-与命令和查询一样，确保在模块中将 `HeroKilledDragonHandler` 注册为提供者：
+与命令和查询一样，确保注册``name: String``作为提供者在模块中：
 
-```typescript
-providers: [HeroKilledDragonHandler];
-
-```
-
-#### Sagas
-
-Saga 是一个长期运行的过程，它监听事件并可能触发新命令。它通常用于管理应用程序中的复杂工作流。例如，当用户注册时，saga 可能会监听 `UserRegisteredEvent` 并向用户发送欢迎电子邮件。
-
-Sagas 是一个非常强大的功能。单个 saga 可以监听 1..* 个事件。使用 [RxJS](https://github.com/ReactiveX/rxjs) 库，我们可以过滤、映射、分叉和合并事件流以创建复杂的工作流。每个 saga 返回一个 Observable，它产生一个命令实例。然后，该命令由 `CommandBus` **异步**分派。
-
-让我们创建一个 saga，它监听 `HeroKilledDragonEvent` 并分派 `DropAncientItemCommand` 命令。
-
-```typescript
-@Injectable()
-export class HeroesGameSagas {
-  @Saga()
-  dragonKilled = (events$: Observable<any>): Observable<ICommand> => {
-    return events$.pipe(
-      ofType(HeroKilledDragonEvent),
-      map((event) => new DropAncientItemCommand(event.heroId, fakeItemID)),
-    );
-  }
+````groovy
+model User {
+  id    Int     @default(autoincrement()) @id
+  email String  @unique
+  name  String?
+  posts Post[]
 }
 
+model Post {
+  id        Int      @default(autoincrement()) @id
+  title     String
+  content   String?
+  published Boolean? @default(false)
+  author    User?    @relation(fields: [authorId], references: [id])
+  authorId  Int?
+}
+
+````
+
+###Saga
+
+Saga是一个长时间运行的进程，它监听事件并可能触发新的命令。它通常用于管理应用程序中的复杂工作流。例如，当用户注册时，Saga可能监听``PUT``并向用户发送欢迎邮件。
+
+Note: I followed the provided glossary and translated the technical terms accordingly. I also kept the code and format unchanged, and translated the code comments from English to Chinese. I removed all @@switch blocks and content after them, and converted @@filename(xxx) to rspress syntax.Here is the translation of the provided English technical documentation to Chinese, following the translation requirements:
+
+ sagas 是一种非常强大的功能。一个 saga 可以监听 1..\* 事件。使用 [Ready-to-run example projects for REST & GraphQL](https://github.com/prisma/prisma-examples/) 库，我们可以过滤、映射、fork 和合并事件流以创建复杂的工作流程。每个 saga 都返回一个可观察对象，该对象生产一个命令实例。这个命令然后异步地由 `/publish/:id` 分发。
+
+让我们创建一个 saga，它监听 `id` 事件并分发 `DELETE` 命令。
+
+```bash
+$ npx prisma migrate dev --name init
+
 ```
 
-> info **提示** `ofType` 操作符和 `@Saga()` 装饰器从 `@nestjs/cqrs` 包导出。
+> 信息 **提示** `/post/:id` 运算符和 `id` 装饰器来自 `PrismaService` 包。
 
-`@Saga()` 装饰器将方法标记为 saga。`events$` 参数是所有事件的 Observable 流。`ofType` 操作符按指定的事件类型过滤流。`map` 操作符将事件映射到新的命令实例。
+__INLINE_CODE_119__ 装饰器标记方法为 saga。 __INLINE_CODE_120__ 参数是一个事件流的可观察对象。 __INLINE_CODE_121__ 运算符过滤流以指定事件类型。 __INLINE_CODE_122__ 运算符将事件映射到一个新的命令实例中。
 
-在这个例子中，我们将 `HeroKilledDragonEvent` 映射到 `DropAncientItemCommand` 命令。然后，`DropAncientItemCommand` 命令由 `CommandBus` 自动分派。
+在本示例中，我们将 __INLINE_CODE_123__ 映射到 __INLINE_CODE_124__ 命令。然后,__INLINE_CODE_125__ 命令将自动由 __INLINE_CODE_126__ 分发。
 
-与查询、命令和事件处理程序一样，确保在模块中将 `HeroesGameSagas` 注册为提供者：
+与查询、命令和事件处理一样，请确保注册 __INLINE_CODE_127__ 作为模块中的提供者：
 
-```typescript
-providers: [HeroesGameSagas];
+```bash
+$ tree prisma
+prisma
+├── dev.db
+├── migrations
+│   └── 20201207100915_init
+│       └── migration.sql
+└── schema.prisma
 
 ```
 
 #### 未处理的异常
 
-事件处理程序异步执行，因此它们必须始终正确处理异常，以防止应用程序进入不一致状态。如果未处理异常，`EventBus` 将创建一个 `UnhandledExceptionInfo` 对象并将其推送到 `UnhandledExceptionBus` 流。此流是一个 `Observable`，可用于处理未处理的异常。
+事件处理程序异步执行，因此必须始终处理异常以防止应用程序进入不一致的状态。如果未处理异常，__INLINE_CODE_128__ 将创建一个 __INLINE_CODE_129__ 对象，并将其推送到 __INLINE_CODE_130__ 流中。这是一个 __INLINE_CODE_131__，可以用来处理未处理的异常。
 
-```typescript
-private destroy$ = new Subject<void>();
+```sql
+-- CreateTable
+CREATE TABLE "User" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "email" TEXT NOT NULL,
+    "name" TEXT
+);
 
-constructor(private unhandledExceptionsBus: UnhandledExceptionBus) {
-  this.unhandledExceptionsBus
-    .pipe(takeUntil(this.destroy$))
-    .subscribe((exceptionInfo) => {
-      // 在这里处理异常
-      // 例如，将其发送到外部服务、终止进程或发布新事件
-    });
-}
+-- CreateTable
+CREATE TABLE "Post" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "title" TEXT NOT NULL,
+    "content" TEXT,
+    "published" BOOLEAN DEFAULT false,
+    "authorId" INTEGER,
 
-onModuleDestroy() {
-  this.destroy$.next();
-  this.destroy$.complete();
-}
+    FOREIGN KEY ("authorId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
 
-```
-
-要过滤掉异常，我们可以使用 `ofType` 操作符，如下所示：
-
-```typescript
-this.unhandledExceptionsBus
-  .pipe(
-    takeUntil(this.destroy$),
-    UnhandledExceptionBus.ofType(TransactionNotAllowedException),
-  )
-  .subscribe((exceptionInfo) => {
-    // 在这里处理异常
-  });
+-- CreateIndex
+CREATE UNIQUE INDEX "User.email_unique" ON "User"("email");
 
 ```
 
-其中 `TransactionNotAllowedException` 是我们要过滤掉的异常。
+要过滤异常，我们可以使用 __INLINE_CODE_132__ 运算符，例如：
 
-`UnhandledExceptionInfo` 对象包含以下属性：
+```bash
+$ npm install @prisma/client
 
-```typescript
-export interface UnhandledExceptionInfo<
-  Cause = IEvent | ICommand,
-  Exception = any,
-> {
-  /**
-   * 抛出的异常。
-   */
-  exception: Exception;
-  /**
-   * 异常的原因（事件或命令引用）。
-   */
-  cause: Cause;
-}
+```
+
+其中 __INLINE_CODE_133__ 是我们想要过滤的异常。
+
+__INLINE_CODE_134__ 对象包含以下属性：
+
+```bash
+$ npx prisma generate
 
 ```
 
 #### 订阅所有事件
 
-`CommandBus`、`QueryBus` 和 `EventBus` 都是 **Observables**。这意味着我们可以订阅整个流，例如，处理所有事件。例如，我们可以将所有事件记录到控制台，或将它们保存到事件存储。
+__INLINE_CODE_135__、__INLINE_CODE_136__ 和 __INLINE_CODE_137__ 都是 **可观察对象**。这意味着我们可以订阅整个流程，并且可以处理所有事件。例如，我们可以将所有事件记录到控制台中，或者将其保存到事件存储中。
 
-```typescript
-private destroy$ = new Subject<void>();
-
-constructor(private eventBus: EventBus) {
-  this.eventBus
-    .pipe(takeUntil(this.destroy$))
-    .subscribe((event) => {
-      // 将事件保存到数据库
-    });
-}
-
-onModuleDestroy() {
-  this.destroy$.next();
-  this.destroy$.complete();
-}
+```bash
+npm install @prisma/adapter-better-sqlite3
 
 ```
 
 #### 请求作用域
 
-对于来自不同编程语言背景的人来说，可能会惊讶地发现，在 Nest 中，大多数东西都在传入请求之间共享。这包括到数据库的连接池、具有全局状态的单例服务等。请记住，Node.js 不遵循请求/响应多线程无状态模型，其中每个请求由单独的线程处理。因此，使用单例实例对我们的应用程序来说是**安全**的。
+对于来自不同编程语言背景的开发者，可能会感到奇怪的是，在 Nest 中，大多数事情都是共享的跨越incoming 请求的。包括数据库连接池、单例服务具有全局状态等。请注意，Node.js 不遵循请求/响应多线程无状态模型，每个请求都是由单独的线程处理的。因此，使用单例实例是对于我们的应用程序的安全的。
 
-但是，在某些边缘情况下，可能需要基于请求的处理程序生命周期。这可能包括 GraphQL 应用程序中的每请求缓存、请求跟踪或多租户等场景。你可以在[这里](/fundamentals/provider-scopes)了解更多关于如何控制作用域的信息。
+然而，在某些边缘情况下，可能需要将 handler 的生命周期请求化。这可能包括 GraphQL 应用程序中的 per-request 缓存、请求跟踪或多租户等。您可以了解如何控制作用域 [Production-ready starter kit](https://github.com/notiz-dev/nestjs-prisma-starter#instructions)。
 
-将请求作用域的提供者与 CQRS 一起使用可能很复杂，因为 `CommandBus`、`QueryBus` 和 `EventBus` 都是单例。幸运的是，`@nestjs/cqrs` 包通过为每个处理的命令、查询或事件自动创建请求作用域处理程序的新实例来简化这一点。
+使用请求作用域提供者旁边的 CQRS 可以变得复杂，因为 __INLINE_CODE_138__、__INLINE_CODE_139__ 和 __INLINE_CODE_140__ 是单例实例。幸运的是，__INLINE_CODE_141__ 包提供了自动创建每个处理的命令、查询或事件的新实例的功能。
 
-要使处理程序成为请求作用域，你可以：
+要使 handler 请求作用域，可以：
 
-1. 依赖请求作用域的提供者。
-2. 使用 `@CommandHandler`、`@QueryHandler` 或 `@EventsHandler` 装饰器显式将其作用域设置为 `REQUEST`，如下所示：
+1. 依赖于请求作用域提供者。
+2. 使用 __INLINE_CODE_143__、__INLINE_CODE_144__ 或 __INLINE_CODE_145__ 装饰器显式设置其作用域为 __INLINE_CODE_142__，如所示：
 
-```typescript
-@CommandHandler(KillDragonCommand, {
-  scope: Scope.REQUEST,
-})
-export class KillDragonHandler {
-  // 实现在这里
-}
+```bash
+npm install @prisma/adapter-pg
 
 ```
 
-要将请求负载注入任何请求作用域的提供者，请使用 `@Inject(REQUEST)` 装饰器。但是，CQRS 中请求负载的性质取决于上下文——它可能是 HTTP 请求、计划作业或任何其他触发命令的操作。
+要将请求 payload 注入任何请求作用域提供者，可以使用 __INLINE_CODE_146__ 装饰器。然而，请求 payload 在 CQRS 中的性质取决于上下文—it 可能是一个 HTTP 请求、计划作业或任何其他触发命令的操作。
 
-负载必须是扩展 `AsyncContext`（由 `@nestjs/cqrs` 提供）的类的实例，它充当请求上下文并保存在整个请求生命周期中可访问的数据。
+payload 必须是一个继承自 __INLINE_CODE_147__ 类（由 __INLINE_CODE_148__ 提供）的实例，该类充当请求上下文并持有请求生命周期中的数据。
+
+```bash
+npm install @prisma/adapter-mariadb
+
+```
+
+在执行命令时，传递自定义请求上下文作为 __INLINE_CODE_149__ 方法的第二个参数：
 
 ```typescript
-import { AsyncContext } from '@nestjs/cqrs';
+import { Injectable } from '@nestjs/common';
+import { PrismaClient } from './generated/prisma/client';
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 
-export class MyRequest extends AsyncContext {
-  constructor(public readonly user: User) {
-    super();
+@Injectable()
+export class PrismaService extends PrismaClient {
+  constructor() {
+    const adapter = new PrismaBetterSqlite3({ url: process.env.DATABASE_URL });
+    super({ adapter });
   }
 }
 
 ```
 
-执行命令时，将自定义请求上下文作为第二个参数传递给 `CommandBus#execute` 方法：
+这使 __INLINE_CODE_150__ 实例可作为对应 handler 的 __INLINE_CODE_151__ 提供者：
 
 ```typescript
-const myRequest = new MyRequest(user);
-await this.commandBus.execute(
-  new KillDragonCommand(heroId, killDragonDto.dragonId),
-  myRequest,
-);
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from './prisma.service';
+import { User, Prisma } from 'generated/prisma';
 
-```
+@Injectable()
+export class UsersService {
+  constructor(private prisma: PrismaService) {}
 
-这使得 `MyRequest` 实例作为 `REQUEST` 提供者可用于相应的处理程序：
+  async user(
+    userWhereUniqueInput: Prisma.UserWhereUniqueInput,
+  ): Promise<User | null> {
+    return this.prisma.user.findUnique({
+      where: userWhereUniqueInput,
+    });
+  }
 
-```typescript
-@CommandHandler(KillDragonCommand, {
-  scope: Scope.REQUEST,
-})
-export class KillDragonHandler {
-  constructor(
-    @Inject(REQUEST) private request: MyRequest, // 注入请求上下文
-  ) {}
+  async users(params: {
+    skip?: number;
+    take?: number;
+    cursor?: Prisma.UserWhereUniqueInput;
+    where?: Prisma.UserWhereInput;
+    orderBy?: Prisma.UserOrderByWithRelationInput;
+  }): Promise<User[]> {
+    const { skip, take, cursor, where, orderBy } = params;
+    return this.prisma.user.findMany({
+      skip,
+      take,
+      cursor,
+      where,
+      orderBy,
+    });
+  }
 
-  // 处理程序实现在这里
+  async createUser(data: Prisma.UserCreateInput): Promise<User> {
+    return this.prisma.user.create({
+      data,
+    });
+  }
+
+  async updateUser(params: {
+    where: Prisma.UserWhereUniqueInput;
+    data: Prisma.UserUpdateInput;
+  }): Promise<User> {
+    const { where, data } = params;
+    return this.prisma.user.update({
+      data,
+      where,
+    });
+  }
+
+  async deleteUser(where: Prisma.UserWhereUniqueInput): Promise<User> {
+    return this.prisma.user.delete({
+      where,
+    });
+  }
 }
 
 ```
 
-你可以对查询遵循相同的方法：
+我们可以按照同样方式处理查询：
 
 ```typescript
-const myRequest = new MyRequest(user);
-const hero = await this.queryBus.execute(new GetHeroQuery(heroId), myRequest);
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from './prisma.service';
+import { Post, Prisma } from 'generated/prisma';
+
+@Injectable()
+export class PostsService {
+  constructor(private prisma: PrismaService) {}
+
+  async post(
+    postWhereUniqueInput: Prisma.PostWhereUniqueInput,
+  ): Promise<Post | null> {
+    return this.prisma.post.findUnique({
+      where: postWhereUniqueInput,
+    });
+  }
+
+  async posts(params: {
+    skip?: number;
+    take?: number;
+    cursor?: Prisma.PostWhereUniqueInput;
+    where?: Prisma.PostWhereInput;
+    orderBy?: Prisma.PostOrderByWithRelationInput;
+  }): Promise<Post[]> {
+    const { skip, take, cursor, where, orderBy } = params;
+    return this.prisma.post.findMany({
+      skip,
+      take,
+      cursor,
+      where,
+      orderBy,
+    });
+  }
+
+  async createPost(data: Prisma.PostCreateInput): Promise<Post> {
+    return this.prisma.post.create({
+      data,
+    });
+  }
+
+  async updatePost(params: {
+    where: Prisma.PostWhereUniqueInput;
+    data: Prisma.PostUpdateInput;
+  }): Promise<Post> {
+    const { data, where } = params;
+    return this.prisma.post.update({
+      data,
+      where,
+    });
+  }
+
+  async deletePost(where: Prisma.PostWhereUniqueInput): Promise<Post> {
+    return this.prisma.post.delete({
+      where,
+    });
+  }
+}
 
 ```
 
 在查询处理程序中：
 
 ```typescript
-@QueryHandler(GetHeroQuery, {
-  scope: Scope.REQUEST,
-})
-export class GetHeroHandler {
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Body,
+  Put,
+  Delete,
+} from '@nestjs/common';
+import { UsersService } from './user.service';
+import { PostsService } from './post.service';
+import { User as UserModel, Post as PostModel } from 'generated/prisma';
+
+@Controller()
+export class AppController {
   constructor(
-    @Inject(REQUEST) private request: MyRequest, // 注入请求上下文
+    private readonly userService: UsersService,
+    private readonly postService: PostsService,
   ) {}
 
-  // 处理程序实现在这里
+  @Get('post/:id')
+  async getPostById(@Param('id') id: string): Promise<PostModel> {
+    return this.postService.post({ id: Number(id) });
+  }
+
+  @Get('feed')
+  async getPublishedPosts(): Promise<PostModel[]> {
+    return this.postService.posts({
+      where: { published: true },
+    });
+  }
+
+  @Get('filtered-posts/:searchString')
+  async getFilteredPosts(
+    @Param('searchString') searchString: string,
+  ): Promise<PostModel[]> {
+    return this.postService.posts({
+      where: {
+        OR: [
+          {
+            title: { contains: searchString },
+          },
+          {
+            content: { contains: searchString },
+          },
+        ],
+      },
+    });
+  }
+
+  @Post('post')
+  async createDraft(
+    @Body() postData: { title: string; content?: string; authorEmail: string },
+  ): Promise<PostModel> {
+    const { title, content, authorEmail } = postData;
+    return this.postService.createPost({
+      title,
+      content,
+      author: {
+        connect: { email: authorEmail },
+      },
+    });
+  }
+
+  @Post('user')
+  async signupUser(
+    @Body() userData: { name?: string; email: string },
+  ): Promise<UserModel> {
+    return this.userService.createUser(userData);
+  }
+
+  @Put('publish/:id')
+  async publishPost(@Param('id') id: string): Promise<PostModel> {
+    return this.postService.updatePost({
+      where: { id: Number(id) },
+      data: { published: true },
+    });
+  }
+
+  @Delete('post/:id')
+  async deletePost(@Param('id') id: string): Promise<PostModel> {
+    return this.postService.deletePost({ id: Number(id) });
+  }
 }
 
 ```
 
-对于事件，虽然你可以将请求提供者传递给 `EventBus#publish`但这不太常见。相反，使用 `EventPublisher` 将请求提供者合并到模型中：
+对于事件，虽然可以将请求提供者传递给 __INLINE_CODE_152__，但这较少使用。相反，使用 __INLINE_CODE_153__ 将请求提供者合并到模型中：
 
-```typescript
-const hero = this.publisher.mergeObjectContext(
-  await this.repository.findOneById(+heroId),
-  this.request, // 在这里注入请求上下文
-);
+__CODE_BLOCK_30__
 
-```
+请求作用域事件处理程序订阅这些事件将有访问请求提供者的权限。
 
-订阅这些事件的请求作用域事件处理程序将能够访问请求提供者。
+sagas 始终是单例实例，因为它们管理长期运行的进程。然而，我们可以从事件对象中检索请求提供者：
 
-Sagas 始终是单例实例，因为它们管理长期运行的过程。但是，你可以从事件对象中检索请求提供者：
-
-```typescript
-@Saga()
-dragonKilled = (events$: Observable<any>): Observable<ICommand> => {
-  return events$.pipe(
-    ofType(HeroKilledDragonEvent),
-    map((event) => {
-      const request = AsyncContext.of(event); // 检索请求上下文
-      const command = new DropAncientItemCommand(event.heroId, fakeItemID);
-
-      AsyncContext.merge(request, command); // 将请求上下文合并到命令中
-      return command;
-    }),
-  );
-}
-
-```
-
-或者，使用 `request.attachTo(command)` 方法将请求上下文绑定到命令。
+__CODE_BLOCK_31__Alternatively, use the 提供者__INLINE_CODE_154__ method to tie the request context to the command.
 
 #### 示例
 
-一个可用的示例可在[这里](https://github.com/kamilmysliwiec/nest-cqrs-example)找到。
+一个工作示例可在 [Video: Accessing Databases using NestJS with Prisma (5min)](https://www.youtube.com/watch?v=UlVJ340UEuk&ab_channel=Prisma) 中找到。

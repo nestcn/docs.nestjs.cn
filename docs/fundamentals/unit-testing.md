@@ -1,457 +1,282 @@
+<!-- 此文件从 content/fundamentals/unit-testing.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-15T05:00:32.328Z -->
+<!-- 源文件: content/fundamentals/unit-testing.md -->
+
 ### 测试
 
-自动化测试被认为是任何严肃的软件开发工作的重要组成部分。自动化使得在开发过程中快速轻松地重复单个测试或测试套件变得容易。这有助于确保发布版本满足质量和性能目标。自动化有助于增加覆盖率并为开发人员提供更快的反馈循环。自动化既提高了单个开发人员的生产力，又确保在关键开发生命周期节点运行测试，例如源代码控制签入、功能集成和版本发布。
+自动测试被认为是任何严肃软件开发努力的必要组成部分。自动化使得可以快速和轻松地重复单个测试或测试套件，帮助确保发布满足质量和性能目标。自动化还可以增加覆盖率，提供快速反馈回路，以便开发者更好地了解测试结果。自动化不仅提高了单个开发者的生产力，还确保了在关键开发生命周期阶段，例如源代码控制检查入、特性集成和版本发布时，测试被运行。
 
-这些测试通常跨越各种类型，包括单元测试、端到端（e2e）测试、集成测试等。虽然好处是毋庸置疑的，但设置它们可能很繁琐。Nest努力促进开发最佳实践，包括有效的测试，因此它包含以下功能来帮助开发人员和团队构建和自动化测试。Nest：
+这些测试通常包括多种类型，例如单元测试、端到端(e2e)测试、集成测试等。虽然其优点无可争辩，但设置它们可能很繁琐。Nest 强调开发最佳实践，包括有效的测试，因此它包括以下功能帮助开发者和团队构建和自动化测试。Nest：
 
-- 自动为组件搭建默认的单元测试和应用程序的端到端测试
-- 提供默认工具（例如构建隔离模块/应用程序加载器的测试运行器）
-- 开箱即用地提供与[Jest](https://github.com/facebook/jest)和[Supertest](https://github.com/visionmedia/supertest)的集成，同时保持对测试工具的不可知性
-- 在测试环境中提供Nest依赖注入系统，以便轻松模拟组件
+- 自动创建默认单元测试和 e2e 测试
+- 提供默认工具（例如测试运行器和隔离模块/应用程序加载器）
+- 与 __LINK_150__ 和 __LINK_151__ 等测试工具无缝集成，从而保持了agnosticism
+- 将 Nest 依赖注入系统在测试环境中提供，以便轻松地模拟组件
 
-如前所述，您可以使用任何**测试框架**，因为Nest不会强制任何特定工具。只需替换所需的元素（例如测试运行器），您仍然可以享受Nest现成的测试设施的好处。
+正如所述，您可以使用任何测试框架，因为 Nest 不强求特定的工具 Simply replace the elements needed (such as the test runner), and you will still enjoy the benefits of Nest's ready-made testing facilities.
 
 #### 安装
 
 要开始，请首先安装所需的包：
 
 ```bash
-$ npm i --save-dev @nestjs/testing
+$ npm i --save redis socket.io @socket.io/redis-adapter
 
 ```
 
 #### 单元测试
 
-在以下示例中，我们测试两个类：`CatsController`和`CatsService`。如前所述，[Jest](https://github.com/facebook/jest)被提供为默认的测试框架。它充当测试运行器，还提供断言函数和测试双倍工具，帮助进行模拟、监视等。在以下基本测试中，我们手动实例化这些类，并确保控制器和服务满足其API契约。
+以下示例中，我们测试两个类：`WsAdapter` 和 `ws`。正如所述，__LINK_152__ 作为默认测试框架，作为测试运行器和 assert 函数和 test-double 实用工具，帮助模拟、监视等。在以下基本测试中，我们手动实例化这些类，并确保控制器和服务满足 API 合同。
 
 ```typescript
-import { CatsController } from './cats.controller';
-import { CatsService } from './cats.service';
+import { IoAdapter } from '@nestjs/platform-socket.io';
+import { ServerOptions } from 'socket.io';
+import { createAdapter } from '@socket.io/redis-adapter';
+import { createClient } from 'redis';
 
-describe('CatsController', () => {
-  let catsController: CatsController;
-  let catsService: CatsService;
+export class RedisIoAdapter extends IoAdapter {
+  private adapterConstructor: ReturnType<typeof createAdapter>;
 
-  beforeEach(() => {
-    catsService = new CatsService();
-    catsController = new CatsController(catsService);
-  });
+  async connectToRedis(): Promise<void> {
+    const pubClient = createClient({ url: `redis://localhost:6379` });
+    const subClient = pubClient.duplicate();
 
-  describe('findAll', () => {
-    it('should return an array of cats', async () => {
-      const result = ['test'];
-      jest.spyOn(catsService, 'findAll').mockImplementation(() => result);
+    await Promise.all([pubClient.connect(), subClient.connect()]);
 
-      expect(await catsController.findAll()).toBe(result);
-    });
-  });
-});
+    this.adapterConstructor = createAdapter(pubClient, subClient);
+  }
 
-describe('CatsController', () => {
-  let catsController;
-  let catsService;
-
-  beforeEach(() => {
-    catsService = new CatsService();
-    catsController = new CatsController(catsService);
-  });
-
-  describe('findAll', () => {
-    it('should return an array of cats', async () => {
-      const result = ['test'];
-      jest.spyOn(catsService, 'findAll').mockImplementation(() => result);
-
-      expect(await catsController.findAll()).toBe(result);
-    });
-  });
-});
+  createIOServer(port: number, options?: ServerOptions): any {
+    const server = super.createIOServer(port, options);
+    server.adapter(this.adapterConstructor);
+    return server;
+  }
+}
 
 ```
 
-> info **提示** 将测试文件保存在它们测试的类附近。测试文件应该有`.spec`或`.test`后缀。
+> info **提示**请将测试文件与它们测试的类保持在一起。测试文件应该具有 `socket.io` 或 `ws` 后缀。
 
-因为上面的示例很简单，我们实际上并没有测试任何特定于Nest的内容。事实上，我们甚至没有使用依赖注入（注意我们将`CatsService`的实例传递给我们的`catsController`）。这种测试形式 - 我们手动实例化被测试的类 - 通常被称为**隔离测试**，因为它独立于框架。让我们介绍一些更高级的功能，帮助您测试更广泛使用Nest功能的应用程序。
+由于上述示例非常简单，我们实际上并没有测试 Nest 特定的内容。实际上，我们甚至没有使用依赖注入（注意我们将 `@WebSocketGateway({{ '{' }} path: '/users' {{ '}' }})` 实例传递给 `ws`）。这种形式的测试，即我们手动实例化被测试的类，是被称为 **孤立测试** 的，因为它独立于框架。让我们引入一些更高级的功能，以便更好地测试使用 Nest 特性的应用程序。
 
-#### 测试工具
+#### 测试实用工具
 
-`@nestjs/testing`包提供了一组工具，使测试过程更加健壮。让我们使用内置的`Test`类重写之前的示例：
+`WsAdapter` 包提供了一组实用工具，以便实现更强大的测试过程。让我们重写前面的示例，使用内置的 `@nestjs/platform-ws` 类：
 
 ```typescript
-import { Test } from '@nestjs/testing';
-import { CatsController } from './cats.controller';
-import { CatsService } from './cats.service';
+const app = await NestFactory.create(AppModule);
+const redisIoAdapter = new RedisIoAdapter(app);
+await redisIoAdapter.connectToRedis();
 
-describe('CatsController', () => {
-  let catsController: CatsController;
-  let catsService: CatsService;
-
-  beforeEach(async () => {
-    const moduleRef = await Test.createTestingModule({
-        controllers: [CatsController],
-        providers: [CatsService],
-      }).compile();
-
-    catsService = moduleRef.get(CatsService);
-    catsController = moduleRef.get(CatsController);
-  });
-
-  describe('findAll', () => {
-    it('should return an array of cats', async () => {
-      const result = ['test'];
-      jest.spyOn(catsService, 'findAll').mockImplementation(() => result);
-
-      expect(await catsController.findAll()).toBe(result);
-    });
-  });
-});
-
-describe('CatsController', () => {
-  let catsController;
-  let catsService;
-
-  beforeEach(async () => {
-    const moduleRef = await Test.createTestingModule({
-        controllers: [CatsController],
-        providers: [CatsService],
-      }).compile();
-
-    catsService = moduleRef.get(CatsService);
-    catsController = moduleRef.get(CatsController);
-  });
-
-  describe('findAll', () => {
-    it('should return an array of cats', async () => {
-      const result = ['test'];
-      jest.spyOn(catsService, 'findAll').mockImplementation(() => result);
-
-      expect(await catsController.findAll()).toBe(result);
-    });
-  });
-});
+app.useWebSocketAdapter(redisIoAdapter);
 
 ```
 
-`Test`类对于提供应用程序执行上下文非常有用，该上下文本质上模拟了完整的Nest运行时，但为您提供了钩子，使管理类实例（包括模拟和覆盖）变得容易。`Test`类有一个`createTestingModule()`方法，该方法将模块元数据对象作为其参数（与您传递给`@Module()`装饰器的对象相同）。此方法返回一个`TestingModule`实例，该实例又提供了一些方法。对于单元测试，重要的是`compile()`方法。此方法引导模块及其依赖项（类似于应用程序在传统`main.ts`文件中使用`NestFactory.create()`引导的方式），并返回一个准备好测试的模块。
+`wsAdapter` 类非常有用，用于提供一个应用程序执行上下文，该上下文模拟了完整的 Nest 运行时，但提供了 hooks，使得您可以轻松地管理类实例，包括模拟和override。`{{ '{' }} event: string, data: any {{ '}' }}` 类具有 `setMessageParser` 方法，该方法接受一个模块元数据对象作为其参数（与您在 `@nestjs/platform-ws` 装饰器中传递的同一个对象）。该方法返回一个 `WsAdapter` 实例，该实例提供了一些方法。对于单元测试，重要的一点是 `WsAdapter` 方法。该方法启动了一个模块及其依赖项（类似于在 conventional `useWebSocketAdapter()` 文件中使用 `WsAdapter`），并返回一个准备好的模块。
 
-> info **提示** `compile()`方法是**异步**的，因此必须等待。模块编译后，您可以使用`get()`方法检索它声明的任何**静态**实例（控制器和提供者）。
+> info **提示**__INLINE_CODE_29__ 方法是 **异步** 的，因此需要等待。模块编译完成后，您可以使用 __INLINE_CODE_30__ 方法获取任何 **静态** 实例（控制器和提供者）。
 
-`TestingModule`继承自[模块引用](/fundamentals/module-reference)类，因此具有动态解析作用域提供者（瞬态或请求作用域）的能力。使用`resolve()`方法执行此操作（`get()`方法只能检索静态实例）。
+__INLINE_CODE_31__ 继承自 __LINK_153__ 类，因此它可以动态地解决作用域提供者（瞬态或请求作用域）。使用 __INLINE_CODE_32__ 方法（__INLINE_CODE_33__ 方法只能获取静态实例）。
 
-```typescript
-const moduleRef = await Test.createTestingModule({
-  controllers: [CatsController],
-  providers: [CatsService],
-}).compile();
-
-catsService = await moduleRef.resolve(CatsService);
+```bash
+$ npm i --save @nestjs/platform-ws
 
 ```
 
-> warning **警告** `resolve()`方法返回提供者的唯一实例，来自其自己的**DI容器子树**。每个子树都有唯一的上下文标识符。因此，如果您多次调用此方法并比较实例引用，您会发现它们不相等。
+> warning **警告**__INLINE_CODE_34__ 方法返回该提供者的唯一实例，从其自己的 **DI 容器子树** 中。每个子树都有唯一的上下文标识符。因此，如果您多次调用该方法并比较实例引用，您将看到它们不相等。
 
-> info **提示** 在此处了解有关模块引用功能的更多信息[/fundamentals/module-reference]。
+> info **提示**了解更多关于模块引用功能 __LINK_154__。Here is the translation of the English technical documentation to Chinese:
 
-您可以使用[自定义提供者](/fundamentals/dependency-injection)覆盖任何提供者的生产版本，以进行测试。例如，您可以模拟数据库服务，而不是连接到实时数据库。我们将在下一节中介绍覆盖，但它们也可用于单元测试。
+** overrides  **
 
-<app-banner-courses></app-banner-courses>
+Nest 可以将生产环境中的提供者覆盖为__LINK_155__以供测试使用。例如，可以模拟数据库服务，而不是连接到在线数据库。我们将在下一节中 discussing overrides，但它们也可用于单元测试中。
+
+__HTML_TAG_90____HTML_TAG_91__
 
 #### 自动模拟
 
-Nest还允许您定义一个模拟工厂，应用于所有缺少的依赖项。这对于类中有大量依赖项的情况非常有用，模拟所有这些依赖项将花费很长时间和大量设置。要使用此功能，`createTestingModule()`需要与`useMocker()`方法链接，传递依赖项模拟的工厂。这个工厂可以接受一个可选的令牌，这是一个实例令牌，任何对Nest提供者有效的令牌，并返回一个模拟实现。以下是使用[`jest-mock`](https://www.npmjs.com/package/jest-mock)创建通用模拟程序和使用`jest.fn()`为`CatsService`创建特定模拟的示例。
+Nest 允许您定义一个 mock 工厂来应用于所有 missing 依赖项。这在你有一个大型类中，多个依赖项时非常有用。在使用该功能时，需要将 __INLINE_CODE_35__ 方法与 __INLINE_CODE_36__ 方法链式调用，并传入依赖项 mock 的工厂。该工厂可以带有可选的 token，它是一个 Nest 提供者的实例 token，返回一个 mock 实现。下面是一个使用 __LINK_156__ 和 __INLINE_CODE_38__ 的特定 mock 示例。
 
 ```typescript
-// ...
-import { ModuleMocker, MockMetadata } from 'jest-mock';
+const app = await NestFactory.create(AppModule);
+app.useWebSocketAdapter(new WsAdapter(app));
 
-const moduleMocker = new ModuleMocker(global);
+```
 
-describe('CatsController', () => {
-  let controller: CatsController;
+你也可以从testing 容器中检索这些 mock，正如你通常处理自定义提供者一样 __INLINE_CODE_40__。
 
-  beforeEach(async () => {
-    const moduleRef = await Test.createTestingModule({
-      controllers: [CatsController],
-    })
-      .useMocker((token) => {
-        const results = ['test1', 'test2'];
-        if (token === CatsService) {
-          return { findAll: jest.fn().mockResolvedValue(results) };
-        }
-        if (typeof token === 'function') {
-          const mockMetadata = moduleMocker.getMetadata(
-            token,
-          ) as MockMetadata<any, any>;
-          const Mock = moduleMocker.generateFromMetadata(
-            mockMetadata,
-          ) as ObjectConstructor;
-          return new Mock();
-        }
-      })
-      .compile();
+> 提示 **Hint** 一般的 mock 工厂，如 __INLINE_CODE_41__ 从 __LINK_157__ 可以直接传递。
 
-    controller = moduleRef.get(CatsController);
-  });
+> 提示 **Hint** __INLINE_CODE_43__ 和 __INLINE_CODE_44__ 提供者不能被自动模拟，因为它们已经在上下文中预定义了。然而，它们可以使用自定义提供语法或 __INLINE_CODE_45__ 方法进行重写。
+
+#### 结果到结果测试
+
+与单元测试不同，结果到结果（e2e）测试将类和模块的交互行为更好地模拟，更加接近生产系统的交互行为。随着应用程序的增长，手动测试 API endpoints 的交互行为变得越来越困难。自动 e2e 测试帮助我们确保系统的整体行为正确，并满足项目要求。为了执行 e2e 测试，我们使用与单元测试相同的配置。另外，Nest 使得使用 __LINK_158__ 库来模拟 HTTP 请求变得非常容易。
+
+```typescript
+const wsAdapter = new WsAdapter(app, {
+  // To handle messages in the [event, data] format
+  messageParser: (data) => {
+    const [event, payload] = JSON.parse(data.toString());
+    return { event, data: payload };
+  },
 });
 
 ```
 
-您也可以像通常处理自定义提供者一样从测试容器中检索这些模拟，`moduleRef.get(CatsService)`。
+> 提示 **Hint** 如果你使用 __LINK_159__ 作为 HTTP 适配器，它需要不同的配置，有内置测试功能：
+>
+> ```typescript
+import * as WebSocket from 'ws';
+import { WebSocketAdapter, INestApplicationContext } from '@nestjs/common';
+import { MessageMappingProperties } from '@nestjs/websockets';
+import { Observable, fromEvent, EMPTY } from 'rxjs';
+import { mergeMap, filter } from 'rxjs/operators';
 
-> info **提示** 通用模拟工厂，如来自[`@golevelup/ts-jest`](https://github.com/golevelup/nestjs/tree/master/packages/testing)的`createMock`也可以直接传递。
+export class WsAdapter implements WebSocketAdapter {
+  constructor(private app: INestApplicationContext) {}
 
-> info **提示** `REQUEST`和`INQUIRER`提供者不能被自动模拟，因为它们已经在上下文中预定义。但是，它们可以使用自定义提供者语法或通过利用`.overrideProvider`方法被**覆盖**。
+  create(port: number, options: any = {}): any {
+    return new WebSocket.Server({ port, ...options });
+  }
 
-#### 端到端测试
+  bindClientConnect(server, callback: Function) {
+    server.on('connection', callback);
+  }
 
-与专注于单个模块和类的单元测试不同，端到端（e2e）测试在更聚合的级别覆盖类和模块的交互 - 更接近最终用户将与生产系统进行的交互。随着应用程序的增长，手动测试每个API端点的端到端行为变得困难。自动化端到端测试帮助我们确保系统的整体行为是正确的，并满足项目要求。要执行端到端测试，我们使用与我们刚刚在**单元测试**中介绍的类似的配置。此外，Nest使使用[Supertest](https://github.com/visionmedia/supertest)库模拟HTTP请求变得容易。
+  bindMessageHandlers(
+    client: WebSocket,
+    handlers: MessageMappingProperties[],
+    process: (data: any) => Observable<any>,
+  ) {
+    fromEvent(client, 'message')
+      .pipe(
+        mergeMap(data => this.bindMessageHandler(data, handlers, process)),
+        filter(result => result),
+      )
+      .subscribe(response => client.send(JSON.stringify(response)));
+  }
 
-```typescript
-import * as request from 'supertest';
-import { Test } from '@nestjs/testing';
-import { CatsModule } from '../../src/cats/cats.module';
-import { CatsService } from '../../src/cats/cats.service';
-import { INestApplication } from '@nestjs/common';
+  bindMessageHandler(
+    buffer,
+    handlers: MessageMappingProperties[],
+    process: (data: any) => Observable<any>,
+  ): Observable<any> {
+    const message = JSON.parse(buffer.data);
+    const messageHandler = handlers.find(
+      handler => handler.message === message.event,
+    );
+    if (!messageHandler) {
+      return EMPTY;
+    }
+    return process(messageHandler.callback(message.data));
+  }
 
-describe('Cats', () => {
-  let app: INestApplication;
-  let catsService = { findAll: () => ['test'] };
-
-  beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({
-      imports: [CatsModule],
-    })
-      .overrideProvider(CatsService)
-      .useValue(catsService)
-      .compile();
-
-    app = moduleRef.createNestApplication();
-    await app.init();
-  });
-
-  it(`/GET cats`, () => {
-    return request(app.getHttpServer())
-      .get('/cats')
-      .expect(200)
-      .expect({
-        data: catsService.findAll(),
-      });
-  });
-
-  afterAll(async () => {
-    await app.close();
-  });
-});
-
-describe('Cats', () => {
-  let app: INestApplication;
-  let catsService = { findAll: () => ['test'] };
-
-  beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({
-      imports: [CatsModule],
-    })
-      .overrideProvider(CatsService)
-      .useValue(catsService)
-      .compile();
-
-    app = moduleRef.createNestApplication();
-    await app.init();
-  });
-
-  it(`/GET cats`, () => {
-    return request(app.getHttpServer())
-      .get('/cats')
-      .expect(200)
-      .expect({
-        data: catsService.findAll(),
-      });
-  });
-
-  afterAll(async () => {
-    await app.close();
-  });
-});
+  close(server) {
+    server.close();
+  }
+}
 
 ```
 
-> info **提示** 如果您使用[Fastify](/techniques/performance)作为HTTP适配器，它需要略有不同的配置，并具有内置的测试功能：
->
-> ```ts
-> let app: NestFastifyApplication;
->
-> beforeAll(async () => {
->   app = moduleRef.createNestApplication<NestFastifyApplication>(
->     new FastifyAdapter(),
->   );
->
->   await app.init();
->   await app.getHttpAdapter().getInstance().ready();
-> });
->
-> it(`/GET cats`, () => {
->   return app
->     .inject({
->       method: 'GET',
->       url: '/cats',
->     })
->     .then((result) => {
->       expect(result.statusCode).toEqual(200);
->       expect(result.payload).toEqual(/* expectedPayload */);
->     });
-> });
->
-> afterAll(async () => {
->   await app.close();
-> });
-> ```
+在这个示例中，我们基于之前描述的概念。除了我们之前使用的 __INLINE_CODE_46__ 方法，我们现在使用 __INLINE_CODE_47__ 方法来实例化一个完整的 Nest 运行环境。
 
-在这个例子中，我们基于前面描述的一些概念进行构建。除了我们之前使用的`compile()`方法外，我们现在使用`createNestApplication()`方法来实例化完整的Nest运行时环境。
+需要注意的是，在你的应用程序使用 __INLINE_CODE_48__ 方法编译时， __INLINE_CODE_49__ 将在那个时间点处于 undefined 状态。这是因为在这个编译阶段，没有创建 HTTP 适配器或服务器。你的测试需要 __INLINE_CODE_50__，你应该使用 __INLINE_CODE_51__ 方法创建应用程序实例，或者重构项目以避免这个依赖项在初始化依赖项图时。
 
-需要考虑的一个警告是，当使用`compile()`方法编译应用程序时，`HttpAdapterHost#httpAdapter`此时将是未定义的。这是因为在这个编译阶段还没有创建HTTP适配器或服务器。如果您的测试需要`httpAdapter`，您应该使用`createNestApplication()`方法创建应用程序实例，或者重构您的项目以避免在初始化依赖图时出现此依赖。
+好的，让我们分解示例：
 
-好的，让我们分解这个例子：
+我们将 running app 的引用保存在 __INLINE_CODE_52__ 变量中，以便使用它来模拟 HTTP 请求。
 
-我们在`app`变量中保存对运行中应用程序的引用，以便我们可以使用它来模拟HTTP请求。
+我们使用 Supertest 的 __INLINE_CODE_53__ 函数来模拟 HTTP 测试。我们想要这些 HTTP 请求路由到 our running Nest app，所以我们将 __INLINE_CODE_54__ 函数传递给 HTTP监听器，该监听器可能由 Express 平台提供。因此，构造 __INLINE_CODE_55__。 __INLINE_CODE_56__ 方法返回一个包装的 HTTP 服务器，现在连接到 Nest app，可以模拟实际 HTTP 请求。例如，使用 __INLINE_CODE_57__ 将发起一个到 Nest app 的请求， identical 到一个实际 HTTP 请求，如 __INLINE_CODE_58__。
 
-我们使用Supertest中的`request()`函数模拟HTTP测试。我们希望这些HTTP请求路由到我们运行的Nest应用程序，因此我们向`request()`函数传递Nest底层的HTTP监听器的引用（这反过来可能由Express平台提供）。因此，构造`request(app.getHttpServer())`。对`request()`的调用为我们提供了一个包装的HTTP服务器，现在连接到Nest应用程序，它公开了模拟实际HTTP请求的方法。例如，使用`request(...).get('/cats')`将启动一个对Nest应用程序的请求，该请求与通过网络传入的**实际**HTTP请求（如`get '/cats'`）相同。
+在这个示例中，我们也提供了一个 alternate（test-double）实现 __INLINE_CODE_59__，它简单地返回一个硬编码值，我们可以测试它。使用 __INLINE_CODE_60__ 提供这样的 alternate 实现。同样，Nest 提供了方法来重写模块、守卫、拦截器、过滤器和管道使用 __INLINE_CODE_61__、__INLINE_CODE_62__、__INLINE_CODE_63__、__INLINE_CODE_64__ 和 __INLINE_CODE_65__ 方法。
 
-在这个例子中，我们还提供了`CatsService`的替代（测试双倍）实现，它简单地返回一个我们可以测试的硬编码值。使用`overrideProvider()`提供这样的替代实现。同样，Nest提供了方法来覆盖模块、守卫、拦截器、过滤器和管道，分别使用`overrideModule()`、`overrideGuard()`、`overrideInterceptor()`、`overrideFilter()`和`overridePipe()`方法。
+每个重写方法（除了 __INLINE_CODE_66__）返回一个对象，其中包含3个不同的方法，类似于 __LINK_160__：
 
-每个覆盖方法（除了`overrideModule()`）都返回一个对象，该对象具有3个不同的方法，这些方法与为[自定义提供者](/fundamentals/dependency-injection)描述的方法镜像：
+- __INLINE_CODE_67__: 你提供一个将被实例化的类，以提供 override 对象（提供者、守卫等）的实例。
+- __INLINE_CODE_68__: 你提供一个将 override 对象的实例。
+- __INLINE_CODE_69__: 你提供一个返回实例将 override 对象的函数。Here is the translation of the English technical documentation to Chinese:
 
-- `useClass`：您提供一个类，该类将被实例化以提供覆盖对象（提供者、守卫等）的实例。
-- `useValue`：您提供一个将覆盖对象的实例。
-- `useFactory`：您提供一个返回将覆盖对象的实例的函数。
-
-另一方面，`overrideModule()`返回一个带有`useModule()`方法的对象，您可以使用该方法提供一个将覆盖原始模块的模块，如下所示：
+有一些时候，__INLINE_CODE_70__将返回一个对象，其中包含__INLINE_CODE_71__方法，可以用来提供一个将覆盖原始模块的模块，例如：
 
 ```typescript
-const moduleRef = await Test.createTestingModule({
-  imports: [AppModule],
-})
-  .overrideModule(CatsModule)
-  .useModule(AlternateCatsModule)
-  .compile();
+const app = await NestFactory.create(AppModule);
+app.useWebSocketAdapter(new WsAdapter(app));
 
 ```
 
-每种覆盖方法类型又返回`TestingModule`实例，因此可以与[流畅风格](https://en.wikipedia.org/wiki/Fluent_interface)中的其他方法链接。您应该在这样的链的末尾使用`compile()`，以使Nest实例化并初始化模块。
+每种覆盖方法类型都返回__INLINE_CODE_72__实例，可以链式地与其他方法在__LINK_161__中使用。请在链式中使用__INLINE_CODE_73__来使Nest实例化和初始化模块。
 
-此外，有时您可能希望提供自定义日志记录器，例如在运行测试时（例如，在CI服务器上）。使用`setLogger()`方法并传递一个满足`LoggerService`接口的对象，以指示`TestModuleBuilder`如何在测试期间记录（默认情况下，只有"错误"日志会被记录到控制台）。
+有时候，您可能想提供一个自定义的日志记录器，例如在测试中运行（例如，在CI服务器上）。使用__INLINE_CODE_74__方法，并将一个实现__INLINE_CODE_75__接口的对象传递给__INLINE_CODE_76__，以便__INLINE_CODE_76__在测试中如何记录日志（默认情况下，只有“error”日志将被记录到控制台）。
 
-编译后的模块有几个有用的方法，如下表所述：
+编译后的模块具有以下有用的方法，如下表所示：
 
-<table>
-  <tr>
-    <td>
-      <code>createNestApplication()</code>
-    </td>
-    <td>
-      创建并返回基于给定模块的Nest应用程序（<code>INestApplication</code>实例）。
-      注意，您必须使用<code>init()</code>方法手动初始化应用程序。
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <code>createNestMicroservice()</code>
-    </td>
-    <td>
-      创建并返回基于给定模块的Nest微服务（<code>INestMicroservice</code>实例）。
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <code>get()</code>
-    </td>
-    <td>
-      检索应用程序上下文中可用的控制器或提供者（包括守卫、过滤器等）的静态实例。继承自<a href="/fundamentals/module-reference">模块引用</a>类。
-    </td>
-  </tr>
-  <tr>
-     <td>
-      <code>resolve()</code>
-    </td>
-    <td>
-      检索应用程序上下文中可用的控制器或提供者（包括守卫、过滤器等）的动态创建的作用域实例（请求或瞬态）。继承自<a href="/fundamentals/module-reference">模块引用</a>类。
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <code>select()</code>
-    </td>
-    <td>
-      遍历模块的依赖图；可用于从选定的模块中检索特定实例（与<code>get()</code>方法中的严格模式（<code>strict: true</code>）一起使用）。
-    </td>
-  </tr>
-</table>
+__HTML_TAG_92__
+  __HTML_TAG_93__
+    __HTML_TAG_94__
+      __HTML_TAG_95__createNestApplication()__HTML_TAG_96__
+    __HTML_TAG_97__
+    __HTML_TAG_98__
+      创建并返回一个Nest应用程序（__HTML_TAG_99__INestApplication__HTML_TAG_100__实例），根据给定的模块。
+      请注意，您需要手动初始化应用程序使用__HTML_TAG_101__init()__HTML_TAG_102__方法。
+    __HTML_TAG_103__
+  __HTML_TAG_104__
+  __HTML_TAG_105__
+    __HTML_TAG_106__
+      __HTML_TAG_107__createNestMicroservice()__HTML_TAG_108__
+    __HTML_TAG_109__
+    __HTML_TAG_110__
+      创建并返回一个Nest微服务（__HTML_TAG_111__INestMicroservice__HTML_TAG_112__实例），根据给定的模块。
+    __HTML_TAG_113__
+  __HTML_TAG_114__
+  __HTML_TAG_115__
+    __HTML_TAG_116__
+      __HTML_TAG_117__get()__HTML_TAG_118__
+    __HTML_TAG_119__
+    __HTML_TAG_120__
+      获取应用程序上下文中可用的控制器或提供者的静态实例（包括守卫、过滤器等）。继承自__HTML_TAG_121__module reference__HTML_TAG_122__类。
+    __HTML_TAG_123__
+  __HTML_TAG_124__
+  __HTML_TAG_125__
+     __HTML_TAG_126__
+      __HTML_TAG_127__resolve()__HTML_TAG_128__
+    __HTML_TAG_129__
+    __HTML_TAG_130__
+      获取应用程序上下文中可用的控制器或提供者的动态实例（请求或瞬态）。继承自__HTML_TAG_131__module reference__HTML_TAG_132__类。
+    __HTML_TAG_133__
+  __HTML_TAG_134__
+  __HTML_TAG_135__
+    __HTML_TAG_136__
+      __HTML_TAG_137__select()__HTML_TAG_138__
+    __HTML_TAG_139__
+    __HTML_TAG_140__
+      在模块的依赖关系图中导航，可以用来获取特定的实例（在strict模式下__HTML_TAG_141__strict: true__HTML_TAG_142__在__HTML_TAG_143__get()__HTML_TAG_144__方法中使用）。
+    __HTML_TAG_145__
+  __HTML_TAG_146__
+__HTML_TAG_147__
 
-> info **提示** 将端到端测试文件保存在`test`目录中。测试文件应该有`.e2e-spec`后缀。
+> 提示 **Hint** 将e2e测试文件放置在__INLINE_CODE_77__目录中。测试文件应该具有__INLINE_CODE_78__后缀。
 
 #### 覆盖全局注册的增强器
 
-如果您有全局注册的守卫（或管道、拦截器或过滤器），您需要采取更多步骤来覆盖该增强器。回顾一下原始注册如下所示：
+如果您已经注册了一个全局守卫（或管道、拦截器或过滤器），则需要更多步骤来覆盖该增强器。总之，原始注册如下所示：
 
-```typescript
-providers: [
-  {
-    provide: APP_GUARD,
-    useClass: JwtAuthGuard,
-  },
-],
+__CODE_BLOCK_8__
 
-```
+这将注册守卫作为“multi”-提供者，通过__INLINE_CODE_79__令牌。要能够替换__INLINE_CODE_80__，注册需要使用现有的提供者在这个slot：
 
-这是通过`APP_*`令牌将守卫注册为"多"提供者。为了能够在此处替换`JwtAuthGuard`，注册需要使用此插槽中的现有提供者：
+__CODE_BLOCK_9__
 
-```typescript
-providers: [
-  {
-    provide: APP_GUARD,
-    useExisting: JwtAuthGuard,
-    // ^^^^^^^^ 注意使用 'useExisting' 而不是 'useClass'
-  },
-  JwtAuthGuard,
-],
+> 提示 **Hint** 将__INLINE_CODE_81__更换为__INLINE_CODE_82__以引用已注册的提供者，而不是让Nest在后台实例化它。
 
-```
+现在__INLINE_CODE_83__可供Nest作为一个普通提供者，以便在创建__INLINE_CODE_84__时被覆盖：
 
-> info **提示** 将`useClass`更改为`useExisting`以引用已注册的提供者，而不是让Nest在令牌后面实例化它。
+__CODE_BLOCK_10__
 
-现在`JwtAuthGuard`对Nest来说是一个常规提供者，可以在创建`TestingModule`时被覆盖：
-
-```typescript
-const moduleRef = await Test.createTestingModule({
-  imports: [AppModule],
-})
-  .overrideProvider(JwtAuthGuard)
-  .useClass(MockAuthGuard)
-  .compile();
-
-```
-
-现在您的所有测试都将在每个请求上使用`MockAuthGuard`。
+现在所有测试都将使用__INLINE_CODE_85__在每个请求中。
 
 #### 测试请求作用域实例
 
-[请求作用域](/fundamentals/provider-scopes)提供者是为每个传入的**请求**唯一创建的。实例在请求处理完成后被垃圾回收。这构成了一个问题，因为我们无法访问为测试请求生成的依赖注入子树。
+__LINK_162__提供者在每个incoming **请求**中创建唯一的实例。该实例在请求处理完成后被垃圾收集。这对我们来说是一个问题，因为我们无法访问测试请求生成的依赖注入子树。
 
-我们知道（基于上面的部分）`resolve()`方法可用于检索动态实例化的类。此外，如<a href="/fundamentals/module-reference#解析作用域提供者">此处</a>所述，我们知道我们可以传递唯一的上下文标识符来控制DI容器子树的生命周期。我们如何在测试上下文中利用这一点？
-
-策略是预先生成一个上下文标识符，并强制Nest使用此特定ID为所有传入请求创建子树。这样，我们将能够检索为测试请求创建的实例。
-
-要实现这一点，请在`ContextIdFactory`上使用`jest.spyOn()`：
-
-```typescript
-const contextId = ContextIdFactory.create();
-jest
-  .spyOn(ContextIdFactory, 'getByRequest')
-  .mockImplementation(() => contextId);
-
-```
-
-现在我们可以使用`contextId`访问任何后续请求的单个生成的DI容器子树。
-
-```typescript
-catsService = await moduleRef.resolve(CatsService, contextId);
-
-```
+我们知道

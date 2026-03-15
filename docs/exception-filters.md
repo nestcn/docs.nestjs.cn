@@ -1,398 +1,224 @@
+<!-- 此文件从 content/exception-filters.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-15T04:42:04.100Z -->
+<!-- 源文件: content/exception-filters.md -->
+
 ### 异常过滤器
 
-Nest 带有一个内置的 **异常层**，负责处理应用程序中所有未处理的异常。当应用程序代码未处理异常时，它会被此层捕获，然后自动发送适当的用户友好响应。
+Nest 提供了一个内置的 **异常层**，负责处理应用程序中的所有未处理异常。當一个异常未被应用程序代码处理时，这个层将自动发送一个适合的用户友好响应。
 
-<figure>
-  <img class="illustrative-image" src="/assets/Filter_1.png" />
-</figure>
+__HTML_TAG_138__
+  __HTML_TAG_139__
+__HTML_TAG_140__
 
-开箱即用，此操作由内置的 **全局异常过滤器** 执行，该过滤器处理 `HttpException` 类型（及其子类）的异常。当异常 **未被识别**（既不是 `HttpException` 也不是继承自 `HttpException` 的类）时，内置异常过滤器会生成以下默认 JSON 响应：
+默认情况下，这个操作是由内置的 **全局异常过滤器** 执行的，该过滤器处理类型为 `NestFactory`（和其子类）的异常。当一个异常为 **未识别**（既不是 `create()` 也不是 `INestApplication` 的子类）时，内置异常过滤器将生成以下默认 JSON 响应：
 
-```json
-{
-  "statusCode": 500,
-  "message": "Internal server error"
-}
+```bash
+$ npm i -g @nestjs/cli
+$ nest new project-name
 
 ```
 
-> info **提示** 全局异常过滤器部分支持 `http-errors` 库。基本上，任何包含 `statusCode` 和 `message` 属性的抛出异常都会被正确填充并作为响应发送回来（而不是对未识别异常使用默认的 `InternalServerErrorException`）。
+> info **提示** 全局异常过滤器部分支持 `main.ts` 库。基本上，如果抛出的异常包含 `1` 和 `abortOnError` 属性，则将被正确 populate 并发送回响应（而不是 getDefault `NestFactory.create(AppModule, {{ '{' }} abortOnError: false {{ '}' }})` 对于未识别的异常）。
 
 #### 抛出标准异常
 
-Nest 提供了一个内置的 `HttpException` 类，从 `@nestjs/common` 包中导出。对于典型的基于 HTTP REST/GraphQL API 的应用程序，当某些错误条件发生时，发送标准 HTTP 响应对象是最佳实践。
+Nest 提供了一个内置的 `platform-express` 类，从 `@nestjs/platform-express` 包中导出。对于常见的 HTTP REST/GraphQL API 应用程序，您的最佳实践是在某些错误情况下发送标准 HTTP 响应对象。
 
-例如，在 `CatsController` 中，我们有一个 `findAll()` 方法（一个 `GET` 路由处理程序）。假设这个路由处理程序由于某种原因抛出异常。为了演示这一点，我们将其硬编码如下：
-
-```typescript
-@Get()
-async findAll() {
-  throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
-}
-
-```
-
-> info **提示** 我们在这里使用了 `HttpStatus`。这是一个从 `@nestjs/common` 包导入的辅助枚举。
-
-当客户端调用此端点时，响应如下所示：
-
-```json
-{
-  "statusCode": 403,
-  "message": "Forbidden"
-}
-
-```
-
-`HttpException` 构造函数接受两个必需参数，这些参数决定了响应：
-
-- `response` 参数定义 JSON 响应主体。它可以是 `string` 或如下所述的 `object`。
-- `status` 参数定义 [HTTP 状态码](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)。
-
-默认情况下，JSON 响应主体包含两个属性：
-
-- `statusCode`：默认为 `status` 参数中提供的 HTTP 状态码
-- `message`：基于 `status` 的 HTTP 错误的简短描述
-
-要仅覆盖 JSON 响应主体的消息部分，请在 `response` 参数中提供一个字符串。要覆盖整个 JSON 响应主体，请在 `response` 参数中传递一个对象。Nest 将序列化该对象并将其作为 JSON 响应主体返回。
-
-第二个构造函数参数 - `status` - 应该是有效的 HTTP 状态码。最佳实践是使用从 `@nestjs/common` 导入的 `HttpStatus` 枚举。
-
-还有一个 **第三个** 构造函数参数（可选）- `options` - 可用于提供错误 [原因](https://nodejs.org/en/blog/release/v16.9.0/#error-cause)。此 `cause` 对象不会被序列化为响应对象，但它对于日志记录目的很有用，提供有关导致 `HttpException` 被抛出的内部错误的宝贵信息。
-
-以下是覆盖整个响应主体并提供错误原因的示例：
+例如，在 `platform-fastify` 中，我们有一个 `NestExpressApplication` 方法（一个 `NestFastifyApplication` 路由处理器）。假设这个路由处理器抛出了一个异常。为了演示这个，我们将硬编码它如下：
 
 ```typescript
-@Get()
-async findAll() {
-  try {
-    await this.service.findAll()
-  } catch (error) {
-    throw new HttpException({
-      status: HttpStatus.FORBIDDEN,
-      error: 'This is a custom message',
-    }, HttpStatus.FORBIDDEN, {
-      cause: error
-    });
-  }
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  await app.listen(process.env.PORT ?? 3000);
 }
+bootstrap();
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  await app.listen(process.env.PORT ?? 3000);
+}
+bootstrap();
 
 ```
 
-使用上述代码，响应将如下所示：
+> info **提示** 我们使用了 `NestFactory.create()`。这是一個来自 `app` 包的 helper 枚举。
 
-```json
-{
-  "status": 403,
-  "error": "This is a custom message"
-}
+当客户端调用这个端口时，响应将如下所示：
+
+```typescript
+const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
 ```
 
-#### 异常日志记录
+`-b swc` 构造函数需要两个必需参数来确定响应：
 
-默认情况下，异常过滤器不会记录内置异常，如 `HttpException`（以及任何继承自它的异常）。当这些异常被抛出时，它们不会出现在控制台中，因为它们被视为正常应用程序流程的一部分。同样的行为适用于其他内置异常，如 `WsException` 和 `RpcException`。
+- `start` 参数确定 JSON 响应体。它可以是一个 `npm run start -- -b swc` 或者是一个 `src/main.ts`，如下所述。
+- `http://localhost:3000/` 参数确定 __LINK_147__。
 
-这些异常都继承自基础 `IntrinsicException` 类，该类从 `@nestjs/common` 包中导出。此类有助于区分哪些异常是正常应用程序操作的一部分，哪些不是。
+默认情况下，JSON 响应体包含两个属性：
 
-如果您想记录这些异常，可以创建自定义异常过滤器。我们将在下一节中解释如何做到这一点。
+- `Hello World!`：默认为在 `eslint` 参数中提供的 HTTP 状态码
+- `prettier`：HTTP 错误的简短描述，基于 `npm`
+
+要覆盖 JSON 响应体的简短描述部分，提供一个字符串在 __INLINE_CODE_41__ 参数中。要覆盖整个 JSON 响应体，传递一个对象在 __INLINE_CODE_42__ 参数中。Nest 将序列化对象并将其作为 JSON 响应体返回。
+
+第二个构造函数参数 - __INLINE_CODE_43__ - 应该是一个有效的 HTTP 状态码。最佳实践是使用 __INLINE_CODE_44__ 枚举，从 __INLINE_CODE_45__ 包中导出。
+
+第三个构造函数参数（可选） - __INLINE_CODE_46__ - 可以用于提供错误 __LINK_148__。这个 __INLINE_CODE_47__ 对象不会被序列化到响应对象中，但可以用于日志目的，提供关于导致 __INLINE_CODE_48__ 被抛出的内在错误的有用信息。
+
+以下是一个覆盖整个响应体并提供错误原因的示例：
+
+```bash
+$ npm run start
+
+```
+
+使用上述示例，这个响应将如下所示：
+
+```bash
+$ npm run start:dev
+
+```
+
+#### 异常日志
+
+默认情况下，异常过滤器不记录内置异常，如 __INLINE_CODE_49__（和其子类）。当这些异常被抛出时，它们不会出现在控制台中，因为它们被视为正常应用程序流程的一部分。同样，对于其他内置异常，如 __INLINE_CODE_50__ 和 __INLINE_CODE_51__，也不会记录。
+
+这些异常都继承自基础 __INLINE_CODE_52__ 类，该类从 __INLINE_CODE_53__ 包中导出。这类帮助 differentiation 两个异常：一个是正常应用程序操作的异常，另一个是不是。
+
+如果您想记录这些异常，可以创建一个自定义的异常过滤器。我们将在下一节中解释如何做到。
 
 #### 自定义异常
 
-在许多情况下，您不需要编写自定义异常，可以使用内置的 Nest HTTP 异常，如下一节所述。如果您确实需要创建自定义异常，最佳实践是创建自己的 **异常层次结构**，其中您的自定义异常继承自基础 `HttpException` 类。通过这种方法，Nest 将识别您的异常，并自动处理错误响应。让我们实现这样的自定义异常：
+在许多情况下，您不需要编写自定义异常，可以使用 Nest 的内置 HTTP 异常，如下节所述。如果您需要创建自定义异常，创建您的 **异常层次结构**，其中您的自定义异常继承自基础 __INLINE_CODE_54__ 类。这样，Nest 就会识别您的异常，并自动处理错误响应。让我们实现这样一个自定义异常：
 
-```typescript
-export class ForbiddenException extends HttpException {
-  constructor() {
-    super('Forbidden', HttpStatus.FORBIDDEN);
-  }
-}
+```bash
+# Lint and autofix with eslint
+$ npm run lint
 
-```
-
-由于 `ForbiddenException` 扩展了基础 `HttpException`，它将与内置异常处理程序无缝协作，因此我们可以在 `findAll()` 方法中使用它。
-
-```typescript
-@Get()
-async findAll() {
-  throw new ForbiddenException();
-}
+# Format with prettier
+$ npm run format
 
 ```
 
-#### 内置 HTTP 异常
+由于 __INLINE_CODE_55__ 扩展了基础 __INLINE_CODE_56__ 类，因此它将与内置的异常处理程序一起工作，并且可以在 __INLINE_CODE_57__ 方法中使用。
 
-Nest 提供了一组标准异常，它们继承自基础 `HttpException`。这些异常从 `@nestjs/common` 包中导出，代表许多最常见的 HTTP 异常：
+__CODE_BLOCK_6__
 
-- `BadRequestException`
-- `UnauthorizedException`
-- `NotFoundException`
-- `ForbiddenException`
-- `NotAcceptableException`
-- `RequestTimeoutException`
-- `ConflictException`
-- `GoneException`
-- `HttpVersionNotSupportedException`
-- `PayloadTooLargeException`
-- `UnsupportedMediaTypeException`
-- `UnprocessableEntityException`
-- `InternalServerErrorException`
-- `NotImplementedException`
-- `ImATeapotException`
-- `MethodNotAllowedException`
-- `BadGatewayException`
-- `ServiceUnavailableException`
-- `GatewayTimeoutException`
-- `PreconditionFailedException`
+#### 内置 HTTP 异常Here is the translation of the provided technical documentation to Chinese:
 
-所有内置异常还可以使用 `options` 参数提供错误 `cause` 和错误描述：
+Nest 提供了一组标准的异常类，它们继承自基础类 `__INLINE_CODE_58__`。这些异常类来自 `__INLINE_CODE_59__` 包，并且代表了许多最常见的 HTTP 异常：
 
-```typescript
-throw new BadRequestException('Something bad happened', {
-  cause: new Error(),
-  description: 'Some error description',
-});
+- `__INLINE_CODE_60__`
+- `__INLINE_CODE_61__`
+- `__INLINE_CODE_62__`
+- `__INLINE_CODE_63__`
+- `__INLINE_CODE_64__`
+- `__INLINE_CODE_65__`
+- `__INLINE_CODE_66__`
+- `__INLINE_CODE_67__`
+- `__INLINE_CODE_68__`
+- `__INLINE_CODE_69__`
+- `__INLINE_CODE_70__`
+- `__INLINE_CODE_71__`
+- `__INLINE_CODE_72__`
+- `__INLINE_CODE_73__`
+- `__INLINE_CODE_74__`
+- `__INLINE_CODE_75__`
+- `__INLINE_CODE_76__`
+- `__INLINE_CODE_77__`
+- `__INLINE_CODE_78__`
+- `__INLINE_CODE_79__`
 
-```
+所有内置的异常类都可以提供错误信息和错误描述，使用 `__INLINE_CODE_81__` 参数：
 
-使用上述代码，响应将如下所示：
+`__CODE_BLOCK_7__`
 
-```json
-{
-  "message": "Something bad happened",
-  "error": "Some error description",
-  "statusCode": 400
-}
+使用上述信息，这就是响应的外观：
 
-```
+`__CODE_BLOCK_8__`
 
 #### 异常过滤器
 
-虽然基础（内置）异常过滤器可以自动处理许多情况，但您可能希望对异常层进行 **完全控制**。例如，您可能希望添加日志记录或基于某些动态因素使用不同的 JSON 模式。**异常过滤器** 正是为此目的而设计的。它们允许您控制确切的控制流和发送回客户端的响应内容。
+虽然基础（内置）异常过滤器可以自动处理许多情况，但是您可能想要完全控制异常层。例如，您可能想要添加日志或使用不同的 JSON schema，根据一些动态因素。 **异常过滤器** 正是为此目的设计的。它们让您控制具体的控制流和客户端接收的响应内容。
 
-让我们创建一个异常过滤器，负责捕获属于 `HttpException` 类实例的异常，并为它们实现自定义响应逻辑。为此，我们需要访问底层平台的 `Request` 和 `Response` 对象。我们将访问 `Request` 对象，以便提取原始 `url` 并将其包含在日志信息中。我们将使用 `Response` 对象来直接控制发送的响应，使用 `response.json()` 方法。
+让我们创建一个异常过滤器，它负责捕捉 `__INLINE_CODE_82__` 类型的异常，并实现自定义响应逻辑。为了实现这一点，我们需要访问 underlying 平台 `__INLINE_CODE_83__` 和 `__INLINE_CODE_84__` 对象。我们将访问 `__INLINE_CODE_85__` 对象，以便将原始 `__INLINE_CODE_86__` 包含在日志信息中。我们将使用 `__INLINE_CODE_87__` 对象来控制响应，并使用 `__INLINE_CODE_88__` 方法。
 
-```typescript
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException } from '@nestjs/common';
-import { Request, Response } from 'express';
+`__CODE_BLOCK_9__`
 
-@Catch(HttpException)
-export class HttpExceptionFilter implements ExceptionFilter {
-  catch(exception: HttpException, host: ArgumentsHost) {
-    const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
-    const status = exception.getStatus();
+> 信息 **提示** 所有异常过滤器都应该实现通用的 `__INLINE_CODE_89__` 接口。这要求您提供带有指定签名的 `__INLINE_CODE_90__` 方法。 `__INLINE_CODE_91__` 表示异常的类型。
 
-    response
-      .status(status)
-      .json({
-        statusCode: status,
-        timestamp: new Date().toISOString(),
-        path: request.url,
-      });
-  }
-}
+> 警告 **警告** 如果您使用 `__INLINE_CODE_92__`，可以使用 `__INLINE_CODE_93__` 而不是 `__INLINE_CODE_94__`。不要忘记从 `__INLINE_CODE_95__` 导入正确的类型。
 
-@Catch(HttpException)
-export class HttpExceptionFilter {
-  catch(exception, host) {
-    const ctx = host.switchToHttp();
-    const response = ctx.getResponse();
-    const request = ctx.getRequest();
-    const status = exception.getStatus();
+`__INLINE_CODE_96__` 装饰器将所需的元数据绑定到异常过滤器，告诉 Nest 这个特定的过滤器正在寻找 `__INLINE_CODE_97__` 类型的异常，并且什么都不做。 `__INLINE_CODE_98__` 装饰器可能需要一个参数，或者是一个逗号分隔的列表。这让您可以设置多个类型的异常过滤器。
 
-    response
-      .status(status)
-      .json({
-        statusCode: status,
-        timestamp: new Date().toISOString(),
-        path: request.url,
-      });
-  }
-}
+#### Arguments host
 
-```
+让我们来看看 `__INLINE_CODE_99__` 方法的参数。 `__INLINE_CODE_100__` 参数是当前被处理的异常对象。 `__INLINE_CODE_101__` 参数是一个 `__INLINE_CODE_102__` 对象。 `__INLINE_CODE_103__` 是一个强大的实用对象，我们将在 `__LINK_149__` 中详细介绍。在这个代码样本中，我们使用它来获取原始请求处理器（在控制器中）传递的 `__INLINE_CODE_104__` 和 `__INLINE_CODE_105__` 对象。在这个代码样本中，我们使用了 `__INLINE_CODE_106__` 的一些帮助方法来获取所需的 `__INLINE_CODE_107__` 和 `__INLINE_CODE_108__` 对象。了解更多关于 `__INLINE_CODE_109__` 的信息，查看 `__LINK_150__`。
 
-> info **提示** 所有异常过滤器都应该实现泛型 `ExceptionFilter<T>` 接口。这要求您提供 `catch(exception: T, host: ArgumentsHost)` 方法及其指定的签名。`T` 表示异常的类型。
+* 这种抽象的原因是 `__INLINE_CODE_110__` 函数在所有上下文（例如，我们正在工作的 HTTP 服务器上下文，但也适用于微服务和 WebSocket），使用 `__INLINE_CODE_111__` 和它的帮助函数，可以访问适当的 `HTML_TAG_141` underlying arguments `HTML_TAG_142` 对象，以便在任何上下文中写入通用的异常过滤器。
 
-> warning **警告** 如果您使用 `@nestjs/platform-fastify`，您可以使用 `response.send()` 而不是 `response.json()`。不要忘记从 `fastify` 导入正确的类型。
-
-`@Catch(HttpException)` 装饰器将所需的元数据绑定到异常过滤器，告诉 Nest 这个特定过滤器正在寻找 `HttpException` 类型的异常，而不是其他异常。`@Catch()` 装饰器可以接受单个参数或逗号分隔的列表。这允许您为多种类型的异常设置过滤器。
-
-#### 参数主机
-
-让我们看一下 `catch()` 方法的参数。`exception` 参数是当前正在处理的异常对象。`host` 参数是一个 `ArgumentsHost` 对象。`ArgumentsHost` 是一个强大的实用程序对象，我们将在 [执行上下文章节](/fundamentals/execution-context)\* 中进一步研究。在此代码示例中，我们使用它来获取传递给原始请求处理程序（在异常起源的控制器中）的 `Request` 和 `Response` 对象的引用。在此代码示例中，我们使用了 `ArgumentsHost` 上的一些辅助方法来获取所需的 `Request` 和 `Response` 对象。了解更多关于 `ArgumentsHost` 的信息 [这里](/fundamentals/execution-context)。
-
-\*这种抽象级别的原因是 `ArgumentsHost` 在所有上下文中都起作用（例如，我们现在正在使用的 HTTP 服务器上下文，以及微服务和 WebSockets）。在执行上下文章节中，我们将看到如何使用 `ArgumentsHost` 及其辅助函数的强大功能访问 **任何** 执行上下文的适当 <a href="/fundamentals/execution-context#host-methods">底层参数</a>。这将允许我们编写在所有上下文中运行的通用异常过滤器。
-
-<app-banner-courses></app-banner-courses>
+`HTML_TAG_143____HTML_TAG_144__`
 
 #### 绑定过滤器
 
-让我们将我们的新 `HttpExceptionFilter` 绑定到 `CatsController` 的 `create()` 方法。
+让我们将我们的 `__INLINE_CODE_112__` 绑定到 `__INLINE_CODE_113__` 的 `__INLINE_CODE_114__` 方法。
 
-```typescript
-@Post()
-@UseFilters(new HttpExceptionFilter())
-async create(@Body() createCatDto: CreateCatDto) {
-  throw new ForbiddenException();
-}
+`__CODE_BLOCK_10__`
 
-```
+> 信息 **提示** `__INLINE_CODE_115__` 装饰器来自 `__INLINE_CODE_116__` 包。
 
-> info **提示** `@UseFilters()` 装饰器从 `@nestjs/common` 包中导入。
+我们在这里使用了 `__INLINE_CODE_117__` 装饰器。类似于 `__INLINE_CODE_118__` 装饰器，它可以接受单个过滤器实例，或者一个逗号分隔的列表。在这里，我们创建了 `__INLINE_CODE_以下是根据规则翻译的中文文档：
 
-我们在这里使用了 `@UseFilters()` 装饰器。与 `@Catch()` 装饰器类似，它可以接受单个过滤器实例或逗号分隔的过滤器实例列表。在这里，我们就地创建了 `HttpExceptionFilter` 的实例。或者，您可以传递类（而不是实例），将实例化的责任留给框架，并启用 **依赖注入**。
+在上面的示例中，__INLINE_CODE_120__仅应用于单个__INLINE_CODE_121__路由处理器，使其方法作用域。异常过滤器可以在不同的级别上作用：控制器/解决方案/网关的方法作用域、控制器作用域或全局作用域。
 
-```typescript
-@Post()
-@UseFilters(HttpExceptionFilter)
-async create(@Body() createCatDto: CreateCatDto) {
-  throw new ForbiddenException();
-}
+例如，要将过滤器设置为控制器作用域，可以执行以下操作：
 
-```
+__CODE_BLOCK_12__
 
-> info **提示** 尽可能通过使用类而不是实例来应用过滤器。这会减少 **内存使用**，因为 Nest 可以轻松地在整个模块中重用同一类的实例。
+这段代码将设置__INLINE_CODE_122__为控制器中的每个路由处理器。
 
-在上面的示例中，`HttpExceptionFilter` 仅应用于单个 `create()` 路由处理程序，使其成为方法范围的。异常过滤器可以在不同级别范围内使用：控制器/解析器/网关的方法范围、控制器范围或全局范围。
-例如，要将过滤器设置为控制器范围，您可以执行以下操作：
+要创建全局作用域的过滤器，可以执行以下操作：
 
-```typescript
-@Controller()
-@UseFilters(new HttpExceptionFilter())
-export class CatsController {}
+__CODE_BLOCK_13__
 
-```
+> warning **注意** __INLINE_CODE_124__方法不设置网关或混合应用程序的过滤器。
 
-此构造为 `CatsController` 内定义的每个路由处理程序设置了 `HttpExceptionFilter`。
+全局过滤器对整个应用程序有效，对每个控制器和每个路由处理器都有效。在依赖注入中，注册于非模块外的全局过滤器（如示例中的__INLINE_CODE_125__）不能注入依赖项。为了解决这个问题，可以在模块中注册全局过滤器，使用以下构造：
 
-要创建全局范围的过滤器，您可以执行以下操作：
+__CODE_BLOCK_14__
 
-```typescript
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.useGlobalFilters(new HttpExceptionFilter());
-  await app.listen(process.env.PORT ?? 3000);
-}
-bootstrap();
+> info **提示** 在使用该方法时注入依赖项时，注意该过滤器实际上是全局的。选择在哪个模块中定义该过滤器（如示例中的__INLINE_CODE_126__）。也可以使用__INLINE_CODE_127__来处理自定义提供商注册。了解更多__LINK_151__。
 
-```
+可以添加多个过滤器，以便在 providers 数组中添加每个过滤器。
 
-> warning **警告** `useGlobalFilters()` 方法不为网关或混合应用程序设置过滤器。
+#### 捕获一切
 
-全局范围的过滤器用于整个应用程序，适用于每个控制器和每个路由处理程序。在依赖注入方面，从任何模块外部注册的全局过滤器（如上面示例中的 `useGlobalFilters()`）不能注入依赖项，因为这是在任何模块的上下文之外完成的。为了解决这个问题，您可以使用以下构造 **直接从任何模块** 注册全局范围的过滤器：
+要捕获**所有**未捕获的异常（不管异常类型），请将__INLINE_CODE_128__装饰器的参数列表留空，例如__INLINE_CODE_129__。
 
-```typescript
-import { Module } from '@nestjs/common';
-import { APP_FILTER } from '@nestjs/core';
+以下是一个使用__LINK_152__来传递响应/platform-agnostic 代码的示例：
 
-@Module({
-  providers: [
-    {
-      provide: APP_FILTER,
-      useClass: HttpExceptionFilter,
-    },
-  ],
-})
-export class AppModule {}
+__CODE_BLOCK_15__
 
-```
-
-> info **提示** 当使用这种方法为过滤器执行依赖注入时，请注意，无论在此构造中使用哪个模块，过滤器实际上都是全局的。应该在哪里做？选择定义过滤器（上面示例中的 `HttpExceptionFilter`）的模块。此外，`useClass` 不是处理自定义提供程序注册的唯一方法。了解更多 [这里](/fundamentals/dependency-injection)。
-
-您可以根据需要使用此技术添加任意数量的过滤器；只需将每个过滤器添加到 providers 数组中即可。
-
-#### 捕获所有异常
-
-为了捕获 **所有** 未处理的异常（无论异常类型如何），请将 `@Catch()` 装饰器的参数列表留空，例如 `@Catch()`。
-
-在下面的示例中，我们有一个与平台无关的代码，因为它使用 [HTTP 适配器](./faq/http-adapter) 来传递响应，并且不直接使用任何平台特定的对象（`Request` 和 `Response`）：
-
-```typescript
-import {
-  ExceptionFilter,
-  Catch,
-  ArgumentsHost,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
-import { HttpAdapterHost } from '@nestjs/core';
-
-@Catch()
-export class CatchEverythingFilter implements ExceptionFilter {
-  constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
-
-  catch(exception: unknown, host: ArgumentsHost): void {
-    // In certain situations `httpAdapter` might not be available in the
-    // constructor method, thus we should resolve it here.
-    const { httpAdapter } = this.httpAdapterHost;
-
-    const ctx = host.switchToHttp();
-
-    const httpStatus =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
-
-    const responseBody = {
-      statusCode: httpStatus,
-      timestamp: new Date().toISOString(),
-      path: httpAdapter.getRequestUrl(ctx.getRequest()),
-    };
-
-    httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
-  }
-}
-
-```
-
-> warning **警告** 当将捕获所有异常的异常过滤器与绑定到特定类型的过滤器结合使用时，应首先声明 "捕获所有" 过滤器，以允许特定过滤器正确处理绑定类型。
+> warning **注意** 组合捕获一切的异常过滤器和绑定到特定类型的过滤器时，“Catch anything”过滤器应该首先声明，以便正确地处理绑定的类型。
 
 #### 继承
 
-通常，您会创建完全自定义的异常过滤器，以满足您的应用程序需求。然而，可能存在一些用例，您希望简单地扩展内置的默认 **全局异常过滤器**，并基于某些因素覆盖行为。
+通常，您将创建完全自定义的异常过滤器，以满足您的应用程序需求。然而，在某些情况下，您可能想要简单地继承内置的默认**全局异常过滤器**，并在必要时 override行为基于某些因素。
 
-为了将异常处理委托给基础过滤器，您需要扩展 `BaseExceptionFilter` 并调用继承的 `catch()` 方法。
+要将异常处理委托给基础过滤器，您需要扩展__INLINE_CODE_132__并调用继承的__INLINE_CODE_133__方法。
 
-```typescript
-import { Catch, ArgumentsHost } from '@nestjs/common';
-import { BaseExceptionFilter } from '@nestjs/core';
+__CODE_BLOCK_16__
 
-@Catch()
-export class AllExceptionsFilter extends BaseExceptionFilter {
-  catch(exception: unknown, host: ArgumentsHost) {
-    super.catch(exception, host);
-  }
-}
+> warning **注意** 方法作用域和控制器作用域的过滤器不能使用__INLINE_CODE_135__实例化。相反，让框架自动实例化它们。
 
-@Catch()
-export class AllExceptionsFilter extends BaseExceptionFilter {
-  catch(exception, host) {
-    super.catch(exception, host);
-  }
-}
+全局过滤器**可以**继承基础过滤器。这可以通过两种方法完成。
 
-```
+第一个方法是在实例化自定义全局过滤器时注入__INLINE_CODE_136__引用：
 
-> warning **警告** 扩展 `BaseExceptionFilter` 的方法范围和控制器范围的过滤器不应使用 `new` 实例化。相反，让框架自动实例化它们。
+__CODE_BLOCK_17__
 
-全局过滤器 **可以** 扩展基础过滤器。这可以通过两种方式之一完成。
-
-第一种方法是在实例化自定义全局过滤器时注入 `HttpAdapter` 引用：
-
-```typescript
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-
-  const { httpAdapter } = app.get(HttpAdapterHost);
-  app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
-
-  await app.listen(process.env.PORT ?? 3000);
-}
-bootstrap();
-
-```
-
-第二种方法是使用 `APP_FILTER` 令牌 <a href="exception-filters#绑定过滤器">如这里所示</a>。
+第二个方法是使用__INLINE_CODE_137__ token__HTML_TAG_145__，如以下代码所示__HTML_TAG_146__。

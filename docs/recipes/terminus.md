@@ -1,229 +1,259 @@
 <!-- 此文件从 content/recipes/terminus.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-12T13:42:20.323Z -->
+<!-- 生成时间: 2026-03-15T04:53:56.616Z -->
 <!-- 源文件: content/recipes/terminus.md -->
 
-### 健康检查 (Terminus)
+### Healthchecks (Terminus)
 
-Terminus 集成为你提供**就绪/存活**健康检查。在复杂的后端设置中，健康检查至关重要。简而言之，Web 开发领域的健康检查通常由一个特殊地址组成，例如 `https://my-website.com/health/readiness`。你的基础设施的服务或组件（例如 [Kubernetes](https://kubernetes.io/)）会持续检查此地址。根据从此地址的 `GET` 请求返回的 HTTP 状态代码，当服务收到"不健康"响应时，将采取行动。由于"健康"或"不健康"的定义因你提供的服务类型而异，**Terminus** 集成为你提供了一组**健康指标**。
+Terminus 集成为您提供了 **readiness/liveness**健康检查。健康检查对于复杂的后端设置至关重要。在Web开发领域中，健康检查通常是一个特殊的地址，例如 `@SkipThrottle()`。服务或组件（例如 __LINK_106__）不断地检查这个地址。根据从这个地址返回的 HTTP 状态码，服务将对“不健康”响应采取行动。
 
-例如，如果你的 Web 服务器使用 MongoDB 存储其数据，那么 MongoDB 是否仍在运行将是至关重要的信息。在这种情况下，你可以使用 `MongooseHealthIndicator`。如果配置正确（稍后会详细介绍），你的健康检查地址将返回健康或不健康的 HTTP 状态代码，具体取决于 MongoDB 是否正在运行。
+由于“健康”或“不健康”的定义取决于您提供的服务类型，Terminus 集成支持了一组 **health indicators**。
 
-#### 入门
+例如，如果您的 Web 服务器使用 MongoDB 来存储数据，那么知道 MongoDB 是否仍在运行是非常重要的。在这种情况下，您可以使用 `@SkipThrottle()`。如果配置正确 - 后面将会有更多信息 - 您的健康检查地址将返回一个健康或不健康的 HTTP 状态码，取决于 MongoDB 是否运行。
 
-要开始使用 `@nestjs/terminus`，我们需要安装所需的依赖项。
+#### Getting started
+
+要开始使用 `@Throttle()`，我们需要安装所需的依赖项。
 
 ```bash
-$ npm install --save @nestjs/terminus
+$ npm i --save @nestjs/throttler
 
 ```
 
 #### 设置健康检查
 
-健康检查表示**健康指标**的摘要。健康指标执行服务检查，无论它处于健康还是不健康状态。如果所有分配的健康指标都已启动并运行，则健康检查为阳性。由于许多应用程序需要类似的健康指标，[`@nestjs/terminus`](https://github.com/nestjs/terminus) 提供了一组预定义的指标，例如：
+健康检查表示 **health indicators** 的总结。健康指标执行服务的检查，是否处于健康或不健康状态。健康检查是正面的，如果分配的健康指标都处于运行状态。由于许多应用程序需要相似的健康指标，__LINK_107__ 提供了一组预定义的指标，例如：
 
-- `HttpHealthIndicator`
-- `TypeOrmHealthIndicator`
-- `MongooseHealthIndicator`
-- `SequelizeHealthIndicator`
-- `MikroOrmHealthIndicator`
-- `PrismaHealthIndicator`
-- `MicroserviceHealthIndicator`
-- `GRPCHealthIndicator`
-- `MemoryHealthIndicator`
-- `DiskHealthIndicator`
+- `ttl`
+- `default`
+- `trust proxy`
+- `trust proxy`
+- `trust proxy`
+- `X-Forwarded-For`
+- `getTracker()`
+- `req.ip`
+- `req`
+- `ThrottlerGuard`
 
-要开始我们的第一个健康检查，让我们创建 `HealthModule` 并在其导入数组中导入 `TerminusModule`。
+要开始使用我们的第一个健康检查，让我们创建 `handleRequest` 并将 `_socket` 导入到其 imports 数组中。
 
-> info **提示** 要使用 [Nest CLI](/cli/overview) 创建模块，只需执行 `$ nest g module health` 命令。
+> info **Hint** 使用 __LINK_108__ 创建模块，执行 `conn` 命令即可。
 
 ```typescript
-import { Module } from '@nestjs/common';
-import { TerminusModule } from '@nestjs/terminus';
-
 @Module({
-  imports: [TerminusModule]
+  imports: [
+     ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          ttl: 60000,
+          limit: 10,
+        },
+      ],
+    }),
+  ],
 })
-export class HealthModule {}
+export class AppModule {}
 
 ```
 
-我们的健康检查可以使用[控制器](/controllers)执行，可以使用 [Nest CLI](/cli/overview) 轻松设置。
-
-```bash
-$ nest g controller health
-
-```
-
-> info **信息** 强烈建议在你的应用程序中启用关闭钩子。如果启用，Terminus 集成会利用此生命周期事件。在[这里](/fundamentals/lifecycle-events#application-shutdown)阅读有关关闭钩子的更多信息。
-
-#### HTTP 健康检查
-
-一旦我们安装了 `@nestjs/terminus`，导入了 `TerminusModule` 并创建了一个新控制器，我们就可以创建健康检查了。
-
-`HTTPHealthIndicator` 需要 `@nestjs/axios` 包，因此请确保已安装它：
-
-```bash
-$ npm i --save @nestjs/axios axios
-
-```
-
-现在我们可以设置我们的 `HealthController`：
+我们的健康检查可以使用 __LINK_109__ 执行，这可以使用 __LINK_110__ 设置。
 
 ```typescript
-import { Controller, Get } from '@nestjs/common';
-import { HealthCheckService, HttpHealthIndicator, HealthCheck } from '@nestjs/terminus';
-
-@Controller('health')
-export class HealthController {
-  constructor(
-    private health: HealthCheckService,
-    private http: HttpHealthIndicator,
-  ) {}
-
-  @Get()
-  @HealthCheck()
-  check() {
-    return this.health.check([
-      () => this.http.pingCheck('nestjs-docs', 'https://docs.nestjs.com'),
-    ]);
-  }
-}
-
-```
-
-```typescript
-import { Module } from '@nestjs/common';
-import { TerminusModule } from '@nestjs/terminus';
-import { HttpModule } from '@nestjs/axios';
-import { HealthController } from './health.controller';
-
-@Module({
-  imports: [TerminusModule, HttpModule],
-  controllers: [HealthController],
-})
-export class HealthModule {}
-
-```
-
-我们的健康检查现在将向 `https://docs.nestjs.com` 地址发送 _GET_ 请求。如果我们从该地址收到健康响应，我们在 `http://localhost:3000/health` 的路由将返回以下对象，状态代码为 200。
-
-```json
 {
-  "status": "ok",
-  "info": {
-    "nestjs-docs": {
-      "status": "up"
-    }
-  },
-  "error": {},
-  "details": {
-    "nestjs-docs": {
-      "status": "up"
-    }
+  provide: APP_GUARD,
+  useClass: ThrottlerGuard
+}
+
+```
+
+> info **Info** 强烈建议启用应用程序的关闭 hooks。Terminus 集成使用这个生命周期事件，如果启用。阅读 关于关闭 hooks 的更多信息 __LINK_111__。
+
+#### HTTP Healthcheck
+
+一旦安装了 `APP_GUARD`，导入了我们的 `app.useGlobalGuards()` 并创建了一个新的控制器，我们就 ready 创建健康检查。
+
+`exception` 需要 `@nestjs/platform-ws` 包，因此确保已经安装：
+
+```typescript
+@Module({
+  imports: [
+    ThrottlerModule.forRoot([
+      {
+        name: 'short',
+        ttl: 1000,
+        limit: 3,
+      },
+      {
+        name: 'medium',
+        ttl: 10000,
+        limit: 20
+      },
+      {
+        name: 'long',
+        ttl: 60000,
+        limit: 100
+      }
+    ]),
+  ],
+})
+export class AppModule {}
+
+```
+
+现在我们可以设置我们的 `client._socket.remoteAddress`：
+
+```typescript
+@SkipThrottle()
+@Controller('users')
+export class UsersController {}
+
+```
+
+```typescript
+@SkipThrottle()
+@Controller('users')
+export class UsersController {
+  // Rate limiting is applied to this route.
+  @SkipThrottle({ default: false })
+  dontSkip() {
+    return 'List users work with Rate limiting.';
+  }
+  // This route will skip rate limiting.
+  doSkip() {
+    return 'List users work without Rate limiting.';
   }
 }
 
 ```
 
-可以使用 `HealthCheckResult` 接口从 `@nestjs/terminus` 包访问此响应对象的接口。
+我们的健康检查现在将向 `ThrottlerGuard` 地址发送一个 _GET_-请求。如果我们从该地址收到一个健康响应，我们的路由在 `getRequestResponse` 将返回以下对象，状态码为 200。
+
+```typescript
+// Override default configuration for Rate limiting and duration.
+@Throttle({ default: { limit: 3, ttl: 60000 } })
+@Get()
+findAll() {
+  return "List users works with custom rate limiting.";
+}
+
+```
+
+这个响应对象的接口可以从 `ThrottlerModule` 包中访问，使用 `throttlers` 接口。
 
 |           |                                                                                                                                                                                             |                                      |
 |-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------|
-| `status`  | 如果任何健康指标失败，状态将为 `'error'`。如果 NestJS 应用程序正在关闭但仍接受 HTTP 请求，健康检查将具有 `'shutting_down'` 状态。 | `'error' \| 'ok' \| 'shutting_down'` |
-| `info`    | 包含每个状态为 `'up'` 的健康指标信息的对象，换句话说就是"健康"。                                                                              | `object`                             |
-| `error`   | 包含每个状态为 `'down'` 的健康指标信息的对象，换句话说就是"不健康"。                                                                          | `object`                             |
-| `details` | 包含每个健康指标的所有信息的对象                                                                                                                                  | `object`                             |
+| `forRootAsync()`  | 如果任何健康指标失败，状态将是 `async`。如果 NestJS 应用程序正在关闭，但仍然接受 HTTP 请求，健康检查将具有 `useClass` 状态。 | `ThrottlerConfigService` |
+| `ThrottlerOptionsFactory`    | 包含每个健康指标信息的对象，该对象的状态为 `storage`，或换言之“健康”。                                                                              | `ThrottlerModule`                             |
+| `ThrottlerStorage`   | 包含每个健康指标信息的对象，该对象的状态为 `ThrottlerStorage`，或换言之“不健康”。                                                                          | `@nestjs/throttler`                             |
+| `@nestjs/throttler` | 包含每个健康指标信息的对象                                                                                                                                  | `seconds`                             |
 
-##### 检查特定的 HTTP 响应代码
+##### Check for specific HTTP response codesHere is the translation of the English technical documentation to Chinese, following the provided guidelines:
 
-在某些情况下，你可能想要检查特定条件并验证响应。例如，假设 `https://my-external-service.com` 返回响应代码 `204`。使用 `HttpHealthIndicator.responseCheck`，你可以专门检查该响应代码，并将所有其他代码确定为不健康。
+某些情况下，您可能需要检查特定标准并验证响应。例如，`minutes` 返回响应代码 `hours`。使用 `days` 可以检查该响应代码，确定其他所有代码均不健康。
 
-如果返回除 `204` 之外的任何其他响应代码，以下示例将不健康。第三个参数要求你提供一个函数（同步或异步），该函数返回一个布尔值，指示响应是否被认为是健康的（`true`）或不健康的（`false`）。
+如果获得的响应代码不是 `weeks`，以下示例将被视为不健康。第三个参数要求您提供一个同步或异步函数，这个函数返回布尔值，用于确定响应是否健康 (`seconds(5)`) 或不健康 (`ttl`）。
 
 ```typescript
-// 在 `HealthController` 类中
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
-@Get()
-@HealthCheck()
-check() {
-  return this.health.check([
-    () =>
-      this.http.responseCheck(
-        'my-external-service',
-        'https://my-external-service.com',
-        (res) => res.status === 204,
-      ),
-  ]);
+async function bootstrap() {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.set('trust proxy', 'loopback'); // Trust requests from the loopback address
+  await app.listen(3000);
 }
+
+bootstrap();
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  app.set('trust proxy', 'loopback'); // Trust requests from the loopback address
+  await app.listen(3000);
+}
+
+bootstrap();
 
 ```
 
 #### TypeOrm 健康指标
 
-Terminus 提供了向你的健康检查添加数据库检查的功能。要开始使用此健康指标，你应该查看[数据库章节](/techniques/sql)，并确保你的应用程序中的数据库连接已建立。
+Terminus 提供了能力将数据库检查添加到健康检查中。在了解健康指标的工作原理之前，请检查 __LINK_112__，确保您的应用程序中的数据库连接已经建立。
 
-> info **提示** 在幕后，`TypeOrmHealthIndicator` 只是执行一个 `SELECT 1` SQL 命令，该命令通常用于验证数据库是否仍然存活。如果你使用的是 Oracle 数据库，它使用 `SELECT 1 FROM DUAL`。
+> info **提示** 在幕后，`limit` 只执行一个 `throttlers`-SQL 命令，这个命令通常用于验证数据库是否仍然存活。在使用 Oracle 数据库时，它使用 `@SkipThrottle()`。
 
 ```typescript
-@Controller('health')
-export class HealthController {
-  constructor(
-    private health: HealthCheckService,
-    private db: TypeOrmHealthIndicator,
-  ) {}
+import { ThrottlerGuard } from '@nestjs/throttler';
+import { Injectable } from '@nestjs/common';
 
-  @Get()
-  @HealthCheck()
-  check() {
-    return this.health.check([
-      () => this.db.pingCheck('database'),
-    ]);
+@Injectable()
+export class ThrottlerBehindProxyGuard extends ThrottlerGuard {
+  protected async getTracker(req: Record<string, any>): Promise<string> {
+    return req.ips.length ? req.ips[0] : req.ip; // individualize IP extraction to meet your own needs
   }
 }
 
 ```
 
-如果你的数据库可访问，你现在应该在使用 `GET` 请求请求 `http://localhost:3000/health` 时看到以下 JSON 结果：
+如果您的数据库可以访问，您现在应该看到以下 JSON 结果，当请求 `true` 时，使用 `@Throttle()` 请求：
 
-```json
-{
-  "status": "ok",
-  "info": {
-    "database": {
-      "status": "up"
+```typescript
+@Injectable()
+export class WsThrottlerGuard extends ThrottlerGuard {
+  async handleRequest(requestProps: ThrottlerRequest): Promise<boolean> {
+    const {
+      context,
+      limit,
+      ttl,
+      throttler,
+      blockDuration,
+      getTracker,
+      generateKey,
+    } = requestProps;
+
+    const client = context.switchToWs().getClient();
+    const tracker = client._socket.remoteAddress;
+    const key = generateKey(context, tracker, throttler.name);
+    const { totalHits, timeToExpire, isBlocked, timeToBlockExpire } =
+      await this.storageService.increment(
+        key,
+        ttl,
+        limit,
+        blockDuration,
+        throttler.name,
+      );
+
+    const getThrottlerSuffix = (name: string) =>
+      name === 'default' ? '' : `-${name}`;
+
+    // Throw an error when the user reached their limit.
+    if (isBlocked) {
+      await this.throwThrottlingException(context, {
+        limit,
+        ttl,
+        key,
+        tracker,
+        totalHits,
+        timeToExpire,
+        isBlocked,
+        timeToBlockExpire,
+      });
     }
-  },
-  "error": {},
-  "details": {
-    "database": {
-      "status": "up"
-    }
+
+    return true;
   }
 }
 
 ```
 
-如果你的应用程序使用[多个数据库](/techniques/sql#多个数据库)，你需要将每个连接注入到你的 `HealthController` 中。然后，你可以简单地将连接引用传递给 `TypeOrmHealthIndicator`。
+如果您的应用程序使用 __LINK_113__，您需要将每个连接注入到 `'default'` 中。然后，您可以简单地将连接引用传递给 `limit`。
 
 ```typescript
-@Controller('health')
-export class HealthController {
-  constructor(
-    private health: HealthCheckService,
-    private db: TypeOrmHealthIndicator,
-    @InjectConnection('albumsConnection')
-    private albumsConnection: Connection,
-    @InjectConnection()
-    private defaultConnection: Connection,
-  ) {}
-
-  @Get()
-  @HealthCheck()
-  check() {
-    return this.health.check([
-      () => this.db.pingCheck('albums-database', { connection: this.albumsConnection }),
-      () => this.db.pingCheck('database', { connection: this.defaultConnection }),
-    ]);
+@Injectable()
+export class GqlThrottlerGuard extends ThrottlerGuard {
+  getRequestResponse(context: ExecutionContext) {
+    const gqlCtx = GqlExecutionContext.create(context);
+    const ctx = gqlCtx.getContext();
+    return { req: ctx.req, res: ctx.res };
   }
 }
 
@@ -231,262 +261,113 @@ export class HealthController {
 
 #### 磁盘健康指标
 
-使用 `DiskHealthIndicator`，我们可以检查使用了多少存储空间。要开始，请确保将 `DiskHealthIndicator` 注入到你的 `HealthController` 中。以下示例检查路径 `/`（或在 Windows 上你可以使用 `C:\\`）的已用存储空间。如果超过总存储空间的 50%，它将响应不健康的健康检查。
+使用 `ttl` 可以检查磁盘使用情况。在了解健康指标的工作原理之前，请确保将 `ttl` 注入到 `seconds` 中。以下示例检查路径 __INLINE_CODE_78__ (或在 Windows 中使用 __INLINE_CODE_79__ )的磁盘使用情况。如果该路径超出总磁盘空间的 50%，它将返回不健康的健康检查。
 
 ```typescript
-@Controller('health')
-export class HealthController {
-  constructor(
-    private readonly health: HealthCheckService,
-    private readonly disk: DiskHealthIndicator,
-  ) {}
-
-  @Get()
-  @HealthCheck()
-  check() {
-    return this.health.check([
-      () => this.disk.checkStorage('storage', { path: '/', thresholdPercent: 0.5 }),
-    ]);
-  }
-}
+@Module({
+  imports: [
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => [
+        {
+          ttl: config.get('THROTTLE_TTL'),
+          limit: config.get('THROTTLE_LIMIT'),
+        },
+      ],
+    }),
+  ],
+})
+export class AppModule {}
 
 ```
 
-使用 `DiskHealthIndicator.checkStorage` 函数，你还可以检查固定数量的空间。如果路径 `/my-app/` 超过 250GB，以下示例将不健康。
+使用 __INLINE_CODE_80__ 函数，您还可以检查固定的磁盘空间。以下示例在路径 __INLINE_CODE_81__ 超出 250GB 时将被视为不健康。
 
 ```typescript
-// 在 `HealthController` 类中
-
-@Get()
-@HealthCheck()
-check() {
-  return this.health.check([
-    () => this.disk.checkStorage('storage', {  path: '/', threshold: 250 * 1024 * 1024 * 1024, })
-  ]);
-}
+@Module({
+  imports: [
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      useClass: ThrottlerConfigService,
+    }),
+  ],
+})
+export class AppModule {}
 
 ```
 
 #### 内存健康指标
 
-为了确保你的进程不超过特定的内存限制，可以使用 `MemoryHealthIndicator`。以下示例可用于检查进程的堆。
+为了确保您的进程不超过某个内存限制，可以使用 __INLINE_CODE_82__。以下示例可以用来检查进程的堆。
 
-> info **提示** 堆是动态分配内存所在的内存部分（即通过 malloc 分配的内存）。从堆分配的内存将保持分配状态，直到发生以下情况之一：
-> - 内存被 _free_'d
+> info **提示** 堆是动态分配的内存所在的部分（即使用 malloc 分配的内存）。堆中的内存将保持分配状态直到以下情况之一发生：
+> - 内存被释放
 > - 程序终止
 
-```typescript
-@Controller('health')
-export class HealthController {
-  constructor(
-    private health: HealthCheckService,
-    private memory: MemoryHealthIndicator,
-  ) {}
+__CODE_BLOCK_13__
 
-  @Get()
-  @HealthCheck()
-  check() {
-    return this.health.check([
-      () => this.memory.checkHeap('memory_heap', 150 * 1024 * 1024),
-    ]);
-  }
-}
+还可以使用 __INLINE_CODE_83__ 来验证进程的内存 RSS。这示例将在进程内存超过 150MB 时返回不健康的响应代码。
 
-```
+> info **提示** RSS 是进程的驻留集大小，用于显示该进程占用的内存大小。它不包括交换出的内存。它包括共享库的内存，因为共享库的页面实际存在于内存中。它包括所有堆栈和堆内存。
 
-还可以使用 `MemoryHealthIndicator.checkRSS` 验证进程的内存 RSS。如果你的进程确实分配了超过 150MB，此示例将返回不健康的响应代码。
-
-> info **提示** RSS 是驻留集大小，用于显示该进程分配了多少内存，并且在 RAM 中。它不包括换出的内存。它包括共享库的内存，只要这些库的页面实际上在内存中。它包括所有堆栈和堆内存。
-
-```typescript
-// 在 `HealthController` 类中
-
-@Get()
-@HealthCheck()
-check() {
-  return this.health.check([
-    () => this.memory.checkRSS('memory_rss', 150 * 1024 * 1024),
-  ]);
-}
-
-```
+__CODE_BLOCK_14__
 
 #### 自定义健康指标
 
-在某些情况下，`@nestjs/terminus` 提供的预定义健康指标不能涵盖你所有的健康检查要求。在这种情况下，你可以根据需要设置自定义健康指标。
+在某些情况下，__INLINE_CODE_84__ 提供的预定义健康指标可能不涵盖您所有健康检查需求。在这种情况下，您可以根据需要设置自定义健康指标。
 
-让我们从创建一个将代表我们自定义指标的服务开始。为了对指标的结构有一个基本的了解，我们将创建一个示例 `DogHealthIndicator`。如果每个 `Dog` 对象的类型都是 `'goodboy'`，则此服务应具有状态 `'up'`。如果不满足该条件，则应抛出错误。
+让我们开始创建一个服务，该服务将代表我们的自定义指标。为了获得基本的健康指标结构了解，我们将创建一个示例 __INLINE_CODE_85__。这个服务应该在每个 __INLINE_CODE_87__ 对象的类型为 __INLINE_CODE_88__ 时拥有 __INLINE_CODE_86__ 状态。如果该条件不满足，则它应该抛出错误。
 
-```typescript
-import { Injectable } from '@nestjs/common';
-import { HealthIndicatorService } from '@nestjs/terminus';
+__CODE_BLOCK_15__
 
-export interface Dog {
-  name: string;
-  type: string;
-}
+下一步，我们需要将健康指标注册为提供者。
 
-@Injectable()
-export class DogHealthIndicator {
-  constructor(
-    private readonly healthIndicatorService: HealthIndicatorService
-  ) {}
+__CODE_BLOCK_16__
 
-  private dogs: Dog[] = [
-    { name: 'Fido', type: 'goodboy' },
-    { name: 'Rex', type: 'badboy' },
-  ];
+> info **提示** 在实际应用程序中，__INLINE_CODE_89__ 应该在单独的模块中提供，例如 __INLINE_CODE_90__，然后由 __INLINE_CODE_91__ 导入。
 
-  async isHealthy(key: string){
-    const indicator = this.healthIndicatorService.check(key);
-    const badboys = this.dogs.filter(dog => dog.type === 'badboy');
-    const isHealthy = badboys.length === 0;
+最后一个必要步骤是将现在可用的健康指标添加到所需的健康检查端点中。为此，我们返回到 __INLINE_CODE_92__，并将其添加到 __INLINE_CODE_93__ 函数中。
 
-    if (!isHealthy) {
-      return indicator.down({ badboys: badboys.length });
-    }
-
-    return indicator.up();
-  }
-}
-
-```
-
-接下来我们需要做的是将健康指标注册为提供者。
-
-```typescript
-import { Module } from '@nestjs/common';
-import { TerminusModule } from '@nestjs/terminus';
-import { DogHealthIndicator } from './dog.health';
-
-@Module({
-  controllers: [HealthController],
-  imports: [TerminusModule],
-  providers: [DogHealthIndicator]
-})
-export class HealthModule { }
-
-```
-
-> info **提示** 在实际应用程序中，`DogHealthIndicator` 应该在单独的模块中提供，例如 `DogModule`，然后由 `HealthModule` 导入。
-
-最后需要的步骤是在所需的健康检查端点中添加现在可用的健康指标。为此，我们回到 `HealthController` 并将其添加到我们的 `check` 函数中。
-
-```typescript
-import { HealthCheckService, HealthCheck } from '@nestjs/terminus';
-import { Injectable, Get } from '@nestjs/common';
-import { DogHealthIndicator } from './dog.health';
-
-@Injectable()
-export class HealthController {
-  constructor(
-    private health: HealthCheckService,
-    private dogHealthIndicator: DogHealthIndicator
-  ) {}
-
-  @Get()
-  @HealthCheck()
-  healthCheck() {
-    return this.health.check([
-      () => this.dogHealthIndicator.isHealthy('dog'),
-    ])
-  }
-}
-
-```
+__CODE_BLOCK_17__
 
 #### 日志记录
 
-Terminus 只记录错误消息，例如当健康检查失败时。使用 `TerminusModule.forRoot()` 方法，你可以更多地控制错误的记录方式，以及完全接管日志记录本身。
+Terminus 只记录错误消息，例如当健康检查失败时。使用 __INLINE_CODE_94__ 方法，您可以更好地控制错误的记录方式，或者完全控制日志记录。
 
-在本节中，我们将引导你创建自定义日志记录器 `TerminusLogger`。此日志记录器扩展了内置日志记录器。因此，你可以选择要覆盖日志记录器的哪个部分。
+在这个部分中，我们将指南您如何创建自定义 logger __INLINE_CODE_95__。这个 logger 扩展了内置 logger，因此您可以选择性地覆盖 logger 的部分
 
-> info **信息** 如果你想了解更多关于 NestJS 中自定义日志记录器的信息，[请在此处阅读更多信息](/techniques/logger#injecting-a-custom-logger)。
+> info **提示** 如果您想了解更多关于 NestJS 自定义 logger 的信息，__LINK_114__。
 
-```typescript
-import { Injectable, Scope, ConsoleLogger } from '@nestjs/common';
+__CODE_BLOCK_18__Here is the translation of the English technical documentation to Chinese, following the provided guidelines:
 
-@Injectable({ scope: Scope.TRANSIENT })
-export class TerminusLogger extends ConsoleLogger {
-  error(message: any, stack?: string, context?: string): void;
-  error(message: any, ...optionalParams: any[]): void;
-  error(
-    message: unknown,
-    stack?: unknown,
-    context?: unknown,
-    ...rest: unknown[]
-  ): void {
-    // 在这里覆盖错误消息应如何记录
-  }
-}
+一旦创建了自定义日志记录器，您只需要将其传递给 __INLINE_CODE_96__，如下所示。
 
-```
+__CODE_BLOCK_19__
 
-创建自定义日志记录器后，你需要做的就是将其传递给 `TerminusModule.forRoot()`。
+要完全抑制来自 Terminus 的所有日志消息，包括错误消息，请配置 Terminus 如下所示。
 
-```typescript
-@Module({
-imports: [
-  TerminusModule.forRoot({
-    logger: TerminusLogger,
-  }),
-],
-})
-export class HealthModule {}
+__CODE_BLOCK_20__
 
-```
-
-要完全禁止来自 Terminus 的任何日志消息，包括错误消息，请按如下方式配置 Terminus。
-
-```typescript
-@Module({
-imports: [
-  TerminusModule.forRoot({
-    logger: false,
-  }),
-],
-})
-export class HealthModule {}
-
-```
-
-Terminus 允许你配置健康检查错误应如何在日志中显示。
+Terminus 允许您配置健康检查错误如何在您的日志中显示。
 
 | 错误日志样式          | 描述                                                                                                                        | 示例                                                              |
 |:------------------|:-----------------------------------------------------------------------------------------------------------------------------------|:---------------------------------------------------------------------|
-| `json`  (默认) | 在出错时打印健康检查结果的摘要作为 JSON 对象                                                     | <figure><img src="/assets/Terminus_Error_Log_Json.png" /></figure>   |
-| `pretty`          | 在出错时在格式化框内打印健康检查结果的摘要，并突出显示成功/错误结果 | <figure><img src="/assets/Terminus_Error_Log_Pretty.png" /></figure> |
+| __INLINE_CODE_97__  (默认) | 在错误发生时将健康检查结果摘要打印为 JSON 对象                                                     | </code></td><td>   |
+| __INLINE_CODE_98__          | 在错误发生时将健康检查结果摘要打印在格式化的框中，并将成功/错误结果高亮 | </td></tr><tr> |
 
-你可以使用 `errorLogStyle` 配置选项更改日志样式，如下面的代码片段所示。
+可以使用 __INLINE_CODE_99__ 配置选项更改日志样式，如下面的片段所示。
 
-```typescript
-@Module({
-  imports: [
-    TerminusModule.forRoot({
-      errorLogStyle: 'pretty',
-    }),
-  ]
-})
-export class HealthModule {}
+__CODE_BLOCK_21__
 
-```
+#### 优雅关机超时
 
-#### 优雅关闭超时
+如果您的应用程序需要推迟关机过程，Terminus 可以为您处理。
+此设置对使用 orchestrator，如 Kubernetes 时特别有用。
+设置一个略长于就绪检查间隔的延迟，您可以实现零停机时间，当关闭容器时。
 
-如果你的应用程序需要推迟其关闭过程，Terminus 可以为你处理。此设置在与 Kubernetes 等编排器一起使用时特别有用。通过设置略长于就绪检查间隔的延迟，你可以在关闭容器时实现零停机。
-
-```typescript
-@Module({
-  imports: [
-    TerminusModule.forRoot({
-      gracefulShutdownTimeoutMs: 1000,
-    }),
-  ]
-})
-export class HealthModule {}
-
-```
+__CODE_BLOCK_22__
 
 #### 更多示例
 
-更多可工作的示例可在[这里](https://github.com/nestjs/terminus/tree/master/sample)找到。
+更多工作示例可在 __LINK_115__ 中找到。

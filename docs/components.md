@@ -1,229 +1,119 @@
+<!-- 此文件从 content/components.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-15T04:42:05.557Z -->
+<!-- 源文件: content/components.md -->
+
 ### 提供者
 
-提供者是 Nest 中的核心概念。许多基本的 Nest 类，如服务、存储库、工厂和助手，都可以被视为提供者。提供者背后的关键思想是它可以**被注入**为依赖项，允许对象之间形成各种关系。"连接"这些对象的责任在很大程度上由 Nest 运行时系统处理。
+提供者是 Nest 的核心概念。许多基本的 Nest 类，如服务、存储库、工厂和帮助器，可以被视为提供者。提供者的关键思想是，它可以作为依赖项被注入，从而允许对象之间形成各种关系。Nest 运行时系统主要负责将这些对象"连接"起来。
 
-<figure><img class="illustrative-image" src="/assets/Components_1.png" /></figure>
+__HTML_TAG_34____HTML_TAG_35____HTML_TAG_36__
 
-在上一章中，我们创建了一个简单的 `CatsController`。控制器应该处理 HTTP 请求并将更复杂的任务委托给**提供者**。提供者是在 NestJS 模块中声明为 `providers` 的普通 JavaScript 类。有关更多详细信息，请参阅"模块"章节。
+在前一章中，我们创建了一个简单的 `@nestjs/common`. 控制器应该处理 HTTP 请求，并将更复杂的任务委派给 __提供者__。提供者是简单的 JavaScript 类，声明为 `rxjs` 在一个 NestJS 模块中。对于更多信息，please refer to the "Modules" chapter.
 
-> info **提示** 由于 Nest 使你能够以面向对象的方式设计和组织依赖项，我们强烈建议遵循 [SOLID 原则](https://en.wikipedia.org/wiki/SOLID)。
+> info **提示**由于 Nest 允许您以对象导向的方式设计和组织依赖项，我们强烈建议遵循 __LINK_69__。
 
 #### 服务
 
-让我们首先创建一个简单的 `CatsService`。此服务将处理数据存储和检索，它将被 `CatsController` 使用。由于其在管理应用程序逻辑中的作用，它是被定义为提供者的理想候选者。
+让我们开始创建一个简单的 `reflect-metadata`. 这个服务将处理数据存储和检索，并将被用于 __INLINE_CODE_10__.由于其在应用程序逻辑管理中的角色，它是一个理想的候选人，以被定义为提供者。
 
-```typescript
-import { Injectable } from '@nestjs/common';
-import { Cat } from './interfaces/cat.interface';
-
-@Injectable()
-export class CatsService {
-  private readonly cats: Cat[] = [];
-
-  create(cat: Cat) {
-    this.cats.push(cat);
-  }
-
-  findAll(): Cat[] {
-    return this.cats;
-  }
-}
-
-@Injectable()
-export class CatsService {
-  constructor() {
-    this.cats = [];
-  }
-
-  create(cat) {
-    this.cats.push(cat);
-  }
-
-  findAll() {
-    return this.cats;
-  }
-}
+```bash
+$ npm i -g @nestjs/cli
+$ nest new project-name
 
 ```
 
-> info **提示** 要使用 CLI 创建服务，只需执行 `$ nest g service cats` 命令。
+> info **提示**要使用 CLI 创建一个服务，简单地执行 __INLINE_CODE_11__ 命令。
 
-我们的 `CatsService` 是一个基本类，具有一个属性和两个方法。这里的关键添加是 `@Injectable()` 装饰器。此装饰器将元数据附加到类，表明 `CatsService` 是一个可以由 Nest [IoC](https://en.wikipedia.org/wiki/Inversion_of_control) 容器管理的类。
+我们的 __INLINE_CODE_12__ 是一个基本的类，有一个属性和两个方法。关键的添加是 __INLINE_CODE_13__ 装饰器。这装饰器将元数据附加到类上，表明 __INLINE_CODE_14__ 是一个可以被 Nest __LINK_70__ 容器管理的类。
 
-此外，此示例使用了 `Cat` 接口，它可能如下所示：
+此外，该示例还使用了一个 __INLINE_CODE_15__ 接口，这可能类似于以下内容：
 
-```typescript
-export interface Cat {
-  name: string;
-  age: number;
-  breed: string;
-}
-
-```
-
-现在我们有了一个服务类来检索猫，让我们在 `CatsController` 中使用它：
-
-```typescript
-import { Controller, Get, Post, Body } from '@nestjs/common';
-import { CreateCatDto } from './dto/create-cat.dto';
-import { CatsService } from './cats.service';
-import { Cat } from './interfaces/cat.interface';
-
-@Controller('cats')
-export class CatsController {
-  constructor(private catsService: CatsService) {}
-
-  @Post()
-  async create(@Body() createCatDto: CreateCatDto) {
-    this.catsService.create(createCatDto);
-  }
-
-  @Get()
-  async findAll(): Promise<Cat[]> {
-    return this.catsService.findAll();
-  }
-}
-
-@Controller('cats')
-@Dependencies(CatsService)
-export class CatsController {
-  constructor(catsService) {
-    this.catsService = catsService;
-  }
-
-  @Post()
-  @Bind(Body())
-  async create(createCatDto) {
-    this.catsService.create(createCatDto);
-  }
-
-  @Get()
-  async findAll() {
-    return this.catsService.findAll();
-  }
-}
+```bash
+$ git clone https://github.com/nestjs/typescript-starter.git project
+$ cd project
+$ npm install
+$ npm run start
 
 ```
 
-我们使用**构造函数注入**来注入 `CatsService`。在 TypeScript 中，这是通过在构造函数参数上添加类型注解来完成的。在 JavaScript 中，我们使用 `@Dependencies()` 装饰器来指定依赖项。
+现在，我们已经有了一个服务类来检索猫，让我们在 __INLINE_CODE_16__ 内部使用它：
 
-#### 依赖注入
+__CODE_BLOCK_2__
 
-Nest 是建立在强大的设计模式基础上的，主要是**依赖注入**。我们建议在官方 [Angular](https://angular.dev/guide/dependency-injection) 文档中阅读有关此概念的更多信息，因为其原理在 Nest 中非常相似。
+__INLINE_CODE_17__ 通过类构造函数被注入。注意 __INLINE_CODE_18__ 关键字的使用。这简语法允许我们在同一行both 声明和初始化 __INLINE_CODE_19__ 成员，简化了过程。
 
-在 Nest 中，依赖项通常在构造函数中注入，如上面的示例所示。Nest 会解析关系图并在需要时自动注入这些依赖项。
+#### 依赖项注入
 
-#### 注册提供者
+Nest 是基于强大的设计模式，即 **依赖项注入**。我们强烈推荐阅读官方 __LINK_71__ 中关于该概念的文章。
 
-现在我们有了服务类，我们需要在 Nest 中注册它，以便它可以被注入。我们通过在模块的 `providers` 数组中声明它来做到这一点：
+在 Nest 中， thanks to TypeScript 的能力，管理依赖项变得简单，因为它们是根据类型进行解决的。在以下示例中，Nest 将解决 __INLINE_CODE_20__ bằng创建并返回一个 __INLINE_CODE_21__ 实例（或，在单例情况下，返回已经请求过的实例）。然后，这个依赖项将被注入到控制器的构造函数中（或分配到指定的属性中）：
 
-```typescript
-import { Module } from '@nestjs/common';
-import { CatsController } from './cats.controller';
-import { CatsService } from './cats.service';
+__CODE_BLOCK_3__
 
-@Module({
-  controllers: [CatsController],
-  providers: [CatsService],
-})
-export class CatsModule {}
+#### 作用域
 
-```
+提供者通常具有与应用程序生命周期相对应的生命周期（“作用域”）。当应用程序启动时，每个依赖项都必须被解决，即每个提供者都将被实例化。同样，当应用程序关闭时，所有提供者都将被销毁。然而，也可能使提供者 **请求作用域**，即其生命周期与特定的请求相关。您可以在 __LINK_72__ 章中了解这些技术。
+
+__HTML_TAG_37____HTML_TAG_38__
 
 #### 自定义提供者
 
-Nest 有一个内置的依赖注入系统，我们在上面的示例中看到了它的基本用法。在 Nest 中，提供者不仅限于类，还可以是各种不同的提供者，如值、工厂、异步工厂等。更多关于这一点的信息，以及如何创建自定义提供者的详细信息，可以在 [自定义提供者](/fundamentals/dependency-injection) 章节中找到。
+Nest 来自带有反转控制（“IoC”）容器，它管理提供者之间的关系。这特性是依赖项注入的基础，但实际上是比我们所涵盖的还要更加强大。有几种方式可以定义提供者：您可以使用纯值、类和异步或同步工厂。要了解更多关于定义提供者的示例，请查看 __LINK_73__ 章。
 
 #### 可选提供者
 
-有时，你可能需要处理依赖项可能不存在的情况。例如，当你想为可选配置提供默认值时，或者当你想仅在特定条件下注册提供者时。在这种情况下，你可以将依赖项标记为**可选**。
+有时，您可能需要依赖项，但这些依赖项并不总是需要被解决。例如，您的类可能依赖于一个 **配置对象**，但如果没有提供该对象，应该使用默认值。在这种情况下，依赖项被认为是可选的，并且配置提供者的缺失不应导致错误。
 
-```typescript
-import { Injectable, Optional, Inject } from '@nestjs/common';
-import { Cat } from './interfaces/cat.interface';
-import { CREATE_CAT_OPTIONS } from './cats.constants';
+要标记提供者为可选，请在构造函数签名中使用 __INLINE_CODE_22__ 装饰器。
 
-@Injectable()
-export class CatsService {
-  private readonly cats: Cat[] = [];
+__CODE_BLOCK_4__
 
-  constructor(@Optional() @Inject(CREATE_CAT_OPTIONS) private readonly options: object) {}
+在上面的示例中，我们使用了一个自定义提供者，这是为什么我们包括 __INLINE_CODE_23__ 自定义 **token**。前面的示例展示了构造函数注入，where 依赖项通过类在构造函数中被指示。要了解更多关于自定义提供者和相关 token 的信息，请查看 __LINK_74__ 章。
 
-  create(cat: Cat) {
-    this.cats.push(cat);
-  }
+#### 属性注入
 
-  findAll(): Cat[] {
-    return this.cats;
-  }
-}
+... (rest of the translation)Here is the translation of the provided technical documentation from English to Chinese:
 
-@Injectable()
-export class CatsService {
-  constructor(@Optional() @Inject('CREATE_CAT_OPTIONS') options) {
-    this.cats = [];
-    this.options = options;
-  }
+我们之前使用的技术称为构造函数注入方法，其中提供者通过构造函数方法注入。某些特定的情况下，**属性注入**可能非常有用。例如，如果您的顶级类依赖于一个或多个提供者，而将它们传递到子类中变得很复杂，可以在属性级别使用 __INLINE_CODE_25__ 装饰器。
 
-  create(cat) {
-    this.cats.push(cat);
-  }
+__CODE_BLOCK_5__
 
-  findAll() {
-    return this.cats;
-  }
-}
+> 警告 **Warning** 如果您的类不继承另一个类，那么使用 **构造函数注入** 通常更好。构造函数清楚地指定了所需的依赖项，提供了更好的可见性，使代码变得更加易于理解，相比于类属性上使用 __INLINE_CODE_26__。
 
-```
+#### 提供者注册
 
-在此示例中，`CREATE_CAT_OPTIONS` 是一个提供者令牌，我们使用 `@Optional()` 装饰器将其标记为可选。如果该令牌的提供者不存在，`options` 参数将是 `undefined`。
+现在，我们已经定义了一个提供者(__INLINE_CODE_27__)和一个消费者(__INLINE_CODE_28__),需要将服务注册到 Nest 中，以便它可以处理注入。这可以通过编辑模块文件(__INLINE_CODE_29__)，将服务添加到 __INLINE_CODE_30__ 数组中，方法是使用 __INLINE_CODE_31__ 装饰器。
 
-#### 基于属性的注入
+__CODE_BLOCK_6__
 
-在某些非常特殊的情况下，基于属性的注入可能很有用。例如，当顶级类依赖于一个或多个提供者时，而你不想在子类中通过构造函数传递它们。要使用基于属性的注入，你可以使用 `@Inject()` 装饰器：
+Nest 现在将能够解析 __INLINE_CODE_32__ 类的依赖项。
 
-```typescript
-import { Injectable, Inject } from '@nestjs/common';
+到目前为止，我们的目录结构应该如下所示：
 
-@Injectable()
-export class BaseService {
-  @Inject()
-  protected httpService: HttpService;
-}
+__HTML_TAG_39__
+__HTML_TAG_40__src__HTML_TAG_41__
+__HTML_TAG_42__
+__HTML_TAG_43__cats__HTML_TAG_44__
+__HTML_TAG_45__
+__HTML_TAG_46__dto__HTML_TAG_47__
+__HTML_TAG_48__
+__HTML_TAG_49__create-cat.dto.ts__HTML_TAG_50__
+__HTML_TAG_51__
+__HTML_TAG_52__interfaces__HTML_TAG_53__
+__HTML_TAG_54__
+__HTML_TAG_55__cat.interface.ts__HTML_TAG_56__
+__HTML_TAG_57__
+__HTML_TAG_58__cats.controller.ts__HTML_TAG_59__
+__HTML_TAG_60__cats.service.ts__HTML_TAG_61__
+__HTML_TAG_62__
+__HTML_TAG_63__app.module.ts__HTML_TAG_64__
+__HTML_TAG_65__main.ts__HTML_TAG_66__
+__HTML_TAG_67__
+__HTML_TAG_68__
 
-```
+#### 手动实例化
 
-但是，这种技术通常不推荐，因为它使你的代码更难测试，并且可能使依赖关系变得不那么明确。
+到目前为止，我们已经涵盖了 Nest 自动处理大多数依赖项的细节。然而，在某些情况下，您可能需要超出内置的依赖项注入系统，并手动获取或实例化提供者。以下是两种技术的简要讨论。
 
-#### 提供者作用域
-
-提供者通常具有与应用程序生命周期对齐的生命周期（"作用域"）。当应用程序引导时，必须解析每个依赖项，这意味着每个提供者都会被实例化。同样，当应用程序关闭时，所有提供者都会被销毁。然而，也可以使提供者**请求作用域**，这意味着其生命周期与特定请求而不是应用程序的生命周期相关联。你可以在 [依赖注入](/fundamentals/dependency-injection) 章节中了解更多关于这些技术的信息。
-
-#### 模块引用
-
-在某些情况下，你可能需要在运行时动态获取提供者的实例，而不是在构造函数中注入它。例如，当你需要根据某些条件或配置动态选择提供者时。在这种情况下，你可以使用 `ModuleRef` 类：
-
-```typescript
-import { Injectable, ModuleRef } from '@nestjs/common';
-import { Cat } from './interfaces/cat.interface';
-
-@Injectable()
-export class CatsService {
-  private readonly cats: Cat[] = [];
-
-  constructor(private moduleRef: ModuleRef) {}
-
-  create(cat: Cat) {
-    this.cats.push(cat);
-  }
-
-  findAll(): Cat[] {
-    return this.cats;
-  }
-}
-
-```
-
-`ModuleRef` 提供了一个 `get()` 方法，允许你获取已注册提供者的实例。这在动态模块或需要基于某些条件解析提供者的场景中特别有用。
-
-> info **提示** 有关 `ModuleRef` 的更多信息，请参阅 [执行上下文](/fundamentals/execution-context) 章节。
+- 若要获取现有实例或动态实例化提供者，可以使用 __LINK_75__。
+- 若要在 __INLINE_CODE_33__ 函数中获取提供者（例如，用于独立应用程序或在启动时使用配置服务），请查看 __LINK_76__。

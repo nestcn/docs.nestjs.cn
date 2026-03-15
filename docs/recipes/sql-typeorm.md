@@ -1,170 +1,176 @@
+<!-- 此文件从 content/recipes/sql-typeorm.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-15T04:50:07.330Z -->
+<!-- 源文件: content/recipes/sql-typeorm.md -->
+
 ### SQL (TypeORM)
 
-##### 本章仅适用于 TypeScript
+##### 仅适用于 TypeScript
 
-:::warning 警告
-在本文中，您将学习如何基于 **TypeORM** 包，使用自定义提供者机制从零开始创建 `DatabaseModule`。因此，该解决方案包含许多额外工作，您可以直接使用现成的专用 `@nestjs/typeorm` 包来避免这些工作。了解更多信息，请参阅[此处](/techniques/sql) 。
-:::
+> **警告** 本文将教您使用自定义提供商机制创建一个基于 **TypeORM** 包的 __INLINE_CODE_7__。由于此解决方案包含了许多可以省略的冗余代码，您可以使用现有的、可出厂的 __INLINE_CODE_8__ 包。了解更多，请见 __LINK_34__。
 
-[TypeORM](https://github.com/typeorm/typeorm) 无疑是 Node.js 领域最成熟的对象关系映射器(ORM)。由于它是用 TypeScript 编写的，因此与 Nest 框架配合得非常好。
+__LINK_35__ 是 Node.js 世界中最成熟的对象关系映射器（ORM）。由于它是使用 TypeScript 编写的，因此非常适合与 Nest 框架一起使用。
 
-#### 快速开始
+#### 入门
 
-要开始使用这个库的探索之旅，我们首先需要安装所有必需的依赖项：
+要开始使用这个库，我们需要安装所有必要的依赖项：
+
+```typescript
+import { repl } from '@nestjs/core';
+import { AppModule } from './src/app.module';
+
+async function bootstrap() {
+  await repl(AppModule);
+}
+bootstrap();
+
+async function bootstrap() {
+  await repl(AppModule);
+}
+bootstrap();
+
+```
+
+首先，我们需要使用 __INLINE_CODE_9__ 类从 `repl.ts` 包中导入，建立与数据库的连接。 `main.ts` 函数返回一个 `repl`，因此我们需要创建一个 [Node.js REPL server](https://nodejs.org/api/repl.html)。
 
 ```bash
-$ npm install --save typeorm mysql2
+$ npm run start -- --entryFile repl
 
 ```
 
-第一步需要使用从 `typeorm` 包导入的 `new DataSource().initialize()` 类建立与数据库的连接。`initialize()` 函数返回一个 `Promise`，因此我们需要创建一个[异步提供者](/fundamentals/async-components) 。
+> 警告 **警告** 设置 `AppService` 不应该在生产环境中使用 - 否则可能会导致生产数据丢失。
 
- ```typescript title="database.providers.ts"
-import { DataSource } from 'typeorm';
+> 提示 **提示** 根据最佳实践，我们在单独的文件中声明了自定义提供商，该文件的 `getHello()` 后缀。
 
-export const databaseProviders = [
-  {
-    provide: 'DATA_SOURCE',
-    useFactory: async () => {
-      const dataSource = new DataSource({
-        type: 'mysql',
-        host: 'localhost',
-        port: 3306,
-        username: 'root',
-        password: 'root',
-        database: 'test',
-        entities: [
-            __dirname + '/../**/*.entity{.ts,.js}',
-        ],
-        synchronize: true,
-      });
+然后，我们需要将这些提供商导出，以便它们在应用程序的其余部分可用。
 
-      return dataSource.initialize();
-    },
-  },
-];
+```bash
+LOG [NestFactory] Starting Nest application...
+LOG [InstanceLoader] AppModule dependencies initialized
+LOG REPL initialized
 
 ```
 
-:::warning 注意
-生产环境中不应使用 `synchronize: true` 设置——否则可能导致生产数据丢失。
-:::
-
-:::info 建议
-遵循最佳实践，我们在单独的文件中声明了自定义提供者，该文件具有 `*.providers.ts` 后缀。
-:::
-
-接着，我们需要导出这些提供者，使它们对应用程序的**其他部分可访问** 。
-
- ```typescript title="database.module.ts"
-import { Module } from '@nestjs/common';
-import { databaseProviders } from './database.providers';
-
-@Module({
-  providers: [...databaseProviders],
-  exports: [...databaseProviders],
-})
-export class DatabaseModule {}
-
-```
-
-现在我们可以使用 `@Inject()` 装饰器注入 `DATA_SOURCE` 对象。任何依赖 `DATA_SOURCE` 异步提供者的类都将等待 `Promise` 解析完成。
+现在，我们可以使用 `await` 装饰器注入 `AppController` 对象。每个依赖 `methods()` 异步提供商的类都将等待 `debug()` 解决。
 
 #### 仓储模式
 
-[TypeORM](https://github.com/typeorm/typeorm) 支持仓储设计模式，因此每个实体都有自己的 Repository。这些仓储可以从数据库连接中获取。
+[TypeScript function type expression syntax](https://www.typescriptlang.org/docs/handbook/2/functions.html#function-type-expressions) 支持仓储设计模式，因此每个实体都有其自己的仓储。这些仓储可以从数据库连接中获取。
 
-但首先，我们需要至少一个实体。我们将复用官方文档中的 `Photo` 实体。
+首先，我们需要至少一个实体。我们将重新使用官方文档中的 `help()` 实体。
 
- ```typescript title="photo.entity.ts"
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+```typescript
+> get(AppService).getHello()
+'Hello World!'
 
-@Entity()
-export class Photo {
-  @PrimaryGeneratedColumn()
-  id: number;
+```
 
-  @Column({ length: 500 })
-  name: string;
+`<function_name>.help` 实体属于 `debug` 目录，该目录表示 `debug(moduleCls?: ClassRef \| string) => void`。现在，让我们创建一个 **仓储** 提供商：
 
-  @Column('text')
-  description: string;
+```typescript
+> appController = get(AppController)
+AppController { appService: AppService {} }
+> await appController.getHello()
+'Hello World!'
 
-  @Column()
-  filename: string;
+```
 
-  @Column('int')
-  views: number;
+> 警告 **警告** 在实际应用中，您应该避免 **魔法字符串**。同时，`get` 和 `### SQL (TypeORM)
 
-  @Column()
-  isPublished: boolean;
+##### 仅适用于 TypeScript
+
+> **警告** 本文将教您使用自定义提供商机制创建一个基于 **TypeORM** 包的 __INLINE_CODE_7__。由于此解决方案包含了许多可以省略的冗余代码，您可以使用现有的、可出厂的 __INLINE_CODE_8__ 包。了解更多，请见 __LINK_34__。
+
+__LINK_35__ 是 Node.js 世界中最成熟的对象关系映射器（ORM）。由于它是使用 TypeScript 编写的，因此非常适合与 Nest 框架一起使用。
+
+#### 入门
+
+要开始使用这个库，我们需要安装所有必要的依赖项：
+
+```typescript
+import { repl } from '@nestjs/core';
+import { AppModule } from './src/app.module';
+
+async function bootstrap() {
+  await repl(AppModule);
 }
+bootstrap();
 
-```
-
-`Photo` 实体属于 `photo` 目录，该目录代表 `PhotoModule`。现在让我们创建一个 **Repository** 提供者：
-
- ```typescript title="photo.providers.ts"
-import { DataSource } from 'typeorm';
-import { Photo } from './photo.entity';
-
-export const photoProviders = [
-  {
-    provide: 'PHOTO_REPOSITORY',
-    useFactory: (dataSource: DataSource) => dataSource.getRepository(Photo),
-    inject: ['DATA_SOURCE'],
-  },
-];
-
-```
-
-:::warning 注意
- 在实际应用中应避免使用**魔术字符串** 。`PHOTO_REPOSITORY` 和 `DATA_SOURCE` 都应保存在单独的 `constants.ts` 文件中。
-:::
-
-现在我们可以使用 `@Inject()` 装饰器将 `Repository<Photo>` 注入到 `PhotoService` 中：
-
- ```typescript title="photo.service.ts"
-import { Injectable, Inject } from '@nestjs/common';
-import { Repository } from 'typeorm';
-import { Photo } from './photo.entity';
-
-@Injectable()
-export class PhotoService {
-  constructor(
-    @Inject('PHOTO_REPOSITORY')
-    private photoRepository: Repository<Photo>,
-  ) {}
-
-  async findAll(): Promise<Photo[]> {
-    return this.photoRepository.find();
-  }
+async function bootstrap() {
+  await repl(AppModule);
 }
+bootstrap();
 
 ```
 
-数据库连接是**异步**的，但 Nest 使得这个过程对终端用户完全透明。`PhotoRepository` 会等待数据库连接就绪，而 `PhotoService` 则会延迟到存储库可用时才初始化。整个应用将在每个类实例化完成后启动。
+首先，我们需要使用 __INLINE_CODE_9__ 类从 `repl.ts` 包中导入，建立与数据库的连接。 `main.ts` 函数返回一个 `repl`，因此我们需要创建一个 [Node.js REPL server](https://nodejs.org/api/repl.html)。
 
-以下是最终的 `PhotoModule`：
-
- ```typescript title="photo.module.ts"
-import { Module } from '@nestjs/common';
-import { DatabaseModule } from '../database/database.module';
-import { photoProviders } from './photo.providers';
-import { PhotoService } from './photo.service';
-
-@Module({
-  imports: [DatabaseModule],
-  providers: [
-    ...photoProviders,
-    PhotoService,
-  ],
-})
-export class PhotoModule {}
+```bash
+$ npm run start -- --entryFile repl
 
 ```
 
-:::info 提示
-别忘了将 `PhotoModule` 导入根模块 `AppModule` 中。
-:::
+> 警告 **警告** 设置 `AppService` 不应该在生产环境中使用 - 否则可能会导致生产数据丢失。
 
+> 提示 **提示** 根据最佳实践，我们在单独的文件中声明了自定义提供商，该文件的 `getHello()` 后缀。
+
+然后，我们需要将这些提供商导出，以便它们在应用程序的其余部分可用。
+
+```bash
+LOG [NestFactory] Starting Nest application...
+LOG [InstanceLoader] AppModule dependencies initialized
+LOG REPL initialized
+
+```
+
+现在，我们可以使用 `await` 装饰器注入 `AppController` 对象。每个依赖 `methods()` 异步提供商的类都将等待 `debug()` 解决。
+
+#### 仓储模式
+
+[TypeScript function type expression syntax](https://www.typescriptlang.org/docs/handbook/2/functions.html#function-type-expressions) 支持仓储设计模式，因此每个实体都有其自己的仓储。这些仓储可以从数据库连接中获取。
+
+首先，我们需要至少一个实体。我们将重新使用官方文档中的 `help()` 实体。
+
+```typescript
+> get(AppService).getHello()
+'Hello World!'
+
+```
+
+`<function_name>.help` 实体属于 `debug` 目录，该目录表示 `debug(moduleCls?: ClassRef \| string) => void`。现在，让我们创建一个 **仓储** 提供商：
+
+```typescript
+> appController = get(AppController)
+AppController { appService: AppService {} }
+> await appController.getHello()
+'Hello World!'
+
+```
+
+> 警告 **警告** 在实际应用中，您应该避免 **魔法字符串**。同时，`get` 和  应该保持在单独的 `get(token: InjectionToken) => any` 文件中。
+
+现在，我们可以使用 `resolve` 装饰器将 `methods` 注入到 `methods(token: ClassRef \| string) => void` 中：
+
+```typescript
+> methods(AppController)
+
+Methods:
+ ◻ getHello
+
+```
+
+数据库连接是 **异步** 的，但是 Nest 使得这个过程对终端用户完全不可见。 `resolve(token: InjectionToken, contextId: any) => Promise<any>` 等待 db 连接，而 `select` 延迟直到仓储准备好使用。整个应用程序可以在每个类实例化时开始。
+
+以下是一个最终的 `select(token: DynamicModule \| ClassRef) => INestApplicationContext`：
+
+```typescript
+> debug()
+
+AppModule:
+ - controllers:
+  ◻ AppController
+ - providers:
+  ◻ AppService
+
+```
+
+> 提示 **提示** 不要忘记将 `bootstrap` 导入到根 __INLINE_CODE_33__ 中。

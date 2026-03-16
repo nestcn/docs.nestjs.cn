@@ -84,17 +84,17 @@ docs/
         </a>
     </td>
     <td align="center">
-        <a href="https://github.com/renovate-bot">
-            <img src="https://avatars.githubusercontent.com/u/25180681?v=4" width="100;" alt="renovate-bot"/>
-            <br />
-            <sub><b>renovate-bot</b></sub>
-        </a>
-    </td>
-    <td align="center">
         <a href="https://github.com/gustbul">
             <img src="https://avatars.githubusercontent.com/u/122509882?v=4" width="100;" alt="gustbul"/>
             <br />
             <sub><b>gustbul</b></sub>
+        </a>
+    </td>
+    <td align="center">
+        <a href="https://github.com/renovate-bot">
+            <img src="https://avatars.githubusercontent.com/u/25180681?v=4" width="100;" alt="renovate-bot"/>
+            <br />
+            <sub><b>renovate-bot</b></sub>
         </a>
     </td>
     <td align="center">

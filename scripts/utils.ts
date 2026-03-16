@@ -4,8 +4,8 @@
 
 import type { ProtectedContent, Glossary } from './types';
 
-const PLACEHOLDER_PREFIX = '__PLACEHOLDER_';
-const PLACEHOLDER_SUFFIX = '__';
+const PLACEHOLDER_PREFIX = '___PH_';
+const PLACEHOLDER_SUFFIX = '___';
 
 export function protectCodeBlocks(content: string): ProtectedContent {
   const placeholders = new Map<string, string>();
@@ -17,9 +17,9 @@ export function protectCodeBlocks(content: string): ProtectedContent {
   };
 
   const patterns = [
-    { regex: /```[\s\S]*?```/g, type: 'CODE_BLOCK' },
-    { regex: /`[^`\n]+`/g, type: 'INLINE_CODE' },
-    { regex: /<[^>]+>/g, type: 'HTML_TAG' },
+    { regex: /```[\s\S]*?```/g, type: 'CODE' },
+    { regex: /`[^`\n]+`/g, type: 'INLINE' },
+    { regex: /<[^>]+>/g, type: 'HTML' },
     { regex: /\[([^\]]*)\]\([^)]*\)/g, type: 'LINK' },
   ];
 
@@ -107,16 +107,56 @@ export function convertFilenameToTitle(content: string): string {
 }
 
 export function hasPlaceholders(content: string): boolean {
-  return /__PLACEHOLDER_(CODE_BLOCK|INLINE_CODE|HTML_TAG|LINK)_\d+__/.test(
-    content
-  );
+  return /___PH_(CODE|INLINE|HTML|LINK)_\d+___/.test(content);
 }
 
 export function extractPlaceholders(content: string): string[] {
   const matches = content.match(
-    /__PLACEHOLDER_(CODE_BLOCK|INLINE_CODE|HTML_TAG|LINK)_\d+__/g
+    /___PH_(CODE|INLINE|HTML|LINK)_\d+___/g
   );
   return matches ? [...new Set(matches)] : [];
+}
+
+export function validateTranslation(
+  original: string,
+  translated: string,
+  placeholders: Map<string, string>
+): { valid: boolean; errors: string[] } {
+  const errors: string[] = [];
+
+  const expectedPlaceholders = Array.from(placeholders.keys());
+  const foundPlaceholders = extractPlaceholders(translated);
+
+  const missingPlaceholders = expectedPlaceholders.filter(
+    (p) => !translated.includes(p)
+  );
+  if (missingPlaceholders.length > 0) {
+    errors.push(`Missing placeholders: ${missingPlaceholders.join(', ')}`);
+  }
+
+  const extraPlaceholders = foundPlaceholders.filter(
+    (p) => !expectedPlaceholders.includes(p)
+  );
+  if (extraPlaceholders.length > 0) {
+    errors.push(`Extra placeholders found: ${extraPlaceholders.join(', ')}`);
+  }
+
+  const chineseRatio = getChineseRatio(translated);
+  if (chineseRatio < 0.1) {
+    errors.push(`Low Chinese ratio: ${(chineseRatio * 100).toFixed(1)}%`);
+  }
+
+  const originalLines = original.split('\n').length;
+  const translatedLines = translated.split('\n').length;
+  const lineRatio = translatedLines / originalLines;
+  if (lineRatio < 0.5 || lineRatio > 2.0) {
+    errors.push(`Line count ratio abnormal: ${lineRatio.toFixed(2)}`);
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
 }
 
 export function generateFileHeader(sourcePath: string): string {

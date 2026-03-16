@@ -26,6 +26,7 @@ import {
   removeFilenameLines,
   generateFileHeader,
   hasPlaceholders,
+  validateTranslation,
 } from './utils';
 import { CloudflareTranslator } from './translator';
 import type {
@@ -139,12 +140,23 @@ class DocumentTranslator {
       translated = protectedContent;
     }
 
-    // 5. 恢复代码块
+    // 5. 验证翻译
+    const validation = validateTranslation(protectedContent, translated, placeholders);
+    if (!validation.valid) {
+      console.error(`❌ Translation validation failed for ${filePath}:`);
+      validation.errors.forEach((err) => console.error(`   - ${err}`));
+      throw new Error(`Translation validation failed: ${validation.errors.join('; ')}`);
+    }
+
+    // 6. 恢复代码块
     translated = restoreCodeBlocks(translated, placeholders);
 
-    // 6. 检查占位符是否恢复
+    // 7. 检查占位符是否恢复
     if (hasPlaceholders(translated)) {
-      console.warn(`Warning: Placeholders not fully restored in ${filePath}`);
+      console.error(`❌ Placeholders not fully restored in ${filePath}`);
+      const remainingPlaceholders = translated.match(/___PH_\w+_\d+___/g) || [];
+      console.error(`   Remaining: ${remainingPlaceholders.join(', ')}`);
+      throw new Error(`Placeholders not restored: ${remainingPlaceholders.join(', ')}`);
     }
 
     return translated;

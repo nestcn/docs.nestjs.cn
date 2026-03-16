@@ -171,6 +171,10 @@ jobs:
         run: |
           echo "🔄 正在处理内容变更并进行翻译..."
           
+          # 清除旧的翻译缓存，确保使用新的占位符格式
+          rm -f scripts/.translation-cache.json
+          echo "🗑️ 已清除翻译缓存"
+          
           # 检查是否有可用的 Cloudflare 配置
           if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
             echo "✅ Cloudflare Workers AI 已配置，使用 AI 翻译"

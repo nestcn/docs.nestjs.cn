@@ -1,185 +1,125 @@
+<!-- 此文件从 content/microservices/redis.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-16T05:23:17.624Z -->
+<!-- 源文件: content/microservices/redis.md -->
+
 ### Redis
 
-[Redis](https://redis.io/) 传输器实现了发布/订阅消息范式，并利用了 Redis 的 [Pub/Sub](https://redis.io/topics/pubsub) 功能。发布的消息按通道分类，无需知晓最终哪些订阅者（如果有）会接收该消息。每个微服务可订阅任意数量的通道，同时还能一次性订阅多个通道。通过通道交换的消息采用**即发即弃**模式，这意味着如果发布消息时没有感兴趣的订阅者，该消息将被移除且无法恢复。因此，无法保证消息或事件至少会被一个服务处理。单个消息可被多个订阅者同时订阅（并接收）。
+__LINK_113__ transporter 实现了 publish/subscribe 消息传递模型，并利用了 __LINK_114__ 的 Redis 功能。发布的消息将被分类到通道中，而不知道哪些订阅者（如果有）将最终接收到消息。每个微服务都可以订阅任何数量的通道。此外，多个通道可以同时订阅。通过通道传递的消息是 **fire-and-forget**，这意味着如果消息被发布且没有感兴趣的订阅者，它将被删除且无法恢复。因此，你不能确保消息或事件将至少由一个服务处理。单个消息可以被多个订阅者订阅并接收。
 
-![](/assets/Redis_1.png)
+__HTML_TAG_50____HTML_TAG_51____HTML_TAG_52__
 
 #### 安装
 
-要开始构建基于 Redis 的微服务，首先需安装以下必备包：
+要开始构建基于 Redis 的微服务，首先安装所需的包：
 
-```bash
-$ npm i --save ioredis
+```typescript
+@UseInterceptors(new TransformInterceptor())
+@MessagePattern({ cmd: 'sum' })
+accumulate(data: number[]): number {
+  return (data || []).reduce((a, b) => a + b);
+}
 
 ```
 
 #### 概述
 
-要使用 Redis 传输器，请将以下配置对象传入 `createMicroservice()` 方法：
+要使用 Redis transporter，传递以下选项对象到 __INLINE_CODE_12__ 方法：
 
- ```typescript title="main.ts"
-const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
-  transport: Transport.REDIS,
-  options: {
-    host: 'localhost',
-    port: 6379,
-  },
-});
+__CODE_BLOCK_1__
 
-```
-
-:::info 提示
-`Transport` 枚举是从 `@nestjs/microservices` 包中导入的。
-:::
+> info **Hint** __INLINE_CODE_13__ 枚举来自 __INLINE_CODE_14__ 包。
 
 #### 选项
 
-`options` 属性取决于所选传输器类型。**Redis** 传输器暴露的配置属性如下所述：
+__INLINE_CODE_15__ 属性特定于选择的 transporter。__HTML_TAG_53__Redis__HTML_TAG_54__ transporter 描绘了以下属性。
 
-| 选项            | 描述                                                                                          |
-| --------------- | --------------------------------------------------------------------------------------------- |
-| `host`          | 连接 URL                                                                                     |
-| `port`          | 连接端口                                                                                     |
-| `retryAttempts` | 消息重试次数（默认：`0`）                                                                    |
-| `retryDelay`    | 消息重试尝试之间的延迟（毫秒）（默认：`0`）                                                   |
-| `wildcards`     | 启用 Redis 通配符订阅功能，指示传输器在底层使用 `psubscribe`/`pmessage`（默认：`false`）     |
+__HTML_TAG_55__
+  __HTML_TAG_56__
+    __HTML_TAG_57____HTML_TAG_58__host__HTML_TAG_59____HTML_TAG_60__
+    __HTML_TAG_61__Connection url__HTML_TAG_62__
+  __HTML_TAG_63__
+  __HTML_TAG_64__
+    __HTML_TAG_65____HTML_TAG_66__port__HTML_TAG_67____HTML_TAG_68__
+    __HTML_TAG_69__Connection port__HTML_TAG_70__
+  __HTML_TAG_71__
+  __HTML_TAG_72__
+    __HTML_TAG_73____HTML_TAG_74__retryAttempts__HTML_TAG_75____HTML_TAG_76__
+    __HTML_TAG_77__Number of times to retry message (default: __HTML_TAG_78__0__HTML_TAG_79__)__HTML_TAG_80__
+  __HTML_TAG_81__
+  __HTML_TAG_82__
+    __HTML_TAG_83____HTML_TAG_84__retryDelay__HTML_TAG_85____HTML_TAG_86__
+    __HTML_TAG_87__Delay between message retry attempts (ms) (default: __HTML_TAG_88__0__HTML_TAG_89__)__HTML_TAG_90__
+  __HTML_TAG_91__
+   __HTML_TAG_92__
+    __HTML_TAG_93____HTML_TAG_94__wildcards__HTML_TAG_95____HTML_TAG_96__
+    __HTML_TAG_97__Enables Redis wildcard subscriptions, instructing transporter to use __HTML_TAG_98__psubscribe__HTML_TAG_99__/__HTML_TAG_100__pmessage__HTML_TAG_101__ under the hood. (default: __HTML_TAG_102__false__HTML_TAG_103__)__HTML_TAG_104__
+  __HTML_TAG_105__
+__HTML_TAG_106__
 
-官方 [ioredis](https://redis.github.io/ioredis/index.html#RedisOptions) 客户端支持的所有属性，该传输器同样支持。
+所有由官方 __LINK_115__ 客户端支持的属性都被支持。
 
 #### 客户端
 
-与其他微服务传输器类似，创建 Redis `ClientProxy` 实例时您有 [多种选择](./basics#客户端) 。
+像其他微服务 transporter 一样，您有 __HTML_TAG_107__ several options__HTML_TAG_108__ 创建 Redis __INLINE_CODE_16__ 实例。
 
-一种创建实例的方法是使用 `ClientsModule`。要通过 `ClientsModule` 创建客户端实例，需先导入该模块，然后使用 `register()` 方法传入一个选项对象（包含与上文 `createMicroservice()` 方法相同的属性），以及用作注入令牌的 `name` 属性。更多关于 `ClientsModule` 的信息请参阅[此处](./basics#客户端) 。
+一种创建实例的方法是使用 __INLINE_CODE_17__。要创建客户端实例，并将 __INLINE_CODE_18__ 作为注入令牌，导入它并使用 __INLINE_CODE_19__ 方法传递同上述 __INLINE_CODE_20__ 方法中的选项对象，以及一个 __INLINE_CODE_21__ 属性。了解更多关于 __INLINE_CODE_22__ __HTML_TAG_109__here__HTML_TAG_110__。
 
-```typescript
-@Module({
-  imports: [
-    ClientsModule.register([
-      {
-        name: 'MATH_SERVICE',
-        transport: Transport.REDIS,
-        options: {
-          host: 'localhost',
-          port: 6379,
-        }
-      },
-    ]),
-  ]
-  ...
-})
+__CODE_BLOCK_2__
 
-```
-
-也可以使用其他方式创建客户端（`ClientProxyFactory` 或 `@Client()`）。相关说明请查看[此文档](./basics#客户端) 。
+其他创建客户端实例的选项（如 __INLINE_CODE_23__ 或 __INLINE_CODE_24__）也可以使用。了解更多 __HTML_TAG_111__here__HTML_TAG_112__。
 
 #### 上下文
 
-在更复杂的场景中，您可能需要访问有关传入请求的额外信息。使用 Redis 传输器时，您可以访问 `RedisContext` 对象。
+在复杂的场景中，您可能需要访问 incoming 请求的更多信息。当使用 Redis transporter，您可以访问 __INLINE_CODE_25__ 对象。
+
+__CODE_BLOCK_3__
+
+> info **Hint** __INLINE_CODE_26__, __INLINE_CODE_27__ 和 __INLINE_CODE_28__ 来自 __INLINE_CODE_29__ 包。
+
+#### Wildcards
+
+要启用 wildcards 支持，设置 __INLINE_CODE_30__ 选项为 __INLINE_CODE_31__。这 instructs transporter 使用 __INLINE_CODE_32__ 和 __INLINE_CODE_33__ under the hood。
+
+__CODE_BLOCK_4__
+
+确保在创建客户端实例时也传递 __INLINE_CODE_34__ 选项。
+
+使用 wildcards 支持，您可以在消息和事件模式中使用 wildcards。例如，为了订阅所有开始于 __INLINE_CODE_35__ 的通道，可以使用以下模式：
+
+__CODE_BLOCK以下是翻译后的中文技术文档：
+
+在某些情况下，您可能想监听微服务内部事件。例如，当发生错误时，可以监听 __INLINE_CODE_44__ 事件来触发额外操作。要做到这点，可以使用 __INLINE_CODE_45__ 方法，如下所示：
 
 ```typescript
-@MessagePattern('notifications')
-getNotifications(@Payload() data: number[], @Ctx() context: RedisContext) {
-  console.log(`Channel: ${context.getChannel()}`);
-}
+__CODE_BLOCK_8__
 
 ```
 
-:::info 提示
-`@Payload()`、`@Ctx()` 和 `RedisContext` 均从 `@nestjs/microservices` 包导入。
-:::
-
-#### 通配符
-
-要启用通配符支持，请将 `wildcards` 选项设置为 `true`。这将指示传输器在底层使用 `psubscribe` 和 `pmessage`。
+类似地，您也可以监听服务器的内部事件：
 
 ```typescript
-const app = await NestFactory.createMicroservice(AppModule, {
-  transport: Transport.REDIS,
-  options: {
-    // Other options
-    wildcards: true,
-  },
-});
+__CODE_BLOCK_9__
 
 ```
 
-创建客户端实例时也请确保传递 `wildcards` 选项。
+> 信息 **提示** __INLINE_CODE_46__ 类型来自 __INLINE_CODE_47__ 包。
 
-启用此选项后，您可以在消息和事件模式中使用通配符。例如，要订阅所有以 `notifications` 开头的频道，可以使用以下模式：
+#### underlying driver access
+
+对于更复杂的用例，您可能需要访问 underlying driver 实例。这可以在手动关闭连接或使用驱动程序专门方法时有用。然而，在大多数情况下，您**不应该**直接访问驱动程序。
+
+要做到这点，可以使用 __INLINE_CODE_48__ 方法，它返回 underlying driver 实例。泛型类型参数应该指定您期望的驱动程序实例类型。
 
 ```typescript
-@EventPattern('notifications.*')
+__CODE_BLOCK_10__
 
 ```
 
-#### 实例状态更新
-
-要获取连接及底层驱动实例状态的实时更新，您可以订阅 `status` 流。该流提供特定于所选驱动的状态更新。对于 Redis 驱动，`status` 流会发出 `connected`、`disconnected` 和 `reconnecting` 事件。
+类似地，您也可以访问服务器的 underlying driver 实例：
 
 ```typescript
-this.client.status.subscribe((status: RedisStatus) => {
-  console.log(status);
-});
+__CODE_BLOCK_11__
 
 ```
 
-:::info 提示
-`RedisStatus` 类型是从 `@nestjs/microservices` 包导入的。
-:::
-
-同样地，您可以订阅服务器的 `status` 流来接收有关服务器状态的通知。
-
-```typescript
-const server = app.connectMicroservice<MicroserviceOptions>(...);
-server.status.subscribe((status: RedisStatus) => {
-  console.log(status);
-});
-
-```
-
-#### 监听 Redis 事件
-
-在某些情况下，您可能需要监听微服务发出的内部事件。例如，您可以监听 `error` 事件，以便在发生错误时触发其他操作。为此，请使用如下所示的 `on()` 方法：
-
-```typescript
-this.client.on('error', (err) => {
-  console.error(err);
-});
-
-```
-
-同样地，您可以监听服务器的内部事件：
-
-```typescript
-server.on<RedisEvents>('error', (err) => {
-  console.error(err);
-});
-
-```
-
-:::info 注意
-`RedisEvents` 类型是从 `@nestjs/microservices` 包中导入的。
-:::
-
-#### 底层驱动访问
-
-对于更高级的用例，您可能需要访问底层驱动实例。这在手动关闭连接或使用驱动特定方法等场景中非常有用。但请注意，在大多数情况下，您**不需要**直接访问驱动。
-
-为此，您可以使用 `unwrap()` 方法，该方法会返回底层驱动实例。泛型类型参数应指定您预期的驱动实例类型。
-
-```typescript
-const [pub, sub] =
-  this.client.unwrap<[import('ioredis').Redis, import('ioredis').Redis]>();
-
-```
-
-同样地，您可以访问服务器的底层驱动实例：
-
-```typescript
-const [pub, sub] =
-  server.unwrap<[import('ioredis').Redis, import('ioredis').Redis]>();
-
-```
-
-请注意，与其他传输器不同，Redis 传输器会返回一个由两个 `ioredis` 实例组成的元组：第一个实例用于发布消息，第二个实例用于订阅消息。
+需要注意的是，相比其他传输器，Redis 传输器返回一个包含两个 __INLINE_CODE_49__ 实例的元组：第一个实例用于发布消息，第二个实例用于订阅消息。

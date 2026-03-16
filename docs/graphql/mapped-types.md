@@ -1,158 +1,131 @@
-### 映射类型
+<!-- 此文件从 content/graphql/mapped-types.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-16T05:29:13.116Z -->
+<!-- 源文件: content/graphql/mapped-types.md -->
 
-> warning **警告** 本章仅适用于代码优先方法。
+### Mapped types
 
-当您构建 CRUD（创建/读取/更新/删除）等功能时，在基础实体类型上构建变体通常很有用。Nest 提供了几个实用函数来执行类型转换，使此任务更加方便。
+> warning **警告** 本章仅适用于代码优先 approach。
+
+当您构建 CRUD 等功能时，构建基于基本实体类型的变体时非常有用。Nest 提供了多种 utility 函数，可以对类型进行转换，以简化此任务。
 
 #### Partial
 
-在构建输入验证类型（也称为数据传输对象或 DTO）时，在同一类型上构建**创建**和**更新**变体通常很有用。例如，**创建**变体可能需要所有字段，而**更新**变体可能使所有字段成为可选。
+在构建输入验证类型（也称为数据传输对象或 DTO）时，通常需要构建 **create** 和 **update** 变体，以便在同一个类型上进行变体。例如， **create** 变体可能需要所有字段，而 **update** 变体可能将所有字段设置为可选。
 
-Nest 提供了 `PartialType()` 实用函数，使此任务更容易并减少样板代码。
+Nest 提供了 __INLINE_CODE_10__ 工具函数，可以使得此任务变得更加简单，减少 boilerplate。
 
-`PartialType()` 函数返回一个类型（类），其中输入类型的所有属性都设置为可选。例如，假设我们有一个如下所示的**创建**类型：
+__INLINE_CODE_11__ 函数返回一个类型（类），其中所有输入类型的属性都设置为可选。例如，如果我们有一个 **create** 类型如下所示：
 
 ```typescript
-@InputType()
-class CreateUserInput {
-  @Field()
-  email: string;
-
-  @Field()
-  password: string;
-
-  @Field()
-  firstName: string;
+@Post()
+async create(@Body() createCatDto: CreateCatDto) {
+  this.catsService.create(createCatDto);
 }
 
 ```
 
-默认情况下，所有这些字段都是必需的。要创建一个具有相同字段但每个字段都是可选的类型，请使用 `PartialType()` 传递类引用（`CreateUserInput`）作为参数：
+默认情况下，这些字段都是必需的。要创建一个具有相同字段，但每个字段都可选的类型，请使用 __INLINE_CODE_12__，将类引用（__INLINE_CODE_13__）作为参数传递：
 
 ```typescript
-@InputType()
-export class UpdateUserInput extends PartialType(CreateUserInput) {}
+import { ApiProperty } from '@nestjs/swagger';
+
+export class CreateCatDto {
+  @ApiProperty()
+  name: string;
+
+  @ApiProperty()
+  age: number;
+
+  @ApiProperty()
+  breed: string;
+}
 
 ```
 
-> info **提示** `PartialType()` 函数是从 `@nestjs/graphql` 包导入的。
+> info **提示** __INLINE_CODE_14__ 函数来自 __INLINE_CODE_15__ 包。
 
-`PartialType()` 函数接受一个可选的第二个参数，该参数是对装饰器工厂的引用。此参数可用于更改应用于结果（子）类的装饰器函数。如果未指定，子类实际上使用与**父**类相同的装饰器（在第一个参数中引用的类）。在上面的示例中，我们扩展了用 `@InputType()` 装饰器注释的 `CreateUserInput`。由于我们希望 `UpdateUserInput` 也被视为用 `@InputType()` 装饰，我们不需要将 `InputType` 作为第二个参数传递。如果父类型和子类型不同（例如，父类型用 `@ObjectType` 装饰），我们将传递 `InputType` 作为第二个参数。例如：
+__INLINE_CODE_16__ 函数接受一个可选的第二个参数，这个参数是装饰器工厂的引用。在没有指定时，子类将使用父类（被引用的类）的同一个装饰器。如果父类和子类不同（例如父类被装饰为 __INLINE_CODE_18__），我们将传递 __INLINE_CODE_21__ 作为第二个参数。例如：
 
 ```typescript
-@InputType()
-export class UpdateUserInput extends PartialType(User, InputType) {}
+@ApiProperty({
+  description: 'The age of a cat',
+  minimum: 1,
+  default: 1,
+})
+age: number;
 
 ```
 
 #### Pick
 
-`PickType()` 函数通过从输入类型中选择一组属性来构造新类型（类）。例如，假设我们从这样的类型开始：
+__INLINE_CODE_24__ 函数构建了一个新类型（类），从输入类型中选择一组属性。例如，如果我们从一个类型开始：
 
 ```typescript
-@InputType()
-class CreateUserInput {
-  @Field()
-  email: string;
-
-  @Field()
-  password: string;
-
-  @Field()
-  firstName: string;
-}
+@ApiProperty({
+  type: Number,
+})
+age: number;
 
 ```
 
-我们可以使用 `PickType()` 实用函数从此类中选择一组属性：
+我们可以使用 __INLINE_CODE_25__ 工具函数选择一组属性：
 
 ```typescript
-@InputType()
-export class UpdateEmailInput extends PickType(CreateUserInput, [
-  'email',
-] as const) {}
+@ApiProperty({ type: [String] })
+names: string[];
 
 ```
 
-> info **提示** `PickType()` 函数是从 `@nestjs/graphql` 包导入的。
+> info **提示** __INLINE_CODE_26__ 函数来自 __INLINE_CODE_27__ 包。
 
 #### Omit
 
-`OmitType()` 函数通过从输入类型中选择所有属性然后删除特定键集来构造类型。例如，假设我们从这样的类型开始：
+`SwaggerModule` 函数构建了一个类型，首先从输入类型中选择所有属性，然后删除特定的键。例如，如果我们从一个类型开始：
 
 ```typescript
-@InputType()
-class CreateUserInput {
-  @Field()
-  email: string;
-
-  @Field()
-  password: string;
-
-  @Field()
-  firstName: string;
-}
+@ApiProperty({ type: () => Node })
+node: Node;
 
 ```
 
-我们可以生成一个派生类型，该类型具有**除** `email` 之外的每个属性，如下所示。在此构造中，`OmitType` 的第二个参数是属性名称数组。
+我们可以生成一个衍生类型，该类型具有除 `@Body()` 之外的每个属性，如下所示。在这个构造中，第二个参数 `@Query()` 是一个属性名称数组。
 
 ```typescript
-@InputType()
-export class UpdateUserInput extends OmitType(CreateUserInput, [
-  'email',
-] as const) {}
+createBulk(@Body() usersDto: CreateUserDto[])
 
 ```
 
-> info **提示** `OmitType()` 函数是从 `@nestjs/graphql` 包导入的。
+> info **提示** `@Param()` 函数来自 `@ApiBody()` 包。
 
 #### Intersection
 
-`IntersectionType()` 函数将两种类型组合成一种新类型（类）。例如，假设我们从两种类型开始：
+`@nestjs/swagger` 函数将两个类型组合成一个新的类型（类）。例如，如果我们从两个类型开始：
 
 ```typescript
-@InputType()
-class CreateUserInput {
-  @Field()
-  email: string;
-
-  @Field()
-  password: string;
-}
-
-@ObjectType()
-export class AdditionalUserInfo {
-  @Field()
-  firstName: string;
-
-  @Field()
-  lastName: string;
-}
+@ApiBody({ type: [CreateUserDto] })
+createBulk(@Body() usersDto: CreateUserDto[])
 
 ```
 
-我们可以生成一个组合两种类型中所有属性的新类型。
+我们可以生成一个新的类型，该类型组合了这两个类型中的所有属性。
 
 ```typescript
-@InputType()
-export class UpdateUserInput extends IntersectionType(
-  CreateUserInput,
-  AdditionalUserInfo,
-) {}
+@ApiProperty({ enum: ['Admin', 'Moderator', 'User']})
+role: UserRole;
 
 ```
 
-> info **提示** `IntersectionType()` 函数是从 `@nestjs/graphql` 包导入的。
+> info **提示** `CreateCatDto` 函数来自 `SwaggerModule` 包。
 
-#### 组合
+#### Composition
 
-类型映射实用函数是可组合的。例如，以下将产生一个类型（类），该类型具有 `CreateUserInput` 类型的所有属性，除了 `email`，并且这些属性将被设置为可选：
+类型映射 utility 函数是可组合的。例如，以下将生成一个类型（类），该类型具有 `@ApiProperty()` 类型中的所有属性，除 `CreateCatDto` 外，并将这些属性设置为可选：
 
 ```typescript
-@InputType()
-export class UpdateUserInput extends PartialType(
-  OmitType(CreateUserInput, ['email'] as const),
-) {}
+export enum UserRole {
+  Admin = 'Admin',
+  Moderator = 'Moderator',
+  User = 'User',
+}
 
 ```

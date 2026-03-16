@@ -1,201 +1,91 @@
-### 热重载
+<!-- 此文件从 content/recipes/hot-reload.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-16T05:00:26.376Z -->
+<!-- 源文件: content/recipes/hot-reload.md -->
 
-对应用程序启动过程影响最大的是 **TypeScript 编译** 。幸运的是，借助 [webpack](https://github.com/webpack/webpack) 的 HMR（热模块替换）功能，我们无需在每次变更时重新编译整个项目。这大幅减少了实例化应用程序所需的时间，使迭代开发变得更加轻松。
+### Hot Reload
 
-:::warning 警告
-请注意 `webpack` 不会自动将资源文件（例如 `graphql` 文件）复制到 `dist` 目录。同样地，`webpack` 也不支持通配符静态路径（例如 `TypeOrmModule` 中的 `entities` 属性）。
-:::
+热加载对应用程序的启动过程的影响最大的是**TypeScript 编译**。幸运的是，使用 __LINK_42__ HMR（Hot-Module Replacement），我们不需要在每次更改时重新编译整个项目。这大大减少了实例化应用程序所需的时间，并使iterative开发变得更加容易。
+
+> warning **警告**注意 __INLINE_CODE_10__ 不会自动将资产（例如 __INLINE_CODE_11__ 文件）复制到 __INLINE_CODE_12__ 文件夹。同样， __INLINE_CODE_13__ 不兼容 glob 静态路径（例如 __INLINE_CODE_14__ 属性在 __INLINE_CODE_15__ 中）。
 
 ### 使用 CLI
 
-若您使用 [Nest CLI](../cli/overview)，配置过程相当简单。该 CLI 封装了 `webpack`，因此可以使用 `HotModuleReplacementPlugin`。
+如果您使用 __LINK_43__，配置过程非常简单。CLI 将 __INLINE_CODE_16__ 包装，以便使用 __INLINE_CODE_17__。
 
 #### 安装
 
-首先安装所需依赖包：
+首先安装所需的包：
 
 ```bash
-$ npm i --save-dev webpack-node-externals run-script-webpack-plugin webpack
+$ npm i -D @compodoc/compodoc
 
 ```
 
-:::info 提示
-若使用 **Yarn Berry**（非经典版 Yarn），请安装 `webpack-pnp-externals` 而非 `webpack-node-externals`。
-:::
+> info **提示**如果您使用 **Yarn Berry**（而不是classic Yarn），安装 __INLINE_CODE_18__ 包而不是 __INLINE_CODE_19__。
 
 #### 配置
 
-安装完成后，在应用程序的根目录下创建一个 `webpack-hmr.config.js` 文件。
-
-```typescript
-const nodeExternals = require('webpack-node-externals');
-const { RunScriptWebpackPlugin } = require('run-script-webpack-plugin');
-
-module.exports = function (options, webpack) {
-  return {
-    ...options,
-    entry: ['webpack/hot/poll?100', options.entry],
-    externals: [
-      nodeExternals({
-        allowlist: ['webpack/hot/poll?100'],
-      }),
-    ],
-    plugins: [
-      ...options.plugins,
-      new webpack.HotModuleReplacementPlugin(),
-      new webpack.WatchIgnorePlugin({
-        paths: [/\.js$/, /\.d\.ts$/],
-      }),
-      new RunScriptWebpackPlugin({
-        name: options.output.filename,
-        autoRestart: false,
-      }),
-    ],
-  };
-};
-
-```
-
-:::info 提示
-使用 **Yarn Berry**（非经典 Yarn）时，不要在 `externals` 配置属性中使用 `nodeExternals`，而应改用 `webpack-pnp-externals` 包中的 `WebpackPnpExternals`： `WebpackPnpExternals({ exclude: ['webpack/hot/poll?100'] })` 。
-:::
-
-该函数第一个参数接收包含默认 webpack 配置的原始对象，第二个参数接收 Nest CLI 使用的底层 `webpack` 包引用。它返回一个修改后的 webpack 配置，其中包含 `HotModuleReplacementPlugin`、`WatchIgnorePlugin` 和 `RunScriptWebpackPlugin` 插件。
-
-#### 热模块替换
-
-要启用 **HMR**，请打开应用程序入口文件(`main.ts`)并添加以下 webpack 相关指令：
-
-```typescript
-declare const module: any;
-
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(process.env.PORT ?? 3000);
-
-  if (module.hot) {
-    module.hot.accept();
-    module.hot.dispose(() => app.close());
-  }
-}
-bootstrap();
-
-```
-
-为简化执行流程，请在 `package.json` 文件中添加一个脚本。
-
-```json
-"start:dev": "nest build --webpack --webpackPath webpack-hmr.config.js --watch"
-
-```
-
-现在只需打开命令行并运行以下命令：
+安装完成后，在应用程序根目录创建 __INLINE_CODE_20__ 文件。
 
 ```bash
-$ npm run start:dev
+$ npx @compodoc/compodoc -p tsconfig.json -s
 
 ```
 
-### 无命令行界面
+> info **提示**使用 **Yarn Berry**（而不是classic Yarn），在 __INLINE_CODE_22__ 配置属性中使用 __INLINE_CODE_23__ 而不是 __INLINE_CODE_21__，来自 __INLINE_CODE_24__ 包：__INLINE_CODE_25__。
 
-如果不使用 [Nest CLI](../cli/overview)，配置会稍显复杂（需要更多手动步骤）。
+该函数将原始对象，包含默认 Webpack 配置作为第一个参数，以及对应的 __INLINE_CODE_26__ 包的引用作为第二个参数。它还将返回一个修改后的 Webpack 配置，添加了 __INLINE_CODE_27__、__INLINE_CODE_28__ 和 __INLINE_CODE_29__ 插件。
+
+#### Hot-Module Replacement
+
+要启用 **HMR**，打开应用程序入口文件（__INLINE_CODE_30__）并添加以下 Webpack 相关指令：
+
+__CODE_BLOCK_2__
+
+为了简化执行过程，添加一个脚本到您的 __INLINE_CODE_31__ 文件。
+
+__CODE_BLOCK_3__
+
+现在，打开命令行并运行以下命令：
+
+__CODE_BLOCK_4__
+
+### 不使用 CLI
+
+如果您不使用 __LINK_44__，配置将略微复杂一些（需要更多手动步骤）。
 
 #### 安装
 
-首先安装所需依赖包：
+首先安装所需的包：
 
-```bash
-$ npm i --save-dev webpack webpack-cli webpack-node-externals ts-loader run-script-webpack-plugin
+__CODE_BLOCK_5__
 
-```
-
-:::info 提示
-如果使用 **Yarn Berry**（非经典版 Yarn），请安装 `webpack-pnp-externals` 包而非 `webpack-node-externals`。
-:::
+> info **提示**如果您使用 **Yarn Berry**（而不是classic Yarn），安装 __INLINE_CODE_32__ 包而不是 __INLINE_CODE_33__。
 
 #### 配置
 
-安装完成后，在应用程序的根目录下创建一个 `webpack.config.js` 文件。
+安装完成后，在应用程序根目录创建 __INLINE_CODE_34__ 文件。
 
-```typescript
-const webpack = require('webpack');
-const path = require('path');
-const nodeExternals = require('webpack-node-externals');
-const { RunScriptWebpackPlugin } = require('run-script-webpack-plugin');
+__CODE_BLOCK_6__
 
-module.exports = {
-  entry: ['webpack/hot/poll?100', './src/main.ts'],
-  target: 'node',
-  externals: [
-    nodeExternals({
-      allowlist: ['webpack/hot/poll?100'],
-    }),
-  ],
-  module: {
-    rules: [
-      {
-        test: /.tsx?$/,
-        use: 'ts-loader',
-        exclude: /node_modules/,
-      },
-    ],
-  },
-  mode: 'development',
-  resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
-  },
-  plugins: [
-    new webpack.HotModuleReplacementPlugin(),
-    new RunScriptWebpackPlugin({ name: 'server.js', autoRestart: false }),
-  ],
-  output: {
-    path: path.join(__dirname, 'dist'),
-    filename: 'server.js',
-  },
-};
+> info **提示**使用 **Yarn Berry**（而不是classic Yarn），在 __INLINE_CODE_36__ 配置属性中使用 __INLINE_CODE_37__ 而不是 __INLINE_CODE_35__，来自 __INLINE_CODE_38__ 包：__INLINE_CODE_39__。
 
-```
+该配置告诉 Webpack 几个关于应用程序的基本信息：入口文件的位置、哪个目录用于存储编译后的文件，以及我们想要使用哪种加载器来编译源文件。一般情况下，您可以将该文件作为-is 使用，即使您不完全理解所有选项。
 
-:::info 提示
-使用 **Yarn Berry**（非经典版 Yarn）时，不要在 `externals` 配置属性中使用 `nodeExternals`，而应改用 `webpack-pnp-externals` 包中的 `WebpackPnpExternals`： `WebpackPnpExternals({ exclude: ['webpack/hot/poll?100'] })` 。
-:::
+#### Hot-Module Replacement
 
-此配置向 webpack 说明了关于应用程序的几个关键信息：入口文件的位置、存放**编译后**文件的目录，以及用于编译源文件的加载器类型。通常即使您不完全理解所有选项，也可以直接使用此文件。
+要启用 **HMR**，打开应用程序入口文件（__INLINE_CODE_40__）并添加以下 Webpack 相关指令：
 
-#### 热模块替换
+__CODE_BLOCK_7__
 
-要启用 **HMR**，请打开应用程序入口文件(`main.ts`)并添加以下 webpack 相关指令：
+为了简化执行过程，添加一个脚本到您的 __INLINE_CODE_41__ 文件。
 
-```typescript
-declare const module: any;
+__CODE_BLOCK_8__
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(process.env.PORT ?? 3000);
+现在，打开命令行并运行以下命令：
 
-  if (module.hot) {
-    module.hot.accept();
-    module.hot.dispose(() => app.close());
-  }
-}
-bootstrap();
-
-```
-
-为简化执行流程，请在 `package.json` 文件中添加一个脚本。
-
-```json
-"start:dev": "webpack --config webpack.config.js --watch"
-
-```
-
-现在只需打开命令行并运行以下命令：
-
-```bash
-$ npm run start:dev
-
-```
+__CODE_BLOCK_9__
 
 #### 示例
 
-一个可用的示例[在此处](https://github.com/nestjs/nest/tree/master/sample/08-webpack)查看。
+一个工作示例可在 __LINK_45__ 中找到。

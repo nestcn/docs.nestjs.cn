@@ -1,137 +1,120 @@
-### 读取-求值-输出循环（REPL）
+<!-- 此文件从 content/recipes/repl.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-16T05:04:05.721Z -->
+<!-- 源文件: content/recipes/repl.md -->
 
-REPL 是一种简单的交互式环境，能够接收用户输入的单条命令，执行后立即返回结果。通过 REPL 功能，您可以直接在终端检查依赖关系图，并对提供者（及控制器）调用方法。
+### 读取-评估-打印-循环（REPL）
 
-#### 使用方法
+REPL 是一个简单的交互环境，它可以单独处理用户输入，执行它们，并将结果返回给用户。
+REPL 功能让您可以检查依赖关系图并在控制台直接调用提供者（和控制器）的方法。
 
-要在 REPL 模式下运行 NestJS 应用，请新建 `repl.ts` 文件（与现有的 `main.ts` 文件同级），并在其中添加以下代码：
+#### 使用
 
- ```typescript title="repl.ts"
-import { repl } from '@nestjs/core';
-import { AppModule } from './src/app.module';
-
-async function bootstrap() {
-  await repl(AppModule);
-}
-bootstrap();
-
-```
-
-现在在终端中，使用以下命令启动 REPL：
-
-```bash
-$ npm run start -- --entryFile repl
-
-```
-
-:::info 提示
-`repl` 返回一个 [Node.js REPL 服务器](https://nodejs.org/api/repl.html)对象。
-:::
-
-当它启动并运行后，你将在控制台中看到以下消息：
-
-```bash
-LOG [NestFactory] Starting Nest application...
-LOG [InstanceLoader] AppModule dependencies initialized
-LOG REPL initialized
-
-```
-
-现在你可以开始与依赖关系图进行交互。例如，你可以获取一个 `AppService`（这里我们以启动项目为例）并调用 `getHello()` 方法：
+要在 REPL 模式下运行 NestJS 应用程序，创建一个新的文件（与现有文件同级）并添加以下代码：
 
 ```typescript
-> get(AppService).getHello()
-'Hello World!'
+title="REPL"
 
 ```
 
-你可以在终端内执行任何 JavaScript 代码，例如将 `AppController` 的实例赋值给局部变量，并使用 `await` 调用异步方法：
-
-```typescript
-> appController = get(AppController)
-AppController { appService: AppService {} }
-> await appController.getHello()
-'Hello World!'
+现在，在您的控制台中，使用以下命令启动 REPL：
 
 ```
 
-要显示给定提供者或控制器上所有可用的公共方法，请使用 `methods()` 函数，如下所示：
-
-```typescript
-> methods(AppController)
-
-Methods:
- ◻ getHello
+title="REPL"
 
 ```
 
-要打印所有已注册模块及其控制器和提供者的列表，请使用 `debug()`。
+> 提示 `SentryModule` 返回一个 __LINK_36__ 对象。
 
-```typescript
-> debug()
+一旦启动成功，您将在控制台中看到以下消息：
 
-AppModule:
- - controllers:
-  ◻ AppController
- - providers:
-  ◻ AppService
+```
+
+title="REPL"
+
+```
+
+现在，您可以开始与依赖关系图交互。例如，您可以检索一个 `app.useGlobalFilters()`（在这里使用starter项目作为示例）并调用 `@Catch()` 方法：
+
+```
+
+title="REPL"
+
+```
+
+您可以在控制台中执行任意 JavaScript 代码，例如将 `@SentryExceptionCaptured()` 实例分配给一个局部变量，并使用 `catch()` 调用异步方法：
+
+```
+
+title="REPL"
+
+```
+
+要显示某个提供者或控制器上的所有公共方法，请使用 `HttpExceptions` 函数，例如：
+
+```
+
+title="REPL"
+
+```
+
+要打印所有注册模块的列表，包括它们的控制器和提供者，请使用 `SentryGlobalFilter`。
+
+```
+
+title="REPL"
 
 ```
 
 快速演示：
 
-<figure><img src="/assets/repl.gif" alt="REPL example" /></figure>
+```html
+title="REPL"
 
-您可以在下方章节中找到有关现有预定义原生方法的更多信息。
+```
+
+您可以在下面部分中找到更多关于现有预定义native 方法的信息。
 
 #### 原生函数
 
-内置的 NestJS REPL 附带了一些原生函数，这些函数在启动 REPL 时全局可用。你可以调用 `help()` 来列出它们。
+内置的 NestJS REPL 附带了一些原生函数，这些函数在启动 REPL 时全局可用。您可以使用 `SentryGlobalFilter` 列出它们。
 
-如果你不记得某个函数的签名（即预期参数和返回类型），可以调用 `<function_name>.help`。例如：
-
-```text
-> $.help
-Retrieves an instance of either injectable or controller, otherwise, throws exception.
-Interface: $(token: InjectionToken) => any
+如果您不记得某个函数的签名（即：expected parameters 和 return type），您可以使用 `/debug-sentry`。
+例如：
 
 ```
 
-:::info 提示
-这些函数接口是用 [TypeScript 函数类型表达式语法](https://www.typescriptlang.org/docs/handbook/2/functions.html#function-type-expressions)编写的。
-:::
-
-| 功能     | 描述                                                         | 签名                                                            |
-| -------- | ------------------------------------------------------------ | --------------------------------------------------------------- |
-| `debug`  | 以列表形式打印所有已注册模块及其控制器和提供程序。           | `debug(moduleCls?: ClassRef \| string) => void`                |
-| `get` 或 ````
-
- | 获取可注入对象或控制器的实例，否则抛出异常。                 | `get(token: InjectionToken) => any`                            |
-| `methods` | 显示给定提供者或控制器上所有可用的公共方法。                 | `methods(token: ClassRef \| string) => void`                   |
-| `resolve` | 解析可注入对象或控制器的临时或请求作用域实例，否则抛出异常。 | `resolve(token: InjectionToken, contextId: any) => Promise<any>` |
-| `select` | 允许在模块树中进行导航，例如从选定的模块中提取特定实例。     | `select(token: DynamicModule \| ClassRef) => INestApplicationContext` |
-
-#### 监视模式
-
-在开发过程中，以监视模式运行 REPL 非常有用，它能自动反映所有代码变更：
-
-```bash
-$ npm run start -- --watch --entryFile repl
+title="REPL"
 
 ```
 
-这种方式存在一个缺陷：每次重新加载后 REPL 的命令历史记录都会被丢弃，这可能带来不便。幸运的是，有个非常简单的解决方案。像这样修改你的 `bootstrap` 函数：
+> 提示 那些函数接口是使用 __LINK_37__ 编写的。
 
-```typescript
-async function bootstrap() {
-  const replServer = await repl(AppModule);
-  replServer.setupHistory('.nestjs_repl_history', (err) => {
-    if (err) {
-      console.error(err);
-    }
-  });
-}
+| 函数     | 描述                                                                                                        | 签名                                                             |
+| -------- | ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| __INLINE_CODE_21__      | 打印所有注册模块的列表，包括它们的控制器和提供者。                              | __INLINE_CODE_22__                       |
+| __INLINE_CODE_23__ 或 __INLINE_CODE_24__ | 检索一个可注入或控制器的实例，否则抛出异常。                             | __INLINE_CODE_25__                                   |
+| __INLINE_CODE_26__    | 显示某个提供者或控制器上的所有公共方法。                                            | __INLINE_CODE_27__                          |
+| __INLINE_CODE_28__    | 解析瞬态或请求范围实例的可注入或控制器，否则抛出异常。     | __INLINE_CODE_29__      |
+| __INLINE_CODE_30__     | 允许在模块树中导航，以从选择的模块中提取特定的实例。 | __INLINE_CODE_31__ |
+
+#### 监听模式
+
+在开发中，运行 REPL 在监听模式下非常有用，以便在代码更改后自动反映：
 
 ```
 
-现在运行/重新加载之间的历史记录都能保留了。
+title="REPL"
+
+```
+
+这有一個缺陷，即 REPL 的命令历史在每次重新加载后被丢弃，这可能会很麻烦。
+幸运的是，有一个非常简单的解决方案。修改您的 __INLINE_CODE_32__ 函数如下：
+
+```
+
+title="REPL"
+
+```
+
+现在，历史将在运行/重新加载之间被保留。

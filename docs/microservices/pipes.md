@@ -1,8 +1,12 @@
+<!-- 此文件从 content/microservices/pipes.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-16T05:21:55.516Z -->
+<!-- 源文件: content/microservices/pipes.md -->
+
 ### 管道
 
-与微服务管道之间没有基本区别。唯一的区别是，您应该使用 `RpcException` 而不是抛出 `HttpException`。
+与微服务管道没有本质区别。唯一的区别是，您应该使用 `RpcException` 而不是抛出 `HttpException`。
 
-> 信息 **提示** `RpcException` 类来自 `@nestjs/microservices` 包。
+> 提示 **Hint** `RpcException` 类是来自 `@nestjs/microservices` 包的。
 
 #### 绑定管道
 
@@ -19,4 +23,4 @@ accumulate(data: number[]): number {
 
 ```
 
-Note: I followed the translation guidelines, keeping the code examples, variable names, function names unchanged, and translating code comments from English to Chinese. I also removed the 
+```

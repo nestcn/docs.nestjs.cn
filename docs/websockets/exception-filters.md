@@ -1,66 +1,69 @@
 <!-- 此文件从 content/websockets/exception-filters.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-12T13:42:20.330Z -->
+<!-- 生成时间: 2026-03-16T04:52:51.122Z -->
 <!-- 源文件: content/websockets/exception-filters.md -->
 
 ### 异常过滤器
 
-HTTP [异常过滤器](/exception-filters)层与相应的 WebSocket 层之间的唯一区别是，不应该抛出 `HttpException`，而应该使用 `WsException`。
+HTTP 层和相应的 WebSocket 层之间唯一的区别是，在抛出 __INLINE_CODE_4__ 时，不要抛出，而是使用 __INLINE_CODE_5__。
 
-```typescript
-throw new WsException('Invalid credentials.');
+```bash
+$ npm i --save redis socket.io @socket.io/redis-adapter
 
 ```
 
-> info **提示** `WsException` 类从 `@nestjs/websockets` 包导入。
+> 信息 **提示** __INLINE_CODE_6__ 类来自 __INLINE_CODE_7__ 包。
 
-使用上面的示例，Nest 将处理抛出的异常并发出具有以下结构的 `exception` 消息：
+Nest 将处理抛出的异常，并以以下结构 emit `WebSocketAdapter` 消息：
 
 ```typescript
-{
-  status: 'error',
-  message: 'Invalid credentials.'
+import { IoAdapter } from '@nestjs/platform-socket.io';
+import { ServerOptions } from 'socket.io';
+import { createAdapter } from '@socket.io/redis-adapter';
+import { createClient } from 'redis';
+
+export class RedisIoAdapter extends IoAdapter {
+  private adapterConstructor: ReturnType<typeof createAdapter>;
+
+  async connectToRedis(): Promise<void> {
+    const pubClient = createClient({ url: `redis://localhost:6379` });
+    const subClient = pubClient.duplicate();
+
+    await Promise.all([pubClient.connect(), subClient.connect()]);
+
+    this.adapterConstructor = createAdapter(pubClient, subClient);
+  }
+
+  createIOServer(port: number, options?: ServerOptions): any {
+    const server = super.createIOServer(port, options);
+    server.adapter(this.adapterConstructor);
+    return server;
+  }
 }
 
 ```
 
 #### 过滤器
 
-WebSocket 异常过滤器的行为与 HTTP 异常过滤器等效。以下示例使用手动实例化的方法范围过滤器。与基于 HTTP 的应用程序一样，你也可以使用网关范围的过滤器（即在网关类前加上 `@UseFilters()` 装饰器）。
+WebSocket 异常过滤器与 HTTP 异常过滤器行为相同。以下示例使用手动实例化的方法作用域过滤器。与 HTTP 基于应用程序相同，您也可以使用网关作用域过滤器（即在网关类前添加 `IoAdapter` 装饰器）。
 
 ```typescript
-@UseFilters(new WsExceptionFilter())
-@SubscribeMessage('events')
-onEvent(client, data: any): WsResponse<any> {
-  const event = 'events';
-  return { event, data };
-}
+const app = await NestFactory.create(AppModule);
+const redisIoAdapter = new RedisIoAdapter(app);
+await redisIoAdapter.connectToRedis();
+
+app.useWebSocketAdapter(redisIoAdapter);
 
 ```
 
 #### 继承
 
-通常，你将创建完全自定义的异常过滤器，以满足你的应用程序需求。但是，可能有些用例你只想简单地扩展**核心异常过滤器**，并根据某些因素覆盖行为。
+通常，您将创建完全自定义的异常过滤器，以满足应用程序需求。然而，有些情况下，您可能想简单地继承 **core 异常过滤器**，并根据某些因素override 行为。
 
-为了将异常处理委托给基础过滤器，你需要扩展 `BaseWsExceptionFilter` 并调用继承的 `catch()` 方法。
+要将异常处理委派给基本过滤器，您需要扩展 `IoAdapter` 并调用继承的 `transports: ['websocket']` 方法。
 
-```typescript
-import { Catch, ArgumentsHost } from '@nestjs/common';
-import { BaseWsExceptionFilter } from '@nestjs/websockets';
-
-@Catch()
-export class AllExceptionsFilter extends BaseWsExceptionFilter {
-  catch(exception: unknown, host: ArgumentsHost) {
-    super.catch(exception, host);
-  }
-}
-
-@Catch()
-export class AllExceptionsFilter extends BaseWsExceptionFilter {
-  catch(exception, host) {
-    super.catch(exception, host);
-  }
-}
+```bash
+$ npm i --save @nestjs/platform-ws
 
 ```
 
-上面的实现只是一个外壳，演示了该方法。扩展异常过滤器的实现将包括你定制的**业务逻辑**（例如，处理各种条件）。
+上述实现只是展示了该方法。您的扩展异常过滤器实现将包括您定制的 **业务逻辑**（例如，处理各种条件）。

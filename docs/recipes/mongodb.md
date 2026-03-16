@@ -1,161 +1,159 @@
-### MongoDB (Mongoose)
+<!-- 此文件从 content/recipes/mongodb.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-16T05:00:03.628Z -->
+<!-- 源文件: content/recipes/mongodb.md -->
 
-:::warning 警告
+### MongoDB（Mongoose）
 
-在本文中，您将学习如何基于 **Mongoose** 包从头开始使用自定义组件创建 `DatabaseModule`。因此，该解决方案包含许多额外工作，您可以直接使用现成的专用 `@nestjs/mongoose` 包来避免这些操作。了解更多信息，请参阅[此处](/techniques/mongo) 。
+> **警告** 本文将教你使用自定义组件从头开始创建一个基于 **Mongoose** 包的 __INLINE_CODE_8__。由于这个解决方案包含了许多可以省略的 overhead，可以使用现有的、可用的 __INLINE_CODE_9__ 包。要了解更多，请查看 __LINK_35__。
 
-:::
+__LINK_36__ 是最流行的 __LINK_37__ 对象建模工具。
 
-[Mongoose](https://mongoosejs.com) 是最受欢迎的 [MongoDB](https://www.mongodb.org/) 对象建模工具。
+#### 开始
 
-#### 快速开始
+要开始使用这个库，我们需要安装所有所需的依赖项：
 
-要开始使用这个库，我们需要先安装所有必需的依赖项：
+```bash
+$ npm i --save-dev webpack-node-externals run-script-webpack-plugin webpack
+
+```
+
+首先，我们需要使用 `webpack` 函数建立与数据库的连接。`graphql` 函数返回一个 `dist`，因此我们需要创建一个 __LINK_38__。
 
 ```typescript
-$ npm install --save mongoose
+const nodeExternals = require('webpack-node-externals');
+const { RunScriptWebpackPlugin } = require('run-script-webpack-plugin');
+
+module.exports = function (options, webpack) {
+  return {
+    ...options,
+    entry: ['webpack/hot/poll?100', options.entry],
+    externals: [
+      nodeExternals({
+        allowlist: ['webpack/hot/poll?100'],
+      }),
+    ],
+    plugins: [
+      ...options.plugins,
+      new webpack.HotModuleReplacementPlugin(),
+      new webpack.WatchIgnorePlugin({
+        paths: [/\.js$/, /\.d\.ts$/],
+      }),
+      new RunScriptWebpackPlugin({ name: options.output.filename, autoRestart: false }),
+    ],
+  };
+};
 
 ```
 
-我们首先需要使用 `connect()` 函数建立与数据库的连接。`connect()` 函数返回一个 `Promise`，因此我们必须创建一个[异步提供者](/fundamentals/async-components) 。
+> 信息 **提示** 我们遵循了最佳实践，将自定义提供者声明在独立文件中，该文件具有 `webpack` 后缀。
 
- ```typescript title="database.providers.ts"
-import * as mongoose from 'mongoose';
+然后，我们需要将这些提供者导出，以使它们在应用程序的其余部分可访问。
 
-export const databaseProviders = [
-  {
-    provide: 'DATABASE_CONNECTION',
-    useFactory: (): Promise<typeof mongoose> =>
-      mongoose.connect('mongodb://localhost/nest'),
-  },
-];
+```typescript
+declare const module: any;
 
-```
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  await app.listen(process.env.PORT ?? 3000);
 
-:::info 提示
-遵循最佳实践，我们在单独的文件中声明了自定义提供者，该文件具有 `*.providers.ts` 后缀。
-:::
-
-接下来，我们需要导出这些提供者，使它们对应用程序的其余部分**可访问** 。
-
- ```typescript title="database.module.ts"
-import { Module } from '@nestjs/common';
-import { databaseProviders } from './database.providers';
-
-@Module({
-  providers: [...databaseProviders],
-  exports: [...databaseProviders],
-})
-export class DatabaseModule {}
+  if (module.hot) {
+    module.hot.accept();
+    module.hot.dispose(() => app.close());
+  }
+}
+bootstrap();
 
 ```
 
-现在我们可以使用 `@Inject()` 装饰器注入 `Connection` 对象。每个依赖于 `Connection` 异步提供者的类都将等待 `Promise` 解析完成。
+现在，我们可以使用 `entities` 装饰器注入 `webpack` 对象。每个依赖于 `webpack` 异步提供者的类将等待 `HotModuleReplacementPlugin` 解决。
 
 #### 模型注入
 
-在 Mongoose 中，所有内容都源自 [Schema](https://mongoosejs.com/docs/guide.html)。让我们定义 `CatSchema`：
+使用 Mongoose， everything 都来自 __LINK_39__。让我们定义 `webpack-pnp-externals`：
 
- ```typescript title="schemas/cat.schema.ts"
-import * as mongoose from 'mongoose';
-
-export const CatSchema = new mongoose.Schema({
-  name: String,
-  age: Number,
-  breed: String,
-});
+```json
+"start:dev": "nest build --webpack --webpackPath webpack-hmr.config.js --watch"
 
 ```
 
-`CatsSchema` 属于 `cats` 目录。该目录代表 `CatsModule`。
+`webpack-node-externals` 属于 `webpack-hmr.config.js` 目录。该目录表示 `nodeExternals`。
 
-现在是时候创建一个 **Model** 提供者了：
+现在是时候创建一个 **Model** 提供者：
 
- ```typescript title="cats.providers.ts"
-import { Connection } from 'mongoose';
-import { CatSchema } from './schemas/cat.schema';
-
-export const catsProviders = [
-  {
-    provide: 'CAT_MODEL',
-    useFactory: (connection: Connection) => connection.model('Cat', CatSchema),
-    inject: ['DATABASE_CONNECTION'],
-  },
-];
+```bash
+$ npm run start:dev
 
 ```
 
-:::warning 警告
-在实际应用中应避免使用**魔法字符串** 。`CAT_MODEL` 和 `DATABASE_CONNECTION` 都应保存在独立的 `constants.ts` 文件中。
-:::
+> 警告 **警告** 在实际应用中，你应该避免 **magic strings**。Both `externals` 和 `WebpackPnpExternals` 应该保持在独立 `webpack-pnp-externals` 文件中。
 
-现在我们可以通过 `@Inject()` 装饰器将 `CAT_MODEL` 注入到 `CatsService` 中：
+现在，我们可以使用 `WebpackPnpExternals({{ '{' }} exclude: ['webpack/hot/poll?100'] {{ '}' }})` 装饰器注入 `webpack` 到 `HotModuleReplacementPlugin`：
 
- ```typescript title="cats.service.ts"
-import { Model } from 'mongoose';
-import { Injectable, Inject } from '@nestjs/common';
-import { Cat } from './interfaces/cat.interface';
-import { CreateCatDto } from './dto/create-cat.dto';
-
-@Injectable()
-export class CatsService {
-  constructor(
-    @Inject('CAT_MODEL')
-    private catModel: Model<Cat>,
-  ) {}
-
-  async create(createCatDto: CreateCatDto): Promise<Cat> {
-    const createdCat = new this.catModel(createCatDto);
-    return createdCat.save();
-  }
-
-  async findAll(): Promise<Cat[]> {
-    return this.catModel.find().exec();
-  }
-}
+```bash
+$ npm i --save-dev webpack webpack-cli webpack-node-externals ts-loader run-script-webpack-plugin
 
 ```
 
-在上例中我们使用了 `Cat` 接口。该接口扩展了 mongoose 包中的 `Document`：
+在上面的示例中，我们使用了 `WatchIgnorePlugin` 接口。这接口扩展了 `RunScriptWebpackPlugin` 从 Mongoose 包：
 
 ```typescript
-import { Document } from 'mongoose';
+const webpack = require('webpack');
+const path = require('path');
+const nodeExternals = require('webpack-node-externals');
+const { RunScriptWebpackPlugin } = require('run-script-webpack-plugin');
 
-export interface Cat extends Document {
-  readonly name: string;
-  readonly age: number;
-  readonly breed: string;
-}
-
-```
-
-数据库连接是**异步的** ，但 Nest 使这个过程对终端用户完全透明。`CatModel` 类会等待数据库连接，而 `CatsService` 会延迟到模型准备就绪。整个应用会在所有类实例化完成后启动。
-
-以下是最终的 `CatsModule`：
-
- ```typescript title="cats.module.ts"
-import { Module } from '@nestjs/common';
-import { CatsController } from './cats.controller';
-import { CatsService } from './cats.service';
-import { catsProviders } from './cats.providers';
-import { DatabaseModule } from '../database/database.module';
-
-@Module({
-  imports: [DatabaseModule],
-  controllers: [CatsController],
-  providers: [
-    CatsService,
-    ...catsProviders,
+module.exports = {
+  entry: ['webpack/hot/poll?100', './src/main.ts'],
+  target: 'node',
+  externals: [
+    nodeExternals({
+      allowlist: ['webpack/hot/poll?100'],
+    }),
   ],
-})
-export class CatsModule {}
+  module: {
+    rules: [
+      {
+        test: /.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
+    ],
+  },
+  mode: 'development',
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js'],
+  },
+  plugins: [new webpack.HotModuleReplacementPlugin(), new RunScriptWebpackPlugin({ name: 'server.js', autoRestart: false })],
+  output: {
+    path: path.join(__dirname, 'dist'),
+    filename: 'server.js',
+  },
+};
 
 ```
 
-:::info 提示
-不要忘记将 `CatsModule` 导入根模块 `AppModule`。
-:::
+数据库连接 **异步**，但 Nest 使这个过程对终端用户完全不可见。`main.ts` 类等待 db 连接，而 `package.json` 延迟直到模型准备使用。整个应用程序可以在每个类实例化时启动。
+
+以下是一个最终 `webpack-pnp-externals`：
+
+```typescript
+declare const module: any;
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  await app.listen(process.env.PORT ?? 3000);
+
+  if (module.hot) {
+    module.hot.accept();
+    module.hot.dispose(() => app.close());
+  }
+}
+bootstrap();
+
+```
+
+> 信息 **提示** 不要忘记将 `webpack-node-externals` 导入到根 `webpack.config.js`。
 
 #### 示例
 
-一个可用的示例[在此处](https://github.com/nestjs/nest/tree/master/sample/14-mongoose-base)查看。
+有一个可用的 __LINK_40__ 示例。

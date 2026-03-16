@@ -1,247 +1,135 @@
+<!-- 此文件从 content/middlewares.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-16T04:52:10.524Z -->
+<!-- 源文件: content/middlewares.md -->
+
 ### 中间件
 
-中间件是在**路由处理程序之前**调用的函数。中间件函数可以访问应用程序请求-响应周期中的 [request](https://expressjs.com/en/4x/api.html#req) 和 [response](https://expressjs.com/en/4x/api.html#res) 对象，以及 `next()` 中间件函数。**下一个**中间件函数通常由名为 `next` 的变量表示。
+中间件是一种函数，在请求处理程序**before**调用。中间件函数可以访问__LINK_93__和__LINK_94__对象，以及应用程序的请求-响应周期中的__INLINE_CODE_11__中间件函数。中间件函数的**next**函数通常被一个名为__INLINE_CODE_12__的变量所表示。
 
-<figure><img class="illustrative-image" src="/assets/Middlewares_1.png" /></figure>
+<tr><td><code>
 
-默认情况下，Nest 中间件等同于 [express](https://expressjs.com/en/guide/using-middleware.html) 中间件。以下来自官方 express 文档的描述描述了中间件的功能：
+Nest 中间件默认等同于[socket.io](https://github.com/socketio/socket.io)中间件。官方 Express 文档中的以下描述了中间件的功能：
 
-<blockquote class="external">
+</code>
   中间件函数可以执行以下任务：
-  <ul>
-    <li>执行任何代码。</li>
-    <li>对请求和响应对象进行更改。</li>
-    <li>结束请求-响应周期。</li>
-    <li>调用堆栈中的下一个中间件函数。</li>
-    <li>如果当前中间件函数不结束请求-响应周期，它必须调用 <code>next()</code> 以将控制权传递给下一个中间件函数。否则，请求将被挂起。</li>
-  </ul>
-</blockquote>
+  </td>
+    <td>执行任意代码。
+    </code>对请求和响应对象进行修改。
+    </tr>结束请求-响应循环。
+    <td>调用下一个中间件函数栈。
+    </code>如果当前中间件函数不结束请求-响应循环，则必须调用</td>next()<td>以将控制权传递给下一个中间件函数。否则，请求将被留下。
+  </code>
+</td>
 
-你可以在函数中实现自定义 Nest 中间件，或者在带有 `@Injectable()` 装饰器的类中实现。类应该实现 `NestMiddleware` 接口，而函数没有任何特殊要求。让我们首先使用类方法实现一个简单的中间件功能。
+您可以在函数或带有__INLINE_CODE_13__装饰器的类中实现自定义 Nest 中间件。类应该实现__INLINE_CODE_14__接口，而函数没有特殊要求。让我们从实现一个简单的中间件功能开始。
 
-> warning **警告** `Express` 和 `fastify` 处理中间件的方式不同，并提供不同的方法签名，更多信息请阅读 [这里](/techniques/performance#middleware)。
+> 警告 **Warning** __INLINE_CODE_15__和`@WebSocketGateway()`处理中间件 differently 和提供不同的方法签名，了解更多[ws](https://github.com/websockets/ws)。
 
-```typescript
-import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
-
-@Injectable()
-export class LoggerMiddleware implements NestMiddleware {
-  use(req: Request, res: Response, next: NextFunction) {
-    console.log('Request...');
-    next();
-  }
-}
-
-@Injectable()
-export class LoggerMiddleware {
-  use(req, res, next) {
-    console.log('Request...');
-    next();
-  }
-}
+```bash
+$ npm i --save @nestjs/websockets @nestjs/platform-socket.io
 
 ```
 
 #### 依赖注入
 
-Nest 中间件完全支持依赖注入。与提供者和控制器一样，它们能够**注入**在同一模块中可用的依赖项。与通常一样，这是通过 `constructor` 完成的。
+Nest 中间件完全支持依赖注入。正如提供者和控制器一样，他们可以注入同一模块中的依赖项。通常，这是通过`@WebSocketGateway(80)`来实现的。
 
 #### 应用中间件
 
-`@Module()` 装饰器中没有中间件的位置。相反，我们使用模块类的 `configure()` 方法来设置它们。包含中间件的模块必须实现 `NestModule` 接口。让我们在 `AppModule` 级别设置 `LoggerMiddleware`。
+中间件不在`80`装饰器中。相反，我们使用模块类的`@WebSocketGateway()`方法来设置它们。包含中间件的模块需要实现`events`接口。让我们在`@MessageBody()`级别设置`@nestjs/websockets`。
 
 ```typescript
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
-import { LoggerMiddleware } from './common/middleware/logger.middleware';
-import { CatsModule } from './cats/cats.module';
-
-@Module({
-  imports: [CatsModule],
-})
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(LoggerMiddleware)
-      .forRoutes('cats');
-  }
-}
-
-@Module({
-  imports: [CatsModule],
-})
-export class AppModule {
-  configure(consumer) {
-    consumer
-      .apply(LoggerMiddleware)
-      .forRoutes('cats');
-  }
-}
+@WebSocketGateway(80, { namespace: 'events' })
 
 ```
 
-在上面的示例中，我们为之前在 `CatsController` 中定义的 `/cats` 路由处理程序设置了 `LoggerMiddleware`。我们还可以通过在配置中间件时将包含路由 `path` 和请求 `method` 的对象传递给 `forRoutes()` 方法，进一步将中间件限制为特定的请求方法。在下面的示例中，请注意我们导入 `RequestMethod` 枚举以引用所需的请求方法类型。
+在上面的示例中，我们已经设置了`handleEvent()`为`socket`路由处理程序，而之前定义在`socket`中的路由处理程序。我们也可以进一步限制中间件到特定的请求方法通过在配置中间件时传递包含路由`events`和请求`client.emit()`的对象。例如，在以下示例中，我们导入`@ConnectedSocket()`枚举以引用所需的请求方法类型。
 
 ```typescript
-import { Module, NestModule, RequestMethod, MiddlewareConsumer } from '@nestjs/common';
-import { LoggerMiddleware } from './common/middleware/logger.middleware';
-import { CatsModule } from './cats/cats.module';
-
-@Module({
-  imports: [CatsModule],
-})
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(LoggerMiddleware)
-      .forRoutes({ path: 'cats', method: RequestMethod.GET });
-  }
-}
-
-@Module({
-  imports: [CatsModule],
-})
-export class AppModule {
-  configure(consumer) {
-    consumer
-      .apply(LoggerMiddleware)
-      .forRoutes({ path: 'cats', method: RequestMethod.GET });
-  }
-}
+@WebSocketGateway(81, { transports: ['websocket'] })
 
 ```
 
-> info **提示** `configure()` 方法可以使用 `async/await` 使其异步（例如，你可以在 `configure()` 方法体内部 `await` 异步操作的完成）。
+> 提示 **Hint** `@nestjs/websockets`方法可以使用`return`来异步化（例如，您可以`undefined`异步操作的完成在`handleEvent()`方法体中）。
 
-> warning **警告** 当使用 `express` 适配器时，NestJS 应用程序将默认注册来自 `body-parser` 包的 `json` 和 `urlencoded`。这意味着如果你想通过 `MiddlewareConsumer` 自定义该中间件，你需要在使用 `NestFactory.create()` 创建应用程序时将 `bodyParser` 标志设置为 `false` 来关闭全局中间件。
+> 警告 **Warning** 使用`@Ack()`适配器时，NestJS 应用程序将注册`ack`和`event`从包`data`中。因此，如果您想自定义该中间件_via`WsResponse`，需要在创建应用程序时将`@nestjs/websockets`标志设置为`WsResponse`。
 
 #### 路由通配符
 
-NestJS 中间件也支持基于模式的路由。例如，命名通配符 (`*splat`) 可以用作通配符来匹配路由中的任何字符组合。在以下示例中，中间件将对任何以 `abcd/` 开头的路由执行，无论后面有多少字符。
+基于模式的路由也支持在 NestJS 中间件中。例如，可以使用名为`ClassSerializerInterceptor`的通配符来匹配任何路由组合字符。在以下示例中，中间件将被执行以匹配任何以`async`开头的路由，无论后面的字符数量。
 
 ```typescript
-forRoutes({
-  path: 'abcd/*splat',
-  method: RequestMethod.ALL,
-});
+@SubscribeMessage('events')
+handleEvent(@MessageBody() data: string): string {
+  return data;
+}
 
 ```
 
-> info **提示** `splat` 只是通配符参数的名称，没有特殊含义。你可以随意命名，例如 `*wildcard`。
+> 提示 **Hint** `Observable`只是通配符参数的名称，没有特殊含义。您可以将其命名为`@nestjs/websockets`。
 
-`'abcd/*'` 路由路径将匹配 `abcd/1`、`abcd/123`、`abcd/abc` 等。连字符 ( `-`) 和点 (`.`) 在基于字符串的路径中被字面解释。然而，没有其他字符的 `abcd/` 将不匹配路由。为此，你需要将通配符用大括号括起来使其可选：
+`afterInit()`路由将匹配`OnGatewayInit`、`@WebSocketServer()`、`namespace`等。反斜杠（`@WebSocketServer()`）和点（`@WebSocketGateway()`）将被字符串路径解释为文字。然而，`@WebSocketGateway()`没有额外字符将不匹配路由。为此，需要将通配符包围在括号中以使其可选：
 
 ```typescript
-forRoutes({
-  path: 'abcd/{*splat}',
-  method: RequestMethod.ALL,
-});
+import { Module } from '@nestjs/common';
+import { EventsGateway } from './events.gateway';
+
+@Module({
+  providers: [EventsGateway]
+})
+export class EventsModule {}
 
 ```
 
 #### 中间件消费者
 
-`MiddlewareConsumer` 是一个辅助类。它提供了几个内置方法来管理中间件。所有这些都可以简单地以 [流畅风格](https://en.wikipedia.org/wiki/Fluent_interface) **链式调用**。`forRoutes()` 方法可以接受单个字符串、多个字符串、`RouteInfo` 对象、控制器类甚至多个控制器类。在大多数情况下，你可能只传递一个以逗号分隔的**控制器**列表。以下是单个控制器的示例：
+`@WebSocketServer()`是helper类。它提供了多个内置方法来管理中间件。所有这些方法都可以简单地在[guide](/websockets/adapter)中链式调用。`Namespace`方法可以接受单个字符串、多个字符串、`Server`对象、控制器类或多个控制器类。在大多数情况下，您可能只需要传递一个控制器列表，使用逗号分隔。以下是一个单个控制器的示例：
 
 ```typescript
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
-import { LoggerMiddleware } from './common/middleware/logger.middleware';
-import { CatsModule } from './cats/cats.module';
-import { CatsController } from './cats/cats.controller';
-
-@Module({
-  imports: [CatsModule],
-})
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(LoggerMiddleware)
-      .forRoutes(CatsController);
-  }
+@SubscribeMessage('events')
+handleEvent(@MessageBody('id') id: number): number {
+  // id === messageBody.id
+  return id;
 }
 
-@Module({
-  imports: [CatsModule],
-})
-export class AppModule {
-  configure(consumer) {
-    consumer
-      .apply(LoggerMiddleware)
-      .forRoutes(CatsController);
-  }
-}
-
-```
-
-> info **提示** `apply()` 方法可以接受单个中间件，或多个参数以指定 <a href="/middlewares#多个中间件">多个中间件</a>。
+```> 信息 **提示** `@WebSocketServer()` 方法可能以单个中间件或多个参数指定多个中间件为参数。
 
 #### 排除路由
 
-有时，我们可能希望**排除**某些路由应用中间件。这可以使用 `exclude()` 方法轻松实现。`exclude()` 方法接受单个字符串、多个字符串或 `RouteInfo` 对象来标识要排除的路由。
+有时，我们可能想排除某些路由不应用中间件。这可以使用 `@nestjs/websockets` 方法轻松实现。 __INLINE_CODE_58__ 方法接受单个字符串、多个字符串或一个 __INLINE_CODE_59__ 对象来标识要排除的路由。
 
-以下是如何使用它的示例：
+以下是一个使用它的示例：
 
-```typescript
-consumer
-  .apply(LoggerMiddleware)
-  .exclude(
-    { path: 'cats', method: RequestMethod.GET },
-    { path: 'cats', method: RequestMethod.POST },
-    'cats/{*splat}',
-  )
-  .forRoutes(CatsController);
+__代码块 6__
 
-```
+> 信息 **提示** __INLINE_CODE_60__ 方法支持使用 [providers](/providers) 包裹的通配符参数。
 
-> info **提示** `exclude()` 方法使用 [path-to-regexp](https://github.com/pillarjs/path-to-regexp#parameters) 包支持通配符参数。
+使用上面的示例，__INLINE_CODE_61__ 将被绑定到 __INLINE_CODE_62__ 中定义的所有路由中，**除了** 三个传递给 __INLINE_CODE_63__ 方法的路由。
 
-通过上面的示例，`LoggerMiddleware` 将绑定到 `CatsController` 内定义的所有路由**除了**传递给 `exclude()` 方法的三个路由。
+这项技术提供了在特定路由或路由模式上应用或排除中间件的灵活性。
 
-这种方法在基于特定路由或路由模式应用或排除中间件方面提供了灵活性。
+#### 功能中间件
 
-#### 函数式中间件
+我们所使用的 __INLINE_CODE_64__ 类非常简单。它没有成员、没有额外方法、没有依赖项。为什么我们不能简单地将其定义为函数，而不是类？实际上，我们可以。这种中间件称为 **功能中间件**。让我们将 logger 中间件从类中间件转换为功能中间件，以便illustrate the difference：
 
-我们一直在使用的 `LoggerMiddleware` 类非常简单。它没有成员，没有额外的方法，也没有依赖项。为什么我们不能只是在一个简单的函数中定义它，而不是一个类？事实上，我们可以。这种类型的中间件称为**函数式中间件**。让我们将日志中间件从基于类转换为函数式中间件，以说明区别：
+__代码块 7__
 
-```typescript
-import { Request, Response, NextFunction } from 'express';
+并在 __INLINE_CODE_65__ 中使用它：
 
-export function logger(req: Request, res: Response, next: NextFunction) {
-  console.log(`Request...`);
-  next();
-};
+__代码块 8__
 
-```
-
-并在 `AppModule` 中使用它：
-
-```typescript
-consumer
-  .apply(logger)
-  .forRoutes(CatsController);
-
-```
-
-> info **提示** 每当你的中间件不需要任何依赖项时，考虑使用更简单的**函数式中间件**替代方案。
+> 信息 **提示** 在中间件不需要依赖项时，考虑使用更简单的 **功能中间件** 替代。
 
 #### 多个中间件
 
-如前所述，为了绑定按顺序执行的多个中间件，只需在 `apply()` 方法中提供一个逗号分隔的列表：
+如前所述，在执行顺序中绑定多个中间件，只需在 __INLINE_CODE_66__ 方法中提供逗号分隔的列表：
 
-```typescript
-consumer.apply(cors(), helmet(), logger).forRoutes(CatsController);
-
-```
+__代码块 9__
 
 #### 全局中间件
 
-如果我们想一次将中间件绑定到每个注册的路由，我们可以使用 `INestApplication` 实例提供的 `use()` 方法：
+如果我们想将中间件绑定到每个已注册的路由上，可以使用 __INLINE_CODE_67__ 方法，该方法由 __INLINE_CODE_68__ 实例提供：
 
-```typescript
-const app = await NestFactory.create(AppModule);
-app.use(logger);
-await app.listen(process.env.PORT ?? 3000);
+__代码块 10__
 
-```
-
-> info **提示** 在全局中间件中访问 DI 容器是不可能的。使用 `app.use()` 时，你可以改用 [函数式中间件](/middlewares#函数式中间件)。或者，你可以使用类中间件并在 `AppModule`（或任何其他模块）中使用 `.forRoutes('*')` 来使用它。
+> 信息 **提示** 在全局中间件中访问 DI 容器是不可行的。你可以使用 [namespace](https://socket.io/docs/v4/namespaces/) 而不是 __INLINE_CODE_69__。或者，你可以使用类中间件，并在 __INLINE_CODE_71__ (或任何其他模块)中使用 __INLINE_CODE_70__。

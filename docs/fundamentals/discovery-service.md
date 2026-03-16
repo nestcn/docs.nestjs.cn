@@ -1,101 +1,132 @@
 <!-- 此文件从 content/fundamentals/discovery-service.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-12T13:42:20.390Z -->
+<!-- 生成时间: 2026-03-16T04:58:08.236Z -->
 <!-- 源文件: content/fundamentals/discovery-service.md -->
 
 ### 发现服务
 
-`@nestjs/core` 包提供的 `DiscoveryService` 是一个强大的实用工具，允许开发人员在 NestJS 应用程序中动态检查和检索提供者、控制器和其他元数据。这在构建依赖运行时内省的插件、装饰器或高级功能时特别有用。通过利用 `DiscoveryService`，开发人员可以创建更灵活和模块化的架构，从而在应用程序中实现自动化和动态行为。
+__INLINE_CODE_7__ 提供的 __INLINE_CODE_8__ 包中的 __INLINE_CODE_7__ 是一个功能强大的实用工具，允许开发者在 NestJS 应用程序中动态地检查和检索提供者、控制器和其他元数据。这在构建插件、装饰器或高级功能时非常有用，特别是在需要在运行时进行 introspection 时。通过使用 __INLINE_CODE_9__，开发者可以创建更加灵活和模块化的架构，启用自动化和动态行为。
 
 #### 入门
 
-在使用 `DiscoveryService` 之前，你需要在你打算使用它的模块中导入 `DiscoveryModule`。这确保了该服务可用于依赖注入。以下是如何在 NestJS 模块中配置它的示例：
+在使用 __INLINE_CODE_10__ 之前，您需要在要使用它的模块中导入 __INLINE_CODE_11__。这确保了服务可以供依赖注入使用。下面是一个在 NestJS 模块中配置它的示例：
 
 ```typescript
 import { Module } from '@nestjs/common';
-import { DiscoveryModule } from '@nestjs/core';
-import { ExampleService } from './example.service';
+import { UsersService } from './users.service';
 
 @Module({
-  imports: [DiscoveryModule],
-  providers: [ExampleService],
+  providers: [UsersService],
+  exports: [UsersService],
 })
-export class ExampleModule {}
+export class UsersModule {}
 
 ```
 
-一旦模块设置完成，`DiscoveryService` 就可以注入到任何需要动态发现的提供者或服务中。
+一旦模块设置好了，__INLINE_CODE_12__ 就可以被注入到任何需要动态发现的提供者或服务中。
 
 ```typescript
-@Injectable()
-export class ExampleService {
-  constructor(private readonly discoveryService: DiscoveryService) {}
-}
+import { Module } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { UsersModule } from '../users/users.module';
+
+@Module({
+  imports: [UsersModule],
+  providers: [AuthService],
+  exports: [AuthService],
+})
+export class AuthModule {}
 
 ```
 
 #### 发现提供者和控制器
 
-`DiscoveryService` 的关键功能之一是检索应用程序中所有注册的提供者。这对于根据特定条件动态处理提供者很有用。以下代码片段演示了如何访问所有提供者：
-
-```typescript
-const providers = this.discoveryService.getProviders();
-console.log(providers);
-
-```
-
-每个提供者对象都包含其实例、令牌和元数据等信息。同样，如果你需要检索应用程序中所有注册的控制器，可以使用：
-
-```typescript
-const controllers = this.discoveryService.getControllers();
-console.log(controllers);
-
-```
-
-此功能对于需要动态处理控制器的场景特别有用，例如分析跟踪或自动注册机制。
-
-#### 提取元数据
-
-除了发现提供者和控制器外，`DiscoveryService` 还可以检索附加到这些组件的元数据。这在使用在运行时存储元数据的自定义装饰器时特别有价值。
-
-例如，考虑一个使用自定义装饰器为提供者标记特定元数据的情况：
-
-```typescript
-import { DiscoveryService } from '@nestjs/core';
-
-export const FeatureFlag = DiscoveryService.createDecorator();
-
-```
-
-将此装饰器应用于服务可以存储稍后可以查询的元数据：
+__INLINE_CODE_13__ 的一个关键功能是检索应用程序中的所有注册提供者。这在动态地处理提供者时非常有用。以下是一个访问所有提供者的示例：
 
 ```typescript
 import { Injectable } from '@nestjs/common';
-import { FeatureFlag } from './custom-metadata.decorator';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
-@FeatureFlag('experimental')
-export class CustomService {}
+export class AuthService {
+  constructor(private usersService: UsersService) {}
+  /*
+    Implementation that makes use of this.usersService
+  */
+}
 
 ```
 
-一旦以这种方式将元数据附加到提供者，`DiscoveryService` 就可以轻松地根据分配的元数据过滤提供者。以下代码片段演示了如何检索已标记特定元数据值的提供者：
+每个提供者对象都包含了该实例、token 和元数据的信息。类似地，如果您需要检索应用程序中的所有注册控制器，可以使用：
 
 ```typescript
-const providers = this.discoveryService.getProviders();
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { ConfigModule } from './config/config.module';
 
-const [provider] = providers.filter(
-  (item) =>
-    this.discoveryService.getMetadataByDecorator(FeatureFlag, item) ===
-    'experimental',
-);
-
-console.log(
-  '具有 "experimental" 功能标志元数据的提供者：',
-  provider,
-);
+@Module({
+  imports: [ConfigModule],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
 
 ```
 
-#### 总结
+这个功能在需要动态处理控制器时非常有用，例如分析跟踪或自动注册机制。
 
-`DiscoveryService` 是一个多功能且强大的工具，可在 NestJS 应用程序中实现运行时内省。通过允许动态发现提供者、控制器和元数据，它在构建可扩展框架、插件和自动化驱动功能方面发挥着关键作用。无论你需要扫描和处理提供者、提取元数据进行高级处理，还是创建模块化和可扩展的架构，`DiscoveryService` 都提供了一种高效且结构化的方法来实现这些目标。
+#### 提取元数据
+
+除了发现提供者和控制器,__INLINE_CODE_14__ 还可以检索附加到这些组件的元数据。这在使用自定义装饰器时非常有用，因为这些装饰器可以在运行时存储元数据。
+
+例如，考虑一个使用自定义装饰器将提供者标记为特定元数据的场景：
+
+```typescript
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { ConfigModule } from './config/config.module';
+
+@Module({
+  imports: [ConfigModule.register({ folder: './config' })],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
+
+```
+
+将这个装饰器应用于服务，可以将元数据存储在提供者上：
+
+```typescript
+@Module({
+  imports: [DogsModule],
+  controllers: [CatsController],
+  providers: [CatsService],
+  exports: [CatsService]
+})
+
+```
+
+一旦将元数据附加到提供者上，__INLINE_CODE_15__ 就可以轻松地根据分配的元数据来过滤提供者。以下是一个检索提供者，根据指定的元数据值来过滤的示例：
+
+```typescript
+import { DynamicModule, Module } from '@nestjs/common';
+import { ConfigService } from './config.service';
+
+@Module({})
+export class ConfigModule {
+  static register(): DynamicModule {
+    return {
+      module: ConfigModule,
+      providers: [ConfigService],
+      exports: [ConfigService],
+    };
+  }
+}
+
+```
+
+#### 结论
+
+__INLINE_CODE_16__ 是一个功能强大和灵活的工具，能够在 NestJS 应用程序中实现运行时 introspection。通过允许动态发现提供者、控制器和元数据，它在构建可扩展的框架、插件和自动化驱动的特性时扮演着关键角色。无论您需要扫描和处理提供者、提取元数据以进行高级处理，还是创建模块化和可扩展的架构，__INLINE_CODE_17__ 提供了一个高效和结构化的方法来实现这些目标。

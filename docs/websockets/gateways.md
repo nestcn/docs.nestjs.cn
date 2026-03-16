@@ -1,245 +1,492 @@
-### 网关
+<!-- 此文件从 content/websockets/gateways.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-16T04:53:33.092Z -->
+<!-- 源文件: content/websockets/gateways.md -->
 
-本文档其他地方讨论的大多数概念，如依赖注入、装饰器、异常过滤器、管道、守卫和拦截器，也同样适用于网关。只要可能，Nest 就会抽象实现细节，以便相同的组件可以运行在基于 HTTP 的平台、WebSockets 和微服务上。本节涵盖了 Nest 中特定于 WebSockets 的方面。
+### Gateways
 
-在 Nest 中，网关只是一个使用 `@WebSocketGateway()` 装饰器注释的类。从技术上讲，网关是平台无关的，这使得它们在创建适配器后与任何 WebSockets 库兼容。开箱即用支持两个 WS 平台：[socket.io](https://github.com/socketio/socket.io) 和 [ws](https://github.com/websockets/ws)。您可以选择最适合您需求的一个。此外，您还可以按照此 [指南](/websockets/adapter) 构建自己的适配器。
+大多数讨论在其他部分的概念，例如依赖注入、装饰器、异常过滤器、管道、守卫和拦截器，在gateways中都适用。Nest尽量抽象实现细节，以便在HTTP平台、WebSockets和微服务中运行相同的组件。这个部分涵盖Nest特定的WebSocket方面。
 
-<figure><img class="illustrative-image" src="/assets/Gateways_1.png" /></figure>
+在Nest中，一个gateway只是一个带有__INLINE_CODE_16__装饰器的类。技术上，gateways是平台无关的，这使它们可以与任何WebSocket库一起工作，只要创建了适配器。现有两个WS平台支持：[here](https://github.com/nestjs/jwt/blob/master/README.md)和[here](https://github.com/auth0/node-jsonwebtoken#用法)。您可以选择适合您需求的其中一个，也可以根据[global guard](/guards#绑定守卫)创建自己的适配器。
 
-> info **提示** 网关可以被视为 [](/overview/providers)；这意味着它们可以通过类构造函数注入依赖项。此外，网关也可以被其他类（提供者和控制器）注入。
+__HTML_TAG_58____HTML_TAG_59____HTML_TAG_60__
+
+> info **提示** Gateways可以被视为[here](/guards#putting-it-all-together)；这意味着它们可以通过类构造函数注入依赖项。同时，gateways也可以被其他类（提供者和控制器）注入。
 
 #### 安装
 
-要开始构建基于 WebSockets 的应用程序，首先安装所需的包：
+要开始构建WebSocket应用程序，首先安装所需的包：
 
 ```bash
-$ npm i --save @nestjs/websockets @nestjs/platform-socket.io
+$ nest g module auth
+$ nest g controller auth
+$ nest g service auth
 
 ```
 
 #### 概述
 
-通常，每个网关都在与 **HTTP 服务器** 相同的端口上监听，除非您的应用程序不是 Web 应用程序，或者您手动更改了端口。可以通过向 `@WebSocketGateway(80)` 装饰器传递一个参数来修改此默认行为，其中 `80` 是选定的端口号。您还可以使用以下构造设置网关使用的 [命名空间](https://socket.io/docs/v4/namespaces/)：
+通常，每个gateway都监听与**HTTP 服务器**相同的端口，除非您的应用程序不是Web应用程序或您手动更改了端口。这个默认行为可以通过将__INLINE_CODE_17__装饰器的参数设置为一个选择的端口号来修改。您也可以使用以下构建来设置gateway使用的[Passport](https://github.com/jaredhanson/passport)：
 
-```typescript
-@WebSocketGateway(80, { namespace: 'events' })
-
-```
-
-> warning **警告** 在现有模块的 providers 数组中引用网关之前，它们不会被实例化。
-
-您可以通过 `@WebSocketGateway()` 装饰器的第二个参数将任何受支持的 [选项](https://socket.io/docs/v4/server-options/) 传递给 socket 构造函数，如下所示：
-
-```typescript
-@WebSocketGateway(81, { transports: ['websocket'] })
+```bash
+$ nest g module users
+$ nest g service users
 
 ```
 
-网关现在正在监听，但我们尚未订阅任何传入消息。让我们创建一个处理器，它将订阅 `events` 消息并使用完全相同的数据响应用户。
+> warning **警告** Gateways直到在现有模块的提供者数组中被引用时实例化。
+
+您可以将任何支持的[chapter](/recipes/passport)传递给socket构造函数，以第二个参数传递给`AuthModule`装饰器，例如：
 
 ```typescript
-@SubscribeMessage('events')
-handleEvent(@MessageBody() data: string): string {
-  return data;
+import { Injectable } from '@nestjs/common';
+
+// This should be a real class/interface representing a user entity
+export type User = any;
+
+@Injectable()
+export class UsersService {
+  private readonly users = [
+    {
+      userId: 1,
+      username: 'john',
+      password: 'changeme',
+    },
+    {
+      userId: 2,
+      username: 'maria',
+      password: 'guess',
+    },
+  ];
+
+  async findOne(username: string): Promise<User | undefined> {
+    return this.users.find(user => user.username === username);
+  }
+}
+
+@Injectable()
+export class UsersService {
+  constructor() {
+    this.users = [
+      {
+        userId: 1,
+        username: 'john',
+        password: 'changeme',
+      },
+      {
+        userId: 2,
+        username: 'maria',
+        password: 'guess',
+      },
+    ];
+  }
+
+  async findOne(username) {
+    return this.users.find(user => user.username === username);
+  }
 }
 
 ```
 
-> info **提示** `@SubscribeMessage()` 和 `@MessageBody()` 装饰器是从 `@nestjs/websockets` 包中导入的。
-
-一旦创建了网关，我们就可以在我们的模块中注册它。
+gateway现在正在监听，但是我们还没有订阅任何 incoming 消息。让我们创建一个处理器来订阅`AuthService` 消息并将 exact相同的数据回送给用户。
 
 ```typescript
 import { Module } from '@nestjs/common';
-import { EventsGateway } from './events.gateway';
+import { UsersService } from './users.service';
 
 @Module({
-  providers: [EventsGateway]
+  providers: [UsersService],
+  exports: [UsersService],
 })
-export class EventsModule {}
+export class UsersModule {}
+
+@Module({
+  providers: [UsersService],
+  exports: [UsersService],
+})
+export class UsersModule {}
 
 ```
 
-您还可以将属性键传递给装饰器以从传入消息正文中提取它：
+> info **提示** `AuthController`和`AuthService`装饰器来自`AuthController`包。
+
+一旦gateway创建完毕，我们可以将其注册到我们的模块中。
 
 ```typescript
-@SubscribeMessage('events')
-handleEvent(@MessageBody('id') id: number): number {
-  // id === messageBody.id
-  return id;
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { UsersService } from '../users/users.service';
+
+@Injectable()
+export class AuthService {
+  constructor(private usersService: UsersService) {}
+
+  async signIn(username: string, pass: string): Promise<any> {
+    const user = await this.usersService.findOne(username);
+    if (user?.password !== pass) {
+      throw new UnauthorizedException();
+    }
+    const { password, ...result } = user;
+    // 待办： Generate a JWT and return it here
+    // instead of the user object
+    return result;
+  }
+}
+
+@Injectable()
+@Dependencies(UsersService)
+export class AuthService {
+  constructor(usersService) {
+    this.usersService = usersService;
+  }
+
+  async signIn(username: string, pass: string) {
+    const user = await this.usersService.findOne(username);
+    if (user?.password !== pass) {
+      throw new UnauthorizedException();
+    }
+    const { password, ...result } = user;
+    // 待办： Generate a JWT and return it here
+    // instead of the user object
+    return result;
+  }
 }
 
 ```
 
-如果您不想使用装饰器，以下代码在功能上是等效的：
+您也可以将property key传递给装饰器以从 incoming 消息体中提取：
 
 ```typescript
-@SubscribeMessage('events')
-handleEvent(client: Socket, data: string): string {
-  return data;
+import { Module } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { AuthController } from './auth.controller';
+import { UsersModule } from '../users/users.module';
+
+@Module({
+  imports: [UsersModule],
+  providers: [AuthService],
+  controllers: [AuthController],
+})
+export class AuthModule {}
+
+@Module({
+  imports: [UsersModule],
+  providers: [AuthService],
+  controllers: [AuthController],
+})
+export class AuthModule {}
+
+```
+
+如果您不想使用装饰器，以下代码是等效的：
+
+```typescript
+import { Body, Controller, Post, HttpCode, HttpStatus } from '@nestjs/common';
+import { AuthService } from './auth.service';
+
+@Controller('auth')
+export class AuthController {
+  constructor(private authService: AuthService) {}
+
+  @HttpCode(HttpStatus.OK)
+  @Post('login')
+  signIn(@Body() signInDto: Record<string, any>) {
+    return this.authService.signIn(signInDto.username, signInDto.password);
+  }
 }
 
 ```
 
-在上面的示例中，`handleEvent()` 函数有两个参数。第一个是平台特定的 [socket 实例](https://socket.io/docs/v4/server-api/#socket)，而第二个是从客户端接收的数据。但不推荐这种方法，因为它需要在每个单元测试中模拟 `socket` 实例。
+在上面的示例中，`AuthService`函数有两个参数。第一个是平台特定的[here](https://github.com/nestjs/nest/tree/master/sample/19-auth-jwt)，第二个是从客户端接收的数据。这种方法不推荐，因为它需要在每个单元测试中模拟`UsersService`实例。
 
-一旦接收到 `events` 消息，处理器就会发送一个包含在网络上发送的相同数据的确认。此外，可以使用库特定的方法发射消息，例如，利用 `client.emit()` 方法。为了访问连接的 socket 实例，使用 `@ConnectedSocket()` 装饰器。
+一旦收到`UsersService` 消息，处理器将发送包含相同数据的确认信号。另外，也可以使用库特定的方法来 emit 消息，例如使用`UsersModule`方法。为了访问连接的socket实例，使用`UsersService`装饰器。
+
+```bash
+$ npm install --save @nestjs/jwt
+
+```
+
+> info **提示** `@Module`装饰器来自`AuthService`包。
+
+然而，在这种情况下，您不能使用拦截器。如果您不想回送用户，您可以简单地跳过`AuthService`语句（或明确地返回一个“falsy”值，例如`signIn()`）。
+
+现在，当客户端 emit 消息如下：
 
 ```typescript
-@SubscribeMessage('events')
-handleEvent(
-  @MessageBody() data: string,
-  @ConnectedSocket() client: Socket,
-): string {
-  return data;
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { UsersService } from '../users/users.service';
+import { JwtService } from '@nestjs/jwt';
+
+@Injectable()
+export class AuthService {
+  constructor(
+    private usersService: UsersService,
+    private jwtService: JwtService
+  ) {}
+
+  async signIn(
+    username: string,
+    pass: string,
+  ): Promise<{ access_token: string }> {
+    const user = await this.usersService.findOne(username);
+    if (user?.password !== pass) {
+      throw new UnauthorizedException();
+    }
+    const payload = { sub: user.userId, username: user.username };
+    return {
+      // 💡 Here the JWT secret key that's used for signing the payload 
+      // is the key that was passsed in the JwtModule
+      access_token: await this.jwtService.signAsync(payload),
+    };
+  }
+}
+
+@Dependencies(UsersService, JwtService)
+@Injectable()
+export class AuthService {
+  constructor(usersService, jwtService) {
+    this.usersService = usersService;
+    this.jwtService = jwtService;
+  }
+
+  async signIn(username, pass) {
+    const user = await this.usersService.findOne(username);
+    if (user?.password !== pass) {
+      throw new UnauthorizedException();
+    }
+    const payload = { username: user.username, sub: user.userId };
+    return {
+      // 💡 Here the JWT secret key that's used for signing the payload 
+      // is the key that was passsed in the JwtModule
+      access_token: await this.jwtService.signAsync(payload),
+    };
+  }
 }
 
 ```
 
-> info **提示** `@ConnectedSocket()` 装饰器是从 `@nestjs/websockets` 包中导入的。
-
-但是，在这种情况下，您将无法利用拦截器。如果您不想响应用户，只需跳过 `return` 语句（或显式返回一个“假”值，例如 `undefined`）。
-
-现在，当客户端按如下方式发射消息时：
+`AuthModule`方法将被执行。在 order to listen for messages emitted from within the above handler，the client must attach a corresponding acknowledgment listener：
 
 ```typescript
-socket.emit('events', { name: 'Nest' });
+export const jwtConstants = {
+  secret: 'DO NOT USE THIS VALUE. INSTEAD, CREATE A COMPLEX SECRET AND KEEP IT SAFE OUTSIDE OF THE SOURCE CODE.',
+};
 
 ```
 
-`handleEvent()` 方法将被执行。为了监听从上述处理器内部发射的消息，客户端必须附加一个相应的确认监听器：
+在返回值来自消息处理器时，隐式地发送确认信号。但是在 advanced 场景中，需要直接控制确认回调。
+
+`UsersModule`参数装饰器允许将`AuthController`回调函数直接注入到消息处理器中。
+没有使用装饰器，这个回调函数作为方法的第三个参数传递。
 
 ```typescript
-socket.emit('events', { name: 'Nest' }, (data) => console.log(data));
+import { Module } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { UsersModule } from '../users/users.module';
+import { JwtModule } from '@nestjs/jwt';
+import { AuthController } from './auth.controller';
+import { jwtConstants } from './constants';
 
-```
+@Module({
+  imports: [
+    UsersModule,
+    JwtModule.register({
+      global: true,
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '60s' },
+    }),
+  ],
+  providers: [AuthService],
+  controllers: [AuthController],
+  exports: [AuthService],
+})
+export class AuthModule {}
 
-虽然从消息处理器返回值本质上会发送确认，但高级场景通常需要直接控制确认回调。
-
-`@Ack()` 参数装饰器允许将 `ack` 回调函数直接注入消息处理器。
-如果不使用装饰器，此回调将作为方法的第三个参数传递。
-
-```typescript
-@SubscribeMessage('events')
-handleEvent(
-  @MessageBody() data: string,
-  @Ack() ack: (response: { status: string; data: string }) => void,
-) {
-  ack({ status: 'received', data });
-}
+@Module({
+  imports: [
+    UsersModule,
+    JwtModule.register({
+      global: true,
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '60s' },
+    }),
+  ],
+  providers: [AuthService],
+  controllers: [AuthController],
+  exports: [AuthService],
+})
+export class AuthModule {}
 
 ```
 
 #### 多个响应
 
-确认仅调度一次。此外，原生 WebSockets 实现不支持它。为了解决此限制，您可以返回一个由两个属性组成的对象。`event` 是发射的事件名称，`data` 是必须转发给客户端的数据。
+确认信号只会被 dispatch 一次。此外，native WebSockets 实现不支持确认信号。为了解决这个限制，您可以返回一个对象，该对象包含两个属性。`signIn()`是 emitted 事件的名称，`Record<string, any>`是需要将其转发给客户端的数据。
 
-```typescript
-@SubscribeMessage('events')
-handleEvent(@MessageBody() data: unknown): WsResponse<unknown> {
-  const event = 'events';
-  return { event, data };
-}
+```bash
+$ # POST to /auth/login
+$ curl -X POST http://localhost:3000/auth/login -d '{"username": "john", "password": "changeme"}' -H "Content-Type: application/json"
+{"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."}
+$ # Note: above JWT truncated
 
 ```
 
-> info **提示** `WsResponse` 接口是从 `@nestjs/websockets` 包中导入的。
+> info **提示** `@nestjs/jwt`接口来自`authService`包。
 
-> warning **警告** 如果您的 `data` 字段依赖于 `ClassSerializerInterceptor`，则应该返回一个实现 `WsResponse` 的类实例，因为它会忽略纯 JavaScript 对象响应。
+> warning **警告** 如果您的`auth`字段依赖于`JwtService`，则应该返回实现`auth.service.ts`的类实例，因为它忽略了 JavaScript 对象响应。以下是翻译后的中文技术文档：
 
-为了监听传入的响应，客户端必须应用另一个事件监听器。
+为了监听 incoming response(s)，客户端需要添加另一个事件监听器。
 
 ```typescript
-socket.on('events', (data) => console.log(data));
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { Request } from 'express';
+
+@Injectable()
+export class AuthGuard implements CanActivate {
+  constructor(private jwtService: JwtService) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest();
+    const token = this.extractTokenFromHeader(request);
+    if (!token) {
+      throw new UnauthorizedException();
+    }
+    try {
+      // 💡 Here the JWT secret key that's used for verifying the payload 
+      // is the key that was passsed in the JwtModule
+      const payload = await this.jwtService.verifyAsync(token);
+      // 💡 We're assigning the payload to the request object here
+      // so that we can access it in our route handlers
+      request['user'] = payload;
+    } catch {
+      throw new UnauthorizedException();
+    }
+    return true;
+  }
+
+  private extractTokenFromHeader(request: Request): string | undefined {
+    const [type, token] = request.headers.authorization?.split(' ') ?? [];
+    return type === 'Bearer' ? token : undefined;
+  }
+}
 
 ```
 
 #### 异步响应
 
-消息处理器能够以同步或 **异步** 方式响应。因此，支持 `async` 方法。消息处理器还能够返回一个 `Observable`，在这种情况下，结果值将被发射直到流完成。
+消息处理器可以同步或**异步**地响应。因此，`signIn` 方法也被支持。消息处理器还可以返回一个 `@nestjs/jwt`，在这种情况下，结果值将直到流完成后被 emit。
 
 ```typescript
-@SubscribeMessage('events')
-onEvent(@MessageBody() data: unknown): Observable<WsResponse<number>> {
-  const event = 'events';
-  const response = [1, 2, 3];
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Request,
+  UseGuards
+} from '@nestjs/common';
+import { AuthGuard } from './auth.guard';
+import { AuthService } from './auth.service';
 
-  return from(response).pipe(
-    map(data => ({ event, data })),
-  );
-}
+@Controller('auth')
+export class AuthController {
+  constructor(private authService: AuthService) {}
 
-  return from(response).pipe(
-    map(data => ({ event, data })),
-  );
+  @HttpCode(HttpStatus.OK)
+  @Post('login')
+  signIn(@Body() signInDto: Record<string, any>) {
+    return this.authService.signIn(signInDto.username, signInDto.password);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('profile')
+  getProfile(@Request() req) {
+    return req.user;
+  }
 }
 
 ```
 
-在上面的示例中，消息处理器将响应 **3 次**（数组中的每个项目对应一次）。
+在上面的示例中，消息处理器将在**3次**（每个数组项）中响应。
 
 #### 生命周期钩子
 
-有 3 个有用的生命周期钩子可用。它们都有相应的接口，并在下表中进行了描述：
+有 3 个有用的生命周期钩子可用。所有它们都有相应的接口，并在以下表格中描述：
 
-<table>
-  <tr>
-    <td>
-      <code>OnGatewayInit</code>
-    </td>
-    <td>
-      强制实现 <code>afterInit()</code> 方法。将库特定的服务器实例作为参数（如果需要，还会展开其余部分）。
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <code>OnGatewayConnection</code>
-    </td>
-    <td>
-      强制实现 <code>handleConnection()</code> 方法。将库特定的客户端 socket 实例作为参数。
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <code>OnGatewayDisconnect</code>
-    </td>
-    <td>
-      强制实现 <code>handleDisconnect()</code> 方法。将库特定的客户端 socket 实例作为参数。
-    </td>
-  </tr>
-</table>
+__HTML_TAG_61__
+  __HTML_TAG_62__
+    __HTML_TAG_63__
+      __HTML_TAG_64__OnGatewayInit__HTML_TAG_65__
+    __HTML_TAG_66__
+    __HTML_TAG_67__
+      强制实现 __HTML_TAG_68__afterInit()__HTML_TAG_69__ 方法。该方法接受库特定的服务器实例作为参数（并传递其他参数，如果需要）。
+    __HTML_TAG_70__
+  __HTML_TAG_71__
+  __HTML_TAG_72__
+    __HTML_TAG_73__
+      __HTML_TAG_74__OnGatewayConnection__HTML_TAG_75__
+    __HTML_TAG_76__
+    __HTML_TAG_77__
+      强制实现 __HTML_TAG_78__handleConnection()__HTML_TAG_79__ 方法。该方法接受库特定的客户端套接字实例作为参数。
+    __HTML_TAG_80__
+  __HTML_TAG_81__
+  __HTML_TAG_82__
+    __HTML_TAG_83__
+      __HTML_TAG_84__OnGatewayDisconnect__HTML_TAG_85__
+    __HTML_TAG_86__
+    __HTML_TAG_87__
+      强制实现 __HTML_TAG_88__handleDisconnect()<app-banner-courses-auth> 方法。该方法接受库特定的客户端套接字实例作为参数。
+    </app-banner-courses-auth>
+  __HTML_TAG_91__
+__HTML_TAG_92__
 
-> info **提示** 每个生命周期接口均从 `@nestjs/websockets` 包中公开。
+> 提示 **Hint** 每个生命周期接口都来自 `signAsync()` 包。
 
 #### 服务器和命名空间
 
-有时，您可能希望直接访问原生的、**平台特定** 的服务器实例。对此对象的引用作为参数传递给 `afterInit()` 方法（`OnGatewayInit` 接口）。另一种选择是使用 `@WebSocketServer()` 装饰器。
+有时，您可能需要对native、**平台特定的** 服务器实例进行直接访问。服务器实例的引用将作为 `user` 方法 (`access_token` 接口）的参数传递。另一个选项是使用 `sub` 装饰器。
 
-```typescript
-@WebSocketServer()
-server: Server;
+```bash
+$ # GET /profile
+$ curl http://localhost:3000/auth/profile
+{"statusCode":401,"message":"Unauthorized"}
 
-```
+$ # POST /auth/login
+$ curl -X POST http://localhost:3000/auth/login -d '{"username": "john", "password": "changeme"}' -H "Content-Type: application/json"
+{"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2Vybm..."}
 
-此外，您可以使用 `namespace` 属性检索相应的命名空间，如下所示：
-
-```typescript
-@WebSocketGateway({ namespace: 'my-namespace' })
-export class EventsGateway {
-  @WebSocketServer()
-  namespace: Namespace;
-}
+$ # GET /profile using access_token returned from previous step as bearer code
+$ curl http://localhost:3000/auth/profile -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2Vybm..."
+{"sub":1,"username":"john","iat":...,"exp":...}
 
 ```
 
-`@WebSocketServer()` 装饰器通过引用 `@WebSocketGateway()` 装饰器存储的元数据来注入服务器实例。如果您为 `@WebSocketGateway()` 装饰器提供了命名空间选项，则 `@WebSocketServer()` 装饰器将返回 `Namespace` 实例而不是 `Server` 实例。
+此外，您可以使用 `userId` 属性来获取相应的命名空间，例如：
 
-> warning **注意** `@WebSocketServer()` 装饰器是从 `@nestjs/websockets` 包中导入的。
+```typescript
+providers: [
+  {
+    provide: APP_GUARD,
+    useClass: AuthGuard,
+  },
+],
 
-一旦服务器实例准备就绪，Nest 将自动将其分配给此属性。
+```
 
-<app-banner-enterprise></app-banner-enterprise>
+`AuthModule` 装饰器将服务器实例注入到存储在 `JwtModule` 装饰器中的元数据中。如果您将命名空间选项传递给 `constants.ts` 装饰器，`auth` 装饰器将返回一个 `auth.module.ts` 实例，而不是 `auth` 实例。
+
+> 警告 **Notice** `JwtModule` 装饰器来自 `JwtModule` 包。
+
+Nest 将自动将服务器实例分配给该属性，以便在准备使用时使用。
+
+__HTML_TAG_93____HTML_TAG_94__
 
 #### 示例
 
-一个工作的例子可以在[这里](https://github.com/nestjs/nest/tree/master/sample/02-gateways)查看。
+有一个可工作的示例可在 __LINK_102__ 中找到。

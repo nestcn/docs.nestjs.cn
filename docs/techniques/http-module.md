@@ -1,197 +1,165 @@
+<!-- 此文件从 content/techniques/http-module.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-16T05:12:46.968Z -->
+<!-- 源文件: content/techniques/http-module.md -->
+
 ### HTTP 模块
 
-[Axios](https://github.com/axios/axios) 是一个功能丰富的 HTTP 客户端包，被广泛使用。Nest 封装了 Axios 并通过内置的 `HttpModule` 暴露它。`HttpModule` 导出了 `HttpService` 类，该类提供了基于 Axios 的方法来执行 HTTP 请求。该库还将生成的 HTTP 响应转换为 `Observables`。
+__LINK_53__ 是一个功能丰富的 HTTP 客户端包，广泛使用。Nest 使用 Axios 并将其暴露给内置的 __INLINE_CODE_12__。__INLINE_CODE_13__ 导出 __INLINE_CODE_14__ 类，它暴露 Axios 基于的方法来执行 HTTP 请求。库还将结果 HTTP 响应转换为 __INLINE_CODE_15__。
 
-:::info 提示
-你也可以直接使用任何通用的 Node.js HTTP 客户端库，包括 [got](https://github.com/sindresorhus/got) 或 [undici](https://github.com/nodejs/undici)。
-:::
+> info **Hint** 你也可以使用任何一般-purpose Node.js HTTP 客户端库，包括 __LINK_54__ 或 __LINK_55__。
 
 #### 安装
 
-要开始使用它，我们首先需要安装所需的依赖项。
+要开始使用它，我们首先安装必要的依赖项。
 
 ```bash
-$ npm i --save @nestjs/axios axios
+$ npm i --save class-validator class-transformer
 
 ```
 
-#### 快速开始
+#### 获取 started
 
-安装过程完成后，要使用 `HttpService`，首先需要导入 `HttpModule`。
-
-```typescript
-@Module({
-  imports: [HttpModule],
-  providers: [CatsService],
-})
-export class CatsModule {}
-
-```
-
-接下来，通过常规的构造函数注入方式注入 `HttpService`。
-
-:::info 提示
-`HttpModule` 和 `HttpService` 是从 `@nestjs/axios` 包中导入的。
-:::
+安装过程完成后，使用 __INLINE_CODE_16__，首先导入 __INLINE_CODE_17__。
 
 ```typescript
-@Injectable()
-export class CatsService {
-  constructor(private readonly httpService: HttpService) {}
-
-  findAll(): Observable<AxiosResponse<Cat[]>> {
-    return this.httpService.get('http://localhost:3000/cats');
-  }
+export interface ValidationPipeOptions extends ValidatorOptions {
+  transform?: boolean;
+  disableErrorMessages?: boolean;
+  exceptionFactory?: (errors: ValidationError[]) => any;
 }
 
 ```
 
-:::info 提示
-`AxiosResponse` 是从 `axios` 包(`$ npm i axios`)导出的接口。
-:::
+然后，使用正常的构造函数注入注入 __INLINE_CODE_18__。
 
-所有 `HttpService` 方法都会返回一个封装在 `Observable` 对象中的 `AxiosResponse`。
+> info **Hint** __INLINE_CODE_19__ 和 __INLINE_CODE_20__来自 __INLINE_CODE_21__ 包。
+
+```typescript
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  app.useGlobalPipes(new ValidationPipe());
+  await app.listen(process.env.PORT ?? 3000);
+}
+bootstrap();
+
+```
+
+> info **Hint** __INLINE_CODE_22__ 是来自 __INLINE_CODE_23__ 包的接口 (__INLINE_CODE_24__)
+
+所有 __INLINE_CODE_25__ 方法返回一个 __INLINE_CODE_26__，裹在 `ValidationPipe` 对象中。
 
 #### 配置
 
-[Axios](https://github.com/axios/axios) 可通过多种选项进行配置，以自定义 `HttpService` 的行为。点击[此处](https://github.com/axios/axios#request-config)了解更多。要配置底层 Axios 实例，在导入 `HttpModule` 时，向其 `register()` 方法传递一个可选配置对象。该配置对象将直接传递给底层 Axios 构造函数。
+__LINK_56__ 可以使用多种选项来自定义 `ParseIntPipe` 的行为。阅读更多关于它们的信息 __LINK_57__。要配置 underlying Axios 实例，使用可选的 options 对象在导入 `ParseBoolPipe` 方法时，传递给 `ParseArrayPipe`。这个 options 对象将被直接传递给 underlying Axios 构造函数。
 
 ```typescript
-@Module({
-  imports: [
-    HttpModule.register({
-      timeout: 5000,
-      maxRedirects: 5,
-    }),
-  ],
-  providers: [CatsService],
-})
-export class CatsModule {}
+@Post()
+create(@Body() createUserDto: CreateUserDto) {
+  return 'This action adds a new user';
+}
 
 ```
 
 #### 异步配置
 
-当需要异步传递模块配置而非静态传递时，请使用 `registerAsync()` 方法。与大多数动态模块一样，Nest 提供了多种处理异步配置的技术。
+当您需要异步传递模块选项而不是静态时，使用 `ParseUUIDPipe` 方法。像其他动态模块一样，Nest 提供了多种技术来处理异步配置。
 
-其中一种技术是使用工厂函数：
+一种技术是使用工厂函数：
 
 ```typescript
-HttpModule.registerAsync({
-  useFactory: () => ({
-    timeout: 5000,
-    maxRedirects: 5,
+import { IsEmail, IsNotEmpty } from 'class-validator';
+
+export class CreateUserDto {
+  @IsEmail()
+  email: string;
+
+  @IsNotEmpty()
+  password: string;
+}
+
+```
+
+像其他工厂提供者一样，我们的工厂函数可以 __LINK_58__ 并可以通过 `ValidationPipe` 注入依赖项。
+
+```json
+{
+  "statusCode": 400,
+  "error": "Bad Request",
+  "message": ["email must be an email"]
+}
+
+```
+
+或者，您可以使用类来配置 `ValidationPipe`，如以下所示。
+
+```typescript
+@Get(':id')
+findOne(@Param() params: FindOneParams) {
+  return 'This action returns a user';
+}
+
+```
+
+构建上述实例化 `ValidationPipe` 在 `ValidationPipe` 内部，使用它创建一个选项对象。请注意，在这个示例中，`@nestjs/common` 必须实现 `class-validator` 接口，如以下所示。`class-transformer` 将在实例化对象上的 `class-validator` 方法上调用。
+
+```typescript
+import { IsNumberString } from 'class-validator';
+
+export class FindOneParams {
+  @IsNumberString()
+  id: string;
+}
+
+```
+
+如果您想重用现有选项提供者，而不是在 `ValidatorOptions` 内部创建私有副本，使用 `class-validator` 语法。
+
+```typescript
+app.useGlobalPipes(
+  new ValidationPipe({
+    disableErrorMessages: true,
   }),
-});
+);
 
 ```
 
-与其他工厂提供程序类似，我们的工厂函数可以是[异步的](../fundamentals/dependency-injection#工厂提供者-usefactory) ，并且可以通过 `inject` 注入依赖项。
+您还可以将所谓的 `ValidationPipe` 传递给 `ValidationPipe` 方法。这些提供者将与模块提供者合并。
 
 ```typescript
-HttpModule.registerAsync({
-  imports: [ConfigModule],
-  useFactory: async (configService: ConfigService) => ({
-    timeout: configService.get('HTTP_TIMEOUT'),
-    maxRedirects: configService.get('HTTP_MAX_REDIRECTS'),
+app.useGlobalPipes(
+  new ValidationPipe({
+    whitelist: true,
   }),
-  inject: [ConfigService],
-});
+);
 
 ```
 
-或者，您也可以使用类而非工厂来配置 `HttpModule`，如下所示。
+这很有用，当您想为工厂函数或类构造器提供额外的依赖项时。
+
+#### 使用 Axios 直接
+
+如果您认为 `import {{ '{' }} CreateUserDto {{ '}' }}` 的选项不够或只是想访问 underlying Axios 实例由 `import type {{ '{' }} CreateUserDto {{ '}' }}` 创建的，可以访问它通过 `CreateUserDto`，如下所示：
 
 ```typescript
-HttpModule.registerAsync({
-  useClass: HttpConfigService,
-});
-
-```
-
-上述结构在 `HttpModule` 内部实例化 `HttpConfigService`，并用它来创建一个选项对象。请注意，在本例中，`HttpConfigService` 必须实现如下所示的 `HttpModuleOptionsFactory` 接口。`HttpModule` 将在提供的类的实例化对象上调用 `createHttpOptions()` 方法。
-
-```typescript
-@Injectable()
-class HttpConfigService implements HttpModuleOptionsFactory {
-  createHttpOptions(): HttpModuleOptions {
-    return {
-      timeout: 5000,
-      maxRedirects: 5,
-    };
-  }
+@Post()
+@UsePipes(new ValidationPipe({ transform: true }))
+async create(@Body() createCatDto: CreateCatDto) {
+  this.catsService.create(createCatDto);
 }
 
 ```
 
-如果要在 `HttpModule` 中重用现有的选项提供程序，而不是创建私有副本，请使用 `useExisting` 语法。
+#### 全部示例
+
+由于 `class-validator` 方法的返回值是一个 Observable，我们可以使用 `CreateUserDto` - `email` 或 `400 Bad Request` 来获取请求的数据，以 promise 的形式。
 
 ```typescript
-HttpModule.registerAsync({
-  imports: [ConfigModule],
-  useExisting: HttpConfigService,
-});
+app.useGlobalPipes(
+  new ValidationPipe({
+    transform: true,
+  }),
+);
 
 ```
 
-您还可以向 `registerAsync()` 方法传递所谓的 `extraProviders`。这些提供程序将与模块提供程序合并。
-
-```typescript
-HttpModule.registerAsync({
-  imports: [ConfigModule],
-  useClass: HttpConfigService,
-  extraProviders: [MyAdditionalProvider],
-});
-
-```
-
-当您需要向工厂函数或类构造函数提供额外依赖项时，这非常有用。
-
-#### 直接使用 Axios
-
-如果你认为 `HttpModule.register` 的配置选项无法满足需求，或者你只是想访问由 `@nestjs/axios` 创建的底层 Axios 实例，可以通过 `HttpService#axiosRef` 来访问它，如下所示：
-
-```typescript
-@Injectable()
-export class CatsService {
-  constructor(private readonly httpService: HttpService) {}
-
-  findAll(): Promise<AxiosResponse<Cat[]>> {
-    return this.httpService.axiosRef.get('http://localhost:3000/cats');
-    //                      ^ AxiosInstance interface
-  }
-}
-
-```
-
-#### 完整示例
-
-由于 `HttpService` 方法的返回值是一个 Observable，我们可以使用 `rxjs` 的 `firstValueFrom` 或 `lastValueFrom` 来以 Promise 形式获取请求数据。
-
-```typescript
-import { catchError, firstValueFrom } from 'rxjs';
-
-@Injectable()
-export class CatsService {
-  private readonly logger = new Logger(CatsService.name);
-  constructor(private readonly httpService: HttpService) {}
-
-  async findAll(): Promise<Cat[]> {
-    const { data } = await firstValueFrom(
-      this.httpService.get<Cat[]>('http://localhost:3000/cats').pipe(
-        catchError((error: AxiosError) => {
-          this.logger.error(error.response.data);
-          throw 'An error happened!';
-        }),
-      ),
-    );
-    return data;
-  }
-}
-
-```
-
-:::info 提示
- 请访问 RxJS 关于 [`firstValueFrom`](https://rxjs.dev/api/index/function/firstValueFrom) 和 [`lastValueFrom`](https://rxjs.dev/api/index/function/lastValueFrom) 的文档，以了解它们之间的区别。
-:::
-
+> info **Hint** 访问 RxJS 的文档，了解 __LINK_59__ 和 __LINK_60__ 之间的区别。

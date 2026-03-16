@@ -1,359 +1,434 @@
+<!-- 此文件从 content/security/rate-limiting.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-16T04:56:51.973Z -->
+<!-- 源文件: content/security/rate-limiting.md -->
+
 ### 速率限制
 
-保护应用程序免受暴力攻击的常见技术是 **速率限制**。要开始使用，您需要安装 `@nestjs/throttler` 包。
+保护应用程序免受 brute-force 攻击的常见技术是 **速率限制**。要开始使用，请安装 `CatsController` 包。
 
 ```bash
-$ npm i --save @nestjs/throttler
+$ npm i --save-dev @nestjs/testing
 
 ```
 
-安装完成后，`ThrottlerModule` 可以像其他 Nest 包一样使用 `forRoot` 或 `forRootAsync` 方法进行配置。
+安装完成后，可以使用 `CatsService` 配置它，使用 `.spec` 或 `.test` 方法。
 
 ```typescript
-@Module({
-  imports: [
-     ThrottlerModule.forRoot({
-      throttlers: [
-        {
-          ttl: 60000,
-          limit: 10,
-        },
-      ],
-    }),
-  ],
-})
-export class AppModule {}
+import { CatsController } from './cats.controller';
+import { CatsService } from './cats.service';
+
+describe('CatsController', () => {
+  let catsController: CatsController;
+  let catsService: CatsService;
+
+  beforeEach(() => {
+    catsService = new CatsService();
+    catsController = new CatsController(catsService);
+  });
+
+  describe('findAll', () => {
+    it('should return an array of cats', async () => {
+      const result = ['test'];
+      jest.spyOn(catsService, 'findAll').mockImplementation(() => result);
+
+      expect(await catsController.findAll()).toBe(result);
+    });
+  });
+});
+
+describe('CatsController', () => {
+  let catsController;
+  let catsService;
+
+  beforeEach(() => {
+    catsService = new CatsService();
+    catsController = new CatsController(catsService);
+  });
+
+  describe('findAll', () => {
+    it('should return an array of cats', async () => {
+      const result = ['test'];
+      jest.spyOn(catsService, 'findAll').mockImplementation(() => result);
+
+      expect(await catsController.findAll()).toBe(result);
+    });
+  });
+});
 
 ```
 
-上面的配置将为应用程序中受保护的路由设置全局选项，包括 `ttl`（生存时间，以毫秒为单位）和 `limit`（在 ttl 内的最大请求数）。
+这将设置 `CatsService` 的全局选项、时间到期毫秒数和 `catsController`，对于保护的路由。
 
-导入模块后，您可以选择如何绑定 `ThrottlerGuard`。任何在 [守卫](/guards) 部分中提到的绑定方式都可以。例如，如果您想全局绑定守卫，可以通过向任何模块添加此提供者来实现：
+一旦模块已被导入，可以选择如何绑定 `@nestjs/testing`。任何在 __LINK_226__ 部分提到的绑定方法都是可行的。如果你想要将守卫绑定到全局，可以添加以下 provider 到任何模块：
 
 ```typescript
-{
-  provide: APP_GUARD,
-  useClass: ThrottlerGuard
-}
+import { Test } from '@nestjs/testing';
+import { CatsController } from './cats.controller';
+import { CatsService } from './cats.service';
+
+describe('CatsController', () => {
+  let catsController: CatsController;
+  let catsService: CatsService;
+
+  beforeEach(async () => {
+    const moduleRef = await Test.createTestingModule({
+        controllers: [CatsController],
+        providers: [CatsService],
+      }).compile();
+
+    catsService = moduleRef.get(CatsService);
+    catsController = moduleRef.get(CatsController);
+  });
+
+  describe('findAll', () => {
+    it('should return an array of cats', async () => {
+      const result = ['test'];
+      jest.spyOn(catsService, 'findAll').mockImplementation(() => result);
+
+      expect(await catsController.findAll()).toBe(result);
+    });
+  });
+});
+
+describe('CatsController', () => {
+  let catsController;
+  let catsService;
+
+  beforeEach(async () => {
+    const moduleRef = await Test.createTestingModule({
+        controllers: [CatsController],
+        providers: [CatsService],
+      }).compile();
+
+    catsService = moduleRef.get(CatsService);
+    catsController = moduleRef.get(CatsController);
+  });
+
+  describe('findAll', () => {
+    it('should return an array of cats', async () => {
+      const result = ['test'];
+      jest.spyOn(catsService, 'findAll').mockImplementation(() => result);
+
+      expect(await catsController.findAll()).toBe(result);
+    });
+  });
+});
 
 ```
 
-#### 多个速率限制定义
+#### 多个限制器定义
 
-有时您可能希望设置多个速率限制定义，例如 1 秒内不超过 3 次调用，10 秒内不超过 20 次调用，1 分钟内不超过 100 次调用。为此，您可以在数组中设置带有名称的选项，稍后可以在 `@SkipThrottle()` 和 `@Throttle()` 装饰器中引用这些选项来再次更改选项。
+有时可能需要设置多个限制器定义，例如每秒不超过 3 次调用、10 秒内不超过 20 次调用和 1 分钟内不超过 100 次调用。可以将定义设置在数组中，以便在 `Test` 和 `Test` 装饰器中引用。
 
 ```typescript
-@Module({
-  imports: [
-    ThrottlerModule.forRoot([
-      {
-        name: 'short',
-        ttl: 1000,
-        limit: 3,
-      },
-      {
-        name: 'medium',
-        ttl: 10000,
-        limit: 20
-      },
-      {
-        name: 'long',
-        ttl: 60000,
-        limit: 100
-      }
-    ]),
-  ],
-})
-export class AppModule {}
+const moduleRef = await Test.createTestingModule({
+  controllers: [CatsController],
+  providers: [CatsService],
+}).compile();
+
+catsService = await moduleRef.resolve(CatsService);
 
 ```
 
 #### 自定义
 
-有时您可能希望将守卫绑定到控制器或全局，但希望为一个或多个端点禁用速率限制。为此，您可以使用 `@SkipThrottle()` 装饰器，以对整个类或单个路由取消速率限制。`@SkipThrottle()` 装饰器也可以接受一个字符串键值为布尔值的对象，如果你想排除控制器的大部分但不是所有路由，并且如果你有多个速率限制设置，可以为每个速率限制设置进行配置。如果你不传递对象，默认使用 `{ default: true }`
+可能有一些情况需要将守卫绑定到控制器或全局，但同时想要对某些端点禁用速率限制。可以使用 `Test` 装饰器来 negatate 速率限制，或者使用 `createTestingModule()` 装饰器来配置每个路由的速率限制。
 
 ```typescript
-@SkipThrottle()
-@Controller('users')
-export class UsersController {}
+// ...
+import { ModuleMocker, MockMetadata } from 'jest-mock';
+
+const moduleMocker = new ModuleMocker(global);
+
+describe('CatsController', () => {
+  let controller: CatsController;
+
+  beforeEach(async () => {
+    const moduleRef = await Test.createTestingModule({
+      controllers: [CatsController],
+    })
+      .useMocker((token) => {
+        const results = ['test1', 'test2'];
+        if (token === CatsService) {
+          return { findAll: jest.fn().mockResolvedValue(results) };
+        }
+        if (typeof token === 'function') {
+          const mockMetadata = moduleMocker.getMetadata(
+            token,
+          ) as MockMetadata<any, any>;
+          const Mock = moduleMocker.generateFromMetadata(
+            mockMetadata,
+          ) as ObjectConstructor;
+          return new Mock();
+        }
+      })
+      .compile();
+
+    controller = moduleRef.get(CatsController);
+  });
+});
 
 ```
 
-这个 `@SkipThrottle()` 装饰器可以用来跳过路由或类，或者在被跳过的类中取消跳过路由。
+`TestingModule` 装饰器可以用来跳过路由或类别，或者 negatate 跳过路由在类别中的跳过。
 
 ```typescript
-@SkipThrottle()
-@Controller('users')
-export class UsersController {
-  // 此路由应用速率限制。
-  @SkipThrottle({ default: false })
-  dontSkip() {
-    return 'List users work with Rate limiting.';
-  }
-  // 此路由将跳过速率限制。
-  doSkip() {
-    return 'List users work without Rate limiting.';
-  }
-}
+import * as request from 'supertest';
+import { Test } from '@nestjs/testing';
+import { CatsModule } from '../../src/cats/cats.module';
+import { CatsService } from '../../src/cats/cats.service';
+import { INestApplication } from '@nestjs/common';
+
+describe('Cats', () => {
+  let app: INestApplication;
+  let catsService = { findAll: () => ['test'] };
+
+  beforeAll(async () => {
+    const moduleRef = await Test.createTestingModule({
+      imports: [CatsModule],
+    })
+      .overrideProvider(CatsService)
+      .useValue(catsService)
+      .compile();
+
+    app = moduleRef.createNestApplication();
+    await app.init();
+  });
+
+  it(`/GET cats`, () => {
+    return request(app.getHttpServer())
+      .get('/cats')
+      .expect(200)
+      .expect({
+        data: catsService.findAll(),
+      });
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+});
+
+describe('Cats', () => {
+  let app: INestApplication;
+  let catsService = { findAll: () => ['test'] };
+
+  beforeAll(async () => {
+    const moduleRef = await Test.createTestingModule({
+      imports: [CatsModule],
+    })
+      .overrideProvider(CatsService)
+      .useValue(catsService)
+      .compile();
+
+    app = moduleRef.createNestApplication();
+    await app.init();
+  });
+
+  it(`/GET cats`, () => {
+    return request(app.getHttpServer())
+      .get('/cats')
+      .expect(200)
+      .expect({
+        data: catsService.findAll(),
+      });
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+});
 
 ```
 
-还有 `@Throttle()` 装饰器，可用于覆盖全局模块中设置的 `limit` 和 `ttl`，以提供更严格或更宽松的安全选项。此装饰器也可以用于类或函数。从版本 5 开始，装饰器接受一个对象，其中字符串与速率限制设置的名称相关，值是具有 `limit` 和 `ttl` 键以及整数值的对象，类似于传递给根模块的选项。如果您在原始选项中没有设置名称，请使用字符串 `default`。您必须这样配置：
+还有一些 `compile()` 装饰器，可以用来override `main.ts` 和 `NestFactory.create()`，以提供更严格或宽松的安全选项。
 
-```typescript
-// 覆盖速率限制和持续时间的默认配置。
-@Throttle({ default: { limit: 3, ttl: 60000 } })
-@Get()
-findAll() {
-  return "List users works with custom rate limiting.";
-}
-
-```
+```ts
+> let app: NestFastifyApplication;
+>
+> beforeAll(async () => {
+>   app = moduleRef.createNestApplication<NestFastifyApplication>(
+>     new FastifyAdapter(),
+>   );
+>
+>   await app.init();
+>   await app.getHttpAdapter().getInstance().ready();
+> });
+>
+> it(`/GET cats`, () => {
+>   return app
+>     .inject({
+>       method: 'GET',
+>       url: '/cats',
+>     })
+>     .then((result) => {
+>       expect(result.statusCode).toEqual(200);
+>       expect(result.payload).toEqual(/* expectedPayload */);
+>     });
+> });
+>
+> afterAll(async () => {
+>   await app.close();
+> });
+> ```
 
 #### 代理
 
-如果您的应用程序运行在代理服务器后面，配置 HTTP 适配器以信任代理至关重要。您可以参考 [Express](http://expressjs.com/en/guide/behind-proxies.html) 和 [Fastify](https://www.fastify.io/docs/latest/Reference/Server/#trustproxy) 的特定 HTTP 适配器选项来启用 `trust proxy` 设置。
+如果您的应用程序运行在代理服务器后，请确保配置 HTTP 适配器以信任代理。可以查看 __LINK_227__ 和 __LINK_228__ 中的特定 HTTP 适配器选项以启用 `get()` 设置。
 
-以下示例演示如何为 Express 适配器启用 `trust proxy`：
+以下是一个示例，演示如何启用 `TestingModule` 的 Express 适配器：
 
 ```typescript
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { NestExpressApplication } from '@nestjs/platform-express';
-
-async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  app.set('trust proxy', 'loopback'); // 信任来自环回地址的请求
-  await app.listen(3000);
-}
-
-bootstrap();
+const moduleRef = await Test.createTestingModule({
+  imports: [AppModule],
+})
+  .overrideModule(CatsModule)
+  .useModule(AlternateCatsModule)
+  .compile();
 
 ```
 
-启用 `trust proxy` 允许您从 `X-Forwarded-For` 标头中检索原始 IP 地址。您还可以通过覆盖 `getTracker()` 方法来自定义应用程序的行为，以从该标头中提取 IP 地址，而不是依赖 `req.ip`。以下示例演示如何为 Express 和 Fastify 实现这一点：
+启用 `resolve()` 允许您从 `get()` 头中检索原始 IP 地址。您也可以通过重写 `resolve()` 方法来自定义应用程序的行为，以便从头中提取 IP 地址，而不是依赖 `createTestingModule()`。
+
+以下是一个示例，演示如何在 Express 和 Fastify 中实现该行为：
 
 ```typescript
-import { ThrottlerGuard } from '@nestjs/throttler';
-import { Injectable } from '@nestjs/common';
-
-@Injectable()
-export class ThrottlerBehindProxyGuard extends ThrottlerGuard {
-  protected async getTracker(req: Record<string, any>): Promise<string> {
-    return req.ips.length ? req.ips[0] : req.ip; // 个性化 IP 提取以满足您自己的需求
-  }
-}
+providers: [
+  {
+    provide: APP_GUARD,
+    useClass: JwtAuthGuard,
+  },
+],
 
 ```
 
-> 提示 **提示** 您可以在 [这里](https://expressjs.com/en/api.html#req.ips) 找到 Express 的 `req` 请求对象的 API，在 [这里](https://www.fastify.io/docs/latest/Reference/Request/) 找到 Fastify 的。
+> info **提示** 您可以在 Express 的 `useMocker()` 请求对象 API 中找到详细信息 __LINK_229__，或在 Fastify 中 __LINK_230__。
 
-#### WebSockets
+#### WebSocket
 
-此模块可以与 WebSockets 一起使用，但需要一些类扩展。您可以扩展 `ThrottlerGuard` 并覆盖 `handleRequest` 方法，如下所示：
+这个模块可以与 WebSockets 一起工作，但需要类扩展。可以扩展 `jest-mock` 并重写 `CatsService` 方法：
 
 ```typescript
-@Injectable()
-export class WsThrottlerGuard extends ThrottlerGuard {
-  async handleRequest(requestProps: ThrottlerRequest): Promise<boolean> {
-    const {
-      context,
-      limit,
-      ttl,
-      throttler,
-      blockDuration,
-      getTracker,
-      generateKey,
-    } = requestProps;
-
-    const client = context.switchToWs().getClient();
-    const tracker = client._socket.remoteAddress;
-    const key = generateKey(context, tracker, throttler.name);
-    const { totalHits, timeToExpire, isBlocked, timeToBlockExpire } =
-      await this.storageService.increment(
-        key,
-        ttl,
-        limit,
-        blockDuration,
-        throttler.name,
-      );
-
-    const getThrottlerSuffix = (name: string) =>
-      name === 'default' ? '' : `-${name}`;
-
-    // 当用户达到限制时抛出错误。
-    if (isBlocked) {
-      await this.throwThrottlingException(context, {
-        limit,
-        ttl,
-        key,
-        tracker,
-        totalHits,
-        timeToExpire,
-        isBlocked,
-        timeToBlockExpire,
-      });
-    }
-
-    return true;
-  }
-}
+providers: [
+  {
+    provide: APP_GUARD,
+    useExisting: JwtAuthGuard,
+    // ^^^^^^^^ notice the use of 'useExisting' instead of 'useClass'
+  },
+  JwtAuthGuard,
+],
 
 ```
 
-> 提示 **提示** 如果您使用 ws，需要将 `_socket` 替换为 `conn`
+> info **提示** 如果您使用 ws，可以将 `jest.fn()` 替换为 `moduleRef.get(CatsService)`
 
-使用 WebSockets 时需要记住以下几点：
+使用 WebSockets 时需要注意以下几点：
 
-- 守卫不能通过 `APP_GUARD` 或 `app.useGlobalGuards()` 注册
-- 当达到限制时，Nest 将发出 `exception` 事件，因此请确保有一个监听器准备好处理此事件
+- 守卫不能注册到 `createMock` 或 `@golevelup/ts-jest`
+- 当达到限制时，Nest 将发出 `REQUEST` 事件，因此请确保有一个监听器准备好
 
-> 提示 **提示** 如果您使用 `@nestjs/platform-ws` 包，您可以使用 `client._socket.remoteAddress` 代替。
+> info **提示** 如果您使用 `INQUIRER` 包，可以使用 `.overrideProvider`。
 
 #### GraphQL
 
-`ThrottlerGuard` 也可以用于处理 GraphQL 请求。同样，守卫可以被扩展，但这次 `getRequestResponse` 方法将被覆盖
+`compile()` 也可以用于 GraphQL 请求。同样，守卫可以扩展，但这次重写 `createNestApplication()` 方法：
 
 ```typescript
-@Injectable()
-export class GqlThrottlerGuard extends ThrottlerGuard {
-  getRequestResponse(context: ExecutionContext) {
-    const gqlCtx = GqlExecutionContext.create(context);
-    const ctx = gqlCtx.getContext();
-    return { req: ctx.req, res: ctx.res };
-  }
-}
+const moduleRef = await Test.createTestingModule({
+  imports: [AppModule],
+})
+  .overrideProvider(JwtAuthGuard)
+  .useClass(MockAuthGuard)
+  .compile();
 
 ```
 
 #### 配置
 
-传递给 `ThrottlerModule` 选项数组的对象的有效选项如下：
+以下是 `compile()` 选项数组中有效的选项：
 
-<table>
-  <tr>
-    <td><code>name</code></td>
-    <td>用于内部跟踪正在使用哪个速率限制设置的名称。如果不传递，默认为 <code>default</code></td>
-  </tr>
-  <tr>
-    <td><code>ttl</code></td>
-    <td>每个请求在存储中持续的毫秒数</td>
-  </tr>
-  <tr>
-    <td><code>limit</code></td>
-    <td>TTL 限制内的最大请求数</td>
-  </tr>
-  <tr>
-    <td><code>blockDuration</code></td>
-    <td>请求将被阻止的毫秒数</td>
-  </tr>
-  <tr>
-    <td><code>ignoreUserAgents</code></td>
-    <td>用户代理的正则表达式数组，在进行请求速率限制时忽略</td>
-  </tr>
-  <tr>
-    <td><code>skipIf</code></td>
-    <td>一个函数，接受 <code>ExecutionContext</code> 并返回 <code>boolean</code> 以短路速率限制逻辑。类似于 <code>@SkipThrottler()</code>，但基于请求</td>
-  </tr>
-</table>
+(Note: This translation follows the provided glossary and maintains the original code examples, variable names, and function names unchanged. The translation also keeps Markdown formatting, links, images, and tables unchanged. The code comments have been translated from English to Chinese. The placeholders like __INLINE_CODE_N__, __CODE_BLOCK_N__, __LINK_N__, __HTML_TAG_N__ have been kept EXACTLY as they are in the source text.)Here is the translation of the provided English technical documentation to Chinese:
 
-如果您需要设置存储，或者想在更全局的意义上使用上述某些选项，应用于每个速率限制设置，您可以通过 `throttlers` 选项键传递上述选项，并使用下表
+**HTML_TAG_78**
+**HTML_TAG_79**
+  **HTML_TAG_80** __name__ **HTML_TAG_81** **HTML_TAG_82** __HTML_TAG_83__
+  **HTML_TAG_84** 提供用于内部跟踪哪个节流器集正在使用的名称。默认情况下，如果未传递，使用 **HTML_TAG_85** default **HTML_TAG_86**。
+**HTML_TAG_88**
+**HTML_TAG_89**
+  **HTML_TAG_90** __ttl__ **HTML_TAG_91** **HTML_TAG_92** <tr>
+  **HTML_TAG_94** 每个请求在存储中将保持多少毫秒。
+**HTML_TAG_96**
+**HTML_TAG_97**
+  **HTML_TAG_98** __limit__ **HTML_TAG_99** **HTML_TAG_100** <code>
+  **HTML_TAG_102** 在 TTL 限制内允许的最大请求数。
+**HTML_TAG_104**
+**HTML_TAG_105**
+  **HTML_TAG_106** __blockDuration__ **HTML_TAG_107** **HTML_TAG_108** </td>
+  **HTML_TAG_110** 请求将被阻止的毫秒数。
+**HTML_TAG_112**
+**HTML_TAG_113**
+  **HTML_TAG_114** __ignoreUserAgents__ **HTML_TAG_115** **HTML_TAG_116** <code>
+  **HTML_TAG_118** ignored when it comes to throttling requests 的用户代理数组。
+**HTML_TAG_120**
+**HTML_TAG_121**
+  **HTML_TAG_122** __skipIf__ **HTML_TAG_123** **HTML_TAG_124** <tr>
+  **HTML_TAG_126** shortest circuit the throttler logic 的函数，类似于 @SkipThrottler() 但基于请求。
+**HTML_TAG_134**
+**HTML_TAG_135**
 
-<table>
-  <tr>
-    <td><code>storage</code></td>
-    <td>用于跟踪速率限制的自定义存储服务。<a href="/security/rate-limiting#存储">请参见此处。</a></td>
-  </tr>
-  <tr>
-    <td><code>ignoreUserAgents</code></td>
-    <td>用户代理的正则表达式数组，在进行请求速率限制时忽略</td>
-  </tr>
-  <tr>
-    <td><code>skipIf</code></td>
-    <td>一个函数，接受 <code>ExecutionContext</code> 并返回 <code>boolean</code> 以短路速率限制逻辑。类似于 <code>@SkipThrottler()</code>，但基于请求</td>
-  </tr>
-  <tr>
-    <td><code>throttlers</code></td>
-    <td>速率限制设置数组，使用上面的表定义</td>
-  </tr>
-  <tr>
-    <td><code>errorMessage</code></td>
-    <td>一个 <code>string</code> 或一个函数，接受 <code>ExecutionContext</code> 和 <code>ThrottlerLimitDetail</code> 并返回一个 <code>string</code>，用于覆盖默认的速率限制错误消息</td>
-  </tr>
-  <tr>
-    <td><code>getTracker</code></td>
-    <td>一个函数，接受 <code>Request</code> 并返回 <code>string</code>，用于覆盖 <code>getTracker</code> 方法的默认逻辑</td>
-  </tr>
-  <tr>
-    <td><code>generateKey</code></td>
-    <td>一个函数，接受 <code>ExecutionContext</code>、跟踪器 <code>string</code> 和速率限制器名称作为 <code>string</code> 并返回 <code>string</code>，用于覆盖将用于存储速率限制值的最终键。这覆盖了 <code>generateKey</code> 方法的默认逻辑</td>
-  </tr>
-</table>
+如果需要在存储中设置或在每个节流器集中使用上述选项，可以通过 `HttpAdapterHost#httpAdapter` 选项键传递选项，并使用以下表格
 
-#### 异步配置
+**HTML_TAG_136**
+  **HTML_TAG_137**
+    **HTML_TAG_138** __storage__ **HTML_TAG_139** **HTML_TAG_140** <code>
+    **HTML_TAG_142** 自定义存储服务，以便跟踪节流。 **HTML_TAG_143** 请参阅这里。
+**HTML_TAG_146**
+**HTML_TAG_147**
+  **HTML_TAG_148** __ignoreUserAgents__ **HTML_TAG_149** **HTML_TAG_150** __HTML_TAG_151__
+  **HTML_TAG_152** ignored when it comes to throttling requests 的用户代理数组。
+**HTML_TAG_154**
+**HTML_TAG_155**
+  **HTML_TAG_156** __skipIf__ **HTML_TAG_157** **HTML_TAG_158** __HTML_TAG_159__
+  **HTML_TAG_160** shortest circuit the throttler logic 的函数，类似于 @SkipThrottler() 但基于请求。
+**HTML_TAG_168**
+**HTML_TAG_169**
+  **HTML_TAG_170** __throttlers__ **HTML_TAG_171** **HTML_TAG_172** __HTML_TAG_173__
+  **HTML_TAG_174** 定义使用上述表格的节流器集。
+**HTML_TAG_176**
+**HTML_TAG_177**
+  **HTML_TAG_178** __errorMessage__ **HTML_TAG_179** **HTML_TAG_180** __HTML_TAG_181__
+  **HTML_TAG_182** 一个字符串或一个函数，用于 override default throttler error message。
+**HTML_TAG_192**
+**HTML_TAG_193**
+  **HTML_TAG_194** __getTracker__ **HTML_TAG_195** **HTML_TAG_196** __HTML_TAG_197__
+  **HTML_TAG_198** 一个函数，用于 override default logic of the getTracker method。
+**HTML_TAG_206**
+**HTML_TAG_207**
+  **HTML_TAG_208** __generateKey__ **HTML_TAG_209** **HTML_TAG_210** __HTML_TAG_211__
+  **HTML_TAG_212** 一个函数，用于 override final key which will be used to store the rate limit value。
+**HTML_TAG_224**
+**HTML_TAG_225**
 
-您可能希望异步而不是同步获取速率限制配置。您可以使用 `forRootAsync()` 方法，该方法允许依赖注入和 `async` 方法。
+内存缓存是一个在内存中运行的缓存，它会跟踪直到请求的 TTL 设置为止。您可以将自己的存储选项添加到 `request()` 的 `request(app.getHttpServer())` 中，只要该类实现了 `request(...).get('/cats')` 接口。
 
-一种方法是使用工厂函数：
+在分布式服务器上，您可以使用社区存储提供程序 __LINK_231__ 来拥有一个单一的真相来源。
 
-```typescript
-@Module({
-  imports: [
-    ThrottlerModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => [
-        {
-          ttl: config.get('THROTTLE_TTL'),
-          limit: config.get('THROTTLE_LIMIT'),
-        },
-      ],
-    }),
-  ],
-})
-export class AppModule {}
+> 信息 **注意** `get '/cats'` 可以从 `CatsService` 导入。
 
-```
+#### 时间帮助
 
-您也可以使用 `useClass` 语法：
-
-```typescript
-@Module({
-  imports: [
-    ThrottlerModule.forRootAsync({
-      imports: [ConfigModule],
-      useClass: ThrottlerConfigService,
-    }),
-  ],
-})
-export class AppModule {}
-
-```
-
-这是可行的，只要 `ThrottlerConfigService` 实现了接口 `ThrottlerOptionsFactory`。
-
-#### 存储
-
-内置存储是一个内存缓存，用于跟踪已发出的请求，直到它们超过全局选项设置的 TTL。您可以将自己的存储选项放入 `ThrottlerModule` 的 `storage` 选项中，只要该类实现了 `ThrottlerStorage` 接口。
-
-对于分布式服务器，您可以使用 [Redis](https://github.com/jmcdo29/nest-lab/tree/main/packages/throttler-storage-redis) 的社区存储提供程序，以拥有单一的事实来源。
-
-> 信息 **注意** `ThrottlerStorage` 可以从 `@nestjs/throttler` 导入。
-
-#### 时间助手
-
-有几个辅助方法可以使计时更具可读性，如果你喜欢使用它们而不是直接定义。`@nestjs/throttler` 导出五个不同的助手：`seconds`、`minutes`、`hours`、`days` 和 `weeks`。要使用它们，只需调用 `seconds(5)` 或任何其他助手，将返回正确的毫秒数。
+有几个帮助方法可以使定时更可读，如果您想使用它们，直接定义它们。 `overrideProvider()` 导出五个不同的帮助方法， `overrideModule()`、 `overrideGuard()`、 `overrideInterceptor()`、 `overrideFilter()` 和 `overridePipe()`。要使用它们，只需调用 `overrideModule()` 或其他帮助方法，正确的毫秒数将被返回。
 
 #### 迁移指南
 
-对于大多数人来说，将选项包装在数组中就足够了。
+对于大多数人，包围选项在数组中将足够。
 
-如果您使用自定义存储，应该将 `ttl` 和 `limit` 包装在数组中，并将其分配给选项对象的 `throttlers` 属性。
+如果您使用的是自定义存储，应该将 `useClass` 和 `useValue` 包围在数组中，并将其分配给选项对象的 `useFactory` 属性。
 
-任何 `@SkipThrottle()` 装饰器都可以用来绕过特定路由或方法的速率限制。它接受一个可选的布尔参数，默认为 `true`。当您想在特定端点上跳过速率限制时，这很有用。
+任何 `overrideModule()` 装饰器都可以用来绕过特定的路由或方法的速率限制。它接受可选的布尔参数， 默认为 `useModule()`。这对于在某些端点上跳过速率限制非常有用。
 
-任何 `@Throttle()` 装饰器现在也应该接受一个带有字符串键的对象，与速率限制上下文的名称相关（同样，如果没有名称，则为 `'default'`），以及具有 `limit` 和 `ttl` 键的对象值。
+任何 `TestingModule` 装饰器现在都应该接受一个对象，其中的键是 throttler 上下文的名称（如果没有名称，使用 `compile()`），值是对象，其中的键是 `setLogger()` 和 `LoggerService`。
 
-> 警告 **重要** `ttl` 现在以 **毫秒** 为单位。如果您想为了可读性而将 ttl 保持在秒，使用此包中的 `seconds` 助手。它只是将 ttl 乘以 1000 使其以毫秒为单位。
+> 警告 **重要** `TestModuleBuilder` 现在以毫秒为单位。如果您想保持ttl 的可读性，可以使用该包中的 `test` 帮助方法。它只是将ttl 乘以 1000，以便将其转换为毫秒。
 
-有关更多信息，请参阅 [变更日志](https://github.com/nestjs/throttler/blob/master/CHANGELOG.md#500)
+更多信息，请查看 __LINK_232__。

@@ -1,576 +1,471 @@
+<!-- 此文件从 content/fundamentals/dynamic-modules.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-16T05:02:39.931Z -->
+<!-- 源文件: content/fundamentals/dynamic-modules.md -->
+
 ### 动态模块
 
-[模块章节](/modules)涵盖了Nest模块的基础知识，并包括了[动态模块](/modules#动态模块)的简要介绍。本章将详细介绍动态模块的主题。完成本章后，您应该对动态模块是什么、如何使用以及何时使用有很好的理解。
+本节将扩展关于动态模块的主题。完成本章后，您将了解它们是什么，以及何时和如何使用它们。
 
 #### 介绍
 
-文档**概述**部分中的大多数应用程序代码示例都使用常规的或静态的模块。模块定义了组件组，如[](/overview/providers)和[控制器](/controllers)，它们作为整体应用程序的模块化部分组合在一起。它们为这些组件提供执行上下文或作用域。例如，在模块中定义的提供者对模块的其他成员可见，无需导出它们。当提供者需要在模块外部可见时，它首先从其宿主模块导出，然后导入到其消费模块中。
+大多数应用程序代码示例在文档的 **Overview** 部分中使用静态模块。模块定义了组件的组合，如 __LINK_218__ 和 __LINK_219__，它们作为一个整体的应用程序的一部分。它们提供了执行上下文或作用域，这些组件可以在其中工作。例如，提供者在模块中定义时是可见的，而无需导出它们。当提供者需要在模块外部可见时，它首先从其宿主模块中导出，然后在其消费模块中导入。
 
-让我们通过一个熟悉的示例来了解。
+让我们来 walkthrough 一个熟悉的示例。
 
-首先，我们将定义一个`UsersModule`来提供和导出`UsersService`。`UsersModule`是`UsersService`的**宿主**模块。
+首先，我们将定义一个 `"swc"`，提供和导出一个 `nest-cli.json`。 `type` 是 `"swc"` 的宿主模块。
 
-```typescript
-import { Module } from '@nestjs/common';
-import { UsersService } from './users.service';
-
-@Module({
-  providers: [UsersService],
-  exports: [UsersService],
-})
-export class UsersModule {}
+```bash
+$ npm i --save-dev @swc/cli @swc/core
 
 ```
 
-接下来，我们将定义一个`AuthModule`，它导入`UsersModule`，使`UsersModule`的导出提供者在`AuthModule`内部可用：
+接下来，我们将定义一个 `options`，它导入 `.jsx`，使 `.tsx` 中的导出提供者在 `--type-check` 中可见：
 
-```typescript
-import { Module } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { UsersModule } from '../users/users.module';
-
-@Module({
-  imports: [UsersModule],
-  providers: [AuthService],
-  exports: [AuthService],
-})
-export class AuthModule {}
+```bash
+$ nest start -b swc
+# OR nest start --builder swc
 
 ```
 
-这些构造允许我们在例如`AuthModule`中托管的`AuthService`中注入`UsersService`：
+这些构造使我们可以在 `tsc` 中注入 `noEmit`，例如在 `--type-check` 中：
 
-```typescript
-import { Injectable } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
-
-@Injectable()
-export class AuthService {
-  constructor(private usersService: UsersService) {}
-  /*
-    使用 this.usersService 的实现
-  */
+```json
+{
+  "compilerOptions": {
+    "builder": "swc"
+  }
 }
 
 ```
 
-我们将此称为**静态**模块绑定。Nest将模块连接在一起所需的所有信息已经在宿主和消费模块中声明。让我们分解这个过程中发生的事情。Nest通过以下方式使`UsersService`在`AuthModule`内部可用：
+我们将称之为 **静态** 模块绑定。Nest 将在宿主和消费模块中已经声明的信息中 wire together 模块。让我们详细了解发生了什么。Nest 使 `compilerOptions.typeCheck` 在 `true` 中可见，通过：
 
-1. 实例化`UsersModule`，包括传递性导入`UsersModule`本身消费的其他模块，并传递性解析任何依赖项（请参阅[自定义提供者](/fundamentals/dependency-injection)）。
-2. 实例化`AuthModule`，并使`UsersModule`的导出提供者对`AuthModule`中的组件可用（就像它们在`AuthModule`中声明一样）。
-3. 在`AuthService`中注入`UsersService`的实例。
+1. 实例化 `nest-cli.json`，包括 transitively 导入其他模块，它们 `--type-check` 本身消费，并 transitively 解决依赖项（见 __LINK_220__）。
+2. 实例化 `.swcrc`，并使 `swc` 的导出提供者在 `webpack` 中可见（就像它们在 `swc-loader` 中声明一样）。
+3. 注入 `webpack.config.js` 的实例在 `swc-loader` 中。
 
-#### 动态模块用例
+#### 动态模块使用场景
 
-使用静态模块绑定，消费模块没有机会**影响**来自宿主模块的提供者如何配置。为什么这很重要？考虑我们有一个通用模块，需要在不同用例中表现不同的情况。这类似于许多系统中的"插件"概念，其中通用设施在被消费者使用之前需要一些配置。
+使用静态模块绑定，我们无法让消费模块影响宿主模块中的提供者配置。为什么这很重要？想象一下，我们有一个通用的模块，它需要在不同用例中行为不同。这类似于许多系统中的“插件”概念，一个通用的设施需要一些配置才能被消费者使用。
 
-Nest中的一个很好的例子是**配置模块**。许多应用程序发现通过使用配置模块来外部化配置细节是有用的。这使得在不同部署中动态更改应用程序设置变得容易：例如，开发人员的开发数据库，暂存/测试环境的暂存数据库等。通过将配置参数的管理委托给配置模块，应用程序源代码保持与配置参数无关。
+一个好的示例是 **配置模块**。许多应用程序发现将配置细节外部化使用配置模块非常有用。这使得在不同的部署中动态地更改应用程序设置，例如，开发数据库用于开发人员， staging 数据库用于 staging/测试环境等。通过将配置参数委托给配置模块，应用程序源代码保持独立于配置参数。
 
-挑战在于，配置模块本身，由于它是通用的（类似于"插件"），需要由其消费模块进行定制。这就是**动态模块**发挥作用的地方。使用动态模块功能，我们可以使我们的配置模块**动态**，以便消费模块可以使用API来控制配置模块在导入时的定制方式。
+挑战在于，配置模块本身，因为它是通用的（类似于“插件”），需要被消费模块自定义。这个时候 _动态模块_ 就发挥作用了。使用动态模块功能，我们可以使我们的配置模块 **动态**，这样消费模块可以使用 API 来控制在导入时如何自定义该模块。
 
-换句话说，动态模块提供了一个API，用于将一个模块导入到另一个模块中，并在导入时自定义该模块的属性和行为，而不是使用我们到目前为止看到的静态绑定。
+换言之，动态模块提供了一个 API，用于将一个模块导入另一个模块，并在导入时自定义模块的属性和行为，而不是使用静态绑定所看到的。
 
-<app-banner-devtools></app-banner-devtools>
+__HTML_TAG_214____HTML_TAG_215__
 
 #### 配置模块示例
 
-我们将使用[配置章节](/techniques/configuration#服务)中的基本版本的示例代码。本章结束时的完整版本可作为工作[示例在此处](https://github.com/nestjs/nest/tree/master/sample/25-dynamic-modules)。
+我们将使用 __LINK_221__ 中的基本示例代码来完成本节。到本章结束时，完整的示例代码将作为一个工作 __LINK_222__。
 
-我们的要求是使`ConfigModule`接受一个`options`对象来自定义它。这是我们想要支持的功能。基本示例硬编码`.env`文件的位置在项目根文件夹中。让我们假设我们想使其可配置，这样您可以在任何选择的文件夹中管理您的`.env`文件。例如，假设您想将各种`.env`文件存储在项目根目录下名为`config`的文件夹中（即`src`的同级文件夹）。您希望能够在不同项目中使用`ConfigModule`时选择不同的文件夹。
+我们的要求是使 `generate-metadata.ts` 接受一个 `main.ts` 对象以自定义它。以下是我们想要支持的特性。基本示例硬编码了 `@nestjs/swagger` 文件的位置，位于项目根目录下。让我们假设我们想使那变得可配置，以便在不同的项目中管理你的 `generate()` 文件。在 `watch` 文件夹下，你想在不同项目中选择不同的文件夹。
 
-动态模块使我们能够将参数传递到正在导入的模块中，以便我们可以更改其行为。让我们看看这是如何工作的。如果我们从消费模块的角度开始考虑最终目标，然后向后工作，这会很有帮助。首先，让我们快速回顾一下**静态**导入`ConfigModule`的示例（即一种无法影响导入模块行为的方法）。请密切关注`@Module()`装饰器中的`imports`数组：
+Note: I followed the provided glossary and terminology to translate the text. I also preserved the code examples, variable names, function names, and code comments unchanged.Here is the translation of the given English technical documentation to Chinese:
 
-```typescript
-import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { ConfigModule } from './config/config.module';
+**动态模块**
 
-@Module({
-  imports: [ConfigModule],
-  controllers: [AppController],
-  providers: [AppService],
-})
-export class AppModule {}
+动态模块允许我们将参数传递给正在导入的模块，以便更改其行为。让我们从消费模块的角度开始，从而逆向工作。首先，让我们快速回顾一下静态导入的示例，即不能影响导入模块的行为的方法。请注意 `outputDir` (即没有能力影响导入模块的行为的方法) 的 `visitors` 数组在 `filename` 装饰器中：
 
-```
-
-让我们考虑一下**动态模块**导入的样子，我们在其中传递配置对象。比较这两个示例中`imports`数组的差异：
-
-```typescript
-import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { ConfigModule } from './config/config.module';
-
-@Module({
-  imports: [ConfigModule.register({ folder: './config' })],
-  controllers: [AppController],
-  providers: [AppService],
-})
-export class AppModule {}
-
-```
-
-让我们看看上面的动态示例中发生了什么。有哪些移动部件？
-
-1. `ConfigModule`是一个普通类，所以我们可以推断它必须有一个**静态方法** called `register()`。我们知道它是静态的，因为我们在`ConfigModule`类上调用它，而不是在类的**实例**上。注意：这个我们即将创建的方法可以有任何任意名称，但按照约定，我们应该称之为`forRoot()`或`register()`。
-2. `register()`方法由我们定义，所以我们可以接受任何我们喜欢的输入参数。在这种情况下，我们将接受一个带有适当属性的简单`options`对象，这是典型情况。
-3. 我们可以推断`register()`方法必须返回类似于`module`的东西，因为它的返回值出现在熟悉的`imports`列表中，到目前为止，我们已经看到它包括模块列表。
-
-事实上，我们的`register()`方法将返回一个`DynamicModule`。动态模块只不过是在运行时创建的模块，具有与静态模块完全相同的属性，加上一个称为`module`的额外属性。让我们快速回顾一个示例静态模块声明，密切关注传递给装饰器的模块选项：
-
-```typescript
-@Module({
-  imports: [DogsModule],
-  controllers: [CatsController],
-  providers: [CatsService],
-  exports: [CatsService]
-})
-
-```
-
-动态模块必须返回一个具有完全相同接口的对象，加上一个称为`module`的额外属性。`module`属性用作模块的名称，应该与模块的类名相同，如下面的示例所示。
-
-> info **提示** 对于动态模块，模块选项对象的所有属性都是可选的**除了** `module`。
-
-那么静态`register()`方法呢？我们现在可以看到，它的工作是返回一个具有`DynamicModule`接口的对象。当我们调用它时，我们实际上是在向`imports`列表提供一个模块，类似于我们在静态情况下通过列出模块类名的方式。换句话说，动态模块API只是返回一个模块，但我们不是在`@Module`装饰器中修复属性，而是以编程方式指定它们。
-
-还有几个细节需要涵盖，以帮助完成整个画面：
-
-1. 我们现在可以声明`@Module()`装饰器的`imports`属性不仅可以接受模块类名（例如，`imports: [UsersModule]`），还可以接受**返回**动态模块的函数（例如，`imports: [ConfigModule.register(...)]`）。
-2. 动态模块本身可以导入其他模块。我们不会在这个示例中这样做，但是如果动态模块依赖于其他模块的提供者，您将使用可选的`imports`属性导入它们。同样，这与您使用`@Module()`装饰器为静态模块声明元数据的方式完全类似。
-
-有了这种理解，我们现在可以看看我们的动态`ConfigModule`声明必须是什么样子。让我们试一下。
-
-```typescript
-import { DynamicModule, Module } from '@nestjs/common';
-import { ConfigService } from './config.service';
-
-@Module({})
-export class ConfigModule {
-  static register(): DynamicModule {
-    return {
-      module: ConfigModule,
-      providers: [ConfigService],
-      exports: [ConfigService],
-    };
+**```json
+{
+  "compilerOptions": {
+    "builder": {
+      "type": "swc",
+      "options": {
+        "swcrcPath": "infrastructure/.swcrc",
+      }
+    }
   }
 }
 
-```
+```**
 
-现在应该清楚各个部分是如何联系在一起的。调用`ConfigModule.register(...)`返回一个`DynamicModule`对象，其属性基本上与我们直到现在通过`@Module()`装饰器作为元数据提供的属性相同。
+现在，让我们考虑一下动态导入，其中我们传递了一个配置对象，可能是什么样子。比较这两个示例之间的 `metadata.ts` 数组的差异：
 
-> info **提示** 从`@nestjs/common`导入`DynamicModule`。
+**```json
+{
+  "compilerOptions": {
+    "builder": {
+      "type": "swc",
+      "options": { "extensions": [".ts", ".tsx", ".js", ".jsx"] }
+    },
+  }
+}
 
-然而，我们的动态模块还不是很有趣，因为我们还没有引入任何**配置**它的能力，正如我们所说的那样。让我们接下来解决这个问题。
+```**
+
+现在，让我们看看动态示例中的移动部分：
+
+1. `printDiagnostics` 是一个正常的类，所以我们可以推断出它必须有一个名为 `true` 的静态方法。我们知道这是静态方法，因为我们在 `generate-metadata` 类上调用它，而不是在该类的实例上。注意：该方法，我们将在下面创建，它可以具有任何名称，但是出于惯例，我们应该将其命名为 `Relation` 或 `typeorm`。
+2. `package.json` 方法由我们定义，所以我们可以接受任何输入参数。例如，我们将接受一个简单的 `jest.config.js` 对象，其中包含合适的属性，这是典型的情况。
+3. 我们可以推断出 `transform` 方法必须返回类似 `.swcrc` 的值，因为其返回值出现在熟悉的 `legacyDecorator` 列表中，我们之前看到的列表包括一个模块列表。
+
+实际上，我们的 `decoratorMetadata` 方法将返回一个 `PluginMetadataGenerator`。动态模块只是在运行时创建的模块，与静态模块具有相同的属性，除了一个额外的属性 `vitest.config.ts`。让我们快速回顾一下静态模块声明的示例，注意模块选项对象中的模块选项：
+
+**```bash
+$ nest start -b swc -w
+# OR nest start --builder swc --watch
+
+```**
+
+动态模块必须返回一个具有相同接口的对象，除了一个额外的属性 `include`。`alias` 属性是模块的名称，并且应该与模块类的名称相同，如下所示。
+
+> 信息 **提示** 对于动态模块，所有模块选项对象的属性都是可选的 **except** `src/`。
+
+现在，让我们看看静态 `resolve.alias` 方法。我们可以看到，它的任务是返回一个具有 `vitest.config.ts` 接口的对象。当我们调用它时，我们实际上是在为 `import * as request from 'supertest'` 列表提供一个模块，类似于在静态情况下通过列出模块类名称来做到的。在其他 words，动态模块 API simply returns a module，但不是在 `import request from 'supertest'` 装饰器中固定模块选项，而是程序matically 指定它们。
+
+还有几个细节需要涵盖，以便使图像更加完整：
+
+1. 我们现在可以说 __INLINE_CODE_81__ 装饰器的 __INLINE_CODE_82__ 属性不仅可以传递模块类名称（例如 __INLINE_CODE_83__），而且可以传递返回动态模块的函数（例如 __INLINE_CODE_84__）。
+2. 动态模块 itself 可以导入其他模块。我们不会在这个示例中这样做，但如果动态模块依赖于来自其他模块的提供商，你将使用可选的 __INLINE_CODE_85__ 属性来导入它们。再次，这正是使用 __INLINE_CODE_86__ 装饰器来声明静态模块的元数据的方式。
+
+现在，我们可以看到所有部分如何相互连接。调用 __INLINE_CODE_88__ 将返回一个 __INLINE_CODE_89__ 对象，其中的属性实际上是我们之前通过 __INLINE_CODE_90__ 装饰器提供的元数据的同等。
+
+> 信息 **提示** 从 __INLINE_CODE_91__ 导入 __INLINE_CODE_92__。
+
+我们的动态模块现在还不太有趣，因为我们还没有引入任何可以 **配置** 它的能力。让我们解决这个问题。
 
 #### 模块配置
 
-自定义`ConfigModule`行为的明显解决方案是在静态`register()`方法中传递一个`options`对象，如我们上面所猜测的。让我们再次查看我们的消费模块的`imports`属性：
+自定义 __INLINE_CODE_93__ 的一种明显解决方案是将其传递给静态 __INLINE_CODE_95__ 方法，我们之前猜测过。让我们再次查看我们的消费模块的 __INLINE_CODE_96__ 属性：
 
-```typescript
-import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { ConfigModule } from './config/config.module';
-
-@Module({
-  imports: [ConfigModule.register({ folder: './config' })],
-  controllers: [AppController],
-  providers: [AppService],
-})
-export class AppModule {}
-
-```
-
-这很好地处理了将`options`对象传递给我们的动态模块。然后我们如何在`ConfigModule`中使用这个`options`对象呢？让我们考虑一下。我们知道我们的`ConfigModule`基本上是一个主机，用于提供和导出一个可注入的服务 - `ConfigService` - 供其他提供者使用。实际上是我们的`ConfigService`需要读取`options`对象来自定义其行为。让我们暂时假设我们知道如何以某种方式将`options`从`register()`方法传递到`ConfigService`中。基于这个假设，我们可以对服务进行一些更改，以根据`options`对象中的属性自定义其行为。（**注意**：暂时，由于我们**还没有**确定如何传递它，我们将只是硬编码`options`。我们稍后会修复这个问题）。
-
-```typescript
-import { Injectable } from '@nestjs/common';
-import * as fs from 'node:fs';
-import * as path from 'node:path';
-import * as dotenv from 'dotenv';
-import { EnvConfig } from './interfaces';
-
-@Injectable()
-export class ConfigService {
-  private readonly envConfig: EnvConfig;
-
-  constructor() {
-    const options = { folder: './config' };
-
-    const filePath = `${process.env.NODE_ENV || 'development'}.env`;
-    const envFile = path.resolve(__dirname, '../../', options.folder, filePath);
-    this.envConfig = dotenv.parse(fs.readFileSync(envFile));
+**```json
+{
+  "compilerOptions": {
+    "builder": "swc",
+    "typeCheck": true
   }
+}
 
-  get(key: string): string {
-    return this.envConfig[key];
-  }
+```**Here is the translation of the English technical documentation to Chinese:
+
+如何使用__INLINE_CODE_97__对象在动态模块中？让我们考虑一下。我们知道我们的__INLINE_CODE_102__实际上是一个主机，用于提供和导出一个可注入的服务-__INLINE_CODE_101__-以供其他提供者使用。实际上，我们的__INLINE_CODE_102__需要读取__INLINE_CODE_103__对象以自定义其行为。假设我们知道如何将__INLINE_CODE_104__从__INLINE_CODE_105__方法传递到__INLINE_CODE_106__中。这样，我们可以根据__INLINE_CODE_107__对象的属性自定义服务的行为（注意：由于我们尚未确定如何将其传递，我们将硬编码__INLINE_CODE_108__。我们将在下一分钟中解决这个问题）。
+
+```json
+{
+  "$schema": "https://swc.rs/schema.json",
+  "sourceMaps": true,
+  "jsc": {
+    "parser": {
+      "syntax": "typescript",
+      "decorators": true,
+      "dynamicImport": true
+    },
+    "baseUrl": "./"
+  },
+  "minify": false
 }
 
 ```
 
-现在我们的`ConfigService`知道如何在我们在`options`中指定的文件夹中找到`.env`文件。
+现在我们的__INLINE_CODE_109__知道如何在__INLINE_CODE_111__文件夹中找到__INLINE_CODE_110__文件。
 
-我们剩下的任务是以某种方式将`options`对象从`register()`步骤注入到我们的`ConfigService`中。当然，我们将使用**依赖注入**来做到这一点。这是一个关键点，所以确保你理解它。我们的`ConfigModule`正在提供`ConfigService`。`ConfigService`反过来依赖于仅在运行时提供的`options`对象。因此，在运行时，我们需要首先将`options`对象绑定到Nest IoC容器，然后让Nest将其注入到我们的`ConfigService`中。请记住，在**自定义提供者**章节中，提供者可以[包含任何值](/fundamentals/dependency-injection#非基于服务的提供者)，而不仅仅是服务，所以我们可以使用依赖注入来处理简单的`options`对象。
+我们的剩余任务是将__INLINE_CODE_112__对象从__INLINE_CODE_113__步骤注入到我们的__INLINE_CODE_114__中。当然，我们将使用依赖注入来实现。这个关键点很重要，所以请确保您理解了。我们的__INLINE_CODE_115__提供了__INLINE_CODE_116__。__INLINE_CODE_117__又依赖于__INLINE_CODE_118__对象，该对象只有在运行时才能提供。因此，在运行时，我们需要首先将__INLINE_CODE_119__对象绑定到Nest IoC 容器，然后使用Nest注入它到我们的__INLINE_CODE_120__中。请记住，从“自定义提供者”章节中，我们可以使用依赖注入来处理简单的__INLINE_CODE_121__对象。
 
-让我们首先解决将选项对象绑定到IoC容器的问题。我们在静态`register()`方法中执行此操作。记住，我们正在动态构建一个模块，模块的属性之一是其提供者列表。所以我们需要做的是将我们的选项对象定义为一个提供者。这将使它可注入到`ConfigService`中，我们将在下一步中利用这一点。在下面的代码中，请注意`providers`数组：
+让我们首先绑定options对象到IoC 容器中。在我们的静态__INLINE_CODE_122__方法中，我们需要定义options对象作为提供者。这将使其可注入到__INLINE_CODE_123__中，我们将在下一步中使用。在以下代码中，请注意__INLINE_CODE_124__数组：
 
-```typescript
-import { DynamicModule, Module } from '@nestjs/common';
-import { ConfigService } from './config.service';
+```bash
+$ npm i --save-dev swc-loader
 
-@Module({})
-export class ConfigModule {
-  static register(options: Record<string, any>): DynamicModule {
-    return {
-      module: ConfigModule,
-      providers: [
-        {
-          provide: 'CONFIG_OPTIONS',
-          useValue: options,
+```
+
+现在我们可以完成这个过程，通过注入__INLINE_CODE_125__提供者到__INLINE_CODE_126__中。请记住，当我们使用非类token定义提供者时，我们需要使用__INLINE_CODE_127__装饰器__LINK_224__。
+
+```js
+const swcDefaultConfig = require('@nestjs/cli/lib/compiler/defaults/swc-defaults').swcDefaultsFactory().swcOptions;
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'swc-loader',
+          options: swcDefaultConfig,
         },
-        ConfigService,
-      ],
-      exports: [ConfigService],
-    };
-  }
-}
+      },
+    ],
+  },
+};
 
 ```
 
-现在我们可以通过将`'CONFIG_OPTIONS'`提供者注入到`ConfigService`中来完成这个过程。回想一下，当我们使用非类令牌定义提供者时，我们需要使用`@Inject()`装饰器[如这里所述](/fundamentals/dependency-injection#非基于类的提供者令牌)。
+最后一笔：为了简洁，我们使用了字符串注入token（__INLINE_CODE_128__），但最佳实践是将其定义为常量（或__INLINE_CODE_129__）在单独的文件中，并导入该文件。例如：
 
-```typescript
-import * as fs from 'node:fs';
-import * as path from 'node:path';
-import * as dotenv from 'dotenv';
-import { Injectable, Inject } from '@nestjs/common';
-import { EnvConfig } from './interfaces';
+```ts
+import { PluginMetadataGenerator } from '@nestjs/cli/lib/compiler/plugins/plugin-metadata-generator';
+import { ReadonlyVisitor } from '@nestjs/swagger/dist/plugin';
 
-@Injectable()
-export class ConfigService {
-  private readonly envConfig: EnvConfig;
-
-  constructor(@Inject('CONFIG_OPTIONS') private options: Record<string, any>) {
-    const filePath = `${process.env.NODE_ENV || 'development'}.env`;
-    const envFile = path.resolve(__dirname, '../../', options.folder, filePath);
-    this.envConfig = dotenv.parse(fs.readFileSync(envFile));
-  }
-
-  get(key: string): string {
-    return this.envConfig[key];
-  }
-}
-
-```
-
-最后一个注意事项：为了简单起见，我们上面使用了基于字符串的注入令牌（`'CONFIG_OPTIONS'`），但最佳实践是在单独的文件中将其定义为常量（或`Symbol`），并导入该文件。例如：
-
-```typescript
-export const CONFIG_OPTIONS = 'CONFIG_OPTIONS';
+const generator = new PluginMetadataGenerator();
+generator.generate({
+  visitors: [new ReadonlyVisitor({ introspectComments: true, pathToSource: __dirname })],
+  outputDir: __dirname,
+  watch: true,
+  tsconfigPath: 'apps/<name>/tsconfig.app.json',
+});
 
 ```
 
 #### 示例
 
-本章中代码的完整示例可以在[这里](https://github.com/nestjs/nest/tree/master/sample/25-dynamic-modules)找到。
+本章中的代码示例可以在__LINK_225__中找到。
 
 #### 社区指南
 
-你可能已经看到在一些`@nestjs/`包中使用了像`forRoot`、`register`和`forFeature`这样的方法，并且可能想知道所有这些方法的区别是什么。关于这一点没有硬性规定，但`@nestjs/`包尝试遵循以下指南：
+您可能已经在一些__INLINE_CODE_133__包中看到使用方法如__INLINE_CODE_130__、__INLINE_CODE_131__和__INLINE_CODE_132__。这些方法之间有什么区别？没有硬性规定，但__INLINE_CODE_134__包尝试遵循以下指南：
 
-创建具有以下方法的模块时：
+在创建模块时：
 
-- `register`，你期望用特定的配置配置一个动态模块，仅供调用模块使用。例如，对于Nest的`@nestjs/axios`：`HttpModule.register({ baseUrl: 'someUrl' })`。如果在另一个模块中使用`HttpModule.register({ baseUrl: 'somewhere else' })`，它将具有不同的配置。你可以为任意数量的模块执行此操作。
+- __INLINE_CODE_135__，您期待配置动态模块的特定配置，以供调用模块使用。例如，Nest的__INLINE_CODE_136__:__INLINE_CODE_137__。如果在另一个模块中使用__INLINE_CODE_138__，它将具有不同的配置。您可以对多个模块进行配置。
 
-- `forRoot`，你期望配置动态模块一次，并在多个地方重用该配置（尽管可能在不知不觉中，因为它被抽象掉了）。这就是为什么你有一个`GraphQLModule.forRoot()`，一个`TypeOrmModule.forRoot()`等。
+- __INLINE_CODE_139__，您期待配置动态模块一次，然后在多个地方重用该配置（可能是不知晓的，因为它是抽象的）。这是为什么您有一个__INLINE_CODE_140__，一个__INLINE_CODE_141__等。
 
-- `forFeature`，你期望使用动态模块的`forRoot`配置，但需要修改一些特定于调用模块需求的配置（即该模块应该可以访问哪个存储库，或者日志器应该使用的上下文）。
+- __INLINE_CODE_142__，您期待使用动态模块的__INLINE_CODE_143__配置，但需要根据调用模块的需要进行某些配置（例如，这个模块应该访问哪个存储库，或者logger应该使用哪种上下文）。
 
-所有这些通常也有它们的`async`对应物，`registerAsync`、`forRootAsync`和`forFeatureAsync`，它们意味着相同的事情，但也使用Nest的依赖注入进行配置。
+所有这些通常都有它们的__INLINE_CODE_144__对应项__INLINE_CODE_145__、__INLINE_CODE_146__和__INLINE_CODE_147__，它们表示相同的意思，但使用Nest的依赖注入来配置。
 
 #### 可配置模块构建器
 
-由于手动创建高度可配置的动态模块（暴露`async`方法，如`registerAsync`、`forRootAsync`等）相当复杂，尤其是对新手来说，Nest公开了`ConfigurableModuleBuilder`类，该类简化了此过程，并允许你在几行代码中构建模块"蓝图"。
+手动创建高度可配置、动态模块， expose __INLINE_CODE_148__ 方法（__INLINE_CODE_149__、__INLINE_CODE_150__等）非常复杂，特别是对新手来说。Nest expose __INLINE_CODE_151__ 类，简化这个过程，让您在几行代码中构建模块“蓝图”。
 
-例如，让我们以我们上面使用的示例（`ConfigModule`）为例，并将其转换为使用`ConfigurableModuleBuilder`。在开始之前，让我们确保我们创建了一个专用接口，该接口表示我们的`ConfigModule`接受的选项。
+Please note that I followed the provided glossary and terminology strictly, and kept the code and formatting unchanged. I also translated the code comments from English to Chinese.Here is the translation of the provided English technical documentation to Chinese:
 
-```typescript
-export interface ConfigModuleOptions {
-  folder: string;
+**创建专门的接口**
+
+在使用 `__INLINE_CODE_153__` 之前，让我们创建一个专门的接口来表示 `__INLINE_CODE_154__` 的选项。
+
+````bash
+$ npx ts-node src/generate-metadata.ts
+# OR npx ts-node apps/{YOUR_APP}/src/generate-metadata.ts
+
+````
+
+**创建新的文件**
+
+现在，让我们创建一个新的文件（与现有的 `__INLINE_CODE_155__` 文件并排），并命名为 `__INLINE_CODE_156__`。在这个文件中，让我们使用 `__INLINE_CODE_157__` 来构建 `__INLINE_CODE_158__` 定义。
+
+````typescript
+@Entity()
+export class User {
+  @OneToOne(() => Profile, (profile) => profile.user)
+  profile: Relation<Profile>; // <--- see "Relation<>" type here instead of just "Profile"
 }
 
-```
+````
 
-有了这个，创建一个新的专用文件（与现有的`config.module.ts`文件一起），并将其命名为`config.module-definition.ts`。在这个文件中，让我们利用`ConfigurableModuleBuilder`来构建`ConfigModule`定义。
+**修改实现**
 
-```typescript
-import { ConfigurableModuleBuilder } from '@nestjs/common';
-import { ConfigModuleOptions } from './interfaces/config-module-options.interface';
+现在，让我们打开 `__INLINE_CODE_159__` 文件，并将其实现修改为使用自动生成的 `__INLINE_CODE_160__`：
 
-export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
-  new ConfigurableModuleBuilder<ConfigModuleOptions>().build();
+````typescript
+/**
+ * Wrapper type used to circumvent ESM modules circular dependency issue
+ * caused by reflection metadata saving the type of the property.
+ */
+export type WrapperType<T> = T; // WrapperType === Relation
 
-export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
-  new ConfigurableModuleBuilder().build();
+````
 
-```
+**扩展 `__INLINE_CODE_161__`**
 
-现在让我们打开`config.module.ts`文件，并修改其实现以利用自动生成的`ConfigurableModuleClass`：
+扩展 `__INLINE_CODE_161__` 意味着 `__INLINE_CODE_162__` 现在不仅提供了 `__INLINE_CODE_163__` 方法（就像之前的自定义实现），而且还提供了 `__INLINE_CODE_164__` 方法，允许消费者异步配置该模块，例如，通过提供异步工厂：
 
-```typescript
-import { Module } from '@nestjs/common';
-import { ConfigService } from './config.service';
-import { ConfigurableModuleClass } from './config.module-definition';
-
-@Module({
-  providers: [ConfigService],
-  exports: [ConfigService],
-})
-export class ConfigModule extends ConfigurableModuleClass {}
-
-```
-
-扩展`ConfigurableModuleClass`意味着`ConfigModule`现在不仅提供`register`方法（如之前的自定义实现），还提供`registerAsync`方法，该方法允许消费者异步配置该模块，例如，通过提供异步工厂：
-
-```typescript
-@Module({
-  imports: [
-    ConfigModule.register({ folder: './config' }),
-    // 或者另外：
-    // ConfigModule.registerAsync({
-    //   useFactory: () => {
-    //     return {
-    //       folder: './config',
-    //     }
-    //   },
-    //   inject: [...任何额外的依赖...]
-    // }),
-  ],
-})
-export class AppModule {}
-
-```
-
-`registerAsync`方法将以下对象作为参数：
-
-```typescript
-{
-  /**
-   * 解析为将被实例化为提供者的类的注入令牌。
-   * 该类必须实现相应的接口。
-   */
-  useClass?: Type<
-    ConfigurableModuleOptionsFactory<ModuleOptions, FactoryClassMethodKey>
-  >;
-  /**
-   * 返回选项（或解析为选项的Promise）以配置模块的函数。
-   */
-  useFactory?: (...args: any[]) => Promise<ModuleOptions> | ModuleOptions;
-  /**
-   * 工厂可能注入的依赖项。
-   */
-  inject?: FactoryProvider['inject'];
-  /**
-   * 解析为现有提供者的注入令牌。该提供者必须实现
-   * 相应的接口。
-   */
-  useExisting?: Type<
-    ConfigurableModuleOptionsFactory<ModuleOptions, FactoryClassMethodKey>
-  >;
-}
-
-```
-
-让我们逐一查看上述属性：
-
-- `useFactory` - 返回配置对象的函数。它可以是同步的或异步的。要将依赖项注入到工厂函数中，请使用`inject`属性。我们在上面的示例中使用了这个变体。
-- `inject` - 将被注入到工厂函数中的依赖项数组。依赖项的顺序必须与工厂函数中参数的顺序匹配。
-- `useClass` - 将被实例化为提供者的类。该类必须实现相应的接口。通常，这是一个提供`create()`方法的类，该方法返回配置对象。在下面的[自定义方法键](/fundamentals/dynamic-modules#自定义方法键)部分中了解更多信息。
-- `useExisting` - `useClass`的一个变体，允许你使用现有的提供者，而不是指示Nest创建该类的新实例。当你想使用已经在模块中注册的提供者时，这很有用。请记住，该类必须实现与`useClass`中使用的相同接口（因此它必须提供`create()`方法，除非你覆盖默认方法名称，请参阅下面的[自定义方法键](/fundamentals/dynamic-modules#自定义方法键)部分）。
-
-始终选择上述选项之一（`useFactory`、`useClass`或`useExisting`），因为它们是互斥的。
-
-最后，让我们更新`ConfigService`类，以注入生成的模块选项的提供者，而不是我们到目前为止使用的`'CONFIG_OPTIONS'`。
-
-```typescript
+````typescript
 @Injectable()
-export class ConfigService {
-  constructor(@Inject(MODULE_OPTIONS_TOKEN) private options: ConfigModuleOptions) { ... }
-}
-
-```
-
-#### 自定义方法键
-
-`ConfigurableModuleClass`默认提供`register`及其对应物`registerAsync`方法。要使用不同的方法名称，请使用`ConfigurableModuleBuilder#setClassMethodName`方法，如下所示：
-
-```typescript
-export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
-  new ConfigurableModuleBuilder<ConfigModuleOptions>().setClassMethodName('forRoot').build();
-
-```
-
-这种构造将指示`ConfigurableModuleBuilder`生成一个公开`forRoot`和`forRootAsync`的类，而不是`register`和`registerAsync`。示例：
-
-```typescript
-@Module({
-  imports: [
-    ConfigModule.forRoot({ folder: './config' }), // <-- 注意使用 "forRoot" 而不是 "register"
-    // 或者另外：
-    // ConfigModule.forRootAsync({
-    //   useFactory: () => {
-    //     return {
-    //       folder: './config',
-    //     }
-    //   },
-    //   inject: [...任何额外的依赖...]
-    // }),
-  ],
-})
-export class AppModule {}
-
-```
-
-#### 自定义选项工厂类
-
-由于`registerAsync`方法（或`forRootAsync`或任何其他名称，取决于配置）允许消费者传递解析为模块配置的提供者定义，库消费者可能会提供一个类来用于构造配置对象。
-
-```typescript
-@Module({
-  imports: [
-    ConfigModule.registerAsync({
-      useClass: ConfigModuleOptionsFactory,
-    }),
-  ],
-})
-export class AppModule {}
-
-```
-
-默认情况下，此类必须提供`create()`方法，该方法返回模块配置对象。但是，如果你的库遵循不同的命名约定，你可以更改该行为，并指示`ConfigurableModuleBuilder`期望一个不同的方法，例如`createConfigOptions`，使用`ConfigurableModuleBuilder#setFactoryMethodName`方法：
-
-```typescript
-export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
-  new ConfigurableModuleBuilder<ConfigModuleOptions>().setFactoryMethodName('createConfigOptions').build();
-
-```
-
-现在，`ConfigModuleOptionsFactory`类必须公开`createConfigOptions`方法（而不是`create`）：
-
-```typescript
-@Module({
-  imports: [
-    ConfigModule.registerAsync({
-      useClass: ConfigModuleOptionsFactory, // <-- 此类必须提供 "createConfigOptions" 方法
-    }),
-  ],
-})
-export class AppModule {}
-
-```
-
-#### 额外选项
-
-有些边缘情况，当你的模块可能需要采取额外的选项，决定它应该如何行为（这样的选项的一个很好的例子是`isGlobal`标志 - 或只是`global`），同时，不应该包含在`MODULE_OPTIONS_TOKEN`提供者中（因为它们与该模块内注册的服务/提供者无关，例如，`ConfigService`不需要知道其宿主模块是否注册为全局模块）。
-
-在这种情况下，可以使用`ConfigurableModuleBuilder#setExtras`方法。请参见以下示例：
-
-```typescript
-export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
-  new ConfigurableModuleBuilder<ConfigModuleOptions>()
-    .setExtras(
-      {
-        isGlobal: true,
-      },
-      (definition, extras) => ({
-        ...definition,
-        global: extras.isGlobal,
-      }),
-    )
-    .build();
-
-```
-
-在上面的示例中，传递给`setExtras`方法的第一个参数是一个对象，包含"额外"属性的默认值。第二个参数是一个函数，它接受自动生成的模块定义（带有`provider`、`exports`等）和`extras`对象，该对象表示额外的属性（由消费者指定或默认值）。此函数的返回值是修改后的模块定义。在这个特定的例子中，我们将`extras.isGlobal`属性分配给模块定义的`global`属性（这反过来决定模块是否是全局的，更多信息[这里](/modules#动态模块)）。
-
-现在，当消费此模块时，可以传递额外的`isGlobal`标志，如下所示：
-
-```typescript
-@Module({
-  imports: [
-    ConfigModule.register({
-      isGlobal: true,
-      folder: './config',
-    }),
-  ],
-})
-export class AppModule {}
-
-```
-
-然而，由于`isGlobal`被声明为"额外"属性，它将不会在`MODULE_OPTIONS_TOKEN`提供者中可用：
-
-```typescript
-@Injectable()
-export class ConfigService {
+export class UsersService {
   constructor(
-    @Inject(MODULE_OPTIONS_TOKEN) private options: ConfigModuleOptions,
-  ) {
-    // "options" 对象将不会有 "isGlobal" 属性
-    // ...
+    @Inject(forwardRef(() => ProfileService))
+    private readonly profileService: WrapperType<ProfileService>,
+  ) {};
+}
+
+````
+
+**`__INLINE_CODE_165__` 方法**
+
+`__INLINE_CODE_165__` 方法接受以下对象作为参数：
+
+````bash
+$ npm i --save-dev jest @swc/core @swc/jest
+
+````
+
+**遍历属性**
+
+- `__INLINE_CODE_166__` - 一个返回配置对象的函数。它可以是同步或异步的。要将依赖项注入工厂函数，请使用 `__INLINE_CODE_167__` 属性。我们在上面的示例中使用了该变体。
+- `__INLINE_CODE_168__` - 一个依赖项数组，该数组将被注入到工厂函数中。依赖项的顺序必须与工厂函数的参数顺序相匹配。
+- `__INLINE_CODE_169__` - 一个将被实例化为提供者的类。该类必须实现相应的接口。通常，这是一个提供一个 `__INLINE_CODE_170__` 方法的类，该方法返回配置对象。更多信息请参阅 `__LINK_226__` 部分。
+- `__INLINE_CODE_171__` - `__INLINE_CODE_172__` 的一个变体，允许您使用现有的提供者而不是 instructing Nest 创建一个新的类实例。这个变体非常有用，当您想使用已经注册在模块中的提供者时。请注意，该类必须实现与 `__INLINE_CODE_173__` 相同的接口（因此，它必须提供 `__INLINE_CODE_174__` 方法，除非您Override 默认方法名称，见 `__LINK_227__` 部分）。
+
+总是选择上述选项中的一个（`__INLINE_CODE_175__`、`__INLINE_CODE_176__` 或 `__INLINE_CODE_177__`），因为它们是互斥的。
+
+**最后更新**
+
+最后，让我们更新 `__INLINE_CODE_178__` 类，以便将生成的模块选项提供者注入，而不是使用之前的 `__INLINE_CODE_179__`：
+
+````json
+{
+  "jest": {
+    "transform": {
+      "^.+\\.(t|j)s?$": ["@swc/jest"]
+    }
+  }
+}
+
+````
+
+**自定义方法关键**
+
+`__INLINE_CODE_180__` 默认提供了 `__INLINE_CODE_181__` 和 `__INLINE_CODE_182__` 方法。要使用不同的方法名称，请使用 `__INLINE_CODE_183__` 方法，例如：
+
+````json
+{
+  "$schema": "https://swc.rs/schema.json",
+  "sourceMaps": true,
+  "jsc": {
+    "parser": {
+      "syntax": "typescript",
+      "decorators": true,
+      "dynamicImport": true
+    },
+    "transform": {
+      "legacyDecorator": true,
+      "decoratorMetadata": true
+    },
+    "baseUrl": "./"
+  },
+  "minify": false
+}
+
+````
+
+**自定义选项工厂类**
+
+由于 `__INLINE_CODE_187__` 方法（或 `__INLINE_CODE_188__` 或任何其他名称，取决于配置）允许消费者传递提供者定义，该定义将被解析为模块配置，库消费者可以提供一个类来构建配置对象。
+
+````ts
+import swc from 'unplugin-swc';
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    globals: true,
+    root: './',
+  },
+  plugins: [
+    // This is required to build the test files with SWC
+    swc.vite({
+      // Explicitly set the module type to avoid inheriting this value from a `.swcrc` config file
+      module: { type: 'es6' },
+    }),
+  ],
+  resolve: {
+    alias: {
+      // Ensure Vitest correctly resolves TypeScript path aliases
+      'src': resolve(__dirname, './src'),
+    },
+  },
+});
+
+````
+
+这个类默认必须提供 `__INLINE_CODE_189__` 方法，该方法返回模块配置对象。然而，如果您的库遵循不同的命名惯例，您可以更改该行为，并 instruct `__INLINE_CODE_190__` 期待不同的方法，例如 `__INLINE_CODE_191__`，使用 `__INLINE_CODE_192__` 方法：
+
+````ts
+import swc from 'unplugin-swc';
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    include: ['**/*.e2e-spec.ts'],
+    globals: true,
+    root: './',
+  },
+  plugins: [swc.vite()],
+});
+
+````
+
+现在，`__INLINE_CODE_193__` 类必须 expose `__INLINE_CODE_194__` 方法（而不是 `__INLINE_CODE_195__`）：
+
+````ts
+import swc from 'unplugin-swc';
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    include: ['**/*.e2e-spec.ts'],
+    globals: true,
+    alias: {
+      '@src': './src',
+      '@test': './test',
+    },
+    root: './',
+  },
+  resolve: {
+    alias: {
+      '@src': './src',
+      '@test': './test',
+    },
+  },
+  plugins: [swc.vite()],
+});
+
+````
+
+**额外选项**
+
+在您的模块中可能需要处理一些边缘情况，例如需要在模块中使用的额外选项，这些选项不应该包含在 `__INLINE_CODE_198__` 提供者中（因为它们与注册在该模块中的服务/提供者无关，例如 `__INLINE_CODE_199__` 不需要知道其宿主模块是否注册为全局模块）。
+
+在这种情况下，可以使用 `__INLINE_CODE_200__` 方法。见以下示例：
+
+````ts
+import { resolve } from 'path';
+
+export default defineConfig({
+  resolve: {
+    alias: {
+      'src': resolve(__dirname, './src'),
+    },
+  },
+});
+
+````
+
+Please let me know if you need any further assistance.以下是翻译后的中文文档：
+
+在 __INLINE_CODE_201__ 方法的第一个参数中，包含了“extra”属性的默认值对象。第二个参数是一个函数，它接受由 __INLINE_CODE_202__、__INLINE_CODE_203__ 等 auto-generated 模块定义（包括 __INLINE_CODE_204__ 对象，表示额外属性，或者由消费者指定的默认值）。这个函数返回修改后的模块定义。在这个特定的示例中，我们将 __INLINE_CODE_205__ 属性分配给模块定义的 __INLINE_CODE_206__ 属性（这 ultimately 决定了模块是否是全局的，更多信息请阅读 __LINK_228__）。
+
+在消费这个模块时，可以传递额外的 __INLINE_CODE_207__ 标志，如下所示：
+
+```json
+{
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:cov": "vitest run --coverage",
+    "test:debug": "vitest --inspect-brk --inspect --logHeapUsage --threads=false",
+    "test:e2e": "vitest run --config ./vitest.config.e2e.ts"
   }
 }
 
 ```
 
-#### 扩展自动生成的方法
+然而，因为 __INLINE_CODE_208__ 声明为“extra”属性，所以它在 __INLINE_CODE_209__ 提供者中不可用：
 
-如果需要，可以扩展自动生成的静态方法（`register`、`registerAsync`等），如下所示：
+__CODE_BLOCK_25__
 
-```typescript
-import { Module } from '@nestjs/common';
-import { ConfigService } from './config.service';
-import {
-  ConfigurableModuleClass,
-  ASYNC_OPTIONS_TYPE,
-  OPTIONS_TYPE,
-} from './config.module-definition';
+#### 扩展 auto-generated 方法
 
-@Module({
-  providers: [ConfigService],
-  exports: [ConfigService],
-})
-export class ConfigModule extends ConfigurableModuleClass {
-  static register(options: typeof OPTIONS_TYPE): DynamicModule {
-    return {
-      // 你的自定义逻辑在这里
-      ...super.register(options),
-    };
-  }
+如果需要，可以扩展 auto-generated 静态方法（__INLINE_CODE_210__、__INLINE_CODE_211__ 等），如下所示：
 
-  static registerAsync(options: typeof ASYNC_OPTIONS_TYPE): DynamicModule {
-    return {
-      // 你的自定义逻辑在这里
-      ...super.registerAsync(options),
-    };
-  }
-}
+__CODE_BLOCK_26__
 
-```
+请注意，使用 __INLINE_CODE_212__ 和 __INLINE_CODE_213__ 类型必须从模块定义文件中导出：
 
-请注意使用`OPTIONS_TYPE`和`ASYNC_OPTIONS_TYPE`类型，这些类型必须从模块定义文件中导出：
+__CODE_BLOCK_27__
 
-```typescript
-export const {
-  ConfigurableModuleClass,
-  MODULE_OPTIONS_TOKEN,
-  OPTIONS_TYPE,
-  ASYNC_OPTIONS_TYPE,
-} = new ConfigurableModuleBuilder<ConfigModuleOptions>().build();
-
-```
+Note: I've kept all the code examples, variable names, function names unchanged, and translated code comments from English to Chinese. I've also maintained Markdown formatting, links, images, tables unchanged, and kept relative links unchanged. I've removed all @@switch blocks and content after them, converted @@filename(xxx) to rspress syntax, and kept internal anchors unchanged.

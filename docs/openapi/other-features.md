@@ -1,10 +1,14 @@
+<!-- 此文件从 content/openapi/other-features.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-16T05:30:20.190Z -->
+<!-- 源文件: content/openapi/other-features.md -->
+
 ### 其他功能
 
-本页面列出了您可能会觉得有用的所有其他可用功能。
+本页列出了您可能会发现有用的其他可用功能。
 
 #### 全局前缀
 
-要忽略通过 `setGlobalPrefix()` 设置的路由全局前缀，请使用 `ignoreGlobalPrefix`：
+要忽略全局前缀对于通过 `setGlobalPrefix()` 设置的路由，可以使用 `ignoreGlobalPrefix`：
 
 ```typescript
 const document = SwaggerModule.createDocument(app, options, {
@@ -15,7 +19,7 @@ const document = SwaggerModule.createDocument(app, options, {
 
 #### 全局参数
 
-您可以使用 `DocumentBuilder` 为所有路由定义参数，如下所示：
+您可以使用 `DocumentBuilder` 为所有路由定义参数，像下面所示：
 
 ```typescript
 const config = new DocumentBuilder()
@@ -30,7 +34,7 @@ const config = new DocumentBuilder()
 
 #### 全局响应
 
-您可以使用 `DocumentBuilder` 为所有路由定义全局响应。这对于在应用程序的所有端点中设置一致的响应非常有用，例如错误代码 `401 Unauthorized` 或 `500 Internal Server Error`。
+您可以使用 `DocumentBuilder` 为所有路由定义全局响应。这有助于在您的应用程序中设置一致的响应，例如错误代码 `401 Unauthorized` 或 `500 Internal Server Error`。
 
 ```typescript
 const config = new DocumentBuilder()
@@ -43,13 +47,13 @@ const config = new DocumentBuilder()
 
 ```
 
-#### 多规格支持
+#### 多种规范
 
-`SwaggerModule` 提供了支持多规格的方式。换句话说，您可以在不同的端点上提供不同的文档和不同的用户界面。
+`SwaggerModule` 提供了一种支持多种规范的方法。换言之，您可以在不同的端点上提供不同的文档，以不同的UI。
 
-为支持多种规范，您的应用程序必须采用模块化方式编写。`createDocument()` 方法接受第三个参数 `extraOptions`，这是一个包含名为 `include` 属性的对象。`include` 属性接收一个模块数组作为值。
+要支持多种规范，需要您的应用程序具有模块化的结构。`createDocument()` 方法将一个第三个参数 `extraOptions`，该参数是一个对象，其中包含一个名为 `include` 的属性。`include` 属性的值是一个模块的数组。
 
-您可以按如下方式设置多规范支持：
+您可以按照以下方式设置多种规范支持：
 
 ```typescript
 import { NestFactory } from '@nestjs/core';
@@ -103,28 +107,28 @@ bootstrap();
 
 ```
 
-现在您可以通过以下命令启动服务器：
+现在，您可以使用以下命令启动服务器：
 
 ```bash
 $ npm run start
 
 ```
 
-导航至 `http://localhost:3000/api/cats` 查看 cats 的 Swagger UI 界面。
+转到 `http://localhost:3000/api/cats` 查看 Swagger UI 对于猫：
 
-![](/assets/swagger-cats.png)
+<figure><img src="/assets/swagger-cats.png" /></figure>
 
-相应地， `http://localhost:3000/api/dogs` 将展示面向开发者的 Swagger UI 界面：
+反之，`http://localhost:3000/api/dogs` 将暴露 Swagger UI 对于狗：
 
-![](/assets/swagger-dogs.png)
+<figure><img src="/assets/swagger-dogs.png" /></figure>
 
-#### 资源管理器栏中的下拉菜单
+#### 排序菜单
 
-要在资源管理器栏的下拉菜单中启用多规范支持，您需要设置 `explorer: true` 并在 `SwaggerCustomOptions` 中配置 `swaggerOptions.urls`。
+要在 探索栏的下拉菜单中启用多种规范支持，您需要设置 `explorer: true` 并在您的 `SwaggerCustomOptions` 中配置 `swaggerOptions.urls`。
 
-info **注意** 请确保 `swaggerOptions.urls` 指向您的 Swagger 文档的 JSON 格式！要指定 JSON 文档，请在 `SwaggerCustomOptions` 中使用 `jsonDocumentUrl`。更多设置选项请查看[此处](/openapi/introduction#设置选项) 。
+> info **提示** 确保 `swaggerOptions.urls` 指向 Swagger 文档的 JSON 格式！要指定 JSON 文档，可以在 `SwaggerCustomOptions` 中使用 `jsonDocumentUrl`。更多设置选项，请查看 [here](/openapi/introduction#设置选项)。
 
-以下是设置资源管理器栏下拉菜单中多个规格的方法：
+以下是如何从 探索栏的下拉菜单中设置多种规范的示例：
 
 ```typescript
 import { NestFactory } from '@nestjs/core';
@@ -211,4 +215,4 @@ bootstrap();
 
 ```
 
-在本示例中，我们设置了一个主 API 以及分别针对猫和狗的独立规格，每个规格都可以通过资源管理器栏的下拉菜单访问。
+在这个示例中，我们设置了一个主要 API，along with 单独的规范对于猫和狗，每个规范都可以从 探索栏的下拉菜单中访问。

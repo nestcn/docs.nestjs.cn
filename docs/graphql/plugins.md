@@ -1,84 +1,64 @@
-### Apollo 插件
+<!-- 此文件从 content/graphql/plugins.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-16T05:23:55.760Z -->
+<!-- 源文件: content/graphql/plugins.md -->
 
-插件能够通过响应特定事件执行自定义操作来扩展 Apollo Server 的核心功能。目前这些事件对应 GraphQL 请求生命周期的各个阶段，以及 Apollo Server 自身的启动过程（详见[此处](https://www.apollographql.com/docs/apollo-server/integrations/plugins/) ）。例如，一个基础日志插件可以记录发送到 Apollo Server 的每个请求所关联的 GraphQL 查询字符串。
+### Apollo 服务器插件
+
+插件使您能够通过在 Apollo 服务器的 GraphQL 请求生命周期特定阶段或启动时执行自定义操作来扩展 Apollo 服务器的核心功能。当前，这些事件对应于 GraphQL 请求生命周期的个别阶段，以及 Apollo 服务器的启动本身（了解更多关于 @@16）。例如，一种基本的日志插件可能将与每个请求关联的 GraphQL 查询字符串记录到 Apollo 服务器。
 
 #### 自定义插件
 
-要创建插件，需声明一个用 `@Plugin` 装饰器标注的类，该装饰器从 `@nestjs/apollo` 包导出。同时，为了获得更好的代码自动补全功能，建议实现来自 `@apollo/server` 包的 `ApolloServerPlugin` 接口。
+要创建插件，声明一个带有 @@4 装饰器的类，导出自 @@5 包。另外，为更好的代码自动完成，实现 @@6 接口，从 @@7 包中导出。
 
 ```typescript
-import { ApolloServerPlugin, GraphQLRequestListener } from '@apollo/server';
-import { Plugin } from '@nestjs/apollo';
+async function generateSchema() {
+  const app = await NestFactory.create(GraphQLSchemaBuilderModule);
+  await app.init();
 
-@Plugin()
-export class LoggingPlugin implements ApolloServerPlugin {
-  async requestDidStart(): Promise<GraphQLRequestListener<any>> {
-    console.log('Request started');
-    return {
-      async willSendResponse() {
-        console.log('Will send response');
-      },
-    };
-  }
+  const gqlSchemaFactory = app.get(GraphQLSchemaFactory);
+  const schema = await gqlSchemaFactory.create([RecipesResolver]);
+  console.log(printSchema(schema));
 }
 
 ```
 
-这样我们就可以将 `LoggingPlugin` 注册为一个提供者。
+这样，我们可以将 @@8 作为提供者注册。
 
 ```typescript
-@Module({
-  providers: [LoggingPlugin],
-})
-export class CommonModule {}
+const schema = await gqlSchemaFactory.create([
+  RecipesResolver,
+  AuthorsResolver,
+  PostsResolvers,
+]);
 
 ```
 
-Nest 会自动实例化插件并将其应用到 Apollo Server。
+Nest 将自动实例化插件并将其应用于 Apollo 服务器。
 
 #### 使用外部插件
 
-系统提供了多个开箱即用的插件。要使用现有插件，只需导入它并将其添加到 `plugins` 数组中：
+有多个插件提供了预置的插件。要使用现有插件， simplement 导入它并将其添加到 @@9 数组：
 
 ```typescript
-GraphQLModule.forRoot({
-  // ...
-  plugins: [ApolloServerOperationRegistry({ /* options */})]
-}),
+const schema = await gqlSchemaFactory.create(
+  [RecipesResolver, AuthorsResolver, PostsResolvers],
+  [DurationScalar, DateScalar],
+);
 
 ```
 
-:::info 提示
-`ApolloServerOperationRegistry` 插件是从 `@apollo/server-plugin-operation-registry` 包导出的。
-:::
+> info **提示** @@10 插件来自 @@11 包。
 
-#### 与 Mercurius 搭配使用的插件
+#### Mercurius 插件
 
-部分现有的 mercurius 专属 Fastify 插件必须在 mercurius 插件之后加载（详见插件树[此处](https://mercurius.dev/#/docs/plugins) ）。
+一些现有的 Mercurius 特定 Fastify 插件在插件树中必须在 Mercurius 插件后加载（了解更多关于 @@17）。此外， @@18 是一个例外，应该在主文件中注册。
 
-:::warning 注意
-[mercurius-upload](https://github.com/mercurius-js/mercurius-upload) 是个例外，应在主文件中注册。
-:::
-
-为此，`MercuriusDriver` 提供了一个可选的 `plugins` 配置项。它表示一个由对象组成的数组，每个对象包含两个属性：`plugin` 及其对应的 `options`。因此，注册 [缓存插件](https://github.com/mercurius-js/cache) 的示例如下：
+因此， @@12 暴露了一个可选的 @@13 配置选项。它表示一个对象数组，其中包含两个属性： @@14 和 @@15。因此，注册 @@19 将如下所示：
 
 ```typescript
-GraphQLModule.forRoot({
-  driver: MercuriusDriver,
-  // ...
-  plugins: [
-    {
-      plugin: cache,
-      options: {
-        ttl: 10,
-        policy: {
-          Query: {
-            add: true
-          }
-        }
-      },
-    }
-  ]
-}),
+const schema = await gqlSchemaFactory.create([RecipesResolver], {
+  skipCheck: true,
+  orphanedTypes: [],
+});
 
 ```

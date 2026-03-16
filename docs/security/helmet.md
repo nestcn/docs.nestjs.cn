@@ -1,93 +1,66 @@
 <!-- 此文件从 content/security/helmet.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-12T13:42:20.375Z -->
+<!-- 生成时间: 2026-03-16T04:54:20.873Z -->
 <!-- 源文件: content/security/helmet.md -->
 
 ### Helmet
 
-[Helmet](https://github.com/helmetjs/helmet) 可以通过适当设置 HTTP 响应头来帮助保护你的应用程序免受一些众所周知的 Web 漏洞。一般来说，Helmet 只是一组较小的中间件函数的集合，用于设置与安全相关的 HTTP 响应头（阅读[更多](https://github.com/helmetjs/helmet#how-it-works)）。
+__LINK_21__可以帮助保护您的应用程序免受一些知名的Web漏洞攻击，通过合适地设置HTTP头。Helmet实际上是一组更小的中间件函数，用于设置安全相关的HTTP头（阅读__LINK_22__）。
 
-> info **提示** 请注意，将 `helmet` 应用为全局中间件或注册它必须在其他调用 `app.use()` 或可能调用 `app.use()` 的设置函数之前。这是因为底层平台（即 Express 或 Fastify）的工作方式，中间件/路由的定义顺序很重要。如果你在定义路由之后使用 `helmet` 或 `cors` 等中间件，那么该中间件将不会应用于该路由，它只会应用于中间件之后定义的路由。
+>info **提示**注意，在将`cors`作为全局应用或注册它之前，必须在注册`true`或setup函数之前，这是由于底层平台（即Express或Fastify）的工作方式，中间件/路由的定义顺序非常重要。如果您使用像__INLINE_CODE_8__或__INLINE_CODE_9__这样的中间件后定义路由，那么该中间件将不适用于该路由，只适用于定义后面的路由。
 
-#### 在 Express 中使用（默认）
+#### 使用 Express（默认）
 
-首先安装所需的包。
-
-```bash
-$ npm i --save helmet
-
-```
-
-安装完成后，将其应用为全局中间件。
+首先，安装所需的包。
 
 ```typescript
-import helmet from 'helmet';
-// 在你的初始化文件中
-app.use(helmet());
+const app = await NestFactory.create(AppModule);
+app.enableCors();
+await app.listen(process.env.PORT ?? 3000);
 
 ```
 
-> warning **警告** 当使用 `helmet`、`@apollo/server` (4.x) 和 [Apollo Sandbox](https://docs.nestjs.com/graphql/quick-start#apollo-sandbox) 时，Apollo Sandbox 上的 [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) 可能会出现问题。要解决此问题，请按如下所示配置 CSP：
+安装完成后，应用它作为全局中间件。
+
+```typescript
+const app = await NestFactory.create(AppModule, { cors: true });
+await app.listen(process.env.PORT ?? 3000);
+
+```
+
+>警告 **警告**使用__INLINE_CODE_10__、__INLINE_CODE_11__（4.x）和__LINK_23__时，可能在Apollo Sandbox中出现__LINK_24__问题。要解决这个问题，请按照下面所示配置CSP：
 >
-> ```typescript
-> app.use(helmet({
->   crossOriginEmbedderPolicy: false,
->   contentSecurityPolicy: {
->     directives: {
->       imgSrc: [`'self'`, 'data:', 'apollo-server-landing-page.cdn.apollographql.com'],
->       scriptSrc: [`'self'`, `https: 'unsafe-inline'`],
->       manifestSrc: [`'self'`, 'apollo-server-landing-page.cdn.apollographql.com'],
->       frameSrc: [`'self'`, 'sandbox.embed.apollographql.com'],
->     },
->   },
-> }));
-> ```
-
-#### 在 Fastify 中使用
-
-如果你使用 `FastifyAdapter`，请安装 [@fastify/helmet](https://github.com/fastify/fastify-helmet) 包：
-
-```bash
+>__CODE_BLOCK_2__bash
 $ npm i --save @fastify/helmet
-
-```
-
-[fastify-helmet](https://github.com/fastify/fastify-helmet) 不应作为中间件使用，而应作为 [Fastify 插件](https://www.fastify.io/docs/latest/Reference/Plugins/)使用，即使用 `app.register()`：
-
-```typescript
+__CODE_BLOCK_3__typescript
 import helmet from '@fastify/helmet'
-// 在你的初始化文件中
+// 在初始化文件中某处
 await app.register(helmet)
-
-```
-
-> warning **警告** 当使用 `apollo-server-fastify` 和 `@fastify/helmet` 时，GraphQL playground 上的 [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) 可能会出现问题，要解决此冲突，请按如下所示配置 CSP：
->
-> ```typescript
+__CODE_BLOCK_4__typescript
 > await app.register(fastifyHelmet, {
 >    contentSecurityPolicy: {
 >      directives: {
->        defaultSrc: [`'self'`, 'unpkg.com'],
+>        defaultSrc: [__INLINE_CODE_12__, 'unpkg.com'],
 >        styleSrc: [
->          `'self'`,
->          `'unsafe-inline'`,
+>          __INLINE_CODE_13__,
+>          __INLINE_CODE_14__,
 >          'cdn.jsdelivr.net',
 >          'fonts.googleapis.com',
 >          'unpkg.com',
 >        ],
->        fontSrc: [`'self'`, 'fonts.gstatic.com', 'data:'],
->        imgSrc: [`'self'`, 'data:', 'cdn.jsdelivr.net'],
+>        fontSrc: [__INLINE_CODE_15__, 'fonts.gstatic.com', 'data:'],
+>        imgSrc: [__INLINE_CODE_16__, 'data:', 'cdn.jsdelivr.net'],
 >        scriptSrc: [
->          `'self'`,
->          `https: 'unsafe-inline'`,
->          `cdn.jsdelivr.net`,
->          `'unsafe-eval'`,
+>          __INLINE_CODE_17__,
+>          __INLINE_CODE_18__,
+>          __INLINE_CODE_19__,
+>          __INLINE_CODE_20__,
 >        ],
 >      },
 >    },
 >  });
 >
-> // 如果你根本不打算使用 CSP，可以使用这个：
+> // 如果您不打算使用CSP，可以使用以下内容：
 > await app.register(fastifyHelmet, {
 >   contentSecurityPolicy: false,
 > });
-> ```
+>

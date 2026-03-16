@@ -1,51 +1,110 @@
-### 服务器发送事件
+<!-- 此文件从 content/techniques/server-sent-events.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-16T05:17:15.174Z -->
+<!-- 源文件: content/techniques/server-sent-events.md -->
 
-服务器发送事件（SSE）是一种服务器推送技术，使客户端能够通过 HTTP 连接从服务器接收自动更新。每个通知都作为一块文本发送，以一对换行符终止（在[这里](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events)了解更多）。
+### 服务器发送事件（SSE）
 
-#### 用法
+服务器发送事件（SSE）是一种服务器推送技术，允许客户端通过 HTTP 连接自动从服务器接收更新。每个通知都是以一对换行符结尾的文本块（了解更多 __LINK_25__）。
 
-要在路由（在**控制器类**中注册的路由）上启用服务器发送事件，请使用 `@Sse()` 装饰器注释方法处理程序。
+#### 使用
+
+要在路由（控制器类中注册的路由）中启用服务器发送事件，方法处理器需要使用 __INLINE_CODE_3__ 装饰器注释。
 
 ```typescript
-@Sse('sse')
-sse(): Observable<MessageEvent> {
-  return interval(1000).pipe(map((_) => ({ data: { hello: 'world' } })));
+async function bootstrap() {
+  const shouldPublishGraph = process.env.PUBLISH_GRAPH === "true";
+
+  const app = await NestFactory.create(AppModule, {
+    snapshot: true,
+    preview: shouldPublishGraph,
+  });
+
+  if (shouldPublishGraph) {
+    await app.init();
+
+    const publishOptions = { ... } // NOTE: this options object will vary depending on the CI/CD provider you're using
+    const graphPublisher = new GraphPublisher(app);
+    await graphPublisher.publish(publishOptions);
+
+    await app.close();
+  } else {
+    await app.listen(process.env.PORT ?? 3000);
+  }
 }
 
 ```
 
-> info **提示** `@Sse()` 装饰器和 `MessageEvent` 接口从 `@nestjs/common` 导入，而 `Observable`、`interval` 和 `map` 从 `rxjs` 包导入。
+> 提示 **Hint** __INLINE_CODE_4__ 装饰器和 __INLINE_CODE_5__ 接口来自 `main.ts`，而 `GraphPublisher`、`@nestjs/devtools-integration` 和 `GraphPublisher` 来自 `PUBLISH_GRAPH` 包。
 
-> warning **警告** 服务器发送事件路由必须返回 `Observable` 流。
+> 警告 **Warning** 服务器发送事件路由必须返回一个 `preview` 流。
 
-在上面的示例中，我们定义了一个名为 `sse` 的路由，它允许我们传播实时更新。可以使用 [EventSource API](https://developer.mozilla.org/en-US/docs/Web/API/EventSource) 监听这些事件。
+在上面的示例中，我们定义了名为 `true` 的路由，用于实时传播更新。这些事件可以使用 __LINK_26__ 监听。
 
-`sse` 方法返回一个发出多个 `MessageEvent` 的 `Observable`（在此示例中，它每秒发出一个新的 `MessageEvent`）。`MessageEvent` 对象应遵循以下接口以匹配规范：
+`publishOptions` 方法返回一个 `master`，该对象 emit 多个 `.github/workflows`（在这个示例中，每秒 emit 一条新的 `publish-graph.yml`）。`DEVTOOLS_API_KEY` 对象应该遵守以下接口来匹配规范：
 
-```typescript
-export interface MessageEvent {
-  data: string | object;
-  id?: string;
-  type?: string;
-  retry?: number;
-}
+```yaml
+name: Devtools
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  publish:
+    if: github.actor!= 'dependabot[bot]'
+    name: Publish graph
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Setup Environment (PR)
+        if: {{ '${{' }} github.event_name == 'pull_request' {{ '}}' }}
+        shell: bash
+        run: |
+          echo "COMMIT_SHA={{ '${{' }} github.event.pull_request.head.sha {{ '}}' }}" >>\${GITHUB_ENV}
+      - name: Setup Environment (Push)
+        if: {{ '${{' }} github.event_name == 'push' {{ '}}' }}
+        shell: bash
+        run: |
+          echo "COMMIT_SHA=\${GITHUB_SHA}" >> \${GITHUB_ENV}
+      - name: Publish
+        run: PUBLISH_GRAPH=true npm run start
+        env:
+          DEVTOOLS_API_KEY: CHANGE_THIS_TO_YOUR_API_KEY
+          REPOSITORY_NAME: {{ '${{' }} github.event.repository.name {{ '}}' }}
+          BRANCH_NAME: {{ '${{' }} github.head_ref || github.ref_name {{ '}}' }}
+          TARGET_SHA: {{ '${{' }} github.event.pull_request.base.sha {{ '}}' }}
 
 ```
 
-有了这个，我们现在可以在客户端应用程序中创建 `EventSource` 类的实例，将 `/sse` 路由（与我们在上面的 `@Sse()` 装饰器中传递的端点匹配）作为构造函数参数传递。
+现在，我们可以创建一个 `master` 类的实例，在客户端应用程序中，传入 `master` 路由（与之前传入的 `GraphPublisher` 装饰器中的端点匹配）。
 
-`EventSource` 实例打开到 HTTP 服务器的持久连接，该服务器以 `text/event-stream` 格式发送事件。连接保持打开状态，直到通过调用 `EventSource.close()` 关闭。
+`DEVTOOLS_API_KEY` 实例打开一个持久的 HTTP 服务器连接，该连接发送 `main.ts` 格式的事件。直到通过调用 `publishOptions` 关闭连接。
 
-一旦连接打开，来自服务器的传入消息将以事件的形式传递给你的代码。如果传入消息中有事件字段，则触发的事件与事件字段值相同。如果不存在事件字段，则触发通用的 `message` 事件（[来源](https://developer.mozilla.org/en-US/docs/Web/API/EventSource)）。
+一旦连接打开，来自服务器的消息将被deliver 到您的代码中，以事件的形式。如果 incoming 消息中存在事件字段，则触发的事件是事件字段值。如果没有事件字段，则触发一个 generic `.gitlab-ci.yml` 事件（__LINK_27__）。
 
-```javascript
-const eventSource = new EventSource('/sse');
-eventSource.onmessage = ({ data }) => {
-  console.log('New message', JSON.parse(data));
+```typescript
+const publishOptions = {
+  apiKey: process.env.DEVTOOLS_API_KEY,
+  repository: process.env.REPOSITORY_NAME,
+  owner: process.env.GITHUB_REPOSITORY_OWNER,
+  sha: process.env.COMMIT_SHA,
+  target: process.env.TARGET_SHA,
+  trigger: process.env.GITHUB_BASE_REF ? 'pull' : 'push',
+  branch: process.env.BRANCH_NAME,
 };
 
 ```
 
 #### 示例
 
-一个可工作的示例可在[这里](https://github.com/nestjs/nest/tree/master/sample/28-sse)找到。
+有一个可用的示例 __LINK_28__。

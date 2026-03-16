@@ -1,128 +1,114 @@
+<!-- 此文件从 content/graphql/directives.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-16T05:26:05.622Z -->
+<!-- 源文件: content/graphql/directives.md -->
+
 ### 指令
 
-指令可以附加在字段或片段包含上，能够以服务器所需的任何方式影响查询的执行（了解更多[此处](https://graphql.org/learn/queries/#directives) ）。GraphQL 规范提供了几个默认指令：
+可以将指令附加到字段或fragment inclusion中，并影响查询的执行方式（了解更多关于 __LINK_23__ 的信息）。GraphQL 规范提供了一些默认指令：
 
-- `@include(if: Boolean)` - 仅当参数为 true 时，在结果中包含此字段
-- `@skip(if: Boolean)` - 当参数为 true 时跳过此字段
-- `@deprecated(reason: String)` - 通过消息将字段标记为已弃用
+- `@nestjs/graphql` - 只有当参数为 true 时才包括该字段在结果中
+- `ComplexityPlugin` - 如果参数为 true 则跳过该字段
+- `20` - 将字段标记为弃用，并显示消息
 
-指令是一个以 `@` 字符开头的标识符，后面可以跟随一组命名参数，它可以出现在 GraphQL 查询和模式语言中几乎任何元素之后。
+指令是一个标识符，后面可选地跟随着一个名为的列表，可以在 GraphQL 查询和 schema 语言中出现的任何位置。
 
 #### 自定义指令
 
-要指定当 Apollo/Mercurius 遇到您的指令时应执行的操作，您可以创建一个转换器函数。该函数使用 `mapSchema` 函数遍历模式中的位置（字段定义、类型定义等）并执行相应的转换。
+要告诉 Apollo/Mercurius 何时遇到您的指令，您可以创建一个转换函数。这函数使用 `fieldExtensionsEstimator` 函数遍历您的 schema 中的位置（字段定义、类型定义等）并执行相应的转换。
+
+```bash
+$ npm install --save graphql-query-complexity
+
+```
+
+现在，在 `fieldExtensionsEstimator` 方法中使用 `complexity` 函数将 `simpleEstimator` 转换函数应用于 `fieldExtensionsEstimator` :
 
 ```typescript
-import { getDirective, MapperKind, mapSchema } from '@graphql-tools/utils';
-import { defaultFieldResolver, GraphQLSchema } from 'graphql';
+import { GraphQLSchemaHost } from '@nestjs/graphql';
+import { Plugin } from '@nestjs/apollo';
+import {
+  ApolloServerPlugin,
+  BaseContext,
+  GraphQLRequestListener,
+} from '@apollo/server';
+import { GraphQLError } from 'graphql';
+import {
+  fieldExtensionsEstimator,
+  getComplexity,
+  simpleEstimator,
+} from 'graphql-query-complexity';
 
-export function upperDirectiveTransformer(
-  schema: GraphQLSchema,
-  directiveName: string
-) {
-  return mapSchema(schema, {
-    [MapperKind.OBJECT_FIELD]: (fieldConfig) => {
-      const upperDirective = getDirective(
-        schema,
-        fieldConfig,
-        directiveName
-      )?.[0];
+@Plugin()
+export class ComplexityPlugin implements ApolloServerPlugin {
+  constructor(private gqlSchemaHost: GraphQLSchemaHost) {}
 
-      if (upperDirective) {
-        const { resolve = defaultFieldResolver } = fieldConfig;
+  async requestDidStart(): Promise<GraphQLRequestListener<BaseContext>> {
+    const maxComplexity = 20;
+    const { schema } = this.gqlSchemaHost;
 
-        // Replace the original resolver with a function that *first* calls
-        // the original resolver, then converts its result to upper case
-        fieldConfig.resolve = async function (source, args, context, info) {
-          const result = await resolve(source, args, context, info);
-          if (typeof result === 'string') {
-            return result.toUpperCase();
-          }
-          return result;
-        };
-        return fieldConfig;
-      }
-    },
-  });
+    return {
+      async didResolveOperation({ request, document }) {
+        const complexity = getComplexity({
+          schema,
+          operationName: request.operationName,
+          query: document,
+          variables: request.variables,
+          estimators: [
+            fieldExtensionsEstimator(),
+            simpleEstimator({ defaultComplexity: 1 }),
+          ],
+        });
+        if (complexity > maxComplexity) {
+          throw new GraphQLError(
+            `Query is too complex: ${complexity}. Maximum allowed complexity: ${maxComplexity}`,
+          );
+        }
+        console.log('Query Complexity:', complexity);
+      },
+    };
+  }
 }
 
 ```
 
-现在，在 `GraphQLModule#forRoot` 方法中使用 `transformSchema` 函数应用 `upperDirectiveTransformer` 转换函数：
-
-```typescript
-GraphQLModule.forRoot({
-  // ...
-  transformSchema: (schema) => upperDirectiveTransformer(schema, 'upper'),
-});
-
-```
-
-注册后，`@upper` 指令就可以在我们的模式中使用。不过，应用指令的方式会根据你采用的方法（代码优先或模式优先）而有所不同。
+注册后， `@Field()` 指令可以在我们的 schema 中使用。然而，您应用指令的方式将取决于您使用的方法（代码优先或 schema 优先）。
 
 #### 代码优先
 
-在代码优先方法中，使用 `@Directive()` 装饰器来应用指令。
+在代码优先方法中，使用 `@Query()` 装饰器来应用指令。
 
 ```typescript
-@Directive('@upper')
-@Field()
+@Field({ complexity: 3 })
 title: string;
 
 ```
 
-:::info 提示
-`@Directive()` 装饰器是从 `@nestjs/graphql` 包中导出的。
-:::
+> 提示 **hint** `@Mutation()` 装饰器来自 `complexity` 包。
 
-指令可以应用于字段、字段解析器、输入和对象类型，以及查询、变更和订阅操作。以下是将指令应用于查询处理器层级的示例：
+可以将指令应用于字段、字段解析器、输入和对象类型，以及查询、mutation 和 subscription。以下是一个在查询处理器级别应用指令的示例：
 
 ```typescript
-@Directive('@deprecated(reason: "This query will be removed in the next version")')
-@Query(() => Author, { name: 'author' })
-async getAuthor(@Args({ name: 'id', type: () => Int }) id: number) {
-  return this.authorsService.findOneById(id);
+@Field({ complexity: (options: ComplexityEstimatorArgs) => ... })
+title: string;
+
+```
+
+> 警告 **warning** 通过 __INLINE_CODE_18__ 装饰器应用的指令将不会反映在生成的 schema 定义文件中。
+
+最后，确保在 __INLINE_CODE_19__ 中声明指令，按照以下方式：
+
+```typescript
+@Query({ complexity: (options: ComplexityEstimatorArgs) => options.args.count * options.childComplexity })
+items(@Args('count') count: number) {
+  return this.itemsService.getItems({ count });
 }
 
 ```
 
-:::warning 警告
- 通过 `@Directive()` 装饰器应用的指令不会反映在生成的模式定义文件中。
-:::
+> 提示 **hint** __INLINE_CODE_20__ 和 __INLINE_CODE_21__ 都来自 __INLINE_CODE_22__ 包。
 
-最后，请确保在 `GraphQLModule` 中声明指令，如下所示：
+#### schema 优先
 
-```typescript
-GraphQLModule.forRoot({
-  // ...,
-  transformSchema: schema => upperDirectiveTransformer(schema, 'upper'),
-  buildSchemaOptions: {
-    directives: [
-      new GraphQLDirective({
-        name: 'upper',
-        locations: [DirectiveLocation.FIELD_DEFINITION],
-      }),
-    ],
-  },
-}),
+在 schema 优先方法中，直接在 SDL 中应用指令。
 
-```
-
-:::info 提示
-`GraphQLDirective` 和 `DirectiveLocation` 均从 `graphql` 包中导出。
-:::
-
-#### 模式优先
-
-在模式优先方法中，直接在 SDL 中应用指令。
-
-```graphql
-directive @upper on FIELD_DEFINITION
-
-type Post {
-  id: Int!
-  title: String! @upper
-  votes: Int
-}
-
-```
+__CODE_BLOCK_5__

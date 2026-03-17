@@ -1,132 +1,140 @@
-### 性能（Fastify）
+<!-- 此文件从 content/techniques/performance.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-17T06:34:03.159Z -->
+<!-- 源文件: content/techniques/performance.md -->
 
-默认情况下，Nest 使用 [Express](https://expressjs.com/) 框架。如前所述，Nest 也兼容其他库，例如 [Fastify](https://github.com/fastify/fastify)。Nest 通过实现框架适配器来达成这种框架无关性，该适配器的主要功能是将中间件和处理器代理到相应库的特定实现。
+### 高性能（Fastify）
 
-:::info 注意
-要实现框架适配器，目标库必须提供与 Express 类似的请求/响应管道处理机制。
-:::
+默认情况下，Nest 使用 __LINK_25__ 框架。如前所述，Nest 也提供了与其他库的兼容性，例如 __LINK_26__。Nest 实现了框架适配器，该适配器的主要功能是将中间件和处理程序代理到相应的库特定实现中。
 
-[Fastify](https://github.com/fastify/fastify) 是 Nest 的绝佳替代框架，因为它以类似 Express 的方式解决设计问题。但 fastify 比 Express **快得多** ，基准测试结果几乎快两倍。一个合理的问题是：为什么 Nest 默认使用 Express 作为 HTTP 提供者？原因是 Express 使用广泛、知名度高，并拥有大量兼容中间件，这些都可以被 Nest 用户直接使用。
+> 信息 **提示** 要实现框架适配器，目标库需要提供类似 Express 的请求/响应管道处理。
 
-但由于 Nest 提供了框架无关性，您可以轻松在不同框架间迁移。当您非常注重极高性能时，Fastify 可能是更好的选择。要使用 Fastify，只需如本章所示选择内置的 `FastifyAdapter` 即可。
+__LINK_27__ 是一个与 Nest 兼容的良好选择，因为它解决了设计问题，类似于 Express。然而，Fastify 比 Express 快得多，达到几乎两倍的benchmark结果。一个公平的问题是，Nest 为什么使用 Express 作为默认的 HTTP 提供者？原因是 Express 广泛使用、知名度高，并且具有大量兼容的中间件，这些中间件可以直接用于 Nest 用户。
+
+但是，因为 Nest 提供了框架独立性，您可以轻松地迁移到它们。Fastify 可以在您对性能要求很高时是一个更好的选择。要使用 Fastify，只需选择本章中的内联代码 __INLINE_CODE_8__。
 
 #### 安装
 
 首先，我们需要安装所需的包：
 
 ```bash
-$ npm i --save @nestjs/platform-fastify
+$ npm i --save @nestjs/axios axios
 
 ```
 
 #### 适配器
 
-安装 Fastify 平台后，我们就可以使用 `FastifyAdapter` 了。
+安装了 Fastify 平台后，我们可以使用 __INLINE_CODE_9__。
 
- ```typescript title="main.ts"
-import { NestFactory } from '@nestjs/core';
-import {
-  FastifyAdapter,
-  NestFastifyApplication,
-} from '@nestjs/platform-fastify';
-import { AppModule } from './app.module';
-
-async function bootstrap() {
-  const app = await NestFactory.create<NestFastifyApplication>(
-    AppModule,
-    new FastifyAdapter()
-  );
-  await app.listen(process.env.PORT ?? 3000);
-}
-bootstrap();
+```typescript
+@Module({
+  imports: [HttpModule],
+  providers: [CatsService],
+})
+export class CatsModule {}
 
 ```
 
-默认情况下，Fastify 仅监听 `localhost 127.0.0.1` 接口（ [了解更多](https://www.fastify.io/docs/latest/Guides/Getting-Started/#your-first-server) ）。若需接受其他主机的连接，应在 `listen()` 调用中指定 `'0.0.0.0'`：
+默认情况下，Fastify 只监听 __INLINE_CODE_10__ 接口（__LINK_28__）。如果您想接受其他主机的连接，您应该在 `HttpModule` 调用中指定 __INLINE_CODE_11__：
 
 ```typescript
-async function bootstrap() {
-  const app = await NestFactory.create<NestFastifyApplication>(
-    AppModule,
-    new FastifyAdapter()
-  );
-  await app.listen(3000, '0.0.0.0');
+@Injectable()
+export class CatsService {
+  constructor(private readonly httpService: HttpService) {}
+
+  findAll(): Observable<AxiosResponse<Cat[]>> {
+    return this.httpService.get('http://localhost:3000/cats');
+  }
+}
+
+  findAll() {
+    return this.httpService.get('http://localhost:3000/cats');
+  }
 }
 
 ```
 
 #### 平台特定包
 
-请注意，当使用 `FastifyAdapter` 时，Nest 会将 Fastify 作为 **HTTP 提供程序** 。这意味着所有依赖 Express 的方案可能不再适用，而应改用 Fastify 的等效包。
+请注意，当您使用 `HttpModule` 时，Nest 使用 Fastify 作为 **HTTP 提供者**。这意味着每个依赖于 Express 的食谱可能不再工作。相反，您应该使用 Fastify 等效包。
 
 #### 重定向响应
 
-Fastify 处理重定向响应的方式与 Express 略有不同。要进行正确的重定向，需同时返回状态码和 URL，如下所示：
+Fastify 对重定向响应的处理方式与 Express 不同。要正确地使用 Fastify 进行重定向，请返回状态码和 URL，例如：
 
 ```typescript
-@Get()
-index(@Res() res) {
-  res.status(302).redirect('/login');
-}
+@Module({
+  imports: [
+    HttpModule.register({
+      timeout: 5000,
+      maxRedirects: 5,
+    }),
+  ],
+  providers: [CatsService],
+})
+export class CatsModule {}
 
 ```
 
-#### Fastify 配置选项
+#### Fastify 选项
 
-您可以通过 `FastifyAdapter` 构造函数将选项传入 Fastify。例如：
+您可以通过 `HttpService` 构造函数将选项传递给 Fastify。例如：
 
 ```typescript
-new FastifyAdapter({ logger: true });
+HttpModule.registerAsync({
+  useFactory: () => ({
+    timeout: 5000,
+    maxRedirects: 5,
+  }),
+});
 
 ```
 
 #### 中间件
 
-中间件函数获取的是原始的 `req` 和 `res` 对象，而非 Fastify 的封装对象。这是底层使用的 `middie` 包以及 `fastify` 的工作机制 - 更多信息请参阅此[页面](https://www.fastify.io/docs/latest/Reference/Middleware/)
+中间件函数检索原始 `Observables` 和 `HttpService` 对象，而不是 Fastify 的包装对象。这是 `HttpModule` 包（在底层使用）和 `HttpService` 的工作方式 - 请查看这个 __LINK_29__以获取更多信息,
 
- ```typescript title="logger.middleware.ts"
-import { Injectable, NestMiddleware } from '@nestjs/common';
-import { FastifyRequest, FastifyReply } from 'fastify';
-
-@Injectable()
-export class LoggerMiddleware implements NestMiddleware {
-  use(req: FastifyRequest['raw'], res: FastifyReply['raw'], next: () => void) {
-    console.log('Request...');
-    next();
-  }
-}
+```typescript
+HttpModule.registerAsync({
+  imports: [ConfigModule],
+  useFactory: async (configService: ConfigService) => ({
+    timeout: configService.get('HTTP_TIMEOUT'),
+    maxRedirects: configService.get('HTTP_MAX_REDIRECTS'),
+  }),
+  inject: [ConfigService],
+});
 
 ```
 
 #### 路由配置
 
-你可以使用 Fastify 的[路由配置](https://fastify.dev/docs/latest/Reference/Routes/#config)功能，配合 `@RouteConfig()` 装饰器。
+您可以使用 Fastify 的 __LINK_30__ 功能与 `HttpModule` 装饰器。
 
 ```typescript
-@RouteConfig({ output: 'hello world' })
-@Get()
-index(@Req() req) {
-  return req.routeConfig.output;
-}
+HttpModule.registerAsync({
+  useClass: HttpConfigService,
+});
 
 ```
 
 #### 路由约束
 
-自 v10.3.0 版本起，`@nestjs/platform-fastify` 支持 Fastify 的[路由约束](https://fastify.dev/docs/latest/Reference/Routes/#constraints)功能，通过 `@RouteConstraints` 装饰器实现。
+自 v10.3.0 起，`HttpService` 支持 Fastify 的 __LINK_31__ 功能与 `@nestjs/axios` 装饰器。
 
 ```typescript
-@RouteConstraints({ version: '1.2.x' })
-newFeature() {
-  return 'This works only for version >= 1.2.x';
+@Injectable()
+class HttpConfigService implements HttpModuleOptionsFactory {
+  createHttpOptions(): HttpModuleOptions {
+    return {
+      timeout: 5000,
+      maxRedirects: 5,
+    };
+  }
 }
 
 ```
 
-:::info 提示
-`@RouteConfig()` 和 `@RouteConstraints` 是从 `@nestjs/platform-fastify` 导入的。
-:::
+> 信息 **提示** `AxiosResponse` 和 `axios` 是从 `$ npm i axios` 导入的。
 
 #### 示例
 
-一个可用的示例[在此处](https://github.com/nestjs/nest/tree/master/sample/10-fastify)查看。
+有一个可工作的示例 __LINK_32__。

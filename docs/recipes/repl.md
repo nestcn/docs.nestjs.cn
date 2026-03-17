@@ -1,137 +1,313 @@
-### 读取-求值-输出循环（REPL）
+<!-- 此文件从 content/recipes/repl.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-17T06:08:22.972Z -->
+<!-- 源文件: content/recipes/repl.md -->
 
-REPL 是一种简单的交互式环境，能够接收用户输入的单条命令，执行后立即返回结果。通过 REPL 功能，您可以直接在终端检查依赖关系图，并对提供者（及控制器）调用方法。
+### 读取-评估-打印-循环 (REPL)
 
-#### 使用方法
+REPL 是一个简单的交互式环境，它从用户输入中获取单个输入，执行它们，并将结果返回给用户。
+REPL 功能允许您检查依赖关系图并在控制台直接调用提供者和控制器的方法。
 
-要在 REPL 模式下运行 NestJS 应用，请新建 `repl.ts` 文件（与现有的 `main.ts` 文件同级），并在其中添加以下代码：
+#### 使用
 
- ```typescript title="repl.ts"
-import { repl } from '@nestjs/core';
-import { AppModule } from './src/app.module';
+要在 REPL 模式下运行 NestJS 应用程序，请创建一个新的文件（与现有文件并排），并在其中添加以下代码：
 
-async function bootstrap() {
-  await repl(AppModule);
+```typescript
+// __INLINE_CODE_10__
+
+```
+
+现在，在您的终端中，使用以下命令启动 REPL：
+
+```
+
+node __INLINE_CODE_11__
+
+```
+
+> 提示 **Hint** __INLINE_CODE_12__ 返回一个 __LINK_36__ 对象。
+
+一旦启动完成，您将在控制台中看到以下消息：
+
+```
+
+// ```bash
+$ nest g module users
+$ nest g service users
+
+```
+
+```
+
+现在，您可以开始与依赖关系图交互。例如，您可以检索一个 __INLINE_CODE_13__ (在这里使用 starter 项目作为示例)并调用 __INLINE_CODE_14__ 方法：
+
+```typescript
+// ```typescript
+import { Injectable } from '@nestjs/common';
+
+// This should be a real class/interface representing a user entity
+export type User = any;
+
+@Injectable()
+export class UsersService {
+  private readonly users = [
+    {
+      userId: 1,
+      username: 'john',
+      password: 'changeme',
+    },
+    {
+      userId: 2,
+      username: 'maria',
+      password: 'guess',
+    },
+  ];
+
+  async findOne(username: string): Promise<User | undefined> {
+    return this.users.find(user => user.username === username);
+  }
 }
-bootstrap();
+
+@Injectable()
+export class UsersService {
+  constructor() {
+    this.users = [
+      {
+        userId: 1,
+        username: 'john',
+        password: 'changeme',
+      },
+      {
+        userId: 2,
+        username: 'maria',
+        password: 'guess',
+      },
+    ];
+  }
+
+  async findOne(username) {
+    return this.users.find(user => user.username === username);
+  }
+}
 
 ```
 
-现在在终端中，使用以下命令启动 REPL：
-
-```bash
-$ npm run start -- --entryFile repl
-
 ```
 
-:::info 提示
-`repl` 返回一个 [Node.js REPL 服务器](https://nodejs.org/api/repl.html)对象。
-:::
-
-当它启动并运行后，你将在控制台中看到以下消息：
-
-```bash
-LOG [NestFactory] Starting Nest application...
-LOG [InstanceLoader] AppModule dependencies initialized
-LOG REPL initialized
-
-```
-
-现在你可以开始与依赖关系图进行交互。例如，你可以获取一个 `AppService`（这里我们以启动项目为例）并调用 `getHello()` 方法：
+您可以在控制台中执行任何 JavaScript 代码，例如将 __INLINE_CODE_15__ 的实例分配给一个局部变量，并使用 __INLINE_CODE_16__ 调用异步方法：
 
 ```typescript
-> get(AppService).getHello()
-'Hello World!'
+// ```typescript
+import { Module } from '@nestjs/common';
+import { UsersService } from './users.service';
+
+@Module({
+  providers: [UsersService],
+  exports: [UsersService],
+})
+export class UsersModule {}
+
+@Module({
+  providers: [UsersService],
+  exports: [UsersService],
+})
+export class UsersModule {}
 
 ```
 
-你可以在终端内执行任何 JavaScript 代码，例如将 `AppController` 的实例赋值给局部变量，并使用 `await` 调用异步方法：
+```
+
+要显示一个给定提供者或控制器的所有公共方法，请使用 __INLINE_CODE_17__ 函数，例如：
 
 ```typescript
-> appController = get(AppController)
-AppController { appService: AppService {} }
-> await appController.getHello()
-'Hello World!'
+// ```typescript
+import { Injectable } from '@nestjs/common';
+import { UsersService } from '../users/users.service';
+
+@Injectable()
+export class AuthService {
+  constructor(private usersService: UsersService) {}
+
+  async validateUser(username: string, pass: string): Promise<any> {
+    const user = await this.usersService.findOne(username);
+    if (user && user.password === pass) {
+      const { password, ...result } = user;
+      return result;
+    }
+    return null;
+  }
+}
+
+@Injectable()
+@Dependencies(UsersService)
+export class AuthService {
+  constructor(usersService) {
+    this.usersService = usersService;
+  }
+
+  async validateUser(username, pass) {
+    const user = await this.usersService.findOne(username);
+    if (user && user.password === pass) {
+      const { password, ...result } = user;
+      return result;
+    }
+    return null;
+  }
+}
 
 ```
 
-要显示给定提供者或控制器上所有可用的公共方法，请使用 `methods()` 函数，如下所示：
-
-```typescript
-> methods(AppController)
-
-Methods:
- ◻ getHello
-
 ```
 
-要打印所有已注册模块及其控制器和提供者的列表，请使用 `debug()`。
+要显示所有注册的模块作为一个列表，包括控制器和提供者，请使用 __INLINE_CODE_18__。
 
 ```typescript
-> debug()
+// ```typescript
+import { Module } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { UsersModule } from '../users/users.module';
 
-AppModule:
- - controllers:
-  ◻ AppController
- - providers:
-  ◻ AppService
+@Module({
+  imports: [UsersModule],
+  providers: [AuthService],
+})
+export class AuthModule {}
+
+@Module({
+  imports: [UsersModule],
+  providers: [AuthService],
+})
+export class AuthModule {}
+
+```
 
 ```
 
 快速演示：
 
-<figure><img src="/assets/repl.gif" alt="REPL example" /></figure>
-
-您可以在下方章节中找到有关现有预定义原生方法的更多信息。
-
-#### 原生函数
-
-内置的 NestJS REPL 附带了一些原生函数，这些函数在启动 REPL 时全局可用。你可以调用 `help()` 来列出它们。
-
-如果你不记得某个函数的签名（即预期参数和返回类型），可以调用 `<function_name>.help`。例如：
-
-```text
-> $.help
-Retrieves an instance of either injectable or controller, otherwise, throws exception.
-Interface: $(token: InjectionToken) => any
+```html
+<!-- __HTML_TAG_33__ --> <!-- __HTML_TAG_34__ --> <!-- __HTML_TAG_35__ -->
 
 ```
 
-:::info 提示
-这些函数接口是用 [TypeScript 函数类型表达式语法](https://www.typescriptlang.org/docs/handbook/2/functions.html#function-type-expressions)编写的。
-:::
+您可以在以下部分中找到关于现有预定义本地方法的更多信息。
 
-| 功能     | 描述                                                         | 签名                                                            |
-| -------- | ------------------------------------------------------------ | --------------------------------------------------------------- |
-| `debug`  | 以列表形式打印所有已注册模块及其控制器和提供程序。           | `debug(moduleCls?: ClassRef \| string) => void`                |
-| `get` 或 ````
+#### 本地函数
 
- | 获取可注入对象或控制器的实例，否则抛出异常。                 | `get(token: InjectionToken) => any`                            |
-| `methods` | 显示给定提供者或控制器上所有可用的公共方法。                 | `methods(token: ClassRef \| string) => void`                   |
-| `resolve` | 解析可注入对象或控制器的临时或请求作用域实例，否则抛出异常。 | `resolve(token: InjectionToken, contextId: any) => Promise<any>` |
-| `select` | 允许在模块树中进行导航，例如从选定的模块中提取特定实例。     | `select(token: DynamicModule \| ClassRef) => INestApplicationContext` |
+自带的 NestJS REPL 附带了一些本地函数，这些函数在您启动 REPL 时是全局可用的。您可以调用 __INLINE_CODE_19__ 列出它们。
 
-#### 监视模式
-
-在开发过程中，以监视模式运行 REPL 非常有用，它能自动反映所有代码变更：
-
-```bash
-$ npm run start -- --watch --entryFile repl
-
-```
-
-这种方式存在一个缺陷：每次重新加载后 REPL 的命令历史记录都会被丢弃，这可能带来不便。幸运的是，有个非常简单的解决方案。像这样修改你的 `bootstrap` 函数：
+如果您忘记了一个函数的签名（即：期望的参数和返回类型），您可以调用 __INLINE_CODE_20__。
+例如：
 
 ```typescript
-async function bootstrap() {
-  const replServer = await repl(AppModule);
-  replServer.setupHistory('.nestjs_repl_history', (err) => {
-    if (err) {
-      console.error(err);
+// ```typescript
+import { Strategy } from 'passport-local';
+import { PassportStrategy } from '@nestjs/passport';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { AuthService } from './auth.service';
+
+@Injectable()
+export class LocalStrategy extends PassportStrategy(Strategy) {
+  constructor(private authService: AuthService) {
+    super();
+  }
+
+  async validate(username: string, password: string): Promise<any> {
+    const user = await this.authService.validateUser(username, password);
+    if (!user) {
+      throw new UnauthorizedException();
     }
-  });
+    return user;
+  }
+}
+
+@Injectable()
+@Dependencies(AuthService)
+export class LocalStrategy extends PassportStrategy(Strategy) {
+  constructor(authService) {
+    super();
+    this.authService = authService;
+  }
+
+  async validate(username, password) {
+    const user = await this.authService.validateUser(username, password);
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    return user;
+  }
 }
 
 ```
 
-现在运行/重新加载之间的历史记录都能保留了。
+```
+
+> 提示 **Hint** 函数接口是使用 __LINK_37__ 写的。
+
+| 函数     | 描述                                                                                                        | 签名                                                             |
+| ------------ | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
+| __INLINE_CODE_21__      | 显示所有注册的模块作为一个列表，包括控制器和提供者。                              | __INLINE_CODE_22__                       |
+| __INLINE_CODE_23__ 或 __INLINE_CODE_24__ | 检索一个 injectable 或 controller 的实例，否则抛出异常。                             | __INLINE_CODE_25__                                   |
+| __INLINE_CODE_26__    | 显示一个给定提供者或控制器的所有公共方法。                                            | __INLINE_CODE_27__                          |
+| __INLINE_CODE_28__    | 解析 transient 或 request-scoped 实例，否则抛出异常。                             | __INLINE_CODE_29__      |
+| __INLINE_CODE_30__     | 允许在模块树中导航，例如从选择的模块中提取特定实例。 | __INLINE_CODE_31__ |
+
+#### 监听模式
+
+在开发过程中，运行 REPL 在监听模式下非常有用，这样可以自动反映所有代码更改：
+
+```typescript
+// ```typescript
+import { Module } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { UsersModule } from '../users/users.module';
+import { PassportModule } from '@nestjs/passport';
+import { LocalStrategy } from './local.strategy';
+
+@Module({
+  imports: [UsersModule, PassportModule],
+  providers: [AuthService, LocalStrategy],
+})
+export class AuthModule {}
+
+@Module({
+  imports: [UsersModule, PassportModule],
+  providers: [AuthService, LocalStrategy],
+})
+export class AuthModule {}
+
+```
+
+```
+
+这有一点缺陷，即 REPL 的命令历史将在每次重新加载时被丢弃，这可能会很不方便。
+幸运的是，有一个简单的解决方案。修改您的 __INLINE_CODE_32__ 函数如下：
+
+```typescript
+// ```typescript
+import { Controller, Request, Post, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+
+@Controller()
+export class AppController {
+  @UseGuards(AuthGuard('local'))
+  @Post('auth/login')
+  async login(@Request() req) {
+    return req.user;
+  }
+}
+
+@Controller()
+export class AppController {
+  @UseGuards(AuthGuard('local'))
+  @Post('auth/login')
+  @Bind(Request())
+  async login(req) {
+    return req.user;
+  }
+}
+
+```
+
+```
+
+现在，历史记录将在运行之间保留。

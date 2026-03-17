@@ -1,139 +1,58 @@
-### CRUD 生成器（仅限 TypeScript）
+<!-- 此文件从 content/recipes/crud-generator.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-17T06:04:38.847Z -->
+<!-- 源文件: content/recipes/crud-generator.md -->
 
-在项目的整个生命周期中，当我们构建新功能时，经常需要向应用程序添加新资源。这些资源通常需要多次重复操作，每次定义新资源时我们都必须重复这些操作。
+### CRUD 生成器（TypeScript 只）
 
-#### 介绍
+在项目的整个生命周期中，当我们添加新特性时，我们通常需要在应用程序中添加新资源。这些资源通常需要多个重复的操作，我们每次定义新资源时都需要重复这些操作。
 
-让我们设想一个真实场景：需要为两个实体（例如**用户**和**产品**实体）暴露 CRUD 端点。按照最佳实践，每个实体都需要执行以下多项操作：
+#### 简介
 
-- 生成模块（`nest g mo`）以保持代码组织性并建立清晰边界（将相关组件分组）
-- 生成控制器（`nest g co`）来定义 CRUD 路由（或 GraphQL 应用的查询/变更）
-- 生成服务（`nest g s`）来实现和隔离业务逻辑
-- 生成实体类/接口来表示资源数据结构
-- 生成数据传输对象（或 GraphQL 应用的输入）来定义数据在网络中的传输格式
+让我们想象一个现实世界的场景，我们需要为 2 个实体，例如 **User** 和 **Product** 实体，暴露 CRUD 端点。
+遵循最佳实践，对于每个实体，我们需要执行以下操作：
 
-步骤真不少！
+- 生成一个模块 (__INLINE_CODE_4__)以保持代码组织和明确界限（将相关组件组合在一起）
+- 生成一个控制器 (__INLINE_CODE_5__)以定义 CRUD 路由（或 GraphQL 应用程序中的查询/ mutate）
+- 生成一个服务 (__INLINE_CODE_6__)以实现和隔离业务逻辑
+- 生成一个实体类/接口，以表示资源数据形状
+- 生成数据传输对象（或 GraphQL 应用程序中的输入）以定义如何将数据发送到网络
 
-为了加速这一重复性流程，[Nest CLI](/cli/overview) 提供了一个生成器（schematic），它能自动生成所有样板代码，帮助我们省去这些繁琐操作，大幅简化开发体验。
+这太多步骤了！
 
-:::info 注意
-该 schematic 支持生成 **HTTP** 控制器、 **微服务** 控制器、**GraphQL** 解析器（包括代码优先和架构优先两种模式）以及 **WebSocket** 网关。
-:::
+为了帮助加速这个重复的过程，__LINK_15__ 提供了一个生成器（schematic），它自动生成所有的 boilerplate 代码，以帮助我们避免执行所有这些步骤，并使开发者体验更加简单。
+
+> 信息 **注意** 生成器支持生成 **HTTP** 控制器、**Microservice** 控制器、**GraphQL** 解析器（both 代码 first 和 schema first）、和 **WebSocket** Gateway。
 
 #### 生成新资源
 
-要创建新资源，只需在项目根目录下运行以下命令：
+要创建一个新资源，只需在项目的根目录中运行以下命令：
 
-```shell
-$ nest g resource
-
-```
-
-`nest g resource` 命令不仅会生成所有 NestJS 构建块（模块、服务、控制器类），还会生成实体类、DTO 类以及测试文件（`.spec`）。
-
-下方可以看到生成的控制器文件（用于 REST API）：
-
-```typescript
-@Controller('users')
-export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
-
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
-  }
-}
+```bash
+$ npm i -D @compodoc/compodoc
 
 ```
 
-此外，它会自动为所有 CRUD 端点创建占位符（REST API 的路由、GraphQL 的查询和变更、微服务和 WebSocket 网关的消息订阅）——所有这些都无需手动操作。
+__INLINE_CODE_7__ 命令不仅生成了 NestJS 的基本组件（模块、服务、控制器类）还生成了实体类、DTO 类，以及测试 (__INLINE_CODE_8__) 文件。
 
-:::warning 注意
-生成的服务类**不**与任何特定的 **ORM（或数据源）** 绑定。这使得生成器具有足够通用性，可满足任何项目的需求。默认情况下，所有方法都将包含占位符，允许您根据项目特定的数据源进行填充。
-:::
+以下是生成的控制器文件（REST API）：
 
-同样地，如果您想为 GraphQL 应用生成解析器，只需选择 `GraphQL (code first)`（或 `GraphQL (schema first)`）作为传输层。
-
-在这种情况下，NestJS 将生成解析器类而非 REST API 控制器：
-
-```shell
-$ nest g resource users
-
-> ? What transport layer do you use? GraphQL (code first)
-> ? Would you like to generate CRUD entry points? Yes
-> CREATE src/users/users.module.ts (224 bytes)
-> CREATE src/users/users.resolver.spec.ts (525 bytes)
-> CREATE src/users/users.resolver.ts (1109 bytes)
-> CREATE src/users/users.service.spec.ts (453 bytes)
-> CREATE src/users/users.service.ts (625 bytes)
-> CREATE src/users/dto/create-user.input.ts (195 bytes)
-> CREATE src/users/dto/update-user.input.ts (281 bytes)
-> CREATE src/users/entities/user.entity.ts (187 bytes)
-> UPDATE src/app.module.ts (312 bytes)
+```bash
+$ npx @compodoc/compodoc -p tsconfig.json -s
 
 ```
 
-:::info 提示
-若要避免生成测试文件，可传入 `--no-spec` 标志，如下所示： `nest g resource users --no-spec`
-:::
+它也自动创建了所有 CRUD 端点（路由）的占位符（REST APIs、GraphQL、Microservices 和 WebSocket Gateway 的查询和 mutate）—所有不需要我们 lift a finger。
 
-我们可以看到，不仅所有样板化的变更和查询都已生成，而且所有内容都已完美整合。我们正在使用 `UsersService` 服务、`User` 实体以及我们的 DTO 对象。
+> 警告 **注意** 生成的服务类 **不** 绑定到任何特定的 **ORM（或数据源）**。这使得生成器足够通用，以满足任何项目的需求。默认情况下，所有方法都将包含占位符，允许您将其填充到与您的项目相关的数据源中。
 
-```typescript
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
-import { UsersService } from './users.service';
-import { User } from './entities/user.entity';
-import { CreateUserInput } from './dto/create-user.input';
-import { UpdateUserInput } from './dto/update-user.input';
+类似地，如果您想生成 GraphQL 应用程序的解析器，只需选择 __INLINE_CODE_9__（或 __INLINE_CODE_10__）作为您的传输层。
 
-@Resolver(() => User)
-export class UsersResolver {
-  constructor(private readonly usersService: UsersService) {}
+在这种情况下，NestJS 将生成一个解析器类，而不是一个 REST API 控制器：
 
-  @Mutation(() => User)
-  createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
-    return this.usersService.create(createUserInput);
-  }
+__CODE_BLOCK_2__
 
-  @Query(() => [User], { name: 'users' })
-  findAll() {
-    return this.usersService.findAll();
-  }
+> 信息 **提示** 如果您想要避免生成测试文件，可以传递 __INLINE_CODE_11__ 标志，例如：__INLINE_CODE_12__
 
-  @Query(() => User, { name: 'user' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.usersService.findOne(id);
-  }
+我们可以看到，除了生成了所有 boilerplate mutate 和 query 之外，一切都连接在一起。我们正在使用 __INLINE_CODE_13__、__INLINE_CODE_14__ 实体和我们的 DTO。
 
-  @Mutation(() => User)
-  updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput) {
-    return this.usersService.update(updateUserInput.id, updateUserInput);
-  }
-
-  @Mutation(() => User)
-  removeUser(@Args('id', { type: () => Int }) id: number) {
-    return this.usersService.remove(id);
-  }
-}
-
-```
+__CODE_BLOCK_3__

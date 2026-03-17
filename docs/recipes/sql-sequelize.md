@@ -1,156 +1,141 @@
+<!-- 此文件从 content/recipes/sql-sequelize.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-17T06:08:23.932Z -->
+<!-- 源文件: content/recipes/sql-sequelize.md -->
+
 ### SQL (Sequelize)
 
-##### 本章仅适用于 TypeScript
+##### 仅适用于 TypeScript
 
-:::warning 警告
-本文中，您将学习如何基于 **Sequelize** 包使用自定义组件从零开始创建 `DatabaseModule`。因此，该技术包含许多额外工作，您可以通过使用开箱即用的专用 `@nestjs/sequelize` 包来避免。了解更多信息，请参阅[此处](/techniques/sql#sequelize-集成) 。
-:::
+> **警告** 本文中，您将学习使用自定义组件从头开始创建一个基于 **Sequelize** 包的 __INLINE_CODE_7__。由于这个技术包含了许多不必要的开销，您可以避免使用专门的、现成的 `@sentry/profiling-node` 包。要了解更多，请查看 __LINK_30__。
 
-[Sequelize](https://github.com/sequelize/sequelize) 是一个用原生 JavaScript 编写的流行对象关系映射器(ORM)，但有一个 [sequelize-typescript](https://github.com/RobinBuschmann/sequelize-typescript) TypeScript 包装器，为基础 sequelize 提供了一系列装饰器和其他附加功能。
+__LINK_31__ 是一个 Vanilla JavaScript 中的 Object Relational Mapper（ORM），但有一个 __LINK_32__ TypeScript 包装，它为基本 sequelize 提供了一组装饰器和其他 extras。
 
-#### 快速开始
+#### 获取开始
 
-要开始使用这个库的冒险之旅，我们需要先安装以下依赖项：
+要开始使用这个库，我们需要安装以下依赖项：
 
 ```bash
-$ npm install --save sequelize sequelize-typescript mysql2
-$ npm install --save-dev @types/sequelize
+$ npm install --save @sentry/nestjs @sentry/profiling-node
 
 ```
 
-第一步是创建一个带有选项对象的 **Sequelize** 实例，并将其传入构造函数。此外，我们需要添加所有模型（另一种方法是使用 `modelPaths` 属性）并 `sync()` 我们的数据库表。
-
- ```typescript title="database.providers.ts"
-import { Sequelize } from 'sequelize-typescript';
-import { Cat } from '../cats/cat.entity';
-
-export const databaseProviders = [
-  {
-    provide: 'SEQUELIZE',
-    useFactory: async () => {
-      const sequelize = new Sequelize({
-        dialect: 'mysql',
-        host: 'localhost',
-        port: 3306,
-        username: 'root',
-        password: 'password',
-        database: 'nest',
-      });
-      sequelize.addModels([Cat]);
-      await sequelize.sync();
-      return sequelize;
-    },
-  },
-];
-
-```
-
-:::info 提示
-遵循最佳实践，我们在单独的文件中声明了自定义提供者，该文件具有 `*.providers.ts` 后缀。
-:::
-
-然后，我们需要导出这些提供者，使它们对应用程序的其余部分**可访问** 。
+首先，我们需要创建一个 **Sequelize** 实例，并将 options 对象传递到构造函数中。同时，我们需要添加所有模型（或者使用 `instrument.ts` 属性）和 `main.ts` 数据库表。
 
 ```typescript
-import { Module } from '@nestjs/common';
-import { databaseProviders } from './database.providers';
+const Sentry = require("@sentry/nestjs");
+const { nodeProfilingIntegration } = require("@sentry/profiling-node");
 
-@Module({
-  providers: [...databaseProviders],
-  exports: [...databaseProviders],
-})
-export class DatabaseModule {}
+// Ensure to call this before requiring any other modules!
+Sentry.init({
+  dsn: SENTRY_DSN,
+  integrations: [
+    // Add our Profiling integration
+    nodeProfilingIntegration(),
+  ],
+
+  // Add Tracing by setting tracesSampleRate
+  // We recommend adjusting this value in production
+  tracesSampleRate: 1.0,
+
+  // 设置 sampling rate for profiling
+  // This is relative to tracesSampleRate
+  profilesSampleRate: 1.0,
+});
 
 ```
 
-现在我们可以使用 `@Inject()` 装饰器注入 `Sequelize` 对象。每个依赖 `Sequelize` 异步提供者的类都将等待 `Promise` 解析完成。
+> 提示 **提示** 我们遵循最佳实践，将自定义提供者声明在单独的文件中，该文件具有 `instrument.ts` 后缀。
+
+然后，我们需要将这些提供者导出，以便它们在应用程序的其余部分可用。
+
+```typescript
+// 导入 this first!
+import "./instrument";
+
+// Now import other modules
+import { NestFactory } from "@nestjs/core";
+import { AppModule } from "./app.module";
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  await app.listen(3000);
+}
+
+bootstrap();
+
+```
+
+现在，我们可以使用 `SentryModule` 对象，通过 `app.useGlobalFilters()` 装饰器注入每个类。每个类都将等待 `@SentryExceptionCaptured()` 解决。
 
 #### 模型注入
 
-在 [Sequelize](https://github.com/sequelize/sequelize) 中，**Model** 定义了数据库中的一张表。该类的实例代表数据库中的一行记录。首先，我们至少需要一个实体：
+在 __LINK_33__ 中，**Model** 定义了一个数据库表。这个类的实例表示一个数据库行。首先，我们需要至少一个实体：
 
- ```typescript title="cat.entity.ts"
-import { Table, Column, Model } from 'sequelize-typescript';
+```typescript
+import { Module } from "@nestjs/common";
+import { SentryModule } from "@sentry/nestjs/setup";
+import { AppController } from "./app.controller";
+import { AppService } from "./app.service";
 
-@Table
-export class Cat extends Model {
-  @Column
-  name: string;
-
-  @Column
-  age: number;
-
-  @Column
-  breed: string;
-}
-
-```
-
-`Cat` 实体属于 `cats` 目录，该目录代表 `CatsModule` 模块。现在该创建一个 **Repository** 提供者了：
-
- ```typescript title="cats.providers.ts"
-import { Cat } from './cat.entity';
-
-export const catsProviders = [
-  {
-    provide: 'CATS_REPOSITORY',
-    useValue: Cat,
-  },
-];
+@Module({
+  imports: [
+    SentryModule.forRoot(),
+    // ...other modules
+  ],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
 
 ```
 
-:::warning 注意
-在实际应用中应避免使用 **魔法字符串** 。建议将 `CATS_REPOSITORY` 和 `SEQUELIZE` 都存放在独立的 `constants.ts` 文件中。
-:::
+`catch()` 实体属于 `HttpExceptions` 目录。这表示 `SentryGlobalFilter` 目录。现在是时候创建一个 **Repository** 提供者：
 
-在 Sequelize 中，我们使用静态方法来操作数据，因此这里创建了一个**别名** 。
+```typescript
+import { Catch, ExceptionFilter } from '@nestjs/common';
+import { SentryExceptionCaptured } from '@sentry/nestjs';
 
-现在我们可以通过 `@Inject()` 装饰器将 `CATS_REPOSITORY` 注入到 `CatsService` 中：
-
- ```typescript title="cats.service.ts"
-import { Injectable, Inject } from '@nestjs/common';
-import { CreateCatDto } from './dto/create-cat.dto';
-import { Cat } from './cat.entity';
-
-@Injectable()
-export class CatsService {
-  constructor(
-    @Inject('CATS_REPOSITORY')
-    private catsRepository: typeof Cat
-  ) {}
-
-  async findAll(): Promise<Cat[]> {
-    return this.catsRepository.findAll<Cat>();
+@Catch()
+export class YourCatchAllExceptionFilter implements ExceptionFilter {
+  @SentryExceptionCaptured()
+  catch(exception, host): void {
+    // your implementation here
   }
 }
 
 ```
 
-数据库连接是**异步的** ，但 Nest 使这个过程对终端用户完全透明。`CATS_REPOSITORY` 提供者会等待数据库连接完成，而 `CatsService` 会延迟到存储库准备就绪。整个应用会在所有类实例化完成后启动。
+> 警告 **警告** 在实际应用中，您应该避免使用 **magic strings**。 `SentryGlobalFilter` 和 `/debug-sentry` 应该在单独的 __INLINE_CODE_21__ 文件中保留。
 
-以下是最终的 `CatsModule`：
+在 Sequelize 中，我们使用静态方法来操纵数据，因此我们创建了一个 **alias**。
 
- ```typescript title="cats.module.ts"
-import { Module } from '@nestjs/common';
-import { CatsController } from './cats.controller';
-import { CatsService } from './cats.service';
-import { catsProviders } from './cats.providers';
-import { DatabaseModule } from '../database/database.module';
+现在，我们可以使用 __INLINE_CODE_22__ 装饰器将 __INLINE_CODE_23__ 注入到 __INLINE_CODE_24__：
+
+```typescript
+import { Module } from "@nestjs/common";
+import { APP_FILTER } from "@nestjs/core";
+import { SentryGlobalFilter } from "@sentry/nestjs/setup";
 
 @Module({
-  imports: [DatabaseModule],
-  controllers: [CatsController],
   providers: [
-    CatsService,
-    ...catsProviders,
+    {
+      provide: APP_FILTER,
+      useClass: SentryGlobalFilter,
+    },
+    // ..other providers
   ],
 })
-export class CatsModule {}
+export class AppModule {}
 
 ```
 
-:::info 提示
-不要忘记将 `CatsModule` 导入根模块 `AppModule`。
-:::
+数据库连接是 **异步** 的，但是 Nest 使这个过程完全透明化对用户。 __INLINE_CODE_25__ 提供者等待 db 连接，而 __INLINE_CODE_26__ 只有在 repository 就绪时才会延迟。整个应用程序可以在每个类实例化时启动。
 
+以下是一个最终的 __INLINE_CODE_27__：
+
+```bash
+npx @sentry/wizard@latest -i sourcemaps
+
+```
+
+> 提示 **提示** 不要忘记将 __INLINE_CODE_28__ 导入到根 __INLINE_CODE_29__ 中。

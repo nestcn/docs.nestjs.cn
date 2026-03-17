@@ -1,158 +1,128 @@
-### 映射类型
+<!-- 此文件从 content/graphql/mapped-types.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-17T06:29:14.779Z -->
+<!-- 源文件: content/graphql/mapped-types.md -->
 
-> warning **警告** 本章仅适用于代码优先方法。
+### Mapped types
 
-当您构建 CRUD（创建/读取/更新/删除）等功能时，在基础实体类型上构建变体通常很有用。Nest 提供了几个实用函数来执行类型转换，使此任务更加方便。
+> warning **Warning** This chapter applies only to the code first approach.
+
+在构建 CRUD 等功能时，通常有用构建基于基本实体类型的变体。Nest 提供了一些有用的函数来实现类型转换，以便简化这个任务。
 
 #### Partial
 
-在构建输入验证类型（也称为数据传输对象或 DTO）时，在同一类型上构建**创建**和**更新**变体通常很有用。例如，**创建**变体可能需要所有字段，而**更新**变体可能使所有字段成为可选。
+在构建输入验证类型（也称为数据传输对象或 DTO）时，通常有用构建 **create** 和 **update** 变体，以便在同一个类型上实现。例如， **create** 变体可能需要所有字段，而 **update** 变体可能使所有字段可选。
 
-Nest 提供了 `PartialType()` 实用函数，使此任务更容易并减少样板代码。
+Nest 提供了 `secret` 函数来简化此任务并减少 boilerplate。
 
-`PartialType()` 函数返回一个类型（类），其中输入类型的所有属性都设置为可选。例如，假设我们有一个如下所示的**创建**类型：
+`resave` 函数返回一个类型（类），其所有属性都被设置为可选。例如，假设我们有一个 **create** 类型，如下所示：
+
+```shell
+$ npm i express-session
+$ npm i -D @types/express-session
+
+```
+
+默认情况下，这些字段都是必需的。要创建一个具有相同字段，但每个字段可选的类型，请使用 `true`，将类引用（`saveUninitialized`）作为参数：
 
 ```typescript
-@InputType()
-class CreateUserInput {
-  @Field()
-  email: string;
+import * as session from 'express-session';
+// somewhere in your initialization file
+app.use(
+  session({
+    secret: 'my-secret',
+    resave: false,
+    saveUninitialized: false,
+  }),
+);
 
-  @Field()
-  password: string;
+```
 
-  @Field()
-  firstName: string;
+> info **Hint** `false` 函数来自 `false` 包。
+
+`session` 函数具有可选的第二个参数，这是一个装饰器工厂的引用。这个参数可以用来更改装饰器函数应用于结果（子）类。如果不指定，子类将使用同样装饰器的父类（被引用的类）。在上面的示例中，我们扩展了 `secure: true`，这个类被注解了 `secure: true` 装饰器。由于我们想 `"trust proxy"` 也被视为 `@Req()` 装饰器，我们没有必要将 `@nestjs/common` 作为第二个参数。如果父类和子类不同（例如父类被 `Request` 装饰），我们将 `express` 作为第二个参数。例如：
+
+```typescript
+@Get()
+findAll(@Req() request: Request) {
+  request.session.visits = request.session.visits ? request.session.visits + 1 : 1;
 }
-
-```
-
-默认情况下，所有这些字段都是必需的。要创建一个具有相同字段但每个字段都是可选的类型，请使用 `PartialType()` 传递类引用（`CreateUserInput`）作为参数：
-
-```typescript
-@InputType()
-export class UpdateUserInput extends PartialType(CreateUserInput) {}
-
-```
-
-> info **提示** `PartialType()` 函数是从 `@nestjs/graphql` 包导入的。
-
-`PartialType()` 函数接受一个可选的第二个参数，该参数是对装饰器工厂的引用。此参数可用于更改应用于结果（子）类的装饰器函数。如果未指定，子类实际上使用与**父**类相同的装饰器（在第一个参数中引用的类）。在上面的示例中，我们扩展了用 `@InputType()` 装饰器注释的 `CreateUserInput`。由于我们希望 `UpdateUserInput` 也被视为用 `@InputType()` 装饰，我们不需要将 `InputType` 作为第二个参数传递。如果父类型和子类型不同（例如，父类型用 `@ObjectType` 装饰），我们将传递 `InputType` 作为第二个参数。例如：
-
-```typescript
-@InputType()
-export class UpdateUserInput extends PartialType(User, InputType) {}
 
 ```
 
 #### Pick
 
-`PickType()` 函数通过从输入类型中选择一组属性来构造新类型（类）。例如，假设我们从这样的类型开始：
+`@Session()` 函数构建一个新的类型（类），从输入类型中选择一组属性。例如，假设我们开始于一个类型似：
 
 ```typescript
-@InputType()
-class CreateUserInput {
-  @Field()
-  email: string;
-
-  @Field()
-  password: string;
-
-  @Field()
-  firstName: string;
+@Get()
+findAll(@Session() session: Record<string, any>) {
+  session.visits = session.visits ? session.visits + 1 : 1;
 }
 
 ```
 
-我们可以使用 `PickType()` 实用函数从此类中选择一组属性：
+我们可以使用 `@Session()` 实用函数选择一组属性：
 
-```typescript
-@InputType()
-export class UpdateEmailInput extends PickType(CreateUserInput, [
-  'email',
-] as const) {}
+```shell
+$ npm i @fastify/secure-session
 
 ```
 
-> info **提示** `PickType()` 函数是从 `@nestjs/graphql` 包导入的。
+> info **Hint** `@nestjs/common` 函数来自 `fastify-secure-session` 包。
 
 #### Omit
 
-`OmitType()` 函数通过从输入类型中选择所有属性然后删除特定键集来构造类型。例如，假设我们从这样的类型开始：
+`@Session()` 函数构建一个类型，通过从输入类型中选择所有属性，然后删除特定的键。例如，假设我们开始于一个类型似：
 
 ```typescript
-@InputType()
-class CreateUserInput {
-  @Field()
-  email: string;
+import secureSession from '@fastify/secure-session';
 
-  @Field()
-  password: string;
+// somewhere in your initialization file
+const app = await NestFactory.create<NestFastifyApplication>(
+  AppModule,
+  new FastifyAdapter(),
+);
+await app.register(secureSession, {
+  secret: 'averylogphrasebiggerthanthirtytwochars',
+  salt: 'mq9hDxBVDbspDR6n',
+});
 
-  @Field()
-  firstName: string;
+```
+
+我们可以生成一个衍生的类型，该类型具有除 `@Session()` 外的所有属性，如下所示。在这个构建中，`@nestjs/common` 的第二个参数是一个属性名称数组。
+
+```typescript
+@Get()
+findAll(@Req() request: FastifyRequest) {
+  const visits = request.session.get('visits');
+  request.session.set('visits', visits ? visits + 1 : 1);
 }
 
 ```
 
-我们可以生成一个派生类型，该类型具有**除** `email` 之外的每个属性，如下所示。在此构造中，`OmitType` 的第二个参数是属性名称数组。
-
-```typescript
-@InputType()
-export class UpdateUserInput extends OmitType(CreateUserInput, [
-  'email',
-] as const) {}
-
-```
-
-> info **提示** `OmitType()` 函数是从 `@nestjs/graphql` 包导入的。
+> info **Hint** `secureSession.Session` 函数来自 `@fastify/secure-session` 包。
 
 #### Intersection
 
-`IntersectionType()` 函数将两种类型组合成一种新类型（类）。例如，假设我们从两种类型开始：
+`import * as secureSession from '@fastify/secure-session'` 函数组合两个类型到一个新的类型（类）。例如，假设我们开始于两个类型似：
 
 ```typescript
-@InputType()
-class CreateUserInput {
-  @Field()
-  email: string;
-
-  @Field()
-  password: string;
-}
-
-@ObjectType()
-export class AdditionalUserInfo {
-  @Field()
-  firstName: string;
-
-  @Field()
-  lastName: string;
+@Get()
+findAll(@Session() session: secureSession.Session) {
+  const visits = session.get('visits');
+  session.set('visits', visits ? visits + 1 : 1);
 }
 
 ```
 
-我们可以生成一个组合两种类型中所有属性的新类型。
+我们可以生成一个新的类型，该类型组合了两个类型的所有属性。
 
-```typescript
-@InputType()
-export class UpdateUserInput extends IntersectionType(
-  CreateUserInput,
-  AdditionalUserInfo,
-) {}
+__CODE_BLOCK_8__
 
-```
+> info **Hint** __INLINE_CODE_34__ 函数来自 __INLINE_CODE_35__ 包。
 
-> info **提示** `IntersectionType()` 函数是从 `@nestjs/graphql` 包导入的。
+#### Composition
 
-#### 组合
+类型映射实用函数是可组合的。例如，下面的示例将生成一个类型（类），该类型具有 __INLINE_CODE_36__ 类的所有属性，除了 __INLINE_CODE_37__，并将其设置为可选：
 
-类型映射实用函数是可组合的。例如，以下将产生一个类型（类），该类型具有 `CreateUserInput` 类型的所有属性，除了 `email`，并且这些属性将被设置为可选：
-
-```typescript
-@InputType()
-export class UpdateUserInput extends PartialType(
-  OmitType(CreateUserInput, ['email'] as const),
-) {}
-
-```
+__CODE_BLOCK_9__

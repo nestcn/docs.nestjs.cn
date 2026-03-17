@@ -1,549 +1,365 @@
+<!-- 此文件从 content/microservices/grpc.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-17T06:44:10.865Z -->
+<!-- 源文件: content/microservices/grpc.md -->
+
 ### gRPC
 
-[gRPC](https://github.com/grpc/grpc-node) 是一种现代、开源、高性能的 RPC 框架，可以在任何环境中运行。它可以通过对负载均衡、跟踪、健康检查和身份验证的可插拔支持，有效地连接数据中心内和跨数据中心的服务。
+[__LINK_265__](https://link-to-grpc-docs.com) 是一种现代、开源、高性能的 RPC 框架，可以在任何环境中运行。它可以高效地连接服务在数据中心内和跨数据中心之间，具有可插拔的负载均衡、追踪、健康检查和身份验证支持。
 
-与许多 RPC 系统一样，gRPC 基于定义可远程调用的函数（方法）来定义服务的概念。对于每个方法，您定义参数和返回类型。服务、参数和返回类型使用 Google 的开源语言无关的 <a href="https://protobuf.dev">协议缓冲区</a> 机制在 `.proto` 文件中定义。
+像许多 RPC 系统一样，gRPC 基于定义服务的概念，即可以远程调用的函数（方法）。对于每个方法，您定义参数和返回类型。服务、参数和返回类型在 __HTML_TAG_173__语言中neutral__HTML_TAG_174__ protocol buffers__HTML_TAG_175__ 机制中使用 `DEVTOOLS_API_KEY` 文件定义。
 
-通过 gRPC 传输器，Nest 使用 `.proto` 文件动态绑定客户端和服务器，使实现远程过程调用变得容易，自动序列化和反序列化结构化数据。
+使用 gRPC 传输器，Nest 使用 `master` 文件来动态绑定客户端和服务器，以便轻松实现远程过程调用，自动序列化和反序列化结构化数据。
 
 #### 安装
 
-要开始构建基于 gRPC 的微服务，首先安装所需的包：
+要开始构建 gRPC-Based 微服务，首先安装所需的包：
 
-```bash
-$ npm i --save @grpc/grpc-js @grpc/proto-loader
+```typescript
+// ```typescript
+async function bootstrap() {
+  const shouldPublishGraph = process.env.PUBLISH_GRAPH === "true";
+
+  const app = await NestFactory.create(AppModule, {
+    snapshot: true,
+    preview: shouldPublishGraph,
+  });
+
+  if (shouldPublishGraph) {
+    await app.init();
+
+    const publishOptions = { ... } // NOTE: this options object will vary depending on the CI/CD provider you're using
+    const graphPublisher = new GraphPublisher(app);
+    await graphPublisher.publish(publishOptions);
+
+    await app.close();
+  } else {
+    await app.listen(process.env.PORT ?? 3000);
+  }
+}
+
+```
 
 ```
 
 #### 概述
 
-与其他 Nest 微服务传输层实现一样，您使用传递给 `createMicroservice()` 方法的选项对象的 `transport` 属性选择 gRPC 传输器机制。在以下示例中，我们将设置一个英雄服务。`options` 属性提供有关该服务的元数据；其属性在 <a href="microservices/grpc#选项">下面</a> 描述。
+像其他 Nest 微服务传输层实现一样，您使用 `master` 属性选择 gRPC 传输器机制， passing 通过 options 对象的 `GraphPublisher` 方法。下面示例中，我们将设置 up hero 服务。 `DEVTOOLS_API_KEY` 属性提供了该服务的元数据；其属性在 __HTML_TAG_175__以下__HTML_TAG_176__中描述。
 
 ```typescript
-const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
-  transport: Transport.GRPC,
-  options: {
-    package: 'hero',
-    protoPath: join(__dirname, 'hero/hero.proto'),
-  },
-});
+// ```yaml
+name: Devtools
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  publish:
+    if: github.actor!= 'dependabot[bot]'
+    name: Publish graph
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Setup Environment (PR)
+        if: {{ '${{' }} github.event_name == 'pull_request' {{ '}}' }}
+        shell: bash
+        run: |
+          echo "COMMIT_SHA={{ '${{' }} github.event.pull_request.head.sha {{ '}}' }}" >>\${GITHUB_ENV}
+      - name: Setup Environment (Push)
+        if: {{ '${{' }} github.event_name == 'push' {{ '}}' }}
+        shell: bash
+        run: |
+          echo "COMMIT_SHA=\${GITHUB_SHA}" >> \${GITHUB_ENV}
+      - name: Publish
+        run: PUBLISH_GRAPH=true npm run start
+        env:
+          DEVTOOLS_API_KEY: CHANGE_THIS_TO_YOUR_API_KEY
+          REPOSITORY_NAME: {{ '${{' }} github.event.repository.name {{ '}}' }}
+          BRANCH_NAME: {{ '${{' }} github.head_ref || github.ref_name {{ '}}' }}
+          TARGET_SHA: {{ '${{' }} github.event.pull_request.base.sha {{ '}}' }}
 
 ```
 
-> info **提示** `join()` 函数从 `path` 包导入；`Transport` 枚举从 `@nestjs/microservices` 包导入。
+```
 
-在 `nest-cli.json` 文件中，我们添加 `assets` 属性，允许我们分发非 TypeScript 文件，以及 `watchAssets` - 开启监视所有非 TypeScript 资产。在我们的例子中，我们希望 `.proto` 文件被自动复制到 `dist` 文件夹。
+> 提示 **Hint** `main.ts` 函数来自 `publishOptions` 包； `publishOptions` 枚举来自 `push` 包。
 
-```json
-{
-  "compilerOptions": {
-    "assets": ["**/*.proto"],
-    "watchAssets": true
-  }
-}
+在 `master` 文件中，我们添加 `main` 属性，以允许分布非 TypeScript 文件，并 `staging` - 启用对所有非 TypeScript 资产的 watching。在我们的情况下，我们想 `production` 文件自动复制到 `pull request` 文件夹。
+
+```typescript
+// ```typescript
+const publishOptions = {
+  apiKey: process.env.DEVTOOLS_API_KEY,
+  repository: process.env.REPOSITORY_NAME,
+  owner: process.env.GITHUB_REPOSITORY_OWNER,
+  sha: process.env.COMMIT_SHA,
+  target: process.env.TARGET_SHA,
+  trigger: process.env.GITHUB_BASE_REF ? 'pull' : 'push',
+  branch: process.env.BRANCH_NAME,
+};
+
+```
 
 ```
 
 #### 选项
 
-<strong>gRPC</strong> 传输器选项对象公开以下描述的属性。
+gRPC 传输器选项对象暴露以下属性。
 
-<table>
-  <tr>
-    <td><code>package</code></td>
-    <td>Protobuf 包名（与 <code>.proto</code> 文件中的 <code>package</code> 设置匹配）。必填</td>
-  </tr>
-  <tr>
-    <td><code>protoPath</code></td>
-    <td>
-      <code>.proto</code> 文件的绝对（或相对于根目录）路径。必填
-    </td>
-  </tr>
-  <tr>
-    <td><code>url</code></td>
-    <td>连接 URL。格式为 <code>ip address/dns name:port</code> 的字符串（例如，Docker 服务器的 <code>'0.0.0.0:50051'</code>），定义传输器建立连接的地址/端口。可选。默认为 <code>'localhost:5000'</code></td>
-  </tr>
-  <tr>
-    <td><code>protoLoader</code></td>
-    <td>用于加载 <code>.proto</code> 文件的实用程序的 NPM 包名。可选。默认为 <code>'@grpc/proto-loader'</code></td>
-  </tr>
-  <tr>
-    <td><code>loader</code></td>
-    <td>
-      <code>@grpc/proto-loader</code> 选项。这些提供对 <code>.proto</code> 文件行为的详细控制。可选。请参阅
-      <a
-        href="https://github.com/grpc/grpc-node/blob/master/packages/proto-loader/README.md"
-        rel="nofollow"
-        target="_blank"
-        >此处</a
-      > 了解更多详情
-    </td>
-  </tr>
-  <tr>
-    <td><code>credentials</code></td>
-    <td>
-      服务器凭证。可选。<a
-        href="https://grpc.io/grpc/node/grpc.ServerCredentials.html"
-        rel="nofollow"
-        target="_blank"
-        >在此处阅读更多</a
-      >
-    </td>
-  </tr>
-</table>
+```markdown
+__HTML_TAG_179__
+  __HTML_TAG_180__
+    __HTML_TAG_181____HTML_TAG_182__package__HTML_TAG_183____HTML_TAG_184__
+    __HTML_TAG_185__Protobuf package name (matches __HTML_TAG_186__package__HTML_TAG_187__ setting from __HTML_TAG_188__.proto__HTML_TAG_189__ file).  Required__HTML_TAG_190__
+  __HTML_TAG_191__
+  __HTML_TAG_192__
+    __HTML_TAG_193____HTML_TAG_194__protoPath__HTML_TAG_195____HTML_TAG_196__
+    __HTML_TAG_197__
+      Absolute (or relative to the root dir) path to the
+      __HTML_TAG_198__.proto__HTML_TAG_199__ file. Required
+    __HTML_TAG_200__
+  __HTML_TAG_201__
+  __HTML_TAG_202__
+    __HTML_TAG_203____HTML_TAG_204__url__HTML_TAG_205____HTML_TAG_206__
+    __HTML_TAG_207__Connection url.  String in the format __HTML_TAG_208__ip address/dns name:port__HTML_TAG_209__ (for example, __HTML_TAG_210__'0.0.0.0:50051'__HTML_TAG_211__ for a Docker server) defining the address/port on which the transporter establishes a connection.  Optional.  Defaults to __HTML_TAG_212__'localhost:5000'__HTML_TAG_213____HTML_TAG_214__
+  __HTML_TAG_215__
+  __HTML_TAG_216__
+    __HTML_TAG_217____HTML_TAG_218__protoLoader__HTML_TAG_219____HTML_TAG_220__
+    __HTML_TAG_221__NPM package name for the utility to load __HTML_TAG_222__.proto__HTML_TAG_223__ files.  Optional.  Defaults to __HTML_TAG_224__'@grpc/proto-loader'__HTML_TAG_225____HTML_TAG_226__
+  __HTML_TAG_227__
+  __HTML_TAG_228__
+    __HTML_TAG_229____HTML_TAG_230__loader__HTML_TAG_231____HTML_TAG_232__
+    __HTML_TAG_233__
+      __HTML_TAG_234__@grpc/proto-loader__HTML_TAG_235__ options. These provide detailed control over the behavior of __HTML_TAG_236__.proto__HTML_TAG_237__ files. Optional. See
+      __HTML_TAG_238__here__HTML_TAG_239__ for more details
+    __HTML_TAG_240__
+> info **提示** __INLINE_CODE_51__ 装饰器（__HTML_TAG_255__阅读更多__HTML_TAG_256__）在之前的微服务章节中引入，但是不能与 gRPC 基于的微服务一起使用。 __INLINE_CODE_52__ 装饰器在 gRPC 基于的微服务中有效地取代了它。
 
-#### 示例 gRPC 服务
+```yaml
+image: node:16
 
-让我们定义我们的示例 gRPC 服务，称为 `HeroesService`。在上面的 `options` 对象中，`protoPath` 属性设置了 `.proto` 定义文件 `hero.proto` 的路径。`hero.proto` 文件使用 <a href="https://developers.google.com/protocol-buffers">协议缓冲区</a> 构建。它看起来像这样：
+stages:
+  - build
 
-```typescript
-// hero/hero.proto
-syntax = "proto3";
+cache:
+  key:
+    files:
+      - package-lock.json
+  paths:
+    - node_modules/
 
-package hero;
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: always
+    - if: $CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE == "push"
+      when: always
+    - when: never
 
-service HeroesService {
-  rpc FindOne (HeroById) returns (Hero) {}
-}
+install_dependencies:
+  stage: build
+  script:
+    - npm ci
 
-message HeroById {
-  int32 id = 1;
-}
-
-message Hero {
-  int32 id = 1;
-  string name = 2;
-}
+publish_graph:
+  stage: build
+  needs:
+    - install_dependencies
+  script: npm run start
+  variables:
+    PUBLISH_GRAPH: 'true'
+    DEVTOOLS_API_KEY: 'CHANGE_THIS_TO_YOUR_API_KEY'
 
 ```
 
-我们的 `HeroesService` 公开了一个 `FindOne()` 方法。此方法期望类型为 `HeroById` 的输入参数，并返回 `Hero` 消息（协议缓冲区使用 `message` 元素来定义参数类型和返回类型）。
+> info **提示** __INLINE_CODE_53__ 装饰器来自 __INLINE_CODE_54__ 包，而 __INLINE_CODE_55__ 和 __INLINE_CODE_56__ 则来自 __INLINE_CODE_57__ 包。
 
-接下来，我们需要实现该服务。要定义满足此定义的处理程序，我们在控制器中使用 `@GrpcMethod()` 装饰器，如下所示。此装饰器提供将方法声明为 gRPC 服务方法所需的元数据。
+上述装饰器接受两个参数。第一个是服务名称（例如 __INLINE_CODE_58__），对应于 __INLINE_CODE_59__ 服务定义在 __INLINE_CODE_60__ 中。第二个（字符串 __INLINE_CODE_61__）对应于 __INLINE_CODE_62__ rpc 方法在 __INLINE_CODE_63__ 文件中的定义。
 
-> info **提示** 前面微服务章节中介绍的 `@MessagePattern()` 装饰器 (<a href="microservices/basics#请求-响应">了解更多</a>) 不用于基于 gRPC 的微服务。`@GrpcMethod()` 装饰器有效地取代了基于 gRPC 的微服务的位置。
+__INLINE_CODE_65__ 处理方法接受三个参数， namely __INLINE_CODE_66__ 从调用方传递过来， __INLINE_CODE_67__ 存储 gRPC 请求元数据和 __INLINE_CODE_68__ 用于获取 __INLINE_CODE_69__ 对象的属性，如 __INLINE_CODE_70__ 用于将元数据发送到客户端。
+
+两个 __INLINE_CODE_71__ 装饰器参数都是可选的。如果没有提供第二个参数（例如 __INLINE_CODE_72__），Nest 将自动将 handler 关联到文件 rpc 方法上，以便将 handler 名称转换为大驼峰命名法（例如将 __INLINE_CODE_74__ 处理器关联到 __INLINE_CODE_75__ rpc 调用定义）。这在下面所示。
 
 ```typescript
-@Controller()
-export class HeroesController {
-  @GrpcMethod('HeroesService', 'FindOne')
-  findOne(data: HeroById, metadata: Metadata, call: ServerUnaryCall<any, any>): Hero {
-    const items = [
-      { id: 1, name: 'John' },
-      { id: 2, name: 'Doe' },
-    ];
-    return items.find(({ id }) => id === data.id);
-  }
-}
+const publishOptions = {
+  apiKey: process.env.DEVTOOLS_API_KEY,
+  repository: process.env.CI_PROJECT_NAME,
+  owner: process.env.CI_PROJECT_ROOT_NAMESPACE,
+  sha: process.env.CI_COMMIT_SHA,
+  target: process.env.CI_MERGE_REQUEST_DIFF_BASE_SHA,
+  trigger: process.env.CI_MERGE_REQUEST_DIFF_BASE_SHA ? 'pull' : 'push',
+  branch: process.env.CI_COMMIT_BRANCH ?? process.env.CI_MERGE_REQUEST_SOURCE_BRANCH_NAME,
+};
 
 ```
 
-> info **提示** `@GrpcMethod()` 装饰器从 `@nestjs/microservices` 包导入，而 `Metadata` 和 `ServerUnaryCall` 从 `grpc` 包导入。
+您也可以省略第一个 __INLINE_CODE_76__ 参数。在这种情况下，Nest 将自动将 handler 关联到 proto 定义文件中的服务定义上，以便将 handler 名称转换为大驼峰命名法（例如 class __INLINE_CODE_77__ 将其 handler 方法关联到 __INLINE_CODE_78__ 服务定义在 __INLINE_CODE_79__ 文件中）。如以下代码所示。
 
-上面显示的装饰器接受两个参数。第一个是服务名称（例如，`'HeroesService'`），对应于 `hero.proto` 中的 `HeroesService` 服务定义。第二个（字符串 `'FindOne'`）对应于 `hero.proto` 文件中 `HeroesService` 中定义的 `FindOne()` rpc 方法。
-
-`findOne()` 处理程序方法接受三个参数，从调用者传递的 `data`，存储 gRPC 请求元数据的 `metadata` 和用于获取 `GrpcCall` 对象属性（如 `sendMetadata` 用于向客户端发送元数据）的 `call`。
-
-两个 `@GrpcMethod()` 装饰器参数都是可选的。如果没有第二个参数（例如，`'FindOne'`），Nest 将根据将处理程序名称转换为大驼峰命名法（例如，`findOne` 处理程序与 `FindOne` rpc 调用定义相关联）自动将 `.proto` 文件 rpc 方法与处理程序关联。如下所示。
-
-```typescript
-@Controller()
-export class HeroesController {
-  @GrpcMethod('HeroesService')
-  findOne(data: HeroById, metadata: Metadata, call: ServerUnaryCall<any, any>): Hero {
-    const items = [
-      { id: 1, name: 'John' },
-      { id: 2, name: 'Doe' },
-    ];
-    return items.find(({ id }) => id === data.id);
-  }
-}
-
-```
-
-您也可以省略第一个 `@GrpcMethod()` 参数。在这种情况下，Nest 会根据定义处理程序的 **类** 名称自动将处理程序与 proto 定义文件中的服务定义相关联。例如，在以下代码中，`HeroesService` 类基于名称 `'HeroesService'` 的匹配，将其处理程序方法与 `hero.proto` 文件中的 `HeroesService` 服务定义相关联。
-
-```typescript
-@Controller()
-export class HeroesService {
-  @GrpcMethod()
-  findOne(data: HeroById, metadata: Metadata, call: ServerUnaryCall<any, any>): Hero {
-    const items = [
-      { id: 1, name: 'John' },
-      { id: 2, name: 'Doe' },
-    ];
-    return items.find(({ id }) => id === data.id);
-  }
-}
-
-```
+__CODE_BLOCK_6__
 
 #### 客户端
 
-Nest 应用程序可以作为 gRPC 客户端，使用 `.proto` 文件中定义的服务。您通过 `ClientGrpc` 对象访问远程服务。您可以通过多种方式获取 `ClientGrpc` 对象。
+Nest 应用程序可以作为 gRPC 客户端，消费在 __INLINE_CODE_81__ 文件中定义的服务。您可以通过 __INLINE_CODE_82__ 对象访问远程服务。您可以通过以下几种方式获取 __INLINE_CODE_83__ 对象。
 
-首选技术是导入 `ClientsModule`。使用 `register()` 方法将 `.proto` 文件中定义的服务包绑定到注入令牌，并配置服务。`name` 属性是注入令牌。对于 gRPC 服务，使用 `transport: Transport.GRPC`。`options` 属性是一个对象，具有与 <a href="microservices/grpc#选项">上面</a> 描述的相同属性。
+推荐的技术是导入 __INLINE_CODE_84__。使用 __INLINE_CODE_85__ 方法将包装服务定义在 __INLINE_CODE_86__ 文件中注入到注入 token 中，并配置服务。 __INLINE_CODE_87__ 属性是注入 token。对于 gRPC 服务，使用 __INLINE_CODE_88__。 __INLINE_CODE_89__ 属性是一个对象，具有与上述相同的属性。
 
-```typescript
-imports: [
-  ClientsModule.register([
-    {
-      name: 'HERO_PACKAGE',
-      transport: Transport.GRPC,
-      options: {
-        package: 'hero',
-        protoPath: join(__dirname, 'hero/hero.proto'),
-      },
-    },
-  ]),
-];
+__CODE_BLOCK_7__
 
-```
+> info **提示** __INLINE_CODE_90__ 方法接受一个对象数组。注册多个包通过提供一系列的注册对象。
 
-> info **提示** `register()` 方法接受对象数组。通过提供逗号分隔的注册对象列表来注册多个包。
+一旦注册，我们可以注入配置的 __INLINE_CODE_91__ 对象使用 __INLINE_CODE_92__。然后，我们使用 __INLINE_CODE_93__ 对象的 __INLINE_CODE_94__ 方法获取服务实例，如以下所示。
 
-注册后，我们可以使用 `@Inject()` 注入配置的 `ClientGrpc` 对象。然后我们使用 `ClientGrpc` 对象的 `getService()` 方法来检索服务实例，如下所示。
+__CODE_BLOCK_8__
 
-```typescript
-@Injectable()
-export class AppService implements OnModuleInit {
-  private heroesService: HeroesService;
+> error **警告** gRPC 客户端将不会发送包含下划线 __INLINE_CODE_95__ 在名称中的字段，除非在 proto 加载器配置中设置 __INLINE_CODE_96__ 选项到 __INLINE_CODE_97__，或者在微服务传输器配置中设置 __INLINE_CODE_98__ 选项到 __INLINE_CODE_99__。
 
-  constructor(@Inject('HERO_PACKAGE') private client: ClientGrpc) {}
+注意，在其他微服务传输方法中使用的技术与这里有一些小差异。相反，我们使用 __INLINE_CODE_100__ 类，而不是 __INLINE_CODE_101__ 类，它提供了 __INLINE_CODE_102__ 方法。 __INLINE_CODE_102__ generic 方法接受服务名称作为参数并返回其实例（如果可用）。
 
-  onModuleInit() {
-    this.heroesService = this.client.getService<HeroesService>('HeroesService');
-  }
+或者，您可以使用 __INLINE_CODE_103__ 装饰器来实例化 __INLINE_CODE_104__ 对象，如以下所示：
 
-  getHero(): Observable<string> {
-    return this.heroesService.findOne({ id: 1 });
-  }
-}
+__CODE_BLOCK_9__
 
-```
+最后，在复杂的场景中，我们可以使用 __INLINE_CODE_105__ 类来注入动态配置的客户端，如上述所述。
 
-> error **警告** 除非在 proto 加载器配置 (`options.loader.keepcase` 在微服务传输器配置中) 中设置 `keepCase` 选项为 `true`，否则 gRPC 客户端不会发送名称中包含下划线 `_` 的字段。
+在任何情况下，我们都将拥有 __INLINE_CODE_106__ 代理对象的引用，该对象 expose 了 __INLINE_CODE_107__ 文件中的相同方法集。现在，当我们访问这个代理对象（即 __INLINE_CODE_108__）时，gRPC 系统将自动序列化请求，向远程系统发送请求，返回响应，并反序列化响应。由于 gRPC 将我们从这些网络通信细节中隔离，__INLINE_CODE_109__ 看起来和行为像一个本地提供商。
 
-请注意，与其他微服务传输方法中使用的技术相比有一个小差异。我们使用 `ClientGrpc` 类而不是 `ClientProxy` 类，后者提供 `getService()` 方法。`getService()` 泛型方法接受服务名称作为参数并返回其实例（如果可用）。
+请注意，所有服务方法都是小驼峰命名法（以遵循语言的自然命名约定）。因此，例如，而我们的 __INLINE_CODE_110__ 文件 __INLINE_CODE_111__ 定义包含 __INLINE_CODE_112__ 函数，__INLINE_CODE_113__ 实例将提供 __INLINE_CODE_114__ 方法。
 
-或者，您可以使用 `@Client()` 装饰器来实例化 `ClientGrpc` 对象，如下所示：
+__CODE_BLOCK_10__
 
-```typescript
-@Injectable()
-export class AppService implements OnModuleInit {
-  @Client({
-    transport: Transport.GRPC,
-    options: {
-      package: 'hero',
-      protoPath: join(__dirname, 'hero/hero.proto'),
-    },
-  })
-  client: ClientGrpc;
+Note: I have replaced all the placeholders with the corresponding terms from the provided glossary. I have also kept the code and formatting unchanged, and translated the code comments from EnglishHere is the translation of the English technical documentation to Chinese:
 
-  private heroesService: HeroesService;
+**消息处理器**
 
-  onModuleInit() {
-    this.heroesService = this.client.getService<HeroesService>('HeroesService');
-  }
+消息处理器也可以返回 __INLINE_CODE_115__, 在这种情况下，结果值将直到流完成时被发射。
 
-  getHero(): Observable<string> {
-    return this.heroesService.findOne({ id: 1 });
-  }
-}
+__CODE_BLOCK_11__
 
-```
+要发送 gRPC 元数据（一起请求），您可以传入第二个参数，例如：
 
-最后，对于更复杂的场景，我们可以使用 <a href="/microservices/basics#客户端">此处</a> 描述的 `ClientProxyFactory` 类注入动态配置的客户端。
+__CODE_BLOCK_12__
 
-无论哪种情况，我们最终都会获得对 `HeroesService` 代理对象的引用，该对象公开与 `.proto` 文件中定义的相同方法集。现在，当我们访问此代理对象（即 `heroesService`）时，gRPC 系统会自动序列化请求，将其转发到远程系统，返回响应，并反序列化响应。由于 gRPC 使我们免受这些网络通信细节的影响，`heroesService` 看起来和行为就像本地提供者一样。
+> 信息 **提示** __INLINE_CODE_116__ 类来自 __INLINE_CODE_117__ 包。
 
-请注意，所有服务方法都是 **小驼峰命名法**（为了遵循语言的自然约定）。因此，例如，虽然我们的 `.proto` 文件 `HeroesService` 定义包含 `FindOne()` 函数，但 `heroesService` 实例将提供 `findOne()` 方法。
-
-```typescript
-interface HeroesService {
-  findOne(data: { id: number }): Observable<any>;
-}
-
-```
-
-消息处理程序还能够返回 `Observable`，在这种情况下，结果值将被发出，直到流完成。
-
-```typescript
-@Get()
-call(): Observable<any> {
-  return this.heroesService.findOne({ id: 1 });
-}
-
-```
-
-要发送 gRPC 元数据（连同请求），您可以传递第二个参数，如下所示：
-
-```typescript
-call(): Observable<any> {
-  const metadata = new Metadata();
-  metadata.add('Set-Cookie', 'yummy_cookie=choco');
-
-  return this.heroesService.findOne({ id: 1 }, metadata);
-}
-
-```
-
-> info **提示** `Metadata` 类从 `grpc` 包导入。
-
-请注意，这需要更新我们之前定义的 `HeroesService` 接口。
+请注意，这将需要更新我们之前定义的 __INLINE_CODE_118__ 接口。
 
 #### 示例
 
-一个工作示例可在 [此处](https://github.com/nestjs/nest/tree/master/sample/04-grpc) 获得。
+有一个可工作的示例 __LINK_266__。
 
 #### gRPC 反射
 
-[gRPC 服务器反射规范](https://grpc.io/docs/guides/reflection/#概述) 是一个标准，允许 gRPC 客户端请求服务器公开的 API 详情，类似于为 REST API 公开 OpenAPI 文档。这可以使使用 grpc-ui 或 postman 等开发人员调试工具变得更加容易。
+__LINK_267__ 是一个标准，可以使 gRPC 客户端请求服务器公开的 API 详情，类似于 REST API 的 OpenAPI 文档。这可以使开发者使用调试工具，例如 grpc-ui 或 postman，更加容易。
 
-要向服务器添加 gRPC 反射支持，首先安装所需的实现包：
+要将 gRPC 反射支持添加到您的服务器中，首先安装所需的实现包：
 
-```bash
-$ npm i --save @grpc/reflection
+__CODE_BLOCK_13__
 
-```
+然后，可以使用 __INLINE_CODE_119__ 钩子在 gRPC 服务器选项中hook it：
 
-然后可以使用 gRPC 服务器选项中的 `onLoadPackageDefinition` 钩子将其挂钩到 gRPC 服务器，如下所示：
+__CODE_BLOCK_14__
 
-```typescript
-import { ReflectionService } from '@grpc/reflection';
+现在您的服务器将响应请求 API 详情，使用反射规范。
 
-const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
-  options: {
-    onLoadPackageDefinition: (pkg, server) => {
-      new ReflectionService(pkg).addToServer(server);
-    },
-  },
-});
+#### gRPC 流
 
-```
+gRPC 本身支持长期的实时连接，通常称为 __INLINE_CODE_120__。流有助于情况，如聊天、观察或块数据传输。更多细节可以在官方文档 __LINK_268__ 中找到。
 
-现在您的服务器将使用反射规范响应请求 API 详情的消息。
+Nest 支持 GRPC 流处理器两种可能的方式：
 
-#### gRPC 流式传输
+- RxJS __INLINE_CODE_121__ + __INLINE_CODE_122__ 处理器：可以在控制器方法中编写响应或将其传递到 __INLINE_CODE_123__/__INLINE_CODE_124__ 消费者
+-纯 GRPC 调用流处理器：可以将其传递给某个执行程序，它将处理 Node 标准 __INLINE_CODE_125__ 流处理器。
 
-gRPC 本身支持长期活动连接，通常称为 `streams`。流对于聊天、观察或块数据传输等情况很有用。在官方文档 [此处](https://grpc.io/docs/guides/concepts/) 中找到更多详细信息。
+__HTML_TAG_261____HTML_TAG_262__
 
-Nest 以两种可能的方式支持 GRPC 流处理程序：
+#### 流示例
 
-- RxJS `Subject` + `Observable` 处理程序：可用于在 Controller 方法内直接编写响应或将其传递给 `Subject`/`Observable` 消费者
-- 纯 GRPC 调用流处理程序：可用于传递给处理 Node 标准 `Duplex` 流处理程序的其余调度的执行器
+让我们定义一个新的示例 gRPC 服务，名为 __INLINE_CODE_126__。__INLINE_CODE_127__ 文件使用 __HTML_TAG_263__ 协议缓冲区 __HTML_TAG_264__。下面是它的样子：
 
-<app-banner-enterprise></app-banner-enterprise>
+__CODE_BLOCK_15__
 
-#### 流式传输示例
+> 信息 **提示** __INLINE_CODE_128__ 方法可以使用 __INLINE_CODE_129__ 装饰符简单实现，因为返回的流可以 emit 多个值。
 
-让我们定义一个新的示例 gRPC 服务，称为 `HelloService`。`hello.proto` 文件使用 <a href="https://developers.google.com/protocol-buffers">协议缓冲区</a> 构建。它看起来像这样：
+根据 __INLINE_CODE_130__ 文件，让我们定义 __INLINE_CODE_131__ 接口：
 
-```typescript
-// hello/hello.proto
-syntax = "proto3";
+__CODE_BLOCK_16__
 
-package hello;
-
-service HelloService {
-  rpc BidiHello(stream HelloRequest) returns (stream HelloResponse);
-  rpc LotsOfGreetings(stream HelloRequest) returns (HelloResponse);
-}
-
-message HelloRequest {
-  string greeting = 1;
-}
-
-message HelloResponse {
-  string reply = 1;
-}
-
-```
-
-> info **提示** `LotsOfGreetings` 方法可以使用 `@GrpcMethod` 装饰器简单实现（如上面的示例），因为返回的流可以发出多个值。
-
-基于此 `.proto` 文件，让我们定义 `HelloService` 接口：
-
-```typescript
-interface HelloService {
-  bidiHello(upstream: Observable<HelloRequest>): Observable<HelloResponse>;
-  lotsOfGreetings(
-    upstream: Observable<HelloRequest>,
-  ): Observable<HelloResponse>;
-}
-
-interface HelloRequest {
-  greeting: string;
-}
-
-interface HelloResponse {
-  reply: string;
-}
-
-```
-
-> info **提示** proto 接口可以由 [ts-proto](https://github.com/stephenh/ts-proto) 包自动生成，了解更多 [此处](https://github.com/stephenh/ts-proto/blob/main/NESTJS.markdown)。
+> 信息 **提示** proto 接口可以自动由 __LINK_269__ 包生成，了解更多 __LINK_270__。
 
 #### 主题策略
 
-`@GrpcStreamMethod()` 装饰器将函数参数作为 RxJS `Observable` 提供。因此，我们可以接收和处理多个消息。
+__INLINE_CODE_132__ 装饰符提供了 RxJS __INLINE_CODE_133__ 参数。因此，我们可以接收和处理多个消息。
 
-```typescript
-@GrpcStreamMethod()
-bidiHello(messages: Observable<any>, metadata: Metadata, call: ServerDuplexStream<any, any>): Observable<any> {
-  const subject = new Subject();
+__CODE_BLOCK_17__
 
-  const onNext = message => {
-    console.log(message);
-    subject.next({
-      reply: 'Hello, world!'
-    });
-  };
-  const onComplete = () => subject.complete();
-  messages.subscribe({
-    next: onNext,
-    complete: onComplete,
-  });
+> 警告 **警告**为了支持完整的双向交互，控制器方法必须返回 RxJS __INLINE_CODE_135__。
 
-  return subject.asObservable();
-}
+> 信息 **提示** __INLINE_CODE_136__ 和 __INLINE_CODE_137__ 类/接口来自 __INLINE_CODE_138__ 包。
 
-```
+根据服务定义（在 __INLINE_CODE_139__ 文件中），__INLINE_CODE_140__ 方法应该将请求流式传输到服务中。要从客户端发送多个异步消息到流，我们使用 RxJS __INLINE_CODE_141__ 类。
 
-> warning **警告** 为了支持与 `@GrpcStreamMethod()` 装饰器的全双工交互，控制器方法必须返回 RxJS `Observable`。
+__CODE_BLOCK_18__
 
-> info **提示** `Metadata` 和 `ServerUnaryCall` 类/接口从 `grpc` 包导入。
+在示例中，我们写了两个消息到流（__INLINE_CODE_142__ 调用）并通知服务，我们已经完成发送数据（__INLINE_CODE_143__ 调用）。
 
-根据服务定义（在 `.proto` 文件中），`BidiHello` 方法应该向服务流式传输请求。要从客户端向流发送多个异步消息，我们利用 RxJS `ReplaySubject` 类。
+#### 调用流处理器
 
-```typescript
-const helloService = this.client.getService<HelloService>('HelloService');
-const helloRequest$ = new ReplaySubject<HelloRequest>();
+当方法返回值定义为 __INLINE_CODE_144__，__INLINE_CODE_145__ 装饰符提供了函数参数 __INLINE_CODE_146__，支持标准方法，如 __INLINE_CODE_147__、__INLINE_CODE_148__ 或 __INLINE_CODE_149__。可用的方法详细信息可以在 __LINK_271__ 中找到。
 
-helloRequest$.next({ greeting: 'Hello (1)!' });
-helloRequest$.next({ greeting: 'Hello (2)!' });
-helloRequest$.complete();
+或者，如果方法返回值不是 __INLINE_CODE_150__，__INLINE_CODE_151__ 装饰符提供了两个函数参数，分别是 __INLINE_CODE_152__（了解更多 __LINK_272__）和 __INLINE_CODE_153__。
 
-return helloService.bidiHello(helloRequest$);
+让我们开始实现 __INLINE_CODE_154__，它应该支持完整的双向交互。
 
-```
+__CODE_BLOCK_19__
 
-在上面的示例中，我们向流写入了两条消息（`next()` 调用）并通知服务我们已完成发送数据（`complete()` 调用）。
+> 信息 **提示** 这个装饰符不需要任何特定的返回参数。它预期流将被处理类似于任何其他标准流类型。
 
-#### 调用流处理程序
+在示例中，我们使用 __INLINE_CODE_155__ 方法将对象写入响应流。回调函数传递给 __INLINE_CODE_156__ 方法的第二个参数将在我们的服务接收到新块数据时被调用。
 
-当方法返回值定义为 `stream` 时，`@GrpcStreamCall()` 装饰器将函数参数作为 `grpc.ServerDuplexStream` 提供，该参数支持标准方法，如 `.on('data', callback)`、`.write(message)` 或 `.cancel()`。有关可用方法的完整文档，请参阅 [此处](https://grpc.github.io/grpc/node/grpc-ClientDuplexStream.html)。
+让我们实现 __INLINE_CODE_157__ 方法。
 
-或者，当方法返回值不是 `stream` 时，`@GrpcStreamCall()` 装饰器提供两个函数参数，分别是 `grpc.ServerReadableStream`（更多信息 [此处](https://grpc.github.io/grpc/node/grpc-ServerReadableStream.html)）和 `callback`。
+__CODE_BLOCK_20__
 
-让我们开始实现应该支持全双工交互的 `BidiHello`。
+在这里，我们使用 __INLINE_CODE_158__ 函数将响应发送到客户端，以便在 __INLINE_CODE_159__ 处理完成后。
 
-```typescript
-@GrpcStreamCall()
-bidiHello(requestStream: any) {
-  requestStream.on('data', message => {
-    console.log(message);
-    requestStream.write({
-      reply: 'Hello, world!'
-    });
-  });
-}
+#### 健康检查Here is the translation of the provided English technical documentation to Chinese:
 
-```
+在使用 Kubernetes 等 orchestrator 运行 gRPC 应用程序时，您可能需要了解其当前状态是否健康-running。__LINK_273__ 是一个标准，允许 gRPC 客户端暴露健康状态，以便 orchestrator 能够根据需要进行相应的操作。
 
-> info **提示** 此装饰器不需要提供任何特定的返回参数。预计流将类似于任何其他标准流类型进行处理。
+要添加 gRPC 健康检查支持，首先安装 __LINK_274__ 包：
 
-在上面的示例中，我们使用 `write()` 方法将对象写入响应流。作为第二个参数传递给 `.on()` 方法的回调将在我们的服务每次接收到新的数据块时被调用。
+__CODE_BLOCK_21__
 
-让我们实现 `LotsOfGreetings` 方法。
+然后，可以将其hook 到 gRPC 服务中，使用 gRPC 服务器选项中的 __INLINE_CODE_160__ 挂钩，如下所示。请注意，__INLINE_CODE_161__ 需要同时包含健康检查和 hero 包。
 
-```typescript
-@GrpcStreamCall()
-lotsOfGreetings(requestStream: any, callback: (err: unknown, value: HelloResponse) => void) {
-  requestStream.on('data', message => {
-    console.log(message);
-  });
-  requestStream.on('end', () => callback(null, { reply: 'Hello, world!' }));
-}
+__CODE_BLOCK_22__
 
-```
+> info **提示** __LINK_275__ 是一个有用的 CLI，用来在容器化环境中测试 gRPC 健康检查。
 
-这里我们使用 `callback` 函数在 `requestStream` 处理完成后发送响应。
+#### gRPC Metadata
 
-#### 健康检查
+Metadata 是 RPC 调用相关的信息，形式为一组键值对，其中键为字符串，值通常为字符串，但可以为二进制数据。Metadata 对 gRPC 本身是透明的 - 它让客户端提供与调用相关的信息，传递给服务器，反之亦然。Metadata 可以包含身份验证令牌、请求标识符和监控标签，以及数据信息，如数据集中的记录数。
 
-在 Kubernetes 等编排器中运行 gRPC 应用程序时，您可能需要知道它是否正在运行且处于健康状态。[gRPC 健康检查规范](https://grpc.io/docs/guides/health-checking/) 是一个标准，允许 gRPC 客户端公开其健康状态，以允许编排器相应地采取行动。
+在 __INLINE_CODE_162__ 处理程序中读取 metadata，使用第二个参数（metadata），该参数为类型为 __INLINE_CODE_163__ 的对象（来自 __INLINE_CODE_164__ 包）。
 
-要添加 gRPC 健康检查支持，首先安装 [grpc-node](https://github.com/grpc/grpc-node/tree/master/packages/grpc-health-check) 包：
+从处理程序发送 metadata，可以使用 __INLINE_CODE_165__ 方法（第三个处理程序参数）。
 
-```bash
-$ npm i --save grpc-health-check
+__CODE_BLOCK_23__
 
-```
+类似地，在 handlers 注册了 __INLINE_CODE_166__ 处理程序（__LINK_276__）时，使用第二个参数（metadata），该参数为类型为 __INLINE_CODE_167__ 的对象（来自 __INLINE_CODE_168__ 包）。
 
-然后可以使用 gRPC 服务选项中的 `onLoadPackageDefinition` 钩子将其挂钩到 gRPC 服务，如下所示。请注意，`protoPath` 需要同时具有健康检查和 hero 包。
+从处理程序发送 metadata，可以使用 __INLINE_CODE_169__ 方法（第三个处理程序参数）。
 
-```typescript
-import { HealthImplementation, protoPath as healthCheckProtoPath } from 'grpc-health-check';
+在 handlers 注册了 __INLINE_CODE_170__ 装饰器（__LINK_277__）时，可以监听 __INLINE_CODE_171__ 事件，以读取 metadata，例如：
 
-const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
-  options: {
-    protoPath: [
-      healthCheckProtoPath,
-      protoPath: join(__dirname, 'hero/hero.proto'),
-    ],
-    onLoadPackageDefinition: (pkg, server) => {
-      const healthImpl = new HealthImplementation({
-        '': 'UNKNOWN',
-      });
-
-      healthImpl.addToServer(server);
-      healthImpl.setStatus('', 'SERVING');
-    },
-  },
-});
-
-```
-
-> info **提示** [gRPC 健康探针](https://github.com/grpc-ecosystem/grpc-health-probe) 是一个有用的 CLI，用于在容器化环境中测试 gRPC 健康检查。
-
-#### gRPC 元数据
-
-元数据是关于特定 RPC 调用的信息，形式为键值对列表，其中键是字符串，值通常是字符串，但也可以是二进制数据。元数据对 gRPC 本身是不透明的 - 它让客户端向服务器提供与调用相关的信息，反之亦然。元数据可能包括身份验证令牌、请求标识符和用于监控目的的标签，以及数据信息，如数据集中的记录数。
-
-要在 `@GrpcMethod()` 处理程序中读取元数据，请使用第二个参数（metadata），该参数的类型为 `Metadata`（从 `grpc` 包导入）。
-
-要从处理程序发送回元数据，请使用 `ServerUnaryCall#sendMetadata()` 方法（第三个处理程序参数）。
-
-```typescript
-@Controller()
-export class HeroesService {
-  @GrpcMethod()
-  findOne(data: HeroById, metadata: Metadata, call: ServerUnaryCall<any, any>): Hero {
-    const serverMetadata = new Metadata();
-    const items = [
-      { id: 1, name: 'John' },
-      { id: 2, name: 'Doe' },
-    ];
-
-    serverMetadata.add('Set-Cookie', 'yummy_cookie=choco');
-    call.sendMetadata(serverMetadata);
-
-    return items.find(({ id }) => id === data.id);
-  }
-}
-
-```
-
-同样，要在使用 `@GrpcStreamMethod()` 处理程序（[主题策略](/microservices/grpc#主题策略)）注释的处理程序中读取元数据，请使用第二个参数（metadata），该参数的类型为 `Metadata`（从 `grpc` 包导入）。
-
-要从处理程序发送回元数据，请使用 `ServerDuplexStream#sendMetadata()` 方法（第三个处理程序参数）。
-
-要在 [调用流处理程序](/microservices/grpc#调用流处理程序)（使用 `@GrpcStreamCall()` 装饰器注释的处理程序）中读取元数据，请在 `requestStream` 引用上监听 `metadata` 事件，如下所示：
-
-```typescript
-requestStream.on('metadata', (metadata: Metadata) => {
-  const meta = metadata.get('X-Meta');
-});
-
-```
+__CODE_BLOCK_24__

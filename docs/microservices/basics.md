@@ -1,524 +1,305 @@
-### 概述
+<!-- 此文件从 content/microservices/basics.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-17T06:48:22.550Z -->
+<!-- 源文件: content/microservices/basics.md -->
 
-除了传统（有时称为单体）应用架构外，Nest 还原生支持微服务架构风格的开发。本文档中讨论的大多数概念，如依赖注入、装饰器、异常过滤器、管道、守卫和拦截器，同样适用于微服务。只要可能，Nest 会抽象实现细节，以便相同的组件可以在基于 HTTP 的平台、WebSocket 和微服务上运行。本节涵盖 Nest 中特定于微服务的方面。
+### Overview
 
-在 Nest 中，微服务本质上是使用与 HTTP 不同的 **传输** 层的应用程序。
+除了传统的（有时称为 monolithic）应用程序架构外，Nest 本质上支持微服务架构风格的开发。这个文档中讨论的许多概念，如依赖注入、装饰器、异常过滤器、管道、守卫和拦截器，对微服务也同样适用。哪里可能，Nest 抽象实现细节，使得相同的组件可以在 HTTP 基于平台、WebSockets 和微服务中运行。这部分涵盖了 Nest 对微服务的特定方面。
 
-<figure><img class="illustrative-image" src="/assets/Microservices_1.png" /></figure>
+在 Nest 中，微服务本质上是一个使用不同的 **传输层** 而不是 HTTP 的应用程序。
 
-Nest 支持几种内置的传输层实现，称为 **传输器**，负责在不同微服务实例之间传输消息。大多数传输器原生支持 **请求-响应** 和 **基于事件** 的消息风格。Nest 在请求-响应和基于事件的消息传递的规范接口后面抽象了每个传输器的实现细节。这使得从一个传输层切换到另一个传输层变得容易 - 例如，利用特定传输层的特定可靠性或性能特性 - 而不会影响应用程序代码。
+__HTML_TAG_140____HTML_TAG_141____HTML_TAG_142__
+
+Nest 支持多个内置的传输层实现，称为 **传输器**，它们负责在不同的微服务实例之间传输消息。大多数传输器本质上支持 beide 请求-响应 和 事件 基的消息风格。Nest 抽象每个传输器的实现细节，提供了对请求-响应 和 事件 基的 messaging 的标准接口。这使得您可以轻松地切换到另一个传输层 - 例如，以利用某个传输层的特定可靠性或性能特性 - 而不影响应用程序代码。
 
 #### 安装
 
 要开始构建微服务，首先安装所需的包：
 
-```bash
-$ npm i --save @nestjs/microservices
+```typescript
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule, {
+    snapshot: true,
+  });
+  await app.listen(process.env.PORT ?? 3000);
+}
 
 ```
 
-#### 入门
+#### 开始使用
 
-要实例化微服务，请使用 `NestFactory` 类的 `createMicroservice()` 方法：
+要实例化一个微服务，使用 `false` 方法的 `graph.json` 类：
 
-```typescript
-import { NestFactory } from '@nestjs/core';
-import { Transport, MicroserviceOptions } from '@nestjs/microservices';
-import { AppModule } from './app.module';
-
-async function bootstrap() {
-  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
-    AppModule,
-    {
-      transport: Transport.TCP,
-    },
-  );
-  await app.listen();
-}
-bootstrap();
+```bash
+$ npm i @nestjs/devtools-integration
 
 ```
 
 > info **提示** 微服务默认使用 **TCP** 传输层。
 
-`createMicroservice()` 方法的第二个参数是一个 `options` 对象。此对象可能包含两个成员：
+`TasksModule` 方法的第二个参数是一个 `DiagnosticsService` 对象。这对象可能包含两个成员：
 
-<table>
-  <tr>
-    <td><code>transport</code></td>
-    <td>指定传输器（例如，<code>Transport.NATS</code>）</td>
-  </tr>
-  <tr>
-    <td><code>options</code></td>
-    <td>特定于传输器的选项对象，确定传输器行为</td>
-  </tr>
-</table>
-<p>
-  <code>options</code> 对象特定于所选的传输器。<strong>TCP</strong> 传输器公开
-  下面描述的属性。对于其他传输器（例如，Redis、MQTT 等），请参阅相关章节以了解可用选项的描述。
-</p>
-<table>
-  <tr>
-    <td><code>host</code></td>
-    <td>连接主机名</td>
-  </tr>
-  <tr>
-    <td><code>port</code></td>
-    <td>连接端口</td>
-  </tr>
-  <tr>
-    <td><code>retryAttempts</code></td>
-    <td>重试消息的次数（默认：<code>0</code>）</td>
-  </tr>
-  <tr>
-    <td><code>retryDelay</code></td>
-    <td>消息重试尝试之间的延迟（毫秒）（默认：<code>0</code>）</td>
-  </tr>
-  <tr>
-    <td><code>serializer</code></td>
-    <td>用于传出消息的自定义 <a href="https://github.com/nestjs/nest/blob/master/packages/microservices/interfaces/serializer.interface.ts" target="_blank">序列化器</a></td>
-  </tr>
-  <tr>
-    <td><code>deserializer</code></td>
-    <td>用于传入消息的自定义 <a href="https://github.com/nestjs/nest/blob/master/packages/microservices/interfaces/deserializer.interface.ts" target="_blank">反序列化器</a></td>
-  </tr>
-  <tr>
-    <td><code>socketClass</code></td>
-    <td>扩展 <code>TcpSocket</code> 的自定义 Socket（默认：<code>JsonSocket</code>）</td>
-  </tr>
-  <tr>
-    <td><code>tlsOptions</code></td>
-    <td>配置 tls 协议的选项</td>
-  </tr>
-</table>
+__HTML_TAG_143__
+  __HTML_TAG_144__
+    __HTML_TAG_145____HTML_TAG_146__transport__HTML_TAG_147____HTML_TAG_148__
+    __HTML_TAG_149__指定传输器（例如 __HTML_TAG_150__Transport.NATS__HTML_TAG_151__)__HTML_TAG_152__
+  __HTML_TAG_153__
+  __HTML_TAG_154__
+    __HTML_TAG_155____HTML_TAG_156__options__HTML_TAG_157____HTML_TAG_158__
+    __HTML_TAG_159__传输器特定的选项对象，确定传输器行为__HTML_TAG_160__
+  __HTML_TAG_161__
+__HTML_TAG_162__
+__HTML_TAG_163__
+  __HTML_TAG_164__options__HTML_TAG_165__ 对象是特定于选择的传输器的。__HTML_TAG_166__TCP__HTML_TAG_167__ 传输器暴露以下属性。对于其他传输器（例如 Redis、MQTT 等），请查看相关章节，以了解可用的选项。
+__HTML_TAG_168__
+__HTML_TAG_169__
+  __HTML_TAG_170__
+    __HTML_TAG_171____HTML_TAG_172__host__HTML_TAG_173____HTML_TAG_174__
+    __HTML_TAG_175__连接主机名__HTML_TAG_176__
+  __HTML_TAG_177__
+  __HTML_TAG_178__
+    __HTML_TAG_179____HTML_TAG_180__port__HTML_TAG_181____HTML_TAG_182__
+    __HTML_TAG_183__连接端口__HTML_TAG_184__
+  __HTML_TAG_185__
+  __HTML_TAG_186__
+    __HTML_TAG_187____HTML_TAG_188__retryAttempts__HTML_TAG_189____HTML_TAG_190__
+    __HTML_TAG_191__消息重试次数（默认：__HTML_TAG_192__0__HTML_TAG_193__)__HTML_TAG_194__
+  __HTML_TAG_195__
+  __HTML_TAG_196__
+    __HTML_TAG_197____HTML_TAG_198__retryDelay__HTML_TAG_199____HTML_TAG_200__
+    __HTML_TAG_201__消息重试尝试之间的延迟（ms）（默认：__HTML_TAG_202__0__HTML_TAG_203__)__HTML_TAG_204__
+  __HTML_TAG_205__
+  __HTML_TAG_206__
+    __HTML_TAG_207____HTML_TAG_208__serializer__HTML_TAG_209____HTML_TAG_210__
+    __HTML_TAG_211__自定义 __HTML_TAG_212__序列化器__HTML_TAG_213__用于 outgoing 消息__HTML_TAG_214__
+  __HTML_TAG_215__
+  __HTML_TAG_216__
+    __HTML_TAG_217____HTML_TAG_218__deserializer__HTML_TAG_219____HTML_TAG_220__
+    __HTML_TAG_221__自定义 __HTML_TAG_222__反序列化器__HTML_TAG_223__用于 incoming 消息__HTML_TAG_224__
+  __HTML_TAG_225__
+  __HTML_TAG_226__
+    __HTML_TAG_227____HTML_TAG_228__socketClass__HTML#### 请求响应
 
-> info **提示** 上述属性特定于 TCP 传输器。有关其他传输器可用选项的信息，请参考相关章节。
+请求响应消息风格非常适合在多个外部服务之间交换消息。这种风格确保了服务实际收到了消息，而无需手动实现确认协议。然而，请求响应方法并不总是最好的选择。例如，流式传输器，如 __LINK_251__ 或 __LINK_252__，它们使用日志持久化，旨在解决与事件消息风格相对应的挑战（请参阅 __LINK_253__ 了解更多信息）。
 
-#### 消息和事件模式
+要启用请求响应消息类型，Nest 创建了两个逻辑通道：一个用于传输数据，另一个用于等待 incoming 响应。对于某些基础传输，如 __LINK_254__，Nest 提供了内置支持。对其他传输，Nest 会手动创建分离的通道。虽然这有效，但它可能会 introduces some  overhead。因此，如果您不需要请求响应消息风格，您可能想考虑使用事件驱动方法。
 
-微服务通过 **模式** 识别消息和事件。模式是一个普通值，例如，字面对象或字符串。模式会自动序列化并与消息的数据部分一起通过网络发送。通过这种方式，消息发送者和消费者可以协调哪些请求由哪些处理程序消费。
-
-#### 请求-响应
-
-当您需要在各种外部服务之间 **交换** 消息时，请求-响应消息风格非常有用。这种范式确保服务实际收到了消息（无需您手动实现确认协议）。但是，请求-响应方法可能并不总是最佳选择。例如，流式传输器，如 [Kafka](https://docs.confluent.io/3.0.0/streams/) 或 [NATS streaming](https://github.com/nats-io/node-nats-streaming)，它们使用基于日志的持久性，针对解决一组不同的挑战进行了优化，更符合事件消息传递范式（有关更多详细信息，请参见 [基于事件的消息传递](/microservices/basics#event-based)）。
-
-为了启用请求-响应消息类型，Nest 创建了两个逻辑通道：一个用于传输数据，另一个用于等待传入的响应。对于某些底层传输，如 [NATS](https://nats.io/)，这种双通道支持是开箱即用的。对于其他传输，Nest 通过手动创建单独的通道来补偿。虽然这很有效，但可能会引入一些开销。因此，如果您不需要请求-响应消息风格，您可能需要考虑使用基于事件的方法。
-
-要基于请求-响应范式创建消息处理程序，请使用 `@MessagePattern()` 装饰器，该装饰器从 `@nestjs/microservices` 包导入。此装饰器应仅在 [控制器](/controllers) 类中使用，因为它们充当应用程序的入口点。在提供者中使用它将无效，因为它们会被 Nest 运行时忽略。
-
-```typescript
-import { Controller } from '@nestjs/common';
-import { MessagePattern } from '@nestjs/microservices';
-
-@Controller()
-export class MathController {
-  @MessagePattern({ cmd: 'sum' })
-  accumulate(data: number[]): number {
-    return (data || []).reduce((a, b) => a + b);
-  }
-}
-
-```
-
-在上面的代码中，`accumulate()` **消息处理程序** 监听与 `{{ '{' }} cmd: 'sum' {{ '}' }}` 消息模式匹配的消息。消息处理程序接受一个参数，即从客户端传递的 `data`。在这种情况下，数据是需要累积的数字数组。
-
-#### 异步响应
-
-消息处理程序可以同步或 **异步** 响应，这意味着支持 `async` 方法。
-
-```typescript
-@MessagePattern({ cmd: 'sum' })
-async accumulate(data: number[]): Promise<number> {
-  return (data || []).reduce((a, b) => a + b);
-}
-
-```
-
-消息处理程序还可以返回 `Observable`，在这种情况下，结果值将被发出，直到流完成。
-
-```typescript
-@MessagePattern({ cmd: 'sum' })
-accumulate(data: number[]): Observable<number> {
-  return from([1, 2, 3]);
-}
-
-```
-
-在上面的示例中，消息处理程序将 **响应三次**，数组中的每个项目一次。
-
-#### 基于事件
-
-虽然请求-响应方法非常适合在服务之间交换消息，但它不太适合基于事件的消息传递 - 当您只想发布 **事件** 而不等待响应时。在这种情况下，维护两个请求-响应通道的开销是不必要的。
-
-例如，如果您想通知另一个服务系统的这部分发生了特定条件，基于事件的消息风格是理想的。
-
-要创建事件处理程序，您可以使用 `@EventPattern()` 装饰器，该装饰器从 `@nestjs/microservices` 包导入。
-
-```typescript
-@EventPattern('user_created')
-async handleUserCreated(data: Record<string, unknown>) {
-  // 业务逻辑
-}
-
-```
-
-> info **提示** 您可以为 **单个** 事件模式注册多个事件处理程序，所有这些处理程序都会自动并行触发。
-
-`handleUserCreated()` **事件处理程序** 监听 `'user_created'` 事件。事件处理程序接受一个参数，即从客户端传递的数据（在这种情况下，是通过网络发送的事件负载）。
-
-<app-banner-enterprise></app-banner-enterprise>
-
-#### 其他请求详情
-
-在更高级的场景中，您可能需要访问有关传入请求的其他详细信息。例如，当使用带有通配符订阅的 NATS 时，您可能想要检索生产者发送消息到的原始主题。同样，使用 Kafka 时，您可能需要访问消息头。要实现这一点，您可以利用如下所示的内置装饰器：
-
-```typescript
-@MessagePattern('time.us.*')
-getDate(@Payload() data: number[], @Ctx() context: NatsContext) {
-  console.log(`Subject: ${context.getSubject()}`); // 例如 "time.us.east"
-  return new Date().toLocaleTimeString(...);
-}
-
-```
-
-> info **提示** `@Payload()`、`@Ctx()` 和 `NatsContext` 是从 `@nestjs/microservices` 导入的。
-
-> info **提示** 您还可以将属性键传递给 `@Payload()` 装饰器，以从传入的负载对象中提取特定属性，例如 `@Payload('id')`。
-
-#### 客户端（生产者类）
-
-客户端 Nest 应用程序可以使用 `ClientProxy` 类与 Nest 微服务交换消息或发布事件。此类提供了几个方法，例如 `send()`（用于请求-响应消息传递）和 `emit()`（用于事件驱动消息传递），使与远程微服务的通信成为可能。您可以通过以下方式获取此类的实例：
-
-一种方法是导入 `ClientsModule`，它公开静态 `register()` 方法。此方法接受表示微服务传输器的对象数组。每个对象必须包含 `name` 属性，可选的 `transport` 属性（默认为 `Transport.TCP`），以及可选的 `options` 属性。
-
-`name` 属性充当 **注入令牌**，您可以使用它在任何需要的地方注入 `ClientProxy` 的实例。此 `name` 属性的值可以是任何任意字符串或 JavaScript 符号，如 [此处](/fundamentals/dependency-injection#非基于类的提供者令牌) 所述。
-
-`options` 属性是一个对象，包含我们之前在 `createMicroservice()` 方法中看到的相同属性。
+要创建基于请求响应风格的消息处理程序，使用来自 `TasksModule` 包的 `TasksService` 装饰器。该装饰器只能在 __LINK_255__ 类中使用，因为它们是应用程序的入口点。将其在提供者中使用将无效，因为 Nest 运行时将忽略它们。
 
 ```typescript
 @Module({
   imports: [
-    ClientsModule.register([
-      { name: 'MATH_SERVICE', transport: Transport.TCP },
-    ]),
+    DevtoolsModule.register({
+      http: process.env.NODE_ENV !== 'production',
+    }),
   ],
-})
-
-```
-
-或者，如果您需要在设置期间提供配置或执行任何其他异步过程，您可以使用 `registerAsync()` 方法。
-
-```typescript
-@Module({
-  imports: [
-    ClientsModule.registerAsync([
-      {
-        imports: [ConfigModule],
-        name: 'MATH_SERVICE',
-        useFactory: async (configService: ConfigService) => ({
-          transport: Transport.TCP,
-          options: {
-            url: configService.get('URL'),
-          },
-        }),
-        inject: [ConfigService],
-      },
-    ]),
-  ],
-})
-
-```
-
-导入模块后，您可以使用 `@Inject()` 装饰器注入为 `'MATH_SERVICE'` 传输器配置的 `ClientProxy` 实例。
-
-```typescript
-constructor(
-  @Inject('MATH_SERVICE') private client: ClientProxy,
-) {}
-
-```
-
-> info **提示** `ClientsModule` 和 `ClientProxy` 类是从 `@nestjs/microservices` 包导入的。
-
-有时，您可能需要从另一个服务（例如 `ConfigService`）获取传输器配置，而不是在客户端应用程序中硬编码它。要实现这一点，您可以使用 `ClientProxyFactory` 类注册 [自定义提供者](/fundamentals/dependency-injection)。此类提供静态 `create()` 方法，该方法接受传输器选项对象并返回自定义的 `ClientProxy` 实例。
-
-```typescript
-@Module({
-  providers: [
-    {
-      provide: 'MATH_SERVICE',
-      useFactory: (configService: ConfigService) => {
-        const mathSvcOptions = configService.getMathSvcOptions();
-        return ClientProxyFactory.create(mathSvcOptions);
-      },
-      inject: [ConfigService],
-    }
-  ]
-  ...
-})
-
-```
-
-> info **提示** `ClientProxyFactory` 是从 `@nestjs/microservices` 包导入的。
-
-另一个选项是使用 `@Client()` 属性装饰器。
-
-```typescript
-@Client({ transport: Transport.TCP })
-client: ClientProxy;
-
-```
-
-> info **提示** `@Client()` 装饰器是从 `@nestjs/microservices` 包导入的。
-
-使用 `@Client()` 装饰器不是首选技术，因为它更难测试且更难共享客户端实例。
-
-`ClientProxy` 是 **惰性的**。它不会立即启动连接。相反，它将在第一次微服务调用之前建立，然后在每次后续调用中重用。但是，如果您想延迟应用程序引导过程，直到建立连接，您可以在 `OnApplicationBootstrap` 生命周期钩子中使用 `ClientProxy` 对象的 `connect()` 方法手动启动连接。
-
-```typescript
-async onApplicationBootstrap() {
-  await this.client.connect();
-}
-
-```
-
-如果无法创建连接，`connect()` 方法将拒绝并返回相应的错误对象。
-
-#### 发送消息
-
-`ClientProxy` 公开 `send()` 方法。此方法旨在调用微服务并返回带有其响应的 `Observable`。因此，我们可以轻松订阅发出的值。
-
-```typescript
-accumulate(): Observable<number> {
-  const pattern = { cmd: 'sum' };
-  const payload = [1, 2, 3];
-  return this.client.send<number>(pattern, payload);
-}
-
-```
-
-`send()` 方法接受两个参数，`pattern` 和 `payload`。`pattern` 应与 `@MessagePattern()` 装饰器中定义的模式匹配。`payload` 是我们想要传输到远程微服务的消息。此方法返回 **冷 `Observable`**，这意味着您必须显式订阅它，然后才会发送消息。
-
-#### 发布事件
-
-要发送事件，请使用 `ClientProxy` 对象的 `emit()` 方法。此方法将事件发布到消息代理。
-
-```typescript
-async publish() {
-  this.client.emit<number>('user_created', new UserCreatedEvent());
-}
-
-```
-
-`emit()` 方法接受两个参数：`pattern` 和 `payload`。`pattern` 应与 `@EventPattern()` 装饰器中定义的模式匹配，而 `payload` 表示您想要传输到远程微服务的事件数据。此方法返回 **热 `Observable`**（与 `send()` 返回的冷 `Observable` 相反），这意味着无论您是否显式订阅可观察对象，代理都会立即尝试传递事件。
-
-<app-banner-devtools></app-banner-devtools>
-
-#### 请求作用域
-
-对于那些来自不同编程语言背景的人来说，可能会惊讶地发现，在 Nest 中，大多数东西都是在传入请求之间共享的。这包括数据库连接池、具有全局状态的单例服务等。请记住，Node.js 不遵循请求/响应多线程无状态模型，其中每个请求由单独的线程处理。因此，对我们的应用程序使用单例实例是 **安全的**。
-
-然而，在边缘情况下，可能希望为处理程序使用基于请求的生命周期。这可能包括 GraphQL 应用程序中的每个请求缓存、请求跟踪或多租户等场景。您可以在 [这里](/fundamentals/provider-scopes) 了解更多关于如何控制作用域的信息。
-
-请求作用域的处理程序和提供者可以使用 `@Inject()` 装饰器结合 `CONTEXT` 令牌来注入 `RequestContext`：
-
-```typescript
-import { Injectable, Scope, Inject } from '@nestjs/common';
-import { CONTEXT, RequestContext } from '@nestjs/microservices';
-
-@Injectable({ scope: Scope.REQUEST })
-export class CatsService {
-  constructor(@Inject(CONTEXT) private ctx: RequestContext) {}
-}
-
-```
-
-这提供了对 `RequestContext` 对象的访问，该对象有两个属性：
-
-```typescript
-export interface RequestContext<T = any> {
-  pattern: string | Record<string, any>;
-  data: T;
-}
-
-```
-
-`data` 属性是消息生产者发送的消息负载。`pattern` 属性是用于识别适当处理程序来处理传入消息的模式。
-
-#### 实例状态更新
-
-要获取连接和底层驱动程序实例状态的实时更新，您可以订阅 `status` 流。此流提供特定于所选驱动程序的状态更新。例如，如果您使用 TCP 传输器（默认），`status` 流会发出 `connected` 和 `disconnected` 事件。
-
-```typescript
-this.client.status.subscribe((status: TcpStatus) => {
-  console.log(status);
-});
-
-```
-
-> info **提示** `TcpStatus` 类型是从 `@nestjs/microservices` 包导入的。
-
-同样，您可以订阅服务器的 `status` 流以接收有关服务器状态的通知。
-
-```typescript
-const server = app.connectMicroservice<MicroserviceOptions>(...);
-server.status.subscribe((status: TcpStatus) => {
-  console.log(status);
-});
-
-```
-
-#### 监听内部事件
-
-在某些情况下，您可能希望监听微服务发出的内部事件。例如，您可以监听 `error` 事件以在发生错误时触发其他操作。要执行此操作，请使用 `on()` 方法，如下所示：
-
-```typescript
-this.client.on('error', (err) => {
-  console.error(err);
-});
-
-```
-
-同样，您可以监听服务器的内部事件：
-
-```typescript
-server.on<TcpEvents>('error', (err) => {
-  console.error(err);
-});
-
-```
-
-> info **提示** `TcpEvents` 类型是从 `@nestjs/microservices` 包导入的。
-
-#### 底层驱动程序访问
-
-对于更高级的用例，您可能需要访问底层驱动程序实例。这对于手动关闭连接或使用特定于驱动程序的方法等场景非常有用。但是，请记住，对于大多数情况，您 **不需要** 直接访问驱动程序。
-
-要这样做，您可以使用 `unwrap()` 方法，该方法返回底层驱动程序实例。泛型类型参数应指定您期望的驱动程序实例类型。
-
-```typescript
-const netServer = this.client.unwrap<Server>();
-
-```
-
-这里，`Server` 是从 `net` 模块导入的类型。
-
-同样，您可以访问服务器的底层驱动程序实例：
-
-```typescript
-const netServer = server.unwrap<Server>();
-
-```
-
-#### 处理超时
-
-在分布式系统中，微服务有时可能会宕机或不可用。为了防止无限期等待，您可以使用超时。超时是与其他服务通信时非常有用的模式。要将超时应用于您的微服务调用，您可以使用 [RxJS](https://rxjs.dev) `timeout` 运算符。如果微服务在指定时间内没有响应，将抛出异常，您可以捕获并适当处理。
-
-要实现这一点，您需要使用 [`rxjs`](https://github.com/ReactiveX/rxjs) 包。只需在管道中使用 `timeout` 运算符：
-
-```typescript
-this.client
-  .send<TResult, TInput>(pattern, data)
-  .pipe(timeout(5000));
-
-```
-
-> info **提示** `timeout` 运算符是从 `rxjs/operators` 包导入的。
-
-5 秒后，如果微服务没有响应，它将抛出错误。
-
-#### TLS 支持
-
-在专用网络外部通信时，加密流量以确保安全性非常重要。在 NestJS 中，这可以通过使用 Node 的内置 [TLS](https://nodejs.org/api/tls.html) 模块通过 TCP 上的 TLS 实现。Nest 在其 TCP 传输中提供了对 TLS 的内置支持，允许我们加密微服务或客户端之间的通信。
-
-要为 TCP 服务器启用 TLS，您需要 PEM 格式的私钥和证书。这些通过设置 `tlsOptions` 并指定密钥和证书文件添加到服务器的选项中，如下所示：
-
-```typescript
-import * as fs from 'fs';
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-
-async function bootstrap() {
-  const key = fs.readFileSync('<pathToKeyFile>', 'utf8').toString();
-  const cert = fs.readFileSync('<pathToCertFile>', 'utf8').toString();
-
-  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
-    AppModule,
-    {
-      transport: Transport.TCP,
-      options: {
-        tlsOptions: {
-          key,
-          cert,
-        },
-      },
-    },
-  );
-
-  await app.listen();
-}
-bootstrap();
-
-```
-
-对于通过 TLS 安全通信的客户端，我们也定义 `tlsOptions` 对象，但这次使用 CA 证书。这是签署服务器证书的权威机构的证书。这确保客户端信任服务器的证书并可以建立安全连接。
-
-```typescript
-import { Module } from '@nestjs/common';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-
-@Module({
-  imports: [
-    ClientsModule.register([
-      {
-        name: 'MATH_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          tlsOptions: {
-            ca: [fs.readFileSync('<pathToCaFile>', 'utf-8').toString()],
-          },
-        },
-      },
-    ]),
-  ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
 
 ```
 
-如果您的设置涉及多个受信任的权威机构，您还可以传递 CA 数组。
+在上面的代码中， `DiagnosticsModule` **消息处理程序** 监听匹配 `TasksModule` 消息模式的消息。消息处理程序将单个参数，来自客户端的 `console.table()`。在这种情况下，数据是一个数字数组，需要累积。
 
-一旦一切设置完毕，您可以像往常一样使用 `@Inject()` 装饰器注入 `ClientProxy` 以在您的服务中使用客户端。这确保了 NestJS 微服务之间的加密通信，由 Node 的 `TLS` 模块处理加密细节。
+#### 异步响应
 
-有关更多信息，请参阅 Node 的 [TLS 文档](https://nodejs.org/api/tls.html)。
+消息处理程序可以同步或 **异步** 响应，即支持 `table()` 方法。
+
+```typescript
+bootstrap().catch((err) => {
+  fs.writeFileSync('graph.json', PartialGraphHost.toString() ?? '');
+  process.exit(1);
+});
+
+```
+
+消息处理程序也可以返回 `SerializedGraph`，在这种情况下，结果值将直到流完成被 emit。
+
+```typescript
+const app = await NestFactory.create(AppModule, {
+  snapshot: true,
+  abortOnError: false, // <--- THIS
+});
+
+```
+
+在上面的示例中，消息处理程序将响应 **三次**，一次对每个数组项。
+
+#### 事件驱动
+
+虽然请求响应方法非常适合在服务之间交换消息，但是在事件驱动 messaging 中，它不太合适。在这种情况下，保持两个通道的请求响应是多余的。
+
+例如，如果您想通知另一个服务在这个系统的一部分中出现了特定条件，那么事件驱动消息风格是理想的。
+
+要创建事件处理程序，可以使用来自 __INLINE_CODE_39__ 包的 `@nestjs/core` 装饰器。
+
+```typescript
+await app.listen(process.env.PORT ?? 3000); // OR await app.init()
+fs.writeFileSync('./graph.json', app.get(SerializedGraph).toString());
+
+```
+
+>  info **提示** 您可以注册多个事件处理程序来处理单个事件模式，并且所有它们都将自动并行触发。
+
+__INLINE_CODE_40__ **事件处理程序** 监听 __INLINE_CODE_41__ 事件。事件处理程序将单个参数，来自客户端的 __INLINE_CODE_42__（在这种情况下，是网络上发送的事件负载）。
+
+__HTML_TAG_247____HTML_TAG_248__
+
+#### 附加请求详细信息
+
+在更复杂的情况下，您可能需要访问 incoming 请求的附加详细信息。例如，在使用 NATS 进行 wilcard 订阅时，您可能想检索原始主体，该主体是生产者发送消息的。同样，在 Kafka 中，您可能需要访问消息头。要实现这点，可以使用以下装饰器：
+
+__CODE_BLOCK_6__
+
+>  info **提示** __INLINE_CODE_43__、__INLINE_CODE_44__ 和 __INLINE_CODE_45__ 是来自 __INLINE_CODE_46__ 的。
+
+>  info **提示** 您也可以将属性键传递给 __INLINE_CODE_47__ 装饰器，以从 incoming  payload 对象中提取特定属性，例如 __INLINE_CODE_48__。
+
+#### 客户端（生产者类）
+
+客户端 Nest 应用程序可以使用 __INLINE_CODE_49__ 类与 Nest 微服务交换消息或发布事件。这个类提供了多个方法，如 __INLINE_CODE_50__（用于请求响应 messaging）和 __INLINE_CODE_51__（用于事件驱动 messaging），从而启用与远程微服务的通信。您可以使用以下方法获取这个类的实例：
+
+一种方法是导入 __INLINE_CODE_52__，该类 expose 了静态 __INLINE_CODE_53__ 方法。这个方法接受一个数组，表示微服务传输器。每个对象必须包含 __INLINE_CODE_54__ 属性， optionally  __INLINE_CODE_55__ 属性（默认为 __INLINE_CODE_56__），以及可选 __INLINE_CODE_57__ 属性。Here is the translated document:
+
+__INLINE_CODE_58__ 属性作为一个 **注入令牌**，您可以在需要时注入一个 __INLINE_CODE_59__ 实例的实例。这个 __INLINE_CODE_60__ 属性的值可以是任何字符串或 JavaScript 符号，正如 __LINK_256__ 中所描述的。
+
+__INLINE_CODE_61__ 属性是一个对象，其中包括了我们在 __INLINE_CODE_62__ 方法中看到的相同属性。
+
+__CODE_BLOCK_7__
+
+或者，您可以使用 __INLINE_CODE_63__ 方法，如果需要在设置时提供配置或执行其他异步操作。
+
+__CODE_BLOCK_8__
+
+一旦模块被导入，您可以使用 __INLINE_CODE_66__ 装饰器将 __INLINE_CODE_64__ 配置为指定选项的 __INLINE_CODE_65__ 传输器实例。
+
+__CODE_BLOCK_9__
+
+> info **注意** __INLINE_CODE_67__ 和 __INLINE_CODE_68__ 类来自 __INLINE_CODE_69__ 包。
+
+有时，您可能需要从另一个服务（例如 __INLINE_CODE_70__）中获取传输器配置，而不是将其硬编码在客户端应用程序中。为了实现这个，您可以使用 __INLINE_CODE_71__ 类注册一个 __LINK_257__。这个类提供了一个静态 __INLINE_CODE_72__ 方法，接受传输器选项对象并返回一个自定义 __INLINE_CODE_73__ 实例。
+
+__CODE_BLOCK_10__
+
+> info **注意** __INLINE_CODE_74__ 是来自 __INLINE_CODE_75__ 包的。
+
+另一个选项是使用 __INLINE_CODE_76__ 属性装饰器。
+
+__CODE_BLOCK_11__
+
+> info **注意** __INLINE_CODE_77__ 装饰器来自 __INLINE_CODE_78__ 包。
+
+使用 __INLINE_CODE_79__ 装饰器不是首选，因为它更难测试，更难共享客户端实例。
+
+__INLINE_CODE_80__ 是 **lazy** 的。它不会立即建立连接。相反，它将在首次微服务调用时建立连接，然后在每个后续调用中重用。然而，如果您想要在应用程序启动时延迟连接建立，您可以在 __INLINE_CODE_83__ 生命周期钩子中手动建立连接使用 __INLINE_CODE_82__ 方法。
+
+__CODE_BLOCK_12__
+
+如果无法创建连接，__INLINE_CODE_84__ 方法将 reject 使用相应的错误对象。
+
+#### 发送消息
+
+__INLINE_CODE_85__ expose 一个 __INLINE_CODE_86__ 方法。这方法用于调用微服务并返回一个 __INLINE_CODE_87__ 对象，其中包含响应。因此，我们可以轻松地订阅 emitted 值。
+
+__CODE_BLOCK_13__
+
+__INLINE_CODE_88__ 方法接受两个参数，__INLINE_CODE_89__ 和 __INLINE_CODE_90__。__INLINE_CODE_91__ 应该匹配 __INLINE_CODE_92__ 装饰器中定义的之一。__INLINE_CODE_93__ 是我们想传输到远程微服务的消息。这方法返回一个 **cold __INLINE_CODE_94__**，这意味着您需要明确地订阅它才能发送消息。
+
+#### 发布事件
+
+要发送事件，请使用 __INLINE_CODE_95__ 对象的 __INLINE_CODE_96__ 方法。这方法将事件发布到消息代理。
+
+__CODE_BLOCK_14__
+
+__INLINE_CODE_97__ 方法接受两个参数：__INLINE_CODE_98__ 和 __INLINE_CODE_99__。__INLINE_CODE_100__ 应该匹配 __INLINE_CODE_101__ 装饰器中定义的之一，而 __INLINE_CODE_102__ 表示您想传输到远程微服务的事件数据。这方法返回一个 **hot __INLINE_CODE_103__**（与 __INLINE_CODE_104__ 返回的 cold __INLINE_CODE_105__ 相反），这意味着无论您是否明确地订阅 observable，代理都会立即尝试传递事件。
+
+__HTML_TAG_249____HTML_TAG_250__
+
+#### 请求范围
+
+对于来自不同编程语言背景的人来说，它可能会感到惊訝，在 Nest 中，大多数事情都是跨越 incoming 请求共享的。这包括连接池到数据库、单例服务具有全局状态等。请注意，Node.js 不遵循请求/响应多线程无状态模型，每个请求都是由单独线程处理的。因此，使用单例实例是 **安全** 的。
+
+然而，有些 edge 情况下，请求基于的 lifetime 处理可能是有用的。这可能包括情况，如 GraphQL 应用程序的 per-request 缓存、请求跟踪或多租户。您可以了解如何控制范围 __LINK_258__。
+
+请求范围的处理器和提供商可以使用 __INLINE_CODE_107__ 装饰器在结合 __INLINE_CODE_108__ 令牌中注入 __INLINE_CODE_106__：
+
+__CODE_BLOCK_15__
+
+这提供了对 __INLINE_CODE_109__ 对象的访问，该对象具有两个属性：
+
+__CODE_BLOCK_16__Here is the translation of the English technical documentation to Chinese:
+
+#### 实例状态更新
+
+要实时获取连接和底层驱动实例的状态更新，可以订阅 __INLINE_CODE_112__ 流。这个流提供了与选定的驱动相关的状态更新。例如，如果您使用的是 TCP 传输器（默认情况下），__INLINE_CODE_113__ 流将 emit __INLINE_CODE_114__ 和 __INLINE_CODE_115__ 事件。
+
+__CODE_BLOCK_17__
+
+> info **提示** __INLINE_CODE_116__ 类型来自 __INLINE_CODE_117__ 包。
+
+类似地，您也可以订阅服务器的 __INLINE_CODE_118__ 流以接收服务器状态通知。
+
+__CODE_BLOCK_18__
+
+#### 监听内部事件
+
+在某些情况下，您可能需要监听微服务内部事件。例如，您可以监听 __INLINE_CODE_119__ 事件来触发在错误发生时的额外操作。要做到这一点，请使用 __INLINE_CODE_120__ 方法，如下所示：
+
+__CODE_BLOCK_19__
+
+类似地，您也可以监听服务器内部事件：
+
+__CODE_BLOCK_20__
+
+> info **提示** __INLINE_CODE_121__ 类型来自 __INLINE_CODE_122__ 包。
+
+#### 底层驱动访问
+
+对于更高级的使用场景，您可能需要访问底层驱动实例。这可以在手动关闭连接或使用驱动特定的方法时有用。然而，除非必要，否则应该避免访问驱动实例。
+
+要做到这一点，可以使用 __INLINE_CODE_123__ 方法，它将返回底层驱动实例。泛型类型参数应该指定期望的驱动实例类型。
+
+__CODE_BLOCK_21__
+
+此处 __INLINE_CODE_124__ 是来自 __INLINE_CODE_125__ 模块的类型。
+
+类似地，您也可以访问服务器的底层驱动实例：
+
+__CODE_BLOCK_22__
+
+#### 处理超时
+
+在分布式系统中，微服务可能会暂时下线或不可用。为了防止长时间等待，您可以使用超时。超时是一种非常有用的模式，当与其他服务通信时使用。要将超时应用于微服务调用，请使用 __LINK_259__ __INLINE_CODE_126__ 操作符。如果微服务在指定时间内没有响应，会抛出异常，您可以捕获并处理该异常。
+
+要实现这一点，您需要使用 __LINK_260__ 包。简单地在管道中使用 __INLINE_CODE_128__ 操作符：
+
+__CODE_BLOCK_23__
+
+> info **提示** __INLINE_CODE_129__ 操作符来自 __INLINE_CODE_130__ 包。
+
+如果微服务在 5 秒内没有响应，将抛出错误。
+
+#### TLS 支持
+
+在外部网络通信时，需要加密流量以确保安全。在 NestJS 中，可以使用 Node 的内置 __LINK_261__ 模块实现 TLS over TCP。Nest 提供了对 TCP 传输的内置 TLS 支持，从而允许在微服务或客户端之间加密通信。
+
+要为 TCP 服务器启用 TLS，可以添加私钥和证书到服务器选项中，并指定 key 和 cert 文件，如下所示：
+
+__CODE_BLOCK_24__
+
+为客户端通信 securely over TLS，可以定义 __INLINE_CODE_132__ 对象，但这次使用 CA 证书。这是签名服务器证书的权威机构的证书。这确保客户端信任服务器证书并可以建立安全连接。
+
+__CODE_BLOCK_25__
+
+您也可以将 CA 列表传递给客户端，以在您的设置中涉及多个可信任的权威机构。
+
+一旦 everything 设置好了，可以使用 __INLINE_CODE_133__ 作为 usual 使用 __INLINE_CODE_134__ 装饰器来使用客户端在服务中。这样可以确保在 NestJS 微服务之间加密通信，Node 的 __INLINE_CODE_135__ 模块处理加密细节。
+
+对于更多信息，请参阅 Node 的 __LINK_262__。
 
 #### 动态配置
 
-当微服务需要使用 `ConfigService`（来自 `@nestjs/config` 包）进行配置，但注入上下文仅在微服务实例创建后可用时，`AsyncMicroserviceOptions` 提供了解决方案。这种方法允许动态配置，确保与 `ConfigService` 的平滑集成。
+当微服务需要使用 __INLINE_CODE_136__ (来自 __INLINE_CODE_137__ 包)进行配置，但注入上下文只有在微服务实例创建后可用时，__INLINE_CODE_138__ 提供了解决方案。这项方法允许动态配置，从而确保与 __INLINE_CODE_139__ 的顺滑集成。
 
-```typescript
-import { ConfigService } from '@nestjs/config';
-import { AsyncMicroserviceOptions, Transport } from '@nestjs/microservices';
-import { AppModule } from './app.module';
-
-async function bootstrap() {
-  const app = await NestFactory.createMicroservice<AsyncMicroserviceOptions>(
-    AppModule,
-    {
-      useFactory: (configService: ConfigService) => ({
-        transport: Transport.TCP,
-        options: {
-          host: configService.get<string>('HOST'),
-          port: configService.get<number>('PORT'),
-        },
-      }),
-      inject: [ConfigService],
-    },
-  );
-
-  await app.listen();
-}
-bootstrap();
-
-```
+__CODE_BLOCK_26__

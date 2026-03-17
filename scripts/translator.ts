@@ -37,10 +37,11 @@ export class CloudflareTranslator {
 翻译要求：
 
 1. **占位符保护（极其重要）**：
-   - 文本中包含形如 ___PH_CODE_N___、___PH_INLINE_N___、___PH_HTML_N___、___PH_LINK_N___ 的占位符
+   - 文本中包含形如 [[PH_0_C]]、[[PH_1_I]]、[[PH_2_H]]、[[PH_3_L]] 的占位符
    - 这些占位符代表代码块、内联代码、HTML标签和链接
    - **必须原样保留这些占位符，不得修改、删除或添加任何占位符**
    - 占位符的数量和位置必须与原文完全一致
+   - 占位符格式：[[PH_数字_字母]]，例如 [[PH_0_C]]、[[PH_1_I]]
 
 2. **技术术语**：严格遵循提供的术语表。${glossaryPrompt}
    - 其他常用术语：Provider -> 提供者, Controller -> 控制器, Middleware -> 中间件, Module -> 模块, Service -> 服务, Guard -> 守卫, Pipe -> 管道, Interceptor -> 拦截器, Filter -> 过滤器

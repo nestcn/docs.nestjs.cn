@@ -4,8 +4,8 @@
 
 import type { ProtectedContent, Glossary } from './types';
 
-const PLACEHOLDER_PREFIX = '___PH_';
-const PLACEHOLDER_SUFFIX = '___';
+const PLACEHOLDER_PREFIX = '[[PH_';
+const PLACEHOLDER_SUFFIX = ']]';
 
 export function protectCodeBlocks(content: string): ProtectedContent {
   const placeholders = new Map<string, string>();
@@ -13,14 +13,14 @@ export function protectCodeBlocks(content: string): ProtectedContent {
   let result = content;
 
   const generatePlaceholder = (type: string): string => {
-    return `${PLACEHOLDER_PREFIX}${type}_${counter++}${PLACEHOLDER_SUFFIX}`;
+    return `${PLACEHOLDER_PREFIX}${counter++}_${type}${PLACEHOLDER_SUFFIX}`;
   };
 
   const patterns = [
-    { regex: /```[\s\S]*?```/g, type: 'CODE' },
-    { regex: /`[^`\n]+`/g, type: 'INLINE' },
-    { regex: /<[^>]+>/g, type: 'HTML' },
-    { regex: /\[([^\]]*)\]\([^)]*\)/g, type: 'LINK' },
+    { regex: /```[\s\S]*?```/g, type: 'C' },
+    { regex: /`[^`\n]+`/g, type: 'I' },
+    { regex: /<[^>]+>/g, type: 'H' },
+    { regex: /\[([^\]]*)\]\([^)]*\)/g, type: 'L' },
   ];
 
   for (const { regex, type } of patterns) {
@@ -107,12 +107,12 @@ export function convertFilenameToTitle(content: string): string {
 }
 
 export function hasPlaceholders(content: string): boolean {
-  return /___PH_(CODE|INLINE|HTML|LINK)_\d+___/.test(content);
+  return /\[\[PH_\d+_[CHIL]\]\]/.test(content);
 }
 
 export function extractPlaceholders(content: string): string[] {
   const matches = content.match(
-    /___PH_(CODE|INLINE|HTML|LINK)_\d+___/g
+    /\[\[PH_\d+_[CHIL]\]\]/g
   );
   return matches ? [...new Set(matches)] : [];
 }

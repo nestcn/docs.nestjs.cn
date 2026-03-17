@@ -154,7 +154,7 @@ class DocumentTranslator {
     // 7. 检查占位符是否恢复
     if (hasPlaceholders(translated)) {
       console.error(`❌ Placeholders not fully restored in ${filePath}`);
-      const remainingPlaceholders = translated.match(/___PH_\w+_\d+___/g) || [];
+      const remainingPlaceholders = translated.match(/\[\[PH_\d+_[CHIL]\]\]/g) || [];
       console.error(`   Remaining: ${remainingPlaceholders.join(', ')}`);
       throw new Error(`Placeholders not restored: ${remainingPlaceholders.join(', ')}`);
     }

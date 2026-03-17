@@ -1,416 +1,718 @@
 <!-- 此文件从 content/recipes/swc.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-12T13:42:20.324Z -->
+<!-- 生成时间: 2026-03-17T04:35:36.990Z -->
 <!-- 源文件: content/recipes/swc.md -->
 
 ### SWC
 
-[SWC](https://swc.rs/)（Speedy Web Compiler）是一个基于 Rust 的可扩展平台，可用于编译和打包。在 Nest CLI 中使用 SWC 是显著加快开发过程的好方法。
+__LINK_81__ (Speedy Web Compiler) 是一个可扩展的 Rust-基于平台，可以用于 both 编译和捆绑。
+使用 SWC 与 Nest CLI 是一个非常简单的方式，以加速您的开发过程。
 
-> info **提示** SWC 比默认的 TypeScript 编译器快约 **20 倍**。
+> info **Hint** SWC 大约是 **x20** 次快于默认 TypeScript 编译器的速度。
 
 #### 安装
 
-首先，安装几个包：
+要开始使用，请首先安装以下包：
 
 ```bash
-$ npm i --save-dev @swc/cli @swc/core
+$ npm install --save @nestjs/passport passport passport-local
+$ npm install --save-dev @types/passport-local
 
 ```
 
-#### 入门
+#### 获取开始
 
-安装完成后，你可以在 Nest CLI 中使用 `swc` 构建器，如下所示：
+安装过程完成后，您可以使用 __INLINE_CODE_25__ 建器与 Nest CLI 一起，如以下所示：
 
 ```bash
-$ nest start -b swc
-# OR nest start --builder swc
+$ nest g module auth
+$ nest g service auth
 
 ```
 
-> info **提示** 如果你的仓库是 monorepo，请查看[本节](/recipes/swc#monorepo)。
+> info **Hint** 如果您的库是一个 monorepo，请查看 __LINK_82__。
 
-除了传递 `-b` 标志外，你还可以在 `nest-cli.json` 文件中将 `compilerOptions.builder` 属性设置为 `"swc"`，如下所示：
+相反，您也可以将 __INLINE_CODE_26__ 标志设置为 __INLINE_CODE_28__ 在您的 __INLINE_CODE_29__ 文件中，如下所示：
 
-```json
-{
-  "compilerOptions": {
-    "builder": "swc"
-  }
-}
+```bash
+$ nest g module users
+$ nest g service users
 
 ```
 
-要自定义构建器的行为，你可以传递一个包含两个属性的对象，`type`（`"swc"`）和 `options`，如下所示：
+要自定义建造器的行为，可以传递一个包含两个属性 __INLINE_CODE_30__（__INLINE_CODE_31__）和 __INLINE_CODE_32__ 的对象，如以下所示：
 
-```json
-{
-  "compilerOptions": {
-    "builder": {
-      "type": "swc",
-      "options": {
-        "swcrcPath": "infrastructure/.swcrc",
-      }
-    }
-  }
-}
+```typescript
+import { Injectable } from '@nestjs/common';
 
-```
+// This should be a real class/interface representing a user entity
+export type User = any;
 
-例如，要让 swc 编译 `.jsx` 和 `.tsx` 文件，请执行：
-
-```json
-{
-  "compilerOptions": {
-    "builder": {
-      "type": "swc",
-      "options": { "extensions": [".ts", ".tsx", ".js", ".jsx"] }
+@Injectable()
+export class UsersService {
+  private readonly users = [
+    {
+      userId: 1,
+      username: 'john',
+      password: 'changeme',
     },
+    {
+      userId: 2,
+      username: 'maria',
+      password: 'guess',
+    },
+  ];
+
+  async findOne(username: string): Promise<User | undefined> {
+    return this.users.find(user => user.username === username);
+  }
+}
+
+@Injectable()
+export class UsersService {
+  constructor() {
+    this.users = [
+      {
+        userId: 1,
+        username: 'john',
+        password: 'changeme',
+      },
+      {
+        userId: 2,
+        username: 'maria',
+        password: 'guess',
+      },
+    ];
+  }
+
+  async findOne(username) {
+    return this.users.find(user => user.username === username);
   }
 }
 
 ```
 
-要在监视模式下运行应用程序，请使用以下命令：
+例如，要使 swc 编译 __INLINE_CODE_33__ 和 __INLINE_CODE_34__ 文件，请执行以下命令：
 
-```bash
-$ nest start -b swc -w
-# OR nest start --builder swc --watch
+```typescript
+import { Module } from '@nestjs/common';
+import { UsersService } from './users.service';
+
+@Module({
+  providers: [UsersService],
+  exports: [UsersService],
+})
+export class UsersModule {}
+
+@Module({
+  providers: [UsersService],
+  exports: [UsersService],
+})
+export class UsersModule {}
+
+```
+
+要在 watch 模式下运行应用程序，请使用以下命令：
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import { UsersService } from '../users/users.service';
+
+@Injectable()
+export class AuthService {
+  constructor(private usersService: UsersService) {}
+
+  async validateUser(username: string, pass: string): Promise<any> {
+    const user = await this.usersService.findOne(username);
+    if (user && user.password === pass) {
+      const { password, ...result } = user;
+      return result;
+    }
+    return null;
+  }
+}
+
+@Injectable()
+@Dependencies(UsersService)
+export class AuthService {
+  constructor(usersService) {
+    this.usersService = usersService;
+  }
+
+  async validateUser(username, pass) {
+    const user = await this.usersService.findOne(username);
+    if (user && user.password === pass) {
+      const { password, ...result } = user;
+      return result;
+    }
+    return null;
+  }
+}
 
 ```
 
 #### 类型检查
 
-SWC 本身不执行任何类型检查（与默认的 TypeScript 编译器相反），因此要启用它，你需要使用 `--type-check` 标志：
+SWC 不会执行任何类型检查（与默认 TypeScript 编译器不同），因此要启用类型检查，您需要使用 __INLINE_CODE_35__ 标志：
 
-```bash
-$ nest start -b swc --type-check
+```typescript
+import { Module } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { UsersModule } from '../users/users.module';
+
+@Module({
+  imports: [UsersModule],
+  providers: [AuthService],
+})
+export class AuthModule {}
+
+@Module({
+  imports: [UsersModule],
+  providers: [AuthService],
+})
+export class AuthModule {}
 
 ```
 
-此命令将指示 Nest CLI 在 `noEmit` 模式下与 SWC 一起运行 `tsc`，这将异步执行类型检查。同样，除了传递 `--type-check` 标志外，你还可以在 `nest-cli.json` 文件中将 `compilerOptions.typeCheck` 属性设置为 `true`，如下所示：
+此命令将告诉 Nest CLI 在使用 SWC 的同时异步执行 __INLINE_CODE_36__，这将执行类型检查。相反，您也可以将 __INLINE_CODE_38__ 标志设置为 `@nestjs/passport` 在您的 `Request` 文件中，如下所示：
 
-```json
-{
-  "compilerOptions": {
-    "builder": "swc",
-    "typeCheck": true
+```typescript
+import { Strategy } from 'passport-local';
+import { PassportStrategy } from '@nestjs/passport';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { AuthService } from './auth.service';
+
+@Injectable()
+export class LocalStrategy extends PassportStrategy(Strategy) {
+  constructor(private authService: AuthService) {
+    super();
+  }
+
+  async validate(username: string, password: string): Promise<any> {
+    const user = await this.authService.validateUser(username, password);
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    return user;
+  }
+}
+
+@Injectable()
+@Dependencies(AuthService)
+export class LocalStrategy extends PassportStrategy(Strategy) {
+  constructor(authService) {
+    super();
+    this.authService = authService;
+  }
+
+  async validate(username, password) {
+    const user = await this.authService.validateUser(username, password);
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    return user;
   }
 }
 
 ```
 
-#### CLI 插件 (SWC)
+#### CLI 插件（SWC）
 
-`--type-check` 标志将自动执行 **NestJS CLI 插件**并生成一个序列化的元数据文件，然后应用程序可以在运行时加载该文件。
+`@nestjs/passport` 标志将自动执行 **NestJS CLI 插件**并生成一个序列化的元数据文件，该文件可以在应用程序运行时被加载。
 
 #### SWC 配置
 
-SWC 构建器已预先配置为满足 NestJS 应用程序的要求。但是，你可以通过在根目录中创建 `.swcrc` 文件并根据需要调整选项来自定义配置。
+SWC 建造器已经预配置以匹配 NestJS 应用程序的要求。然而，您可以自定义配置创建一个 `@nestjs/passport` 文件在应用程序的根目录中，并调整选项。
 
-```json
-{
-  "$schema": "https://swc.rs/schema.json",
-  "sourceMaps": true,
-  "jsc": {
-    "parser": {
-      "syntax": "typescript",
-      "decorators": true,
-      "dynamicImport": true
-    },
-    "baseUrl": "./"
-  },
-  "minify": false
+```typescript
+import { Module } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { UsersModule } from '../users/users.module';
+import { PassportModule } from '@nestjs/passport';
+import { LocalStrategy } from './local.strategy';
+
+@Module({
+  imports: [UsersModule, PassportModule],
+  providers: [AuthService, LocalStrategy],
+})
+export class AuthModule {}
+
+@Module({
+  imports: [UsersModule, PassportModule],
+  providers: [AuthService, LocalStrategy],
+})
+export class AuthModule {}
+
+```
+
+#### monorepo
+
+如果您的库是一个 monorepo，那么您需要使用 `passport` 建造器，而不是使用 __INLINE_CODE_25__ 建造器。
+
+首先，让我们安装所需的包：
+
+```typescript
+import { Controller, Request, Post, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+
+@Controller()
+export class AppController {
+  @UseGuards(AuthGuard('local'))
+  @Post('auth/login')
+  async login(@Request() req) {
+    return req.user;
+  }
+}
+
+@Controller()
+export class AppController {
+  @UseGuards(AuthGuard('local'))
+  @Post('auth/login')
+  @Bind(Request())
+  async login(req) {
+    return req.user;
+  }
 }
 
 ```
 
-#### Monorepo
-
-如果你的仓库是 monorepo，那么你需要配置 `webpack` 以使用 `swc-loader`，而不是使用 `swc` 构建器。
-
-首先，让我们安装所需的包：
+安装完成后，请创建一个 `@types/passport-local` 文件在应用程序的根目录中，内容如下：
 
 ```bash
-$ npm i --save-dev swc-loader
+$ # POST to /auth/login
+$ curl -X POST http://localhost:3000/auth/login -d '{"username": "john", "password": "changeme"}' -H "Content-Type: application/json"
+$ # result -> {"userId":1,"username":"john"}
 
 ```
 
-安装完成后，在应用程序的根目录中创建一个 `webpack.config.js` 文件，内容如下：
+#### monorepo 和 CLI 插件
 
-```js
-const swcDefaultConfig = require('@nestjs/cli/lib/compiler/defaults/swc-defaults').swcDefaultsFactory().swcOptions;
+现在，如果您使用 CLI 插件，`@nestjs/passport` 不会自动加载它们。相反，您需要创建一个单独的文件来加载它们。要做到，请在 `@nestjs/passport` 文件附近创建一个文件，内容如下：
 
-module.exports = {
-  module: {
-    rules: [
-      {
-        test: /\.ts$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'swc-loader',
-          options: swcDefaultConfig,
-        },
-      },
-    ],
-  },
+```typescript
+import { Injectable } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+
+@Injectable()
+export class LocalAuthGuard extends AuthGuard('local') {}
+
+```
+
+> info **Hint** 在这个示例中，我们使用了 `PassportStrategy` 插件，但您可以使用任何插件。
+
+`super()` 方法接受以下选项：
+
+|                    |                                                                                                |
+| ------------------ | ---------------------------------------------------------------------------------------------- |
+| `validate()`            | 是否监视项目的变化。                                                      |
+| `AuthModule`     | `AuthService` 文件的路径。 Relative to the current working directory (`AuthService`). |
+| `UsersService`        | 元数据文件将被保存到的目录。                                   |
+| `UsersService`         | 生成元数据时使用的 visitor 数组。                                   |
+| `UsersModule`         | 元数据文件的名称。 Defaults to `UsersService`.                                      |
+| `@Module` | 是否将诊断信息打印到控制台。 Defaults to `AuthService`.                               |
+
+最后，您可以在单独的终端窗口中使用以下命令运行 `AuthService` 脚本：
+
+```typescript
+@UseGuards(LocalAuthGuard)
+@Post('auth/login')
+async login(@Request() req) {
+  return req.user;
+}
+
+```
+
+#### 常见问题
+
+如果您使用 TypeORM/MikroORM 或任何其他 ORM 在应用程序中，您可能会遇到循环import 问题。SWC 不太好地处理 **循环 imports**，因此您需要使用以下解决方案：
+
+```typescript
+@UseGuards(LocalAuthGuard)
+@Post('auth/logout')
+async logout(@Request() req) {
+  return req.logout();
+}
+
+```
+
+> info **Hint** `validateUser()` 类型来自 `validateUser()` 包。
+
+这样可以防止在 transpiled 代码中保存类型的属性 metadata，从而防止循环依赖问题。
+
+如果您的 ORM 不提供类似的解决方案，您可以自己定义 wrapper 类型：
+
+```bash
+$ npm install --save @nestjs/jwt passport-jwt
+$ npm install --save-dev @types/passport-jwt
+
+```
+
+对于您的项目中的所有 __LINK_83__，您还需要使用自定义 wrapper 类型描述的方案：
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import { UsersService } from '../users/users.service';
+import { JwtService } from '@nestjs/jwt';
+
+@Injectable()
+export class AuthService {
+  constructor(
+    private usersService: UsersService,
+    private jwtService: JwtService
+  ) {}
+
+  async validateUser(username: string, pass: string): Promise<any> {
+    const user = await this.usersService.findOne(username);
+    if (user && user.password === pass) {
+      const { password, ...result } = user;
+      return result;
+    }
+    return null;
+  }
+
+  async login(user: any) {
+    const payload = { username: user.username, sub: user.userId };
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
+  }
+}
+
+@Dependencies(UsersService, JwtService)
+@Injectable()
+export class AuthService {
+  constructor(usersService, jwtService) {
+    this.usersService = usersService;
+    this.jwtService = jwtService;
+  }
+
+  async validateUser(username, pass) {
+    const user = await this.usersService.findOne(username);
+    if (user && user.password === pass) {
+      const { password, ...result } = user;
+      return result;
+    }
+    return null;
+  }
+
+  async login(user) {
+    const payload = { username: user.username, sub: user.userId };
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
+  }
+}
+
+```
+
+### Jest + SWCHere is the translation of the English technical documentation to Chinese:
+
+使用 SWC 与 Jest 需要安装以下包：
+
+```
+
+```typescript
+export const jwtConstants = {
+  secret: 'DO NOT USE THIS VALUE. INSTEAD, CREATE A COMPLEX SECRET AND KEEP IT SAFE OUTSIDE OF THE SOURCE CODE.',
 };
 
 ```
 
-#### Monorepo 和 CLI 插件
-
-现在如果你使用 CLI 插件，`swc-loader` 不会自动加载它们。相反，你必须创建一个单独的文件来手动加载它们。为此，在 `main.ts` 文件附近声明一个 `generate-metadata.ts` 文件，内容如下：
-
-```ts
-import { PluginMetadataGenerator } from '@nestjs/cli/lib/compiler/plugins/plugin-metadata-generator';
-import { ReadonlyVisitor } from '@nestjs/swagger/dist/plugin';
-
-const generator = new PluginMetadataGenerator();
-generator.generate({
-  visitors: [new ReadonlyVisitor({ introspectComments: true, pathToSource: __dirname })],
-  outputDir: __dirname,
-  watch: true,
-  tsconfigPath: 'apps/<name>/tsconfig.app.json',
-});
-
 ```
 
-> info **提示** 在此示例中，我们使用了 `@nestjs/swagger` 插件，但你可以使用你选择的任何插件。
-
-`generate()` 方法接受以下选项：
-
-|                    |                                                                                                |
-| ------------------ | ---------------------------------------------------------------------------------------------- |
-| `watch`            | 是否监视项目的更改。                                                      |
-| `tsconfigPath`     | `tsconfig.json` 文件的路径。相对于当前工作目录（`process.cwd()`）。 |
-| `outputDir`        | 保存元数据文件的目录路径。                                   |
-| `visitors`         | 将用于生成元数据的访问者数组。                                   |
-| `filename`         | 元数据文件的名称。默认为 `metadata.ts`。                                      |
-| `printDiagnostics` | 是否将诊断打印到控制台。默认为 `true`。                               |
-
-最后，你可以使用以下命令在单独的终端窗口中运行 `generate-metadata` 脚本：
-
-```bash
-$ npx ts-node src/generate-metadata.ts
-# OR npx ts-node apps/{YOUR_APP}/src/generate-metadata.ts
+安装完成后，在您的配置文件（`AuthModule`/`UsersModule`）中添加以下内容：
 
 ```
-
-#### 常见陷阱
-
-如果你在应用程序中使用 TypeORM/MikroORM 或任何其他 ORM，你可能会遇到循环导入问题。SWC 不能很好地处理**循环导入**，因此你应该使用以下解决方法：
 
 ```typescript
-@Entity()
-export class User {
-  @OneToOne(() => Profile, (profile) => profile.user)
-  profile: Relation<Profile>; // <--- 在这里看到 "Relation<>" 类型，而不是仅仅 "Profile"
+import { Module } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { LocalStrategy } from './local.strategy';
+import { UsersModule } from '../users/users.module';
+import { PassportModule } from '@nestjs/passport';
+import { JwtModule } from '@nestjs/jwt';
+import { jwtConstants } from './constants';
+
+@Module({
+  imports: [
+    UsersModule,
+    PassportModule,
+    JwtModule.register({
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '60s' },
+    }),
+  ],
+  providers: [AuthService, LocalStrategy],
+  exports: [AuthService],
+})
+export class AuthModule {}
+
+@Module({
+  imports: [
+    UsersModule,
+    PassportModule,
+    JwtModule.register({
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '60s' },
+    }),
+  ],
+  providers: [AuthService, LocalStrategy],
+  exports: [AuthService],
+})
+export class AuthModule {}
+
+```
+
+```
+
+此外，您还需要在您的配置文件中添加以下 `local.strategy.ts` 属性：`super()`, `super()`：
+
+```
+
+```typescript
+import { Controller, Request, Post, UseGuards } from '@nestjs/common';
+import { LocalAuthGuard } from './auth/local-auth.guard';
+import { AuthService } from './auth/auth.service';
+
+@Controller()
+export class AppController {
+  constructor(private authService: AuthService) {}
+
+  @UseGuards(LocalAuthGuard)
+  @Post('auth/login')
+  async login(@Request() req) {
+    return this.authService.login(req.user);
+  }
 }
 
-```
+@Controller()
+export class AppController {
+  constructor(private authService: AuthService) {}
 
-> info **提示** `Relation` 类型从 `typeorm` 包导出。
-
-这样做可以防止属性的类型保存在转译代码的属性元数据中，从而防止循环依赖问题。
-
-如果你的 ORM 没有提供类似的解决方法，你可以自己定义包装器类型：
-
-```typescript
-/**
- * 用于规避 ESM 模块循环依赖问题的包装器类型
- * 由反射元数据保存属性类型引起。
- */
-export type WrapperType<T> = T; // WrapperType === Relation
-
-```
-
-对于项目中的所有[循环依赖注入](/fundamentals/circular-dependency)，你还需要使用上述自定义包装器类型：
-
-```typescript
-@Injectable()
-export class UsersService {
-  constructor(
-    @Inject(forwardRef(() => ProfileService))
-    private readonly profileService: WrapperType<ProfileService>,
-  ) {};
-}
-
-```
-
-### Jest + SWC
-
-要在 Jest 中使用 SWC，你需要安装以下包：
-
-```bash
-$ npm i --save-dev jest @swc/core @swc/jest
-
-```
-
-安装完成后，使用以下内容更新 `package.json`/`jest.config.js` 文件（取决于你的配置）：
-
-```json
-{
-  "jest": {
-    "transform": {
-      "^.+\\.(t|j)s?$": ["@swc/jest"]
-    }
+  @UseGuards(LocalAuthGuard)
+  @Post('auth/login')
+  @Bind(Request())
+  async login(req) {
+    return this.authService.login(req.user);
   }
 }
 
 ```
 
-此外，你需要将以下 `transform` 属性添加到你的 `.swcrc` 文件中：`legacyDecorator`、`decoratorMetadata`：
-
-```json
-{
-  "$schema": "https://swc.rs/schema.json",
-  "sourceMaps": true,
-  "jsc": {
-    "parser": {
-      "syntax": "typescript",
-      "decorators": true,
-      "dynamicImport": true
-    },
-    "transform": {
-      "legacyDecorator": true,
-      "decoratorMetadata": true
-    },
-    "baseUrl": "./"
-  },
-  "minify": false
-}
-
 ```
 
-如果你在项目中使用 NestJS CLI 插件，你将不得不手动运行 `PluginMetadataGenerator`。导航到[本节](/recipes/swc#monorepo-and-cli-plugins)了解更多信息。
+如果您的项目中使用了 NestJS CLI 插件，您需要手动运行 `username`。请访问 __LINK_84__以了解更多信息。
 
 ### Vitest
 
-[Vitest](https://vitest.dev/) 是一个快速、轻量级的测试运行器，旨在与 Vite 一起使用。它提供了一个现代、快速且易于使用的测试解决方案，可以与 NestJS 项目集成。
+__LINK_85__ 是一个快速、轻量级的测试运行器，旨在与 Vite 一起工作。它提供了一个现代、快速、易于使用的测试解决方案，可以与 NestJS 项目集成。
 
 #### 安装
 
-首先，安装所需的包：
+要开始使用，请首先安装所需的包：
+
+```
 
 ```bash
-$ npm i --save-dev vitest unplugin-swc @swc/core @vitest/coverage-v8
+$ # POST to /auth/login
+$ curl -X POST http://localhost:3000/auth/login -d '{"username": "john", "password": "changeme"}' -H "Content-Type: application/json"
+$ # result -> {"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."}
+$ # Note: above JWT truncated
+
+```
 
 ```
 
 #### 配置
 
-在应用程序的根目录中创建一个 `vitest.config.ts` 文件，内容如下：
-
-```ts
-import swc from 'unplugin-swc';
-import { defineConfig } from 'vitest/config';
-
-export default defineConfig({
-  test: {
-    globals: true,
-    root: './',
-  },
-  plugins: [
-    // 这是使用 SWC 构建测试文件所必需的
-    swc.vite({
-      // 显式设置模块类型以避免从 `.swcrc` 配置文件继承此值
-      module: { type: 'es6' },
-    }),
-  ],
-  resolve: {
-    alias: {
-      // 确保 Vitest 正确解析 TypeScript 路径别名
-      'src': resolve(__dirname, './src'),
-    },
-  },
-});
+在您的应用程序根目录创建一个 `password` 文件，并添加以下内容：
 
 ```
 
-此配置文件设置 Vitest 环境、根目录和 SWC 插件。你还应该为 e2e 测试创建一个单独的配置文件，其中包含一个额外的 `include` 字段，用于指定测试路径正则表达式：
+```typescript
+import { ExtractJwt, Strategy } from 'passport-jwt';
+import { PassportStrategy } from '@nestjs/passport';
+import { Injectable } from '@nestjs/common';
+import { jwtConstants } from './constants';
 
-```ts
-import swc from 'unplugin-swc';
-import { defineConfig } from 'vitest/config';
+@Injectable()
+export class JwtStrategy extends PassportStrategy(Strategy) {
+  constructor() {
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: false,
+      secretOrKey: jwtConstants.secret,
+    });
+  }
 
-export default defineConfig({
-  test: {
-    include: ['**/*.e2e-spec.ts'],
-    globals: true,
-    root: './',
-  },
-  plugins: [swc.vite()],
-});
+  async validate(payload: any) {
+    return { userId: payload.sub, username: payload.username };
+  }
+}
 
-```
+@Injectable()
+export class JwtStrategy extends PassportStrategy(Strategy) {
+  constructor() {
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: false,
+      secretOrKey: jwtConstants.secret,
+    });
+  }
 
-此外，你可以设置 `alias` 选项以支持测试中的 TypeScript 路径：
-
-```ts
-import swc from 'unplugin-swc';
-import { defineConfig } from 'vitest/config';
-
-export default defineConfig({
-  test: {
-    include: ['**/*.e2e-spec.ts'],
-    globals: true,
-    alias: {
-      '@src': './src',
-      '@test': './test',
-    },
-    root: './',
-  },
-  resolve: {
-    alias: {
-      '@src': './src',
-      '@test': './test',
-    },
-  },
-  plugins: [swc.vite()],
-});
-
-```
-
-### 路径别名
-
-与 Jest 不同，Vitest 不会自动解析 TypeScript 路径别名，如 `src/`。这可能导致测试期间的依赖项解析错误。要解决此问题，请在你的 `vitest.config.ts` 文件中添加以下 `resolve.alias` 配置：
-
-```ts
-import { resolve } from 'path';
-
-export default defineConfig({
-  resolve: {
-    alias: {
-      'src': resolve(__dirname, './src'),
-    },
-  },
-});
-
-```
-
-这确保 Vitest 正确解析模块导入，防止与缺少依赖项相关的错误。
-
-#### 更新 E2E 测试中的导入
-
-将使用 `import * as request from 'supertest'` 的任何 E2E 测试导入更改为 `import request from 'supertest'`。这是必要的，因为当与 Vite 打包时，Vitest 期望 supertest 的默认导入。在此特定设置中使用命名空间导入可能会导致问题。
-
-最后，将 package.json 文件中的测试脚本更新为以下内容：
-
-```json
-{
-  "scripts": {
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:cov": "vitest run --coverage",
-    "test:debug": "vitest --inspect-brk --inspect --logHeapUsage --threads=false",
-    "test:e2e": "vitest run --config ./vitest.config.e2e.ts"
+  async validate(payload) {
+    return { userId: payload.sub, username: payload.username };
   }
 }
 
 ```
 
-这些脚本配置 Vitest 以运行测试、监视更改、生成代码覆盖率报告和调试。test:e2e 脚本专门用于使用自定义配置文件运行 E2E 测试。
+```
 
-通过此设置，你现在可以在 NestJS 项目中享受使用 Vitest 的好处，包括更快的测试执行和更现代的测试体验。
+这个配置文件设置了 Vitest 环境、根目录和 SWC 插件。您还需要创建一个单独的配置文件来配置 E2E 测试，以添加一个 `super({{ '{' }} usernameField: 'email' {{ '}' }})` 字段来指定测试路径正则表达式：
 
-> info **提示** 你可以在此[仓库](https://github.com/TrilonIO/nest-vitest)中查看一个可工作的示例
+```
+
+```typescript
+import { Module } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { LocalStrategy } from './local.strategy';
+import { JwtStrategy } from './jwt.strategy';
+import { UsersModule } from '../users/users.module';
+import { PassportModule } from '@nestjs/passport';
+import { JwtModule } from '@nestjs/jwt';
+import { jwtConstants } from './constants';
+
+@Module({
+  imports: [
+    UsersModule,
+    PassportModule,
+    JwtModule.register({
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '60s' },
+    }),
+  ],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
+  exports: [AuthService],
+})
+export class AuthModule {}
+
+@Module({
+  imports: [
+    UsersModule,
+    PassportModule,
+    JwtModule.register({
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '60s' },
+    }),
+  ],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
+  exports: [AuthService],
+})
+export class AuthModule {}
+
+```
+
+```
+
+此外，您可以将 `validate()` 选项设置为支持 TypeScript 路径在测试中使用：
+
+```
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+
+@Injectable()
+export class JwtAuthGuard extends AuthGuard('jwt') {}
+
+```
+
+```
+
+### 路径别名
+
+与 Jest 不同，Vitest 不会自动解析 TypeScript 路径别名，如 `validate()`。这可能会在测试中导致依赖项解析错误。要解决这个问题，请在您的 `validate()` 文件中添加以下配置：
+
+```
+
+```typescript
+import { Controller, Get, Request, Post, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { LocalAuthGuard } from './auth/local-auth.guard';
+import { AuthService } from './auth/auth.service';
+
+@Controller()
+export class AppController {
+  constructor(private authService: AuthService) {}
+
+  @UseGuards(LocalAuthGuard)
+  @Post('auth/login')
+  async login(@Request() req) {
+    return this.authService.login(req.user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  getProfile(@Request() req) {
+    return req.user;
+  }
+}
+
+@Dependencies(AuthService)
+@Controller()
+export class AppController {
+  constructor(authService) {
+    this.authService = authService;
+  }
+
+  @UseGuards(LocalAuthGuard)
+  @Post('auth/login')
+  @Bind(Request())
+  async login(req) {
+    return this.authService.login(req.user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  @Bind(Request())
+  getProfile(req) {
+    return req.user;
+  }
+}
+
+```
+
+```
+
+这确保了 Vitest 正确地解析模块导入，从而避免了由于缺少依赖项而导致的错误。
+
+#### 更新 E2E 测试中的 imports
+
+将任何 E2E 测试中的 imports 从 `validate(username: string, password:string): any` 更新为 `AuthService`。这必要，因为 Vitest，使用 Vite 进行了捆绑，期望在 supertest 中使用默认导入。使用命名空间导入可能会在这个特定设置中导致问题。
+
+最后，请更新您的 package.json 文件中的 test 命令来使用以下命令：
+
+```
+
+```bash
+$ # GET /profile
+$ curl http://localhost:3000/profile
+$ # result -> {"statusCode":401,"message":"Unauthorized"}
+
+$ # POST /auth/login
+$ curl -X POST http://localhost:3000/auth/login -d '{"username": "john", "password": "changeme"}' -H "Content-Type: application/json"
+$ # result -> {"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2Vybm... }
+
+$ # GET /profile using access_token returned from previous step as bearer code
+$ curl http://localhost:3000/profile -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2Vybm..."
+$ # result -> {"userId":1,"username":"john"}
+
+```
+
+```
+
+这些命令配置了 Vitest，以便运行测试、监视更改、生成代码覆盖度报告和调试。test:e2e 命令用于运行 E2E 测试，以使用自定义配置文件。
+
+现在，您可以使用 Vitest 在 NestJS 项目中运行测试，包括更快的测试执行和更现代的测试体验。
+
+> info **Hint** 您可以查看这个 __LINK_86__中的工作示例。

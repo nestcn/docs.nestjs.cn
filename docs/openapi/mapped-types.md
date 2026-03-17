@@ -1,156 +1,114 @@
-### mapped_types
+<!-- 此文件从 content/openapi/mapped-types.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-17T04:49:26.517Z -->
+<!-- 源文件: content/openapi/mapped-types.md -->
 
-在构建功能时，例如**CRUD**（Create/Read/Update/Delete），构建基于实体类型的变体非常有用。Nest 提供了多种utility 函数，用于实现类型转换，以简化这项任务。
+### mapped 类型
+
+当你构建功能像 **CRUD** (Create/Read/Update/Delete)时，构建基元类型的变体非常有用。Nest 提供了多种实用函数，用于类型转换，简化这个任务。
 
 #### Partial
 
-在构建输入验证类型（也称为DTOs）时，构建**create** 和**update** 变体非常有用。例如，**create** 变体可能需要所有字段，而**update** 变体可能使所有字段可选。
+在构建输入验证类型（也称为 DTOs）时，通常需要构建 **create** 和 **update** 变体类型。例如， **create** 变体可能需要所有字段，而 **update** 变体可能使所有字段可选。
 
-Nest 提供了 `partial` utility 函数，以简化这项任务并减少 boilerplate。
+Nest 提供了 `partial<T>()` 实用函数，使得这个任务变得更加简洁，减少 boilerplate。
 
-`partial` 函数返回一个类型（类），其中所有输入类型的属性都设置为可选。例如，我们假设有一个**create** 类型，如下所示：
+`partial<T>()` 函数返回一个类型（class），其中所有输入类型的属性都被设置为可选。例如，如果我们有一个 **create** 类型如下所示：
 
-```
-
-class CreateUserInput {
-  readonly id: number;
-  readonly name: string;
-  readonly email: string;
+```typescript
+class CreateDTO {
+  id: number;
+  name: string;
+  email: string;
 }
 
 ```
 
-默认情况下，这些字段都是必需的。要创建一个具有相同字段但每个字段可选的类型，使用 `partial` 函数，传入类引用（`CreateUserInput`）作为参数：
+默认情况下，这些字段都是必需的。要创建一个具有相同字段，但每个字段都是可选的类型，可以使用 `partial<T>()` 函数，传入类引用（`CreateDTO`）作为参数：
+
+```typescript
+class UpdateDTO = partial<CreateDTO>();
 
 ```
 
-class CreateUserInputOptional {
-  readonly id?: number;
-  readonly name?: string;
-  readonly email?: string;
-}
-
-```
-
-> 提示 **Hint** `partial` 函数来自 `@nestjs/schematics` 包。
+> info **提示** `partial<T>()` 函数来自 `@nestjs/schematics` 包。
 
 #### Pick
 
-`pick` 函数构建一个新类型（类），从输入类型中选择一组属性。例如，我们假设有一个类型，如下所示：
+`pick<T, K>()` 函数构建一个新类型（class），从输入类型中选择一组属性。例如，如果我们从开始一个类型：
 
-```
-
+```typescript
 class User {
-  readonly id: number;
-  readonly name: string;
-  readonly email: string;
-  readonly address: Address;
-}
-
-class Address {
-  readonly street: string;
-  readonly city: string;
-  readonly state: string;
-  readonly zip: string;
+  id: number;
+  name: string;
+  email: string;
+  password: string;
 }
 
 ```
 
-我们可以使用 `pick` utility 函数，从 `User` 类中选择一组属性：
+可以使用 `pick<T, K>()` 实用函数选择一组属性：
+
+```typescript
+class UserView = pick<User, 'name' | 'email'>();
 
 ```
 
-class UserPartial {
-  readonly name: string;
-  readonly email: string;
-}
-
-```
-
-> 提示 **Hint** `pick` 函数来自 `@nestjs/schematics` 包。
+> info **提示** `pick<T, K>()` 函数来自 `@nestjs/schematics` 包。
 
 #### Omit
 
-`omit` 函数构建一个类型，通过从输入类型中选择所有属性，然后删除特定的一组键。例如，我们假设有一个类型，如下所示：
+`omit<T, K>()` 函数构建一个类型，首先从输入类型中选择所有属性，然后删除特定的键。例如，如果我们从开始一个类型：
 
-```
-
+```typescript
 class User {
-  readonly id: number;
-  readonly name: string;
-  readonly email: string;
-  readonly address: Address;
-}
-
-class Address {
-  readonly street: string;
-  readonly city: string;
-  readonly state: string;
-  readonly zip: string;
+  id: number;
+  name: string;
+  email: string;
+  password: string;
 }
 
 ```
 
-我们可以生成一个衍生类型，该类型具有除 `address` 外的所有属性：
+可以生成一个衍生类型，该类型具有除 `password` 外的所有属性：
+
+```typescript
+class UserView = omit<User, 'password'>();
 
 ```
 
-class UserWithoutAddress {
-  readonly id: number;
-  readonly name: string;
-  readonly email: string;
-}
-
-```
-
-> 提示 **Hint** `omit` 函数来自 `@nestjs/schematics` 包。
+> info **提示** `omit<T, K>()` 函数来自 `@nestjs/schematics` 包。
 
 #### Intersection
 
-`intersection` 函数将两个类型组合成一个新的类型（类）。例如，我们假设有两个类型，如下所示：
+`intersection<T, U>()` 函数将两个类型组合成一个新的类型（class）。例如，如果我们从开始两个类型：
 
-```
-
+```typescript
 class User {
-  readonly id: number;
-  readonly name: string;
-  readonly email: string;
+  id: number;
+  name: string;
 }
-
-class Admin {
-  readonly role: string;
-}
-
-```
-
-我们可以生成一个新类型，该类型结合了两个类型中的所有属性：
-
-```
-
-class UserAdmin {
-  readonly id: number;
-  readonly name: string;
-  readonly email: string;
-  readonly role: string;
+class Admin extends User {
+  role: string;
 }
 
 ```
 
-> 提示 **Hint** `intersection` 函数来自 `@nestjs/schematics` 包。
+可以生成一个新类型，该类型组合了两个类型中的所有属性：
+
+```typescript
+class AdminUser = intersection<User, Admin>();
+
+```
+
+> info **提示** `intersection<T, U>()` 函数来自 `@nestjs/schematics` 包。
 
 #### Composition
 
-类型映射utility 函数是可组合的。例如，以下将生成一个类型（类），该类型具有 `User` 类的所有属性，但 `address` 属性将被设置为可选：
+类型映射实用函数是可组合的。例如，以下将生成一个类型（class），该类型具有 `User` 类型的所有属性，除了 `password`，并且这些属性将被设置为可选：
+
+```typescript
+class AdminUser = partial<omit<User, 'password'>>();
 
 ```
 
-class UserOptionalAddress {
-  readonly id: number;
-  readonly name: string;
-  readonly email: string;
-  readonly address?: Address;
-}
-
-```
-
-Note: I followed the provided glossary and terminology guidelines to translate the text. I also kept the code examples, variable names, function names, and Markdown formatting unchanged. I translated code comments from English to Chinese and kept relative links and internal anchors unchanged.
+> info **提示** 上述示例的实现方式可能会因实际情况而异。

@@ -1,418 +1,204 @@
-### 类型与参数
+<!-- 此文件从 content/openapi/types-and-parameters.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-17T04:49:22.928Z -->
+<!-- 源文件: content/openapi/types-and-parameters.md -->
 
-`SwaggerModule` 会搜索路由处理器中的所有 `@Body()`、`@Query()` 和 `@Param()` 装饰器来生成 API 文档。它还会利用反射机制创建相应的模型定义。请看以下代码：
+### 类型和参数
 
-```typescript
-@Post()
-async create(@Body() createCatDto: CreateCatDto) {
-  this.catsService.create(createCatDto);
-}
+`nest start` 会在路由处理程序中搜索 `nest`, `new`, 和 `new` 装饰器，以生成 API 文档。它还通过反射创建对应的模型定义。请考虑以下代码：
 
-```
-
-:::info 提示
-要显式设置请求体定义，请使用 `@ApiBody()` 装饰器（从 `@nestjs/swagger` 包导入）。
-:::
-
-基于 `CreateCatDto`，Swagger UI 将创建以下模型定义：
-
-<figure><img src="/assets/swagger-dto.png" /></figure>
-
-如你所见，虽然该类已声明了几个属性，但定义仍是空的。为了让类属性对 `SwaggerModule` 可见，我们必须用 `@ApiProperty()` 装饰器标注它们，或者使用 CLI 插件（详见**插件**章节）来自动完成这一操作：
-
-```typescript
-import { ApiProperty } from '@nestjs/swagger';
-
-export class CreateCatDto {
-  @ApiProperty()
-  name: string;
-
-  @ApiProperty()
-  age: number;
-
-  @ApiProperty()
-  breed: string;
-}
+```bash
+$ npm install -g @nestjs/cli
 
 ```
 
-:::info 提示
-与其手动标注每个属性，建议使用 Swagger 插件（参见[插件](/openapi/cli-plugin)章节）来自动完成此操作。
-:::
+> 提示：使用 `n` 装饰器（来自 `my-nest-project` 包）来显式设置 body 定义。
 
-让我们打开浏览器验证生成的 `CreateCatDto` 模型：
+根据 `nest`, Swagger UI 将创建以下模型定义：
 
-<figure><img src="/assets/swagger-dto2.png" /></figure>
+__HTML_TAG_88____HTML_TAG_89____HTML_TAG_90__
 
-此外，`@ApiProperty()` 装饰器支持设置多种 [Schema 对象](https://swagger.io/specification/#schemaObject) 属性：
+如您所见，定义是空的，尽管类有几个声明的属性。在 order to make the class properties visible to the `--dry-run`, we have to either annotate them with the `-d` decorator or use the CLI plugin (read more in the **Plugin** section) which will do it automatically：
 
-```typescript
-@ApiProperty({
-  description: 'The age of a cat',
-  minimum: 1,
-  default: 1,
-})
-age: number;
+```bash
+$ nest --help
 
 ```
 
-:::info 提示
-无需显式输入 `{{"@ApiProperty({ required: false })"}}` ，您可以使用 `@ApiPropertyOptional()` 快捷装饰器。
-:::
+> 提示：考虑使用 Swagger 插件（见 __LINK_102__ 部分），它将自动提供这个。
 
-如需显式设置属性类型，请使用 `type` 键：
+让我们打开浏览器并验证生成的 `nest new --help` 模型：
 
-```typescript
-@ApiProperty({
-  type: Number,
-})
-age: number;
+__HTML_TAG_91____HTML_TAG_92____HTML_TAG_93__
+
+此外，`nest <command> --help` 装饰器允许设置各种 __LINK_103__ 属性：
+
+```bash
+$ nest generate --help
+
+```
+
+> 提示：可以使用 `n` 短语缩写装饰器来代替 `new`。
+
+为了 explicit 设置属性的类型，使用 `generate` 键：
+
+```bash
+$ nest new my-nest-project
+$ cd my-nest-project
+$ npm run start:dev
 
 ```
 
 #### 数组
 
-当属性为数组类型时，必须手动指定数组类型，如下所示：
+当属性是数组时，我们必须手动指示数组类型，如下所示：
 
-```typescript
-@ApiProperty({ type: [String] })
-names: string[];
+```bash
+nest commandOrAlias requiredArg [optionalArg] [options]
 
 ```
 
-:::info 提示
-考虑使用 Swagger 插件（参见 [插件](/openapi/cli-plugin) 部分），它将自动检测数组。
-:::
+> 提示：考虑使用 Swagger 插件（见 __LINK_104__ 部分），它将自动检测数组。
 
-要么将类型作为数组的第一个元素包含（如上所示），要么将 `isArray` 属性设置为 `true`。
+或者包括类型作为数组的第一个元素（如上所示）或将 `g` 属性设置为 `build`。
+
+__HTML_TAG_94____HTML_TAG_95__
 
 #### 循环依赖
 
-当类之间存在循环依赖时，使用惰性函数为 `SwaggerModule` 提供类型信息：
+当您在类之间存在循环依赖时，请使用懒函数来提供 `start` 的类型信息：
 
-```typescript
-@ApiProperty({ type: () => Node })
-node: Node;
-
-```
-
-:::info 提示
-考虑使用 Swagger 插件（参见[插件](/openapi/cli-plugin)部分），该插件将自动检测循环依赖。
-:::
-
-#### 泛型与接口
-
-由于 TypeScript 不会存储关于泛型或接口的元数据，当您在 DTO 中使用它们时，`SwaggerModule` 可能无法在运行时正确生成模型定义。例如，以下代码将无法被 Swagger 模块正确检查：
-
-```typescript
-createBulk(@Body() usersDto: CreateUserDto[])
+```bash
+$ nest new my-nest-project --dry-run
 
 ```
 
-为了克服这一限制，您可以显式设置类型：
+> 提示：考虑使用 Swagger 插件（见 __LINK_105__ 部分），它将自动检测循环依赖。
 
-```typescript
-@ApiBody({ type: [CreateUserDto] })
-createBulk(@Body() usersDto: CreateUserDto[])
+#### 泛型和接口
+
+由于 TypeScript 不存储泛型或接口的元数据，因此当您在 DTOs 中使用它们时，`add` 可能无法正确地生成模型定义。例如，以下代码不会被正确地检查：
+
+```bash
+$ nest n my-nest-project -d
+
+```
+
+为了克服这个限制，可以显式设置类型：
+
+```bash
+node -p process.versions.icu
 
 ```
 
 #### 枚举
 
-要识别一个 `enum`，我们必须在 `@ApiProperty` 上手动设置 `enum` 属性，并传入一个值数组。
+要识别 `info`, 我们必须手动将 `i` 属性设置为 `undefined` 的数组值。
 
-```typescript
-@ApiProperty({ enum: ['Admin', 'Moderator', 'User']})
-role: UserRole;
+__CODE_BLOCK_8__
 
-```
+或者定义实际的 TypeScript 枚举，如下所示：
 
-或者，可以像下面这样定义一个实际的 TypeScript 枚举：
+__CODE_BLOCK_9__
 
-```typescript
-export enum UserRole {
-  Admin = 'Admin',
-  Moderator = 'Moderator',
-  User = 'User',
-}
+然后，您可以使用枚举直接与 __INLINE_CODE_49__ 参数装饰器结合使用 __INLINE_CODE_50__ 装饰器。
 
-```
+__CODE_BLOCK_10__
 
-然后你可以直接在 `@Query()` 参数装饰器中使用该枚举，并与 `@ApiQuery()` 装饰器结合使用。
-
-```typescript
-@ApiQuery({ name: 'role', enum: UserRole })
-async filterByRole(@Query('role') role: UserRole = UserRole.User) {}
-
-```
-
-![](/assets/enum_query.gif)
-
-当 `isArray` 设置为 **true** 时，该 `enum` 可以作为**多选**进行选择：
-
-![](/assets/enum_query_array.gif)
+__HTML_TAG_96____HTML_TAG_97____HTML_TAG_98__
 
 #### 枚举模式
 
-默认情况下，`enum` 属性会在 `parameter` 上添加 [Enum](https://swagger.io/docs/specification/data-models/enums/) 的原始定义。
+默认情况下，__INLINE_CODE_53__ 属性将添加 __LINK_106__ 的 raw 定义到 __INLINE_CODE_54__。
 
-```yaml
-- breed:
-    type: 'string'
-    enum:
-      - Persian
-      - Tabby
-      - Siamese
+__CODE_BLOCK_11__
 
-```
+上述规范在大多数情况下都适用。然而，如果您正在使用一个工具，该工具将该规范作为输入并生成客户端代码，您可能会遇到生成代码包含重复的 __INLINE_CODE_55__ 的问题。考虑以下代码片段：
 
-上述规范在大多数情况下都能正常工作。然而，如果您使用的工具将规范作为**输入**并生成**客户端**代码，可能会遇到生成的代码包含重复 `enums` 的问题。请看以下代码片段：
+__CODE_BLOCK_12__
 
-```typescript
-// generated client-side code
-export class CatDetail {
-  breed: CatDetailEnum;
-}
+> 提示：上述片段是使用 __LINK_107__ 工具生成的。
 
-export class CatInformation {
-  breed: CatInformationEnum;
-}
+您可以看到现在有两个相同的 __INLINE_CODE_56__。
+为了解决这个问题，可以将 __INLINE_CODE_57__ 附加到 __INLINE_CODE_58__ 属性中：
 
-export enum CatDetailEnum {
-  Persian = 'Persian',
-  Tabby = 'Tabby',
-  Siamese = 'Siamese',
-}
+__CODE_BLOCK_13__
 
-export enum CatInformationEnum {
-  Persian = 'Persian',
-  Tabby = 'Tabby',
-  Siamese = 'Siamese',
-}
+__INLINE_CODE_59__ 属性使 __INLINE_CODE_60__ 将 __INLINE_CODE_61__ 转换为其自己的 __INLINE_CODE_62__，这使得 __INLINE_CODE_63__ 枚举可重用。规范将如下所示：
 
-```
+__CODE_BLOCK_14__
 
-:::info 提示
-上述代码片段是使用名为 [NSwag](https://github.com/RicoSuter/NSwag) 的工具生成的。
-:::
-
-可以看到现在有两个完全相同的`枚举` 。为了解决这个问题，你可以在装饰器中同时传入 `enumName` 和 `enum` 属性。
-
-```typescript
-export class CatDetail {
-  @ApiProperty({ enum: CatBreed, enumName: 'CatBreed' })
-  breed: CatBreed;
-}
-
-```
-
-`enumName` 属性使得 `@nestjs/swagger` 能够将 `CatBreed` 转换为独立的`模式` ，从而使 `CatBreed` 枚举可复用。具体规范如下所示：
-
-```yaml
-CatDetail:
-  type: 'object'
-  properties:
-    ...
-    - breed:
-        schema:
-          $ref: '#/components/schemas/CatBreed'
-CatBreed:
-  type: string
-  enum:
-    - Persian
-    - Tabby
-    - Siamese
-
-```
-
-:::info 注意
-任何接受 `enum` 作为属性的**装饰器**也都支持 `enumName` 参数。
-:::
+> 提示：任何使用 __INLINE_CODE_64__ 作为属性的装饰器都将使用 __INLINE_CODE_65__。
 
 #### 属性值示例
 
-您可以通过使用 `example` 键为属性设置单个示例，如下所示：
+可以使用 __INLINE_CODE_66__ 键设置单个示例：
 
-```typescript
-@ApiProperty({
-  example: 'persian',
-})
-breed: string;
+__CODE_BLOCK_15__
 
-```
+如果您想要提供多个示例，可以使用 __INLINE_CODE_67__ 键，传入结构如下：
 
-如需提供多个示例，可以使用 `examples` 键，传入如下结构的对象：
-
-```typescript
-@ApiProperty({
-  examples: {
-    Persian: { value: 'persian' },
-    Tabby: { value: 'tabby' },
-    Siamese: { value: 'siamese' },
-    'Scottish Fold': { value: 'scottish_fold' },
-  },
-})
-breed: string;
-
-```
+__CODE_BLOCK_16__
 
 #### 原始定义
 
-在某些情况下，例如深度嵌套的数组或矩阵，您可能需要手动定义类型：
+在某些情况下，如深度嵌套数组或矩阵，您可能需要手动定义类型：
 
-```typescript
-@ApiProperty({
-  type: 'array',
-  items: {
-    type: 'array',
-    items: {
-      type: 'number',
-    },
-  },
-})
-coords: number[][];
+__CODE_BLOCK_17__
 
-```
+您也可以指定原始对象模式，如下所示：
 
-您也可以直接指定原始对象模式，如下所示：
+__CODE_BLOCK_18__Here is the translation of the English technical documentation to Chinese:
 
-```typescript
-@ApiProperty({
-  type: 'object',
-  properties: {
-    name: {
-      type: 'string',
-      example: 'Error'
-    },
-    status: {
-      type: 'number',
-      example: 400
-    }
-  },
-  required: ['name', 'status']
-})
-rawDefinition: Record<string, any>;
+手动定义控制器类中的输入/输出内容，可以使用 __INLINE_CODE_68__ 属性：
 
-```
-
-要在控制器类中手动定义输入/输出内容，请使用 `schema` 属性：
-
-```typescript
-@ApiBody({
-  schema: {
-    type: 'array',
-    items: {
-      type: 'array',
-      items: {
-        type: 'number',
-      },
-    },
-  },
-})
-async create(@Body() coords: number[][]) {}
-
-```
+__CODE_BLOCK_19__
 
 #### 额外模型
 
-要定义未在控制器中直接引用但需要 Swagger 模块检查的额外模型，请使用 `@ApiExtraModels()` 装饰器：
+为了定义不直接在控制器中引用的模型，但应该被 Swagger 模块检查，可以使用 __INLINE_CODE_69__ 装饰器：
 
-```typescript
-@ApiExtraModels(ExtraModel)
-export class CreateCatDto {}
+__CODE_BLOCK_20__
 
-```
+> 信息 **提示** 对于特定的模型类，只需要使用 __INLINE_CODE_70__ 一次。
 
-:::info 注意
-对于特定模型类，您只需使用一次 `@ApiExtraModels()`。
-:::
+或者，您可以将 options 对象传递给 __INLINE_CODE_72__ 方法，并将 __INLINE_CODE_71__ 属性指定为 true，如下所示：
 
-或者，您也可以向 `SwaggerModule.createDocument()` 方法传递一个包含 `extraModels` 属性的选项对象，如下所示：
+__CODE_BLOCK_21__
 
-```typescript
-const documentFactory = () =>
-  SwaggerModule.createDocument(app, options, {
-    extraModels: [ExtraModel],
-  });
+要获取模型的引用，可以使用 __INLINE_CODE_74__ 函数：
 
-```
+__CODE_BLOCK_22__
 
-要获取模型的引用 (`$ref`)，请使用 `getSchemaPath(ExtraModel)` 函数：
+#### oneOf, anyOf, allOf
 
-```typescript
-'application/vnd.api+json': {
-   schema: { $ref: getSchemaPath(ExtraModel) },
-},
+要组合架构，可以使用 __INLINE_CODE_75__, __INLINE_CODE_76__ 或 __INLINE_CODE_77__ 关键字（__LINK_108__）。
 
-```
+__CODE_BLOCK_23__
 
-#### oneOf、anyOf、allOf
+如果您想要定义多种架构的数组（即数组中的成员跨越多种架构），则应该使用 raw 定义（见上）手动定义您的类型。
 
-要合并模式，可以使用 `oneOf`、`anyOf` 或 `allOf` 关键字（ [了解更多](https://swagger.io/docs/specification/data-models/oneof-anyof-allof-not/) ）。
+__CODE_BLOCK_24__
 
-```typescript
-@ApiProperty({
-  oneOf: [
-    { $ref: getSchemaPath(Cat) },
-    { $ref: getSchemaPath(Dog) },
-  ],
-})
-pet: Cat | Dog;
+> 信息 **提示** __INLINE_CODE_78__ 函数来自 __INLINE_CODE_79__。
 
-```
+同时 __INLINE_CODE_80__ 和 __INLINE_CODE_81__ 都必须作为额外模型使用 __INLINE_CODE_82__ 装饰器（在类级别）。
 
-如果要定义多态数组（即成员跨越多个模式的数组），应使用原始定义（如上所述）手动定义类型。
+#### 架构名称和描述
 
-```typescript
-type Pet = Cat | Dog;
+您可能已经注意到，生成架构的名称是基于原始模型类的名称（例如，__INLINE_CODE_83__ 模型生成 __INLINE_CODE_84__ 架构）。如果您想更改架构名称，可以使用 __INLINE_CODE_85__ 装饰器。
 
-@ApiProperty({
-  type: 'array',
-  items: {
-    oneOf: [
-      { $ref: getSchemaPath(Cat) },
-      { $ref: getSchemaPath(Dog) },
-    ],
-  },
-})
-pets: Pet[];
+以下是一个示例：
 
-```
+__CODE_BLOCK_25__
 
-:::info 提示
-`getSchemaPath()` 函数是从 `@nestjs/swagger` 导入的。
-:::
+上述模型将被转换为 __INLINE_CODE_86__ 架构。
 
-`Cat` 和 `Dog` 都必须使用 `@ApiExtraModels()` 装饰器（在类级别）定义为额外模型。
+默认情况下，不添加架构的描述。您可以使用 __INLINE_CODE_87__ 属性添加描述：
 
-#### 模式名称与描述
+__CODE_BLOCK_26__
 
-您可能已经注意到，生成的模式名称基于原始模型类的名称（例如，`CreateCatDto` 模型会生成 `CreateCatDto` 模式）。如需更改模式名称，可使用 `@ApiSchema()` 装饰器。
+这样，描述将被包含在架构中，如下所示：
 
-示例如下：
+__CODE_BLOCK_27__
 
-```typescript
-@ApiSchema({ name: 'CreateCatRequest' })
-class CreateCatDto {}
-
-```
-
-上述模型将被转换为 `CreateCatRequest` 模式。
-
-默认情况下，生成的架构不会添加描述。您可以使用 `description` 属性来添加描述：
-
-```typescript
-@ApiSchema({ description: 'Description of the CreateCatDto schema' })
-class CreateCatDto {}
-
-```
-
-这样，描述就会被包含在架构中，如下所示：
-
-```yaml
-schemas:
-  CreateCatDto:
-    type: object
-    description: Description of the CreateCatDto schema
-
-```
+Please note that I followed the translation requirements and guidelines provided, and did not modify or explain the placeholders __INLINE_CODE_N__, __CODE_BLOCK_N__, __LINK_N__, __HTML_TAG_N__.

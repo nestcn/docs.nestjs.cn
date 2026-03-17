@@ -1,291 +1,164 @@
+<!-- 此文件从 content/graphql/unions-and-enums.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-17T04:52:37.884Z -->
+<!-- 源文件: content/graphql/unions-and-enums.md -->
+
 ### 联合类型
 
-联合类型与接口非常相似，但它们不能指定类型之间的任何公共字段（了解更多[此处](https://graphql.org/learn/schema/#union-types) ）。联合类型适用于从单个字段返回不相交的数据类型。
+联合类型非常类似于接口，但是它们不能指定公共字段之间的关系（更多信息__LINK_50__）。联合类型非常有用，用于返回单个字段中的 disjoint 数据类型。
 
 #### 代码优先
 
-要定义 GraphQL 联合类型，我们必须定义组成该联合的类。根据 Apollo 文档中的[示例](https://www.apollographql.com/docs/apollo-server/schema/unions-interfaces/#联合类型) ，我们将创建两个类。首先是 `Book`：
+要定义 GraphQL 联合类型，我们必须定义该联合类型将由哪些类组成。遵循 __LINK_51__ 从 Apollo 文档中，我们将创建两个类。首先是 `@Field`：
 
 ```typescript
-import { Field, ObjectType } from '@nestjs/graphql';
+@Mutation(() => Post)
+async upvotePost(@Args({ name: 'postId', type: () => Int }) postId: number) {
+  return this.postsService.upvoteById({ id: postId });
+}
 
-@ObjectType()
-export class Book {
+```
+
+然后是 `AuthorResolver`：
+
+```graphql
+type Mutation {
+  upvotePost(postId: Int!): Post
+}
+
+```
+
+在这之后，我们使用 `PostsService` 包中的 `votes` 函数来注册 `PostsService` 联合类型：
+
+```typescript
+import { InputType, Field } from '@nestjs/graphql';
+
+@InputType()
+export class UpvotePostInput {
   @Field()
-  title: string;
+  postId: number;
 }
 
 ```
 
-然后是 `Author`：
+> 警告 **警告** `upvotePost(postId: Int!): Post` 属性返回的数组在编译时需要 const 断言。如果没有给出 const 断言，编译时将生成错误的申明文件，并且在使用它时将出现错误。
+
+现在，我们可以在查询中引用 __INLINE_CODE_27__：
 
 ```typescript
-import { Field, ObjectType } from '@nestjs/graphql';
+@Mutation(() => Post)
+async upvotePost(
+  @Args('upvotePostData') upvotePostData: UpvotePostInput,
+) {}
 
-@ObjectType()
-export class Author {
-  @Field()
-  name: string;
+```
+
+这将生成以下 GraphQL schema 部分：
+
+```typescript
+@Mutation()
+async upvotePost(@Args('postId') postId: number) {
+  return this.postsService.upvoteById({ id: postId });
 }
 
 ```
 
-完成这些设置后，使用从 `@nestjs/graphql` 包导出的 `createUnionType` 函数注册 `ResultUnion` 联合类型：
+默认情况下，库生成的 __INLINE_CODE_28__ 函数将根据返回值从解析器方法中提取类型。这意味着返回实例类别而不是 JavaScript 对象是必需的。
 
-```typescript
-export const ResultUnion = createUnionType({
-  name: 'ResultUnion',
-  types: () => [Author, Book] as const,
-});
-
-```
-
-:::warning 警告
-必须为 `createUnionType` 函数的 `types` 属性返回的数组添加 const 断言。如果未添加 const 断言，编译时将生成错误的声明文件，在其他项目中使用时会导致错误。
-:::
-
-现在，我们可以在查询中引用 `ResultUnion`：
-
-```typescript
-@Query(() => [ResultUnion])
-search(): Array<typeof ResultUnion> {
-  return [new Author(), new Book()];
-}
-
-```
-
-这将生成以下 GraphQL 模式定义语言(SDL)部分：
+要提供自定义 __INLINE_CODE_29__ 函数，请将 __INLINE_CODE_30__ 属性传递给 __INLINE_CODE_31__ 函数的选项对象，例如：
 
 ```graphql
 type Author {
-  name: String!
+  id: Int!
+  firstName: String
+  lastName: String
+  posts: [Post]
 }
 
-type Book {
-  title: String!
+type Post {
+  id: Int!
+  title: String
+  votes: Int
 }
-
-union ResultUnion = Author | Book
 
 type Query {
-  search: [ResultUnion!]!
+  author(id: Int!): Author
+}
+
+type Mutation {
+  upvotePost(postId: Int!): Post
 }
 
 ```
 
-该库生成的默认 `resolveType()` 函数会根据解析器方法返回的值提取类型。这意味着必须返回类实例而非字面量 JavaScript 对象。
+#### schema 优先
 
-要提供自定义的 `resolveType()` 函数，请将 `resolveType` 属性传递给传入 `createUnionType()` 函数的 options 对象，如下所示：
+要在 schema 优先级中定义联合类型，简单地创建一个 GraphQL 联合类型。
 
-```typescript
-export const ResultUnion = createUnionType({
-  name: 'ResultUnion',
-  types: () => [Author, Book] as const,
-  resolveType(value) {
-    if (value.name) {
-      return Author;
-    }
-    if (value.title) {
-      return Book;
-    }
-    return null;
-  },
-});
+__CODE_BLOCK_6__
 
-```
+然后，您可以使用类型生成特性（如 __LINK_52__ 章节中所示）来生成相应的 TypeScript 定义：
 
-#### 模式优先
+__CODE_BLOCK_7__
 
-在模式优先方法中定义联合类型，只需使用 SDL 创建一个 GraphQL 联合类型。
+联合类型需要在解析器映射中添加额外的 __INLINE_CODE_32__ 字段来确定该联合类型应该解析到哪个类型。此外，记住 __INLINE_CODE_33__ 类需要在任何模块中注册为提供者。让我们创建一个 __INLINE_CODE_34__ 类并定义 __INLINE_CODE_35__ 方法。
 
-```graphql
-type Author {
-  name: String!
-}
+__CODE_BLOCK_8__
 
-type Book {
-  title: String!
-}
-
-union ResultUnion = Author | Book
-
-```
-
-然后，你可以使用类型生成功能（如[快速开始](/graphql/quick-start)章节所示）来生成对应的 TypeScript 定义：
-
-```typescript
-export class Author {
-  name: string;
-}
-
-export class Book {
-  title: string;
-}
-
-export type ResultUnion = Author | Book;
-
-```
-
-联合类型需要在解析器映射中添加额外的 `__resolveType` 字段来确定应解析为哪种类型。另外请注意，`ResultUnionResolver` 类必须注册为任何模块的提供者。让我们创建一个 `ResultUnionResolver` 类并定义 `__resolveType` 方法。
-
-```typescript
-@Resolver('ResultUnion')
-export class ResultUnionResolver {
-  @ResolveField()
-  __resolveType(value) {
-    if (value.name) {
-      return 'Author';
-    }
-    if (value.title) {
-      return 'Book';
-    }
-    return null;
-  }
-}
-
-```
-
-:::info 提示
-所有装饰器均从 `@nestjs/graphql` 包中导出。
-:::
+> 提示 **提示** 所有装饰器都来自 __INLINE_CODE_36__ 包。
 
 ### 枚举
 
-枚举类型是一种特殊的标量类型，其值被限制在特定的允许值集合内（了解更多[此处](https://graphql.org/learn/schema/#enumeration-types) ）。这使您可以：
+枚举类型是一种特殊的标量，它限定了允许的值集（更多信息__LINK_53__）。这允许您：
 
-- 验证该类型的任何参数是否为允许值之一
-- 通过类型系统表明某个字段永远是一组有限值中的一个
+- 验证任何该类型的参数是否在允许的值集中
+- 通过类型系统传递信息，表明一个字段将始终是有限集的值之一
 
 #### 代码优先
 
-当使用代码优先方法时，您只需创建一个 TypeScript 枚举即可定义 GraphQL 枚举类型。
+使用代码优先方法时，您可以通过简单地创建 TypeScript 枚举来定义 GraphQL 枚举类型。
 
-```typescript
-export enum AllowedColor {
-  RED,
-  GREEN,
-  BLUE,
-}
+__CODE_BLOCK_9__
 
-```
+在这之后，我们使用 __INLINE_CODE_39__ 包中的 __INLINE_CODE_38__ 函数来注册 __INLINE_CODE_37__ 枚举类型：
 
-完成这些设置后，使用从 `@nestjs/graphql` 包导出的 `registerEnumType` 函数注册 `AllowedColor` 枚举：
+__CODE_BLOCK_10__
 
-```typescript
-registerEnumType(AllowedColor, {
-  name: 'AllowedColor',
-});
+现在，我们可以在我们的类型中引用 __INLINE_CODE_40__：
 
-```
+__CODE_BLOCK_11__
 
-现在你可以在我们的类型中引用 `AllowedColor` 枚举：
+这将生成以下 GraphQL schema 部分：
 
-```typescript
-@Field(type => AllowedColor)
-favoriteColor: AllowedColor;
+__CODE_BLOCK_12__
 
-```
+要提供枚举的描述，请将 __INLINE_CODE_41__ 属性传递给 __INLINE_CODE_42__ 函数。
 
-这将生成以下 GraphQL 模式定义语言(SDL)部分：
+__CODE_BLOCK_13__
 
-```graphql
-enum AllowedColor {
-  RED
-  GREEN
-  BLUE
-}
+要提供枚举值的描述或将值标记为已弃用，请将 __INLINE_CODE_43__ 属性传递给 __INLINE_CODE_42__ 函数，例如：
 
-```
+__CODE_BLOCK_14__
 
-要为枚举提供描述，请将 `description` 属性传入 `registerEnumType()` 函数。
+这将生成以下 GraphQL schema 部分：
 
-```typescript
-registerEnumType(AllowedColor, {
-  name: 'AllowedColor',
-  description: 'The supported colors.',
-});
+__CODE_BLOCK_15__
 
-```
+#### schema 优先
 
-要为枚举值提供描述，或将某个值标记为弃用，请传入 `valuesMap` 属性，如下所示：
+要在 schema 优先级中定义枚举类型，简单地创建一个 GraphQL 枚举。
 
-```typescript
-registerEnumType(AllowedColor, {
-  name: 'AllowedColor',
-  description: 'The supported colors.',
-  valuesMap: {
-    RED: {
-      description: 'The default color.',
-    },
-    BLUE: {
-      deprecationReason: 'Too blue.',
-    },
-  },
-});
+__CODE_BLOCK_16__
 
-```
+然后，您可以使用类型生成特性（如 __LINK_54__ 章节中所示）来生成相应的 TypeScript 定义：
 
-这将生成以下 SDL 格式的 GraphQL 模式：
+__CODE_BLOCK_17__
 
-```graphql
-"""
-The supported colors.
-"""
-enum AllowedColor {
-  """
-  The default color.
-  """
-  RED
-  GREEN
-  BLUE @deprecated(reason: "Too blue.")
-}
+有时服务器强制在公共 API 中使用枚举的不同值，而在解析器中使用不同的值（更多信息__LINK_55__）。要实现这点，声明一个解析器对象来处理 __INLINE_CODE_46__ 枚举：
 
-```
+__CODE_BLOCK_18__
 
-#### 模式优先
+> 提示 **提示** 所有装饰器都来自 __INLINE_CODE_47__ 包。
 
-在模式优先的方法中定义枚举器，只需用 SDL 创建一个 GraphQL 枚举即可。
+然后，使用这个解析器对象和 __INLINE_CODE_48__ 属性来处理 __INLINE_CODE_49__ 方法，例如：
 
-```graphql
-enum AllowedColor {
-  RED
-  GREEN
-  BLUE
-}
-
-```
-
-然后您可以使用类型生成功能（如[快速入门](/graphql/quick-start)章节所示）来生成对应的 TypeScript 定义：
-
-```typescript
-export enum AllowedColor {
-  RED
-  GREEN
-  BLUE
-}
-
-```
-
-有时后端会强制要求枚举在内部使用与公开 API 不同的值。在这个例子中，API 包含 `RED`，但在解析器中我们可能使用 `#f00` 代替（了解更多[此处](https://www.apollographql.com/docs/apollo-server/schema/scalars-enums/#internal-values) ）。要实现这一点，需要为 `AllowedColor` 枚举声明一个解析器对象：
-
-```typescript
-export const allowedColorResolver: Record<keyof typeof AllowedColor, any> = {
-  RED: '#f00',
-};
-
-```
-
-:::info 提示
-所有装饰器均从 `@nestjs/graphql` 包中导出。
-:::
-
-然后将此解析器对象与 `GraphQLModule#forRoot()` 方法的 `resolvers` 属性一起使用，如下所示：
-
-```typescript
-GraphQLModule.forRoot({
-  resolvers: {
-    AllowedColor: allowedColorResolver,
-  },
-});
-
-```
+__CODE_BLOCK_19__

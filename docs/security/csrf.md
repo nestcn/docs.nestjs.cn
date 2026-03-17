@@ -1,55 +1,79 @@
 <!-- 此文件从 content/security/csrf.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-12T13:42:20.376Z -->
+<!-- 生成时间: 2026-03-17T04:42:55.760Z -->
 <!-- 源文件: content/security/csrf.md -->
 
 ### CSRF 保护
 
-跨站请求伪造（CSRF 或 XSRF）是一种攻击类型，其中**未经授权**的命令从受信任的用户发送到 Web 应用程序。为了帮助防止这种情况，你可以使用 [csrf-csrf](https://github.com/Psifi-Solutions/csrf-csrf) 包。
+跨站请求伪造（CSRF 或 XSRF）是一种攻击，攻击者可以从信任用户的浏览器中发送未经授权的命令，以帮助防止这种攻击，您可以使用 __LINK_8__ 包。
 
-#### 在 Express 中使用（默认）
+#### 与 Express (默认) 使用
 
-首先安装所需的包：
-
-```bash
-$ npm i csrf-csrf
-
-```
-
-> warning **警告** 如 [csrf-csrf 文档](https://github.com/Psifi-Solutions/csrf-csrf?tab=readme-ov-file#getting-started)中所述，此中间件需要事先初始化会话中间件或 `cookie-parser`。请参阅文档了解更多详细信息。
-
-安装完成后，将 `csrf-csrf` 中间件注册为全局中间件。
-
-```typescript
-import { doubleCsrf } from 'csrf-csrf';
-// ...
-// 在你的初始化文件中
-const {
-  invalidCsrfTokenError, // 如果你计划创建自己的中间件，这纯粹是为了方便而提供的。
-  generateToken, // 在你的路由中使用它来生成和提供 CSRF 哈希，以及令牌 cookie 和令牌。
-  validateRequest, // 如果你计划制作自己的中间件，这也是一个便利工具。
-  doubleCsrfProtection, // 这是默认的 CSRF 保护中间件。
-} = doubleCsrf(doubleCsrfOptions);
-app.use(doubleCsrfProtection);
-
-```
-
-#### 在 Fastify 中使用
-
-首先安装所需的包：
+首先，安装所需的包：
 
 ```bash
-$ npm i --save @fastify/csrf-protection
+$ npm i --save @nestjs/throttler
 
 ```
 
-安装完成后，按如下方式注册 `@fastify/csrf-protection` 插件：
+> 警告 **警告** 正如 __LINK_9__ 中所提到的，这个中间件需要会话中间件或 __INLINE_CODE_4__ 初始化之前。请查看文档以获取更多详细信息。
+
+安装完成后，请将 __INLINE_CODE_5__ 中间件注册为全局中间件。
 
 ```typescript
-import fastifyCsrf from '@fastify/csrf-protection';
-// ...
-// 在注册某些存储插件后的初始化文件中
-await app.register(fastifyCsrf);
+@Module({
+  imports: [
+     ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          ttl: 60000,
+          limit: 10,
+        },
+      ],
+    }),
+  ],
+})
+export class AppModule {}
 
 ```
 
-> warning **警告** 如 `@fastify/csrf-protection` 文档[这里](https://github.com/fastify/csrf-protection#usage)所述，此插件需要先初始化存储插件。请参阅该文档以获取更多说明。
+#### 与 Fastify 使用
+
+首先，安装所需的包：
+
+```typescript
+{
+  provide: APP_GUARD,
+  useClass: ThrottlerGuard
+}
+
+```
+
+安装完成后，请将 __INLINE_CODE_6__ 插件注册为 follows：
+
+```typescript
+@Module({
+  imports: [
+    ThrottlerModule.forRoot([
+      {
+        name: 'short',
+        ttl: 1000,
+        limit: 3,
+      },
+      {
+        name: 'medium',
+        ttl: 10000,
+        limit: 20
+      },
+      {
+        name: 'long',
+        ttl: 60000,
+        limit: 100
+      }
+    ]),
+  ],
+})
+export class AppModule {}
+
+```
+
+> 警告 **警告** 正如 __INLINE_CODE_7__ 文档 __LINK_10__ 中所解释的，这个插件需要在 storage 插件初始化之前。请查看文档以获取更多详细信息。

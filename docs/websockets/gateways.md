@@ -1,245 +1,383 @@
-### 网关
+<!-- 此文件从 content/websockets/gateways.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-17T04:48:36.699Z -->
+<!-- 源文件: content/websockets/gateways.md -->
 
-本文档其他地方讨论的大多数概念，如依赖注入、装饰器、异常过滤器、管道、守卫和拦截器，也同样适用于网关。只要可能，Nest 就会抽象实现细节，以便相同的组件可以运行在基于 HTTP 的平台、WebSockets 和微服务上。本节涵盖了 Nest 中特定于 WebSockets 的方面。
+### WebSocket Gateway
 
-在 Nest 中，网关只是一个使用 `@WebSocketGateway()` 装饰器注释的类。从技术上讲，网关是平台无关的，这使得它们在创建适配器后与任何 WebSockets 库兼容。开箱即用支持两个 WS 平台：[socket.io](https://github.com/socketio/socket.io) 和 [ws](https://github.com/websockets/ws)。您可以选择最适合您需求的一个。此外，您还可以按照此 [指南](/websockets/adapter) 构建自己的适配器。
+大多数情况下，Nest 中讨论的概念都可以应用于 WebSocket Gateway，即使是依赖注入、装饰器、异常过滤器、管道、守卫和拦截器。在这里，我们将讨论 Nest 中与 WebSocket 相关的特定概念。
 
-<figure><img class="illustrative-image" src="/assets/Gateways_1.png" /></figure>
+在 Nest 中，WebSocket Gateway 是一个简单的类，使用 `setup()` 装饰器来标记。技术上讲，gateways 是平台无关的，可以与任何 WebSocket 库一起使用，只要创建了适配器。Nest 支持两个 WS 平台：__LINK_95__ 和 __LINK_96__。您可以根据需要选择合适的平台。您也可以创建自己的适配器，以便遵循 __LINK_97__。
 
-> info **提示** 网关可以被视为 [](/overview/providers)；这意味着它们可以通过类构造函数注入依赖项。此外，网关也可以被其他类（提供者和控制器）注入。
+__HTML_TAG_58____HTML_TAG_59____HTML_TAG_60__
+
+> info **提示**gateways 可以被视为 __LINK_98__，这意味着它们可以通过类构造函数注入依赖项。此外，gateways 也可以被其他类（提供者和控制器）注入。
 
 #### 安装
 
-要开始构建基于 WebSockets 的应用程序，首先安装所需的包：
+要开始构建 WebSocket 应用程序，首先安装必要的包：
 
 ```bash
-$ npm i --save @nestjs/websockets @nestjs/platform-socket.io
+$ npm install --save @nestjs/swagger
 
 ```
 
 #### 概述
 
-通常，每个网关都在与 **HTTP 服务器** 相同的端口上监听，除非您的应用程序不是 Web 应用程序，或者您手动更改了端口。可以通过向 `@WebSocketGateway(80)` 装饰器传递一个参数来修改此默认行为，其中 `80` 是选定的端口号。您还可以使用以下构造设置网关使用的 [命名空间](https://socket.io/docs/v4/namespaces/)：
+在一般情况下，每个 gateway 都在与 **HTTP 服务器**相同的端口上监听，除非您的应用程序不是 Web 应用程序或您已经更改了端口。这个默认行为可以通过将 `SwaggerModule` 的值设置为一个特定的端口号来修改。您也可以使用以下构造来设置 gateway 使用的 __LINK_99__：
 
 ```typescript
-@WebSocketGateway(80, { namespace: 'events' })
+import { NestFactory } from '@nestjs/core';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  const config = new DocumentBuilder()
+    .setTitle('Cats example')
+    .setDescription('The cats API description')
+    .setVersion('1.0')
+    .addTag('cats')
+    .build();
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, documentFactory);
+
+  await app.listen(process.env.PORT ?? 3000);
+}
+bootstrap();
 
 ```
 
-> warning **警告** 在现有模块的 providers 数组中引用网关之前，它们不会被实例化。
+> warning **警告**gateways 只有在已经在现有模块的提供者数组中被引用时才会被实例化。
 
-您可以通过 `@WebSocketGateway()` 装饰器的第二个参数将任何受支持的 [选项](https://socket.io/docs/v4/server-options/) 传递给 socket 构造函数，如下所示：
+您可以将支持的 __LINK_100__ 传递给 socket 构造函数，以便将其传递给 `http://localhost:3000/api-json` 装饰器，例如：
 
-```typescript
-@WebSocketGateway(81, { transports: ['websocket'] })
+```bash
+$ npm run start
 
 ```
 
-网关现在正在监听，但我们尚未订阅任何传入消息。让我们创建一个处理器，它将订阅 `events` 消息并使用完全相同的数据响应用户。
+gateway 现在正在监听，但是我们还没有订阅任何 incoming 消息。让我们创建一个处理程序来订阅 `http://localhost:3000/api` 消息并将 exact same 数据回送给用户。
 
 ```typescript
-@SubscribeMessage('events')
-handleEvent(@MessageBody() data: string): string {
-  return data;
+> SwaggerModule.setup('swagger', app, documentFactory, {
+>   jsonDocumentUrl: 'swagger/json',
+> });
+> ```
+
+> info **提示** `@nestjs/swagger` 和 `http://localhost:3000/swagger/json` 装饰器来自 `fastify` 包。
+
+创建了 gateway 之后，我们可以将其注册到我们的模块中。
+
+```typescript
+> app.register(helmet, {
+>   contentSecurityPolicy: {
+>     directives: {
+>       defaultSrc: [`'self'`],
+>       styleSrc: [`'self'`, `'unsafe-inline'`],
+>       imgSrc: [`'self'`, 'data:', 'validator.swagger.io'],
+>       scriptSrc: [`'self'`, `https: 'unsafe-inline'`],
+>     },
+>   },
+> });
+>
+> // If you are not going to use CSP at all, you can use this:
+> app.register(helmet, {
+>   contentSecurityPolicy: false,
+> });
+> ```
+
+您也可以将 property 关键传递给装饰器，以便从 incoming 消息体中提取：
+
+```TypeScript
+export interface SwaggerDocumentOptions {
+  /**
+   * List of modules to include in the specification
+   */
+  include?: Function[];
+
+  /**
+   * Additional, extra models that should be inspected and included in the specification
+   */
+  extraModels?: Function[];
+
+  /**
+   * If `true`, swagger will ignore the global prefix set through `setGlobalPrefix()` method
+   */
+  ignoreGlobalPrefix?: boolean;
+
+  /**
+   * If `true`, swagger will also load routes from the modules imported by `include` modules
+   */
+  deepScanRoutes?: boolean;
+
+  /**
+   * Custom operationIdFactory that will be used to generate the `operationId`
+   * based on the `controllerKey`, `methodKey`, and version.
+   * @default () => controllerKey_methodKey_version
+   */
+  operationIdFactory?: OperationIdFactory;
+
+  /**
+   * Custom linkNameFactory that will be used to generate the name of links
+   * in the `links` field of responses
+   *
+   * @see [Link objects](https://swagger.io/docs/specification/links/)
+   *
+   * @default () => `${controllerKey}_${methodKey}_from_${fieldKey}`
+   */
+  linkNameFactory?: (
+    controllerKey: string,
+    methodKey: string,
+    fieldKey: string
+  ) => string;
+
+  /*
+   * Generate tags automatically based on the controller name.
+   * If `false`, you must use the `@ApiTags()` decorator to define tags.
+   * Otherwise, the controller name without the suffix `Controller` will be used.
+   * @default true
+   */
+  autoTagControllers?: boolean;
 }
 
 ```
 
-> info **提示** `@SubscribeMessage()` 和 `@MessageBody()` 装饰器是从 `@nestjs/websockets` 包中导入的。
+如果您不想使用装饰器，可以使用以下代码来实现相同的结果：
 
-一旦创建了网关，我们就可以在我们的模块中注册它。
-
-```typescript
-import { Module } from '@nestjs/common';
-import { EventsGateway } from './events.gateway';
-
-@Module({
-  providers: [EventsGateway]
-})
-export class EventsModule {}
+```TypeScript
+const options: SwaggerDocumentOptions =  {
+  operationIdFactory: (
+    controllerKey: string,
+    methodKey: string
+  ) => methodKey
+};
+const documentFactory = () => SwaggerModule.createDocument(app, config, options);
 
 ```
 
-您还可以将属性键传递给装饰器以从传入消息正文中提取它：
+在上面的示例中，`helmet` 函数接受两个参数。第一个参数是平台特定的 __LINK_101__，而第二个参数是从客户端接收的数据。这种方法不太推荐，因为它需要在每个单元测试中模拟 `SwaggerDocumentOptions` 实例。
 
-```typescript
-@SubscribeMessage('events')
-handleEvent(@MessageBody('id') id: number): number {
-  // id === messageBody.id
-  return id;
+当 `createUser` 消息被接收时，处理程序将发送一个相同的数据作为回应。此外，还可以使用库特定的方法来 emit 消息，例如使用 `UsersController_createUser` 方法。在访问连接 socket 实例时，请使用 `SwaggerCustomOptions` 装饰器。
+
+```TypeScript
+export interface SwaggerCustomOptions {
+  /**
+   * If `true`, Swagger resources paths will be prefixed by the global prefix set through `setGlobalPrefix()`.
+   * Default: `false`.
+   * @see /faq/global-prefix
+   */
+  useGlobalPrefix?: boolean;
+
+  /**
+   * If `false`, the Swagger UI will not be served. Only API definitions (JSON and YAML)
+   * will be accessible (on `/{path}-json` and `/{path}-yaml`). To fully disable both the Swagger UI and API definitions, use `raw: false`.
+   * Default: `true`.
+   * @deprecated Use `ui` instead.
+   */
+  swaggerUiEnabled?: boolean;
+
+  /**
+   * If `false`, the Swagger UI will not be served. Only API definitions (JSON and YAML)
+   * will be accessible (on `/{path}-json` and `/{path}-yaml`). To fully disable both the Swagger UI and API definitions, use `raw: false`.
+   * Default: `true`.
+   */
+  ui?: boolean;
+
+  /**
+   * If `true`, raw definitions for all formats will be served.
+   * Alternatively, you can pass an array to specify the formats to be served, e.g., `raw: ['json']` to serve only JSON definitions.
+   * If omitted or set to an empty array, no definitions (JSON or YAML) will be served.
+   * Use this option to control the availability of Swagger-related endpoints.
+   * Default: `true`.
+   */
+  raw?: boolean | Array<'json' | 'yaml'>;
+
+  /**
+   * Url point the API definition to load in Swagger UI.
+   */
+  swaggerUrl?: string;
+
+  /**
+   * Path of the JSON API definition to serve.
+   * Default: `<path>-json`.
+   */
+  jsonDocumentUrl?: string;
+
+  /**
+   * Path of the YAML API definition to serve.
+   * Default: `<path>-yaml`.
+   */
+  yamlDocumentUrl?: string;
+
+  /**
+   * Hook allowing to alter the OpenAPI document before being served.
+   * It's called after the document is generated and before it is served as JSON & YAML.
+   */
+  patchDocumentOnRequest?: <TRequest = any, TResponse = any>(
+    req: TRequest,
+    res: TResponse,
+    document: OpenAPIObject
+  ) => OpenAPIObject;
+
+  /**
+   * If `true`, the selector of OpenAPI definitions is displayed in the Swagger UI interface.
+   * Default: `false`.
+   */
+  explorer?: boolean;
+
+  /**
+   * Additional Swagger UI options
+   */
+  swaggerOptions?: SwaggerUiOptions;
+
+  /**
+   * Custom CSS styles to inject in Swagger UI page.
+   */
+  customCss?: string;
+
+  /**
+   * URL(s) of a custom CSS stylesheet to load in Swagger UI page.
+   */
+  customCssUrl?: string | string[];
+
+  /**
+   * URL(s) of custom JavaScript files to load in Swagger UI page.
+   */
+  customJs?: string | string[];
+
+  /**
+   * Custom JavaScript scripts to load in Swagger UI page.
+   */
+  customJsStr?: string | string[];
+
+  /**
+   * Custom favicon for Swagger UI page.
+   */
+  customfavIcon?: string;
+
+  /**
+   * Custom title for Swagger UI page.
+   */
+  customSiteTitle?: string;
+
+  /**
+   * File system path (ex: ./node_modules/swagger-ui-dist) containing static Swagger UI assets.
+   */
+  customSwaggerUiPath?: string;
+
+  /**
+   * @deprecated This property has no effect.
+   */
+  validatorUrl?: string;
+
+  /**
+   * @deprecated This property has no effect.
+   */
+  url?: string;
+
+  /**
+   * @deprecated This property has no effect.
+   */
+  urls?: Record<'url' | 'name', string>[];
 }
 
 ```
 
-如果您不想使用装饰器，以下代码在功能上是等效的：
+> info **提示** `SwaggerModule#设置` 装饰器来自 `ui` 包。
+
+但是，在这种情况下，您不能使用拦截器。如果您不想回送用户，可以简单地跳过 `raw` 语句（或者明确地返回一个“falsy”值，例如 `ui: false`）。
+
+现在，当客户端 emit 消息时：
 
 ```typescript
-@SubscribeMessage('events')
-handleEvent(client: Socket, data: string): string {
-  return data;
-}
+> const options: SwaggerCustomOptions = {
+>   ui: false, // Swagger UI is disabled
+>   raw: ['json'], // JSON API definition is still accessible (YAML is disabled)
+> };
+> SwaggerModule.setup('api', app, options);
+> ```
 
-```
+`raw: []` 方法将被执行。在订阅来自上述处理程序的消息时，客户端需要附加相应的确认监听器：
 
-在上面的示例中，`handleEvent()` 函数有两个参数。第一个是平台特定的 [socket 实例](https://socket.io/docs/v4/server-api/#socket)，而第二个是从客户端接收的数据。但不推荐这种方法，因为它需要在每个单元测试中模拟 `socket` 实例。
+__CODE_BLOCK_9__
 
-一旦接收到 `events` 消息，处理器就会发送一个包含在网络上发送的相同数据的确认。此外，可以使用库特定的方法发射消息，例如，利用 `client.emit()` 方法。为了访问连接的 socket 实例，使用 `@ConnectedSocket()` 装饰器。
+返回值从消息处理程序中隐式地发送确认，但是在 advanced 场景中通常需要直接控制确认回调。
 
-```typescript
-@SubscribeMessage('events')
-handleEvent(
-  @MessageBody() data: string,
-  @ConnectedSocket() client: Socket,
-): string {
-  return data;
-}
+__INLINE_CODE_34__ 参数装饰器允许将 __INLINE_CODE_35__ 回调函数直接注入到消息处理程序中。
+没有使用装饰器，这个回调将作为方法的第三个参数传递。
 
-```
-
-> info **提示** `@ConnectedSocket()` 装饰器是从 `@nestjs/websockets` 包中导入的。
-
-但是，在这种情况下，您将无法利用拦截器。如果您不想响应用户，只需跳过 `return` 语句（或显式返回一个“假”值，例如 `undefined`）。
-
-现在，当客户端按如下方式发射消息时：
-
-```typescript
-socket.emit('events', { name: 'Nest' });
-
-```
-
-`handleEvent()` 方法将被执行。为了监听从上述处理器内部发射的消息，客户端必须附加一个相应的确认监听器：
-
-```typescript
-socket.emit('events', { name: 'Nest' }, (data) => console.log(data));
-
-```
-
-虽然从消息处理器返回值本质上会发送确认，但高级场景通常需要直接控制确认回调。
-
-`@Ack()` 参数装饰器允许将 `ack` 回调函数直接注入消息处理器。
-如果不使用装饰器，此回调将作为方法的第三个参数传递。
-
-```typescript
-@SubscribeMessage('events')
-handleEvent(
-  @MessageBody() data: string,
-  @Ack() ack: (response: { status: string; data: string }) => void,
-) {
-  ack({ status: 'received', data });
-}
-
-```
+__CODE_BLOCK_10__
 
 #### 多个响应
 
-确认仅调度一次。此外，原生 WebSockets 实现不支持它。为了解决此限制，您可以返回一个由两个属性组成的对象。`event` 是发射的事件名称，`data` 是必须转发给客户端的数据。
+确认只会被发送一次。 native WebSockets 实现不支持确认。为了解决这个限制，可以返回一个包含两个属性的对象。__INLINE_CODE_36__ 是事件名称，__INLINE_CODE_37__ 是要将其转发到客户端的数据。
 
-```typescript
-@SubscribeMessage('events')
-handleEvent(@MessageBody() data: unknown): WsResponse<unknown> {
-  const event = 'events';
-  return { event, data };
-}
+__CODE_BLOCK_11__
 
-```
+> info **提示** __INLINE_CODE_38__ 接口来自 __INLINE_CODE_39__ 包。
 
-> info **提示** `WsResponse` 接口是从 `@nestjs/websockets` 包中导入的。
+> warning **警告**如果您的 __INLINE_CODE_41__ 字段依赖于 __INLINE_CODE_42__，请返回实现 __INLINE_CODE_40__ 的类实例，而不是 plain JavaScript 对象响应。以下是翻译后的中文技术文档：
 
-> warning **警告** 如果您的 `data` 字段依赖于 `ClassSerializerInterceptor`，则应该返回一个实现 `WsResponse` 的类实例，因为它会忽略纯 JavaScript 对象响应。
+**异步响应**
 
-为了监听传入的响应，客户端必须应用另一个事件监听器。
+消息处理器可以以同步或异步方式响应。因此，__INLINE_CODE_43__方法是支持的。消息处理器也可以返回一个__INLINE_CODE_44__，在这种情况下，结果值将直到流程完成时被 emitted。
 
-```typescript
-socket.on('events', (data) => console.log(data));
+__CODE_BLOCK_13__
 
-```
+在上面的示例中，消息处理器将响应__3__次（每个数组项）。
 
-#### 异步响应
+#### 生命周期 hooks
 
-消息处理器能够以同步或 **异步** 方式响应。因此，支持 `async` 方法。消息处理器还能够返回一个 `Observable`，在这种情况下，结果值将被发射直到流完成。
+有三个有用的生命周期 hooks 可用。所有它们都有相应的接口，并在以下表格中描述：
 
-```typescript
-@SubscribeMessage('events')
-onEvent(@MessageBody() data: unknown): Observable<WsResponse<number>> {
-  const event = 'events';
-  const response = [1, 2, 3];
+__HTML_TAG_61__
+  __HTML_TAG_62__
+    __HTML_TAG_63__
+      __HTML_TAG_64__OnGatewayInit__HTML_TAG_65__
+    __HTML_TAG_66__
+    __HTML_TAG_67__
+      强制实施 __HTML_TAG_68__afterInit()__HTML_TAG_69__ 方法。它将接收库特定的服务器实例作为参数（如果需要传递其它参数）。
+    __HTML_TAG_70__
+  __HTML_TAG_71__
+  __HTML_TAG_72__
+    __HTML_TAG_73__
+      __HTML_TAG_74__OnGatewayConnection__HTML_TAG_75__
+    __HTML_TAG_76__
+    __HTML_TAG_77__
+      强制实施 __HTML_TAG_78__handleConnection()__HTML_TAG_79__ 方法。它将接收库特定的客户端套接字实例作为参数。
+    __HTML_TAG_80__
+  __HTML_TAG_81__
+  __HTML_TAG_82__
+    __HTML_TAG_83__
+      __HTML_TAG_84__OnGatewayDisconnect__HTML_TAG_85__
+    __HTML_TAG_86__
+    __HTML_TAG_87__
+      强制实施 __HTML_TAG_88__handleDisconnect()__HTML_TAG_89__ 方法。它将接收库特定的客户端套接字实例作为参数。
+    __HTML_TAG_90__
+  __HTML_TAG_91__
+__HTML_TAG_92__
 
-  return from(response).pipe(
-    map(data => ({ event, data })),
-  );
-}
-
-  return from(response).pipe(
-    map(data => ({ event, data })),
-  );
-}
-
-```
-
-在上面的示例中，消息处理器将响应 **3 次**（数组中的每个项目对应一次）。
-
-#### 生命周期钩子
-
-有 3 个有用的生命周期钩子可用。它们都有相应的接口，并在下表中进行了描述：
-
-<table>
-  <tr>
-    <td>
-      <code>OnGatewayInit</code>
-    </td>
-    <td>
-      强制实现 <code>afterInit()</code> 方法。将库特定的服务器实例作为参数（如果需要，还会展开其余部分）。
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <code>OnGatewayConnection</code>
-    </td>
-    <td>
-      强制实现 <code>handleConnection()</code> 方法。将库特定的客户端 socket 实例作为参数。
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <code>OnGatewayDisconnect</code>
-    </td>
-    <td>
-      强制实现 <code>handleDisconnect()</code> 方法。将库特定的客户端 socket 实例作为参数。
-    </td>
-  </tr>
-</table>
-
-> info **提示** 每个生命周期接口均从 `@nestjs/websockets` 包中公开。
+> 提示 **hint** 每个生命周期接口都是从 __INLINE_CODE_45__ 包中暴露的。
 
 #### 服务器和命名空间
 
-有时，您可能希望直接访问原生的、**平台特定** 的服务器实例。对此对象的引用作为参数传递给 `afterInit()` 方法（`OnGatewayInit` 接口）。另一种选择是使用 `@WebSocketServer()` 装饰器。
+有时，你可能想要拥有对native、平台特定的服务器实例的直接访问。该对象的引用将作为参数传递给 __INLINE_CODE_46__ 方法 (__INLINE_CODE_47__ 接口)。另一个选项是使用 __INLINE_CODE_48__ 装饰器。
 
-```typescript
-@WebSocketServer()
-server: Server;
+__CODE_BLOCK_14__
 
-```
+此外，你可以使用 __INLINE_CODE_49__ 属性来获取相应的命名空间，如下所示：
 
-此外，您可以使用 `namespace` 属性检索相应的命名空间，如下所示：
+__CODE_BLOCK_15__
 
-```typescript
-@WebSocketGateway({ namespace: 'my-namespace' })
-export class EventsGateway {
-  @WebSocketServer()
-  namespace: Namespace;
-}
+__INLINE_CODE_50__ 装饰器将通过参考 __INLINE_CODE_51__ 装饰器存储的元数据来inject 一个服务器实例。如果你将命名空间选项传递给 __INLINE_CODE_52__ 装饰器，__INLINE_CODE_53__ 装饰器将返回一个 __INLINE_CODE_54__ 实例，而不是 __INLINE_CODE_55__ 实例。
 
-```
+> 警告 **Notice** __INLINE_CODE_56__ 装饰器来自 __INLINE_CODE_57__ 包。
 
-`@WebSocketServer()` 装饰器通过引用 `@WebSocketGateway()` 装饰器存储的元数据来注入服务器实例。如果您为 `@WebSocketGateway()` 装饰器提供了命名空间选项，则 `@WebSocketServer()` 装饰器将返回 `Namespace` 实例而不是 `Server` 实例。
+Nest 将自动将服务器实例分配给该属性，直到它准备使用。
 
-> warning **注意** `@WebSocketServer()` 装饰器是从 `@nestjs/websockets` 包中导入的。
-
-一旦服务器实例准备就绪，Nest 将自动将其分配给此属性。
-
-<app-banner-enterprise></app-banner-enterprise>
+__HTML_TAG_93____HTML_TAG_94__
 
 #### 示例
 
-一个工作的例子可以在[这里](https://github.com/nestjs/nest/tree/master/sample/02-gateways)查看。
+有一个可用的工作示例 __LINK_102__。

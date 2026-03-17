@@ -1,444 +1,335 @@
+<!-- 此文件从 content/techniques/task-scheduling.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-17T05:06:10.075Z -->
+<!-- 源文件: content/techniques/task-scheduling.md -->
+
 ### 任务调度
 
-任务调度允许您安排任意代码（方法/函数）在固定的日期/时间、重复的间隔或指定的间隔后执行一次。在 Linux 世界中，这通常由操作系统级别的 [cron](https://en.wikipedia.org/wiki/Cron) 等包处理。对于 Node.js 应用程序，有几个包可以模拟类似 cron 的功能。Nest 提供了 `@nestjs/schedule` 包，它与流行的 Node.js [cron](https://github.com/kelektiv/node-cron) 包集成。我们将在本章中介绍这个包。
+任务调度允许您在固定日期/时间、重复间隔或指定间隔后执行任意代码（方法/函数）。在 Linux 世界中，这通常由像 __LINK_232__ 这样的包在操作系统级别处理。对于 Node.js 应用程序，有多个包模拟 cron 类似功能。Nest 提供了 `symbol` 包，它与流行的 Node.js __LINK_233__ 包集成。我们将在当前章节中涵盖这个包。
 
 #### 安装
 
 要开始使用它，我们首先安装所需的依赖项。
 
-```bash
-$ npm install --save @nestjs/schedule
+```shell
+$ npm i --save @nestjs/event-emitter
 
 ```
 
-要激活作业调度，将 `ScheduleModule` 导入到根 `AppModule` 中并运行 `forRoot()` 静态方法，如下所示：
+要激活任务调度，导入 `string | symbol | Array<string | symbol>` 到根 `OnOptions` 并运行 `eventemitter2` 静态方法，如下所示：
 
 ```typescript
 import { Module } from '@nestjs/common';
-import { ScheduleModule } from '@nestjs/schedule';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
-    ScheduleModule.forRoot()
+    EventEmitterModule.forRoot()
   ],
 })
 export class AppModule {}
 
 ```
 
-`.forRoot()` 调用初始化调度程序并注册应用程序中存在的任何声明性 <a href="techniques/task-scheduling#声明式-cron-任务">cron 作业</a>、<a href="techniques/task-scheduling#声明式超时">超时</a> 和 <a href="techniques/task-scheduling#声明式间隔任务">间隔</a>。注册发生在 `onApplicationBootstrap` 生命周期钩子发生时，确保所有模块都已加载并声明了任何计划的作业。
+`wildcard` 调用初始化调度器，并注册任何声明式 __HTML_TAG_108__cron 作业、 __HTML_TAG_110__超时和 __HTML_TAG_112__间隔，该注册发生在 `EventEmitterModule#forRoot()` 生命周期钩子中，以确保所有模块已加载并声明了任何 schedules 作业。
 
-#### 声明式 cron 任务
+#### 声明式 cron 作业
 
-cron 作业安排任意函数（方法调用）自动运行。Cron 作业可以运行：
+cron 作业将任意函数（方法调用）排程为自动执行。cron 作业可以在以下时间执行：
 
-- 一次，在指定的日期/时间。
-- 定期；定期作业可以在指定的时间间隔内的指定时刻运行（例如，每小时一次、每周一次、每 5 分钟一次）
+- 一次，指定日期/时间。
+- 在指定的间隔重复执行；重复作业可以在指定的瞬间执行（例如，每小时、每周、每 5 分钟）
 
-通过在包含要执行的代码的方法定义之前使用 `@Cron()` 装饰器来声明 cron 作业，如下所示：
+使用 `foo.bar` 装饰器在方法定义中包含要执行的代码，例如：
 
 ```typescript
-import { Injectable, Logger } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
-
-@Injectable()
-export class TasksService {
-  private readonly logger = new Logger(TasksService.name);
-
-  @Cron('45 * * * * *')
-handleCron() {
-    this.logger.debug('Called when the current second is 45');
-  }
-}
+EventEmitterModule.forRoot({
+  // set this to `true` to use wildcards
+  wildcard: false,
+  // the delimiter used to segment namespaces
+  delimiter: '.',
+  // set this to `true` if you want to emit the newListener event
+  newListener: false,
+  // set this to `true` if you want to emit the removeListener event
+  removeListener: false,
+  // the maximum amount of listeners that can be assigned to an event
+  maxListeners: 10,
+  // show event name in memory leak message when more than maximum amount of listeners is assigned
+  verboseMemoryLeak: false,
+  // disable throwing uncaughtException if an error event is emitted and it has no listeners
+  ignoreErrors: false,
+});
 
 ```
 
-在这个例子中，`handleCron()` 方法将在当前秒为 `45` 时被调用。换句话说，该方法将每分钟运行一次，在 45 秒标记处。
+在这个示例中，`['foo', 'bar']` 方法将在当前秒的 `delimiter` 时执行。在其他字面上，方法将在每分钟的 45 秒时执行。
 
-`@Cron()` 装饰器支持以下标准 [cron 模式](http://crontab.org/)：
+`order.*` 装饰器支持以下标准 __LINK_234__：
 
-- 星号（例如 `*`）
-- 范围（例如 `1-3,5`）
-- 步骤（例如 `*/2`）
+- 星号（例如 `order.created`）
+- 范围（例如 `order.shipped`）
+- 步长（例如 `order.delayed.out_of_stock`）
 
-在上面的例子中，我们向装饰器传递了 `45 * * * * *`。以下键显示了 cron 模式字符串中每个位置的解释：
+在上面的示例中，我们将 `multilevel wildcard` 传递给装饰器。下面是 cron 模式字符串中的每个位置的解释：
 
-<pre class="language-javascript"><code class="language-javascript">
+__HTML_TAG_114____HTML_TAG_115__
 * * * * * *
 | | | | | |
-| | | | | day of week
-| | | | months
-| | | day of month
-| | hours
-| minutes
-seconds (optional)
-</code></pre>
+| | | | | 周一至周五
+| | | | 月份
+| | | 日期
+| | 小时
+| 分钟
+秒 (可选)
+__HTML_TAG_116____HTML_TAG_117__
 
-一些示例 cron 模式：
+以下是一些示例 cron 模式：
 
-<table>
-  <tbody>
-    <tr>
-      <td><code>* * * * * *</code></td>
-      <td>每秒</td>
-    </tr>
-    <tr>
-      <td><code>45 * * * * *</code></td>
-      <td>每分钟，在第 45 秒</td>
-    </tr>
-    <tr>
-      <td><code>0 10 * * * *</code></td>
-      <td>每小时，在第 10 分钟开始时</td>
-    </tr>
-    <tr>
-      <td><code>0 */30 9-17 * * *</code></td>
-      <td>上午 9 点到下午 5 点之间每 30 分钟</td>
-    </tr>
-   <tr>
-      <td><code>0 30 11 * * 1-5</code></td>
-      <td>周一至周五上午 11:30</td>
-    </tr>
-  </tbody>
-</table>
+__HTML_TAG_118__
+  __HTML_TAG_119__
+    __HTML_TAG_120__
+      __HTML_TAG_121____HTML_TAG_122__* * * * * *__HTML_TAG_123____HTML_TAG_124__
+      __HTML_TAG_125__每秒__HTML_TAG_126__
+    __HTML_TAG_127__
+    __HTML_TAG_128__
+      __HTML_TAG_129____HTML_TAG_130__45 * * * * *__HTML_TAG_131____HTML_TAG_132__
+      __HTML_TAG_133__每分钟，45 秒时__HTML_TAG_134__
+    __HTML_TAG_135__
+    __HTML_TAG_136__
+      __HTML_TAG_137____HTML_TAG_138__0 10 * * * *__HTML_TAG_139____HTML_TAG_140__
+      __HTML_TAG_141__每小时，10 分钟开始__HTML_TAG_142__
+    __HTML_TAG_143__
+    __HTML_TAG_144__
+      __HTML_TAG_145____HTML_TAG_146__0 */30 9-17 * * *__HTML_TAG_147____HTML_TAG_148__
+      __HTML_TAG_149__每 30 分钟，9:00 到 17:00__HTML_TAG_150__
+    __HTML_TAG_151__
+   __HTML_TAG_152__
+      __HTML_TAG_153____HTML_TAG_154__0 30 11 * * 1-5__HTML_TAG_155____HTML_TAG_156__
+      __HTML_TAG_157__周一至周五，11:30__HTML_TAG_158__
+    __HTML_TAG_159__
+  __HTML_TAG_160__
+__HTML_TAG_161__
 
-`@nestjs/schedule` 包提供了一个方便的枚举，包含常用的 cron 模式。您可以如下使用此枚举：
+`**` 包提供了常用的 cron 模式枚举。您可以使用枚举如下：
 
 ```typescript
-import { Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+constructor(private eventEmitter: EventEmitter2) {}
 
-@Injectable()
-export class TasksService {
-  private readonly logger = new Logger(TasksService.name);
+```
 
-  @Cron(CronExpression.EVERY_30_SECONDS)
-handleCron() {
-    this.logger.debug('Called every 30 seconds');
-  }
+在这个示例中，`EventEmitter2` 方法将每 `EventEmitter2` 秒执行。如果出现异常，它将被记录到控制台，因为每个带有 `waitFor` 注解的方法都将被自动包围在 `onAny` 块中。
+
+或者，您可以将 JavaScript `onApplicationBootstrap` 对象传递给 `onModuleInit` 装饰器。这将导致作业在指定日期执行 exactly once。
+
+> 信息 **提示** 使用 JavaScript 日期算术来 scheduling 作业相对于当前日期。例如，`EventSubscribersLoader` 来 schedule 作业在 10 秒后启动。
+
+此外，您还可以将额外选项作为 `waitUntilReady` 装饰器的第二个参数。
+
+Note: The translation follows the provided glossary and guidelines.Here is the translation of the English technical documentation to Chinese:
+
+__HTML_TAG_162__
+  __HTML_TAG_163__
+    __HTML_TAG_164__
+      __HTML_TAG_165____HTML_TAG_166__name__HTML_TAG_167____HTML_TAG_168__
+      __HTML_TAG_169__
+        可以访问和控制一个 cron 作业后它被声明。
+      __HTML_TAG_170__
+    __HTML_TAG_171__
+    __HTML_TAG_172__
+      __HTML_TAG_173____HTML_TAG_174__timeZone__HTML_TAG_175____HTML_TAG_176__
+      __HTML_TAG_177__
+        指定执行的时区。这将修改实际时间相对于您的时区。如果时区无效，将抛出错误。您可以在 __HTML_TAG_178__Moment Timezone__HTML_TAG_179__ 网站上查看所有可用的时区。
+      __HTML_TAG_180__
+    __HTML_TAG_181__
+    __HTML_TAG_182__
+      __HTML_TAG_183____HTML_TAG_184__utcOffset__HTML_TAG_185____HTML_TAG_186__
+      __HTML_TAG_187__
+        这允许您指定时区的偏移，而不是使用 __HTML_TAG_188__timeZone__HTML_TAG_189__ 参数。
+      __HTML_TAG_190__
+    __HTML_TAG_191__
+    __HTML_TAG_192__
+      __HTML_TAG_193____HTML_TAG_194__waitForCompletion__HTML_TAG_195____HTML_TAG_196__
+      __HTML_TAG_197__
+        如果 __HTML_TAG_198__true__HTML_TAG_199__,当前 cron 作业完成时不会执行任何其他实例。任何在当前 cron 作业运行时排程的新执行将被完全跳过。
+      __HTML_TAG_200__
+    __HTML_TAG_201__
+    __HTML_TAG_202__
+      __HTML_TAG_203____HTML_TAG_204__disabled__HTML_TAG_205____HTML_TAG_206__
+      __HTML_TAG_207__
+       这表示是否会执行作业。
+      __HTML_TAG_208__
+    __HTML_TAG_209__
+  __HTML_TAG_210__
+__HTML_TAG_211__
+
+```typescript
+this.eventEmitter.emit(
+  'order.created',
+  new OrderCreatedEvent({
+    orderId: 1,
+    payload: {},
+  }),
+);
+
+```
+
+可以访问和控制已声明的 cron 作业，或者动态创建 cron 作业（其中 cron 模式在 runtime 定义），使用 __HTML_TAG_212__Dynamic API__HTML_TAG_213__。要访问已声明的 cron 作业，需要将作业与名称关联，通过在可选 options 对象中传递 `EventEmitterReadinessWatcher` 属性作为装饰器的第二个参数。
+
+#### 声明性间隔
+
+要声明一个方法将在指定的间隔运行，prefix 方法定义与 `onApplicationBootstrap` 装饰器。将间隔值作为毫秒数传递给装饰器，如下所示：
+
+```typescript
+@OnEvent('order.created')
+handleOrderCreatedEvent(payload: OrderCreatedEvent) {
+  // handle and process "OrderCreatedEvent" event
 }
 
 ```
 
-在这个例子中，`handleCron()` 方法将每 `30` 秒被调用一次。如果发生异常，它将被记录到控制台，因为每个用 `@Cron()` 注释的方法都会自动包装在 `try-catch` 块中。
+> info **Hint** 这个机制使用了 JavaScript 的 `onApplicationBootstrap` 函数。您也可以使用 cron 作业来计划重复的作业。
 
-或者，您可以向 `@Cron()` 装饰器提供一个 JavaScript `Date` 对象。这样做会导致作业在指定的日期恰好执行一次。
-
-> info **提示** 使用 JavaScript 日期算术来安排相对于当前日期的作业。例如，`@Cron(new Date(Date.now() + 10 * 1000))` 安排作业在应用程序启动后 10 秒运行。
-
-此外，您可以提供其他选项作为 `@Cron()` 装饰器的第二个参数。
-
-<table>
-  <tbody>
-    <tr>
-      <td><code>name</code></td>
-      <td>
-        用于在声明后访问和控制 cron 作业。
-      </td>
-    </tr>
-    <tr>
-      <td><code>timeZone</code></td>
-      <td>
-        指定执行的时区。这将相对于您的时区修改实际时间。如果时区无效，将抛出错误。您可以在 <a href="http://momentjs.com/timezone/">Moment Timezone</a> 网站上检查所有可用的时区。
-      </td>
-    </tr>
-    <tr>
-      <td><code>utcOffset</code></td>
-      <td>
-        这允许您指定时区的偏移量，而不是使用 <code>timeZone</code> 参数。
-      </td>
-    </tr>
-    <tr>
-      <td><code>waitForCompletion</code></td>
-      <td>
-        如果为 <code>true</code>，则在当前 onTick 回调完成之前，不会运行 cron 作业的其他实例。在当前 cron 作业运行时发生的任何新的计划执行将被完全跳过。
-      </td>
-    </tr>
-    <tr>
-      <td><code>disabled</code></td>
-      <td>
-       这表示作业是否会被执行。
-      </td>
-    </tr>
-  </tbody>
-</table>
+如果您想从外部控制声明性间隔，使用以下构造法将间隔与名称关联：
 
 ```typescript
-import { Injectable } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+export type OnEventOptions = OnOptions & {
+  /**
+   * If "true", prepends (instead of append) the given listener to the array of listeners.
+   *
+   * @see https://github.com/EventEmitter2/EventEmitter2#emitterprependlistenerevent-listener-options
+   *
+   * @default false
+   */
+  prependListener?: boolean;
 
-@Injectable()
-export class NotificationService {
-  @Cron('* * 0 * * *', {
-    name: 'notifications',
-    timeZone: 'Europe/Paris',
-  })
-  triggerNotifications() {}
+  /**
+   * If "true", the onEvent callback will not throw an error while handling the event. Otherwise, if "false" it will throw an error.
+   *
+   * @default true
+   */
+  suppressErrors?: boolean;
+};
+
+```
+
+如果出现异常，将被记录到控制台，因为每个带有 __INLINE_CODE_51__ 装饰器的方法都自动被包装在 __INLINE_CODE_52__ 块中。
+
+__HTML_TAG_216__Dynamic API__HTML_TAG_217__ 也启用了 **创建** 动态间隔，where the interval 的 properties 在 runtime 定义，以及 **listing 和 deleting** 它们。
+
+__HTML_TAG_218____HTML_TAG_219__
+
+#### 声明性超时
+
+要声明一个方法将在指定的超时后运行，prefix 方法定义与 __INLINE_CODE_53__ 装饰器。将相对时间偏移量（以毫秒为单位）从应用程序启动到装饰器中，如下所示：
+
+```typescript
+@OnEvent('order.created', { async: true })
+handleOrderCreatedEvent(payload: OrderCreatedEvent) {
+  // handle and process "OrderCreatedEvent" event
 }
 
 ```
 
-您可以在声明后访问和控制 cron 作业，或使用 <a href="/techniques/task-scheduling#动态调度模块-api">动态 API</a> 动态创建 cron 作业（其 cron 模式在运行时定义）。要通过 API 访问声明式 cron 作业，您必须通过在装饰器的第二个参数的可选选项对象中传递 `name` 属性来将作业与名称相关联。
+> info **Hint** 这个机制使用了 JavaScript 的 __INLINE_CODE_54__ 函数。
 
-#### 声明式间隔任务
+如果出现异常，将被记录到控制台，因为每个带有 __INLINE_CODE_55__ 装饰器的方法都自动被包装在 __INLINE_CODE_56__ 块中。
 
-要声明一个方法应该在（重复的）指定间隔运行，请在方法定义前加上 `@Interval()` 装饰器。将间隔值（以毫秒为单位的数字）传递给装饰器，如下所示：
+如果您想从外部控制声明性超时，使用以下构造法将超时与名称关联：
 
 ```typescript
-@Interval(10000)
-handleInterval() {
-  this.logger.debug('Called every 10 seconds');
+@OnEvent('order.*')
+handleOrderEvents(payload: OrderCreatedEvent | OrderRemovedEvent | OrderUpdatedEvent) {
+  // handle and process an event
 }
 
 ```
 
-> info **提示** 此机制在底层使用 JavaScript `setInterval()` 函数。您也可以利用 cron 作业来安排定期作业。
-
-如果您想通过 <a href="/techniques/task-scheduling#动态调度模块-api">动态 API</a> 从声明类外部控制声明式间隔，请使用以下构造将间隔与名称相关联：
-
-```typescript
-@Interval('notifications', 2500)
-handleInterval() {}
-
-```
-
-如果发生异常，它将被记录到控制台，因为每个用 `@Interval()` 注释的方法都会自动包装在 `try-catch` 块中。
-
-<a href="techniques/task-scheduling#动态间隔">动态 API</a> 还支持**创建**动态间隔，其中间隔的属性在运行时定义，以及**列出和删除**它们。
-
-<app-banner-enterprise></app-banner-enterprise>
-
-#### 声明式超时
-
-要声明一个方法应该在指定的超时后（一次）运行，请在方法定义前加上 `@Timeout()` 装饰器。将相对时间偏移（以毫秒为单位）从应用程序启动传递给装饰器，如下所示：
-
-```typescript
-@Timeout(5000)
-handleTimeout() {
-  this.logger.debug('Called once after 5 seconds');
-}
-
-```
-
-> info **提示** 此机制在底层使用 JavaScript `setTimeout()` 函数。
-
-如果发生异常，它将被记录到控制台，因为每个用 `@Timeout()` 注释的方法都会自动包装在 `try-catch` 块中。
-
-如果您想通过 <a href="/techniques/task-scheduling#动态调度模块-api">动态 API</a> 从声明类外部控制声明式超时，请使用以下构造将超时与名称相关联：
-
-```typescript
-@Timeout('notifications', 2500)
-handleTimeout() {}
-
-```
-
-<a href="techniques/task-scheduling#动态超时">动态 API</a> 还支持**创建**动态超时，其中超时的属性在运行时定义，以及**列出和删除**它们。
+__HTML_TAG_222__Dynamic API__HTML_TAG_223__ 也启用了 **创建** 动态超时，where the timeout 的 properties 在 runtime 定义，以及 **listing 和 deleting**它们。
 
 #### 动态调度模块 API
 
-`@nestjs/schedule` 模块提供了一个动态 API，用于管理声明式 <a href="techniques/task-scheduling#声明式-cron-任务">cron 作业</a>、<a href="techniques/task-scheduling#声明式超时">超时</a> 和 <a href="techniques/task-scheduling#声明式间隔任务">间隔</a>。API 还支持创建和管理**动态** cron 作业、超时和间隔，其中属性在运行时定义。
+__INLINE_CODE_57__ 模块提供了一个动态 API，enables managing 声明性 __HTML_TAG_224__cron 作业__HTML_TAG_225__, __HTML_TAG_226__timeouts__HTML_TAG_227__ 和 __HTML_TAG_228__intervals__HTML_TAG_229__. API 也启用了创建和管理 **动态** cron 作业、超时和间隔，where the properties 在 runtime 定义。
 
 #### 动态 cron 作业
 
-使用 `SchedulerRegistry` API 从代码中的任何位置按名称获取对 `CronJob` 实例的引用。首先，使用标准构造函数注入来注入 `SchedulerRegistry`：
+获取一个 __INLINE_CODE_58__ 实例的引用，使用名称从您的代码任何地方获取，使用 __INLINEHere is the translation of the provided English technical documentation to Chinese:
 
-```typescript
-constructor(private schedulerRegistry: SchedulerRegistry) {}
+__INLINE_CODE_63__ 方法返回指定的 cron 作业。返回的 __INLINE_CODE_64__ 对象具有以下方法：
 
-```
+- __INLINE_CODE_65__ - 停止一个定时任务。
+- __INLINE_CODE_66__ - 重新启动一个已停止的任务。
+- __INLINE_CODE_67__ - 停止一个任务，设置新的时间，然后启动它。
+- __INLINE_CODE_68__ - 返回一个 __INLINE_CODE_69__ 对象，表示最后一次任务执行的日期。
+- __INLINE_CODE_70__ - 返回一个 __INLINE_CODE_71__ 对象，表示下一次任务执行的日期。
+- __INLINE_CODE_72__ - 提供一个 __INLINE_CODE_73__ 大小的 __INLINE_CODE_74__ 数组，表示将要触发任务执行的日期集。 __INLINE_CODE_75__ 默认为 0，返回一个空数组。
 
-> info **提示** 从 `@nestjs/schedule` 包中导入 `SchedulerRegistry`。
+> info **Hint** 使用 __INLINE_CODE_76__ 方法将 __INLINE_CODE_77__ 对象转换为 JavaScript 日期的等效对象。
 
-然后在类中如下使用它。假设使用以下声明创建了一个 cron 作业：
+**创建** 一个新的 cron 作业动态地使用 __INLINE_CODE_78__ 方法，以下所示：
 
-```typescript
-@Cron('* * 8 * * *', {
-  name: 'notifications',
-})
-triggerNotifications() {}
+__CODE_BLOCK_12__
 
-```
+在这个代码中，我们使用 __INLINE_CODE_79__ 对象从 __INLINE_CODE_80__ 包中创建 cron 作业。 __INLINE_CODE_81__ 构造函数接受一个 cron 模式（与 __INLINE_CODE_82__ 装饰器相同）作为其第一个参数，以及当 cron 定时器触发时要执行的回调函数作为其第二个参数。 __INLINE_CODE_83__ 方法接受两个参数：cron 作业的名称和 __INLINE_CODE_85__ 对象本身。
 
-使用以下方法访问此作业：
+> warning **Warning** 记住在访问 __INLINE_CODE_86__ 之前需要将其注入。从 __INLINE_CODE_87__ 包中导入 __INLINE_CODE_88__。
 
-```typescript
-const job = this.schedulerRegistry.getCronJob('notifications');
+**删除** 一个名为 cron 作业使用 __INLINE_CODE_89__ 方法，以下所示：
 
-job.stop();
-console.log(job.lastDate());
+__CODE_BLOCK_13__
 
-```
+**列出** 所有 cron 作业使用 __INLINE_CODE_90__ 方法，以下所示：
 
-`getCronJob()` 方法返回命名的 cron 作业。返回的 `CronJob` 对象具有以下方法：
+__CODE_BLOCK_14__
 
-- `stop()` - 停止计划运行的作业。
-- `start()` - 重新启动已停止的作业。
-- `setTime(time: CronTime)` - 停止作业，为其设置新时间，然后启动它
-- `lastDate()` - 返回作业上次执行的日期的 `DateTime` 表示。
-- `nextDate()` - 返回作业下次执行计划的日期的 `DateTime` 表示。
-- `nextDates(count: number)` - 提供 `DateTime` 表示的数组（大小为 `count`），用于将触发作业执行的下一组日期。`count` 默认为 0，返回空数组。
-
-> info **提示** 在 `DateTime` 对象上使用 `toJSDate()` 将它们呈现为与此 DateTime 等效的 JavaScript Date。
-
-使用 `SchedulerRegistry#addCronJob` 方法动态**创建**新的 cron 作业，如下所示：
-
-```typescript
-addCronJob(name: string, seconds: string) {
-  const job = new CronJob(`${seconds} * * * * *`, () => {
-    this.logger.warn(`time (${seconds}) for job ${name} to run!`);
-  });
-
-  this.schedulerRegistry.addCronJob(name, job);
-  job.start();
-
-  this.logger.warn(
-    `job ${name} added for each minute at ${seconds} seconds!`,
-  );
-}
-
-```
-
-在这段代码中，我们使用 `cron` 包中的 `CronJob` 对象来创建 cron 作业。`CronJob` 构造函数的第一个参数是 cron 模式（就像 `@Cron()` <a href="techniques/task-scheduling#声明式-cron-任务">装饰器</a>），第二个参数是当 cron 计时器触发时要执行的回调。`SchedulerRegistry#addCronJob` 方法接受两个参数：`CronJob` 的名称和 `CronJob` 对象本身。
-
-> warning **警告** 记住在访问 `SchedulerRegistry` 之前注入它。从 `cron` 包导入 `CronJob`。
-
-使用 `SchedulerRegistry#deleteCronJob` 方法**删除**命名的 cron 作业，如下所示：
-
-```typescript
-deleteCron(name: string) {
-  this.schedulerRegistry.deleteCronJob(name);
-  this.logger.warn(`job ${name} deleted!`);
-}
-
-```
-
-使用 `SchedulerRegistry#getCronJobs` 方法**列出**所有 cron 作业，如下所示：
-
-```typescript
-getCrons() {
-  const jobs = this.schedulerRegistry.getCronJobs();
-  jobs.forEach((value, key, map) => {
-    let next;
-    try {
-      next = value.nextDate().toJSDate();
-    } catch (e) {
-      next = 'error: next fire date is in the past!';
-    }
-    this.logger.log(`job: ${key} -> next: ${next}`);
-  });
-}
-
-```
-
-`getCronJobs()` 方法返回一个 `map`。在这段代码中，我们遍历 map 并尝试访问每个 `CronJob` 的 `nextDate()` 方法。在 `CronJob` API 中，如果作业已经触发并且没有未来的触发日期，它会抛出异常。
+__INLINE_CODE_91__ 方法返回一个 __INLINE_CODE_92__ 对象。在这个代码中，我们遍历 map 并尝试访问每个 __INLINE_CODE_94__ 对象的 __INLINE_CODE_95__ 方法。在 __INLINE_CODE_96__ API 中，如果任务已经执行并且没有将来执行日期，它将抛出异常。
 
 #### 动态间隔
 
-使用 `SchedulerRegistry#getInterval` 方法获取对间隔的引用。如上所述，使用标准构造函数注入来注入 `SchedulerRegistry`：
+获取一个间隔的引用使用 __INLINE_CODE_96__ 方法。像上面一样，使用标准构造函数注入 __INLINE_CODE_97__：
 
-```typescript
-constructor(private schedulerRegistry: SchedulerRegistry) {}
+__CODE_BLOCK_15__
 
-```
+并使用它如下所示：
 
-并如下使用它：
+__CODE_BLOCK_16__
 
-```typescript
-const interval = this.schedulerRegistry.getInterval('notifications');
-clearInterval(interval);
+**创建** 一个新的间隔动态地使用 __INLINE_CODE_98__ 方法，以下所示：
 
-```
+__CODE_BLOCK_17__
 
-使用 `SchedulerRegistry#addInterval` 方法动态**创建**新的间隔，如下所示：
+在这个代码中，我们创建了一个标准的 JavaScript 间隔，然后将其传递给 __INLINE_CODE_99__ 方法。该方法接受两个参数：间隔的名称和间隔本身。
 
-```typescript
-addInterval(name: string, milliseconds: number) {
-  const callback = () => {
-    this.logger.warn(`Interval ${name} executing at time (${milliseconds})!`);
-  };
+**删除** 一个名为间隔使用 __INLINE_CODE_100__ 方法，以下所示：
 
-  const interval = setInterval(callback, milliseconds);
-  this.schedulerRegistry.addInterval(name, interval);
-}
+__CODE_BLOCK_18__
 
-```
+**列出** 所有间隔使用 __INLINE_CODE_101__ 方法，以下所示：
 
-在这段代码中，我们创建一个标准的 JavaScript 间隔，然后将其传递给 `SchedulerRegistry#addInterval` 方法。
-该方法接受两个参数：间隔的名称和间隔本身。
-
-使用 `SchedulerRegistry#deleteInterval` 方法**删除**命名的间隔，如下所示：
-
-```typescript
-deleteInterval(name: string) {
-  this.schedulerRegistry.deleteInterval(name);
-  this.logger.warn(`Interval ${name} deleted!`);
-}
-
-```
-
-使用 `SchedulerRegistry#getIntervals` 方法**列出**所有间隔，如下所示：
-
-```typescript
-getIntervals() {
-  const intervals = this.schedulerRegistry.getIntervals();
-  intervals.forEach(key => this.logger.log(`Interval: ${key}`));
-}
-
-```
+__CODE_BLOCK_19__
 
 #### 动态超时
 
-使用 `SchedulerRegistry#getTimeout` 方法获取对超时的引用。如上所述，使用标准构造函数注入来注入 `SchedulerRegistry`：
+获取一个超时的引用使用 __INLINE_CODE_102__ 方法。像上面一样，使用标准构造函数注入 __INLINE_CODE_103__：
 
-```typescript
-constructor(private readonly schedulerRegistry: SchedulerRegistry) {}
+__CODE_BLOCK_20__
 
-```
+并使用它如下所示：
 
-并如下使用它：
+__CODE_BLOCK_21__
 
-```typescript
-const timeout = this.schedulerRegistry.getTimeout('notifications');
-clearTimeout(timeout);
+**创建** 一个新的超时动态地使用 __INLINE_CODE_104__ 方法，以下所示：
 
-```
+__CODE_BLOCK_22__
 
-使用 `SchedulerRegistry#addTimeout` 方法动态**创建**新的超时，如下所示：
+在这个代码中，我们创建了一个标准的 JavaScript 超时，然后将其传递给 __INLINE_CODE_105__ 方法。该方法接受两个参数：超时的名称和超时本身。
 
-```typescript
-addTimeout(name: string, milliseconds: number) {
-  const callback = () => {
-    this.logger.warn(`Timeout ${name} executing after (${milliseconds})!`);
-  };
+**删除** 一个名为超时使用 __INLINE_CODE_106__ 方法，以下所示：
 
-  const timeout = setTimeout(callback, milliseconds);
-  this.schedulerRegistry.addTimeout(name, timeout);
-}
+__CODE_BLOCK_23__
 
-```
+**列出** 所有超时使用 __INLINE_CODE_107__ 方法，以下所示：
 
-在这段代码中，我们创建一个标准的 JavaScript 超时，然后将其传递给 `SchedulerRegistry#addTimeout` 方法。
-该方法接受两个参数：超时的名称和超时本身。
-
-使用 `SchedulerRegistry#deleteTimeout` 方法**删除**命名的超时，如下所示：
-
-```typescript
-deleteTimeout(name: string) {
-  this.schedulerRegistry.deleteTimeout(name);
-  this.logger.warn(`Timeout ${name} deleted!`);
-}
-
-```
-
-使用 `SchedulerRegistry#getTimeouts` 方法**列出**所有超时，如下所示：
-
-```typescript
-getTimeouts() {
-  const timeouts = this.schedulerRegistry.getTimeouts();
-  timeouts.forEach(key => this.logger.log(`Timeout: ${key}`));
-}
-
-```
+__CODE_BLOCK_24__
 
 #### 示例
 
-一个工作示例可在 [这里](https://github.com/nestjs/nest/tree/master/sample/27-scheduling) 找到。
+一个工作示例可在 __LINK_235__ 中找到。

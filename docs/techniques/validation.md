@@ -23,7 +23,9 @@ $ npm i --save class-validator class-transformer
 
 ```
 
-> info **提示** `ValidationPipe` 从 `@nestjs/common` 包导出。
+:::info 提示
+`ValidationPipe` 从 `@nestjs/common` 包导出。
+:::
 
 因为此管道使用 [`class-validator`](https://github.com/typestack/class-validator) 和 [`class-transformer`](https://github.com/typestack/class-transformer) 库，所以有许多可用的选项。你可以通过传递给管道的配置对象来配置这些设置。以下是内置选项：
 
@@ -132,7 +134,9 @@ export interface ValidationPipeOptions extends ValidatorOptions {
   </tr>
 </table>
 
-> info **注意** 在 [class-validator 仓库](https://github.com/typestack/class-validator)中查找有关 `class-validator` 包的更多信息。
+:::info 注意
+在 [class-validator 仓库](https://github.com/typestack/class-validator)中查找有关 `class-validator` 包的更多信息。
+:::
 
 #### 自动验证
 
@@ -158,9 +162,13 @@ create(@Body() createUserDto: CreateUserDto) {
 
 ```
 
-> info **提示** 由于 TypeScript 不存储关于**泛型或接口**的元数据，当你在 DTO 中使用它们时，`ValidationPipe` 可能无法正确验证传入的数据。因此，请考虑在 DTO 中使用具体类。
+:::info 提示
+由于 TypeScript 不存储关于**泛型或接口**的元数据，当你在 DTO 中使用它们时，`ValidationPipe` 可能无法正确验证传入的数据。因此，请考虑在 DTO 中使用具体类。
+:::
 
-> info **提示** 在导入 DTO 时，你不能使用仅类型导入，因为这会在运行时被删除，即记住使用 `import {{ '{' }} CreateUserDto {{ '}' }}` 而不是 `import type {{ '{' }} CreateUserDto {{ '}' }}`。
+:::info 提示
+在导入 DTO 时，你不能使用仅类型导入，因为这会在运行时被删除，即记住使用 `import {{ '{' }} CreateUserDto {{ '}' }}` 而不是 `import type {{ '{' }} CreateUserDto {{ '}' }}`。
+:::
 
 现在我们可以在 `CreateUserDto` 中添加一些验证规则。我们使用 `class-validator` 包提供的装饰器来实现这一点，详见[这里](https://github.com/typestack/class-validator#validation-decorators)。通过这种方式，任何使用 `CreateUserDto` 的路由都将自动强制执行这些验证规则。
 
@@ -300,7 +308,9 @@ findOne(
 
 ```
 
-> info **提示** `ParseIntPipe` 和 `ParseBoolPipe` 从 `@nestjs/common` 包导出。
+:::info 提示
+`ParseIntPipe` 和 `ParseBoolPipe` 从 `@nestjs/common` 包导出。
+:::
 
 #### 映射类型
 
@@ -330,7 +340,9 @@ export class UpdateCatDto extends PartialType(CreateCatDto) {}
 
 ```
 
-> info **提示** `PartialType()` 函数从 `@nestjs/mapped-types` 包导入。
+:::info 提示
+`PartialType()` 函数从 `@nestjs/mapped-types` 包导入。
+:::
 
 `PickType()` 函数通过从输入类型中选择一组属性来构造新类型（类）。例如，假设我们从一个类型开始：
 
@@ -350,7 +362,9 @@ export class UpdateCatAgeDto extends PickType(CreateCatDto, ['age'] as const) {}
 
 ```
 
-> info **提示** `PickType()` 函数从 `@nestjs/mapped-types` 包导入。
+:::info 提示
+`PickType()` 函数从 `@nestjs/mapped-types` 包导入。
+:::
 
 `OmitType()` 函数通过从输入类型中选择所有属性然后删除特定键集来构造类型。例如，假设我们从一个类型开始：
 
@@ -370,7 +384,9 @@ export class UpdateCatDto extends OmitType(CreateCatDto, ['name'] as const) {}
 
 ```
 
-> info **提示** `OmitType()` 函数从 `@nestjs/mapped-types` 包导入。
+:::info 提示
+`OmitType()` 函数从 `@nestjs/mapped-types` 包导入。
+:::
 
 `IntersectionType()` 函数将两种类型组合成一种新类型（类）。例如，假设我们从两种类型开始：
 
@@ -396,7 +412,9 @@ export class UpdateCatDto extends IntersectionType(
 
 ```
 
-> info **提示** `IntersectionType()` 函数从 `@nestjs/mapped-types` 包导入。
+:::info 提示
+`IntersectionType()` 函数从 `@nestjs/mapped-types` 包导入。
+:::
 
 类型映射实用函数是可组合的。例如，以下代码将生成一个类型（类），该类型具有 `CreateCatDto` 类型的所有属性（除了 `name`），并且这些属性将设置为可选：
 

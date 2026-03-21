@@ -130,7 +130,9 @@ export class AppModule {}
 
 ```
 
-> info **注意** 分配给 `load` 属性的值是一个数组，允许您加载多个配置文件（例如 `load: [databaseConfig, authConfig]`）
+::: info 注意
+分配给 `load` 属性的值是一个数组，允许您加载多个配置文件（例如 `load: [databaseConfig, authConfig]`）
+:::
 
 使用自定义配置文件，我们还可以管理自定义文件，如 YAML 文件。以下是使用 YAML 格式的配置示例：
 
@@ -219,7 +221,9 @@ constructor(private configService: ConfigService) {}
 
 ```
 
-> info **提示** `ConfigService` 从 `@nestjs/config` 包导入。
+::: info 提示
+`ConfigService` 从 `@nestjs/config` 包导入。
+:::
 
 并在我们的类中使用它：
 
@@ -300,7 +304,9 @@ constructor(private configService: ConfigService<{ PORT: number }, true>) {
 
 ```
 
-> info **提示** 要确保 `ConfigService#get` 方法仅从自定义配置文件中检索值并忽略 `process.env` 变量，请在 `ConfigModule` 的 `forRoot()` 方法的选项对象中设置 `skipProcessEnv` 选项为 `true`。
+::: info 提示
+要确保 `ConfigService#get` 方法仅从自定义配置文件中检索值并忽略 `process.env` 变量，请在 `ConfigModule` 的 `forRoot()` 方法的选项对象中设置 `skipProcessEnv` 选项为 `true`。
+:::
 
 #### 配置命名空间
 
@@ -316,7 +322,9 @@ export default registerAs('database', () => ({
 
 与自定义配置文件一样，在 `registerAs()` 工厂函数内部，`process.env` 对象将包含完全解析的环境变量键/值对（如 <a href="techniques/configuration#入门">上面</a> 所述，`.env` 文件和外部定义的变量已解析和合并）。
 
-> info **提示** `registerAs` 函数从 `@nestjs/config` 包导出。
+::: info 提示
+`registerAs` 函数从 `@nestjs/config` 包导出。
+:::
 
 使用 `forRoot()` 方法的选项对象的 `load` 属性加载命名空间配置，就像加载自定义配置文件一样：
 
@@ -351,7 +359,9 @@ constructor(
 
 ```
 
-> info **提示** `ConfigType` 从 `@nestjs/config` 包导出。
+::: info 提示
+`ConfigType` 从 `@nestjs/config` 包导出。
+:::
 
 #### 模块中的命名空间配置
 
@@ -409,7 +419,9 @@ export class DatabaseModule {}
 
 ```
 
-> info **警告** 在某些情况下，您可能需要使用 `onModuleInit()` 钩子而不是在构造函数中访问通过部分注册加载的属性。这是因为 `forFeature()` 方法在模块初始化期间运行，而模块初始化的顺序是不确定的。如果您在构造函数中访问另一个模块以这种方式加载的值，该配置所依赖的模块可能尚未初始化。`onModuleInit()` 方法仅在其依赖的所有模块初始化后运行，因此此技术是安全的。
+::: info 警告
+在某些情况下，您可能需要使用 `onModuleInit()` 钩子而不是在构造函数中访问通过部分注册加载的属性。这是因为 `forFeature()` 方法在模块初始化期间运行，而模块初始化的顺序是不确定的。如果您在构造函数中访问另一个模块以这种方式加载的值，该配置所依赖的模块可能尚未初始化。`onModuleInit()` 方法仅在其依赖的所有模块初始化后运行，因此此技术是安全的。
+:::
 
 #### 模式验证
 
@@ -422,7 +434,6 @@ export class DatabaseModule {}
 
 ```bash
 $ npm install --save joi
-
 ```
 
 现在我们可以定义一个 Joi 验证模式，并通过 `forRoot()` 方法的选项对象的 `validationSchema` 属性传递它，如下所示：
@@ -480,7 +491,9 @@ export class AppModule {}
 
 请注意，一旦您决定传递 `validationOptions` 对象，任何您未明确传递的设置都将默认为 `Joi` 标准默认值（不是 `@nestjs/config` 默认值）。例如，如果您在自定义 `validationOptions` 对象中未指定 `allowUnknowns`，它将具有 `Joi` 默认值 `false`。因此，在自定义对象中指定**两个**设置可能是最安全的。
 
-> info **提示** 要禁用预定义环境变量的验证，请在 `forRoot()` 方法的选项对象中设置 `validatePredefined` 属性为 `false`。预定义环境变量是在导入模块之前设置的进程变量（`process.env` 变量）。例如，如果您以 `PORT=3000 node main.js` 启动应用程序，那么 `PORT` 就是预定义环境变量。
+::: info 提示 
+要禁用预定义环境变量的验证，请在 `forRoot()` 方法的选项对象中设置 `validatePredefined` 属性为 `false`。预定义环境变量是在导入模块之前设置的进程变量（`process.env` 变量）。例如，如果您以 `PORT=3000 node main.js` 启动应用程序，那么 `PORT` 就是预定义环境变量。
+:::
 
 #### 自定义验证函数
 
@@ -633,12 +646,13 @@ export class AppModule {}
 ```json
 APP_URL=mywebsite.com
 SUPPORT_EMAIL=support@${APP_URL}
-
 ```
 
 通过这种结构，变量 `SUPPORT_EMAIL` 解析为 `'support@mywebsite.com'`。注意使用 `${{ '{' }}...{{ '}' }}` 语法来触发解析 `SUPPORT_EMAIL` 定义内的 `APP_URL` 变量的值。
 
-> info **提示** 对于此功能，`@nestjs/config` 包内部使用 [dotenv-expand](https://github.com/motdotla/dotenv-expand)。
+::: info 提示 
+对于此功能，`@nestjs/config` 包内部使用 [dotenv-expand](https://github.com/motdotla/dotenv-expand)。
+:::
 
 使用 `ConfigModule` 的 `forRoot()` 方法中传递的选项对象的 `expandVariables` 属性启用环境变量扩展，如下所示：
 

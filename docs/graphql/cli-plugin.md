@@ -160,7 +160,7 @@ getCustomTransformers: (program: any) => ({
 
 #### SWC 构建器
 
-对于标准设置（非 monorepo），要将 CLI 插件与 SWC 构建器一起使用，您需要启用类型检查，如[此处](/recipes/swc#type-checking)所述。
+对于标准设置（非 monorepo），要将 CLI 插件与 SWC 构建器一起使用，您需要启用类型检查，如[此处](/recipes/swc#类型检查)所述。
 
 ```bash
 $ nest start -b swc --type-check

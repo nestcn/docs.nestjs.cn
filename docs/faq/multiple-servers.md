@@ -1,88 +1,72 @@
+<!-- 此文件从 content/faq/multiple-servers.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-21T16:09:29.812Z -->
+<!-- 源文件: content/faq/multiple-servers.md -->
+
 ### HTTPS
 
-要创建使用 HTTPS 协议的应用程序，需在传递给 `NestFactory` 类的 `create()` 方法的配置对象中设置 `httpsOptions` 属性：
+要创建使用 HTTPS 协议的应用程序，请将 __INLINE_CODE_4__ 属性设置在传递给 `<provider>` 类的 __INLINE_CODE_5__ 方法的选项对象中：
 
-```typescript
-const httpsOptions = {
-  key: fs.readFileSync('./secrets/private-key.pem'),
-  cert: fs.readFileSync('./secrets/public-certificate.pem'),
-};
-const app = await NestFactory.create(AppModule, {
-  httpsOptions,
-});
-await app.listen(process.env.PORT ?? 3000);
+```typescript title="https"
+// https.ts
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
 
-```
-
-如果使用 `FastifyAdapter`，则按如下方式创建应用程序：
-
-```typescript
-const app = await NestFactory.create<NestFastifyApplication>(
-  AppModule,
-  new FastifyAdapter({ https: httpsOptions })
-);
-
-```
-
-#### 同时运行多个服务器
-
-以下示例展示了如何实例化一个 Nest 应用程序，使其能够同时监听多个端口（例如非 HTTPS 端口和 HTTPS 端口）。
-
-```typescript
-const httpsOptions = {
-  key: fs.readFileSync('./secrets/private-key.pem'),
-  cert: fs.readFileSync('./secrets/public-certificate.pem'),
-};
-
-const server = express();
-const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
-await app.init();
-
-const httpServer = http.createServer(server).listen(3000);
-const httpsServer = https.createServer(httpsOptions, server).listen(443);
-
-```
-
-由于我们自行调用了 `http.createServer`/`https.createServer`，NestJS 在调用 `app.close` 或终止信号时不会关闭这些服务器。我们需要自行处理：
-
-```typescript
-@Injectable()
-export class ShutdownObserver implements OnApplicationShutdown {
-  private httpServers: http.Server[] = [];
-
-  public addHttpServer(server: http.Server): void {
-    this.httpServers.push(server);
-  }
-
-  public async onApplicationShutdown(): Promise<void> {
-    await Promise.all(
-      this.httpServers.map(
-        (server) =>
-          new Promise((resolve, reject) => {
-            server.close((error) => {
-              if (error) {
-                reject(error);
-              } else {
-                resolve(null);
-              }
-            });
-          })
-      )
-    );
-  }
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  await app.listen(443);
 }
 
-const shutdownObserver = app.get(ShutdownObserver);
-shutdownObserver.addHttpServer(httpServer);
-shutdownObserver.addHttpServer(httpsServer);
+```
+
+如果使用 `providers`,创建应用程序如下：
+
+```typescript title="https"
+// https.ts
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  await app.listen(443, '0.0.0.0');
+}
 
 ```
 
-:::info 注意
-注意
-:::
+#### 多个同时服务器
 
-:::warning 警告
-此方案不适用于 [GraphQL 订阅](/graphql/subscriptions) 。
-:::
+以下配方显示了如何实例化一个 Nest 应用程序，它监听多个端口（例如，在非 HTTPS 端口和 HTTPS 端口）同时。
 
+```typescript title="多个同时服务器"
+// multiple-servers.ts
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  await app.listen(3000);
+  await app.listen(443);
+}
+
+```
+
+因为我们自己调用了 `providers` / `imports`,当调用 `<module>` / 时 NestJS 不会关闭它们。我们需要自己关闭它们：
+
+```typescript title="关闭服务器"
+// close-servers.ts
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  await app.listen(3000);
+  await app.listen(443);
+  process.on('SIGINT', () => {
+    app.close();
+  });
+}
+
+```
+
+> 提示 **Hint** `providers` 是来自 `providers` 包的。`providers` 和 `<provider>` 是 Node.js 本身的包。
+
+> 警告 **Warning** 这个配方不适用于 __LINK_15__。

@@ -1,120 +1,144 @@
-### 常见错误
+<!-- 此文件从 content/faq/errors.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-21T16:10:51.304Z -->
+<!-- 源文件: content/faq/errors.md -->
 
-在使用 NestJS 进行开发时，随着对框架的学习，您可能会遇到各种错误。
+### 通常错误
 
-#### "无法解析依赖项"错误
+在使用 NestJS 开发时，您可能会遇到各种错误。
 
-:::info 提示
-查看 [NestJS Devtools](/devtools/overview#排查无法解析依赖项错误) 可以帮助您轻松解决"无法解析依赖项"错误。
-:::
+#### "无法解析依赖性"错误
 
-最常见的错误消息是关于 Nest 无法解析提供者的依赖项。错误消息通常如下所示：
+> 信息 **提示** 您可以查看 __LINK_41__，以轻松地解决 "无法解析依赖性" 错误。
 
-```bash
-Nest can't resolve dependencies of the <provider> (?). Please make sure that the argument <unknown_token> at index [<index>] is available in the <module> context.
+可能是 Nest 不能解析提供者的依赖性错误信息通常如下所示：
 
-Potential solutions:
-- Is <module> a valid NestJS module?
-- If <unknown_token> is a provider, is it part of the current <module>?
-- If <unknown_token> is exported from a separate @Module, is that module imported within <module>?
-  @Module({
-    imports: [ /* the Module containing <unknown_token> */ ]
-  })
+```typescript
+$ npm install --save mongoose
 
 ```
 
-导致此错误最常见的原因是没有将 `<provider>` 放入模块的 `providers` 数组中。请确保该提供者确实位于 `providers` 数组中，并遵循[标准 NestJS 提供者实践](/fundamentals/dependency-injection#di-基础)。
+错误的主要原因是没有在模块的 __INLINE_CODE_7__ 数组中包含提供者。请确保提供者确实在 `DatabaseModule` 数组中，并遵循 __LINK_42__。
 
-有几个常见的陷阱需要注意。其中之一是将提供者放入了 `imports` 数组中。如果是这种情况，错误消息中会在 `<module>` 应该出现的位置显示提供者的名称。
+有一些常见的陷阱，例如将提供者放入 `@nestjs/mongoose` 数组。如果这是情况，那么错误将显示提供者的名称，而不是 `connect()`。
 
-在开发过程中遇到此错误时，请查看错误信息中提到的模块及其 `providers` 配置。对于 `providers` 数组中的每个提供者，请确保该模块能访问所有依赖项。常见情况是 `providers` 在"功能模块"和"根模块"中被重复声明，导致 Nest 会尝试实例化两次提供者。大多数情况下，包含重复 `<provider>` 的模块应该被添加到"根模块"的 `imports` 数组中。
+如果您在开发过程中遇到这个错误，查看错误信息中提到的模块，并查看其 `connect()`。对于每个提供者在 `Promise` 数组中，使得模块有权访问所有依赖项。通常情况下，`*.providers.ts` 在 "Feature 模块" 和 "Root 模块" 中重复，这意味着 Nest 将尝试实例化提供者两次。更可能的是，包含 `Connection` 的模块应该添加到 "Root 模块"'s `@Inject()` 数组中。
 
-如果上文的 `<unknown_token>` 是 `dependency`，可能存在循环文件导入。这与下文[循环依赖](#循环依赖错误)不同——不是指提供者在其构造函数中相互依赖，而是两个文件最终相互导入。典型场景是：模块文件声明令牌时导入提供者，而提供者又从模块文件导入令牌常量。如果使用桶文件，请确保桶文件导入不会形成此类循环导入关系。
+如果 `Connection` 等于 `Promise`，您可能遇到循环文件导入。这与 __LINK_43__ 不同，因为不是提供者之间的依赖关系，而是两个文件之间的循环导入。常见的情况是模块文件声明一个令牌，并导入提供者，然后提供者导入令牌常量从模块文件。如果您使用了 barrel 文件，确保您的 barrel 导入不创建这些循环导入。
 
-如果上方的 `<unknown_token>` 显示为 `Object`，说明您正在使用没有提供者令牌的类型/接口进行注入。要解决此问题，请确保：
+如果 `CatSchema` 等于 `CatsSchema`，这意味着您正在使用 type/interface 而没有提供者的令牌。要解决这个问题，请确保：
 
-1.  您已导入类引用或使用带有 `@Inject()` 装饰器的自定义令牌。请阅读[自定义提供者页面](/fundamentals/dependency-injection)，以及
-2.  对于基于类的提供者，您导入的是具体类而不仅仅是 [`import type ...`](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-8.html#type-only-imports-and-export) 语法引入的类型。
+1. 导入类引用或使用自定义令牌 `cats` 装饰器。阅读 __LINK_44__，并
+2. 对于基于类的提供者，请导入具体类，而不是仅仅是类型 __LINK_45__ 语法。
 
-同时请确保没有出现提供者自我注入的情况，因为 NestJS 不允许自我注入。当发生这种情况时，`<unknown_token>` 很可能会等于 `<provider>`。
+此外，确保您没有将提供者注入到自己身上，因为 NestJS 不允许自我注入。当发生这种情况时， `CAT_MODEL` 将大致等于 `DATABASE_CONNECTION`。
 
-<app-banner-devtools></app-banner-devtools>
+__HTML_TAG_36____HTML_TAG_37__
 
-如果你处于 **monorepo 设置**中，可能会遇到与上述相同的错误，但核心提供者 `ModuleRef` 会显示为 `<unknown_token>`：
+如果您在 **monorepo 设置** 中遇到上述错误，但是在 core 提供者 `constants.ts` 作为 `CAT_MODEL`：
 
-```bash
-Nest can't resolve dependencies of the <provider> (?).
-Please make sure that the argument ModuleRef at index [<index>] is available in the <module> context.
-...
+```typescript
+import * as mongoose from 'mongoose';
+
+export const databaseProviders = [
+  {
+    provide: 'DATABASE_CONNECTION',
+    useFactory: (): Promise<typeof mongoose> =>
+      mongoose.connect('mongodb://localhost/nest'),
+  },
+];
+
+export const databaseProviders = [
+  {
+    provide: 'DATABASE_CONNECTION',
+    useFactory: () => mongoose.connect('mongodb://localhost/nest'),
+  },
+];
 
 ```
 
-这种情况通常发生在你的项目最终加载了两个 `@nestjs/core` 包的 Node 模块时，例如：
+这可能是您的项目加载了两个 Node 模块的包 `CatsService`，如下所示：
 
-```text
-.
-├── package.json
-├── apps
-│   └── api
-│       └── node_modules
-│           └── @nestjs/bull
-│               └── node_modules
-│                   └── @nestjs/core
-└── node_modules
-    ├── (other packages)
-    └── @nestjs/core
+```typescript
+import { Module } from '@nestjs/common';
+import { databaseProviders } from './database.providers';
+
+@Module({
+  providers: [...databaseProviders],
+  exports: [...databaseProviders],
+})
+export class DatabaseModule {}
 
 ```
 
 解决方案：
 
-- 对于 **Yarn** Workspaces，使用 [nohoist 特性](https://classic.yarnpkg.com/blog/2018/02/15/nohoist)来阻止提升 `@nestjs/core` 包。
-- 对于 **pnpm** 工作区，请在其他模块中将 `@nestjs/core` 设置为 peerDependencies，并在导入该模块的应用 package.json 中添加 `"dependenciesMeta": {"other-module-name": {"injected": true}}` 。参见：[dependenciesmetainjected](https://pnpm.io/package_json#dependenciesmetainjected)
+* 对于 **Yarn** 工作区，使用 __LINK_46__ 防止 hoisting 包 `@Inject()`。
+* 对于 **pnpm** 工作区，将 `Cat` 设置为 peerDependencies 在其他模块中，并在 app package.json 中的 `Document`。见： __LINK_47__
 
 #### "循环依赖"错误
 
-有时您会发现应用中难以避免[循环依赖](/fundamentals/circular-dependency)问题。您需要采取一些措施帮助 Nest 解决这些问题。由循环依赖引发的错误通常如下所示：
+有时，您可能会发现很难避免 __LINK_48__ 在应用程序中。您需要采取一些步骤来帮助 Nest 解决这些错误。循环依赖项错误看起来像这样：
 
-```bash
-Nest cannot create the <module> instance.
-The module at index [<index>] of the <module> "imports" array is undefined.
+```typescript
+import * as mongoose from 'mongoose';
 
-Potential causes:
-- A circular dependency between modules. Use forwardRef() to avoid it. Read more: /fundamentals/circular-dependency
-- The module at index [<index>] is of type "undefined". Check your import statements and the type of the module.
-
-Scope [<module_import_chain>]
-# example chain AppModule -> FooModule
+export const CatSchema = new mongoose.Schema({
+  name: String,
+  age: Number,
+  breed: String,
+});
 
 ```
 
-循环依赖可能源于提供者之间相互依赖，或是 TypeScript 文件间因常量而相互依赖（例如从模块文件导出常量并在服务文件中导入）。对于后者，建议为常量创建单独的文件。对于前者，请遵循循环依赖指南，确保模块**和**提供者都使用 `forwardRef` 进行标记。
+循环依赖项可以来自提供者之间的依赖关系，也可以来自 TypeScript 文件之间的依赖关系，例如导出常量从模块文件并在服务文件中导入它们。在后一种情况下，建议创建一个单独的文件来存储常量。在前一种情况下，请遵循循环依赖项指南，并确保模块和提供者都标记为 `CatModel`。
 
 #### 调试依赖项错误
 
-除了手动验证依赖项是否正确外，从 Nest 8.1.0 开始，您可以将 `NEST_DEBUG` 环境变量设置为可解析为真值的字符串，这样在 Nest 解析应用程序所有依赖项时就能获取额外的日志信息。
+除了手动验证依赖项是否正确之外，在 Nest 8.1.0 及更高版本中，您可以将 `CatsService` 环境变量设置为一个字符串，该字符串将被解析为真，并在 Nest 解决应用程序的所有依赖项时获取额外的日志信息。
 
-![Injector_logs.Png](/assets/injector_logs.png)
+__HTML_TAG_38____HTML_TAG_39____HTML_TAG_40__
 
-在上图中，黄色字符串表示被注入依赖项的主机类，蓝色字符串表示被注入依赖项的名称或其注入令牌，紫色字符串表示搜索该依赖项的模块。通过这些信息，通常可以追溯依赖项解析过程，了解发生了什么以及为何会出现依赖项注入问题。
+在上面的图像中，黄色的字符串是依赖项注入的主类名称，蓝色的字符串是注入的依赖项名称或其注入令牌，紫色的字符串是搜索依赖项的模块。使用这项信息，您通常可以跟踪依赖项Resolution 的过程，并确定为什么您会遇到依赖项注入问题。
 
-#### "检测到文件更改"无限循环
+#### "文件更改检测"循环
 
-使用 TypeScript 4.9 及以上版本的 Windows 用户可能会遇到此问题。当您尝试以监视模式运行应用程序时（例如 `npm run start:dev`），会出现日志消息的无限循环：
+使用 TypeScript 版本 4.9 及更高版本的 Windows 用户可能会遇到这个问题。
+这发生在您尝试在 watch 模式下运行应用程序时，例如 `CatsModule`，并看到无限循环的日志消息：
 
-```bash
-XX:XX:XX AM - File change detected. Starting incremental compilation...
-XX:XX:XX AM - Found 0 errors. Watching for file changes.
+```typescript
+import { Connection } from 'mongoose';
+import { CatSchema } from './schemas/cat.schema';
 
-```
+export const catsProviders = [
+  {
+    provide: 'CAT_MODEL',
+    useFactory: (connection: Connection) => connection.model('Cat', CatSchema),
+    inject: ['DATABASE_CONNECTION'],
+  },
+];
 
-当您使用 NestJS CLI 以监视模式启动应用程序时，实际上是通过调用 `tsc --watch` 实现的。从 TypeScript 4.9 版本开始，采用了一种 [新的策略](https://devblogs.microsoft.com/typescript/announcing-typescript-4-9/#file-watching-now-uses-file-system-events) 来检测文件变更，这很可能是导致此问题的原因。要解决此问题，您需要在 tsconfig.json 文件的 `"compilerOptions"` 选项后添加如下设置：
+export const catsProviders = [
+  {
+    provide: 'CAT_MODEL',
+    useFactory: (connection) => connection.model('Cat', CatSchema),
+    inject: ['DATABASE_CONNECTION'],
+  },
+];
 
-```json
-  "watchOptions": {
-    "watchFile": "fixedPollingInterval"
+```使用 NestJS CLI 启动应用程序时，处于 watch 模式是通过调用 ``CatsModule`` 进行的。从 TypeScript 4.9 版本开始，一个 `__LINK_49__` 用于检测文件更改，这可能是导致这个问题的原因。
+
+要解决这个问题，您需要在 `tsconfig.json` 文件中添加一个设置，例如：
+
+```typescript
+{
+  "compilerOptions": {
+    // ...
+    "pollingInterval": `AppModule`
   }
+}
 
 ```
 
-这将指示 TypeScript 使用轮询方法（而非新的默认文件系统事件方法）来检查文件变更，后者在某些机器上可能会引发问题。您可以在 [TypeScript 文档](https://www.typescriptlang.org/tsconfig#watch-watchDirectory) 中阅读更多关于 `"watchFile"` 选项的信息。
+这将使 TypeScript 使用轮询方法来检查文件更改，而不是文件系统事件（新的默认方法），这可能会在某些机器上引起问题。
+
+可以在 `__LINK_50__` 中阅读更多关于 `__INLINE_CODE_35__` 选项的信息。

@@ -180,7 +180,7 @@ class FilesUploadDto {
 
 #### 高级：泛型 `ApiResponse`
 
-通过提供[原始定义](/openapi/types-and-parameters#raw-definitions)的能力，我们可以为 Swagger UI 定义泛型模式。假设我们有以下 DTO：
+通过提供[原始定义](/openapi/types-and-parameters#原始定义)的能力，我们可以为 Swagger UI 定义泛型模式。假设我们有以下 DTO：
 
 ```ts
 export class PaginatedDto<TData> {
@@ -241,7 +241,7 @@ async findAll(): Promise<PaginatedDto<CatDto>> {}
 - `getSchemaPath()` 函数返回给定模型的 OpenAPI 规范文件中的 OpenAPI Schema 路径。
 - `allOf` 是 OAS 3 提供的概念，用于涵盖各种继承相关用例。
 
-最后，由于 `PaginatedDto` 没有被任何控制器直接引用，`SwaggerModule` 尚无法生成相应的模型定义。在这种情况下，我们必须将其添加为[额外模型](/openapi/types-and-parameters#extra-models)。例如，我们可以在控制器级别使用 `@ApiExtraModels()` 装饰器，如下所示：
+最后，由于 `PaginatedDto` 没有被任何控制器直接引用，`SwaggerModule` 尚无法生成相应的模型定义。在这种情况下，我们必须将其添加为[额外模型](/openapi/types-and-parameters#额外模型)。例如，我们可以在控制器级别使用 `@ApiExtraModels()` 装饰器，如下所示：
 
 ```ts
 @Controller('cats')

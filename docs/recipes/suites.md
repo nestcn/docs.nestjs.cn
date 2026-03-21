@@ -1,322 +1,238 @@
+<!-- 此文件从 content/recipes/suites.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-21T16:13:04.529Z -->
+<!-- 源文件: content/recipes/suites.md -->
+
 ### Suites
 
-[Suites](https://suites.dev) 是一个用于 TypeScript 依赖注入框架的[开源](https://github.com/suites-dev/suites)单元测试框架。它作为手动创建模拟、使用多个模拟配置进行冗长测试设置或使用非类型化测试替身（如模拟和存根）的**替代方案**。
+__LINK_56__ 是一个用于 TypeScript 依赖注入框架的 __LINK_57__ 单元测试框架。它可以用作手动创建模拟、复杂的测试设置或使用未类型化的测试双倍（如模拟和_stub）的替代品。
 
-Suites 在运行时从 NestJS 服务中读取元数据，并自动为所有依赖项生成完全类型化的模拟对象。
-这消除了样板模拟设置，并确保类型安全的测试。虽然 Suites 可以与 `Test.createTestingModule()` 一起使用，但它擅长于专注的单元测试。
-使用 `Test.createTestingModule()` 来验证模块连接、装饰器、守卫和拦截器。
-使用 Suites 进行具有自动模拟生成的快速单元测试。
+Suites 在 NestJS 服务运行时读取元数据，并自动为所有依赖项生成完全类型化的模拟。
+这消除了模拟设置的 boilerplate 和确保了类型安全的测试。虽然 Suites 可以与 __INLINE_CODE_14__ 一起使用，但在聚焦单元测试时最为出色。
+使用 __INLINE_CODE_15__ 时验证模块 wiring、装饰器、守卫和拦截器。
+使用 Suites 进行快速单元测试和自动模拟生成。
 
-有关基于模块的测试的更多信息，请参阅[单元测试](/fundamentals/unit-testing)章节。
+关于模块测试，请查看 __LINK_58__ 章节。
 
-> info **注意** `Suites` 是第三方包，不由 NestJS 核心团队维护。请在[相应的仓库](https://github.com/suites-dev/suites)中报告任何问题。
+> info **注意** __INLINE_CODE_16__ 是第三方包，并且不是 NestJS 核心团队维护的。请将任何问题报告到 __LINK_59__。
 
-#### 入门
+#### 获取 started
 
-本指南演示如何使用 Suites 测试 NestJS 服务。它涵盖了隔离测试（所有依赖项都被模拟）和社交测试（选定的真实实现）。
+本指南演示使用 Suites 测试 NestJS 服务。它涵盖了孤立测试（所有依赖项模拟）和社交测试（选择的真实实现）。
 
 #### 安装 Suites
 
-验证 NestJS 运行时依赖项是否已安装：
+验证 NestJS 运行时依赖项是否安装：
 
 ```bash
-$ npm install @nestjs/common @nestjs/core reflect-metadata
+$ npm i --save-dev @swc/cli @swc/core
 
 ```
 
-安装 Suites 核心、NestJS 适配器和测试替身适配器：
+安装 Suites 核心、NestJS 适配器和双倍适配器：
 
 ```bash
-$ npm install --save-dev @suites/unit @suites/di.nestjs @suites/doubles.jest
+$ nest start -b swc
+# OR nest start --builder swc
 
 ```
 
-测试替身适配器（`@suites/doubles.jest`）提供了 Jest 模拟功能的封装。它暴露了 `mock()` 和 `stub()` 函数，用于创建类型安全的测试替身。
+双倍适配器（__INLINE_CODE_17__）提供了对 Jest 模拟能力的包装。它暴露了 __INLINE_CODE_18__ 和 __INLINE_CODE_19__ 函数，这些函数创建了类型安全的测试双倍。
 
 确保 Jest 和 TypeScript 可用：
 
-```bash
-$ npm install --save-dev ts-jest @types/jest jest typescript
+```json
+{
+  "compilerOptions": {
+    "builder": "swc"
+  }
+}
 
 ```
 
-<details><summary>如果您使用 Vitest，请展开</summary>
+__HTML_TAG_48____HTML_TAG_49__Expand if you're using Vitest__HTML_TAG_50__
 
-```bash
-$ npm install --save-dev @suites/unit @suites/di.nestjs @suites/doubles.vitest
+```json
+{
+  "compilerOptions": {
+    "builder": {
+      "type": "swc",
+      "options": {
+        "swcrcPath": "infrastructure/.swcrc",
+      }
+    }
+  }
+}
 
 ```
 
-</details>
+__HTML_TAG_51__
 
-<details><summary>如果您使用 Sinon，请展开</summary>
+__HTML_TAG_52____HTML_TAG_53__Expand if you're using Sinon__HTML_TAG_54__
 
-```bash
-$ npm install --save-dev @suites/unit @suites/di.nestjs @suites/doubles.sinon
+```json
+{
+  "compilerOptions": {
+    "builder": {
+      "type": "swc",
+      "options": { "extensions": [".ts", ".tsx", ".js", ".jsx"] }
+    },
+  }
+}
 
 ```
 
-</details>
+__HTML_TAG_55__
 
 #### 设置类型定义
 
-在项目根目录创建 `global.d.ts`：
+在项目根目录创建 __INLINE_CODE_20__：
 
-```typescript
-/// <reference types="@suites/doubles.jest/unit" />
-/// <reference types="@suites/di.nestjs/types" />
-
-```
-
-#### 创建示例服务
-
-本指南使用一个具有两个依赖项的简单 `UserService`：
-
-```typescript
-import { Injectable } from '@nestjs/common';
-
-@Injectable()
-export class UserRepository {
-  async findById(id: string): Promise<User | null> {
-    // 数据库查询
-  }
-
-  async save(user: User): Promise<User> {
-    // 数据库保存
-  }
-}
+```bash
+$ nest start -b swc -w
+# OR nest start --builder swc --watch
 
 ```
 
-```typescript
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { Logger } from '@nestjs/common';
+#### 创建 sample 服务
 
-@Injectable()
-export class UserService {
-  constructor(
-    private repository: UserRepository,
-    private logger: Logger,
-  ) {}
+本指南使用了一个简单的 __INLINE_CODE_21__，具有两个依赖项：
 
-  async findById(id: string): Promise<User> {
-    const user = await this.repository.findById(id);
-    if (!user) {
-      throw new NotFoundException(`User ${id} not found`);
-    }
-    this.logger.log(`Found user ${id}`);
-    return user;
-  }
+```bash
+$ nest start -b swc --type-check
 
-  async create(email: string, name: string): Promise<User> {
-    const user = { id: generateId(), email, name };
-    await this.repository.save(user);
-    this.logger.log(`Created user ${user.id}`);
-    return user;
+```
+
+```json
+{
+  "compilerOptions": {
+    "builder": "swc",
+    "typeCheck": true
   }
 }
 
 ```
 
-#### 编写单元测试
+#### 写单元测试
 
-使用 `TestBed.solitary()` 创建所有依赖项都被模拟的隔离测试：
+使用 __INLINE_CODE_22__ 创建孤立测试，所有依赖项模拟：
 
-```typescript
-import { TestBed, type Mocked } from '@suites/unit';
-import { UserService } from './user.service';
-import { UserRepository } from './user.repository';
-import { Logger } from '@nestjs/common';
-
-describe('User Service Unit Spec', () => {
-  let userService: UserService;
-  let repository: Mocked<UserRepository>;
-  let logger: Mocked<Logger>;
-
-  beforeAll(async () => {
-    const { unit, unitRef } = await TestBed.solitary(UserService).compile();
-
-    userService = unit;
-    repository = unitRef.get(UserRepository);
-    logger = unitRef.get(Logger);
-  });
-
-  it('should find user by id', async () => {
-    const user = { id: '1', email: 'test@example.com', name: 'Test' };
-    repository.findById.mockResolvedValue(user);
-
-    const result = await userService.findById('1');
-
-    expect(result).toEqual(user);
-    expect(logger.log).toHaveBeenCalled();
-  });
-});
+```json
+{
+  "$schema": "https://swc.rs/schema.json",
+  "sourceMaps": true,
+  "jsc": {
+    "parser": {
+      "syntax": "typescript",
+      "decorators": true,
+      "dynamicImport": true
+    },
+    "baseUrl": "./"
+  },
+  "minify": false
+}
 
 ```
 
-`TestBed.solitary()` 分析构造函数并为所有依赖项创建类型化模拟对象。
-`Mocked<T>` 类型为模拟配置提供 IntelliSense 支持。
+__INLINE_CODE_23__ 分析构造函数，并为所有依赖项生成类型安全的模拟。
+__INLINE_CODE_24__ 类型提供 IntelliSense 支持模拟配置。
 
 #### 预编译模拟配置
 
-在编译前使用 `.mock().impl()` 配置模拟行为：
+使用 `swc` 在编译前配置模拟行为：
 
-```typescript
-import { TestBed } from '@suites/unit';
-import { UserService } from './user.service';
-import { UserRepository } from './user.repository';
-
-describe('User Service Unit Spec - pre-configured', () => {
-  let unit: UserService;
-  let repository: Mocked<UserRepository>;
-  
-  beforeAll(async () => {
-    const { unit: underTest, unitRef } = await TestBed.solitary(UserService)
-      .mock(UserRepository)
-      .impl(stubFn => ({
-        findById: stubFn().mockResolvedValue({ id: '1', email: 'test@example.com', name: 'Test' })
-      }))
-      .compile();
-    
-    repository = unitRef.get(UserRepository);
-    unit = underTest;
-  })
-  
-  it('should find user with pre-configured mock', async () => {
-    const result = await unit.findById('1');
-    
-    expect(repository.findById).toHaveBeenCalled();
-    expect(result.email).toBe('test@example.com');
-  });
-});
+```bash
+$ npm i --save-dev swc-loader
 
 ```
 
-`stubFn` 参数对应于已安装的测试替身适配器（Jest 使用 `jest.fn()`，Vitest 使用 `vi.fn()`，Sinon 使用 `sinon.stub()`）。
+`-b` 参数对应于安装的双倍适配器（Jest 为 `compilerOptions.builder`，Vitest 为 `"swc"`，Sinon 为 `nest-cli.json`）。
 
-#### 使用真实依赖项进行测试
+#### 测试真实依赖项
 
-使用 `TestBed.sociable()` 和 `.expose()` 为特定依赖项使用真实实现：
+使用 `type` 和 `"swc"` 使用真实实现为特定的依赖项：
 
-```typescript
-import { TestBed, Mocked } from '@suites/unit';
-import { UserService } from './user.service';
-import { UserRepository } from './user.repository';
-import { Logger } from '@nestjs/common';
+```js
+const swcDefaultConfig = require('@nestjs/cli/lib/compiler/defaults/swc-defaults').swcDefaultsFactory().swcOptions;
 
-describe('UserService - with real logger', () => {
-  let userService: UserService;
-  let repository: Mocked<UserRepository>;
-
-  beforeAll(async () => {
-    const { unit, unitRef } = await TestBed.sociable(UserService)
-      .expose(Logger)
-      .compile();
-
-    userService = unit;
-    repository = unitRef.get(UserRepository);
-  });
-
-  it('should log when finding user', async () => {
-    const user = { id: '1', email: 'test@example.com' };
-    repository.findById.mockResolvedValue(user);
-
-    await userService.findById('1');
-
-    // Logger 实际执行，无需模拟
-  });
-});
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'swc-loader',
+          options: swcDefaultConfig,
+        },
+      },
+    ],
+  },
+};
 
 ```
 
-`.expose(Logger)` 使用真实实现实例化 `Logger`，同时保持其他依赖项被模拟。
+`options` 实例化 `.jsx` 使用真实实现，同时保持其他依赖项模拟。
 
 #### 基于令牌的依赖项
 
 Suites 处理自定义注入令牌（字符串或符号）：
 
+```ts
+import { PluginMetadataGenerator } from '@nestjs/cli/lib/compiler/plugins/plugin-metadata-generator';
+import { ReadonlyVisitor } from '@nestjs/swagger/dist/plugin';
+
+const generator = new PluginMetadataGenerator();
+generator.generate({
+  visitors: [new ReadonlyVisitor({ introspectComments: true, pathToSource: __dirname })],
+  outputDir: __dirname,
+  watch: true,
+  tsconfigPath: 'apps/<name>/tsconfig.app.json',
+});
+
+```
+
+访问基于令牌的依赖项使用 `.tsx`：
+
+```bash
+$ npx ts-node src/generate-metadata.ts
+# OR npx ts-node apps/{YOUR_APP}/src/generate-metadata.ts
+
+```
+
+#### 使用 mock() 和 stub() 直接
+
+对于那些喜欢直接控制而不使用 `--type-check`，双倍适配器包提供了 `tsc` 和 `noEmit` 函数：
+
 ```typescript
-import { Injectable, Inject } from '@nestjs/common';
-
-export const CONFIG_OPTIONS = 'CONFIG_OPTIONS';
-
-@Injectable()
-export class ConfigService {
-  constructor(
-    @Inject(CONFIG_OPTIONS) private options: { apiKey: string },
-  ) {}
-
-  getApiKey(): string {
-    return this.options.apiKey;
-  }
+@Entity()
+export class User {
+  @OneToOne(() => Profile, (profile) => profile.user)
+  profile: Relation<Profile>; // <--- see "Relation<>" type here instead of just "Profile"
 }
 
 ```
 
-使用 `unitRef.get()` 访问基于令牌的依赖项：
+`--type-check` 创建了类型安全的模拟对象，而 `compilerOptions.typeCheck` 包装了 underlying 模拟库（Jest 在这个示例中）的方法，如 `true`
+这些函数来自安装的双倍适配器（`nest-cli.json`），它适配了测试框架的原生模拟能力。
 
-```typescript
-import { TestBed } from '@suites/unit';
-import { ConfigService, CONFIG_OPTIONS, ConfigOptions } from './config.service';
-
-describe('Config Service Unit Spec', () => {
-  let configService: ConfigService;
-  let options: ConfigOptions;
-
-  beforeAll(async () => {
-    const { unit, unitRef } = await TestBed.solitary(ConfigService).compile();
-    configService = unit;
-
-    options = unitRef.get<ConfigOptions>(CONFIG_OPTIONS);
-  });
-
-  it('should return api key', () => { ... });
-});
-
-```
-
-#### 直接使用 mock() 和 stub()
-
-对于那些更喜欢不使用 `TestBed` 而直接控制的人，测试替身适配器包提供了 `mock()` 和 `stub()` 函数：
-
-```typescript
-import { mock } from '@suites/unit';
-import { UserRepository } from './user.repository';
-
-describe('User Service Unit Spec', () => {
-  it('should work with direct mocks', async () => {
-    const repository = mock<UserRepository>();
-    const logger = mock<Logger>();
-
-    const service = new UserService(repository, logger);
-
-    // ...
-  });
-});
-
-```
-
-`mock()` 创建一个类型化的模拟对象，`stub()` 封装底层模拟库（本例中为 Jest）以提供 `mockResolvedValue()` 等方法。
-这些函数来自已安装的测试替身适配器（`@suites/doubles.jest`），它适配测试框架的原生模拟功能。
-
-> info **提示** `mock()` 函数是 `@golevelup/ts-jest` 中 `createMock` 的替代方案。两者都创建类型化的模拟对象。有关 `createMock` 的更多信息，请参阅[单元测试](/fundamentals/unit-testing#auto-mocking)章节。
+> info **提示** `--type-check` 函数是 `.swcrc` 函数的替代品，来自 `swc`。两个函数都创建了类型安全的模拟对象。查看 __LINK_60__ 章节以了解更多关于 `webpack`。
 
 #### 总结
 
-**使用 `Test.createTestingModule()` 用于：**
-- 验证模块配置和提供者连接
+**使用 `swc-loader` 进行：**
+- 验证模块配置和提供者 wiring
 - 测试装饰器、守卫、拦截器和管道
-- 验证跨模块的依赖注入
-- 使用中间件测试完整的应用程序上下文
+- 验证依赖项注入跨模块
+- 测试完整的应用上下文和中间件
 
-**使用 Suites 用于：**
-- 专注于业务逻辑的快速单元测试
-- 为多个依赖项自动生成模拟
-- 具有 IntelliSense 的类型安全测试替身
+**使用 Suites 进行：**
+- 快速单元测试，聚焦业务逻辑
+- 自动模拟生成多个依赖项
+- 类型安全的测试双倍和 IntelliSense
 
-按目的组织测试：使用 Suites 进行验证单个服务行为的单元测试，使用 `Test.createTestingModule()` 进行验证模块配置的集成测试。
+按测试目的组织：使用 Suites 进行单元测试，验证个体服务行为，而使用 `webpack.config.js` 进行集成测试，验证模块配置。
 
 更多信息：
-- [Suites 文档](https://suites.dev/docs)
-- [Suites GitHub 仓库](https://github.com/suites-dev/suites)
-- [NestJS 测试文档](/fundamentals/unit-testing)
+- __LINK_61__
+- __LINK_62__
+- __LINK_63__

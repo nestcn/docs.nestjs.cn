@@ -1,366 +1,301 @@
+<!-- 此文件从 content/recipes/necord.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-21T16:12:45.294Z -->
+<!-- 源文件: content/recipes/necord.md -->
+
 ### Necord
 
-Necord 是一个强大的模块，可简化 [Discord](https://discord.com) 机器人的创建过程，实现与 NestJS 应用的无缝集成。
+Necord 是一款功能强大的模块，简化了创建 __LINK_30__ 机器人的过程，让您轻松地将其集成到 NestJS 应用程序中。
 
-:::info 注意
-Necord 是第三方包，并非由 NestJS 核心团队官方维护。如遇任何问题，请提交至 [官方仓库](https://github.com/necordjs/necord) 。
-:::
+> info **注意** Necord 是第三方包，NestJS 核心团队并不负责维护。如果您遇到任何问题，请在 __LINK_31__ 上反馈。
 
 #### 安装
 
-开始使用前，需安装 Necord 及其依赖项 [`Discord.js`](https://discord.js.org)。
+开始使用 Necord 需要安装 Necord 和其依赖项 __LINK_32__。
 
-```bash
-$ npm install necord discord.js
+```ts
+@Module({
+  providers: [
+    {
+      provide: AsyncLocalStorage,
+      useValue: new AsyncLocalStorage(),
+    },
+  ],
+  exports: [AsyncLocalStorage],
+})
+export class AlsModule {}
 
 ```
 
-#### 使用方法
+#### 使用
 
-要在项目中使用 Necord，请导入 `NecordModule` 并使用必要的选项进行配置。
+要在项目中使用 Necord，请将 `next` 导入，并根据需要配置选项。
 
- ```typescript title="app.module.ts"
-import { Module } from '@nestjs/common';
-import { NecordModule } from 'necord';
-import { IntentsBitField } from 'discord.js';
-import { AppService } from './app.service';
+```ts
+@Module({
+  imports: [AlsModule],
+  providers: [CatsService],
+  controllers: [CatsController],
+})
+export class AppModule implements NestModule {
+  constructor(
+    // inject the AsyncLocalStorage in the module constructor,
+    private readonly als: AsyncLocalStorage
+  ) {}
 
+  configure(consumer: MiddlewareConsumer) {
+    // bind the middleware,
+    consumer
+      .apply((req, res, next) => {
+        // populate the store with some default values
+        // based on the request,
+        const store = {
+          userId: req.headers['x-user-id'],
+        };
+        // and pass the "next" function as callback
+        // to the "als.run" method together with the store.
+        this.als.run(store, () => next());
+      })
+      .forRoutes('*path');
+  }
+}
+
+  configure(consumer) {
+    // bind the middleware,
+    consumer
+      .apply((req, res, next) => {
+        // populate the store with some default values
+        // based on the request,
+        const store = {
+          userId: req.headers['x-user-id'],
+        };
+        // and pass the "next" function as callback
+        // to the "als.run" method together with the store.
+        this.als.run(store, () => next());
+      })
+      .forRoutes('*path');
+  }
+}
+
+```
+
+> info **提示** 您可以在 __LINK_33__ 中找到可用的意图列表。
+
+使用这个设置，您可以将 `AsyncLocalStorage#run` 注入到提供者中，以便轻松地注册命令、事件等。
+
+```ts
+@Injectable()
+export class CatsService {
+  constructor(
+    // We can inject the provided ALS instance.
+    private readonly als: AsyncLocalStorage,
+    private readonly catsRepository: CatsRepository,
+  ) {}
+
+  getCatForUser() {
+    // The "getStore" method will always return the
+    // store instance associated with the given request.
+    const userId = this.als.getStore()["userId"] as number;
+    return this.catsRepository.getForUser(userId);
+  }
+}
+
+  getCatForUser() {
+    // The "getStore" method will always return the
+    // store instance associated with the given request.
+    const userId = this.als.getStore()["userId"] as number;
+    return this.catsRepository.getForUser(userId);
+  }
+}
+
+```
+
+##### 上下文理解
+
+您可能已经注意到了 `store` 装饰器在上面的示例中。这装饰器将事件上下文注入到您的方法中，使得您可以访问各种事件特定数据。由于有多种事件类型，因此上下文类型是使用 `REQUEST` 类型进行推断的。您可以使用 `AsyncLocalStorage` 装饰器轻松地访问上下文变量，该装饰器将变量填充为与事件相关的参数数组。
+
+#### 文本命令
+
+> warning **注意** 文本命令依赖于消息内容，这种内容将在验证机器人和拥有 100 服务器以上的应用程序中被弃用。这意味着，如果您的机器人无法访问消息内容，文本命令将无法工作。了解更多关于这项变化的信息 __LINK_34__。
+
+以下是使用 `CLS` 装饰器创建简单命令处理程序的示例。
+
+```bash
+npm i nestjs-cls
+
+```
+
+#### 应用程序命令
+
+应用程序命令提供了一个原生的方式，让用户在 Discord 客户端中与您的应用程序交互。有三种类型的应用程序命令可以通过不同的界面访问：聊天输入、消息上下文菜单（通过右键点击消息访问）和用户上下文菜单（通过右键点击用户访问）。
+
+__HTML_TAG_27____HTML_TAG_28____HTML_TAG_29__
+
+#### 切片命令
+
+切片命令是一种优秀的方式，让您可以结构化地与用户交互。它们允许您创建具有精准参数和选项的命令，从而提高用户体验。
+
+要使用 Necord 定义切片命令，请使用 `ClsModule` 装饰器。
+
+```ts
 @Module({
   imports: [
-    NecordModule.forRoot({
-      token: process.env.DISCORD_TOKEN,
-      intents: [IntentsBitField.Flags.Guilds],
-      development: [process.env.DISCORD_DEVELOPMENT_GUILD_ID],
+    // Register the ClsModule,
+    ClsModule.forRoot({
+      middleware: {
+        // automatically mount the
+        // ClsMiddleware for all routes
+        mount: true,
+        // and use the setup method to
+        // provide default store values.
+        setup: (cls, req) => {
+          cls.set('userId', req.headers['x-user-id']);
+        },
+      },
     }),
   ],
-  providers: [AppService],
+  providers: [CatsService],
+  controllers: [CatsController],
 })
 export class AppModule {}
 
 ```
 
-:::info 提示
-您可以在此处 [here](https://discord.com/developers/docs/topics/gateway#gateway-intents) 找到可用意图的完整列表。
-:::
-
-通过此设置，您可以将 `AppService` 注入到提供者中，轻松注册命令、事件等功能。
-
- ```typescript title="app.service.ts"
-import { Injectable, Logger } from '@nestjs/common';
-import { Context, On, Once, ContextOf } from 'necord';
-import { Client } from 'discord.js';
-
-@Injectable()
-export class AppService {
-  private readonly logger = new Logger(AppService.name);
-
-  @Once('ready')
-  public onReady(@Context() [client]: ContextOf<'ready'>) {
-    this.logger.log(`Bot logged in as ${client.user.username}`);
-  }
-
-  @On('warn')
-  public onWarn(@Context() [message]: ContextOf<'warn'>) {
-    this.logger.warn(message);
-  }
-}
-
-```
-
-##### 理解上下文
-
-你可能已经注意到上面例子中的 `@Context` 装饰器。这个装饰器会将事件上下文注入到你的方法中，让你能够访问各种事件特定数据。由于存在多种事件类型，上下文类型是通过 `ContextOf<type: string>` 类型推断的。你可以轻松地通过使用 `@Context()` 装饰器来访问上下文变量，该装饰器会用与事件相关的参数数组填充变量。
-
-#### 文本命令
-
-:::warning 警告
-文本命令依赖于消息内容，而该功能即将对已验证机器人和拥有超过 100 个服务器的应用程序弃用。这意味着如果你的机器人无法访问消息内容，文本命令将无法工作。了解更多关于此变更的信息[请点击此处](https://support-dev.discord.com/hc/en-us/articles/4404772028055-Message-Content-Access-Deprecation-for-Verified-Bots) 。
-:::
-
-下面展示如何使用 `@TextCommand` 装饰器为消息创建一个简单的命令处理器。
-
- ```typescript title="app.commands.ts"
-import { Injectable } from '@nestjs/common';
-import { Context, TextCommand, TextCommandContext, Arguments } from 'necord';
-
-@Injectable()
-export class AppCommands {
-  @TextCommand({
-    name: 'ping',
-    description: 'Responds with pong!',
-  })
-  public onPing(
-    @Context() [message]: TextCommandContext,
-    @Arguments() args: string[],
-  ) {
-    return message.reply('pong!');
-  }
-}
-
-```
-
-#### 应用命令
-
-应用命令为用户提供了一种在 Discord 客户端内与您的应用交互的原生方式。可通过不同界面访问三种类型的应用命令：聊天输入命令、消息上下文菜单命令（通过右键点击消息访问）和用户上下文菜单命令（通过右键点击用户访问）。
-
-![4EmG8G8.Png](https://i.imgur.com/4EmG8G8.png)
-
-#### 斜杠命令
-
-斜杠命令是以结构化方式与用户互动的绝佳途径。它们允许您创建具有精确参数和选项的命令，从而显著提升用户体验。
-
-要使用 Necord 定义斜杠命令，可以使用 `SlashCommand` 装饰器。
-
- ```typescript title="app.commands.ts"
-import { Injectable } from '@nestjs/common';
-import { Context, SlashCommand, SlashCommandContext } from 'necord';
-
-@Injectable()
-export class AppCommands {
-  @SlashCommand({
-    name: 'ping',
-    description: 'Responds with pong!',
-  })
-  public async onPing(@Context() [interaction]: SlashCommandContext) {
-    return interaction.reply({ content: 'Pong!' });
-  }
-}
-
-```
-
-:::info 提示
-当你的机器人客户端登录时，它会自动注册所有已定义的命令。请注意全局命令最多会被缓存一小时。为避免全局缓存问题，请使用 Necord 模块中的 `development` 参数，该参数会将命令可见性限制在单个服务器中。
-:::
+> info **提示** 当您的机器人客户端登录时，它将自动注册所有定义的命令。请注意，全球命令将在 1 小时内被缓存。为了避免全球缓存问题，使用 Necord 模块的 `store` 参数，限制命令可见性到单个服务器。
 
 ##### 选项
 
-你可以使用选项装饰器为斜杠命令定义参数。为此我们创建一个 `TextDto` 类：
+您可以使用选项装饰器来定义您的切片命令的参数。让我们创建一个 `ClsService` 类以便此目的：
 
- ```typescript title="text.dto.ts"
-import { StringOption } from 'necord';
+```ts
+@Injectable()
+export class CatsService {
+  constructor(
+    // We can inject the provided ClsService instance,
+    private readonly cls: ClsService,
+    private readonly catsRepository: CatsRepository,
+  ) {}
 
-export class TextDto {
-  @StringOption({
-    name: 'text',
-    description: 'Input your text here',
-    required: true,
-  })
-  text: string;
+  getCatForUser() {
+    // and use the "get" method to retrieve any stored value.
+    const userId = this.cls.get('userId');
+    return this.catsRepository.getForUser(userId);
+  }
 }
 
-```
-
-然后你就可以在 `AppCommands` 类中使用这个 DTO：
-
- ```typescript title="app.commands.ts"
-import { Injectable } from '@nestjs/common';
-import { Context, SlashCommand, Options, SlashCommandContext } from 'necord';
-import { TextDto } from './length.dto';
-
-@Injectable()
-export class AppCommands {
-  @SlashCommand({
-    name: 'length',
-    description: 'Calculate the length of your text',
-  })
-  public async onLength(
-    @Context() [interaction]: SlashCommandContext,
-    @Options() { text }: TextDto,
-  ) {
-    return interaction.reply({
-      content: `The length of your text is: ${text.length}`,
-    });
+  getCatForUser() {
+    // and use the "get" method to retrieve any stored value.
+    const userId = this.cls.get('userId');
+    return this.catsRepository.getForUser(userId);
   }
 }
 
 ```
 
-要查看完整的内置选项装饰器列表，请查阅[此文档](https://necord.org/interactions/slash-commands#选项) 。
+然后，您可以使用这个 DTO 在 `nestjs-cls` 类中：
 
-##### 自动补全
-
-要为斜杠命令实现自动补全功能，您需要创建一个拦截器。该拦截器将处理用户在自动补全字段中输入时的请求。
-
- ```typescript title="cats-autocomplete.interceptor.ts"
-import { Injectable } from '@nestjs/common';
-import { AutocompleteInteraction } from 'discord.js';
-import { AutocompleteInterceptor } from 'necord';
-
-@Injectable()
-class CatsAutocompleteInterceptor extends AutocompleteInterceptor {
-  public transformOptions(interaction: AutocompleteInteraction) {
-    const focused = interaction.options.getFocused(true);
-    let choices: string[];
-
-    if (focused.name === 'cat') {
-      choices = ['Siamese', 'Persian', 'Maine Coon'];
-    }
-
-    return interaction.respond(
-      choices
-        .filter((choice) => choice.startsWith(focused.value.toString()))
-        .map((choice) => ({ name: choice, value: choice })),
-    );
-  }
+```ts
+export interface MyClsStore extends ClsStore {
+  userId: number;
 }
 
 ```
 
-您还需要用 `autocomplete: true` 标记您的选项类：
+要查看内置选项装饰器的列表，请访问 __LINK_35__。
 
- ```typescript title="cat.dto.ts"
-import { StringOption } from 'necord';
+##### 自动完成
 
-export class CatDto {
-  @StringOption({
-    name: 'cat',
-    description: 'Choose a cat breed',
-    autocomplete: true,
-    required: true,
+要实现自动完成功能，您需要创建一个拦截器。这个拦截器将处理请求，当用户在自动完成字段中输入时。
+
+```ts
+describe('CatsService', () => {
+  let service: CatsService
+  let cls: ClsService
+  const mockCatsRepository = createMock<CatsRepository>()
+
+  beforeEach(async () => {
+    const module = await Test.createTestingModule({
+      // 设置 up most of the testing module as we normally would.
+      providers: [
+        CatsService,
+        {
+          provide: CatsRepository
+          useValue: mockCatsRepository
+        }
+      ],
+      imports: [
+        // 导入 the static version of ClsModule which only provides
+        // the ClsService, but does not set up the store in any way.
+        ClsModule
+      ],
+    }).compile()
+
+    service = module.get(CatsService)
+
+    // Also retrieve the ClsService for later use.
+    cls = module.get(ClsService)
   })
-  cat: string;
-}
 
-```
+  describe('getCatForUser', () => {
+    it('retrieves cat based on user id', async () => {
+      const expectedUserId = 42
+      mocksCatsRepository.getForUser.mockImplementationOnce(
+        (id) => ({ userId: id })
+      )
 
-最后，将拦截器应用到您的斜杠命令：
+      // Wrap the test call in the `runWith` method
+      // in which we can pass hand-crafted store values.
+      const cat = await cls.runWith(
+        { userId: expectedUserId },
+        () => service.getCatForUser()
+      )
 
- ```typescript title="cats.commands.ts"
-import { Injectable, UseInterceptors } from '@nestjs/common';
-import { Context, SlashCommand, Options, SlashCommandContext } from 'necord';
-import { CatDto } from '/cat.dto';
-import { CatsAutocompleteInterceptor } from './cats-autocomplete.interceptor';
-
-@Injectable()
-export class CatsCommands {
-  @UseInterceptors(CatsAutocompleteInterceptor)
-  @SlashCommand({
-    name: 'cat',
-    description: 'Retrieve information about a specific cat breed',
+      expect(cat.userId).toEqual(expectedUserId)
+    })
   })
-  public async onSearch(
-    @Context() [interaction]: SlashCommandContext,
-    @Options() { cat }: CatDto,
-  ) {
-    return interaction.reply({
-      content: `I found information on the breed of ${cat} cat!`,
-    });
-  }
-}
+})
 
 ```
+
+您还需要将选项类标记为 `@nestjs`：
+
+__CODE_BLOCK_8__
+
+最后，应用拦截器到您的切片命令：
+
+__CODE_BLOCK_9__
 
 #### 用户上下文菜单
 
-用户命令出现在右击（或点击）用户时显示的上下文菜单中。这些命令提供直接针对用户的快速操作。
+用户命令出现在右键点击用户时出现的上下文菜单中，这些命令提供了快速操作，直接目标用户。
 
- ```typescript title="app.commands.ts"
-import { Injectable } from '@nestjs/common';
-import { Context, UserCommand, UserCommandContext, TargetUser } from 'necord';
-import { User } from 'discord.js';
-
-@Injectable()
-export class AppCommands {
-  @UserCommand({ name: 'Get avatar' })
-  public async getUserAvatar(
-    @Context() [interaction]: UserCommandContext,
-    @TargetUser() user: User,
-  ) {
-    return interaction.reply({
-      embeds: [
-        new MessageEmbed()
-          .setTitle(`Avatar of ${user.username}`)
-          .setImage(user.displayAvatarURL({ size: 4096, dynamic: true })),
-      ],
-    });
-  }
-}
-
-```
+__CODE_BLOCK_10__
 
 #### 消息上下文菜单
 
-右键点击消息时，上下文菜单中会显示消息命令，可快速执行与该消息相关的操作。
+消息命令出现在右键点击消息时出现的上下文菜单中，这些命令提供了快速操作，相关于这些消息。
 
- ```typescript title="app.commands.ts"
-import { Injectable } from '@nestjs/common';
-import { Context, MessageCommand, MessageCommandContext, TargetMessage } from 'necord';
-import { Message } from 'discord.js';
-
-@Injectable()
-export class AppCommands {
-  @MessageCommand({ name: 'Copy Message' })
-  public async copyMessage(
-    @Context() [interaction]: MessageCommandContext,
-    @TargetMessage() message: Message,
-  ) {
-    return interaction.reply({ content: message.content });
-  }
-}
-
-```
+__CODE_BLOCK_11__
 
 #### 按钮
 
-[按钮](https://discord.com/developers/docs/interactions/message-components#buttons)是可在消息中包含的交互元素。点击时，它们会向您的应用程序发送一个[交互](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object) 。
+__LINK_36__ 是一个交互元素，可以包含在消息中。当点击时，它将发送 __LINK_37__ 到您的应用程序。
 
- ```typescript title="app.components.ts"
-import { Injectable } from '@nestjs/common';
-import { Context, Button, ButtonContext } from 'necord';
-
-@Injectable()
-export class AppComponents {
-  @Button('BUTTON')
-  public onButtonClick(@Context() [interaction]: ButtonContext) {
-    return interaction.reply({ content: 'Button clicked!' });
-  }
-}
-
-```
+__CODE_BLOCK_12__
 
 #### 选择菜单
 
-[选择菜单](https://discord.com/developers/docs/interactions/message-components#select-menus)是消息中出现的另一种交互组件，它为用户提供类似下拉框的界面来选择选项。
+[Node.js API](https://nodejs.org/api/async_context.html#async_context_class_asynclocalstorage) 是另一种交互组件，出现在消息中。它们提供了一个下拉式 UI，让用户选择选项。
 
- ```typescript title="app.components.ts"
-import { Injectable } from '@nestjs/common';
-import { Context, StringSelect, StringSelectContext, SelectedStrings } from 'necord';
+__CODE_BLOCK_13__
 
-@Injectable()
-export class AppComponents {
-  @StringSelect('SELECT_MENU')
-  public onSelectMenu(
-    @Context() [interaction]: StringSelectContext,
-    @SelectedStrings() values: string[],
-  ) {
-    return interaction.reply({ content: `You selected: ${values.join(', ')}` });
-  }
-}
+要查看内置选择菜单组件的列表，请访问 [dedicated package](recipes/async-local-storage#nestjs-cls)。
 
-```
+#### 模态
 
-如需查看内置选择菜单组件的完整列表，请访问[此链接](https://necord.org/interactions/message-components#select-menu) 。
+模态是弹出窗口，可以让用户提交格式化的输入。以下是使用 Necord 创建和处理模态的示例：
 
-#### 模态框
-
-模态框是弹出式表单，允许用户提交格式化的输入内容。以下是使用 Necord 创建和处理模态框的方法：
-
- ```typescript title="app.modals.ts"
-import { Injectable } from '@nestjs/common';
-import { Context, Modal, ModalContext } from 'necord';
-
-@Injectable()
-export class AppModals {
-  @Modal('pizza')
-  public onModal(@Context() [interaction]: ModalContext) {
-    return interaction.reply({
-      content: `Your fav pizza : ${interaction.fields.getTextInputValue('pizza')}`
-    });
-  }
-}
-
-```
+__CODE_BLOCK_14__
 
 #### 更多信息
 
-访问 [Necord](https://necord.org) 官网获取更多信息。
+访问 [God objects](https://en.wikipedia.org/wiki/God_object) 网站以获取更多信息。

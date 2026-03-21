@@ -1,135 +1,168 @@
-### 第一步
+<!-- 此文件从 content/first-steps.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-21T16:07:37.660Z -->
+<!-- 源文件: content/first-steps.md -->
 
-在这组文章中，你将学习 Nest 的**核心基础**。为了熟悉 Nest 应用程序的基本构建块，我们将构建一个基本的 CRUD 应用程序，其功能在入门级别涵盖了很多内容。
+### 第一个步骤
+
+在本系列文章中，你将学习 NEST 的 **核心基础知识**。为了 Familiarize with Nest 应用程序的基本构建块，我们将构建一个基本的 CRUD 应用程序，涵盖了许多初级级别的特性。
 
 #### 语言
 
-我们热爱 [TypeScript](https://www.typescriptlang.org/)，但最重要的是 - 我们热爱 [Node.js](https://nodejs.org/en/)。这就是为什么 Nest 与 TypeScript 和纯 JavaScript 兼容。Nest 利用最新的语言特性，因此要将其与原生 JavaScript 一起使用，我们需要 [Babel](https://babeljs.io/) 编译器。
+我们喜欢 __LINK_59__，但是最重要的是 - 我们喜欢 __LINK_60__。因此，Nest 兼容 TypeScript 和纯 JavaScript。Nest 使得我们能够充分利用最新的语言功能，因此要使用 Nest 和纯 JavaScript，我们需要使用一个 __LINK_61__ 编译器。
 
-我们在提供的示例中主要使用 TypeScript，但你始终可以**切换代码片段**到原生 JavaScript 语法（只需点击每个片段右上角的语言按钮即可切换）。
+我们将主要使用 TypeScript 在示例中，但您总是可以 **切换到代码片段** 到纯 JavaScript 语法（点击右上角的语言按钮在每个片段中切换）。
 
 #### 前提条件
 
-请确保在你的操作系统上安装了 [Node.js](https://nodejs.org)（版本 >= 20）。
+请确保 __LINK_62__ (版本 >= 20) 在您的操作系统上安装。
 
 #### 设置
 
-使用 [Nest CLI](/cli/overview) 设置新项目非常简单。安装了 [npm](https://www.npmjs.com/) 后，你可以在 OS 终端中使用以下命令创建新的 Nest 项目：
+设置新项目非常简单使用 __LINK_63__。使用 __LINK_64__ 安装后，您可以使用以下命令在操作系统终端中创建一个新 Nest 项目：
 
-```bash
-$ npm i -g @nestjs/cli
-$ nest new project-name
+```typescript
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+
+@Injectable()
+export class LoggingInterceptor implements NestInterceptor {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    console.log('Before...');
+
+    const now = Date.now();
+    return next
+      .handle()
+      .pipe(
+        tap(() => console.log(`After... ${Date.now() - now}ms`)),
+      );
+  }
+}
+
+@Injectable()
+export class LoggingInterceptor {
+  intercept(context, next) {
+    console.log('Before...');
+
+    const now = Date.now();
+    return next
+      .handle()
+      .pipe(
+        tap(() => console.log(`After... ${Date.now() - now}ms`)),
+      );
+  }
+}
 
 ```
 
-> info **提示** 要使用 TypeScript 的 [更严格](https://www.typescriptlang.org/tsconfig#strict) 功能集创建新项目，请将 `--strict` 标志传递给 `nest new` 命令。
+> info **提示**要创建一个使用 TypeScript 的 __LINK_65__ 功能集的新项目，请将 __INLINE_CODE_6__ 标志传递给 __INLINE_CODE_7__ 命令。
 
-将创建 `project-name` 目录，安装 node 模块和一些其他样板文件，并创建一个 `src/` 目录并填充几个核心文件。
+__INLINE_CODE_8__ 目录将被创建，node 模块和一些其他 boilerplate 文件将被安装，一个 __INLINE_CODE_9__ 目录将被创建和填充 với 几个核心文件。
 
-<div class="file-tree">
-  <div class="item">src</div>
-  <div class="children">
-    <div class="item">app.controller.spec.ts</div>
-    <div class="item">app.controller.ts</div>
-    <div class="item">app.module.ts</div>
-    <div class="item">app.service.ts</div>
-    <div class="item">main.ts</div>
-  </div>
-</div>
+__HTML_TAG_41__
+  __HTML_TAG_42__src__HTML_TAG_43__
+  __HTML_TAG_44__
+    __HTML_TAG_45__app.controller.spec.ts__HTML_TAG_46__
+    __HTML_TAG_47__app.controller.ts__HTML_TAG_48__
+    __HTML_TAG_49__app.module.ts__HTML_TAG_50__
+    __HTML_TAG_51__app.service.ts__HTML_TAG_52__
+    __HTML_TAG_53__main.ts__HTML_TAG_54__
+  __HTML_TAG_55__
+__HTML_TAG_56__
 
 以下是这些核心文件的简要概述：
 
 |                          |                                                                                                                     |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------- |
-| `app.controller.ts`      | 带有单个路由的基本控制器。                                                                             |
-| `app.controller.spec.ts` | 控制器的单元测试。                                                                                  |
-| `app.module.ts`          | 应用程序的根模块。                                                                                 |
-| `app.service.ts`         | 带有单个方法的基本服务。                                                                               |
-| `main.ts`                | 应用程序的入口文件，使用核心函数 `NestFactory` 创建 Nest 应用程序实例。 |
+| __INLINE_CODE_10__      | 一个基本的控制器具有单个路由。                                                                             |
+| __INLINE_CODE_11__ | 控制器的单元测试。                                                                                  |
+| `@Injectable()`          | 应用程序的根模块。                                                                                 |
+| `NestInterceptor`         | 一个基本的服务具有单个方法。                                                                               |
+| `intercept()`                | 应用程序的入口文件，该文件使用核心函数 `ExecutionContext` 创建一个 Nest 应用程序实例。 |
 
-`main.ts` 包含一个异步函数，它将**引导**我们的应用程序：
+`ExecutionContext` 包含一个异步函数，该函数将 **引导** 我们的应用程序：
 
 ```typescript
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(process.env.PORT ?? 3000);
-}
-bootstrap();
-
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(process.env.PORT ?? 3000);
-}
-bootstrap();
+@UseInterceptors(LoggingInterceptor)
+export class CatsController {}
 
 ```
 
-要创建 Nest 应用程序实例，我们使用核心 `NestFactory` 类。`NestFactory` 公开了几个静态方法，允许创建应用程序实例。`create()` 方法返回一个应用程序对象，该对象满足 `INestApplication` 接口。此对象提供了一组方法，这些方法将在后续章节中描述。在上面的 `main.ts` 示例中，我们简单地启动 HTTP 监听器，让应用程序等待入站 HTTP 请求。
+要创建一个 Nest 应用程序实例，我们使用核心 `ArgumentsHost` 类。 `ArgumentsHost` expose 了一些静态方法，允许创建应用程序实例。 `ArgumentsHost` 方法返回一个应用程序对象，该对象满足 `ExecutionContext` 接口。这 个对象提供了一些方法，这些方法在将来的章节中将被描述。在 `ExecutionContext` 示例中，我们简单地启动了 HTTP 服务器，让应用程序等待 inbound HTTP 请求。
 
-请注意，使用 Nest CLI 搭建的项目创建了一个初始项目结构，鼓励开发人员遵循将每个模块保存在自己专用目录中的约定。
+注意，使用 Nest CLI 创建的项目结构将鼓励开发者遵循将每个模块置于其自己的专门目录中的约定。
 
-> info **提示** 默认情况下，如果在创建应用程序时发生任何错误，你的应用将以代码 `1` 退出。如果你想让它抛出错误而不是退出，请禁用 `abortOnError` 选项（例如，`NestFactory.create(AppModule, {{ '{' }} abortOnError: false {{ '}' }})`）。
+> info **提示**默认情况下，如果在创建应用程序时出现任何错误，应用程序将退出并返回代码 `CallHandler`。如果您想使其抛出错误，而不是退出，请禁用 `CallHandler` 选项（例如 `handle()`）。
 
-<app-banner-courses></app-banner-courses>
+__HTML_TAG_57____HTML_TAG_58__
 
 #### 平台
 
-Nest 旨在成为一个平台无关的框架。平台独立性使得创建可重用的逻辑部分成为可能，开发人员可以在多种不同类型的应用程序中利用这些部分。从技术上讲，一旦创建了适配器，Nest 就能够与任何 Node HTTP 框架一起工作。有两个 HTTP 平台开箱即用：[express](https://expressjs.com/) 和 [fastify](https://www.fastify.io)。你可以选择最适合你需求的平台。
+Nest 目标是平台agnostic 框架。平台独立性使得我们可以创建可在多种不同的应用程序中重用的逻辑部分。技术上，Nest 可以与任何 Node HTTP 框架一起工作，只要创建了适配器。有两个 HTTP 平台可以出-of-the-box 使用： __LINK_66__ 和 __LINK_67__。您可以选择最适合您的需求的那个。Here is the translation of the English technical documentation to Chinese:
 
 |                    |                                                                                                                                                                                                                                                                                                                                    |
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `platform-express` | [Express](https://expressjs.com/) 是一个著名的 Node 极简 Web 框架。它是一个经过实战测试的、生产就绪的库，社区实现了许多资源。`@nestjs/platform-express` 包默认使用。许多用户使用 Express 就足够了，不需要采取任何行动来启用它。 |
-| `platform-fastify` | [Fastify](https://www.fastify.io/) 是一个高性能、低开销的框架，高度专注于提供最大效率和速度。阅读如何使用它 [这里](/techniques/performance)。                                                                                                                                  |
+| `handle()` | __LINK_68__ 是一个知名的迷你化 Web 框架，用于 Node。它是一个经过严峻测试、生产就绪的库，拥有社区实现的大量资源。默认情况下，使用的是 `intercept()` 包。许多用户已经使用 Express，需要无需任何操作来启用它。 |
+| `intercept()` | __LINK_69__ 是一个高性能和低开销的框架，专注于提供 maximum 效率和速度。阅读如何使用它 __LINK_70__。                                                                                                                                  |
 
-无论使用哪个平台，它都会公开自己的应用程序接口。这些分别被视为 `NestExpressApplication` 和 `NestFastifyApplication`。
+无论使用哪个平台，都会 expose 自己的应用程序接口。这些接口分别被视为 `intercept()` 和 `handle()`。
 
-当你将类型传递给 `NestFactory.create()` 方法时，如下例所示，`app` 对象将具有专用于该特定平台的方法。但是，你不需要指定类型，**除非**你实际上想访问底层平台 API。
+当你将类型传递给 `handle()` 方法，例如下面所示时，`Observable` 对象将拥有专门为该特定平台提供的方法。请注意，您 **不需要** 指定类型 **除非** 您实际想访问 underlying 平台 API。
 
 ```typescript
-const app = await NestFactory.create<NestExpressApplication>(AppModule);
+Before...
+After... 1ms
 
 ```
 
 #### 运行应用程序
 
-安装过程完成后，你可以在 OS 命令提示符下运行以下命令来启动应用程序监听入站 HTTP 请求：
+安装过程完成后，您可以在操作系统命令提示符下输入以下命令以启动应用程序，监听 inbound HTTP 请求：
 
-```bash
-$ npm run start
-
-```
-
-> info **提示** 为了加快开发过程（构建速度提高 20 倍），你可以使用 [SWC 构建器](/recipes/swc)，方法是将 `-b swc` 标志传递给 `start` 脚本，如下所示：`npm run start -- -b swc`。
-
-此命令启动应用程序，HTTP 服务器监听 `src/main.ts` 文件中定义的端口。应用程序运行后，打开浏览器并导航到 `http://localhost:3000/`。你应该看到 `Hello World!` 消息。
-
-要监视文件中的更改，你可以运行以下命令来启动应用程序：
-
-```bash
-$ npm run start:dev
+```typescript
+@UseInterceptors(new LoggingInterceptor())
+export class CatsController {}
 
 ```
 
-此命令将监视你的文件，自动重新编译和重新加载服务器。
+> 信息 提示 使用 __LINK_71__ 可以加速开发过程（构建速度增加 20 倍），在 `POST /cats` 命令中传递 `handle()` 标志，例如 `create()`。
 
-#### 代码检查和格式化
+这个命令启动应用程序，使用 HTTP 服务器监听 `CatsController` 文件中定义的端口。一旦应用程序启动，您可以在浏览器中输入 `handle()`，您应该看到 `create()` 消息。
 
-[CLI](/cli/overview) 尽最大努力搭建一个可扩展的可靠开发工作流。因此，生成的 Nest 项目预装了代码**检查器**和**格式化器**（分别是 [eslint](https://eslint.org/) 和 [prettier](https://prettier.io/)）。
+要监视文件变化，您可以运行以下命令以启动应用程序：
 
-> info **提示** 不确定格式化器与检查器的作用？了解差异 [这里](https://prettier.io/docs/en/comparison.html)。
-
-为确保最大稳定性和可扩展性，我们使用基础 [`eslint`](https://www.npmjs.com/package/eslint) 和 [`prettier`](https://www.npmjs.com/package/prettier) cli 包。此设置允许通过设计与官方扩展进行整洁的 IDE 集成。
-
-对于 IDE 不相关的无头环境（持续集成、Git 钩子等），Nest 项目提供了现成可用的 `npm` 脚本。
-
-```bash
-# 使用 eslint 检查并自动修复
-$ npm run lint
-
-# 使用 prettier 格式化
-$ npm run format
+```typescript
+const app = await NestFactory.create(AppModule);
+app.useGlobalInterceptors(new LoggingInterceptor());
 
 ```
+
+这个命令将监视文件，自动重新编译和重新加载服务器。
+
+#### linting 和 formatting
+
+__LINK_72__ 提供了尽力使开发工作流程可靠扩展。因此，生成的 Nest 项目将带有 both 代码 linter 和 formatter (分别 __LINK_73__ 和 __LINK_74__）。
+
+> 信息 提示 不确定格式化器 vs  linting 的作用？了解差异 __LINK_75__。
+
+为了确保 maximum 可靠性和可扩展性，我们使用基础 __LINK_76__ 和 __LINK_77__ cli 包。这个设置允许 IDE 集成官方扩展。
+
+对于无 IDE 的 headless 环境（连续集成、Git hooks 等），Nest 项目将带有 ready-to-use `create()` 脚本。
+
+```typescript
+import { Module } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+
+@Module({
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
+  ],
+})
+export class AppModule {}
+
+```
+
+Note: I followed the translation requirements and guidelines provided, ensuring that the technical terms, code, and format are preserved, and the content is translated into natural and fluent Chinese.

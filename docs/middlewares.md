@@ -1,247 +1,268 @@
+<!-- 此文件从 content/middlewares.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-03-21T16:08:25.302Z -->
+<!-- 源文件: content/middlewares.md -->
+
 ### 中间件
 
-中间件是在**路由处理程序之前**调用的函数。中间件函数可以访问应用程序请求-响应周期中的 [request](https://expressjs.com/en/4x/api.html#req) 和 [response](https://expressjs.com/en/4x/api.html#res) 对象，以及 `next()` 中间件函数。**下一个**中间件函数通常由名为 `next` 的变量表示。
+中间件是一种函数，位于路由处理器之前。中间件函数可以访问`__LINK_93__`和`__LINK_94__`对象，以及应用程序的请求-响应周期中的`__INLINE_CODE_11__`中间件函数。常见的中间件函数是通过变量`__INLINE_CODE_12__`表示的。
 
-<figure><img class="illustrative-image" src="/assets/Middlewares_1.png" /></figure>
+`<HTML_TAG_72>``<HTML_TAG_73>``<HTML_TAG_74>`
 
-默认情况下，Nest 中间件等同于 [express](https://expressjs.com/en/guide/using-middleware.html) 中间件。以下来自官方 express 文档的描述描述了中间件的功能：
+Nest 中间件默认情况下是等同于 Express 中间件的。以下是官方 Express 文档中对中间件的描述：
 
-<blockquote class="external">
+`<HTML_TAG_75>`
   中间件函数可以执行以下任务：
-  <ul>
-    <li>执行任何代码。</li>
-    <li>对请求和响应对象进行更改。</li>
-    <li>结束请求-响应周期。</li>
-    <li>调用堆栈中的下一个中间件函数。</li>
-    <li>如果当前中间件函数不结束请求-响应周期，它必须调用 <code>next()</code> 以将控制权传递给下一个中间件函数。否则，请求将被挂起。</li>
-  </ul>
-</blockquote>
+  `__HTML_TAG_77__execute any code.__HTML_TAG_78__
+  `__HTML_TAG_79__make changes to the request and the response objects.__HTML_TAG_80__
+  `__HTML_TAG_81__end the request-response cycle.__HTML_TAG_82__
+  `__HTML_TAG_83__call the next middleware function in the stack.__HTML_TAG_84__
+  `__HTML_TAG_85__if the current middleware function does not end the request-response cycle, it must call __HTML_TAG_86__next()__HTML_TAG_87__ to
+    pass control to the next middleware function. Otherwise, the request will be left hanging.__HTML_TAG_88__
+  `__HTML_TAG_89__
+`<HTML_TAG_90>`
 
-你可以在函数中实现自定义 Nest 中间件，或者在带有 `@Injectable()` 装饰器的类中实现。类应该实现 `NestMiddleware` 接口，而函数没有任何特殊要求。让我们首先使用类方法实现一个简单的中间件功能。
+您可以在函数或带有``express``装饰器的类中实现自定义 Nest 中间件。类应该实现``tsc``接口，而函数没有特殊要求。让我们从实现一个简单的中间件开始。
 
-> warning **警告** `Express` 和 `fastify` 处理中间件的方式不同，并提供不同的方法签名，更多信息请阅读 [这里](/techniques/performance#middleware)。
+> warning **警告** `webpack` 和 `@nestjs/platform-express` 处理中间件 differently 和提供不同的方法签名，阅读更多 __LINK_96__。
 
-```typescript
-import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
+````typescript
+// #1 Express
+import * as express from 'express';
 
-@Injectable()
-export class LoggerMiddleware implements NestMiddleware {
-  use(req: Request, res: Response, next: NextFunction) {
-    console.log('Request...');
-    next();
-  }
+async function bootstrap() {
+  const app = express();
+  app.get('/', (req, res) => res.send('Hello world!'));
+  await new Promise<void>((resolve) => app.listen(3000, resolve));
 }
+bootstrap();
 
-@Injectable()
-export class LoggerMiddleware {
-  use(req, res, next) {
-    console.log('Request...');
-    next();
-  }
+// #2 Nest (with @nestjs/platform-express)
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule, { logger: ['error'] });
+  await app.listen(process.env.PORT ?? 3000);
 }
+bootstrap();
 
-```
+// #3 Nest as a Standalone application (no HTTP server)
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { AppService } from './app.service';
+
+async function bootstrap() {
+  const app = await NestFactory.createApplicationContext(AppModule, {
+    logger: ['error'],
+  });
+  console.log(app.get(AppService).getHello());
+}
+bootstrap();
+
+// #4 Raw Node.js script
+async function bootstrap() {
+  console.log('Hello world!');
+}
+bootstrap();
+
+````
 
 #### 依赖注入
 
-Nest 中间件完全支持依赖注入。与提供者和控制器一样，它们能够**注入**在同一模块中可用的依赖项。与通常一样，这是通过 `constructor` 完成的。
+Nest 中间件完全支持依赖注入。正如提供者和控制器一样，它们可以注入同一模块中的依赖项。正如通常一样，这是通过``webpack``实现的。
 
 #### 应用中间件
 
-`@Module()` 装饰器中没有中间件的位置。相反，我们使用模块类的 `configure()` 方法来设置它们。包含中间件的模块必须实现 `NestModule` 接口。让我们在 `AppModule` 级别设置 `LoggerMiddleware`。
+中间件不在``nest build --webpack``装饰器中。相反，我们使用模块类的``webpack``方法设置它们。包含中间件的模块需要实现``node_modules``接口。让我们在``@nestjs/platform-express``级别设置``webpack.config.js``。
 
-```typescript
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
-import { LoggerMiddleware } from './common/middleware/logger.middleware';
-import { CatsModule } from './cats/cats.module';
+````javascript
+module.exports = (options, webpack) => {
+  const lazyImports = [
+    '@nestjs/microservices/microservices-module',
+    '@nestjs/websockets/socket-module',
+  ];
 
-@Module({
-  imports: [CatsModule],
-})
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(LoggerMiddleware)
-      .forRoutes('cats');
-  }
+  return {
+    ...options,
+    externals: [],
+    plugins: [
+      ...options.plugins,
+      new webpack.IgnorePlugin({
+        checkResource(resource) {
+          if (lazyImports.includes(resource)) {
+            try {
+              require.resolve(resource);
+            } catch (err) {
+              return true;
+            }
+          }
+          return false;
+        },
+      }),
+    ],
+  };
+};
+
+````
+
+在上面的示例中，我们已经设置了``webpack``为之前在``$ nest g resource``中定义的路由处理器。我们还可以进一步限制中间件到特定的请求方法通过将对象包含路由``AppModule``和请求``LazyModuleLoader``传递给``CacheModule``方法时配置中间件。在以下示例中，注意我们导入``CacheService``枚举以引用所需的请求方法类型。
+
+````typescript
+if (request.method === RequestMethod[RequestMethod.GET]) {
+  const { CacheModule } = await import('./cache.module');
+  const moduleRef = await this.lazyModuleLoader.load(() => CacheModule);
+
+  const { CacheService } = await import('./cache.service');
+  const cacheService = moduleRef.get(CacheService);
+
+  return cacheService.get(ENDPOINT_KEY);
 }
 
-@Module({
-  imports: [CatsModule],
-})
-export class AppModule {
-  configure(consumer) {
-    consumer
-      .apply(LoggerMiddleware)
-      .forRoutes('cats');
-  }
-}
+````
 
-```
+> info **提示** ``main.ts`` 方法可以使用``NestFactory.createApplicationContext``异步化（例如，您可以在``serverless-offline``方法体中完成异步操作）。
 
-在上面的示例中，我们为之前在 `CatsController` 中定义的 `/cats` 路由处理程序设置了 `LoggerMiddleware`。我们还可以通过在配置中间件时将包含路由 `path` 和请求 `method` 的对象传递给 `forRoutes()` 方法，进一步将中间件限制为特定的请求方法。在下面的示例中，请注意我们导入 `RequestMethod` 枚举以引用所需的请求方法类型。
-
-```typescript
-import { Module, NestModule, RequestMethod, MiddlewareConsumer } from '@nestjs/common';
-import { LoggerMiddleware } from './common/middleware/logger.middleware';
-import { CatsModule } from './cats/cats.module';
-
-@Module({
-  imports: [CatsModule],
-})
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(LoggerMiddleware)
-      .forRoutes({ path: 'cats', method: RequestMethod.GET });
-  }
-}
-
-@Module({
-  imports: [CatsModule],
-})
-export class AppModule {
-  configure(consumer) {
-    consumer
-      .apply(LoggerMiddleware)
-      .forRoutes({ path: 'cats', method: RequestMethod.GET });
-  }
-}
-
-```
-
-> info **提示** `configure()` 方法可以使用 `async/await` 使其异步（例如，你可以在 `configure()` 方法体内部 `await` 异步操作的完成）。
-
-> warning **警告** 当使用 `express` 适配器时，NestJS 应用程序将默认注册来自 `body-parser` 包的 `json` 和 `urlencoded`。这意味着如果你想通过 `MiddlewareConsumer` 自定义该中间件，你需要在使用 `NestFactory.create()` 创建应用程序时将 `bodyParser` 标志设置为 `false` 来关闭全局中间件。
+> warning **警告** 当使用``serverless.yml``适配器时，NestJS 应用程序将默认注册``main.ts``和``@nestjs/swagger``从包``tsconfig.json``。这意味着如果您想自定义该中间件，需要在创建应用程序时将``@codegenie/serverless-express``标志设置为``nest build``。
 
 #### 路由通配符
 
-NestJS 中间件也支持基于模式的路由。例如，命名通配符 (`*splat`) 可以用作通配符来匹配路由中的任何字符组合。在以下示例中，中间件将对任何以 `abcd/` 开头的路由执行，无论后面有多少字符。
+基于模式的路由在 NestJS 中间件中也支持。例如，命名通配符(``serverless``)可以用作通配符，以匹配路由中的任何组合字符。在以下示例中，中间件将执行任何以``http://localhost:3000/dev/[ANY_ROUTE]``开头的路由，无论后续字符的数量。
 
-```typescript
-forRoutes({
-  path: 'abcd/*splat',
-  method: RequestMethod.ALL,
-});
+````typescript
+if (workerType === WorkerType.A) {
+  const { WorkerAModule } = await import('./worker-a.module');
+  const moduleRef = await this.lazyModuleLoader.load(() => WorkerAModule);
+  // ...
+} else if (workerType === WorkerType.B) {
+  const { WorkerBModule } = await import('./worker-b.module');
+  const moduleRef = await this.lazyModuleLoader.load(() => WorkerBModule);
+  // ...
+}
 
-```
+````
 
-> info **提示** `splat` 只是通配符参数的名称，没有特殊含义。你可以随意命名，例如 `*wildcard`。
+> info **提示** ``[ANY_ROUTE]`` 是通配符参数的名称，它没有特殊含义。您可以将其命名为任何名称，例如``webpack``。
 
-`'abcd/*'` 路由路径将匹配 `abcd/1`、`abcd/123`、`abcd/abc` 等。连字符 ( `-`) 和点 (`.`) 在基于字符串的路径中被字面解释。然而，没有其他字符的 `abcd/` 将不匹配路由。为此，你需要将通配符用大括号括起来使其可选：
+``webpack.config.js`` 路由将匹配``handler``、``output.libraryTarget``、``commonjs2``等。减号 (``$ nest build --webpack``) 和点 (``$ npx serverless offline``) 是字符串路径中的字面字符。然而，``terser-webpack-plugin`` 没有附加字符将不匹配路由。为此，您需要将通配符包围在花括号中使其可选：
 
-```typescript
-forRoutes({
-  path: 'abcd/{*splat}',
-  method: RequestMethod.ALL,
-});
+````bash
+$ npm i @codegenie/serverless-express aws-lambda
+$ npm i -D @types/aws-lambda serverless-offline
 
-```
+````
 
 #### 中间件消费者
 
-`MiddlewareConsumer` 是一个辅助类。它提供了几个内置方法来管理中间件。所有这些都可以简单地以 [流畅风格](https://en.wikipedia.org/wiki/Fluent_interface) **链式调用**。`forRoutes()` 方法可以接受单个字符串、多个字符串、`RouteInfo` 对象、控制器类甚至多个控制器类。在大多数情况下，你可能只传递一个以逗号分隔的**控制器**列表。以下是单个控制器的示例：
+``class-validator`` 是一个helper 类。它提供了多个内置方法来管理中间件。所有这些方法都可以简单地在`__LINK_97__`中链式调用。``NestFactory.createApplicationContext`` 方法Here is the translation of the English technical documentation to Chinese:
 
-```typescript
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
-import { LoggerMiddleware } from './common/middleware/logger.middleware';
-import { CatsModule } from './cats/cats.module';
-import { CatsController } from './cats/cats.controller';
-
-@Module({
-  imports: [CatsModule],
-})
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(LoggerMiddleware)
-      .forRoutes(CatsController);
-  }
-}
-
-@Module({
-  imports: [CatsModule],
-})
-export class AppModule {
-  configure(consumer) {
-    consumer
-      .apply(LoggerMiddleware)
-      .forRoutes(CatsController);
-  }
-}
-
-```
-
-> info **提示** `apply()` 方法可以接受单个中间件，或多个参数以指定 <a href="/middlewares#多个中间件">多个中间件</a>。
+> info **提示** `NestFactory.createApplicationContext` 方法可能会接受单个中间件或多个参数来指定多个中间件。
 
 #### 排除路由
 
-有时，我们可能希望**排除**某些路由应用中间件。这可以使用 `exclude()` 方法轻松实现。`exclude()` 方法接受单个字符串、多个字符串或 `RouteInfo` 对象来标识要排除的路由。
+有时，我们可能想要**排除**某些路由不应用中间件。这可以使用 `NestFactory.create` 方法来实现。 `event` 方法可以接受单个字符串、多个字符串或 `EventsService` 对象来标识要排除的路由。
 
-以下是如何使用它的示例：
-
-```typescript
-consumer
-  .apply(LoggerMiddleware)
-  .exclude(
-    { path: 'cats', method: RequestMethod.GET },
-    { path: 'cats', method: RequestMethod.POST },
-    'cats/{*splat}',
-  )
-  .forRoutes(CatsController);
-
-```
-
-> info **提示** `exclude()` 方法使用 [path-to-regexp](https://github.com/pillarjs/path-to-regexp#parameters) 包支持通配符参数。
-
-通过上面的示例，`LoggerMiddleware` 将绑定到 `CatsController` 内定义的所有路由**除了**传递给 `exclude()` 方法的三个路由。
-
-这种方法在基于特定路由或路由模式应用或排除中间件方面提供了灵活性。
-
-#### 函数式中间件
-
-我们一直在使用的 `LoggerMiddleware` 类非常简单。它没有成员，没有额外的方法，也没有依赖项。为什么我们不能只是在一个简单的函数中定义它，而不是一个类？事实上，我们可以。这种类型的中间件称为**函数式中间件**。让我们将日志中间件从基于类转换为函数式中间件，以说明区别：
+以下是一个使用它的示例：
 
 ```typescript
-import { Request, Response, NextFunction } from 'express';
+import { NestFactory } from '@nestjs/core';
+import serverlessExpress from '@codegenie/serverless-express';
+import { Callback, Context, Handler } from 'aws-lambda';
+import { AppModule } from './app.module';
 
-export function logger(req: Request, res: Response, next: NextFunction) {
-  console.log(`Request...`);
-  next();
+let server: Handler;
+
+async function bootstrap(): Promise<Handler> {
+  const app = await NestFactory.create(AppModule);
+  await app.init();
+
+  const expressApp = app.getHttpAdapter().getInstance();
+  return serverlessExpress({ app: expressApp });
+}
+
+export const handler: Handler = async (
+  event: any,
+  context: Context,
+  callback: Callback,
+) => {
+  server = server ?? (await bootstrap());
+  return server(event, context, callback);
 };
 
 ```
 
-并在 `AppModule` 中使用它：
+> info **提示** __INLINE_CODE_60__ 方法支持使用 __LINK_98__ 包裹的通配参数。
 
-```typescript
-consumer
-  .apply(logger)
-  .forRoutes(CatsController);
+使用上面的示例,__INLINE_CODE_61__ 将被绑定到 __INLINE_CODE_62__ 内部定义的所有路由**except**三个传递给 __INLINE_CODE_63__ 方法的路由。
+
+这种方法提供了根据特定路由或路由模式来应用或排除中间件的灵活性。
+
+#### 功能中间件
+
+我们使用的 __INLINE_CODE_64__ 类非常简单。它没有成员、没有额外方法、没有依赖项。为什么我们不能简单地将其定义为一个函数而不是一个类？实际上，我们可以。这种中间件被称为**功能中间件**。让我们将 logger 中间件从类中间件转换为功能中间件，以illustrate 的不同：
+
+```json
+{
+  "compilerOptions": {
+    ...
+    "esModuleInterop": true
+  }
+}
 
 ```
 
-> info **提示** 每当你的中间件不需要任何依赖项时，考虑使用更简单的**函数式中间件**替代方案。
+并在 __INLINE_CODE_65__ 中使用它：
+
+```bash
+$ npm run build
+$ npx serverless offline
+
+```
+
+> info **提示** 在您的中间件不需要依赖项时，考虑使用更简单的**功能中间件**Alternative。
 
 #### 多个中间件
 
-如前所述，为了绑定按顺序执行的多个中间件，只需在 `apply()` 方法中提供一个逗号分隔的列表：
+如前所述，我们可以在 __INLINE_CODE_66__ 方法中提供逗号分隔的列表来绑定多个中间件，以便它们顺序执行：
 
-```typescript
-consumer.apply(cors(), helmet(), logger).forRoutes(CatsController);
+```javascript
+return {
+  ...options,
+  externals: [],
+  output: {
+    ...options.output,
+    libraryTarget: 'commonjs2',
+  },
+  // ... the rest of the configuration
+};
 
 ```
 
 #### 全局中间件
 
-如果我们想一次将中间件绑定到每个注册的路由，我们可以使用 `INestApplication` 实例提供的 `use()` 方法：
+如果我们想将中间件绑定到每个已注册的路由上，以便在每个路由上执行，我们可以使用 __INLINE_CODE_67__ 方法，它由 __INLINE_CODE_68__ 实例提供：
 
-```typescript
-const app = await NestFactory.create(AppModule);
-app.use(logger);
-await app.listen(process.env.PORT ?? 3000);
+```javascript
+const TerserPlugin = require('terser-webpack-plugin');
+
+return {
+  ...options,
+  externals: [],
+  optimization: {
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          keep_classnames: true,
+        },
+      }),
+    ],
+  },
+  output: {
+    ...options.output,
+    libraryTarget: 'commonjs2',
+  },
+  // ... the rest of the configuration
+};
 
 ```
 
-> info **提示** 在全局中间件中访问 DI 容器是不可能的。使用 `app.use()` 时，你可以改用 [函数式中间件](/middlewares#函数式中间件)。或者，你可以使用类中间件并在 `AppModule`（或任何其他模块）中使用 `.forRoutes('*')` 来使用它。
+> info **提示** 在全局中间件中访问 DI 容器是不可行的。您可以使用 __LINK_99__ 来访问 DI 容器，而不是使用 __INLINE_CODE_69__。或者，您可以使用类中间件并在 __INLINE_CODE_70__ 中使用 __INLINE_CODE_71__ (或任何其他模块)。

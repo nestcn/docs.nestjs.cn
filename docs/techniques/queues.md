@@ -60,7 +60,9 @@ BullModule.registerQueue({
 
 ```
 
-> info **提示** 通过向 `registerQueue()` 方法传递多个逗号分隔的配置对象来创建多个队列。
+:::info 提示
+通过向 `registerQueue()` 方法传递多个逗号分隔的配置对象来创建多个队列。
+:::
 
 `registerQueue()` 方法用于实例化和/或注册队列。队列在连接到相同底层 Redis 数据库并使用相同凭据的模块和进程之间共享。每个队列通过其 name 属性唯一。队列名称既用作注入令牌（用于将队列注入到控制器/提供者中），也用作装饰器的参数，以将消费者类和监听器与队列关联。
 
@@ -136,7 +138,9 @@ export class AudioService {
 
 ```
 
-> info **提示** `@InjectQueue()` 装饰器通过其名称标识队列，如在 `registerQueue()` 方法调用中提供的那样（例如 `'audio'`）。
+:::info 提示
+`@InjectQueue()` 装饰器通过其名称标识队列，如在 `registerQueue()` 方法调用中提供的那样（例如 `'audio'`）。
+:::
 
 现在，通过调用队列的 `add()` 方法，传递用户定义的作业对象来添加作业。作业表示为可序列化的 JavaScript 对象（因为它们就是这样存储在 Redis 数据库中的）。您传递的作业的形状是任意的；使用它来表示您的作业对象的语义。您还需要给它一个名称。这允许您创建专门的 <a href="techniques/queues#消费者">消费者</a>，它们只会处理具有给定名称的作业。
 
@@ -217,7 +221,9 @@ export class AudioConsumer {}
 
 ```
 
-> info **提示** 消费者必须注册为 `providers`，以便 `@nestjs/bullmq` 包可以拾取它们。
+:::info 提示
+消费者必须注册为 `providers`，以便 `@nestjs/bullmq` 包可以拾取它们。
+:::
 
 其中装饰器的字符串参数（例如 `'audio'`）是要与类方法关联的队列的名称。
 
@@ -246,7 +252,9 @@ export class AudioConsumer extends WorkerHost {
 
 在旧版本的 Bull 中，您可以通过将该 `name` 传递给 `@Process()` 装饰器来指定作业处理程序方法将**仅**处理特定类型的作业（具有特定 `name` 的作业），如下所示。
 
-> warning **警告** 这在 BullMQ 中不起作用，请继续阅读。
+:::warning 警告
+这在 BullMQ 中不起作用，请继续阅读。
+:::
 
 ```typescript
 @Process('transcode')
@@ -306,7 +314,9 @@ constructor(@Inject(JOB_REF) jobRef: Job) {
 
 ```
 
-> info **提示** `JOB_REF` 令牌从 `@nestjs/bullmq` 包导入。
+:::info 提示
+`JOB_REF` 令牌从 `@nestjs/bullmq` 包导入。
+:::
 
 #### 事件监听器
 
@@ -355,7 +365,9 @@ export class AudioEventsListener extends QueueEventsHost {
 
 ```
 
-> info **提示** QueueEvent 监听器必须注册为 `providers`，以便 `@nestjs/bullmq` 包可以拾取它们。
+:::info 提示
+QueueEvent 监听器必须注册为 `providers`，以便 `@nestjs/bullmq` 包可以拾取它们。
+:::
 
 您可以在 [这里](https://api.docs.bullmq.io/interfaces/v4.QueueEventsListener.html) 看到完整的事件列表及其作为 QueueEventsListener 属性的参数。
 
@@ -403,7 +415,9 @@ export class AppModule {}
 
 ```
 
-> warning **警告** 请注意，因为您的函数在分叉进程中执行，所以依赖注入（和 IoC 容器）将不可用。这意味着您的处理器函数需要包含（或创建）它需要的所有外部依赖项实例。
+:::warning 警告
+请注意，因为您的函数在分叉进程中执行，所以依赖注入（和 IoC 容器）将不可用。这意味着您的处理器函数需要包含（或创建）它需要的所有外部依赖项实例。
+:::
 
 #### 异步配置
 
@@ -528,7 +542,9 @@ export class AudioService implements OnModuleInit {
 
 #### Bull 安装
 
-> warning **注意** 如果您决定使用 BullMQ，请跳过此部分和以下章节。
+:::warning 注意
+如果您决定使用 BullMQ，请跳过此部分和以下章节。
+:::
 
 要开始使用 Bull，我们首先安装所需的依赖。
 
@@ -576,7 +592,9 @@ BullModule.registerQueue({
 
 ```
 
-> info **提示** 通过向 `registerQueue()` 方法传递多个逗号分隔的配置对象来创建多个队列。
+:::info 提示
+通过向 `registerQueue()` 方法传递多个逗号分隔的配置对象来创建多个队列。
+:::
 
 `registerQueue()` 方法用于实例化和/或注册队列。队列在连接到相同底层 Redis 数据库并使用相同凭据的模块和进程之间共享。每个队列通过其 name 属性唯一。队列名称既用作注入令牌（用于将队列注入到控制器/提供者中），也用作装饰器的参数，以将消费者类和监听器与队列关联。
 
@@ -641,7 +659,9 @@ export class AudioService {
 
 ```
 
-> info **提示** `@InjectQueue()` 装饰器通过其名称标识队列，如在 `registerQueue()` 方法调用中提供的那样（例如 `'audio'`）。
+:::info 提示
+`@InjectQueue()` 装饰器通过其名称标识队列，如在 `registerQueue()` 方法调用中提供的那样（例如 `'audio'`）。
+:::
 
 现在，通过调用队列的 `add()` 方法，传递用户定义的作业对象来添加作业。作业表示为可序列化的 JavaScript 对象（因为它们就是这样存储在 Redis 数据库中的）。您传递的作业的形状是任意的；使用它来表示您的作业对象的语义。
 
@@ -663,7 +683,9 @@ const job = await this.audioQueue.add('transcode', {
 
 ```
 
-> Warning **警告** 使用命名作业时，您必须为添加到队列的每个唯一名称创建处理器，否则队列会抱怨您缺少给定作业的处理器。有关消费命名作业的更多信息，请参阅 <a href="techniques/queues#消费者">这里</a>。
+:::warning 警告
+使用命名作业时，您必须为添加到队列的每个唯一名称创建处理器，否则队列会抱怨您缺少给定作业的处理器。有关消费命名作业的更多信息，请参阅 <a href="techniques/queues#消费者">这里</a>。
+:::
 
 #### 作业选项
 
@@ -731,7 +753,9 @@ export class AudioConsumer {}
 
 ```
 
-> info **提示** 消费者必须注册为 `providers`，以便 `@nestjs/bull` 包可以拾取它们。
+:::info 提示
+消费者必须注册为 `providers`，以便 `@nestjs/bull` 包可以拾取它们。
+:::
 
 其中装饰器的字符串参数（例如 `'audio'`）是要与类方法关联的队列的名称。
 
@@ -769,7 +793,9 @@ async transcode(job: Job<unknown>) { ... }
 
 ```
 
-> warning **警告** 为同一队列定义多个消费者时，`@Process({{ '{' }} concurrency: 1 {{ '}' }})` 中的 `concurrency` 选项不会生效。最小 `concurrency` 将匹配定义的消费者数量。即使 `@Process()` 处理程序使用不同的 `name` 来处理命名作业，这也适用。
+:::warning 警告
+为同一队列定义多个消费者时，`@Process({{ '{' }} concurrency: 1 {{ '}' }})` 中的 `concurrency` 选项不会生效。最小 `concurrency` 将匹配定义的消费者数量。即使 `@Process()` 处理程序使用不同的 `name` 来处理命名作业，这也适用。
+:::
 
 #### 请求作用域消费者
 
@@ -792,7 +818,9 @@ constructor(@Inject(JOB_REF) jobRef: Job) {
 
 ```
 
-> info **提示** `JOB_REF` 令牌从 `@nestjs/bull` 包导入。
+:::info 提示
+`JOB_REF` 令牌从 `@nestjs/bull` 包导入。
+:::
 
 #### 事件监听器
 
@@ -878,7 +906,9 @@ async onGlobalCompleted(jobId: number, result: any) {
 
 ```
 
-> info **提示** 要访问 `Queue` 对象（进行 `getJob()` 调用），您当然必须注入它。此外，队列必须在您注入它的模块中注册。
+:::info 提示
+要访问 `Queue` 对象（进行 `getJob()` 调用），您当然必须注入它。此外，队列必须在您注入它的模块中注册。
+:::
 
 除了特定的事件监听器装饰器外，您还可以使用通用的 `@OnQueueEvent()` 装饰器，结合 `BullQueueEvents` 或 `BullQueueGlobalEvents` 枚举。有关事件的更多信息，请 [点击这里](https://github.com/OptimalBits/bull/blob/master/REFERENCE.md#事件)。
 

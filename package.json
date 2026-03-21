@@ -5,7 +5,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "npm run check-links && rspress build && node scripts/copy-assets.cjs",
+    "build": "npm run check-links && rspress build && tsx scripts/copy-assets.ts",
     "dev": "rspress dev",
     "preview": "rspress preview",
     "fix-code-blocks": "tsx scripts/fix-code-blocks.ts",

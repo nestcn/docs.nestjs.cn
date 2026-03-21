@@ -152,91 +152,91 @@
 ### 实用工具
 
 - [`@nestjs/cqrs`](https://github.com/nestjs/cqrs) - Nest 框架的轻量级 CQRS 模块
-- ![](https://img.shields.io/github/stars/nestjsx/nestjs-config.svg?style=flat-square) [`nestjs-config`](https://github.com/nestjsx/nestjs-config) - 处理项目配置的优秀模块
-- ![](https://img.shields.io/github/stars/Nikaple/nest-typed-config.svg?style=flat-square) [`nest-typed-config`](https://github.com/Nikaple/nest-typed-config) - 直观、类型安全的 Nest 框架配置模块
-- ![](https://img.shields.io/github/stars/miaowing/nest-schedule.svg?style=flat-square) [`nest-schedule`](https://github.com/miaowing/nest-schedule) - 通过装饰器更简单地安排作业
-- ![](https://img.shields.io/github/stars/Papooch/nestjs-cls.svg?style=flat-square) [`nestjs-cls`](https://github.com/Papooch/nestjs-cls) - 为 Nest 提供延续本地存储的模块
+- ![Nestjs Config.Svg?Style=Flat Square](https://img.shields.io/github/stars/nestjsx/nestjs-config.svg?style=flat-square) [`nestjs-config`](https://github.com/nestjsx/nestjs-config) - 处理项目配置的优秀模块
+- ![Nest Typed Config.Svg?Style=Flat Square](https://img.shields.io/github/stars/Nikaple/nest-typed-config.svg?style=flat-square) [`nest-typed-config`](https://github.com/Nikaple/nest-typed-config) - 直观、类型安全的 Nest 框架配置模块
+- ![Nest Schedule.Svg?Style=Flat Square](https://img.shields.io/github/stars/miaowing/nest-schedule.svg?style=flat-square) [`nest-schedule`](https://github.com/miaowing/nest-schedule) - 通过装饰器更简单地安排作业
+- ![Nestjs Cls.Svg?Style=Flat Square](https://img.shields.io/github/stars/Papooch/nestjs-cls.svg?style=flat-square) [`nestjs-cls`](https://github.com/Papooch/nestjs-cls) - 为 Nest 提供延续本地存储的模块
 
 ### API
 
 - [`@nestjs/swagger`](https://github.com/nestjs/swagger) - Nest 的 OpenAPI (Swagger) 模块
-- ![](https://img.shields.io/github/stars/tripss/nestjs-query.svg?style=flat-square) [`@ptc-org/nestjs-query-*`](https://github.com/tripss/nestjs-query) - GraphQL API 的 Nest CRUD
-- ![](https://img.shields.io/github/stars/samchon/nestia.svg?style=flat-square) [`@nestia/sdk`](https://github.com/samchon/nestia) - 自动 SDK、模拟模拟器和 Swagger 生成器
+- ![Nestjs Query.Svg?Style=Flat Square](https://img.shields.io/github/stars/tripss/nestjs-query.svg?style=flat-square) [`@ptc-org/nestjs-query-*`](https://github.com/tripss/nestjs-query) - GraphQL API 的 Nest CRUD
+- ![Nestia.Svg?Style=Flat Square](https://img.shields.io/github/stars/samchon/nestia.svg?style=flat-square) [`@nestia/sdk`](https://github.com/samchon/nestia) - 自动 SDK、模拟模拟器和 Swagger 生成器
 
 ### 中间件
 
-- ![](https://img.shields.io/github/stars/wbhob/nest-middlewares.svg?style=flat-square) [`@nest-middlewares/*`](https://github.com/wbhob/nest-middlewares) - NestJS 的通用可注入中间件
-- ![](https://img.shields.io/github/stars/halitsever/nest-cloudflare-turnstile.svg?style=flat-square) [`nest-cloudflare-turnstile`](https://github.com/halitsever/nest-cloudflare-turnstile) - ☁️ NestJS 的 Cloudflare Turnstile 验证码集成
+- ![Nest Middlewares.Svg?Style=Flat Square](https://img.shields.io/github/stars/wbhob/nest-middlewares.svg?style=flat-square) [`@nest-middlewares/*`](https://github.com/wbhob/nest-middlewares) - NestJS 的通用可注入中间件
+- ![Nest Cloudflare Turnstile.Svg?Style=Flat Square](https://img.shields.io/github/stars/halitsever/nest-cloudflare-turnstile.svg?style=flat-square) [`nest-cloudflare-turnstile`](https://github.com/halitsever/nest-cloudflare-turnstile) - ☁️ NestJS 的 Cloudflare Turnstile 验证码集成
 
 ### 错误处理
 
-- ![](https://img.shields.io/github/stars/squareboat/nest-eyewitness.svg?style=flat-square) [`@squareboat/nest-eyewitness`](https://github.com/squareboat/nest-eyewitness) - 在 NestJS 应用程序中出现异常时直接向您的收件箱发送错误报告
-- ![](https://img.shields.io/github/stars/shekohex/nestjs-flub.svg?style=flat-square) [`nestjs-flub`](https://github.com/shekohex/nestjs-flub) - NestJS 框架的美观错误堆栈查看器
+- ![Nest Eyewitness.Svg?Style=Flat Square](https://img.shields.io/github/stars/squareboat/nest-eyewitness.svg?style=flat-square) [`@squareboat/nest-eyewitness`](https://github.com/squareboat/nest-eyewitness) - 在 NestJS 应用程序中出现异常时直接向您的收件箱发送错误报告
+- ![Nestjs Flub.Svg?Style=Flat Square](https://img.shields.io/github/stars/shekohex/nestjs-flub.svg?style=flat-square) [`nestjs-flub`](https://github.com/shekohex/nestjs-flub) - NestJS 框架的美观错误堆栈查看器
 
 ### 代码风格
 
-- ![](https://img.shields.io/github/stars/basarat/typescript-book.svg?style=flat-square) [风格指南和编码约定](https://github.com/basarat/typescript-book/blob/master/docs/styleguide/styleguide.md) - 非官方的 TypeScript 风格指南
+- ![Typescript Book.Svg?Style=Flat Square](https://img.shields.io/github/stars/basarat/typescript-book.svg?style=flat-square) [风格指南和编码约定](https://github.com/basarat/typescript-book/blob/master/docs/styleguide/styleguide.md) - 非官方的 TypeScript 风格指南
 
 ### WebSocket
 
 - [`@nestjs/websockets`](https://docs.nestjs.com/websockets/gateways)
-- ![](https://img.shields.io/github/stars/samchon/tgrid?style=flat-square) [`tgrid`](https://github.com/samchon/tgrid) - 支持 WebSocket 和 Worker 协议的 TypeScript RPC 框架
+- ![Tgrid?Style=Flat Square](https://img.shields.io/github/stars/samchon/tgrid?style=flat-square) [`tgrid`](https://github.com/samchon/tgrid) - 支持 WebSocket 和 Worker 协议的 TypeScript RPC 框架
 
 ### 缓存
 
-- ![](https://img.shields.io/github/stars/BJS-kr/nestjs-omacache.svg?style=flat-square) [`nestjs-omacache`](https://github.com/BJS-kr/nestjs-omacache) - NestJS 框架的简单、灵活且功能强大的缓存装饰器工厂
+- ![Nestjs Omacache.Svg?Style=Flat Square](https://img.shields.io/github/stars/BJS-kr/nestjs-omacache.svg?style=flat-square) [`nestjs-omacache`](https://github.com/BJS-kr/nestjs-omacache) - NestJS 框架的简单、灵活且功能强大的缓存装饰器工厂
 
 ### Redis
 
-- ![](https://img.shields.io/github/stars/nest-modules/ioredis.svg?style=flat-square) [`@nestjs-modules/ioredis`](https://github.com/nest-modules/ioredis) - Nest 框架的 ioredis 模块
-- ![](https://img.shields.io/github/stars/liaoliaots/nestjs-redis.svg?style=flat-square) [`@liaoliaots/nestjs-redis`](https://github.com/liaoliaots/nestjs-redis) - NestJS 框架的 Redis(ioredis) 模块
+- ![Ioredis.Svg?Style=Flat Square](https://img.shields.io/github/stars/nest-modules/ioredis.svg?style=flat-square) [`@nestjs-modules/ioredis`](https://github.com/nest-modules/ioredis) - Nest 框架的 ioredis 模块
+- ![Nestjs Redis.Svg?Style=Flat Square](https://img.shields.io/github/stars/liaoliaots/nestjs-redis.svg?style=flat-square) [`@liaoliaots/nestjs-redis`](https://github.com/liaoliaots/nestjs-redis) - NestJS 框架的 Redis(ioredis) 模块
 
 ### 数据库
 
-- ![](https://img.shields.io/github/stars/notiz-dev/nestjs-prisma.svg?style=flat-square) [`nestjs-prisma`](https://github.com/notiz-dev/nestjs-prisma) - 向 NestJS 应用程序添加 Prisma 集成的库和原理图
+- ![Nestjs Prisma.Svg?Style=Flat Square](https://img.shields.io/github/stars/notiz-dev/nestjs-prisma.svg?style=flat-square) [`nestjs-prisma`](https://github.com/notiz-dev/nestjs-prisma) - 向 NestJS 应用程序添加 Prisma 集成的库和原理图
 
 ### 日志
 
-- ![](https://img.shields.io/github/stars/gremo/nest-winston.svg?style=flat-square) [`nest-winston`](https://github.com/gremo/nest-winston) - NestJS 的 Winston 模块
-- ![](https://img.shields.io/github/stars/iamolegga/nestjs-pino.svg?style=flat-square) [`nestjs-pino`](https://github.com/iamolegga/nestjs-pino) - NestJS 的 Pino 模块，在任何地方使用请求上下文记录日志
-- ![](https://img.shields.io/github/stars/jmcdo29/ogma.svg?style=flat-square) [`@ogma/*`](https://github.com/jmcdo29/ogma) - Ogma 记录器及相关包的单体仓库
+- ![Nest Winston.Svg?Style=Flat Square](https://img.shields.io/github/stars/gremo/nest-winston.svg?style=flat-square) [`nest-winston`](https://github.com/gremo/nest-winston) - NestJS 的 Winston 模块
+- ![Nestjs Pino.Svg?Style=Flat Square](https://img.shields.io/github/stars/iamolegga/nestjs-pino.svg?style=flat-square) [`nestjs-pino`](https://github.com/iamolegga/nestjs-pino) - NestJS 的 Pino 模块，在任何地方使用请求上下文记录日志
+- ![Ogma.Svg?Style=Flat Square](https://img.shields.io/github/stars/jmcdo29/ogma.svg?style=flat-square) [`@ogma/*`](https://github.com/jmcdo29/ogma) - Ogma 记录器及相关包的单体仓库
 
 ### 监控
 
 - [`@nestjs/terminus`](https://github.com/nestjs/terminus) - 基于 Terminus 包的集成健康检查
 - [`@nestjs/devtools`](https://www.npmjs.com/package/@nestjs/devtools) - 官方开发工具包
-- ![](https://img.shields.io/github/stars/pragmaticivan/nestjs-otel.svg?style=flat-square) [`nestjs-otel`](https://github.com/pragmaticivan/nestjs-otel) - NestJS 的 OpenTelemetry 模块
-- ![](https://img.shields.io/github/stars/willsoto/nestjs-prometheus.svg?style=flat-square) [`nestjs-prometheus`](https://github.com/willsoto/nestjs-prometheus) - NestJS 的 Prometheus 模块
+- ![Nestjs Otel.Svg?Style=Flat Square](https://img.shields.io/github/stars/pragmaticivan/nestjs-otel.svg?style=flat-square) [`nestjs-otel`](https://github.com/pragmaticivan/nestjs-otel) - NestJS 的 OpenTelemetry 模块
+- ![Nestjs Prometheus.Svg?Style=Flat Square](https://img.shields.io/github/stars/willsoto/nestjs-prometheus.svg?style=flat-square) [`nestjs-prometheus`](https://github.com/willsoto/nestjs-prometheus) - NestJS 的 Prometheus 模块
 
 ### 国际化 (i18n)
 
-- ![](https://img.shields.io/github/stars/ToonvanStrijp/nestjs-i18n.svg?style=flat-square) [`nestjs-i18n`](https://github.com/ToonvanStrijp/nestjs-i18n) - 轻松为服务器添加 i18n 支持，内置丰富的格式化 API
+- ![Nestjs I18n.Svg?Style=Flat Square](https://img.shields.io/github/stars/ToonvanStrijp/nestjs-i18n.svg?style=flat-square) [`nestjs-i18n`](https://github.com/ToonvanStrijp/nestjs-i18n) - 轻松为服务器添加 i18n 支持，内置丰富的格式化 API
 
 ### 认证
 
-- ![](https://img.shields.io/github/stars/iamolegga/nestjs-session.svg?style=flat-square) [`nestjs-session`](https://github.com/iamolegga/nestjs-session) - NestJS 的惯用会话模块
+- ![Nestjs Session.Svg?Style=Flat Square](https://img.shields.io/github/stars/iamolegga/nestjs-session.svg?style=flat-square) [`nestjs-session`](https://github.com/iamolegga/nestjs-session) - NestJS 的惯用会话模块
 
 ### RBAC (基于角色的访问控制)
 
-- ![](https://img.shields.io/github/stars/sergey-telpuk/nestjs-rbac.svg?style=flat-square) [`nestjs-rbac`](https://github.com/sergey-telpuk/nestjs-rbac) - NestJS 的 RBAC 模块，具有动态存储和缓存
-- ![](https://img.shields.io/github/stars/relevantfruit/nestjs-keycloak-admin.svg?style=flat-square) [`nestjs-keycloak-admin`](https://github.com/relevantfruit/nestjs-keycloak-admin) - 支持用户管理访问协议的 Keycloak 管理客户端
+- ![Nestjs Rbac.Svg?Style=Flat Square](https://img.shields.io/github/stars/sergey-telpuk/nestjs-rbac.svg?style=flat-square) [`nestjs-rbac`](https://github.com/sergey-telpuk/nestjs-rbac) - NestJS 的 RBAC 模块，具有动态存储和缓存
+- ![Nestjs Keycloak Admin.Svg?Style=Flat Square](https://img.shields.io/github/stars/relevantfruit/nestjs-keycloak-admin.svg?style=flat-square) [`nestjs-keycloak-admin`](https://github.com/relevantfruit/nestjs-keycloak-admin) - 支持用户管理访问协议的 Keycloak 管理客户端
 
 ### 微服务
 
-- ![](https://img.shields.io/github/stars/pvarentsov/nestjs-pg-notify.svg?style=flat-square) [`nestjs-pg-notify`](https://github.com/pvarentsov/nestjs-pg-notify) - PostgreSQL Pub/Sub 的 NestJS 自定义传输策略
-- ![](https://img.shields.io/github/stars/sergey-telpuk/nestjs-transport-eventbus.svg?style=flat-square) [`nestjs-transport-eventbus`](https://github.com/sergey-telpuk/nestjs-transport-eventbus) - 允许通过各种 NestJS 传输以简单方式广播事件的模块
+- ![Nestjs Pg Notify.Svg?Style=Flat Square](https://img.shields.io/github/stars/pvarentsov/nestjs-pg-notify.svg?style=flat-square) [`nestjs-pg-notify`](https://github.com/pvarentsov/nestjs-pg-notify) - PostgreSQL Pub/Sub 的 NestJS 自定义传输策略
+- ![Nestjs Transport Eventbus.Svg?Style=Flat Square](https://img.shields.io/github/stars/sergey-telpuk/nestjs-transport-eventbus.svg?style=flat-square) [`nestjs-transport-eventbus`](https://github.com/sergey-telpuk/nestjs-transport-eventbus) - 允许通过各种 NestJS 传输以简单方式广播事件的模块
 
 ### 多租户
 
-- ![](https://img.shields.io/github/stars/AlexanderC/nestjs-mtenant.svg?style=flat-square) [`nestjs-mtenant`](https://github.com/AlexanderC/nestjs-mtenant) - 为 NestJS 启用多租户支持的模块，与整个系统深度集成
+- ![Nestjs Mtenant.Svg?Style=Flat Square](https://img.shields.io/github/stars/AlexanderC/nestjs-mtenant.svg?style=flat-square) [`nestjs-mtenant`](https://github.com/AlexanderC/nestjs-mtenant) - 为 NestJS 启用多租户支持的模块，与整个系统深度集成
 
 ## 测试
 
 ### 实用工具
 
-- ![](https://img.shields.io/github/stars/golevelup/nestjs.svg?style=flat-square) [`@golevelup/ts-jest`](https://www.npmjs.com/package/@golevelup/ts-jest) 和 [`@golevelup/ts-vitest`](https://www.npmjs.com/package/@golevelup/ts-vitest) - 简化 NestJS 应用程序测试的实用工具
-- ![](https://img.shields.io/github/stars/omermorad/mockingbird.svg?style=flat-square) [`mockingbird`](https://www.npmjs.com/package/mockingbird) - 使用装饰器创建类型化测试夹具/模拟的库
-- ![](https://img.shields.io/github/stars/omermorad/nestjs-pact.svg?style=flat-square) [NestJS + Pact](https://www.npmjs.com/package/nestjs-pact) - NestJS 的可注入 Pact.js 消费者/提供者
+- ![Nestjs.Svg?Style=Flat Square](https://img.shields.io/github/stars/golevelup/nestjs.svg?style=flat-square) [`@golevelup/ts-jest`](https://www.npmjs.com/package/@golevelup/ts-jest) 和 [`@golevelup/ts-vitest`](https://www.npmjs.com/package/@golevelup/ts-vitest) - 简化 NestJS 应用程序测试的实用工具
+- ![Mockingbird.Svg?Style=Flat Square](https://img.shields.io/github/stars/omermorad/mockingbird.svg?style=flat-square) [`mockingbird`](https://www.npmjs.com/package/mockingbird) - 使用装饰器创建类型化测试夹具/模拟的库
+- ![Nestjs Pact.Svg?Style=Flat Square](https://img.shields.io/github/stars/omermorad/nestjs-pact.svg?style=flat-square) [NestJS + Pact](https://www.npmjs.com/package/nestjs-pact) - NestJS 的可注入 Pact.js 消费者/提供者
 
 ## 集成
 
@@ -244,20 +244,20 @@
 
 - [`@nestjs/typeorm`](https://github.com/nestjs/typeorm) - Nest 框架的 TypeORM 模块
 - [`@nestjs/mongoose`](https://github.com/nestjs/mongoose) - Nest 框架的 Mongoose 模块
-- ![](https://img.shields.io/github/stars/kpfromer/nestjs-typegoose.svg?style=flat-square) [`nestjs-typegoose`](https://github.com/kpfromer/nestjs-typegoose) - Nest 框架的 Typegoose 模块
-- ![](https://img.shields.io/github/stars/mikro-orm/nestjs.svg?style=flat-square) [`@mikro-orm/nestjs`](https://github.com/mikro-orm/nestjs) - Nest 框架的 MikroORM 模块
+- ![Nestjs Typegoose.Svg?Style=Flat Square](https://img.shields.io/github/stars/kpfromer/nestjs-typegoose.svg?style=flat-square) [`nestjs-typegoose`](https://github.com/kpfromer/nestjs-typegoose) - Nest 框架的 Typegoose 模块
+- ![Nestjs.Svg?Style=Flat Square](https://img.shields.io/github/stars/mikro-orm/nestjs.svg?style=flat-square) [`@mikro-orm/nestjs`](https://github.com/mikro-orm/nestjs) - Nest 框架的 MikroORM 模块
 - [Nest Prisma](https://www.prisma.io/nestjs) - NestJS 的完全类型安全 ORM
 
 ### AMQP
 
-- ![](https://img.shields.io/github/stars/nestjsx/nestjs-amqp.svg?style=flat-square) [`nestjs-amqp`](https://github.com/nestjsx/nestjs-amqp) - AMQP 连接管理器
-- ![](https://img.shields.io/github/stars/AlariCode/nestjs-rmq.svg?style=flat-square) [`nestjs-rmq`](https://github.com/AlariCode/nestjs-rmq) - NestJS 微服务的自定义库，允许使用 RabbitMQ 或 AMQP
-- ![](https://img.shields.io/github/stars/golevelup/nestjs.svg?style=flat-square) [`@golevelup/nestjs-rabbitmq`](https://github.com/golevelup/nestjs/tree/master/packages/rabbitmq) - 支持多种消息模式的灵活 AMQP 集成
+- ![Nestjs Amqp.Svg?Style=Flat Square](https://img.shields.io/github/stars/nestjsx/nestjs-amqp.svg?style=flat-square) [`nestjs-amqp`](https://github.com/nestjsx/nestjs-amqp) - AMQP 连接管理器
+- ![Nestjs Rmq.Svg?Style=Flat Square](https://img.shields.io/github/stars/AlariCode/nestjs-rmq.svg?style=flat-square) [`nestjs-rmq`](https://github.com/AlariCode/nestjs-rmq) - NestJS 微服务的自定义库，允许使用 RabbitMQ 或 AMQP
+- ![Nestjs.Svg?Style=Flat Square](https://img.shields.io/github/stars/golevelup/nestjs.svg?style=flat-square) [`@golevelup/nestjs-rabbitmq`](https://github.com/golevelup/nestjs/tree/master/packages/rabbitmq) - 支持多种消息模式的灵活 AMQP 集成
 
 ### 文件存储
 
-- ![](https://img.shields.io/github/stars/codebrewlab/nestjs-storage.svg?style=flat-square) [`@codebrew/nestjs-storage`](https://github.com/codebrewlab/nestjs-storage) - NestJS 框架的文件存储管理模块
-- ![](https://img.shields.io/github/stars/getlarge/nestjs-tools.svg?style=flat-square) [`@getlarge/nestjs-tools-file-storages`](https://github.com/getlarge/nestjs-tools/blob/main/packages/file-storage) - 支持多种策略的文件存储模块
+- ![Nestjs Storage.Svg?Style=Flat Square](https://img.shields.io/github/stars/codebrewlab/nestjs-storage.svg?style=flat-square) [`@codebrew/nestjs-storage`](https://github.com/codebrewlab/nestjs-storage) - NestJS 框架的文件存储管理模块
+- ![Nestjs Tools.Svg?Style=Flat Square](https://img.shields.io/github/stars/getlarge/nestjs-tools.svg?style=flat-square) [`@getlarge/nestjs-tools-file-storages`](https://github.com/getlarge/nestjs-tools/blob/main/packages/file-storage) - 支持多种策略的文件存储模块
 
 ## 运行时
 

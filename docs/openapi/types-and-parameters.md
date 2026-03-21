@@ -146,11 +146,11 @@ async filterByRole(@Query('role') role: UserRole = UserRole.User) {}
 
 ```
 
-![](/assets/enum_query.gif)
+![Enum_query.Gif](/assets/enum_query.gif)
 
 当 `isArray` 设置为 **true** 时，该 `enum` 可以作为**多选**进行选择：
 
-![](/assets/enum_query_array.gif)
+![Enum_query_array.Gif](/assets/enum_query_array.gif)
 
 #### 枚举模式
 

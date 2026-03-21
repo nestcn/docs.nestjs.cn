@@ -10,7 +10,7 @@ interface DeadLink {
   link: string;
 }
 
-async function checkLinks() {
+async function checkLinks(): Promise<void> {
   const docsDir = 'docs';
   console.log(`🔗 开始检查链接 (目录: ${docsDir})`);
 

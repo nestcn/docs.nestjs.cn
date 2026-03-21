@@ -112,11 +112,11 @@ $ npm run start
 
 导航至 `http://localhost:3000/api/cats` 查看 cats 的 Swagger UI 界面。
 
-![](/assets/swagger-cats.png)
+![Swagger Cats.Png](/assets/swagger-cats.png)
 
 相应地， `http://localhost:3000/api/dogs` 将展示面向开发者的 Swagger UI 界面：
 
-![](/assets/swagger-dogs.png)
+![Swagger Dogs.Png](/assets/swagger-dogs.png)
 
 #### 资源管理器栏中的下拉菜单
 

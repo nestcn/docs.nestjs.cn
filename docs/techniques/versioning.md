@@ -264,7 +264,7 @@ app.enableVersioning({
 
 #### 中间件版本控制
 
-[](/overview/middlewares) 也可以使用版本控制元数据来为特定路由的版本配置中间件。 为此，请将版本号提供为 `MiddlewareConsumer.forRoutes()` 方法的参数之一：
+[Middlewares](/overview/middlewares) 也可以使用版本控制元数据来为特定路由的版本配置中间件。 为此，请将版本号提供为 `MiddlewareConsumer.forRoutes()` 方法的参数之一：
 
 ```typescript
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';

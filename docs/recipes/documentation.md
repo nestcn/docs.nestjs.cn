@@ -22,9 +22,9 @@ $ npx @compodoc/compodoc -p tsconfig.json -s
 
 打开浏览器并访问 [http://localhost:8080](http://localhost:8080)，您将看到一个初始的 Nest CLI 项目：
 
-![](/assets/documentation-compodoc-1.jpg)
+![Documentation Compodoc 1.Jpg](/assets/documentation-compodoc-1.jpg)
 
-![](/assets/documentation-compodoc-2.jpg)
+![Documentation Compodoc 2.Jpg](/assets/documentation-compodoc-2.jpg)
 
 #### 贡献
 

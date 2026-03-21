@@ -21,6 +21,6 @@
     },
     "types": ["node"]
   },
-  "include": ["scripts/**/*.ts", "src/**/*.ts"],
+  "include": ["scripts/**/*.ts", "config/**/*.ts", "src/**/*.ts"],
   "exclude": ["node_modules", "dist", "docs", "content"]
 }

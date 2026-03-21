@@ -6,8 +6,8 @@
  * 检查文档中是否存在未恢复的占位符
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 import { glob } from 'glob';
 
 const DOCS_DIR = path.resolve(process.cwd(), 'docs');

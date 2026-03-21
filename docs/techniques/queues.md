@@ -122,7 +122,7 @@ BullModule.registerQueue({
 
 #### 生产者
 
-作业生产者将作业添加到队列中。生产者通常是应用程序服务（Nest [](/overview/providers)）。要向队列添加作业，首先将队列注入到服务中，如下所示：
+作业生产者将作业添加到队列中。生产者通常是应用程序服务（Nest [Providers](/overview/providers)）。要向队列添加作业，首先将队列注入到服务中，如下所示：
 
 ```typescript
 import { Injectable } from '@nestjs/common';
@@ -627,7 +627,7 @@ BullModule.registerQueue({
 
 #### 生产者
 
-作业生产者将作业添加到队列中。生产者通常是应用程序服务（Nest [](/overview/providers)）。要向队列添加作业，首先将队列注入到服务中，如下所示：
+作业生产者将作业添加到队列中。生产者通常是应用程序服务（Nest [Providers](/overview/providers)）。要向队列添加作业，首先将队列注入到服务中，如下所示：
 
 ```typescript
 import { Injectable } from '@nestjs/common';

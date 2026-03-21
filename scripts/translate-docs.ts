@@ -38,6 +38,24 @@ interface CacheData {
   lastUpdated: string;
 }
 
+interface CloudflareAIResponse {
+  success: boolean;
+  result?: {
+    response?: string;
+    choices?: Array<{ message?: { content?: string } }>;
+  } | string;
+  errors?: Array<{ message: string }>;
+}
+
+interface ProxyErrorResponse {
+  error?: string;
+  errors?: Array<{ message: string }>;
+}
+
+function getErrorMessage(err: unknown): string {
+  return err instanceof Error ? err.message : String(err);
+}
+
 class DocumentTranslator {
   private contentDir: string;
   private docsDir: string;
@@ -100,8 +118,8 @@ class DocumentTranslator {
           console.log(`📚 Loaded ${this.translationCache.size} cached translations`);
         }
       }
-    } catch (error: any) {
-      console.warn('⚠️ Failed to load translation cache:', error.message);
+    } catch (err: unknown) {
+      console.warn('⚠️ Failed to load translation cache:', getErrorMessage(err));
       this.translationCache = new Map();
     }
   }
@@ -115,8 +133,8 @@ class DocumentTranslator {
           console.log(`📚 Loaded glossary with ${Object.keys(this.glossary).length} terms`);
         }
       }
-    } catch (error: any) {
-      console.warn('⚠️ Failed to load glossary:', error.message);
+    } catch (err: unknown) {
+      console.warn('⚠️ Failed to load glossary:', getErrorMessage(err));
     }
   }
 
@@ -139,8 +157,8 @@ class DocumentTranslator {
       if (this.verbose) {
         console.log(`💾 Saved ${this.translationCache.size} translations to cache`);
       }
-    } catch (error: any) {
-      console.warn('⚠️ Failed to save translation cache:', error.message);
+    } catch (err: unknown) {
+      console.warn('⚠️ Failed to save translation cache:', getErrorMessage(err));
     }
   }
 
@@ -267,22 +285,22 @@ Please translate the following English technical documentation to Chinese follow
       }
 
       if (!response.ok) {
-        const errorData: any = await response.json();
-        throw new Error(`${isCI ? 'Cloudflare Workers AI error' : 'Proxy error'}: ${errorData.error || errorData.errors?.[0]?.message || response.statusText}`);
+        const errorData = (await response.json()) as ProxyErrorResponse;
+        throw new Error(`${isCI ? 'Cloudflare Workers AI error' : 'Proxy error'}: ${errorData.error ?? errorData.errors?.[0]?.message ?? response.statusText}`);
       }
 
-      const result: any = await response.json();
+      const result = (await response.json()) as CloudflareAIResponse;
 
       if (result.success && result.result) {
-        if (result.result.response) return result.result.response;
-        if (result.result.choices?.[0]) return result.result.choices[0].message?.content || text;
         if (typeof result.result === 'string') return result.result;
+        if (result.result.response) return result.result.response;
+        if (result.result.choices?.[0]) return result.result.choices[0].message?.content ?? text;
       }
 
       return text;
-    } catch (error: any) {
-      console.warn(`⚠️ Translation failed: ${error.message}`);
-      throw error;
+    } catch (err: unknown) {
+      console.warn(`⚠️ Translation failed: ${getErrorMessage(err)}`);
+      throw err;
     }
   }
 
@@ -327,9 +345,9 @@ Please translate the following English technical documentation to Chinese follow
       this.translationCache.set(cacheKey, finalText);
       if (this.verbose) console.log(`  🤖 AI translated: ${filePath}`);
       return finalText;
-    } catch (error: any) {
-      console.warn(`⚠️ AI translation failed for ${filePath}: ${error.message}`);
-      throw error;
+    } catch (err: unknown) {
+      console.warn(`⚠️ AI translation failed for ${filePath}: ${getErrorMessage(err)}`);
+      throw err;
     }
   }
 
@@ -515,9 +533,10 @@ Please translate the following English technical documentation to Chinese follow
       console.log(`✅ Processed: ${relativePath}`);
       this.translatedFiles++;
       return true;
-    } catch (error: any) {
-      this.errors.push({ file: contentPath, error: error.message });
-      console.error(`❌ Translation failed for ${contentPath}: ${error.message}`);
+    } catch (err: unknown) {
+      const message = getErrorMessage(err);
+      this.errors.push({ file: contentPath, error: message });
+      console.error(`❌ Translation failed for ${contentPath}: ${message}`);
       return false;
     }
   }
@@ -558,22 +577,20 @@ Please translate the following English technical documentation to Chinese follow
       if (hasChanges) {
         console.log('\n🔄 Running post-translation processing...');
         try {
-          // 注意: 这里由于 post-translate-processor 还是 .cjs，我们暂时用 require
-          const PostTranslateProcessor = require('./post-translate-processor.cjs');
-          const processor = new PostTranslateProcessor({
+          const { runPostTranslateProcessor } = await import('./post-translate-processor.js');
+          await runPostTranslateProcessor({
             docsDir: this.docsDir,
-            verbose: this.verbose
+            verbose: this.verbose,
           });
-          await processor.run();
-        } catch (error: any) {
-          console.warn('⚠️ Post-processing failed:', error.message);
+        } catch (err: unknown) {
+          console.warn('⚠️ Post-processing failed:', getErrorMessage(err));
         }
       }
 
       return hasChanges;
-    } catch (error: any) {
-      console.error('❌ Translation process failed:', error.message);
-      throw error;
+    } catch (err: unknown) {
+      console.error('❌ Translation process failed:', getErrorMessage(err));
+      throw err;
     }
   }
 }

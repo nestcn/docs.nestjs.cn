@@ -4,7 +4,7 @@
  * 格式：英文锚点 -> 中文锚点
  */
 
-const anchorMappings = {
+export const anchorMappings: Record<string, string> = {
   // Controllers (控制器)
   'route-parameters': '路由参数',
   'request-object': '请求对象',
@@ -13,7 +13,7 @@ const anchorMappings = {
   'full-resource-sample': '完整资源示例',
   'getting-up-and-running': '启动和运行',
   'library-specific-approach': '库特定方法',
-  
+
   // Providers (提供者)
   'services': '服务',
   'dependency-injection': '依赖注入',
@@ -22,21 +22,21 @@ const anchorMappings = {
   'optional-providers': '可选提供者',
   'property-based-injection': '基于属性的注入',
   'provider-registration': '提供者注册',
-  
+
   // Modules (模块)
   'feature-modules': '功能模块',
   'shared-modules': '共享模块',
   'module-re-exporting': '模块重新导出',
   'global-modules': '全局模块',
   'dynamic-modules': '动态模块',
-  
+
   // Guards (守卫)
   'authorization-guard': '授权守卫',
   'execution-context': '执行上下文',
   'role-based-authentication': '基于角色的认证',
   'binding-guards': '绑定守卫',
   'setting-roles-per-handler': '为每个处理程序设置角色',
-  
+
   // Interceptors (拦截器)
   'basics': '基础',
   'call-handler': '调用处理程序',
@@ -46,7 +46,7 @@ const anchorMappings = {
   'exception-mapping': '异常映射',
   'stream-overriding': '流覆盖',
   'more-operators': '更多操作符',
-  
+
   // Exception Filters (异常过滤器)
   'built-in-http-exceptions': '内置-http-异常',
   'custom-exceptions': '自定义异常',
@@ -55,7 +55,7 @@ const anchorMappings = {
   'binding-filters': '绑定过滤器',
   'catch-everything': '捕获所有异常',
   'inheritance': '继承',
-  
+
   // Pipes (管道)
   'built-in-pipes': '内置管道',
   'binding-pipes': '绑定管道',
@@ -69,7 +69,7 @@ const anchorMappings = {
   'transform-payload-objects': '转换负载对象',
   'explicit-conversion': '显式转换',
   'global-scoped-pipes': '全局作用域管道',
-  
+
   // Middlewares (中间件)
   'applying-middleware': '应用中间件',
   'route-wildcards': '路由通配符',
@@ -78,13 +78,13 @@ const anchorMappings = {
   'functional-middleware': '函数式中间件',
   'multiple-middleware': '多个中间件',
   'global-middleware': '全局中间件',
-  
+
   // Custom Decorators (自定义装饰器)
   'param-decorators': '参数装饰器',
   'passing-data': '传递数据',
   'working-with-pipes': '使用管道',
   'decorator-composition': '装饰器组合',
-  
+
   // Provider Scopes (提供者作用域)
   'provider-scope': '提供者作用域',
   'usage': '用法',
@@ -94,11 +94,11 @@ const anchorMappings = {
   'inquirer-provider': '查询者提供者',
   'performance': '性能',
   'durable-providers': '持久提供者',
-  
+
   // Application Context (应用程序上下文)
   'getting-current-sub-tree': '获取当前子树',
   'standalone-applications': '独立应用程序',
-  
+
   // Testing (测试)
   'unit-testing': '单元测试',
   'testing-utilities': '测试工具',
@@ -106,7 +106,7 @@ const anchorMappings = {
   'end-to-end-testing': '端到端测试',
   'testing-request-scoped-instances': '测试请求作用域实例',
   'overriding-globally-registered-enhancers': '覆盖全局注册的增强器',
-  
+
   // Task Scheduling (任务调度)
   'declarative-cron-jobs': '声明式-cron-任务',
   'declarative-timeouts': '声明式超时',
@@ -114,7 +114,7 @@ const anchorMappings = {
   'dynamic-schedule-module-api': '动态调度模块-api',
   'dynamic-intervals': '动态间隔',
   'dynamic-timeouts': '动态超时',
-  
+
   // Configuration (配置)
   'getting-started': '入门',
   'custom-configuration-files': '自定义配置文件',
@@ -126,7 +126,7 @@ const anchorMappings = {
   'custom-getter-functions': '自定义获取器函数',
   'environment-variable-expansion': '环境变量扩展',
   'using-in-the-main.ts': '在-main.ts-中使用',
-  
+
   // Caching (缓存)
   'installation': '安装',
   'in-memory-cache': '内存缓存',
@@ -138,7 +138,7 @@ const anchorMappings = {
   'disable-caching': '禁用缓存',
   'global-cache': '全局缓存',
   'websocket-and-microservices': 'websocket-和微服务',
-  
+
   // Database (数据库)
   'typeorm-integration': 'typeorm-集成',
   'repository-pattern': '仓储模式',
@@ -152,47 +152,47 @@ const anchorMappings = {
   'auto-load-models': '自动加载模型',
   'transactions': '事务',
   'migrations': '迁移',
-  
+
   // Validation (验证)
   'auto-validation': '自动验证',
   'disable-detailed-errors': '禁用详细错误',
   'stripping-properties': '剥离属性',
   'array-validation': '数组验证',
   'nested-object-validation': '嵌套对象验证',
-  
+
   // Serialization (序列化)
   'exclude-properties': '排除属性',
   'expose-properties': '暴露属性',
   'transform': '转换',
   'pass-through': '直通',
   'websockets-and-microservices': 'websockets-和微服务',
-  
+
   // Logger (日志)
   'basic-customization': '基础自定义',
   'advanced-configuration': '高级配置',
   'using-the-logger-for-application-logging': '将记录器用于应用程序日志记录',
   'extending-built-in-logger': '扩展内置记录器',
-  
+
   // Cookies (Cookies)
   'use-with-express-default': '与-express-一起使用（默认）',
   'use-with-fastify': '与-fastify-一起使用',
-  
+
   // HTTP Module (HTTP 模块)
   'configuration': '配置',
   'direct-axios-use': '直接使用-axios',
   'full-example': '完整示例',
-  
+
   // Streaming Files (流式文件)
   'streamable-file-class': 'streamable-file-类',
   'cross-platform-support': '跨平台支持',
   'example': '示例',
-  
+
   // File Upload (文件上传)
   'basic-example': '基本示例',
   'array-of-files': '文件数组',
   'multiple-files': '多个文件',
   'default-options': '默认选项',
-  
+
   // Queues (队列)
   'named-queues': '命名队列',
   'queue-options': '队列选项',
@@ -201,7 +201,7 @@ const anchorMappings = {
   'event-listeners': '事件监听器',
   'queue-management': '队列管理',
   'separate-processes': '独立进程',
-  
+
   // Performance (性能)
   'fastify': 'fastify',
   'platform-specific-packages': '平台特定包',
@@ -210,7 +210,7 @@ const anchorMappings = {
   'fastify-options': 'fastify-选项',
   'route-constraints': '路由约束',
   'middlewares': '中间件',
-  
+
   // Events (事件)
   'dispatch-events': '派发事件',
   'listen-to-events': '监听事件',
@@ -219,18 +219,18 @@ const anchorMappings = {
   'scoped-events': '作用域事件',
   'namespaces': '命名空间',
   'wildcards': '通配符',
-  
+
   // MVC (MVC)
   'template-rendering': '模板渲染',
   'dynamic-template-rendering': '动态模板渲染',
   'async-handlers': '异步处理程序',
-  
+
   // Mongo (MongoDB)
   'connection': '连接',
   'hooks-middleware': '钩子（中间件）',
   'plugins': '插件',
   'discriminators': '判别器',
-  
+
   // GraphQL 相关
   'overview': '概述',
   'graphql-playground': 'graphql-playground',
@@ -271,7 +271,7 @@ const anchorMappings = {
   'using-the-cli-plugin': '使用-cli-插件',
   'integration-with-ts-morph': '与-ts-morph-集成',
   'execute-enhancers-at-the-field-resolver-level': '在字段解析器级别执行增强器',
-  
+
   // Microservices (微服务)
   'patterns': '模式',
   'client': '客户端',
@@ -302,7 +302,7 @@ const anchorMappings = {
   'custom-transporter-class': '自定义传输器类',
   'message-serialization': '消息序列化',
   'message-deserializer': '消息反序列化器',
-  
+
   // WebSockets (WebSocket)
   'gateways': '网关',
   'message-binding': '消息绑定',
@@ -315,7 +315,7 @@ const anchorMappings = {
   'ws-library': 'ws-库',
   'advanced-redis-adapter': '高级-redis-适配器',
   'multiple-servers': '多个服务器',
-  
+
   // Security (安全)
   'authentication': '认证',
   'implementing-passport-local': '实现-passport-local',
@@ -331,48 +331,24 @@ const anchorMappings = {
   'advanced-example': '高级示例',
   'basic-usage': '基本用法',
   'customization': '自定义',
-  
+
   // Security - Authentication (认证)
   'creating-an-authentication-module': '创建认证模块',
   'jwt-token': 'jwt-令牌',
   'implementing-the-authentication-endpoint': '实现认证端点',
   'implementing-the-authentication-guard': '实现认证守卫',
-  'enable-authentication-globally': '启用全局认证',
   'passport-integration': 'passport-集成',
-  'example': '示例',
-  
-  // Security - Authorization (授权)
-  'basic-rbac-implementation': '基本-rbac-实现',
-  'claims-based-authorization': 'claims-based-authorization',
-  'integrating-casl': '集成-casl',
-  
-  // Security - CORS (跨域)
-  'getting-started': '入门',
-  
+
   // Security - CSRF (跨站请求伪造)
-  'use-with-express-default': '与-express-一起使用（默认）',
-  'use-with-fastify': '与-fastify-一起使用',
-  
-  // Security - Encryption & Hashing (加密和哈希)
-  'encryption': '加密',
-  'hashing': '哈希',
-  
-  // Security - Helmet (头部安全)
-  'use-with-express-default': '与-express-一起使用（默认）',
-  'use-with-fastify': '与-fastify-一起使用',
-  
+  // 已包含在上面的 Cookies 部分
+
   // Security - Rate Limiting (速率限制)
   'multiple-throttler-definitions': '多重限流器定义',
-  'customization': '自定义配置',
   'proxies': '代理',
-  'websockets': 'websockets',
-  'graphql': 'graphql',
-  'configuration': '配置',
-  'async-configuration': '异步配置',
   'storages': '存储',
   'time-helpers': '时间助手',
   'migration-guide': '迁移指南',
-  
+
   // CLI (命令行接口)
   'basic-workflow': '基本工作流程',
   'project-structure': '项目结构',
@@ -391,7 +367,7 @@ const anchorMappings = {
   'nest-info': 'nest-info',
   'build-and-webpack': '构建和-webpack',
   'assets': '资源',
-  
+
   // OpenAPI (OpenAPI)
   'bootstrap': '引导',
   'document-options': '文档选项',
@@ -416,7 +392,7 @@ const anchorMappings = {
   'api-hide-property': 'api-hide-property',
   'extra-models': '额外模型',
   'oneOf-anyOf-allOf-not': 'oneOf-anyOf-allOf-not',
-  
+
   // FAQ (常见问题)
   'common-errors': '常见错误',
   'circular-dependency-error': '循环依赖错误',
@@ -428,7 +404,7 @@ const anchorMappings = {
   'keep-alive-connections': '保持活动连接',
   'hybrid-application': '混合应用程序',
   'sharing-configuration': '共享配置',
-  
+
   // Recipes (食谱)
   'commands': '命令',
   'events': '事件',
@@ -471,7 +447,7 @@ const anchorMappings = {
   'in-jest-e2e': '在-jest-e2e-中',
   'common-pitfalls': '常见陷阱',
   'monorepo': 'monorepo',
-  
+
   // 其他常见映射
   'routing': '路由',
   'versioning': '版本控制',
@@ -482,11 +458,11 @@ const anchorMappings = {
   'non-service-based-providers': '非基于服务的提供者',
   'non-class-based-provider-tokens': '非基于类的提供者令牌',
   'custom-method-key': '自定义方法键',
-  'type-checking': '类型检查'
+  'type-checking': '类型检查',
 };
 
 // 路径映射表
-const pathMappings = {
+export const pathMappings: Record<string, string> = {
   '/controllers': '/overview/controllers',
   '/guards': '/overview/guards',
   '/middleware': '/overview/middlewares',
@@ -494,7 +470,7 @@ const pathMappings = {
   '/exception-filters': '/overview/exception-filters',
   '/fundamentals/injection-scopes': '/fundamentals/provider-scopes',
   '/techniques/database': '/techniques/sql',
-  
+
   // Security 路径映射
   '/security/authentication': '/security/authentication',
   '/security/authorization': '/security/authorization',
@@ -502,16 +478,5 @@ const pathMappings = {
   '/security/csrf': '/security/csrf',
   '/security/encryption-hashing': '/security/encryption-hashing',
   '/security/helmet': '/security/helmet',
-  '/security/rate-limiting': '/security/rate-limiting'
+  '/security/rate-limiting': '/security/rate-limiting',
 };
-
-// 导出配置（CommonJS）
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = {
-    anchorMappings,
-    pathMappings
-  };
-}
-
-// ES 模块导出支持
-export { anchorMappings, pathMappings };

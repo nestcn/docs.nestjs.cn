@@ -6,7 +6,7 @@
 
 <figure><img class="illustrative-image" src="/assets/Gateways_1.png" /></figure>
 
-> info **提示** 网关可以被视为 [](/overview/providers)；这意味着它们可以通过类构造函数注入依赖项。此外，网关也可以被其他类（提供者和控制器）注入。
+> info **提示** 网关可以被视为 [Providers](/overview/providers)；这意味着它们可以通过类构造函数注入依赖项。此外，网关也可以被其他类（提供者和控制器）注入。
 
 #### 安装
 

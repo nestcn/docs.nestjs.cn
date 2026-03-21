@@ -103,7 +103,7 @@ export class AppCommands {
 
 应用命令为用户提供了一种在 Discord 客户端内与您的应用交互的原生方式。可通过不同界面访问三种类型的应用命令：聊天输入命令、消息上下文菜单命令（通过右键点击消息访问）和用户上下文菜单命令（通过右键点击用户访问）。
 
-![](https://i.imgur.com/4EmG8G8.png)
+![4EmG8G8.Png](https://i.imgur.com/4EmG8G8.png)
 
 #### 斜杠命令
 

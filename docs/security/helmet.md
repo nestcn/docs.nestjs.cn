@@ -6,7 +6,9 @@
 
 [Helmet](https://github.com/helmetjs/helmet) 可以通过适当设置 HTTP 响应头来帮助保护你的应用程序免受一些众所周知的 Web 漏洞。一般来说，Helmet 只是一组较小的中间件函数的集合，用于设置与安全相关的 HTTP 响应头（阅读[更多](https://github.com/helmetjs/helmet#how-it-works)）。
 
-> info **提示** 请注意，将 `helmet` 应用为全局中间件或注册它必须在其他调用 `app.use()` 或可能调用 `app.use()` 的设置函数之前。这是因为底层平台（即 Express 或 Fastify）的工作方式，中间件/路由的定义顺序很重要。如果你在定义路由之后使用 `helmet` 或 `cors` 等中间件，那么该中间件将不会应用于该路由，它只会应用于中间件之后定义的路由。
+:::info 提示
+请注意，将 `helmet` 应用为全局中间件或注册它必须在其他调用 `app.use()` 或可能调用 `app.use()` 的设置函数之前。这是因为底层平台（即 Express 或 Fastify）的工作方式，中间件/路由的定义顺序很重要。如果你在定义路由之后使用 `helmet` 或 `cors` 等中间件，那么该中间件将不会应用于该路由，它只会应用于中间件之后定义的路由。
+:::
 
 #### 在 Express 中使用（默认）
 
@@ -26,21 +28,22 @@ app.use(helmet());
 
 ```
 
-> warning **警告** 当使用 `helmet`、`@apollo/server` (4.x) 和 [Apollo Sandbox](https://docs.nestjs.com/graphql/quick-start#apollo-sandbox) 时，Apollo Sandbox 上的 [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) 可能会出现问题。要解决此问题，请按如下所示配置 CSP：
->
-> ```typescript
-> app.use(helmet({
->   crossOriginEmbedderPolicy: false,
->   contentSecurityPolicy: {
->     directives: {
->       imgSrc: [`'self'`, 'data:', 'apollo-server-landing-page.cdn.apollographql.com'],
->       scriptSrc: [`'self'`, `https: 'unsafe-inline'`],
->       manifestSrc: [`'self'`, 'apollo-server-landing-page.cdn.apollographql.com'],
->       frameSrc: [`'self'`, 'sandbox.embed.apollographql.com'],
->     },
->   },
-> }));
-> ```
+:::warning 警告
+当使用 `helmet`、`@apollo/server` (4.x) 和 [Apollo Sandbox](https://docs.nestjs.com/graphql/quick-start#apollo-sandbox) 时，Apollo Sandbox 上的 [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) 可能会出现问题。要解决此问题，请按如下所示配置 CSP：
+```typescript
+app.use(helmet({
+  crossOriginEmbedderPolicy: false,
+  contentSecurityPolicy: {
+    directives: {
+      imgSrc: [`'self'`, 'data:', 'apollo-server-landing-page.cdn.apollographql.com'],
+      scriptSrc: [`'self'`, `https: 'unsafe-inline'`],
+      manifestSrc: [`'self'`, 'apollo-server-landing-page.cdn.apollographql.com'],
+      frameSrc: [`'self'`, 'sandbox.embed.apollographql.com'],
+    },
+  },
+}));
+```
+:::
 
 #### 在 Fastify 中使用
 
@@ -60,14 +63,14 @@ await app.register(helmet)
 
 ```
 
-> warning **警告** 当使用 `apollo-server-fastify` 和 `@fastify/helmet` 时，GraphQL playground 上的 [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) 可能会出现问题，要解决此冲突，请按如下所示配置 CSP：
->
-> ```typescript
-> await app.register(fastifyHelmet, {
->    contentSecurityPolicy: {
->      directives: {
->        defaultSrc: [`'self'`, 'unpkg.com'],
->        styleSrc: [
+:::warning 警告
+当使用 `apollo-server-fastify` 和 `@fastify/helmet` 时，GraphQL playground 上的 [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) 可能会出现问题，要解决此冲突，请按如下所示配置 CSP：
+```typescript
+await app.register(fastifyHelmet, {
+   contentSecurityPolicy: {
+     directives: {
+       defaultSrc: [`'self'`, 'unpkg.com'],
+       styleSrc: [
 >          `'self'`,
 >          `'unsafe-inline'`,
 >          'cdn.jsdelivr.net',

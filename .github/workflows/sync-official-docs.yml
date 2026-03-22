@@ -12,9 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     
     env:
-      # Cloudflare Workers AI 配置
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      # NVIDIA NIM API 配置
+      NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
     
     steps:
       - name: Checkout current repository
@@ -175,9 +174,9 @@ jobs:
           rm -f scripts/.translation-cache.json
           echo "🗑️ 已清除翻译缓存"
           
-          # 检查是否有可用的 Cloudflare 配置
-          if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
-            echo "✅ Cloudflare Workers AI 已配置，使用 AI 翻译"
+          # 检查是否有可用的 NVIDIA NIM 配置
+          if [ -n "$NVIDIA_API_KEY" ]; then
+            echo "✅ NVIDIA NIM API 已配置，使用 AI 翻译"
             if bun run translate-docs:verbose; then
               echo "✅ 翻译完成，有内容更新"
               echo "translation_changed=true" >> $GITHUB_OUTPUT
@@ -193,7 +192,7 @@ jobs:
               fi
             fi
           else
-            echo "⚠️ 未配置 Cloudflare API 凭据，使用仅格式化模式"
+            echo "⚠️ 未配置 NVIDIA API Key，使用仅格式化模式"
             if bun run translate-docs:no-ai; then
               echo "✅ 格式处理完成，有内容更新"
               echo "translation_changed=true" >> $GITHUB_OUTPUT

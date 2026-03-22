@@ -22,8 +22,7 @@ interface TranslatorOptions {
   translateEnglish?: boolean;
   useAI?: boolean;
   model?: string;
-  apiToken?: string;
-  accountId?: string;
+  apiKey?: string;
   maxTokens?: number;
   force?: boolean;
 }
@@ -38,18 +37,14 @@ interface CacheData {
   lastUpdated: string;
 }
 
-interface CloudflareAIResponse {
-  success: boolean;
-  result?: {
-    response?: string;
-    choices?: Array<{ message?: { content?: string } }>;
-  } | string;
-  errors?: Array<{ message: string }>;
-}
-
-interface ProxyErrorResponse {
-  error?: string;
-  errors?: Array<{ message: string }>;
+interface NvidiaCompletionResponse {
+  id: string;
+  choices: Array<{
+    index: number;
+    message: { role: string; content: string };
+    finish_reason: string;
+  }>;
+  usage?: { prompt_tokens: number; completion_tokens: number; total_tokens: number };
 }
 
 function getErrorMessage(err: unknown): string {
@@ -69,11 +64,13 @@ class DocumentTranslator {
   private force: boolean;
 
   private useAI: boolean;
-  private aiProvider = 'cloudflare';
-  private apiToken: string | undefined;
-  private accountId: string | undefined;
+  private apiKey: string | undefined;
   private model: string;
   private maxTokens: number;
+
+  // 速率限制: 40 RPM = 每 1500ms 一个请求
+  private readonly rateLimitIntervalMs = 1500;
+  private lastRequestTime = 0;
 
   private glossaryFile: string;
   private glossary: Record<string, string> = {};
@@ -87,15 +84,14 @@ class DocumentTranslator {
     this.contentDir = options.contentDir || 'content';
     this.docsDir = options.docsDir || 'docs';
     this.verbose = options.verbose || false;
-    this.concurrency = options.concurrency || 5;
+    this.concurrency = options.concurrency || 3;
     this.translateEnglish = options.translateEnglish || false;
     this.force = options.force || false;
 
     this.useAI = options.useAI !== false;
-    this.apiToken = options.apiToken || process.env.CLOUDFLARE_API_TOKEN;
-    this.accountId = options.accountId || process.env.CLOUDFLARE_ACCOUNT_ID;
-    this.model = options.model || '@cf/meta/llama-3-8b-instruct';
-    this.maxTokens = options.maxTokens || 4000;
+    this.apiKey = options.apiKey || process.env.NVIDIA_API_KEY;
+    this.model = options.model || 'deepseek-ai/deepseek-v3_1';
+    this.maxTokens = options.maxTokens || 4096;
 
     const currentFileUrl = import.meta.url;
     const currentFilePath = new URL(currentFileUrl).pathname;
@@ -256,55 +252,52 @@ Translation Requirements:
 
 Please translate the following English technical documentation to Chinese following these rules:`;
 
-    const isCI = process.env.CI === 'true' || process.env.NODE_ENV === 'production';
-
     try {
-      let response;
-      if (isCI) {
-        if (!this.apiToken || !this.accountId) {
-          throw new Error('Cloudflare API token and Account ID not configured');
-        }
-
-        response = await fetch(
-          `https://api.cloudflare.com/client/v4/accounts/${this.accountId}/ai/run/${this.model}`,
-          {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${this.apiToken}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              messages: [
-                { role: 'system', content: systemPrompt },
-                { role: 'user', content: text }
-              ],
-              max_tokens: this.maxTokens
-            })
-          }
-        );
-      } else {
-        // 本地开发代理
-        response = await fetch('http://localhost:3000/translate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            text: systemPrompt + '\n' + text,
-            model: this.model
-          })
-        });
+      if (!this.apiKey) {
+        throw new Error('NVIDIA_API_KEY not configured');
       }
+
+      // 速率限制：确保请求间隔 >= 1500ms (40 RPM)
+      const now = Date.now();
+      const elapsed = now - this.lastRequestTime;
+      if (elapsed < this.rateLimitIntervalMs) {
+        await new Promise(r => setTimeout(r, this.rateLimitIntervalMs - elapsed));
+      }
+      this.lastRequestTime = Date.now();
+
+      const response = await fetch(
+        'https://integrate.api.nvidia.com/v1/chat/completions',
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${this.apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: this.model,
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: text },
+            ],
+            max_tokens: this.maxTokens,
+            temperature: 0.3, // 翻译任务用低温度保证准确性
+          }),
+        },
+      );
 
       if (!response.ok) {
-        const errorData = (await response.json()) as ProxyErrorResponse;
-        throw new Error(`${isCI ? 'Cloudflare Workers AI error' : 'Proxy error'}: ${errorData.error ?? errorData.errors?.[0]?.message ?? response.statusText}`);
+        const errorText = await response.text();
+        throw new Error(`NVIDIA NIM API error (${response.status}): ${errorText}`);
       }
 
-      const result = (await response.json()) as CloudflareAIResponse;
+      const result = (await response.json()) as NvidiaCompletionResponse;
+      const content = result.choices?.[0]?.message?.content;
 
-      if (result.success && result.result) {
-        if (typeof result.result === 'string') return result.result;
-        if (result.result.response) return result.result.response;
-        if (result.result.choices?.[0]) return result.result.choices[0].message?.content ?? text;
+      if (content) {
+        if (this.verbose && result.usage) {
+          console.log(`    📊 Tokens: ${result.usage.prompt_tokens} prompt + ${result.usage.completion_tokens} completion`);
+        }
+        return content;
       }
 
       return text;
@@ -636,10 +629,10 @@ const options: TranslatorOptions = {
   contentDir: 'content',
   docsDir: 'docs',
   useAI: !args.includes('--no-ai'),
-  model: '@cf/meta/llama-3-8b-instruct',
-  concurrency: 5,
+  model: 'deepseek-ai/deepseek-v3_1',
+  concurrency: 3,
   translateEnglish: args.includes('--translate-english'),
-  force: args.includes('--force')
+  force: args.includes('--force'),
 };
 
 const getArgValue = (flag: string) => {
@@ -650,8 +643,7 @@ const getArgValue = (flag: string) => {
 options.contentDir = getArgValue('--content-dir') || options.contentDir;
 options.docsDir = getArgValue('--docs-dir') || options.docsDir;
 options.model = getArgValue('--model') || options.model;
-options.apiToken = getArgValue('--api-token');
-options.accountId = getArgValue('--account-id');
+options.apiKey = getArgValue('--api-key');
 const concurrency = getArgValue('--concurrency');
 if (concurrency) options.concurrency = parseInt(concurrency, 10);
 
@@ -662,10 +654,9 @@ if (args.includes('--help') || args.includes('-h')) {
 选项:
   --content-dir <dir>     源文件目录 (默认: content)
   --docs-dir <dir>        目标文件目录 (默认: docs)
-  --model <model>         Cloudflare Workers AI 模型 (默认: @cf/meta/llama-3-8b-instruct)
-  --concurrency <num>     并发请求数 (默认: 5)
-  --api-token <token>     Cloudflare API 令牌
-  --account-id <id>       Cloudflare Account ID
+  --model <model>         NVIDIA NIM 模型 (默认: deepseek-ai/deepseek-v3_1)
+  --concurrency <num>     并发请求数 (默认: 3, 受 40 RPM 限速)
+  --api-key <key>         NVIDIA API Key (或设置 NVIDIA_API_KEY 环境变量)
   --no-ai                 禁用 AI 翻译，仅处理格式
   --translate-english     翻译 docs 目录下的英文文件
   --force                 强制重新翻译所有文件

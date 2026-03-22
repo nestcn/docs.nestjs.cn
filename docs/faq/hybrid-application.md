@@ -17,7 +17,9 @@ await app.listen(3001);
 
 ```
 
-> info **提示** `app.listen(port)` 方法在指定地址启动 HTTP 服务器。如果你的应用不处理 HTTP 请求，则应该使用 `app.init()` 方法代替。
+:::info 提示
+`app.listen(port)` 方法在指定地址启动 HTTP 服务器。如果你的应用不处理 HTTP 请求，则应该使用 `app.init()` 方法代替。
+:::
 
 要连接多个微服务实例，需要为每个微服务调用 `connectMicroservice()`：
 
@@ -59,7 +61,9 @@ getTCPDate(@Payload() data: number[]) {
 
 ```
 
-> info **提示** `@Payload()`、`@Ctx()`、`Transport` 和 `NatsContext` 从 `@nestjs/microservices` 导入。
+:::info 提示
+`@Payload()`、`@Ctx()`、`Transport` 和 `NatsContext` 从 `@nestjs/microservices` 导入。
+:::
 
 #### 共享配置
 

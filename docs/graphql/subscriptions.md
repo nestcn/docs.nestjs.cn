@@ -20,7 +20,9 @@ GraphQLModule.forRoot<ApolloDriverConfig>({
 
 ```
 
-> warning **警告** `installSubscriptionHandlers` 配置选项已从最新版本的 Apollo 服务器中删除，并且很快也会在此包中弃用。默认情况下，`installSubscriptionHandlers` 将回退使用 `subscriptions-transport-ws`（[阅读更多](https://github.com/apollographql/subscriptions-transport-ws)），但我们强烈建议改用 `graphql-ws`（[阅读更多](https://github.com/enisdenjo/graphql-ws)）库。
+:::warning 警告
+`installSubscriptionHandlers` 配置选项已从最新版本的 Apollo 服务器中删除，并且很快也会在此包中弃用。默认情况下，`installSubscriptionHandlers` 将回退使用 `subscriptions-transport-ws`（[阅读更多](https://github.com/apollographql/subscriptions-transport-ws)），但我们强烈建议改用 `graphql-ws`（[阅读更多](https://github.com/enisdenjo/graphql-ws)）库。
+:::
 
 要切换到使用 `graphql-ws` 包，请使用以下配置：
 
@@ -34,7 +36,9 @@ GraphQLModule.forRoot<ApolloDriverConfig>({
 
 ```
 
-> info **提示** 你也可以同时使用两个包（`subscriptions-transport-ws` 和 `graphql-ws`），例如为了向后兼容。
+:::info 提示
+你也可以同时使用两个包（`subscriptions-transport-ws` 和 `graphql-ws`），例如为了向后兼容。
+:::
 
 #### 代码优先
 
@@ -56,9 +60,13 @@ export class AuthorResolver {
 
 ```
 
-> info **提示** 所有装饰器都从 `@nestjs/graphql` 包导出，而 `PubSub` 类从 `graphql-subscriptions` 包导出。
+:::info 提示
+所有装饰器都从 `@nestjs/graphql` 包导出，而 `PubSub` 类从 `graphql-subscriptions` 包导出。
+:::
 
-> warning **注意** `PubSub` 是一个暴露简单 `publish` 和 `subscribe API` 的类。在[这里](https://www.apollographql.com/docs/graphql-subscriptions/setup.html)阅读更多相关信息。请注意，Apollo 文档警告默认实现不适合生产（在[这里](https://github.com/apollographql/graphql-subscriptions#getting-started-with-your-first-subscription)阅读更多）。生产应用程序应使用由外部存储支持的 `PubSub` 实现（在[这里](https://github.com/apollographql/graphql-subscriptions#pubsub-implementations)阅读更多）。
+:::warning 注意
+`PubSub` 是一个暴露简单 `publish` 和 `subscribe API` 的类。在[这里](https://www.apollographql.com/docs/graphql-subscriptions/setup.html)阅读更多相关信息。请注意，Apollo 文档警告默认实现不适合生产（在[这里](https://github.com/apollographql/graphql-subscriptions#getting-started-with-your-first-subscription)阅读更多）。生产应用程序应使用由外部存储支持的 `PubSub` 实现（在[这里](https://github.com/apollographql/graphql-subscriptions#pubsub-implementations)阅读更多）。
+:::
 
 这将导致在 SDL 中生成 GraphQL 架构的以下部分：
 
@@ -140,7 +148,9 @@ commentAdded() {
 
 ```
 
-> warning **注意** 如果你使用 `resolve` 选项，你应该返回未包装的负载（例如，在我们的示例中，直接返回 `newComment` 对象，而不是 `{{ '{' }} commentAdded: newComment {{ '}' }}` 对象）。
+:::warning 注意
+如果你使用 `resolve` 选项，你应该返回未包装的负载（例如，在我们的示例中，直接返回 `newComment` 对象，而不是 `{{ '{' }} commentAdded: newComment {{ '}' }}` 对象）。
+:::
 
 如果你需要访问注入的提供者（例如，使用外部服务验证数据），请使用以下构造。
 
@@ -353,7 +363,9 @@ GraphQLModule.forRoot<ApolloDriverConfig>({
 此示例中的 `authToken` 仅在首次建立连接时由客户端发送一次。
 使用此连接进行的所有订阅都将具有相同的 `authToken`，因此具有相同的用户信息。
 
-> warning **注意** `subscriptions-transport-ws` 中存在一个错误，允许连接跳过 `onConnect` 阶段（[阅读更多](https://github.com/apollographql/subscriptions-transport-ws/issues/349)）。你不应该假设在用户开始订阅时调用了 `onConnect`，并且始终检查 `context` 是否已填充。
+:::warning 注意
+`subscriptions-transport-ws` 中存在一个错误，允许连接跳过 `onConnect` 阶段（[阅读更多](https://github.com/apollographql/subscriptions-transport-ws/issues/349)）。你不应该假设在用户开始订阅时调用了 `onConnect`，并且始终检查 `context` 是否已填充。
+:::
 
 如果你使用 `graphql-ws` 包，`onConnect` 回调的签名会略有不同：
 
@@ -389,7 +401,9 @@ GraphQLModule.forRoot<MercuriusDriverConfig>({
 
 ```
 
-> info **提示** 你也可以传递选项对象来设置自定义发射器、验证传入连接等。在[这里](https://github.com/mercurius-js/mercurius/blob/master/docs/api/options.md#plugin-options)阅读更多（参见 `subscription`）。
+:::info 提示
+你也可以传递选项对象来设置自定义发射器、验证传入连接等。在[这里](https://github.com/mercurius-js/mercurius/blob/master/docs/api/options.md#plugin-options)阅读更多（参见 `subscription`）。
+:::
 
 #### 代码优先
 
@@ -409,9 +423,13 @@ export class AuthorResolver {
 
 ```
 
-> info **提示** 上例中使用的所有装饰器都从 `@nestjs/graphql` 包导出，而 `PubSub` 类从 `mercurius` 包导出。
+:::info 提示
+上例中使用的所有装饰器都从 `@nestjs/graphql` 包导出，而 `PubSub` 类从 `mercurius` 包导出。
+:::
 
-> warning **注意** `PubSub` 是一个暴露简单 `publish` 和 `subscribe` API 的类。查看[此部分](https://github.com/mercurius-js/mercurius/blob/master/docs/subscriptions.md#subscriptions-with-custom-pubsub)了解如何注册自定义 `PubSub` 类。
+:::warning 注意
+`PubSub` 是一个暴露简单 `publish` 和 `subscribe` API 的类。查看[此部分](https://github.com/mercurius-js/mercurius/blob/master/docs/subscriptions.md#subscriptions-with-custom-pubsub)了解如何注册自定义 `PubSub` 类。
+:::
 
 这将导致在 SDL 中生成 GraphQL 架构的以下部分：
 

@@ -36,7 +36,9 @@ export class CatsModule {}
 
 ```
 
-> info **提示** 要使用 CLI 创建模块，只需执行 `$ nest g module cats` 命令。
+:::info 提示
+要使用 CLI 创建模块，只需执行 `$ nest g module cats` 命令。
+:::
 
 上面，我们在 `cats.module.ts` 文件中定义了 `CatsModule`，并将与此模块相关的所有内容移动到 `cats` 目录中。我们需要做的最后一件事是将此模块导入到根模块（`AppModule`，在 `app.module.ts` 文件中定义）。
 
@@ -173,7 +175,9 @@ export class CatsModule {}
 
 `@Global()` 装饰器使模块成为全局范围。全局模块应该**只注册一次**，通常由根模块或核心模块注册。在上面的示例中，`CatsService` 提供者将是无处不在的，希望注入服务的模块不需要在其导入数组中导入 `CatsModule`。
 
-> info **提示** 不建议将一切都设计为全局作为设计实践。虽然全局模块可以帮助减少样板代码，但通常最好使用 `imports` 数组以受控和清晰的方式使模块的 API 对其他模块可用。这种方法提供了更好的结构和可维护性，确保只有模块的必要部分与其他模块共享，同时避免应用程序不相关部分之间的不必要耦合。
+:::info 提示
+不建议将一切都设计为全局作为设计实践。虽然全局模块可以帮助减少样板代码，但通常最好使用 `imports` 数组以受控和清晰的方式使模块的 API 对其他模块可用。这种方法提供了更好的结构和可维护性，确保只有模块的必要部分与其他模块共享，同时避免应用程序不相关部分之间的不必要耦合。
+:::
 
 #### 动态模块
 
@@ -216,7 +220,9 @@ export class DatabaseModule {
 
 ```
 
-> info **提示** `forRoot()` 方法可以同步或异步（即通过 `Promise`）返回动态模块。
+:::info 提示
+`forRoot()` 方法可以同步或异步（即通过 `Promise`）返回动态模块。
+:::
 
 此模块默认定义 `Connection` 提供者（在 `@Module()` 装饰器元数据中），但另外 - 取决于传递给 `forRoot()` 方法的 `entities` 和 `options` 对象 - 公开提供者集合，例如存储库。请注意，动态模块返回的属性**扩展**（而不是覆盖）`@Module()` 装饰器中定义的基础模块元数据。这就是静态声明的 `Connection` 提供者**和**动态生成的存储库提供者都从模块导出的方式。
 
@@ -232,7 +238,9 @@ export class DatabaseModule {
 
 ```
 
-> warning **警告** 如上所述，将一切都做成全局**不是一个好的设计决策**。
+:::warning 警告
+如上所述，将一切都做成全局**不是一个好的设计决策**。
+:::
 
 可以按以下方式导入和配置 `DatabaseModule`：
 
@@ -265,4 +273,6 @@ export class AppModule {}
 
 [动态模块](/fundamentals/dynamic-modules) 章节更详细地介绍了这个主题，并包含一个 [工作示例](https://github.com/nestjs/nest/tree/master/sample/25-dynamic-modules)。
 
-> info **提示** 了解如何使用 `ConfigurableModuleBuilder` 构建高度可定制的动态模块，请参阅 [本章](/fundamentals/dynamic-modules#configurable-module-builder)。
+:::info 提示
+了解如何使用 `ConfigurableModuleBuilder` 构建高度可定制的动态模块，请参阅 [本章](/fundamentals/dynamic-modules#configurable-module-builder)。
+:::

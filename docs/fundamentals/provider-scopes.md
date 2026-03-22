@@ -56,7 +56,9 @@ export class CatsService {}
 
 默认使用单例作用域，不需要声明。如果您确实想将提供者声明为单例作用域，请为`scope`属性使用`Scope.DEFAULT`值。
 
-> warning **注意** WebSocket网关不应使用请求作用域的提供者，因为它们必须作为单例运行。每个网关封装一个真实的套接字，不能多次实例化。此限制也适用于其他一些提供者，如[_Passport策略_](../security/authentication#请求作用域策略)或_Cron控制器_。
+:::warning 注意
+WebSocket网关不应使用请求作用域的提供者，因为它们必须作为单例运行。每个网关封装一个真实的套接字，不能多次实例化。此限制也适用于其他一些提供者，如[_Passport策略_](../security/authentication#请求作用域策略)或_Cron控制器_。
+:::
 
 #### 控制器作用域
 

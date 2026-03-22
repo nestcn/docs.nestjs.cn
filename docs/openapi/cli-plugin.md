@@ -2,7 +2,9 @@
 
 [TypeScript](https://www.typescriptlang.org/docs/handbook/decorators.html) 的元数据反射系统有几个限制，例如，无法确定类由哪些属性组成，或识别给定属性是可选的还是必需的。但是，其中一些约束可以在编译时解决。Nest 提供了一个插件，增强了 TypeScript 编译过程，以减少所需的样板代码量。
 
-> info **提示** 此插件是 **可选的**。如果您愿意，您可以手动声明所有装饰器，或者只在需要的地方声明特定的装饰器。
+:::info 提示
+此插件是 **可选的**。如果您愿意，您可以手动声明所有装饰器，或者只在需要的地方声明特定的装饰器。
+:::
 
 #### 概述
 
@@ -55,15 +57,21 @@ export class CreateUserDto {
 
 ```
 
-> info **注意** Swagger 插件将从 TypeScript 类型和 class-validator 装饰器派生 @ApiProperty() 注释。这有助于在生成的 Swagger UI 文档中清晰地描述您的 API。然而，运行时的验证仍然由 class-validator 装饰器处理。因此，仍然需要继续使用 `IsEmail()`、`IsNumber()` 等验证器。
+:::info 注意
+Swagger 插件将从 TypeScript 类型和 class-validator 装饰器派生 @ApiProperty() 注释。这有助于在生成的 Swagger UI 文档中清晰地描述您的 API。然而，运行时的验证仍然由 class-validator 装饰器处理。因此，仍然需要继续使用 `IsEmail()`、`IsNumber()` 等验证器。
+:::
 
 因此，如果您打算依赖自动注释来生成文档，同时仍希望进行运行时验证，那么 class-validator 装饰器仍然是必要的。
 
-> info **提示** 当在 DTO 中使用 [映射类型工具](/openapi/mapped-types)（如 `PartialType`）时，从 `@nestjs/swagger` 而不是 `@nestjs/mapped-types` 导入它们，以便插件拾取模式。
+:::info 提示
+当在 DTO 中使用 [映射类型工具](/openapi/mapped-types)（如 `PartialType`）时，从 `@nestjs/swagger` 而不是 `@nestjs/mapped-types` 导入它们，以便插件拾取模式。
+:::
 
 该插件基于 **抽象语法树** 动态添加适当的装饰器。因此，您不必为散布在代码中的 `@ApiProperty` 装饰器而烦恼。
 
-> info **提示** 插件将自动生成任何缺失的 swagger 属性，但如果您需要覆盖它们，只需通过 `@ApiProperty()` 显式设置它们。
+:::info 提示
+插件将自动生成任何缺失的 swagger 属性，但如果您需要覆盖它们，只需通过 `@ApiProperty()` 显式设置它们。
+:::
 
 #### 注释内省
 
@@ -115,7 +123,9 @@ export class SomeController {
 
 ```
 
-> info **提示** 对于模型，同样的逻辑适用，但用于 `ApiProperty` 装饰器。
+:::info 提示
+对于模型，同样的逻辑适用，但用于 `ApiProperty` 装饰器。
+:::
 
 对于控制器，您不仅可以提供摘要，还可以提供描述（备注）、标签（如 `@deprecated`）和响应示例，如下所示：
 

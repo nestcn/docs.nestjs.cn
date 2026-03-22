@@ -8,7 +8,7 @@ REPL 是一种简单的交互式环境，能够接收用户输入的单条命令
 
  ```typescript title="repl.ts"
 import { repl } from '@nestjs/core';
-import { AppModule } from './src/app.module';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   await repl(AppModule);

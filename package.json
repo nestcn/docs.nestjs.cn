@@ -10,6 +10,7 @@
     "preview": "rspress preview",
     "fix-code-blocks": "tsx scripts/fix-code-blocks.ts",
     "fix-links": "tsx scripts/fix-links.ts",
+    "validate-translation": "tsx scripts/validate-translation.ts",
     "fix-all": "npm run fix-code-blocks && npm run fix-links",
     "translate-docs": "bun scripts/translate-docs.ts",
     "translate-docs:verbose": "bun scripts/translate-docs.ts --verbose",

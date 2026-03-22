@@ -21,5 +21,17 @@ jobs:
       - name: Install dependencies
         run: bun install
 
+      - name: Validate translation quality
+        run: |
+          echo "🔍 Checking translation quality..."
+          bun run validate-translation
+          echo "✅ Translation quality check passed"
+
+      - name: Check for placeholder leaks
+        run: |
+          echo "🔍 Checking for placeholder leaks..."
+          bun run check-placeholders
+          echo "✅ No placeholder issues found"
+
       - name: Build project
         run: bun run build

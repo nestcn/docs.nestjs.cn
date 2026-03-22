@@ -209,6 +209,16 @@ class DocumentTranslator {
       const escapedPlaceholder = placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       restoredContent = restoredContent.replace(new RegExp(escapedPlaceholder, 'g'), original);
     }
+
+    // 校验：如果还有未还原的占位符则报错
+    const unresolvedMatch = restoredContent.match(/__(?:CODE_BLOCK|INLINE_CODE|LINK|HTML_TAG)_\d+__/g);
+    if (unresolvedMatch) {
+      const unique = [...new Set(unresolvedMatch)];
+      throw new Error(
+        `Placeholder restoration failed: ${unique.length} unresolved placeholder(s) remain: ${unique.slice(0, 5).join(', ')}`,
+      );
+    }
+
     return restoredContent;
   }
 
@@ -316,6 +326,7 @@ Please translate the following English technical documentation to Chinese follow
     }
 
     try {
+      const sourceCodeBlockCount = (text.match(/```/g) || []).length;
       const protectedText = this.protectCodeBlocks(text);
       let translatedText: string;
 
@@ -329,17 +340,29 @@ Please translate the following English technical documentation to Chinese follow
           const chunkTranslated = await this.translateWithCloudflare(chunks[i]);
           translatedChunks.push(chunkTranslated);
         }
-        translatedText = translatedChunks.join('');
+        translatedText = translatedChunks.join('\n\n');
       } else {
         translatedText = await this.translateWithCloudflare(protectedText);
       }
 
       const finalText = this.restoreCodeBlocks(translatedText);
+
+      // 质量校验 1: 中文字符数
       const chineseChars = finalText.match(/[\u4e00-\u9fa5]/g);
       const chineseCount = chineseChars ? chineseChars.length : 0;
-
       if (!filePath.includes('index.md') && chineseCount < 20) {
         throw new Error(`Translation quality check failed: only ${chineseCount} Chinese characters found.`);
+      }
+
+      // 质量校验 2: 代码块数量一致性
+      const translatedCodeBlockCount = (finalText.match(/```/g) || []).length;
+      if (sourceCodeBlockCount !== translatedCodeBlockCount) {
+        console.warn(
+          `  ⚠️ Code block count mismatch for ${filePath}: source=${sourceCodeBlockCount}, translated=${translatedCodeBlockCount}. Falling back to source.`,
+        );
+        throw new Error(
+          `Code block count mismatch: source=${sourceCodeBlockCount}, translated=${translatedCodeBlockCount}`,
+        );
       }
 
       this.translationCache.set(cacheKey, finalText);
@@ -352,6 +375,7 @@ Please translate the following English technical documentation to Chinese follow
   }
 
   private splitTextIntoChunks(text: string, chunkSize: number): string[] {
+    const placeholderPattern = /__(?:CODE_BLOCK|INLINE_CODE|LINK|HTML_TAG)_\d+__/;
     const chunks: string[] = [];
     let currentChunk = '';
     const paragraphs = text.split('\n\n');
@@ -360,16 +384,26 @@ Please translate the following English technical documentation to Chinese follow
       if (currentChunk.length + paragraph.length + 2 <= chunkSize) {
         currentChunk += paragraph + '\n\n';
       } else {
+        // 不在含有占位符的段落边界处切割——如果当前 chunk 末尾
+        // 或下一段开头包含占位符，则合并以避免拆断占位符上下文
+        if (
+          placeholderPattern.test(paragraph) &&
+          currentChunk.length + paragraph.length + 2 <= chunkSize * 1.5
+        ) {
+          currentChunk += paragraph + '\n\n';
+          continue;
+        }
         if (currentChunk) chunks.push(currentChunk);
         if (paragraph.length > chunkSize) {
-          const sentences = paragraph.split(/[.!?]+/);
+          // 超长段落按句子切分，但避免在占位符内部切割
+          const sentences = paragraph.split(/(?<=[.!?])\s+/);
           let currentSentenceChunk = '';
           for (const sentence of sentences) {
             if (currentSentenceChunk.length + sentence.length + 1 <= chunkSize) {
-              currentSentenceChunk += sentence + '.';
+              currentSentenceChunk += sentence + ' ';
             } else {
-              if (currentSentenceChunk) chunks.push(currentSentenceChunk);
-              currentSentenceChunk = sentence + '.';
+              if (currentSentenceChunk) chunks.push(currentSentenceChunk.trimEnd());
+              currentSentenceChunk = sentence + ' ';
             }
           }
           currentChunk = currentSentenceChunk;
@@ -378,7 +412,7 @@ Please translate the following English technical documentation to Chinese follow
         }
       }
     }
-    if (currentChunk) chunks.push(currentChunk);
+    if (currentChunk) chunks.push(currentChunk.trimEnd());
     return chunks;
   }
 

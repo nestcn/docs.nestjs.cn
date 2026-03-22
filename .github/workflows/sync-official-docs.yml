@@ -52,8 +52,8 @@ jobs:
           
           # 检查 content 文件夹是否存在差异
           if [ -d "content" ]; then
-            # 使用 rsync 的 dry-run 模式检查差异
-            if ! rsync -avui --dry-run --delete official-docs/content/ content/ > /tmp/content-diff.log 2>&1; then
+            # 使用 rsync 的 dry-run 和 checksum 模式检查差异，避免本地 checkout 时间戳导致的误报
+            if ! rsync -acvui --dry-run --delete official-docs/content/ content/ > /tmp/content-diff.log 2>&1; then
               CONTENT_CHANGED=true
             elif [ -s /tmp/content-diff.log ]; then
               # 检查是否有实际的文件差异（过滤掉仅有的时间戳差异）
@@ -128,8 +128,8 @@ jobs:
             
             # 检查 assets 文件夹是否存在差异
             if [ -d "public/assets" ]; then
-              # 使用 rsync 的 dry-run 模式检查差异
-              if ! rsync -avui --dry-run --delete official-docs/src/assets/ public/assets/ > /tmp/assets-diff.log 2>&1; then
+              # 使用 rsync 的 checksum 模式检查差异
+              if ! rsync -acvui --dry-run --delete official-docs/src/assets/ public/assets/ > /tmp/assets-diff.log 2>&1; then
                 ASSETS_CHANGED=true
               elif [ -s /tmp/assets-diff.log ]; then
                 # 检查是否有实际的文件差异
@@ -259,30 +259,27 @@ jobs:
       - name: Update README sync time and check for changes
         id: changes
         run: |
-          # 如果有内容同步或翻译更新，更新 README 中的同步时间
-          if [ "${{ steps.sync-content.outputs.content_changed }}" == "true" ] || [ "${{ steps.translate-content.outputs.translation_changed }}" == "true" ] || [ "${{ steps.sync-assets.outputs.assets_changed }}" == "true" ]; then
-            echo "📅 正在更新 README.md 中的同步时间..."
-            
-            # 获取当前时间（北京时间）- 格式: 2025年07月01日 17:48
-            SYNC_TIME=$(TZ='Asia/Shanghai' date '+%Y年%m月%d日 %H:%M')
-            
-            # 更新 README.md 中的同步时间标记
-            sed -i "s|<!-- LAST_SYNC_TIME -->.*<!-- /LAST_SYNC_TIME -->|<!-- LAST_SYNC_TIME --> $SYNC_TIME <!-- /LAST_SYNC_TIME -->|g" README.md
-            
-            echo "✅ 同步时间已更新为: $SYNC_TIME"
-          fi
+          # 1. 检查是否存在实质性的变更
+          git add content docs public/assets scripts 2>/dev/null || true
           
-          # 检查是否有变更需要提交
-          git add .
+          # 如果之前的内容、翻译、资源步骤中有任何明确报告有变更，进一步使用 git 确认
           if git diff --cached --quiet; then
-            echo "未检测到变更"
+            echo "未检测到任何代码/内容变更，跳过 README 更新和 PR 创建"
             echo "has_changes=false" >> $GITHUB_OUTPUT
           else
-            echo "检测到变更"
+            echo "检测到代码/内容变更，准备更新 README 同步时间"
+            
+            # 更新 README.md 中的同步时间
+            SYNC_TIME=$(TZ='Asia/Shanghai' date '+%Y年%m月%d日 %H:%M')
+            sed -i "s|<!-- LAST_SYNC_TIME -->.*<!-- /LAST_SYNC_TIME -->|<!-- LAST_SYNC_TIME --> $SYNC_TIME <!-- /LAST_SYNC_TIME -->|g" README.md
+            echo "✅ 同步时间已更新为: $SYNC_TIME"
+            
+            # 重新 add 所有文件（包括刚更新的 README.md）
+            git add .
             echo "has_changes=true" >> $GITHUB_OUTPUT
             
             # 输出变更的文件列表
-            echo "📋 变更的文件："
+            echo "📋 全部的变更文件："
             git diff --cached --name-status
           fi
 

@@ -30,7 +30,9 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 
 ```
 
-> info **提示** `join()` 函数从 `path` 包导入；`Transport` 枚举从 `@nestjs/microservices` 包导入。
+:::info 提示
+`join()` 函数从 `path` 包导入；`Transport` 枚举从 `@nestjs/microservices` 包导入。
+:::
 
 在 `nest-cli.json` 文件中，我们添加 `assets` 属性，允许我们分发非 TypeScript 文件，以及 `watchAssets` - 开启监视所有非 TypeScript 资产。在我们的例子中，我们希望 `.proto` 文件被自动复制到 `dist` 文件夹。
 
@@ -121,7 +123,9 @@ message Hero {
 
 接下来，我们需要实现该服务。要定义满足此定义的处理程序，我们在控制器中使用 `@GrpcMethod()` 装饰器，如下所示。此装饰器提供将方法声明为 gRPC 服务方法所需的元数据。
 
-> info **提示** 前面微服务章节中介绍的 `@MessagePattern()` 装饰器 (<a href="microservices/basics#请求-响应">了解更多</a>) 不用于基于 gRPC 的微服务。`@GrpcMethod()` 装饰器有效地取代了基于 gRPC 的微服务的位置。
+:::info 提示
+前面微服务章节中介绍的 `@MessagePattern()` 装饰器 (<a href="microservices/basics#请求-响应">了解更多</a>) 不用于基于 gRPC 的微服务。`@GrpcMethod()` 装饰器有效地取代了基于 gRPC 的微服务的位置。
+:::
 
 ```typescript
 @Controller()
@@ -138,7 +142,9 @@ export class HeroesController {
 
 ```
 
-> info **提示** `@GrpcMethod()` 装饰器从 `@nestjs/microservices` 包导入，而 `Metadata` 和 `ServerUnaryCall` 从 `grpc` 包导入。
+:::info 提示
+`@GrpcMethod()` 装饰器从 `@nestjs/microservices` 包导入，而 `Metadata` 和 `ServerUnaryCall` 从 `grpc` 包导入。
+:::
 
 上面显示的装饰器接受两个参数。第一个是服务名称（例如，`'HeroesService'`），对应于 `hero.proto` 中的 `HeroesService` 服务定义。第二个（字符串 `'FindOne'`）对应于 `hero.proto` 文件中 `HeroesService` 中定义的 `FindOne()` rpc 方法。
 
@@ -200,7 +206,9 @@ imports: [
 
 ```
 
-> info **提示** `register()` 方法接受对象数组。通过提供逗号分隔的注册对象列表来注册多个包。
+:::info 提示
+`register()` 方法接受对象数组。通过提供逗号分隔的注册对象列表来注册多个包。
+:::
 
 注册后，我们可以使用 `@Inject()` 注入配置的 `ClientGrpc` 对象。然后我们使用 `ClientGrpc` 对象的 `getService()` 方法来检索服务实例，如下所示。
 
@@ -222,7 +230,9 @@ export class AppService implements OnModuleInit {
 
 ```
 
-> error **警告** 除非在 proto 加载器配置 (`options.loader.keepcase` 在微服务传输器配置中) 中设置 `keepCase` 选项为 `true`，否则 gRPC 客户端不会发送名称中包含下划线 `_` 的字段。
+:::error 警告
+除非在 proto 加载器配置 (`options.loader.keepcase` 在微服务传输器配置中) 中设置 `keepCase` 选项为 `true`，否则 gRPC 客户端不会发送名称中包含下划线 `_` 的字段。
+:::
 
 请注意，与其他微服务传输方法中使用的技术相比有一个小差异。我们使用 `ClientGrpc` 类而不是 `ClientProxy` 类，后者提供 `getService()` 方法。`getService()` 泛型方法接受服务名称作为参数并返回其实例（如果可用）。
 
@@ -288,7 +298,9 @@ call(): Observable<any> {
 
 ```
 
-> info **提示** `Metadata` 类从 `grpc` 包导入。
+:::info 提示
+`Metadata` 类从 `grpc` 包导入。
+:::
 
 请注意，这需要更新我们之前定义的 `HeroesService` 接口。
 
@@ -360,7 +372,9 @@ message HelloResponse {
 
 ```
 
-> info **提示** `LotsOfGreetings` 方法可以使用 `@GrpcMethod` 装饰器简单实现（如上面的示例），因为返回的流可以发出多个值。
+:::info 提示
+`LotsOfGreetings` 方法可以使用 `@GrpcMethod` 装饰器简单实现（如上面的示例），因为返回的流可以发出多个值。
+:::
 
 基于此 `.proto` 文件，让我们定义 `HelloService` 接口：
 
@@ -382,7 +396,9 @@ interface HelloResponse {
 
 ```
 
-> info **提示** proto 接口可以由 [ts-proto](https://github.com/stephenh/ts-proto) 包自动生成，了解更多 [此处](https://github.com/stephenh/ts-proto/blob/main/NESTJS.markdown)。
+:::info 提示
+proto 接口可以由 [ts-proto](https://github.com/stephenh/ts-proto) 包自动生成，了解更多 [此处](https://github.com/stephenh/ts-proto/blob/main/NESTJS.markdown)。
+:::
 
 #### 主题策略
 
@@ -410,9 +426,13 @@ bidiHello(messages: Observable<any>, metadata: Metadata, call: ServerDuplexStrea
 
 ```
 
-> warning **警告** 为了支持与 `@GrpcStreamMethod()` 装饰器的全双工交互，控制器方法必须返回 RxJS `Observable`。
+:::warning 警告
+为了支持与 `@GrpcStreamMethod()` 装饰器的全双工交互，控制器方法必须返回 RxJS `Observable`。
+:::
 
-> info **提示** `Metadata` 和 `ServerUnaryCall` 类/接口从 `grpc` 包导入。
+:::info 提示
+`Metadata` 和 `ServerUnaryCall` 类/接口从 `grpc` 包导入。
+:::
 
 根据服务定义（在 `.proto` 文件中），`BidiHello` 方法应该向服务流式传输请求。要从客户端向流发送多个异步消息，我们利用 RxJS `ReplaySubject` 类。
 
@@ -451,7 +471,9 @@ bidiHello(requestStream: any) {
 
 ```
 
-> info **提示** 此装饰器不需要提供任何特定的返回参数。预计流将类似于任何其他标准流类型进行处理。
+:::info 提示
+此装饰器不需要提供任何特定的返回参数。预计流将类似于任何其他标准流类型进行处理。
+:::
 
 在上面的示例中，我们使用 `write()` 方法将对象写入响应流。作为第二个参数传递给 `.on()` 方法的回调将在我们的服务每次接收到新的数据块时被调用。
 
@@ -505,7 +527,9 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 
 ```
 
-> info **提示** [gRPC 健康探针](https://github.com/grpc-ecosystem/grpc-health-probe) 是一个有用的 CLI，用于在容器化环境中测试 gRPC 健康检查。
+:::info 提示
+[gRPC 健康探针](https://github.com/grpc-ecosystem/grpc-health-probe) 是一个有用的 CLI，用于在容器化环境中测试 gRPC 健康检查。
+:::
 
 #### gRPC 元数据
 

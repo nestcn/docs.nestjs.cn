@@ -8,7 +8,9 @@
 
 虽然 Prisma 可以与纯 JavaScript 一起使用，但它拥抱 TypeScript，并提供了超越 TypeScript 生态系统中其他 ORM 保证的类型安全级别。你可以在[这里](https://www.prisma.io/docs/orm/more/comparisons/prisma-and-typeorm#type-safety)找到 Prisma 和 TypeORM 类型安全保证的深入比较。
 
-> info **注意** 如果你想快速了解 Prisma 的工作原理，可以遵循[快速入门](https://www.prisma.io/docs/getting-started/prisma-orm/quickstart/prisma-postgres)或阅读[文档](https://www.prisma.io/docs)中的[介绍](https://www.prisma.io/docs/orm/overview/introduction/what-is-prisma)。在 [prisma-examples](https://github.com/prisma/prisma-examples/) 仓库中还有[REST](https://github.com/prisma/prisma-examples/tree/b53fad046a6d55f0090ddce9fd17ec3f9b95cab3/orm/nest) 和 [GraphQL](https://github.com/prisma/prisma-examples/tree/b53fad046a6d55f0090ddce9fd17ec3f9b95cab3/orm/nest-graphql) 的可运行示例。
+:::info 注意
+如果你想快速了解 Prisma 的工作原理，可以遵循[快速入门](https://www.prisma.io/docs/getting-started/prisma-orm/quickstart/prisma-postgres)或阅读[文档](https://www.prisma.io/docs)中的[介绍](https://www.prisma.io/docs/orm/overview/introduction/what-is-prisma)。在 [prisma-examples](https://github.com/prisma/prisma-examples/) 仓库中还有[REST](https://github.com/prisma/prisma-examples/tree/b53fad046a6d55f0090ddce9fd17ec3f9b95cab3/orm/nest) 和 [GraphQL](https://github.com/prisma/prisma-examples/tree/b53fad046a6d55f0090ddce9fd17ec3f9b95cab3/orm/nest-graphql) 的可运行示例。
+:::
 
 #### 入门
 
@@ -16,7 +18,9 @@
 
 出于本指南的目的，你将使用 [SQLite](https://sqlite.org/) 数据库，以节省设置数据库服务器的开销。请注意，即使你使用的是 PostgreSQL 或 MySQL，你仍然可以遵循本指南——你将在适当的位置获得使用这些数据库的额外说明。
 
-> info **注意** 如果你已经有一个现有项目并考虑迁移到 Prisma，可以遵循[将 Prisma 添加到现有项目](https://www.prisma.io/docs/getting-started/setup-prisma/add-to-existing-project-typescript-postgres)的指南。如果你从 TypeORM 迁移，可以阅读[从 TypeORM 迁移到 Prisma](https://www.prisma.io/docs/guides/migrate-from-typeorm) 的指南。
+:::info 注意
+如果你已经有一个现有项目并考虑迁移到 Prisma，可以遵循[将 Prisma 添加到现有项目](https://www.prisma.io/docs/getting-started/setup-prisma/add-to-existing-project-typescript-postgres)的指南。如果你从 TypeORM 迁移，可以阅读[从 TypeORM 迁移到 Prisma](https://www.prisma.io/docs/guides/migrate-from-typeorm) 的指南。
+:::
 
 #### 创建 NestJS 项目
 
@@ -103,7 +107,9 @@ generator client {
 
 ```
 
-> info **注意** 需要 `moduleFormat` 配置，因为 Prisma v7 默认作为 ES 模块发布，这与 NestJS 的 CommonJS 设置不兼容。将 `moduleFormat` 设置为 `cjs` 会强制 Prisma 生成 CommonJS 模块而不是 ESM。
+:::info 注意
+需要 `moduleFormat` 配置，因为 Prisma v7 默认作为 ES 模块发布，这与 NestJS 的 CommonJS 设置不兼容。将 `moduleFormat` 设置为 `cjs` 会强制 Prisma 生成 CommonJS 模块而不是 ESM。
+:::
 
 #### 设置数据库连接
 

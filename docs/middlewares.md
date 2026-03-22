@@ -19,7 +19,9 @@
 
 你可以在函数中实现自定义 Nest 中间件，或者在带有 `@Injectable()` 装饰器的类中实现。类应该实现 `NestMiddleware` 接口，而函数没有任何特殊要求。让我们首先使用类方法实现一个简单的中间件功能。
 
-> warning **警告** `Express` 和 `fastify` 处理中间件的方式不同，并提供不同的方法签名，更多信息请阅读 [这里](/techniques/performance#middleware)。
+:::warning 警告
+`Express` 和 `fastify` 处理中间件的方式不同，并提供不同的方法签名，更多信息请阅读 [这里](/techniques/performance#middleware)。
+:::
 
 ```typescript
 import { Injectable, NestMiddleware } from '@nestjs/common';
@@ -111,9 +113,13 @@ export class AppModule {
 
 ```
 
-> info **提示** `configure()` 方法可以使用 `async/await` 使其异步（例如，你可以在 `configure()` 方法体内部 `await` 异步操作的完成）。
+:::info 提示
+`configure()` 方法可以使用 `async/await` 使其异步（例如，你可以在 `configure()` 方法体内部 `await` 异步操作的完成）。
+:::
 
-> warning **警告** 当使用 `express` 适配器时，NestJS 应用程序将默认注册来自 `body-parser` 包的 `json` 和 `urlencoded`。这意味着如果你想通过 `MiddlewareConsumer` 自定义该中间件，你需要在使用 `NestFactory.create()` 创建应用程序时将 `bodyParser` 标志设置为 `false` 来关闭全局中间件。
+:::warning 警告
+当使用 `express` 适配器时，NestJS 应用程序将默认注册来自 `body-parser` 包的 `json` 和 `urlencoded`。这意味着如果你想通过 `MiddlewareConsumer` 自定义该中间件，你需要在使用 `NestFactory.create()` 创建应用程序时将 `bodyParser` 标志设置为 `false` 来关闭全局中间件。
+:::
 
 #### 路由通配符
 
@@ -127,7 +133,9 @@ forRoutes({
 
 ```
 
-> info **提示** `splat` 只是通配符参数的名称，没有特殊含义。你可以随意命名，例如 `*wildcard`。
+:::info 提示
+`splat` 只是通配符参数的名称，没有特殊含义。你可以随意命名，例如 `*wildcard`。
+:::
 
 `'abcd/*'` 路由路径将匹配 `abcd/1`、`abcd/123`、`abcd/abc` 等。连字符 ( `-`) 和点 (`.`) 在基于字符串的路径中被字面解释。然而，没有其他字符的 `abcd/` 将不匹配路由。为此，你需要将通配符用大括号括起来使其可选：
 
@@ -173,7 +181,9 @@ export class AppModule {
 
 ```
 
-> info **提示** `apply()` 方法可以接受单个中间件，或多个参数以指定 <a href="/middlewares#多个中间件">多个中间件</a>。
+:::info 提示
+`apply()` 方法可以接受单个中间件，或多个参数以指定 <a href="/middlewares#多个中间件">多个中间件</a>。
+:::
 
 #### 排除路由
 
@@ -193,7 +203,9 @@ consumer
 
 ```
 
-> info **提示** `exclude()` 方法使用 [path-to-regexp](https://github.com/pillarjs/path-to-regexp#parameters) 包支持通配符参数。
+:::info 提示
+`exclude()` 方法使用 [path-to-regexp](https://github.com/pillarjs/path-to-regexp#parameters) 包支持通配符参数。
+:::
 
 通过上面的示例，`LoggerMiddleware` 将绑定到 `CatsController` 内定义的所有路由**除了**传递给 `exclude()` 方法的三个路由。
 
@@ -222,7 +234,9 @@ consumer
 
 ```
 
-> info **提示** 每当你的中间件不需要任何依赖项时，考虑使用更简单的**函数式中间件**替代方案。
+:::info 提示
+每当你的中间件不需要任何依赖项时，考虑使用更简单的**函数式中间件**替代方案。
+:::
 
 #### 多个中间件
 
@@ -244,4 +258,6 @@ await app.listen(process.env.PORT ?? 3000);
 
 ```
 
-> info **提示** 在全局中间件中访问 DI 容器是不可能的。使用 `app.use()` 时，你可以改用 [函数式中间件](/middlewares#函数式中间件)。或者，你可以使用类中间件并在 `AppModule`（或任何其他模块）中使用 `.forRoutes('*')` 来使用它。
+:::info 提示
+在全局中间件中访问 DI 容器是不可能的。使用 `app.use()` 时，你可以改用 [函数式中间件](/middlewares#函数式中间件)。或者，你可以使用类中间件并在 `AppModule`（或任何其他模块）中使用 `.forRoutes('*')` 来使用它。
+:::

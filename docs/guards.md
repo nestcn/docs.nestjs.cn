@@ -8,7 +8,9 @@
 
 但中间件本质上是"愚蠢"的。它不知道调用 `next()` 函数后将执行哪个处理程序。另一方面，**守卫**可以访问 `ExecutionContext` 实例，因此确切知道接下来要执行什么。它们的设计与异常过滤器、管道和拦截器类似，让你可以在请求/响应周期的正确位置插入处理逻辑，并以声明式的方式进行。这有助于保持代码 DRY 和声明式。
 
-> info **提示** 守卫在所有中间件**之后**执行，但在任何拦截器或管道**之前**执行。
+:::info 提示
+守卫在所有中间件**之后**执行，但在任何拦截器或管道**之前**执行。
+:::
 
 #### 授权守卫
 
@@ -38,7 +40,9 @@ export class AuthGuard {
 
 ```
 
-> info **提示** 如果你正在寻找如何在应用程序中实现认证机制的实际示例，请访问[此章节](/security/authentication)。同样，对于更复杂的授权示例，请查看[此页面](/security/authorization)。
+:::info 提示
+如果你正在寻找如何在应用程序中实现认证机制的实际示例，请访问[此章节](/security/authentication)。同样，对于更复杂的授权示例，请查看[此页面](/security/authorization)。
+:::
 
 `validateRequest()` 函数内部的逻辑可以根据需要简单或复杂。此示例的要点是展示守卫如何融入请求/响应周期。
 
@@ -92,7 +96,9 @@ export class CatsController {}
 
 ```
 
-> info **提示** `@UseGuards()` 装饰器从 `@nestjs/common` 包导入。
+:::info 提示
+`@UseGuards()` 装饰器从 `@nestjs/common` 包导入。
+:::
 
 上面，我们传递了 `RolesGuard` 类（而不是实例），将实例化责任留给框架并启用依赖注入。与管道和异常过滤器一样，我们也可以传递一个就地实例：
 
@@ -113,7 +119,9 @@ app.useGlobalGuards(new RolesGuard());
 
 ```
 
-> warning **注意** 对于混合应用程序，`useGlobalGuards()` 方法默认不会为网关和微服务设置守卫（有关如何更改此行为的信息，请参阅[混合应用程序](/faq/hybrid-application)）。对于"标准"（非混合）微服务应用，`useGlobalGuards()` 确实会全局挂载守卫。
+:::warning 注意
+对于混合应用程序，`useGlobalGuards()` 方法默认不会为网关和微服务设置守卫（有关如何更改此行为的信息，请参阅[混合应用程序](/faq/hybrid-application)）。对于"标准"（非混合）微服务应用，`useGlobalGuards()` 确实会全局挂载守卫。
+:::
 
 全局守卫用于整个应用程序，用于每个控制器和每个路由处理程序。在依赖注入方面，从任何模块外部注册的全局守卫（使用 `useGlobalGuards()`，如上面的示例）无法注入依赖项，因为这是在任何模块上下文之外完成的。为了解决这个问题，你可以使用以下构造直接从任何模块设置守卫：
 
@@ -133,7 +141,9 @@ export class AppModule {}
 
 ```
 
-> info **提示** 当使用此方法为守卫执行依赖注入时，请注意无论使用此构造的模块是什么，守卫实际上是全局的。这应该在哪里做？选择定义守卫的模块（上面示例中的 `RolesGuard`）。此外，`useClass` 不是处理自定义提供者注册的唯一方式。在[此处](/fundamentals/dependency-injection)了解更多。
+:::info 提示
+当使用此方法为守卫执行依赖注入时，请注意无论使用此构造的模块是什么，守卫实际上是全局的。这应该在哪里做？选择定义守卫的模块（上面示例中的 `RolesGuard`）。此外，`useClass` 不是处理自定义提供者注册的唯一方式。在[此处](/fundamentals/dependency-injection)了解更多。
+:::
 
 #### 为每个处理程序设置角色
 
@@ -211,9 +221,13 @@ export class RolesGuard {
 
 ```
 
-> info **提示** 在 node.js 世界中，将授权用户附加到 `request` 对象是常见做法。因此，在上面的示例代码中，我们假设 `request.user` 包含用户实例和允许的角色。在你的应用中，你可能会在自定义**认证守卫**（或中间件）中建立该关联。查看[此章节](/security/authentication)以获取有关此主题的更多信息。
+:::info 提示
+在 node.js 世界中，将授权用户附加到 `request` 对象是常见做法。因此，在上面的示例代码中，我们假设 `request.user` 包含用户实例和允许的角色。在你的应用中，你可能会在自定义**认证守卫**（或中间件）中建立该关联。查看[此章节](/security/authentication)以获取有关此主题的更多信息。
+:::
 
-> warning **警告** `matchRoles()` 函数内部的逻辑可以根据需要简单或复杂。此示例的要点是展示守卫如何融入请求/响应周期。
+:::warning 警告
+`matchRoles()` 函数内部的逻辑可以根据需要简单或复杂。此示例的要点是展示守卫如何融入请求/响应周期。
+:::
 
 有关如何以上下文敏感的方式使用 `Reflector` 的更多详细信息，请参阅**执行上下文**章节的 <a href="https://docs.nestjs.com/fundamentals/execution-context#reflection-and-metadata">反射和元数据</a> 部分。
 
@@ -237,4 +251,6 @@ throw new UnauthorizedException();
 
 守卫抛出的任何异常都将由[异常层](/exception-filters)处理（全局异常过滤器和应用于当前上下文的任何异常过滤器）。
 
-> info **提示** 如果你正在寻找如何实现授权的实际示例，请查看[此章节](/security/authorization)。
+:::info 提示
+如果你正在寻找如何实现授权的实际示例，请查看[此章节](/security/authorization)。
+:::

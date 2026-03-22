@@ -52,7 +52,9 @@ const tasksService = app.select(TasksModule).get(TasksService, { strict: true })
   </tr>
 </table>
 
-> info **Hint** 在非严格模式下，root 模块默认被选择。在选择其他模块时，您需要手动导航模块图。
+:::info Hint
+在非严格模式下，root 模块默认被选择。在选择其他模块时，您需要手动导航模块图。
+:::
 
 请注意，standalone 应用程序没有网络监听器，因此与 HTTP 相关的 Nest 功能（例如中间件、拦截器、管道、守卫等）在这个上下文中不可用。
 

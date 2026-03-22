@@ -11,7 +11,9 @@ throw new WsException('Invalid credentials.');
 
 ```
 
-> info **提示** `WsException` 类从 `@nestjs/websockets` 包导入。
+:::info 提示
+`WsException` 类从 `@nestjs/websockets` 包导入。
+:::
 
 使用上面的示例，Nest 将处理抛出的异常并发出具有以下结构的 `exception` 消息：
 

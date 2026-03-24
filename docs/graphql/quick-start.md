@@ -107,6 +107,7 @@ GraphQLModule.forRoot<ApolloDriverConfig>({
   driver: ApolloDriver,
   graphiql: true,
 }),
+
 ```
 
 如果您的应用程序使用 [订阅](/graphql/subscriptions)，请确保使用 `graphql-ws`，因为 GraphiQL 不支持 `subscriptions-transport-ws`。

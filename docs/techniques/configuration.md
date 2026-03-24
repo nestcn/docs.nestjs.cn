@@ -440,6 +440,7 @@ export class DatabaseModule {}
 
 ```bash
 $ npm install --save joi
+
 ```
 
 现在我们可以定义一个 Joi 验证模式，并通过 `forRoot()` 方法的选项对象的 `validationSchema` 属性传递它，如下所示：
@@ -652,6 +653,7 @@ export class AppModule {}
 ```json
 APP_URL=mywebsite.com
 SUPPORT_EMAIL=support@${APP_URL}
+
 ```
 
 通过这种结构，变量 `SUPPORT_EMAIL` 解析为 `'support@mywebsite.com'`。注意使用 `${{ '{' }}...{{ '}' }}` 语法来触发解析 `SUPPORT_EMAIL` 定义内的 `APP_URL` 变量的值。

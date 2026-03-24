@@ -30,6 +30,7 @@ app.use(helmet());
 
 :::warning 警告
 当使用 `helmet`、`@apollo/server` (4.x) 和 [Apollo Sandbox](https://docs.nestjs.com/graphql/quick-start#apollo-sandbox) 时，Apollo Sandbox 上的 [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) 可能会出现问题。要解决此问题，请按如下所示配置 CSP：
+
 ```typescript
 app.use(helmet({
   crossOriginEmbedderPolicy: false,
@@ -42,7 +43,9 @@ app.use(helmet({
     },
   },
 }));
+
 ```
+
 :::
 
 #### 在 Fastify 中使用
@@ -65,6 +68,7 @@ await app.register(helmet)
 
 :::warning 警告
 当使用 `apollo-server-fastify` 和 `@fastify/helmet` 时，GraphQL playground 上的 [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) 可能会出现问题，要解决此冲突，请按如下所示配置 CSP：
+
 ```typescript
 await app.register(fastifyHelmet, {
    contentSecurityPolicy: {

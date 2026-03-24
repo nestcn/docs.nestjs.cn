@@ -18,6 +18,7 @@
 ```bash
 $ npm install -g @nestjs/mau
 $ mau deploy
+
 ```
 
 部署完成后，你的 NestJS 应用程序将在几秒钟内在 AWS 上运行！

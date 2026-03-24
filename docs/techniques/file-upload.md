@@ -6,7 +6,9 @@
 
 为了处理文件上传，Nest 提供了一个基于 Express 的 [multer](https://github.com/expressjs/multer) 中间件包的内置模块。Multer 处理以 `multipart/form-data` 格式发布的数据，该格式主要用于通过 HTTP `POST` 请求上传文件。此模块完全可配置，你可以根据应用程序需求调整其行为。
 
-> warning **警告** Multer 无法处理不支持的多部分格式（`multipart/form-data`）的数据。另外，请注意此包与 `FastifyAdapter` 不兼容。
+:::warning 警告
+Multer 无法处理不支持的多部分格式（`multipart/form-data`）的数据。另外，请注意此包与 `FastifyAdapter` 不兼容。
+:::
 
 为了更好的类型安全性，让我们安装 Multer 类型包：
 
@@ -30,14 +32,18 @@ uploadFile(@UploadedFile() file: Express.Multer.File) {
 
 ```
 
-> info **提示** `FileInterceptor()` 装饰器从 `@nestjs/platform-express` 包导出。`@UploadedFile()` 装饰器从 `@nestjs/common` 导出。
+:::info 提示
+`FileInterceptor()` 装饰器从 `@nestjs/platform-express` 包导出。`@UploadedFile()` 装饰器从 `@nestjs/common` 导出。
+:::
 
 `FileInterceptor()` 装饰器接受两个参数：
 
 - `fieldName`：提供 HTML 表单中包含文件的字段名称的字符串
 - `options`：`MulterOptions` 类型的可选对象。这是 multer 构造函数使用的相同对象（更多详细信息在[这里](https://github.com/expressjs/multer#multeropts)）。
 
-> warning **警告** `FileInterceptor()` 可能与第三方云提供商（如 Google Firebase 等）不兼容。
+:::warning 警告
+`FileInterceptor()` 可能与第三方云提供商（如 Google Firebase 等）不兼容。
+:::
 
 #### 文件验证
 
@@ -128,7 +134,9 @@ export abstract class FileValidator<TValidationOptions = Record<string, any>> {
 
 ```
 
-> info **提示** `FileValidator` 接口通过其 `isValid` 函数支持异步验证。为了利用类型安全性，如果你使用 express（默认）作为驱动程序，你还可以将 `file` 参数类型化为 `Express.Multer.File`。
+:::info 提示
+`FileValidator` 接口通过其 `isValid` 函数支持异步验证。为了利用类型安全性，如果你使用 express（默认）作为驱动程序，你还可以将 `file` 参数类型化为 `Express.Multer.File`。
+:::
 
 `FileValidator` 是一个常规类，可以访问文件对象并根据客户端提供的选项对其进行验证。Nest 有两个内置的 `FileValidator` 实现，你可以在项目中使用：
 
@@ -150,7 +158,9 @@ file: Express.Multer.File,
 
 ```
 
-> info **提示** 如果验证器数量大幅增加或其选项使文件混乱，你可以在单独的文件中定义此数组，并在此处作为命名常量导入，如 `fileValidators`。
+:::info 提示
+如果验证器数量大幅增加或其选项使文件混乱，你可以在单独的文件中定义此数组，并在此处作为命名常量导入，如 `fileValidators`。
+:::
 
 最后，你可以使用特殊的 `ParseFilePipeBuilder` 类来组合和构建验证器。通过如下所示使用它，你可以避免手动实例化每个验证器，只需直接传递它们的选项：
 
@@ -171,7 +181,9 @@ file: Express.Multer.File,
 
 ```
 
-> info **提示** 默认情况下需要文件存在，但你可以通过在 `build` 函数选项中添加 `fileIsRequired: false` 参数（与 `errorHttpStatusCode` 同级）使其成为可选。
+:::info 提示
+默认情况下需要文件存在，但你可以通过在 `build` 函数选项中添加 `fileIsRequired: false` 参数（与 `errorHttpStatusCode` 同级）使其成为可选。
+:::
 
 #### 文件数组
 
@@ -192,7 +204,9 @@ uploadFile(@UploadedFiles() files: Array<Express.Multer.File>) {
 
 ```
 
-> info **提示** `FilesInterceptor()` 装饰器从 `@nestjs/platform-express` 包导出。`@UploadedFiles()` 装饰器从 `@nestjs/common` 导出。
+:::info 提示
+`FilesInterceptor()` 装饰器从 `@nestjs/platform-express` 包导出。`@UploadedFiles()` 装饰器从 `@nestjs/common` 导出。
+:::
 
 #### 多个文件
 
@@ -254,7 +268,9 @@ MulterModule.register({
 
 ```
 
-> info **提示** `MulterModule` 类从 `@nestjs/platform-express` 包导出。
+:::info 提示
+`MulterModule` 类从 `@nestjs/platform-express` 包导出。
+:::
 
 #### 异步配置
 

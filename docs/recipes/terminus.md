@@ -34,7 +34,9 @@ $ npm install --save @nestjs/terminus
 
 要开始我们的第一个健康检查，让我们创建 `HealthModule` 并在其导入数组中导入 `TerminusModule`。
 
-> info **提示** 要使用 [Nest CLI](/cli/overview) 创建模块，只需执行 `$ nest g module health` 命令。
+:::info 提示
+要使用 [Nest CLI](/cli/overview) 创建模块，只需执行 `$ nest g module health` 命令。
+:::
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -54,7 +56,9 @@ $ nest g controller health
 
 ```
 
-> info **信息** 强烈建议在你的应用程序中启用关闭钩子。如果启用，Terminus 集成会利用此生命周期事件。在[这里](/fundamentals/lifecycle-events#application-shutdown)阅读有关关闭钩子的更多信息。
+:::info 信息
+强烈建议在你的应用程序中启用关闭钩子。如果启用，Terminus 集成会利用此生命周期事件。在[这里](/fundamentals/lifecycle-events#application-shutdown)阅读有关关闭钩子的更多信息。
+:::
 
 #### HTTP 健康检查
 
@@ -162,7 +166,9 @@ check() {
 
 Terminus 提供了向你的健康检查添加数据库检查的功能。要开始使用此健康指标，你应该查看[数据库章节](/techniques/sql)，并确保你的应用程序中的数据库连接已建立。
 
-> info **提示** 在幕后，`TypeOrmHealthIndicator` 只是执行一个 `SELECT 1` SQL 命令，该命令通常用于验证数据库是否仍然存活。如果你使用的是 Oracle 数据库，它使用 `SELECT 1 FROM DUAL`。
+:::info 提示
+在幕后，`TypeOrmHealthIndicator` 只是执行一个 `SELECT 1` SQL 命令，该命令通常用于验证数据库是否仍然存活。如果你使用的是 Oracle 数据库，它使用 `SELECT 1 FROM DUAL`。
+:::
 
 ```typescript
 @Controller('health')
@@ -271,7 +277,9 @@ check() {
 
 为了确保你的进程不超过特定的内存限制，可以使用 `MemoryHealthIndicator`。以下示例可用于检查进程的堆。
 
-> info **提示** 堆是动态分配内存所在的内存部分（即通过 malloc 分配的内存）。从堆分配的内存将保持分配状态，直到发生以下情况之一：
+:::info 提示
+堆是动态分配内存所在的内存部分（即通过 malloc 分配的内存）。从堆分配的内存将保持分配状态，直到发生以下情况之一：
+:::
 > - 内存被 _free_'d
 > - 程序终止
 
@@ -296,7 +304,9 @@ export class HealthController {
 
 还可以使用 `MemoryHealthIndicator.checkRSS` 验证进程的内存 RSS。如果你的进程确实分配了超过 150MB，此示例将返回不健康的响应代码。
 
-> info **提示** RSS 是驻留集大小，用于显示该进程分配了多少内存，并且在 RAM 中。它不包括换出的内存。它包括共享库的内存，只要这些库的页面实际上在内存中。它包括所有堆栈和堆内存。
+:::info 提示
+RSS 是驻留集大小，用于显示该进程分配了多少内存，并且在 RAM 中。它不包括换出的内存。它包括共享库的内存，只要这些库的页面实际上在内存中。它包括所有堆栈和堆内存。
+:::
 
 ```typescript
 // 在 `HealthController` 类中
@@ -368,7 +378,9 @@ export class HealthModule { }
 
 ```
 
-> info **提示** 在实际应用程序中，`DogHealthIndicator` 应该在单独的模块中提供，例如 `DogModule`，然后由 `HealthModule` 导入。
+:::info 提示
+在实际应用程序中，`DogHealthIndicator` 应该在单独的模块中提供，例如 `DogModule`，然后由 `HealthModule` 导入。
+:::
 
 最后需要的步骤是在所需的健康检查端点中添加现在可用的健康指标。为此，我们回到 `HealthController` 并将其添加到我们的 `check` 函数中。
 
@@ -401,7 +413,9 @@ Terminus 只记录错误消息，例如当健康检查失败时。使用 `Termin
 
 在本节中，我们将引导你创建自定义日志记录器 `TerminusLogger`。此日志记录器扩展了内置日志记录器。因此，你可以选择要覆盖日志记录器的哪个部分。
 
-> info **信息** 如果你想了解更多关于 NestJS 中自定义日志记录器的信息，[请在此处阅读更多信息](/techniques/logger#injecting-a-custom-logger)。
+:::info 信息
+如果你想了解更多关于 NestJS 中自定义日志记录器的信息，[请在此处阅读更多信息](/techniques/logger#injecting-a-custom-logger)。
+:::
 
 ```typescript
 import { Injectable, Scope, ConsoleLogger } from '@nestjs/common';

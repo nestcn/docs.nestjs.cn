@@ -24,7 +24,9 @@ $ npm install --save-dev @types/passport-local
 
 ```
 
-> warning **注意** 对于您选择的 **任何** Passport 策略，您始终需要 `@nestjs/passport` 和 `passport` 包。然后，您需要安装实现您正在构建的特定认证策略的策略特定包（例如，`passport-jwt` 或 `passport-local`）。此外，您还可以安装任何 Passport 策略的类型定义，如上所示的 `@types/passport-local`，这在编写 TypeScript 代码时提供帮助。
+:::warning 注意
+对于您选择的 **任何** Passport 策略，您始终需要 `@nestjs/passport` 和 `passport` 包。然后，您需要安装实现您正在构建的特定认证策略的策略特定包（例如，`passport-jwt` 或 `passport-local`）。此外，您还可以安装任何 Passport 策略的类型定义，如上所示的 `@types/passport-local`，这在编写 TypeScript 代码时提供帮助。
+:::
 
 #### 实现 Passport 策略
 
@@ -165,7 +167,9 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 
 我们已经遵循了前面为所有 Passport 策略描述的方案。在我们的 passport-local 用例中，没有配置选项，因此我们的构造函数只是调用 `super()`，没有选项对象。
 
-> info **提示** 我们可以在调用 `super()` 时传递一个选项对象来自定义 passport 策略的行为。在这个例子中，passport-local 策略默认期望请求体中有名为 `username` 和 `password` 的属性。传递一个选项对象来指定不同的属性名，例如：`super({ usernameField: 'email' })`。有关更多信息，请参阅 [Passport 文档](http://www.passportjs.org/docs/configure/)。
+:::info 提示
+我们可以在调用 `super()` 时传递一个选项对象来自定义 passport 策略的行为。在这个例子中，passport-local 策略默认期望请求体中有名为 `username` 和 `password` 的属性。传递一个选项对象来指定不同的属性名，例如：`super({ usernameField: 'email' })`。有关更多信息，请参阅 [Passport 文档](http://www.passportjs.org/docs/configure/)。
+:::
 
 我们还实现了 `validate()` 方法。对于每种策略，Passport 将使用适当的策略特定参数集调用验证函数（在 `@nestjs/passport` 中通过 `validate()` 方法实现）。对于 local-strategy，Passport 期望一个具有以下签名的 `validate()` 方法：`validate(username: string, password:string): any`。
 
@@ -664,7 +668,9 @@ constructor(private moduleRef: ModuleRef) {
 
 ```
 
-> info **提示** `ModuleRef` 类从 `@nestjs/core` 包中导入。
+:::info 提示
+`ModuleRef` 类从 `@nestjs/core` 包中导入。
+:::
 
 确保将 `passReqToCallback` 配置属性设置为 `true`，如上所示。
 

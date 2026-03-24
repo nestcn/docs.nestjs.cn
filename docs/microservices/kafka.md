@@ -33,7 +33,9 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 
 ```
 
-> info **提示** `Transport` 枚举从 `@nestjs/microservices` 包导入。
+:::info 提示
+`Transport` 枚举从 `@nestjs/microservices` 包导入。
+:::
 
 #### 选项
 
@@ -177,7 +179,9 @@ Kafka 微服务消息模式利用两个主题作为请求和回复通道。`Clie
 
 #### 消息响应订阅
 
-> warning **注意** 本节仅与使用 [请求-响应](/microservices/basics#请求-响应) 消息风格（使用 `@MessagePattern` 装饰器和 `ClientKafkaProxy.send` 方法）相关。对于 [基于事件](/microservices/basics#event-based) 通信（`@EventPattern` 装饰器和 `ClientKafkaProxy.emit` 方法），不需要订阅响应主题。
+:::warning 注意
+本节仅与使用 [请求-响应](/microservices/basics#请求-响应) 消息风格（使用 `@MessagePattern` 装饰器和 `ClientKafkaProxy.send` 方法）相关。对于 [基于事件](/microservices/basics#event-based) 通信（`@EventPattern` 装饰器和 `ClientKafkaProxy.emit` 方法），不需要订阅响应主题。
+:::
 
 `ClientKafkaProxy` 类提供 `subscribeToResponseOf()` 方法。`subscribeToResponseOf()` 方法将请求的主题名称作为参数，并将派生的回复主题名称添加到回复主题集合中。实现消息模式时需要此方法。
 
@@ -222,7 +226,9 @@ export class HeroesController {
 
 ```
 
-> info **提示** `@Payload()` 从 `@nestjs/microservices` 包导入。
+:::info 提示
+`@Payload()` 从 `@nestjs/microservices` 包导入。
+:::
 
 传出消息也可以通过传递具有 `key` 和 `value` 属性的对象来键控。键控消息对于满足 [共同分区要求](https://docs.confluent.io/current/ksql/docs/developer-guide/partition-data.html#co-partitioning-requirements) 很重要。
 
@@ -298,7 +304,9 @@ killDragon(@Payload() message: KillDragonMessage, @Ctx() context: KafkaContext) 
 
 ```
 
-> info **提示** `@Payload()`、`@Ctx()` 和 `KafkaContext` 从 `@nestjs/microservices` 包导入。
+:::info 提示
+`@Payload()`、`@Ctx()` 和 `KafkaContext` 从 `@nestjs/microservices` 包导入。
+:::
 
 要访问原始 Kafka `IncomingMessage` 对象，请使用 `KafkaContext` 对象的 `getMessage()` 方法，如下所示：
 
@@ -387,7 +395,9 @@ client: ClientKafkaProxy;
 
 ```
 
-> info **提示** Kafka 客户端和消费者命名约定可以通过在您自己的自定义提供者中扩展 `ClientKafkaProxy` 和 `KafkaServer` 并覆盖构造函数来自定义。
+:::info 提示
+Kafka 客户端和消费者命名约定可以通过在您自己的自定义提供者中扩展 `ClientKafkaProxy` 和 `KafkaServer` 并覆盖构造函数来自定义。
+:::
 
 由于 Kafka 微服务消息模式利用两个主题作为请求和回复通道，因此应该从请求主题派生回复模式。默认情况下，回复主题的名称是请求主题名称的组合，附加了 `.reply`。
 
@@ -398,13 +408,17 @@ onModuleInit() {
 
 ```
 
-> info **提示** Kafka 回复主题命名约定可以通过在您自己的自定义提供者中扩展 `ClientKafkaProxy` 并覆盖 `getResponsePatternName` 方法来自定义。
+:::info 提示
+Kafka 回复主题命名约定可以通过在您自己的自定义提供者中扩展 `ClientKafkaProxy` 并覆盖 `getResponsePatternName` 方法来自定义。
+:::
 
 #### 可重试异常
 
 与其他传输器类似，所有未处理的异常都会自动包装到 `RpcException` 中并转换为 "用户友好" 格式。然而，在某些边缘情况下，您可能希望绕过此机制并让异常被 `kafkajs` 驱动程序消费。处理消息时抛出异常会指示 `kafkajs` **重试** 它（重新传递它），这意味着即使消息（或事件）处理程序被触发，偏移量也不会提交到 Kafka。
 
-> warning **警告** 对于事件处理程序（基于事件的通信），默认情况下所有未处理的异常都被视为 **可重试异常**。
+:::warning 警告
+对于事件处理程序（基于事件的通信），默认情况下所有未处理的异常都被视为 **可重试异常**。
+:::
 
 为此，您可以使用一个名为 `KafkaRetriableException` 的专用类，如下所示：
 
@@ -413,7 +427,9 @@ throw new KafkaRetriableException('...');
 
 ```
 
-> info **提示** `KafkaRetriableException` 类从 `@nestjs/microservices` 包导出。
+:::info 提示
+`KafkaRetriableException` 类从 `@nestjs/microservices` 包导出。
+:::
 
 ### 自定义异常处理
 
@@ -572,7 +588,9 @@ this.client.status.subscribe((status: KafkaStatus) => {
 
 ```
 
-> info **提示** `KafkaStatus` 类型从 `@nestjs/microservices` 包导入。
+:::info 提示
+`KafkaStatus` 类型从 `@nestjs/microservices` 包导入。
+:::
 
 同样，您可以订阅服务器的 `status` 流以接收有关服务器状态的通知。
 

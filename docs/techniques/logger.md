@@ -42,7 +42,9 @@ await app.listen(process.env.PORT ?? 3000);
 
 数组中的值可以是 `'log'`、`'fatal'`、`'error'`、`'warn'`、`'debug'` 和 `'verbose'` 的任意组合。
 
-> info **提示** Nest 中的日志级别是级联的（继承的）。这意味着提供特定的日志级别（如 `'log'`）将自动包括所有更高严重性的级别（例如 `'warn'`、`'error'` 和 `'fatal'`）。
+:::info 提示
+Nest 中的日志级别是级联的（继承的）。这意味着提供特定的日志级别（如 `'log'`）将自动包括所有更高严重性的级别（例如 `'warn'`、`'error'` 和 `'fatal'`）。
+:::
 
 要禁用彩色输出，请传递 `ConsoleLogger` 对象，并将 `colors` 属性设置为 `false` 作为 `logger` 属性的值。
 
@@ -104,7 +106,9 @@ const app = await NestFactory.create(AppModule, {
 
 此外，如果您使用 [NestJS Mau](https://mau.nestjs.com)，JSON 日志记录简化了以组织良好的结构化格式查看日志的过程，这对于调试和性能监控特别有用。
 
-> info **注意** 当 `json` 设置为 `true` 时，`ConsoleLogger` 会通过将 `colors` 属性设置为 `false` 自动禁用文本颜色化。这确保输出保持有效的 JSON，没有格式伪影。但是，出于开发目的，您可以通过显式将 `colors` 设置为 `true` 来覆盖此行为。这会添加彩色 JSON 日志，这可以使本地调试期间的日志条目更易读。
+:::info 注意
+当 `json` 设置为 `true` 时，`ConsoleLogger` 会通过将 `colors` 属性设置为 `false` 自动禁用文本颜色化。这确保输出保持有效的 JSON，没有格式伪影。但是，出于开发目的，您可以通过显式将 `colors` 设置为 `true` 来覆盖此行为。这会添加彩色 JSON 日志，这可以使本地调试期间的日志条目更易读。
+:::
 
 启用 JSON 日志记录时，日志输出将如下所示（在单行中）：
 
@@ -301,7 +305,9 @@ await app.listen(process.env.PORT ?? 3000);
 
 ```
 
-> info **注意** 在上面的示例中，我们将 `bufferLogs` 设置为 `true`，以确保所有日志都将被缓冲，直到附加了自定义日志记录器（在这种情况下是 `MyLogger`），并且应用程序初始化过程要么完成要么失败。如果初始化过程失败，Nest 将回退到原始的 `ConsoleLogger` 来打印任何报告的错误消息。此外，您可以将 `autoFlushLogs` 设置为 `false`（默认 `true`）以手动刷新日志（使用 `Logger.flush()` 方法）。
+:::info 注意
+在上面的示例中，我们将 `bufferLogs` 设置为 `true`，以确保所有日志都将被缓冲，直到附加了自定义日志记录器（在这种情况下是 `MyLogger`），并且应用程序初始化过程要么完成要么失败。如果初始化过程失败，Nest 将回退到原始的 `ConsoleLogger` 来打印任何报告的错误消息。此外，您可以将 `autoFlushLogs` 设置为 `false`（默认 `true`）以手动刷新日志（使用 `Logger.flush()` 方法）。
+:::
 
 在这里，我们使用 `NestApplication` 实例上的 `get()` 方法来检索 `MyLogger` 对象的单例实例。这种技术本质上是一种为 Nest 使用的日志记录器实例"注入"的方法。`app.get()` 调用检索 `MyLogger` 的单例实例，并依赖于该实例首先在另一个模块中注入，如上所述。
 
@@ -375,7 +381,9 @@ await app.listen(process.env.PORT ?? 3000);
 
 ```
 
-> info **提示** 或者，您可以暂时使用 `logger: false` 指令禁用日志记录，而不是将 `bufferLogs` 设置为 `true`。请注意，如果您向 `NestFactory.create` 提供 `logger: false`，在调用 `useLogger` 之前不会记录任何内容，因此您可能会错过一些重要的初始化错误。如果您不介意一些初始消息将使用默认日志记录器记录，您可以简单地省略 `logger: false` 选项。
+:::info 提示
+或者，您可以暂时使用 `logger: false` 指令禁用日志记录，而不是将 `bufferLogs` 设置为 `true`。请注意，如果您向 `NestFactory.create` 提供 `logger: false`，在调用 `useLogger` 之前不会记录任何内容，因此您可能会错过一些重要的初始化错误。如果您不介意一些初始消息将使用默认日志记录器记录，您可以简单地省略 `logger: false` 选项。
+:::
 
 #### 使用外部日志记录器
 

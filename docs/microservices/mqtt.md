@@ -25,7 +25,9 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 
 ```
 
-> info **提示** `Transport` 枚举是从 `@nestjs/microservices` 包导入的。
+:::info 提示
+`Transport` 枚举是从 `@nestjs/microservices` 包导入的。
+:::
 
 #### 选项
 
@@ -69,7 +71,9 @@ getNotifications(@Payload() data: number[], @Ctx() context: MqttContext) {
 
 ```
 
-> info **提示** `@Payload()`、`@Ctx()` 和 `MqttContext` 是从 `@nestjs/microservices` 包导入的。
+:::info 提示
+`@Payload()`、`@Ctx()` 和 `MqttContext` 是从 `@nestjs/microservices` 包导入的。
+:::
 
 要访问原始 mqtt [数据包](https://github.com/mqttjs/mqtt-packet)，请使用 `MqttContext` 对象的 `getPacket()` 方法，如下所示：
 
@@ -127,7 +131,9 @@ handleMetrics(@Payload() data: any) {
 
 ```
 
-> info **提示** 每模式 QoS 配置不影响现有行为。当未指定 `extras.qos` 时，订阅使用全局 `subscribeOptions.qos` 值。
+:::info 提示
+每模式 QoS 配置不影响现有行为。当未指定 `extras.qos` 时，订阅使用全局 `subscribeOptions.qos` 值。
+:::
 
 #### 记录构建器
 
@@ -143,7 +149,9 @@ client.send('replace-emoji', record).subscribe(...);
 
 ```
 
-> info **提示** `MqttRecordBuilder` 类是从 `@nestjs/microservices` 包导出的。
+:::info 提示
+`MqttRecordBuilder` 类是从 `@nestjs/microservices` 包导出的。
+:::
 
 您也可以在服务器端读取这些选项，通过访问 `MqttContext`。
 
@@ -192,7 +200,9 @@ this.client.status.subscribe((status: MqttStatus) => {
 
 ```
 
-> info **提示** `MqttStatus` 类型是从 `@nestjs/microservices` 包导入的。
+:::info 提示
+`MqttStatus` 类型是从 `@nestjs/microservices` 包导入的。
+:::
 
 同样，您可以订阅服务器的 `status` 流以接收有关服务器状态的通知。
 
@@ -224,7 +234,9 @@ server.on<MqttEvents>('error', (err) => {
 
 ```
 
-> info **提示** `MqttEvents` 类型是从 `@nestjs/microservices` 包导入的。
+:::info 提示
+`MqttEvents` 类型是从 `@nestjs/microservices` 包导入的。
+:::
 
 #### 底层驱动程序访问
 

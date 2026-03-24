@@ -25,7 +25,9 @@ export class CatsService {
 
 ```
 
-> info **提示** `HttpAdapterHost` 从 `@nestjs/core` 包中导入。
+:::info 提示
+`HttpAdapterHost` 从 `@nestjs/core` 包中导入。
+:::
 
 `HttpAdapterHost` **不是** 实际的 `HttpAdapter`。要获取实际的 `HttpAdapter` 实例，只需访问 `httpAdapter` 属性。
 

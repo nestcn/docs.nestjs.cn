@@ -41,7 +41,9 @@ export class AppModule {}
 
 ```
 
-> warning **警告** 在生产环境中不应使用 `synchronize: true` - 否则您可能会丢失生产数据。
+:::warning 警告
+在生产环境中不应使用 `synchronize: true` - 否则您可能会丢失生产数据。
+:::
 
 `forRoot()` 方法支持 [TypeORM](https://typeorm.io/data-source-options#common-data-source-options) 包中 `DataSource` 构造函数公开的所有配置属性。此外，还有以下几个额外的配置属性。
 
@@ -60,7 +62,9 @@ export class AppModule {}
   </tr>
 </table>
 
-> info **提示** 了解更多关于数据源选项的信息 [这里](https://typeorm.io/data-source-options)。
+:::info 提示
+了解更多关于数据源选项的信息 [这里](https://typeorm.io/data-source-options)。
+:::
 
 完成后，TypeORM `DataSource` 和 `EntityManager` 对象将可用于在整个项目中注入（无需导入任何模块），例如：
 
@@ -112,7 +116,9 @@ export class User {
 
 ```
 
-> info **提示** 了解更多关于实体的信息，请参阅 [TypeORM 文档](https://typeorm.io/docs/entity/entities/)。
+:::info 提示
+了解更多关于实体的信息，请参阅 [TypeORM 文档](https://typeorm.io/docs/entity/entities/)。
+:::
 
 `User` 实体文件位于 `users` 目录中。此目录包含与 `UsersModule` 相关的所有文件。您可以决定将模型文件保存在哪里，但是，我们建议在相应的模块目录中，在其**域**附近创建它们。
 
@@ -209,7 +215,9 @@ export class UsersService {
 
 ```
 
-> warning **注意** 不要忘记将 `UsersModule` 导入到根 `AppModule` 中。
+:::warning 注意
+不要忘记将 `UsersModule` 导入到根 `AppModule` 中。
+:::
 
 如果您想在导入 `TypeOrmModule.forFeature` 的模块之外使用存储库，您需要重新导出由它生成的提供程序。
 您可以通过导出整个模块来做到这一点，如下所示：
@@ -291,7 +299,9 @@ export class User {
 
 ```
 
-> info **提示** 要了解更多关于 TypeORM 中的关系，请访问 [TypeORM 文档](https://typeorm.io/docs/relations/relations)。
+:::info 提示
+要了解更多关于 TypeORM 中的关系，请访问 [TypeORM 文档](https://typeorm.io/docs/relations/relations)。
+:::
 
 #### 自动加载实体
 
@@ -315,7 +325,9 @@ export class AppModule {}
 
 指定该选项后，通过 `forFeature()` 方法注册的每个实体将自动添加到配置对象的 `entities` 数组中。
 
-> warning **警告** 请注意，未通过 `forFeature()` 方法注册但仅从实体（通过关系）引用的实体不会通过 `autoLoadEntities` 设置包含。
+:::warning 警告
+请注意，未通过 `forFeature()` 方法注册但仅从实体（通过关系）引用的实体不会通过 `autoLoadEntities` 设置包含。
+:::
 
 #### 分离实体定义
 
@@ -355,7 +367,9 @@ export const UserSchema = new EntitySchema<User>({
 
 ```
 
-> warning error **警告** 如果您提供 `target` 选项，`name` 选项值必须与目标类的名称相同。
+:::warning 警告
+如果您提供 `target` 选项，`name` 选项值必须与目标类的名称相同。
+:::
 > 如果您不提供 `target`，您可以使用任何名称。
 
 Nest 允许您在任何需要 `Entity` 的地方使用 `EntitySchema` 实例，例如：
@@ -392,7 +406,9 @@ export class UsersService {
 
 ```
 
-> info **提示** `DataSource` 类从 `typeorm` 包导入。
+:::info 提示
+`DataSource` 类从 `typeorm` 包导入。
+:::
 
 现在，我们可以使用此对象创建事务。
 
@@ -418,7 +434,9 @@ async createMany(users: User[]) {
 
 ```
 
-> info **提示** 请注意，`dataSource` 仅用于创建 `QueryRunner`。但是，测试此类需要模拟整个 `DataSource` 对象（它公开了几个方法）。因此，我们建议使用辅助工厂类（例如 `QueryRunnerFactory`）并定义一个接口，其中包含维护事务所需的有限方法集。这种技术使得模拟这些方法非常简单。
+:::info 提示
+请注意，`dataSource` 仅用于创建 `QueryRunner`。但是，测试此类需要模拟整个 `DataSource` 对象（它公开了几个方法）。因此，我们建议使用辅助工厂类（例如 `QueryRunnerFactory`）并定义一个接口，其中包含维护事务所需的有限方法集。这种技术使得模拟这些方法非常简单。
+:::
 
 <app-banner-devtools></app-banner-devtools>
 
@@ -464,7 +482,9 @@ export class UserSubscriber implements EntitySubscriberInterface<User> {
 
 ```
 
-> error **警告** 事件订阅者不能是 [请求作用域](/fundamentals/provider-scopes)。
+:::error 警告
+事件订阅者不能是 [请求作用域](/fundamentals/provider-scopes)。
+:::
 
 现在，将 `UserSubscriber` 类添加到 `providers` 数组中：
 
@@ -526,9 +546,13 @@ export class AppModule {}
 
 ```
 
-> warning **注意** 如果您不为数据源设置 `name`，其名称将设置为 `default`。请注意，您不应有多个没有名称或具有相同名称的连接，否则它们会被覆盖。
+:::warning 注意
+如果您不为数据源设置 `name`，其名称将设置为 `default`。请注意，您不应有多个没有名称或具有相同名称的连接，否则它们会被覆盖。
+:::
 
-> warning **注意** 如果您使用 `TypeOrmModule.forRootAsync`，您还必须在 `useFactory` 外部设置数据源名称。例如：
+:::warning 注意
+如果您使用 `TypeOrmModule.forRootAsync`，您还必须在 `useFactory` 外部设置数据源名称。例如：
+:::
 >
 > ```typescript
 > TypeOrmModule.forRootAsync({
@@ -693,7 +717,9 @@ TypeOrmModule.forRootAsync({
 
 这种构造的工作方式与 `useClass` 相同，但有一个关键区别 - `TypeOrmModule` 将查找导入的模块以重用现有的 `ConfigService`，而不是实例化一个新的。
 
-> info **提示** 确保 `name` 属性与 `useFactory`、`useClass` 或 `useValue` 属性定义在同一级别。这将允许 Nest 在适当的注入令牌下正确注册数据源。
+:::info 提示
+确保 `name` 属性与 `useFactory`、`useClass` 或 `useValue` 属性定义在同一级别。这将允许 Nest 在适当的注入令牌下正确注册数据源。
+:::
 
 #### 自定义 DataSource 工厂
 
@@ -727,7 +753,9 @@ TypeOrmModule.forRootAsync({
 
 ```
 
-> info **提示** `DataSource` 类从 `typeorm` 包导入。
+:::info 提示
+`DataSource` 类从 `typeorm` 包导入。
+:::
 
 #### 示例
 
@@ -837,7 +865,9 @@ export class User extends Model {
 
 ```
 
-> info **提示** 了解更多关于可用装饰器的信息 [这里](https://github.com/RobinBuschmann/sequelize-typescript#column)。
+:::info 提示
+了解更多关于可用装饰器的信息 [这里](https://github.com/RobinBuschmann/sequelize-typescript#column)。
+:::
 
 `User` 模型文件位于 `users` 目录中。此目录包含与 `UsersModule` 相关的所有文件。您可以决定将模型文件保存在哪里，但是，我们建议在相应的模块目录中，在其**域**附近创建它们。
 
@@ -942,7 +972,9 @@ export class UsersService {
 
 ```
 
-> warning **注意** 不要忘记将 `UsersModule` 导入到根 `AppModule` 中。
+:::warning 注意
+不要忘记将 `UsersModule` 导入到根 `AppModule` 中。
+:::
 
 如果您想在导入 `SequelizeModule.forFeature` 的模块之外使用模型，您需要重新导出由它生成的提供程序。
 您可以通过导出整个模块来做到这一点，如下所示：
@@ -1021,7 +1053,9 @@ export class User extends Model {
 
 ```
 
-> info **提示** 要了解更多关于 Sequelize 中的关联，请阅读 [此](https://github.com/RobinBuschmann/sequelize-typescript#model-association) 章节。
+:::info 提示
+要了解更多关于 Sequelize 中的关联，请阅读 [此](https://github.com/RobinBuschmann/sequelize-typescript#model-association) 章节。
+:::
 
 #### 自动加载模型
 
@@ -1046,7 +1080,9 @@ export class AppModule {}
 
 指定该选项后，通过 `forFeature()` 方法注册的每个模型将自动添加到配置对象的 `models` 数组中。
 
-> warning **警告** 请注意，未通过 `forFeature()` 方法注册但仅从模型（通过关联）引用的模型不会被包含。
+:::warning 警告
+请注意，未通过 `forFeature()` 方法注册但仅从模型（通过关联）引用的模型不会被包含。
+:::
 
 #### Sequelize 事务
 
@@ -1064,7 +1100,9 @@ export class UsersService {
 
 ```
 
-> info **提示** `Sequelize` 类从 `sequelize-typescript` 包导入。
+:::info 提示
+`Sequelize` 类从 `sequelize-typescript` 包导入。
+:::
 
 现在，我们可以使用此对象创建事务。
 
@@ -1091,7 +1129,9 @@ async createMany() {
 
 ```
 
-> info **提示** 请注意，`Sequelize` 实例仅用于启动事务。但是，测试此类需要模拟整个 `Sequelize` 对象（它公开了几个方法）。因此，我们建议使用辅助工厂类（例如 `TransactionRunner`）并定义一个接口，其中包含维护事务所需的有限方法集。这种技术使得模拟这些方法非常简单。
+:::info 提示
+请注意，`Sequelize` 实例仅用于启动事务。但是，测试此类需要模拟整个 `Sequelize` 对象（它公开了几个方法）。因此，我们建议使用辅助工厂类（例如 `TransactionRunner`）并定义一个接口，其中包含维护事务所需的有限方法集。这种技术使得模拟这些方法非常简单。
+:::
 
 #### 迁移
 
@@ -1136,7 +1176,9 @@ export class AppModule {}
 
 ```
 
-> warning **注意** 如果您不为连接设置 `name`，其名称将设置为 `default`。请注意，您不应有多个没有名称或具有相同名称的连接，否则它们会被覆盖。
+:::warning 注意
+如果您不为连接设置 `name`，其名称将设置为 `default`。请注意，您不应有多个没有名称或具有相同名称的连接，否则它们会被覆盖。
+:::
 
 此时，您已经注册了带有自己连接的 `User` 和 `Album` 模型。通过此设置，您必须告诉 `SequelizeModule.forFeature()` 方法和 `@InjectModel()` 装饰器应该使用哪个连接。如果您不传递任何连接名称，则使用 `default` 连接。
 

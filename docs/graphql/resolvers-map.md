@@ -45,11 +45,15 @@ export class Author {
 
 ```
 
-> info **提示** TypeScript 的元数据反射系统有几个限制，例如，无法确定类由哪些属性组成或识别给定属性是可选的还是必需的。由于这些限制，我们必须在模式定义类中显式使用 `@Field()` 装饰器来提供关于每个字段的 GraphQL 类型和可选性的元数据，或者使用 [CLI 插件](/graphql/cli-plugin) 为我们生成这些元数据。
+:::info 提示
+TypeScript 的元数据反射系统有几个限制，例如，无法确定类由哪些属性组成或识别给定属性是可选的还是必需的。由于这些限制，我们必须在模式定义类中显式使用 `@Field()` 装饰器来提供关于每个字段的 GraphQL 类型和可选性的元数据，或者使用 [CLI 插件](/graphql/cli-plugin) 为我们生成这些元数据。
+:::
 
 `Author` 对象类型，像任何类一样，由一组字段组成，每个字段声明一个类型。字段的类型对应于 [GraphQL 类型](https://graphql.org/learn/schema/)。字段的 GraphQL 类型可以是另一个对象类型或标量类型。GraphQL 标量类型是一种基元（如 `ID`、`String`、`Boolean` 或 `Int`），解析为单个值。
 
-> info **提示** 除了 GraphQL 的内置标量类型外，您还可以定义自定义标量类型（阅读 [更多](/graphql/scalars)）。
+:::info 提示
+除了 GraphQL 的内置标量类型外，您还可以定义自定义标量类型（阅读 [更多](/graphql/scalars)）。
+:::
 
 上述 `Author` 对象类型定义将导致 Nest **生成**我们上面显示的 SDL：
 
@@ -81,7 +85,9 @@ title: string;
 
 ```
 
-> info **提示** 您还可以添加描述或弃用整个对象类型：`@ObjectType({ description: 'Author model' })`。
+:::info 提示
+您还可以添加描述或弃用整个对象类型：`@ObjectType({ description: 'Author model' })`。
+:::
 
 当字段是数组时，我们必须在 `Field()` 装饰器的类型函数中手动指示数组类型，如下所示：
 
@@ -91,7 +97,9 @@ posts: Post[];
 
 ```
 
-> info **提示** 使用数组括号表示法（`[ ]`），我们可以指示数组的深度。例如，使用 `[[Int]]` 将表示整数矩阵。
+:::info 提示
+使用数组括号表示法（`[ ]`），我们可以指示数组的深度。例如，使用 `[[Int]]` 将表示整数矩阵。
+:::
 
 要声明数组的项目（而不是数组本身）可为空，请将 `nullable` 属性设置为 `'items'`，如下所示：
 
@@ -101,7 +109,9 @@ posts: Post[];
 
 ```
 
-> info **提示** 如果数组及其项目都可为空，请将 `nullable` 设置为 `'itemsAndList'`。
+:::info 提示
+如果数组及其项目都可为空，请将 `nullable` 设置为 `'itemsAndList'`。
+:::
 
 现在 `Author` 对象类型已创建，让我们定义 `Post` 对象类型。
 
@@ -159,11 +169,15 @@ export class AuthorsResolver {
 
 ```
 
-> info **提示** 所有装饰器（例如，`@Resolver`、`@ResolveField`、`@Args` 等）都从 `@nestjs/graphql` 包中导出。
+:::info 提示
+所有装饰器（例如，`@Resolver`、`@ResolveField`、`@Args` 等）都从 `@nestjs/graphql` 包中导出。
+:::
 
 您可以定义多个解析器类。Nest 将在运行时组合这些。有关代码组织的更多信息，请参见下面的 [模块](/graphql/resolvers-map) 部分。
 
-> warning **注意** `AuthorsService` 和 `PostsService` 类中的逻辑可以根据需要简单或复杂。这个例子的主要目的是展示如何构造解析器以及它们如何与其他提供者交互。
+:::warning 注意
+`AuthorsService` 和 `PostsService` 类中的逻辑可以根据需要简单或复杂。这个例子的主要目的是展示如何构造解析器以及它们如何与其他提供者交互。
+:::
 
 在上面的示例中，我们创建了 `AuthorsResolver`，它定义了一个查询解析器函数和一个字段解析器函数。要创建解析器，我们创建一个以解析器函数作为方法的类，并使用 `@Resolver()` 装饰器注释该类。
 
@@ -175,7 +189,9 @@ export class AuthorsResolver {
 
 我们可以定义多个 `@Query()` 解析器函数（在此类中和任何其他解析器类中），它们将被聚合到生成的 SDL 中的单个**Query 类型**定义中，以及解析器映射中的适当条目。这允许您在靠近它们使用的模型和服务的地方定义查询，并将它们很好地组织在模块中。
 
-> info **提示** Nest CLI 提供了一个生成器（示意图），它会自动生成**所有样板代码**，帮助我们避免做所有这些工作，并使开发人员体验更加简单。在此处了解有关此功能的更多信息 [/recipes/crud-generator]。
+:::info 提示
+Nest CLI 提供了一个生成器（示意图），它会自动生成**所有样板代码**，帮助我们避免做所有这些工作，并使开发人员体验更加简单。在此处了解有关此功能的更多信息 [/recipes/crud-generator]。
+:::
 
 #### 查询类型名称
 
@@ -198,7 +214,9 @@ type Query {
 
 ```
 
-> info **提示** 在此处了解有关 GraphQL 查询的更多信息 [here](https://graphql.org/learn/queries/)。
+:::info 提示
+在此处了解有关 GraphQL 查询的更多信息 [here](https://graphql.org/learn/queries/)。
+:::
 
 按照惯例，我们更希望将这些名称解耦；例如，我们更希望为查询处理程序方法使用像 `getAuthor()` 这样的名称，但仍然为查询类型名称使用 `author`。这同样适用于我们的字段解析器。我们可以通过将映射名称作为 `@Query()` 和 `@ResolveField()` 装饰器的参数传递来轻松做到这一点，如下所示：
 
@@ -281,7 +299,9 @@ getAuthor(
 
 ```
 
-> info **提示** 在 `firstName` 的情况下，这是一个 GraphQL 可空字段，不需要将 `null` 或 `undefined` 的非值类型添加到此字段的类型。只需注意，您需要在解析器中为这些可能的非值类型进行类型保护，因为 GraphQL 可空字段将允许这些类型传递到您的解析器。
+:::info 提示
+在 `firstName` 的情况下，这是一个 GraphQL 可空字段，不需要将 `null` 或 `undefined` 的非值类型添加到此字段的类型。只需注意，您需要在解析器中为这些可能的非值类型进行类型保护，因为 GraphQL 可空字段将允许这些类型传递到您的解析器。
+:::
 
 #### 专用参数类
 
@@ -310,7 +330,9 @@ class GetAuthorArgs {
 
 ```
 
-> info **提示** 同样，由于 TypeScript 的元数据反射系统限制，必须使用 `@Field` 装饰器手动指示类型和可选性，或使用 [CLI 插件](/graphql/cli-plugin)。此外，在 `firstName` 的情况下，这是一个 GraphQL 可空字段，不需要将 `null` 或 `undefined` 的非值类型添加到此字段的类型。只需注意，您需要在解析器中为这些可能的非值类型进行类型保护，因为 GraphQL 可空字段将允许这些类型传递到您的解析器。
+:::info 提示
+同样，由于 TypeScript 的元数据反射系统限制，必须使用 `@Field` 装饰器手动指示类型和可选性，或使用 [CLI 插件](/graphql/cli-plugin)。此外，在 `firstName` 的情况下，这是一个 GraphQL 可空字段，不需要将 `null` 或 `undefined` 的非值类型添加到此字段的类型。只需注意，您需要在解析器中为这些可能的非值类型进行类型保护，因为 GraphQL 可空字段将允许这些类型传递到您的解析器。
+:::
 
 这将导致在 SDL 中生成 GraphQL 模式的以下部分：
 
@@ -321,7 +343,9 @@ type Query {
 
 ```
 
-> info **提示** 请注意，像 `GetAuthorArgs` 这样的参数类与 `ValidationPipe` 配合得很好（阅读 [更多](/techniques/validation)）。
+:::info 提示
+请注意，像 `GetAuthorArgs` 这样的参数类与 `ValidationPipe` 配合得很好（阅读 [更多](/techniques/validation)）。
+:::
 
 #### 类继承
 
@@ -485,7 +509,9 @@ class PaginatedAuthor extends Paginated(Author) {}
 
 如 [上一章](/graphql/quick-start) 中所述，在模式优先方法中，我们首先在 SDL 中手动定义模式类型（阅读 [更多](https://graphql.org/learn/schema/#type-language)）。考虑以下 SDL 类型定义。
 
-> info **提示** 为了本章的方便，我们将所有 SDL 聚合在一个位置（例如，一个 `.graphql` 文件，如下所示）。在实践中，您可能会发现以模块化方式组织代码是合适的。例如，创建具有表示每个域实体的类型定义的单独 SDL 文件，以及相关服务、解析器代码和 Nest 模块定义类，在该实体的专用目录中，这可能会有所帮助。Nest 将在运行时聚合所有单独的模式类型定义。
+:::info 提示
+为了本章的方便，我们将所有 SDL 聚合在一个位置（例如，一个 `.graphql` 文件，如下所示）。在实践中，您可能会发现以模块化方式组织代码是合适的。例如，创建具有表示每个域实体的类型定义的单独 SDL 文件，以及相关服务、解析器代码和 Nest 模块定义类，在该实体的专用目录中，这可能会有所帮助。Nest 将在运行时聚合所有单独的模式类型定义。
+:::
 
 ```graphql
 type Author {
@@ -511,7 +537,9 @@ type Query {
 
 上面的模式公开了一个单一查询 - `author(id: Int!): Author`。
 
-> info **提示** 在此处了解有关 GraphQL 查询的更多信息 [here](https://graphql.org/learn/queries/)。
+:::info 提示
+在此处了解有关 GraphQL 查询的更多信息 [here](https://graphql.org/learn/queries/)。
+:::
 
 现在让我们创建一个 `AuthorsResolver` 类，用于解析作者查询：
 
@@ -537,9 +565,13 @@ export class AuthorsResolver {
 
 ```
 
-> info **提示** 所有装饰器（例如，`@Resolver`、`@ResolveField`、`@Args` 等）都从 `@nestjs/graphql` 包中导出。
+:::info 提示
+所有装饰器（例如，`@Resolver`、`@ResolveField`、`@Args` 等）都从 `@nestjs/graphql` 包中导出。
+:::
 
-> warning **注意** `AuthorsService` 和 `PostsService` 类中的逻辑可以根据需要简单或复杂。这个例子的主要目的是展示如何构造解析器以及它们如何与其他提供者交互。
+:::warning 注意
+`AuthorsService` 和 `PostsService` 类中的逻辑可以根据需要简单或复杂。这个例子的主要目的是展示如何构造解析器以及它们如何与其他提供者交互。
+:::
 
 `@Resolver()` 装饰器是必需的。它接受一个可选的字符串参数，其中包含类的名称。每当类包含 `@ResolveField()` 装饰器以通知 Nest 装饰方法与父类型（我们当前示例中的 `Author` 类型）相关联时，这个类名是必需的。或者，不是在类的顶部设置 `@Resolver()`，而是可以为每个方法执行此操作：
 
@@ -555,9 +587,13 @@ async posts(@Parent() author) {
 
 在这种情况下（方法级别的 `@Resolver()` 装饰器），如果类中有多个 `@ResolveField()` 装饰器，则必须将 `@Resolver()` 添加到所有装饰器。这不被认为是最佳实践（因为它会产生额外的开销）。
 
-> info **提示** 传递给 `@Resolver()` 的任何类名参数**不会**影响查询（`@Query()` 装饰器）或变更（`@Mutation()` 装饰器）。
+:::info 提示
+传递给 `@Resolver()` 的任何类名参数**不会**影响查询（`@Query()` 装饰器）或变更（`@Mutation()` 装饰器）。
+:::
 
-> warning **警告** 在**代码优先**方法中不支持在方法级别使用 `@Resolver` 装饰器。
+:::warning 警告
+在**代码优先**方法中不支持在方法级别使用 `@Resolver` 装饰器。
+:::
 
 在上面的示例中，`@Query()` 和 `@ResolveField()` 装饰器基于方法名与 GraphQL 模式类型关联。例如，考虑上面示例中的以下构造：
 
@@ -602,7 +638,9 @@ export class AuthorsResolver {
 
 ```
 
-> info **提示** Nest CLI 提供了一个生成器（示意图），它会自动生成**所有样板代码**，帮助我们避免做所有这些工作，并使开发人员体验更加简单。在此处了解有关此功能的更多信息 [/recipes/crud-generator]。
+:::info 提示
+Nest CLI 提供了一个生成器（示意图），它会自动生成**所有样板代码**，帮助我们避免做所有这些工作，并使开发人员体验更加简单。在此处了解有关此功能的更多信息 [/recipes/crud-generator]。
+:::
 
 #### 生成类型
 
@@ -640,7 +678,9 @@ export class CreatePostInput {
 
 ```
 
-> warning **注意** 要启用输入（和参数）的自动验证，请使用 `ValidationPipe`。在此处阅读有关验证的更多信息 [/techniques/validation]，更具体地说，在此处阅读有关管道的信息 [/pipes]。
+:::warning 注意
+要启用输入（和参数）的自动验证，请使用 `ValidationPipe`。在此处阅读有关验证的更多信息 [/techniques/validation]，更具体地说，在此处阅读有关管道的信息 [/pipes]。
+:::
 
 但是，如果您直接向自动生成的文件添加装饰器，它们会在每次生成文件时**被覆盖**。相反，创建一个单独的文件并简单地扩展生成的类。
 
@@ -707,4 +747,6 @@ export class AuthorsModule {}
 
 ```
 
-> info **提示** 通过所谓的**域模型**组织代码会很有帮助（类似于您在 REST API 中组织入口点的方式）。在这种方法中，将模型（`ObjectType` 类）、解析器和服务保存在代表域模型的 Nest 模块中。将所有这些组件保存在每个模块的单个文件夹中。当您这样做并使用 [Nest CLI](/cli/overview) 生成每个元素时，Nest 将自动将所有这些部分连接在一起（在适当的文件夹中定位文件，在 `provider` 和 `imports` 数组中生成条目等）。
+:::info 提示
+通过所谓的**域模型**组织代码会很有帮助（类似于您在 REST API 中组织入口点的方式）。在这种方法中，将模型（`ObjectType` 类）、解析器和服务保存在代表域模型的 Nest 模块中。将所有这些组件保存在每个模块的单个文件夹中。当您这样做并使用 [Nest CLI](/cli/overview) 生成每个元素时，Nest 将自动将所有这些部分连接在一起（在适当的文件夹中定位文件，在 `provider` 和 `imports` 数组中生成条目等）。
+:::

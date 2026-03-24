@@ -6,7 +6,9 @@
 
 <figure><img class="illustrative-image" src="/assets/Gateways_1.png" /></figure>
 
-> info **提示** 网关可以被视为 [Providers](/overview/providers)；这意味着它们可以通过类构造函数注入依赖项。此外，网关也可以被其他类（提供者和控制器）注入。
+:::info 提示
+网关可以被视为 [Providers](/overview/providers)；这意味着它们可以通过类构造函数注入依赖项。此外，网关也可以被其他类（提供者和控制器）注入。
+:::
 
 #### 安装
 
@@ -26,7 +28,9 @@ $ npm i --save @nestjs/websockets @nestjs/platform-socket.io
 
 ```
 
-> warning **警告** 在现有模块的 providers 数组中引用网关之前，它们不会被实例化。
+:::warning 警告
+在现有模块的 providers 数组中引用网关之前，它们不会被实例化。
+:::
 
 您可以通过 `@WebSocketGateway()` 装饰器的第二个参数将任何受支持的 [选项](https://socket.io/docs/v4/server-options/) 传递给 socket 构造函数，如下所示：
 
@@ -45,7 +49,9 @@ handleEvent(@MessageBody() data: string): string {
 
 ```
 
-> info **提示** `@SubscribeMessage()` 和 `@MessageBody()` 装饰器是从 `@nestjs/websockets` 包中导入的。
+:::info 提示
+`@SubscribeMessage()` 和 `@MessageBody()` 装饰器是从 `@nestjs/websockets` 包中导入的。
+:::
 
 一旦创建了网关，我们就可以在我们的模块中注册它。
 
@@ -96,7 +102,9 @@ handleEvent(
 
 ```
 
-> info **提示** `@ConnectedSocket()` 装饰器是从 `@nestjs/websockets` 包中导入的。
+:::info 提示
+`@ConnectedSocket()` 装饰器是从 `@nestjs/websockets` 包中导入的。
+:::
 
 但是，在这种情况下，您将无法利用拦截器。如果您不想响应用户，只需跳过 `return` 语句（或显式返回一个“假”值，例如 `undefined`）。
 
@@ -143,9 +151,13 @@ handleEvent(@MessageBody() data: unknown): WsResponse<unknown> {
 
 ```
 
-> info **提示** `WsResponse` 接口是从 `@nestjs/websockets` 包中导入的。
+:::info 提示
+`WsResponse` 接口是从 `@nestjs/websockets` 包中导入的。
+:::
 
-> warning **警告** 如果您的 `data` 字段依赖于 `ClassSerializerInterceptor`，则应该返回一个实现 `WsResponse` 的类实例，因为它会忽略纯 JavaScript 对象响应。
+:::warning 警告
+如果您的 `data` 字段依赖于 `ClassSerializerInterceptor`，则应该返回一个实现 `WsResponse` 的类实例，因为它会忽略纯 JavaScript 对象响应。
+:::
 
 为了监听传入的响应，客户端必须应用另一个事件监听器。
 
@@ -209,7 +221,9 @@ onEvent(@MessageBody() data: unknown): Observable<WsResponse<number>> {
   </tr>
 </table>
 
-> info **提示** 每个生命周期接口均从 `@nestjs/websockets` 包中公开。
+:::info 提示
+每个生命周期接口均从 `@nestjs/websockets` 包中公开。
+:::
 
 #### 服务器和命名空间
 
@@ -234,7 +248,9 @@ export class EventsGateway {
 
 `@WebSocketServer()` 装饰器通过引用 `@WebSocketGateway()` 装饰器存储的元数据来注入服务器实例。如果您为 `@WebSocketGateway()` 装饰器提供了命名空间选项，则 `@WebSocketServer()` 装饰器将返回 `Namespace` 实例而不是 `Server` 实例。
 
-> warning **注意** `@WebSocketServer()` 装饰器是从 `@nestjs/websockets` 包中导入的。
+:::warning 注意
+`@WebSocketServer()` 装饰器是从 `@nestjs/websockets` 包中导入的。
+:::
 
 一旦服务器实例准备就绪，Nest 将自动将其分配给此属性。
 

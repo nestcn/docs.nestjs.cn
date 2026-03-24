@@ -96,7 +96,9 @@ export class KillDragonCommand extends Command<{
 
 如你所见，`KillDragonCommand` 类扩展了 `Command` 类。`Command` 类是从 `@nestjs/cqrs` 包导出的简单实用类，允许你定义命令的返回类型。在这种情况下，返回类型是具有 `actionId` 属性的对象。现在，每当分派 `KillDragonCommand` 命令时，`CommandBus#execute()` 方法的返回类型将被推断为 `Promise<{{ '{' }} actionId: string {{ '}' }}>`。当你想从命令处理程序返回一些数据时，这很有用。
 
-> info **提示** 从 `Command` 类继承是可选的。只有在你想要定义命令的返回类型时才需要。
+:::info 提示
+从 `Command` 类继承是可选的。只有在你想要定义命令的返回类型时才需要。
+:::
 
 `CommandBus` 表示命令的**流**。它负责将命令分派到适当的处理程序。`execute()` 方法返回一个 promise，该 promise 解析为处理程序返回的值。
 
@@ -299,7 +301,9 @@ this.eventBus.publish(new HeroKilledDragonEvent());
 
 ```
 
-> info **提示** `EventBus` 是一个可注入的类。
+:::info 提示
+`EventBus` 是一个可注入的类。
+:::
 
 每个事件可以有多个**事件处理程序**。
 
@@ -315,7 +319,9 @@ export class HeroKilledDragonHandler implements IEventHandler<HeroKilledDragonEv
 
 ```
 
-> info **提示** 请注意，当你开始使用事件处理程序时，你将脱离传统的 HTTP Web 上下文。
+:::info 提示
+请注意，当你开始使用事件处理程序时，你将脱离传统的 HTTP Web 上下文。
+:::
 >
 > - `CommandHandlers` 中的错误仍然可以被内置的[异常过滤器](/overview/exception-filters)捕获。
 > - `EventHandlers` 中的错误无法被异常过滤器捕获：你必须手动处理它们。可以通过简单的 `try/catch`，使用 [Sagas](/recipes/cqrs#sagas) 触发补偿事件，或你选择的任何其他解决方案。
@@ -351,7 +357,9 @@ export class HeroesGameSagas {
 
 ```
 
-> info **提示** `ofType` 操作符和 `@Saga()` 装饰器从 `@nestjs/cqrs` 包导出。
+:::info 提示
+`ofType` 操作符和 `@Saga()` 装饰器从 `@nestjs/cqrs` 包导出。
+:::
 
 `@Saga()` 装饰器将方法标记为 saga。`events$` 参数是所有事件的 Observable 流。`ofType` 操作符按指定的事件类型过滤流。`map` 操作符将事件映射到新的命令实例。
 

@@ -6,7 +6,9 @@
 
 [SWC](https://swc.rs/)（Speedy Web Compiler）是一个基于 Rust 的可扩展平台，可用于编译和打包。在 Nest CLI 中使用 SWC 是显著加快开发过程的好方法。
 
-> info **提示** SWC 比默认的 TypeScript 编译器快约 **20 倍**。
+:::info 提示
+SWC 比默认的 TypeScript 编译器快约 **20 倍**。
+:::
 
 #### 安装
 
@@ -27,7 +29,9 @@ $ nest start -b swc
 
 ```
 
-> info **提示** 如果你的仓库是 monorepo，请查看[本节](/recipes/swc#monorepo)。
+:::info 提示
+如果你的仓库是 monorepo，请查看[本节](/recipes/swc#monorepo)。
+:::
 
 除了传递 `-b` 标志外，你还可以在 `nest-cli.json` 文件中将 `compilerOptions.builder` 属性设置为 `"swc"`，如下所示：
 
@@ -175,7 +179,9 @@ generator.generate({
 
 ```
 
-> info **提示** 在此示例中，我们使用了 `@nestjs/swagger` 插件，但你可以使用你选择的任何插件。
+:::info 提示
+在此示例中，我们使用了 `@nestjs/swagger` 插件，但你可以使用你选择的任何插件。
+:::
 
 `generate()` 方法接受以下选项：
 
@@ -209,7 +215,9 @@ export class User {
 
 ```
 
-> info **提示** `Relation` 类型从 `typeorm` 包导出。
+:::info 提示
+`Relation` 类型从 `typeorm` 包导出。
+:::
 
 这样做可以防止属性的类型保存在转译代码的属性元数据中，从而防止循环依赖问题。
 
@@ -413,4 +421,6 @@ export default defineConfig({
 
 通过此设置，你现在可以在 NestJS 项目中享受使用 Vitest 的好处，包括更快的测试执行和更现代的测试体验。
 
-> info **提示** 你可以在此[仓库](https://github.com/TrilonIO/nest-vitest)中查看一个可工作的示例
+:::info 提示
+你可以在此[仓库](https://github.com/TrilonIO/nest-vitest)中查看一个可工作的示例
+:::

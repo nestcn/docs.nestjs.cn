@@ -143,7 +143,9 @@ export class AuthService {
 
 ```
 
-> warning **警告** 当然，在实际应用中，你不会以明文形式存储密码。你应该使用像 [bcrypt](https://github.com/kelektiv/node.bcrypt.js#readme) 这样的库，采用加盐单向哈希算法。使用这种方法，你只存储哈希密码，然后将存储的密码与**传入**密码的哈希版本进行比较，从而永远不会以明文形式存储或暴露用户密码。为了保持示例应用的简单性，我们违反了这一绝对规定，使用明文。**不要在你的实际应用中这样做！**
+:::warning 警告
+当然，在实际应用中，你不会以明文形式存储密码。你应该使用像 [bcrypt](https://github.com/kelektiv/node.bcrypt.js#readme) 这样的库，采用加盐单向哈希算法。使用这种方法，你只存储哈希密码，然后将存储的密码与**传入**密码的哈希版本进行比较，从而永远不会以明文形式存储或暴露用户密码。为了保持示例应用的简单性，我们违反了这一绝对规定，使用明文。**不要在你的实际应用中这样做！**
+:::
 
 现在，我们更新 `AuthModule` 以导入 `UsersModule`。
 
@@ -188,7 +190,9 @@ export class AuthController {
 
 ```
 
-> info **提示** 理想情况下，我们应该使用 DTO 类来定义请求体的形状，而不是使用 `Record<string, any>` 类型。有关更多信息，请参阅[验证](/techniques/validation)章节。
+:::info 提示
+理想情况下，我们应该使用 DTO 类来定义请求体的形状，而不是使用 `Record<string, any>` 类型。有关更多信息，请参阅[验证](/techniques/validation)章节。
+:::
 
 <app-banner-courses-auth></app-banner-courses-auth>
 
@@ -206,7 +210,9 @@ $ npm install --save @nestjs/jwt
 
 ```
 
-> info **提示** `@nestjs/jwt` 包（在[此处](https://github.com/nestjs/jwt)了解更多）是一个帮助处理 JWT 的实用程序包。这包括生成和验证 JWT 令牌。
+:::info 提示
+`@nestjs/jwt` 包（在[此处](https://github.com/nestjs/jwt)了解更多）是一个帮助处理 JWT 的实用程序包。这包括生成和验证 JWT 令牌。
+:::
 
 为了保持服务的模块化，我们将在 `authService` 中处理 JWT 的生成。打开 `auth` 文件夹中的 `auth.service.ts` 文件，注入 `JwtService`，并更新 `signIn` 方法以生成 JWT 令牌，如下所示：
 
@@ -278,7 +284,9 @@ export const jwtConstants = {
 
 我们将使用它在 JWT 签名和验证步骤之间共享我们的密钥。
 
-> warning **警告** **不要公开暴露此密钥**。我们在这里这样做是为了让代码的作用更加清晰，但在生产系统中，你**必须**使用适当的措施（如密钥库、环境变量或配置服务）来保护此密钥。
+:::warning 警告
+**不要公开暴露此密钥**。我们在这里这样做是为了让代码的作用更加清晰，但在生产系统中，你**必须**使用适当的措施（如密钥库、环境变量或配置服务）来保护此密钥。
+:::
 
 现在，打开 `auth` 文件夹中的 `auth.module.ts` 并将其更新为如下所示：
 
@@ -322,7 +330,9 @@ export class AuthModule {}
 
 ```
 
-> info **提示** 我们将 `JwtModule` 注册为全局模块，以使事情更简单。这意味着我们不需要在应用程序的其他任何地方导入 `JwtModule`。
+:::info 提示
+我们将 `JwtModule` 注册为全局模块，以使事情更简单。这意味着我们不需要在应用程序的其他任何地方导入 `JwtModule`。
+:::
 
 我们使用 `register()` 配置 `JwtModule`，传入一个配置对象。有关 Nest `JwtModule` 的更多信息，请参阅[此处](https://github.com/nestjs/jwt/blob/master/README.md)，有关可用配置选项的更多详细信息，请参阅[此处](https://github.com/auth0/node-jsonwebtoken#usage)。
 

@@ -17,7 +17,9 @@ $ npm install -g @nestjs/cli
 
 ```
 
-> info **提示** 或者，你可以使用此命令 `npx @nestjs/cli@latest` 而无需全局安装 CLI。
+:::info 提示
+或者，你可以使用此命令 `npx @nestjs/cli@latest` 而无需全局安装 CLI。
+:::
 
 #### 基本工作流程
 
@@ -46,7 +48,9 @@ $ npm run start:dev
 
 在浏览器中，打开 [http://localhost:3000](http://localhost:3000) 查看新应用程序运行。当你更改任何源文件时，应用程序将自动重新编译和重新加载。
 
-> info **提示** 我们建议使用 [SWC 构建器](/recipes/swc) 以获得更快的构建速度（比默认的 TypeScript 编译器快 10 倍）。
+:::info 提示
+我们建议使用 [SWC 构建器](/recipes/swc) 以获得更快的构建速度（比默认的 TypeScript 编译器快 10 倍）。
+:::
 
 #### 项目结构
 

@@ -1,6 +1,8 @@
 ### 版本控制
 
-> info **提示** 本章节仅适用于基于 HTTP 的应用程序。
+:::info 提示
+本章节仅适用于基于 HTTP 的应用程序。
+:::
 
 版本控制允许您在同一个应用程序中拥有 **不同版本** 的控制器或个体路由。应用程序变化非常频繁，很少会出现需要支持之前版本的应用程序，而又需要对应用程序进行更新的情况。
 
@@ -29,7 +31,9 @@
 
 URI 版本控制使用请求 URI 中的版本，例如 `https://example.com/v1/route` 和 `https://example.com/v2/route`。
 
-> warning **注意** 使用 URI 版本控制时，版本将自动添加到 URI 中，位于全局路径前缀（如果存在）之后，控制器或路由路径之前。
+:::warning 注意
+使用 URI 版本控制时，版本将自动添加到 URI 中，位于全局路径前缀（如果存在）之后，控制器或路由路径之前。
+:::
 
 要为您的应用程序启用 URI 版本控制，请执行以下操作：
 
@@ -43,9 +47,13 @@ await app.listen(process.env.PORT ?? 3000);
 
 ```
 
-> warning **注意** URI 中的版本默认会自动加上 `v` 前缀，但可以通过将 `prefix` 键设置为您所需的前缀来配置前缀值，或者如果您希望禁用它，则设置为 `false`。
+:::warning 注意
+URI 中的版本默认会自动加上 `v` 前缀，但可以通过将 `prefix` 键设置为您所需的前缀来配置前缀值，或者如果您希望禁用它，则设置为 `false`。
+:::
 
-> info **提示** `VersioningType` 枚举可用于 `type` 属性，并从 `@nestjs/common` 包中导入。
+:::info 提示
+`VersioningType` 枚举可用于 `type` 属性，并从 `@nestjs/common` 包中导入。
+:::
 
 #### Header 版本控制类型
 
@@ -67,7 +75,9 @@ await app.listen(process.env.PORT ?? 3000);
 
 `header` 属性应该是包含请求版本的标头的名称。
 
-> info **提示** `VersioningType` 枚举可用于 `type` 属性，并从 `@nestjs/common` 包中导入。
+:::info 提示
+`VersioningType` 枚举可用于 `type` 属性，并从 `@nestjs/common` 包中导入。
+:::
 
 #### Media Type 版本控制类型
 
@@ -89,7 +99,9 @@ await app.listen(process.env.PORT ?? 3000);
 
 `key` 属性应该是包含版本的键值对的键和分隔符。对于示例 `Accept: application/json;v=2`，`key` 属性将被设置为 `v=`。
 
-> info **提示** `VersioningType` 枚举可用于 `type` 属性，并从 `@nestjs/common` 包中导入。
+:::info 提示
+`VersioningType` 枚举可用于 `type` 属性，并从 `@nestjs/common` 包中导入。
+:::
 
 #### 自定义版本控制类型
 
@@ -103,7 +115,9 @@ await app.listen(process.env.PORT ?? 3000);
 
 如果提取了版本 `[3, 2, 1]`，但仅存在版本 `2` 和 `1` 的路由，则选择匹配版本 `2` 的路由（版本 `3` 自动被忽略）。
 
-> warning **注意** 由于设计限制，基于从 `extractor` 返回的数组选择最高匹配版本 **在 Express 适配器中无法可靠工作**。单个版本（字符串或 1 个元素的数组）在 Express 中工作正常。Fastify 正确支持最高匹配版本选择和单个版本选择。
+:::warning 注意
+由于设计限制，基于从 `extractor` 返回的数组选择最高匹配版本 **在 Express 适配器中无法可靠工作**。单个版本（字符串或 1 个元素的数组）在 Express 中工作正常。Fastify 正确支持最高匹配版本选择和单个版本选择。
+:::
 
 要为您的应用程序启用 **自定义版本控制**，请创建一个 `extractor` 函数并将其传递到您的应用程序中，如下所示：
 
@@ -130,7 +144,9 @@ await app.listen(process.env.PORT ?? 3000);
 
 版本控制允许您对控制器、单个路由进行版本控制，并提供了一种让某些资源退出版本控制的方法。无论您的应用程序使用哪种版本控制类型，版本控制的用法都是相同的。
 
-> warning **注意** 如果为应用程序启用了版本控制，但控制器或路由未指定版本，则对该控制器/路由的任何请求都将返回 `404` 响应状态。 同样，如果收到的请求包含一个没有对应控制器或路由的版本，也将返回 `404` 响应状态。
+:::warning 注意
+如果为应用程序启用了版本控制，但控制器或路由未指定版本，则对该控制器/路由的任何请求都将返回 `404` 响应状态。 同样，如果收到的请求包含一个没有对应控制器或路由的版本，也将返回 `404` 响应状态。
+:::
 
 #### 控制器版本
 
@@ -217,7 +233,9 @@ export class CatsController {
 
 传入请求将被映射到 `VERSION_NEUTRAL` 控制器或路由，无论请求中发送的版本如何，此外如果请求根本不包含版本。
 
-> warning **注意** 对于 URI 版本控制，`VERSION_NEUTRAL` 资源在 URI 中不会出现版本。
+:::warning 注意
+对于 URI 版本控制，`VERSION_NEUTRAL` 资源在 URI 中不会出现版本。
+:::
 
 要添加版本 neutral 控制器或路由，请执行以下操作：
 
@@ -287,4 +305,6 @@ export class AppModule implements NestModule {
 
 使用上面的代码，`LoggerMiddleware` 将仅应用于 `/cats` 端点的版本 '2'。
 
-> info **注意** 中间件适用于本节中描述的任何版本控制类型：`URI`、`Header`、`Media Type` 或 `Custom`。
+:::info 注意
+中间件适用于本节中描述的任何版本控制类型：`URI`、`Header`、`Media Type` 或 `Custom`。
+:::

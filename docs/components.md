@@ -6,7 +6,9 @@
 
 在上一章中，我们创建了一个简单的 `CatsController`。控制器应该处理 HTTP 请求并将更复杂的任务委托给**提供者**。提供者是在 NestJS 模块中声明为 `providers` 的普通 JavaScript 类。有关更多详细信息，请参阅"模块"章节。
 
-> info **提示** 由于 Nest 使你能够以面向对象的方式设计和组织依赖项，我们强烈建议遵循 [SOLID 原则](https://en.wikipedia.org/wiki/SOLID)。
+:::info 提示
+由于 Nest 使你能够以面向对象的方式设计和组织依赖项，我们强烈建议遵循 [SOLID 原则](https://en.wikipedia.org/wiki/SOLID)。
+:::
 
 #### 服务
 
@@ -46,7 +48,9 @@ export class CatsService {
 
 ```
 
-> info **提示** 要使用 CLI 创建服务，只需执行 `$ nest g service cats` 命令。
+:::info 提示
+要使用 CLI 创建服务，只需执行 `$ nest g service cats` 命令。
+:::
 
 我们的 `CatsService` 是一个基本类，具有一个属性和两个方法。这里的关键添加是 `@Injectable()` 装饰器。此装饰器将元数据附加到类，表明 `CatsService` 是一个可以由 Nest [IoC](https://en.wikipedia.org/wiki/Inversion_of_control) 容器管理的类。
 
@@ -226,4 +230,6 @@ export class CatsService {
 
 `ModuleRef` 提供了一个 `get()` 方法，允许你获取已注册提供者的实例。这在动态模块或需要基于某些条件解析提供者的场景中特别有用。
 
-> info **提示** 有关 `ModuleRef` 的更多信息，请参阅 [执行上下文](/fundamentals/execution-context) 章节。
+:::info 提示
+有关 `ModuleRef` 的更多信息，请参阅 [执行上下文](/fundamentals/execution-context) 章节。
+:::

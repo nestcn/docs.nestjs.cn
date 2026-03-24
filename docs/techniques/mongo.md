@@ -54,7 +54,9 @@ export const CatSchema = SchemaFactory.createForClass(Cat);
 
 ```
 
-> info **提示** 注意，您还可以使用 `DefinitionsFactory` 类（来自 `nestjs/mongoose`）生成原始模式定义。这允许您手动修改基于您提供的元数据生成的模式定义。这对于某些可能难以用装饰器表示所有内容的边缘情况很有用。
+:::info 提示
+注意，您还可以使用 `DefinitionsFactory` 类（来自 `nestjs/mongoose`）生成原始模式定义。这允许您手动修改基于您提供的元数据生成的模式定义。这对于某些可能难以用装饰器表示所有内容的边缘情况很有用。
+:::
 
 `@Schema()` 装饰器将类标记为模式定义。它将我们的 `Cat` 类映射到同名的 MongoDB 集合，但末尾附加一个 "s" - 因此最终的 mongo 集合名称将是 `cats`。此装饰器接受一个可选参数，即模式选项对象。将其视为您通常作为 `mongoose.Schema` 类构造函数的第二个参数传递的对象（例如 `new mongoose.Schema(_, options)`）。要了解有关可用模式选项的更多信息，请参阅[此](https://mongoosejs.com/docs/guide.html#选项)章节。
 
@@ -115,7 +117,9 @@ async findAllPopulated() {
 
 ```
 
-> info **提示** 如果没有要填充的外部文档，类型可能是 `Owner | null`，具体取决于您的 [Mongoose 配置](https://mongoosejs.com/docs/populate.html#doc-not-found)。或者，它可能会抛出错误，在这种情况下类型将是 `Owner`。
+:::info 提示
+如果没有要填充的外部文档，类型可能是 `Owner | null`，具体取决于您的 [Mongoose 配置](https://mongoosejs.com/docs/populate.html#doc-not-found)。或者，它可能会抛出错误，在这种情况下类型将是 `Owner`。
+:::
 
 最后，**原始**模式定义也可以传递给装饰器。这在例如属性表示未定义为类的嵌套对象时很有用。为此，使用 `@nestjs/mongoose` 包中的 `raw()` 函数，如下所示：
 
@@ -249,7 +253,9 @@ export class AppModule {}
 
 ```
 
-> warning **注意** 请注意，您不应该有多个没有名称或具有相同名称的连接，否则它们将被覆盖。
+:::warning 注意
+请注意，您不应该有多个没有名称或具有相同名称的连接，否则它们将被覆盖。
+:::
 
 通过此设置，您必须告诉 `MongooseModule.forFeature()` 函数应该使用哪个连接。
 
@@ -419,8 +425,10 @@ export const EventSchema = SchemaFactory.createForClass(Event);
 
 ```
 
-> info **提示** Mongoose 区分不同鉴别器模型的方式是通过 "鉴别器键"，默认为 `__t`。Mongoose 向您的模式添加一个名为 `__t` 的 String 路径，用于跟踪此文档是哪个鉴别器的实例。
-> 您也可以使用 `discriminatorKey` 选项来定义用于鉴别的路径。
+:::info 提示
+Mongoose 区分不同鉴别器模型的方式是通过 "鉴别器键"，默认为 `__t`。Mongoose 向您的模式添加一个名为 `__t` 的 String 路径，用于跟踪此文档是哪个鉴别器的实例。
+您也可以使用 `discriminatorKey` 选项来定义用于鉴别的路径。
+:::
 
 `SignedUpEvent` 和 `ClickedLinkEvent` 实例将存储在与通用事件相同的集合中。
 
@@ -687,7 +695,9 @@ class Person {
 
 ```
 
-> info **提示** `@Virtual()` 装饰器从 `@nestjs/mongoose` 包导入。
+:::info 提示
+`@Virtual()` 装饰器从 `@nestjs/mongoose` 包导入。
+:::
 
 在此示例中，`fullName` 虚拟派生自 `firstName` 和 `lastName`。即使它在访问时表现得像一个普通属性，它也永远不会保存到 MongoDB 文档中。
 

@@ -139,7 +139,9 @@ async findOne(@User('firstName') firstName: string) {
 
 你可以使用不同的键使用同一个装饰器来访问不同的属性。如果 `user` 对象很深或很复杂，这可以使请求处理程序实现更容易和更可读。
 
-> info **提示** 对于 TypeScript 用户，请注意 `createParamDecorator<T>()` 是一个泛型。这意味着你可以显式强制类型安全，例如 `createParamDecorator<string>((data, ctx) => ...)`。或者，在工厂函数中指定参数类型，例如 `createParamDecorator((data: string, ctx) => ...)`。如果你同时省略两者，`data` 的类型将是 `any`。
+:::info 提示
+对于 TypeScript 用户，请注意 `createParamDecorator<T>()` 是一个泛型。这意味着你可以显式强制类型安全，例如 `createParamDecorator<string>((data, ctx) => ...)`。或者，在工厂函数中指定参数类型，例如 `createParamDecorator((data: string, ctx) => ...)`。如果你同时省略两者，`data` 的类型将是 `any`。
+:::
 
 #### 与管道一起使用
 
@@ -156,7 +158,9 @@ async findOne(
 
 ```
 
-> info **提示** 请注意，`validateCustomDecorators` 选项必须设置为 true。`ValidationPipe` 默认不会验证使用自定义装饰器注释的参数。
+:::info 提示
+请注意，`validateCustomDecorators` 选项必须设置为 true。`ValidationPipe` 默认不会验证使用自定义装饰器注释的参数。
+:::
 
 #### 装饰器组合
 
@@ -196,4 +200,6 @@ findAllUsers() {}
 
 这具有通过单个声明应用所有四个装饰器的效果。
 
-> warning **警告** 来自 `@nestjs/swagger` 包的 `@ApiHideProperty()` 装饰器不可组合，并且与 `applyDecorators` 函数一起使用时不能正常工作。
+:::warning 警告
+来自 `@nestjs/swagger` 包的 `@ApiHideProperty()` 装饰器不可组合，并且与 `applyDecorators` 函数一起使用时不能正常工作。
+:::

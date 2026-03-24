@@ -139,7 +139,9 @@ providers: [
 
 Nest 允许你定义自定义提供者来处理这些情况。它提供了几种定义自定义提供者的方法。让我们逐一介绍。
 
-> info **提示** 如果你在依赖项解析方面遇到问题，可以设置 `NEST_DEBUG` 环境变量并在启动期间获取额外的依赖项解析日志。
+:::info 提示
+如果你在依赖项解析方面遇到问题，可以设置 `NEST_DEBUG` 环境变量并在启动期间获取额外的依赖项解析日志。
+:::
 
 #### 值提供者：`useValue`
 
@@ -190,7 +192,9 @@ export class AppModule {}
 
 在这个例子中，我们将字符串值令牌（`'CONNECTION'`）与我们从外部文件导入的预先存在的 `connection` 对象关联。
 
-> warning **注意** 除了使用字符串作为令牌值外，你还可以使用 JavaScript [符号](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol)或 TypeScript [枚举](https://www.typescriptlang.org/docs/handbook/enums.html)。
+:::warning 注意
+除了使用字符串作为令牌值外，你还可以使用 JavaScript [符号](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol)或 TypeScript [枚举](https://www.typescriptlang.org/docs/handbook/enums.html)。
+:::
 
 我们之前已经看到了如何使用标准[基于构造函数的注入](https://docs.nestjs.com/providers#dependency-injection)模式注入提供者。此模式**要求**依赖项用类名声明。`'CONNECTION'` 自定义提供者使用字符串值令牌。让我们看看如何注入这样的提供者。为此，我们使用 `@Inject()` 装饰器。此装饰器接受单个参数 - 令牌。
 
@@ -202,7 +206,9 @@ export class CatsRepository {
 
 ```
 
-> info **提示** `@Inject()` 装饰器从 `@nestjs/common` 包导入。
+:::info 提示
+`@Inject()` 装饰器从 `@nestjs/common` 包导入。
+:::
 
 虽然我们在上面的例子中直接使用字符串 `'CONNECTION'` 来说明目的，但为了清晰的代码组织，最佳做法是在单独的文件中定义令牌，例如 `constants.ts`。像对待在自己的文件中定义并按需导入的符号或枚举一样对待它们。
 

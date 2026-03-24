@@ -123,7 +123,9 @@ handleCron() {
 
 或者，您可以向 `@Cron()` 装饰器提供一个 JavaScript `Date` 对象。这样做会导致作业在指定的日期恰好执行一次。
 
-> info **提示** 使用 JavaScript 日期算术来安排相对于当前日期的作业。例如，`@Cron(new Date(Date.now() + 10 * 1000))` 安排作业在应用程序启动后 10 秒运行。
+:::info 提示
+使用 JavaScript 日期算术来安排相对于当前日期的作业。例如，`@Cron(new Date(Date.now() + 10 * 1000))` 安排作业在应用程序启动后 10 秒运行。
+:::
 
 此外，您可以提供其他选项作为 `@Cron()` 装饰器的第二个参数。
 
@@ -191,7 +193,9 @@ handleInterval() {
 
 ```
 
-> info **提示** 此机制在底层使用 JavaScript `setInterval()` 函数。您也可以利用 cron 作业来安排定期作业。
+:::info 提示
+此机制在底层使用 JavaScript `setInterval()` 函数。您也可以利用 cron 作业来安排定期作业。
+:::
 
 如果您想通过 <a href="/techniques/task-scheduling#动态调度模块-api">动态 API</a> 从声明类外部控制声明式间隔，请使用以下构造将间隔与名称相关联：
 
@@ -219,7 +223,9 @@ handleTimeout() {
 
 ```
 
-> info **提示** 此机制在底层使用 JavaScript `setTimeout()` 函数。
+:::info 提示
+此机制在底层使用 JavaScript `setTimeout()` 函数。
+:::
 
 如果发生异常，它将被记录到控制台，因为每个用 `@Timeout()` 注释的方法都会自动包装在 `try-catch` 块中。
 
@@ -246,7 +252,9 @@ constructor(private schedulerRegistry: SchedulerRegistry) {}
 
 ```
 
-> info **提示** 从 `@nestjs/schedule` 包中导入 `SchedulerRegistry`。
+:::info 提示
+从 `@nestjs/schedule` 包中导入 `SchedulerRegistry`。
+:::
 
 然后在类中如下使用它。假设使用以下声明创建了一个 cron 作业：
 
@@ -277,7 +285,9 @@ console.log(job.lastDate());
 - `nextDate()` - 返回作业下次执行计划的日期的 `DateTime` 表示。
 - `nextDates(count: number)` - 提供 `DateTime` 表示的数组（大小为 `count`），用于将触发作业执行的下一组日期。`count` 默认为 0，返回空数组。
 
-> info **提示** 在 `DateTime` 对象上使用 `toJSDate()` 将它们呈现为与此 DateTime 等效的 JavaScript Date。
+:::info 提示
+在 `DateTime` 对象上使用 `toJSDate()` 将它们呈现为与此 DateTime 等效的 JavaScript Date。
+:::
 
 使用 `SchedulerRegistry#addCronJob` 方法动态**创建**新的 cron 作业，如下所示：
 
@@ -299,7 +309,9 @@ addCronJob(name: string, seconds: string) {
 
 在这段代码中，我们使用 `cron` 包中的 `CronJob` 对象来创建 cron 作业。`CronJob` 构造函数的第一个参数是 cron 模式（就像 `@Cron()` <a href="techniques/task-scheduling#声明式-cron-任务">装饰器</a>），第二个参数是当 cron 计时器触发时要执行的回调。`SchedulerRegistry#addCronJob` 方法接受两个参数：`CronJob` 的名称和 `CronJob` 对象本身。
 
-> warning **警告** 记住在访问 `SchedulerRegistry` 之前注入它。从 `cron` 包导入 `CronJob`。
+:::warning 警告
+记住在访问 `SchedulerRegistry` 之前注入它。从 `cron` 包导入 `CronJob`。
+:::
 
 使用 `SchedulerRegistry#deleteCronJob` 方法**删除**命名的 cron 作业，如下所示：
 

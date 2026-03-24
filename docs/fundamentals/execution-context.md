@@ -29,7 +29,9 @@ if (host.getType() === 'http') {
 
 ```
 
-> info **提示** `GqlContextType` 从 `@nestjs/graphql` 包导入。
+::: info 提示 
+ 从 `@nestjs/graphql` 包导入。
+:::
 
 有了可用的应用程序类型，我们可以编写更通用的组件，如下所示。
 
@@ -178,7 +180,9 @@ export class RolesGuard {
 
 ```
 
-> info **提示** `Reflector` 类从 `@nestjs/core` 包导入。
+::: info 提示 
+从 `@nestjs/core` 包导入。
+:::
 
 现在，要读取处理程序元数据，使用 `get()` 方法：
 
@@ -255,7 +259,9 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 ```
 
-> info **提示** `@SetMetadata()` 装饰器从 `@nestjs/common` 包导入。
+::: info 提示 
+从 `@nestjs/common` 包导入。
+:::
 
 通过上面的构造，我们将 `roles` 元数据（`roles` 是元数据键，`['admin']` 是关联的值）附加到 `create()` 方法。虽然这可行，但直接在路由中使用 `@SetMetadata()` 不是好的做法。相反，您可以创建自己的装饰器，如下所示：
 
@@ -291,7 +297,9 @@ export class RolesGuard {
 
 ```
 
-> info **提示** `Reflector` 类从 `@nestjs/core` 包导入。
+::: info 提示 
+从 `@nestjs/core` 包导入。
+:::
 
 现在，要读取处理程序元数据，使用 `get()` 方法。
 

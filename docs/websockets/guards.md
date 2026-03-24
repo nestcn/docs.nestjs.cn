@@ -6,7 +6,9 @@
 
 WebSocket 守卫与[常规 HTTP 应用程序守卫](/guards)没有根本区别。唯一的区别是，不应该抛出 `HttpException`，而应该使用 `WsException`。
 
-> info **提示** `WsException` 类从 `@nestjs/websockets` 包导出。
+:::info 提示
+`WsException` 类从 `@nestjs/websockets` 包导出。
+:::
 
 #### 绑定守卫
 

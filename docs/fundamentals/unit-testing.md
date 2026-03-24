@@ -17,7 +17,6 @@
 
 ```bash
 $ npm i --save-dev @nestjs/testing
-
 ```
 
 #### 单元测试
@@ -65,10 +64,11 @@ describe('CatsController', () => {
     });
   });
 });
-
 ```
 
-> info **提示** 将测试文件保存在它们测试的类附近。测试文件应该有`.spec`或`.test`后缀。
+:::info 提示
+将测试文件保存在它们测试的类附近。测试文件应该有`.spec`或`.test`后缀。
+:::
 
 因为上面的示例很简单，我们实际上并没有测试任何特定于Nest的内容。事实上，我们甚至没有使用依赖注入（注意我们将`CatsService`的实例传递给我们的`catsController`）。这种测试形式 - 我们手动实例化被测试的类 - 通常被称为**隔离测试**，因为它独立于框架。让我们介绍一些更高级的功能，帮助您测试更广泛使用Nest功能的应用程序。
 
@@ -128,12 +128,13 @@ describe('CatsController', () => {
     });
   });
 });
-
 ```
 
 `Test`类对于提供应用程序执行上下文非常有用，该上下文本质上模拟了完整的Nest运行时，但为您提供了钩子，使管理类实例（包括模拟和覆盖）变得容易。`Test`类有一个`createTestingModule()`方法，该方法将模块元数据对象作为其参数（与您传递给`@Module()`装饰器的对象相同）。此方法返回一个`TestingModule`实例，该实例又提供了一些方法。对于单元测试，重要的是`compile()`方法。此方法引导模块及其依赖项（类似于应用程序在传统`main.ts`文件中使用`NestFactory.create()`引导的方式），并返回一个准备好测试的模块。
 
-> info **提示** `compile()`方法是**异步**的，因此必须等待。模块编译后，您可以使用`get()`方法检索它声明的任何**静态**实例（控制器和提供者）。
+:::info 提示
+`compile()`方法是**异步**的，因此必须等待。模块编译后，您可以使用`get()`方法检索它声明的任何**静态**实例（控制器和提供者）。
+:::
 
 `TestingModule`继承自[模块引用](/fundamentals/module-reference)类，因此具有动态解析作用域提供者（瞬态或请求作用域）的能力。使用`resolve()`方法执行此操作（`get()`方法只能检索静态实例）。
 
@@ -144,16 +145,21 @@ const moduleRef = await Test.createTestingModule({
 }).compile();
 
 catsService = await moduleRef.resolve(CatsService);
-
 ```
 
-> warning **警告** `resolve()`方法返回提供者的唯一实例，来自其自己的**DI容器子树**。每个子树都有唯一的上下文标识符。因此，如果您多次调用此方法并比较实例引用，您会发现它们不相等。
+::: warning 警告 
+`resolve()`方法返回提供者的唯一实例，来自其自己的**DI容器子树**。每个子树都有唯一的上下文标识符。因此，如果您多次调用此方法并比较实例引用，您会发现它们不相等。
+:::
 
-> info **提示** 在此处了解有关模块引用功能的更多信息[/fundamentals/module-reference]。
+:::info 提示
+在此处了解有关模块引用功能的更多信息[/fundamentals/module-reference]。
+:::
 
 您可以使用[自定义提供者](/fundamentals/dependency-injection)覆盖任何提供者的生产版本，以进行测试。例如，您可以模拟数据库服务，而不是连接到实时数据库。我们将在下一节中介绍覆盖，但它们也可用于单元测试。
 
+```
 <app-banner-courses></app-banner-courses>
+```
 
 #### 自动模拟
 
@@ -192,14 +198,17 @@ describe('CatsController', () => {
     controller = moduleRef.get(CatsController);
   });
 });
-
 ```
 
 您也可以像通常处理自定义提供者一样从测试容器中检索这些模拟，`moduleRef.get(CatsService)`。
 
-> info **提示** 通用模拟工厂，如来自[`@golevelup/ts-jest`](https://github.com/golevelup/nestjs/tree/master/packages/testing)的`createMock`也可以直接传递。
+:::info 提示
+通用模拟工厂，如来自[`@golevelup/ts-jest`](https://github.com/golevelup/nestjs/tree/master/packages/testing)的`createMock`也可以直接传递。
+:::
 
-> info **提示** `REQUEST`和`INQUIRER`提供者不能被自动模拟，因为它们已经在上下文中预定义。但是，它们可以使用自定义提供者语法或通过利用`.overrideProvider`方法被**覆盖**。
+:::info 提示
+`REQUEST`和`INQUIRER`提供者不能被自动模拟，因为它们已经在上下文中预定义。但是，它们可以使用自定义提供者语法或通过利用`.overrideProvider`方法被**覆盖**。
+:::
 
 #### 端到端测试
 
@@ -271,39 +280,40 @@ describe('Cats', () => {
     await app.close();
   });
 });
-
 ```
 
-> info **提示** 如果您使用[Fastify](/techniques/performance)作为HTTP适配器，它需要略有不同的配置，并具有内置的测试功能：
->
-> ```ts
-> let app: NestFastifyApplication;
->
-> beforeAll(async () => {
->   app = moduleRef.createNestApplication<NestFastifyApplication>(
->     new FastifyAdapter(),
->   );
->
->   await app.init();
->   await app.getHttpAdapter().getInstance().ready();
-> });
->
-> it(`/GET cats`, () => {
->   return app
->     .inject({
->       method: 'GET',
->       url: '/cats',
->     })
->     .then((result) => {
->       expect(result.statusCode).toEqual(200);
->       expect(result.payload).toEqual(/* expectedPayload */);
->     });
-> });
->
-> afterAll(async () => {
->   await app.close();
-> });
-> ```
+:::info 提示
+如果您使用[Fastify](/techniques/performance)作为HTTP适配器，它需要略有不同的配置，并具有内置的测试功能：
+:::
+
+```ts
+let app: NestFastifyApplication;
+
+beforeAll(async () => {
+  app = moduleRef.createNestApplication<NestFastifyApplication>(
+    new FastifyAdapter(),
+  );
+
+  await app.init();
+  await app.getHttpAdapter().getInstance().ready();
+});
+
+it(`/GET cats`, () => {
+  return app
+    .inject({
+      method: 'GET',
+      url: '/cats',
+    })
+    .then((result) => {
+      expect(result.statusCode).toEqual(200);
+      expect(result.payload).toEqual(/* expectedPayload */);
+    });
+});
+
+afterAll(async () => {
+  await app.close();
+});
+```
 
 在这个例子中，我们基于前面描述的一些概念进行构建。除了我们之前使用的`compile()`方法外，我们现在使用`createNestApplication()`方法来实例化完整的Nest运行时环境。
 
@@ -332,7 +342,6 @@ const moduleRef = await Test.createTestingModule({
   .overrideModule(CatsModule)
   .useModule(AlternateCatsModule)
   .compile();
-
 ```
 
 每种覆盖方法类型又返回`TestingModule`实例，因此可以与[流畅风格](https://en.wikipedia.org/wiki/Fluent_interface)中的其他方法链接。您应该在这样的链的末尾使用`compile()`，以使Nest实例化并初始化模块。
@@ -385,7 +394,10 @@ const moduleRef = await Test.createTestingModule({
   </tr>
 </table>
 
-> info **提示** 将端到端测试文件保存在`test`目录中。测试文件应该有`.e2e-spec`后缀。
+:::info 提示
+将端到端测试文件保存在`test`目录中。测试文件应该有`.e2e-spec`后缀。
+:::
+
 
 #### 覆盖全局注册的增强器
 
@@ -398,7 +410,6 @@ providers: [
     useClass: JwtAuthGuard,
   },
 ],
-
 ```
 
 这是通过`APP_*`令牌将守卫注册为"多"提供者。为了能够在此处替换`JwtAuthGuard`，注册需要使用此插槽中的现有提供者：
@@ -412,10 +423,11 @@ providers: [
   },
   JwtAuthGuard,
 ],
-
 ```
 
-> info **提示** 将`useClass`更改为`useExisting`以引用已注册的提供者，而不是让Nest在令牌后面实例化它。
+:::info 提示
+将`useClass`更改为`useExisting`以引用已注册的提供者，而不是让Nest在令牌后面实例化它。
+:::
 
 现在`JwtAuthGuard`对Nest来说是一个常规提供者，可以在创建`TestingModule`时被覆盖：
 
@@ -426,7 +438,6 @@ const moduleRef = await Test.createTestingModule({
   .overrideProvider(JwtAuthGuard)
   .useClass(MockAuthGuard)
   .compile();
-
 ```
 
 现在您的所有测试都将在每个请求上使用`MockAuthGuard`。
@@ -446,12 +457,10 @@ const contextId = ContextIdFactory.create();
 jest
   .spyOn(ContextIdFactory, 'getByRequest')
   .mockImplementation(() => contextId);
-
 ```
 
 现在我们可以使用`contextId`访问任何后续请求的单个生成的DI容器子树。
 
 ```typescript
 catsService = await moduleRef.resolve(CatsService, contextId);
-
 ```

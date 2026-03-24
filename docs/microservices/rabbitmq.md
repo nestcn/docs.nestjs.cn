@@ -29,7 +29,9 @@ const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
 
 ```
 
-> info **提示** `Transport` 枚举从 `@nestjs/microservices` 包导入。
+:::info 提示
+`Transport` 枚举从 `@nestjs/microservices` 包导入。
+:::
 
 #### 选项
 
@@ -148,7 +150,9 @@ getNotifications(@Payload() data: number[], @Ctx() context: RmqContext) {
 
 ```
 
-> info **提示** `@Payload()`、`@Ctx()` 和 `RmqContext` 从 `@nestjs/microservices` 包导入。
+:::info 提示
+`@Payload()`、`@Ctx()` 和 `RmqContext` 从 `@nestjs/microservices` 包导入。
+:::
 
 要访问原始 RabbitMQ 消息（带有 `properties`、`fields` 和 `content`），请使用 `RmqContext` 对象的 `getMessage()` 方法，如下所示：
 
@@ -220,7 +224,9 @@ this.client.send('replace-emoji', record).subscribe(...);
 
 ```
 
-> info **提示** `RmqRecordBuilder` 类从 `@nestjs/microservices` 包导出。
+:::info 提示
+`RmqRecordBuilder` 类从 `@nestjs/microservices` 包导出。
+:::
 
 您也可以在服务器端通过访问 `RmqContext` 来读取这些值，如下所示：
 
@@ -244,7 +250,9 @@ this.client.status.subscribe((status: RmqStatus) => {
 
 ```
 
-> info **提示** `RmqStatus` 类型从 `@nestjs/microservices` 包导入。
+:::info 提示
+`RmqStatus` 类型从 `@nestjs/microservices` 包导入。
+:::
 
 同样，您可以订阅服务器的 `status` 流以接收有关服务器状态的通知。
 
@@ -276,7 +284,9 @@ server.on<RmqEvents>('error', (err) => {
 
 ```
 
-> info **提示** `RmqEvents` 类型从 `@nestjs/microservices` 包导入。
+:::info 提示
+`RmqEvents` 类型从 `@nestjs/microservices` 包导入。
+:::
 
 #### 底层驱动程序访问
 

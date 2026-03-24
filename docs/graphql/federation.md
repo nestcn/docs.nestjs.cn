@@ -9,7 +9,9 @@ Federation 提供了一种将您的单体 GraphQL 服务器拆分成独立微服
 - 图形应该是简单的，可以供客户端消费。联邦服务可以形成一个完整的、产品-关注的图形，该图形准确反映了客户端的消费方式。
 - 这只是一种 **GraphQL**，使用了语言规范的特性。任何语言，不只是 JavaScript，可以实现 Federation。
 
-> warning **警告** Federation 目前不支持订阅。
+:::warning 警告
+Federation 目前不支持订阅。
+:::
 
 在以下部分，我们将设置一个演示应用程序，包含一个网关和两个联邦端点：Users 服务和 Posts 服务。
 
@@ -407,7 +409,9 @@ $ npm install --save @apollo/subgraph @nestjs/mercurius
 
 ```
 
-> info **注意** 需要 `@apollo/subgraph` 包来构建子图架构 (`buildSubgraphSchema`、`printSubgraphSchema` 函数)。
+::: info 注意
+需要 `@apollo/subgraph` 包来构建子图架构 (`buildSubgraphSchema`、`printSubgraphSchema` 函数)。
+:::
 
 #### Schema First 模式
 
@@ -776,7 +780,11 @@ export class AppModule {}
 
 根据 [Apollo 文档](https://www.apollographql.com/docs/federation/federation-2/new-in-federation-2)，Federation 2 改进了原始 Apollo Federation（本文档中称为 Federation 1）的开发体验，它与大多数原始 supergraph 向后兼容。
 
-> warning **警告** Mercurius 不完全支持 Federation 2。您可以在 [这里](https://www.apollographql.com/docs/federation/supported-subgraphs#javascript--typescript) 查看支持 Federation 2 的库列表。
+:::warning 警告
+Mercurius 不完全支持 Federation 2。
+
+您可以在 [这里](https://www.apollographql.com/docs/federation/supported-subgraphs#javascript--typescript) 查看支持 Federation 2 的库列表。
+:::
 
 在以下部分中，我们将升级之前的示例到 Federation 2。
 

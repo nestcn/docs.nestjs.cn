@@ -6,7 +6,9 @@
 
 访问原始请求体的最常见用例之一是执行 webhook 签名验证。通常，执行 webhook 签名验证需要未序列化的请求体来计算 HMAC 哈希值。
 
-> warning **警告** 此功能仅在内置全局 body parser 中间件启用时可用，即在创建应用时不能传递 `bodyParser: false`。
+:::warning 警告
+此功能仅在内置全局 body parser 中间件启用时可用，即在创建应用时不能传递 `bodyParser: false`。
+:::
 
 #### 在 Express 中使用
 
@@ -52,7 +54,9 @@ app.useBodyParser('text');
 
 ```
 
-> warning **警告** 确保为 `NestFactory.create` 调用提供正确的应用类型。对于 Express 应用，正确的类型是 `NestExpressApplication`。否则将找不到 `.useBodyParser` 方法。
+:::warning 警告
+确保为 `NestFactory.create` 调用提供正确的应用类型。对于 Express 应用，正确的类型是 `NestExpressApplication`。否则将找不到 `.useBodyParser` 方法。
+:::
 
 #### Body parser 大小限制
 
@@ -116,7 +120,9 @@ app.useBodyParser('text/plain');
 
 ```
 
-> warning **警告** 确保为 `NestFactory.create` 调用提供正确的应用类型。对于 Fastify 应用，正确的类型是 `NestFastifyApplication`。否则将找不到 `.useBodyParser` 方法。
+:::warning 警告
+确保为 `NestFactory.create` 调用提供正确的应用类型。对于 Fastify 应用，正确的类型是 `NestFastifyApplication`。否则将找不到 `.useBodyParser` 方法。
+:::
 
 #### Body parser 大小限制
 

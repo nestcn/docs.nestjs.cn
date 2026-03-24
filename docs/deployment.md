@@ -12,15 +12,16 @@
 - 任何所需的服务（如数据库）已设置并准备就绪。
 - 部署平台上至少安装了 Node.js 的 LTS 版本。
 
-> info **提示** 如果你正在寻找基于云的平台来部署 NestJS 应用程序，请查看 [Mau](https://mau.nestjs.com/ 'Deploy Nest')，这是我们在 AWS 上部署 NestJS 应用程序的官方平台。使用 Mau，部署 NestJS 应用程序就像点击几个按钮并运行单个命令一样简单：
->
-> ```bash
-> $ npm install -g @nestjs/mau
-> $ mau deploy
-> ```
+:::info 提示
+如果你正在寻找基于云的平台来部署 NestJS 应用程序，请查看 [Mau](https://mau.nestjs.com/ 'Deploy Nest')，这是我们在 AWS 上部署 NestJS 应用程序的官方平台。使用 Mau，部署 NestJS 应用程序就像点击几个按钮并运行单个命令一样简单：
 
->
-> 部署完成后，你的 NestJS 应用程序将在几秒钟内在 AWS 上运行！
+```bash
+$ npm install -g @nestjs/mau
+$ mau deploy
+```
+
+部署完成后，你的 NestJS 应用程序将在几秒钟内在 AWS 上运行！
+:::
 
 #### 构建应用程序
 
@@ -95,7 +96,9 @@ $ node dist/main.js # 根据你的入口点位置调整
 - **使用关联 ID**：在分布式系统中，在日志中包含唯一标识符（如关联 ID）以跨不同服务跟踪请求。
 - **使用日志级别**：按严重程度（例如，`info`、`warn`、`error`）对日志进行分类，并在生产中禁用调试或详细日志以减少噪音。
 
-> info **提示** 如果你使用 [AWS](https://aws.amazon.com/)（使用 [Mau](https://mau.nestjs.com/ 'Deploy Nest') 或直接），请考虑使用 JSON 日志记录以便更轻松地解析和分析日志。
+:::info 提示
+如果你使用 [AWS](https://aws.amazon.com/)（使用 [Mau](https://mau.nestjs.com/ 'Deploy Nest') 或直接），请考虑使用 JSON 日志记录以便更轻松地解析和分析日志。
+:::
 
 对于分布式应用程序，使用集中式日志记录服务（如 ElasticSearch、Loggly 或 Datadog）可能非常有用。这些工具提供日志聚合、搜索和可视化等强大功能，可以更轻松地监控和分析应用程序的性能和行为。
 
@@ -121,7 +124,9 @@ $ node dist/main.js # 根据你的入口点位置调整
 
 使用容器化技术如 [Docker](https://www.docker.com/) 和容器编排平台如 [Kubernetes](https://kubernetes.io/)，此过程非常简单。此外，你可以利用特定云的负载均衡器，如 [AWS Elastic Load Balancing](https://aws.amazon.com/elasticloadbalancing/) 或 [Azure Load Balancer](https://azure.microsoft.com/en-us/services/load-balancer/) 在应用程序实例之间分配流量。
 
-> info **提示** [Mau](https://mau.nestjs.com/ 'Deploy Nest') 在 AWS 上提供对水平扩展的内置支持，允许你轻松部署多个 NestJS 应用程序实例，只需点击几下即可管理它们。
+:::info 提示
+[Mau](https://mau.nestjs.com/ 'Deploy Nest') 在 AWS 上提供对水平扩展的内置支持，允许你轻松部署多个 NestJS 应用程序实例，只需点击几下即可管理它们。
+:::
 
 #### 其他提示
 
@@ -178,7 +183,9 @@ CMD ["node", "dist/main"]
 
 ```
 
-> info **提示** 确保将 `node:20` 替换为项目中使用的适当 Node.js 版本。你可以在 [官方 Docker Hub 仓库](https://hub.docker.com/_/node) 上找到可用的 Node.js Docker 镜像。
+:::info 提示
+确保将 `node:20` 替换为项目中使用的适当 Node.js 版本。你可以在 [官方 Docker Hub 仓库](https://hub.docker.com/_/node) 上找到可用的 Node.js Docker 镜像。
+:::
 
 这是一个基本的 Dockerfile，它设置 Node.js 环境，安装应用程序依赖项，构建 NestJS 应用程序并运行它。你可以根据项目需求自定义此文件（例如，使用不同的基础镜像，优化构建过程，仅安装生产依赖项等）。
 

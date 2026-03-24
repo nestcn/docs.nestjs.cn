@@ -69,9 +69,13 @@ export class LoggingInterceptor {
 
 ```
 
-> info **提示** `NestInterceptor<T, R>` 是一个泛型接口，其中 `T` 表示 `Observable<T>` 的类型（支持响应流），`R` 是 `Observable<R>` 包装的值的类型。
+:::info 提示
+`NestInterceptor<T, R>` 是一个泛型接口，其中 `T` 表示 `Observable<T>` 的类型（支持响应流），`R` 是 `Observable<R>` 包装的值的类型。
+:::
 
-> warning **注意** 拦截器与控制器、提供者、守卫等一样，可以通过其 `constructor` **注入依赖项**。
+:::warning 注意
+拦截器与控制器、提供者、守卫等一样，可以通过其 `constructor` **注入依赖项**。
+:::
 
 由于 `handle()` 返回一个 RxJS `Observable`，我们有多种操作符可以用来操作流。在上面的示例中，我们使用了 `tap()` 操作符，它在可观察流正常或异常终止时调用我们的匿名日志记录函数，但不会以其他方式干扰响应周期。
 
@@ -85,7 +89,9 @@ export class CatsController {}
 
 ```
 
-> info **提示** `@UseInterceptors()` 装饰器从 `@nestjs/common` 包导入。
+:::info 提示
+`@UseInterceptors()` 装饰器从 `@nestjs/common` 包导入。
+:::
 
 使用上述构造，`CatsController` 中定义的每个路由处理程序都将使用 `LoggingInterceptor`。当有人调用 `GET /cats` 端点时，你将在标准输出中看到以下输出：
 
@@ -131,13 +137,17 @@ export class AppModule {}
 
 ```
 
-> info **提示** 当使用此方法为拦截器执行依赖注入时，请注意无论使用此构造的模块是什么，拦截器实际上是全局的。这应该在哪里做？选择定义拦截器的模块（上面示例中的 `LoggingInterceptor`）。此外，`useClass` 不是处理自定义提供者注册的唯一方式。在[此处](/fundamentals/dependency-injection)了解更多。
+:::info 提示
+当使用此方法为拦截器执行依赖注入时，请注意无论使用此构造的模块是什么，拦截器实际上是全局的。这应该在哪里做？选择定义拦截器的模块（上面示例中的 `LoggingInterceptor`）。此外，`useClass` 不是处理自定义提供者注册的唯一方式。在[此处](/fundamentals/dependency-injection)了解更多。
+:::
 
 #### 响应映射
 
 我们已经知道 `handle()` 返回一个 `Observable`。该流包含从路由处理程序**返回**的值，因此我们可以使用 RxJS 的 `map()` 操作符轻松地对其进行转换。
 
-> warning **警告** 响应映射功能不适用于库特定的响应策略（禁止直接使用 `@Res()` 对象）。
+:::warning 警告
+响应映射功能不适用于库特定的响应策略（禁止直接使用 `@Res()` 对象）。
+:::
 
 让我们创建 `TransformInterceptor`，它将以简单的方式修改每个响应以演示该过程。它将使用 RxJS 的 `map()` 操作符将响应对象分配给新创建对象的 `data` 属性，将新对象返回给客户端。
 
@@ -166,7 +176,9 @@ export class TransformInterceptor {
 
 ```
 
-> info **提示** Nest 拦截器适用于同步和异步 `intercept()` 方法。如有必要，你可以简单地将方法切换为 `async`。
+:::info 提示
+Nest 拦截器适用于同步和异步 `intercept()` 方法。如有必要，你可以简单地将方法切换为 `async`。
+:::
 
 使用上述构造，当有人调用 `GET /cats` 端点时，响应将如下所示（假设路由处理程序返回一个空数组 `[]`）：
 

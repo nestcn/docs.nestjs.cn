@@ -22,7 +22,9 @@ $ nest new project-name
 
 ```
 
-> info **提示** 要使用 TypeScript 的 [更严格](https://www.typescriptlang.org/tsconfig#strict) 功能集创建新项目，请将 `--strict` 标志传递给 `nest new` 命令。
+:::info 提示
+要使用 TypeScript 的 [更严格](https://www.typescriptlang.org/tsconfig#strict) 功能集创建新项目，请将 `--strict` 标志传递给 `nest new` 命令。
+:::
 
 将创建 `project-name` 目录，安装 node 模块和一些其他样板文件，并创建一个 `src/` 目录并填充几个核心文件。
 
@@ -39,12 +41,12 @@ $ nest new project-name
 
 以下是这些核心文件的简要概述：
 
-|                          |                                                                                                                     |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------- |
-| `app.controller.ts`      | 带有单个路由的基本控制器。                                                                             |
-| `app.controller.spec.ts` | 控制器的单元测试。                                                                                  |
-| `app.module.ts`          | 应用程序的根模块。                                                                                 |
-| `app.service.ts`         | 带有单个方法的基本服务。                                                                               |
+|                          |                                                                         |
+| ------------------------ | ----------------------------------------------------------------------- |
+| `app.controller.ts`      | 带有单个路由的基本控制器。                                              |
+| `app.controller.spec.ts` | 控制器的单元测试。                                                      |
+| `app.module.ts`          | 应用程序的根模块。                                                      |
+| `app.service.ts`         | 带有单个方法的基本服务。                                                |
 | `main.ts`                | 应用程序的入口文件，使用核心函数 `NestFactory` 创建 Nest 应用程序实例。 |
 
 `main.ts` 包含一个异步函数，它将**引导**我们的应用程序：
@@ -71,7 +73,9 @@ bootstrap();
 
 请注意，使用 Nest CLI 搭建的项目创建了一个初始项目结构，鼓励开发人员遵循将每个模块保存在自己专用目录中的约定。
 
-> info **提示** 默认情况下，如果在创建应用程序时发生任何错误，你的应用将以代码 `1` 退出。如果你想让它抛出错误而不是退出，请禁用 `abortOnError` 选项（例如，`NestFactory.create(AppModule, {{ '{' }} abortOnError: false {{ '}' }})`）。
+:::info 提示
+默认情况下，如果在创建应用程序时发生任何错误，你的应用将以代码 `1` 退出。如果你想让它抛出错误而不是退出，请禁用 `abortOnError` 选项（例如，`NestFactory.create(AppModule, {{ '{' }} abortOnError: false {{ '}' }})`）。
+:::
 
 <app-banner-courses></app-banner-courses>
 
@@ -79,10 +83,10 @@ bootstrap();
 
 Nest 旨在成为一个平台无关的框架。平台独立性使得创建可重用的逻辑部分成为可能，开发人员可以在多种不同类型的应用程序中利用这些部分。从技术上讲，一旦创建了适配器，Nest 就能够与任何 Node HTTP 框架一起工作。有两个 HTTP 平台开箱即用：[express](https://expressjs.com/) 和 [fastify](https://www.fastify.io)。你可以选择最适合你需求的平台。
 
-|                    |                                                                                                                                                                                                                                                                                                                                    |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|                    |                                                                                                                                                                                                                                 |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `platform-express` | [Express](https://expressjs.com/) 是一个著名的 Node 极简 Web 框架。它是一个经过实战测试的、生产就绪的库，社区实现了许多资源。`@nestjs/platform-express` 包默认使用。许多用户使用 Express 就足够了，不需要采取任何行动来启用它。 |
-| `platform-fastify` | [Fastify](https://www.fastify.io/) 是一个高性能、低开销的框架，高度专注于提供最大效率和速度。阅读如何使用它 [这里](/techniques/performance)。                                                                                                                                  |
+| `platform-fastify` | [Fastify](https://www.fastify.io/) 是一个高性能、低开销的框架，高度专注于提供最大效率和速度。阅读如何使用它 [这里](/techniques/performance)。                                                                                   |
 
 无论使用哪个平台，它都会公开自己的应用程序接口。这些分别被视为 `NestExpressApplication` 和 `NestFastifyApplication`。
 
@@ -102,7 +106,9 @@ $ npm run start
 
 ```
 
-> info **提示** 为了加快开发过程（构建速度提高 20 倍），你可以使用 [SWC 构建器](/recipes/swc)，方法是将 `-b swc` 标志传递给 `start` 脚本，如下所示：`npm run start -- -b swc`。
+:::info 提示
+为了加快开发过程（构建速度提高 20 倍），你可以使用 [SWC 构建器](/recipes/swc)，方法是将 `-b swc` 标志传递给 `start` 脚本，如下所示：`npm run start -- -b swc`。
+:::
 
 此命令启动应用程序，HTTP 服务器监听 `src/main.ts` 文件中定义的端口。应用程序运行后，打开浏览器并导航到 `http://localhost:3000/`。你应该看到 `Hello World!` 消息。
 
@@ -119,7 +125,9 @@ $ npm run start:dev
 
 [CLI](/cli/overview) 尽最大努力搭建一个可扩展的可靠开发工作流。因此，生成的 Nest 项目预装了代码**检查器**和**格式化器**（分别是 [eslint](https://eslint.org/) 和 [prettier](https://prettier.io/)）。
 
-> info **提示** 不确定格式化器与检查器的作用？了解差异 [这里](https://prettier.io/docs/en/comparison.html)。
+:::info 提示
+不确定格式化器与检查器的作用？了解差异 [这里](https://prettier.io/docs/en/comparison.html)。
+:::
 
 为确保最大稳定性和可扩展性，我们使用基础 [`eslint`](https://www.npmjs.com/package/eslint) 和 [`prettier`](https://www.npmjs.com/package/prettier) cli 包。此设置允许通过设计与官方扩展进行整洁的 IDE 集成。
 

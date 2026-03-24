@@ -15,7 +15,9 @@
 
 Nest 提供了许多内置管道，您可以直接使用。您也可以构建自己的自定义管道。在本章中，我们将介绍内置管道，并展示如何将它们绑定到路由处理程序。然后，我们将研究几个自定义构建的管道，以展示如何从头开始构建一个管道。
 
-> info **提示** 管道在异常区域内运行。这意味着当管道抛出异常时，它会由异常层（全局异常过滤器和应用于当前上下文的任何 [异常过滤器](/exception-filters)）处理。鉴于上述情况，很明显，当在管道中抛出异常时，控制器方法不会被执行。这为您提供了一种最佳实践技术，用于在系统边界验证从外部源进入应用程序的数据。
+:::info 提示
+管道在异常区域内运行。这意味着当管道抛出异常时，它会由异常层（全局异常过滤器和应用于当前上下文的任何 [异常过滤器](/exception-filters)）处理。鉴于上述情况，很明显，当在管道中抛出异常时，控制器方法不会被执行。这为您提供了一种最佳实践技术，用于在系统边界验证从外部源进入应用程序的数据。
+:::
 
 #### 内置管道
 
@@ -105,11 +107,15 @@ async findOne(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
 
 ```
 
-> info **提示** 当使用 `ParseUUIDPipe()` 时，您正在解析版本 3、4 或 5 的 UUID，如果您只需要特定版本的 UUID，您可以在管道选项中传递版本。
+:::info 提示
+当使用 `ParseUUIDPipe()` 时，您正在解析版本 3、4 或 5 的 UUID，如果您只需要特定版本的 UUID，您可以在管道选项中传递版本。
+:::
 
 上面我们已经看到了绑定各种内置 `Parse*` 家族管道的示例。绑定验证管道略有不同；我们将在以下部分讨论这一点。
 
-> info **提示** 另请参阅 [验证技术](/techniques/validation) 以获取验证管道的大量示例。
+:::info 提示
+另请参阅 [验证技术](/techniques/validation) 以获取验证管道的大量示例。
+:::
 
 #### 自定义管道
 
@@ -136,7 +142,9 @@ export class ValidationPipe {
 
 ```
 
-> info **提示** `PipeTransform<T, R>` 是任何管道必须实现的通用接口。通用接口使用 `T` 表示输入 `value` 的类型，`R` 表示 `transform()` 方法的返回类型。
+:::info 提示
+`PipeTransform<T, R>` 是任何管道必须实现的通用接口。通用接口使用 `T` 表示输入 `value` 的类型，`R` 表示 `transform()` 方法的返回类型。
+:::
 
 每个管道都必须实现 `transform()` 方法以履行 `PipeTransform` 接口契约。此方法有两个参数：
 
@@ -187,7 +195,9 @@ export interface ArgumentMetadata {
   </tr>
 </table>
 
-> warning **警告** TypeScript 接口在转译过程中会消失。因此，如果方法参数的类型被声明为接口而不是类，`metatype` 值将为 `Object`。
+:::warning 警告
+TypeScript 接口在转译过程中会消失。因此，如果方法参数的类型被声明为接口而不是类，`metatype` 值将为 `Object`。
+:::
 
 #### 基于模式的验证
 
@@ -313,13 +323,19 @@ async create(@Body() createCatDto: CreateCatDto) {
 
 ```
 
-> info **提示** `@UsePipes()` 装饰器从 `@nestjs/common` 包中导入。
+:::info 提示
+`@UsePipes()` 装饰器从 `@nestjs/common` 包中导入。
+:::
 
-> warning **警告** `zod` 库要求在您的 `tsconfig.json` 文件中启用 `strictNullChecks` 配置。
+:::warning 警告
+`zod` 库要求在您的 `tsconfig.json` 文件中启用 `strictNullChecks` 配置。
+:::
 
 #### 类验证器
 
-> warning **警告** 本节中的技术需要 TypeScript，如果您的应用程序使用纯 JavaScript 编写，则不可用。
+:::warning 警告
+本节中的技术需要 TypeScript，如果您的应用程序使用纯 JavaScript 编写，则不可用。
+:::
 
 让我们看看我们的验证技术的另一种实现。
 
@@ -348,7 +364,9 @@ export class CreateCatDto {
 
 ```
 
-> info **提示** 有关 class-validator 装饰器的更多信息，请阅读 [这里](https://github.com/typestack/class-validator#用法)。
+:::info 提示
+有关 class-validator 装饰器的更多信息，请阅读 [这里](https://github.com/typestack/class-validator#用法)。
+:::
 
 现在我们可以创建一个使用这些注解的 `ValidationPipe` 类。
 
@@ -379,9 +397,13 @@ export class ValidationPipe implements PipeTransform<any> {
 
 ```
 
-> info **提示** 提醒一下，您不必自己构建通用验证管道，因为 `ValidationPipe` 是 Nest 开箱即用的。内置的 `ValidationPipe` 提供了比我们在本章中构建的示例更多的选项，该示例为了说明自定义构建管道的机制而保持简单。您可以在 [这里](/techniques/validation) 找到完整的详细信息以及许多示例。
+:::info 提示
+提醒一下，您不必自己构建通用验证管道，因为 `ValidationPipe` 是 Nest 开箱即用的。内置的 `ValidationPipe` 提供了比我们在本章中构建的示例更多的选项，该示例为了说明自定义构建管道的机制而保持简单。您可以在 [这里](/techniques/validation) 找到完整的详细信息以及许多示例。
+:::
 
-> warning **注意** 我们上面使用了 [class-transformer](https://github.com/typestack/class-transformer) 库，它由与 **class-validator** 库相同的作者制作，因此它们配合得很好。
+:::warning 注意
+我们上面使用了 [class-transformer](https://github.com/typestack/class-transformer) 库，它由与 **class-validator** 库相同的作者制作，因此它们配合得很好。
+:::
 
 让我们分析一下这段代码。首先，请注意 `transform()` 方法被标记为 `async`。这是可能的，因为 Nest 支持同步和 **异步** 管道。我们将此方法设为 `async`，因为一些 class-validator 验证 [可以是异步的](https://github.com/typestack/class-validator#custom-validation-classes)（利用 Promise）。
 
@@ -422,7 +444,9 @@ bootstrap();
 
 ```
 
-> warning **注意** 在 <a href="faq/hybrid-application">混合应用程序</a> 的情况下，`useGlobalPipes()` 方法不会为网关和微服务设置管道。对于 "标准"（非混合）微服务应用程序，`useGlobalPipes()` 会全局挂载管道。
+:::warning 注意
+在 <a href="faq/hybrid-application">混合应用程序</a> 的情况下，`useGlobalPipes()` 方法不会为网关和微服务设置管道。对于 "标准"（非混合）微服务应用程序，`useGlobalPipes()` 会全局挂载管道。
+:::
 
 全局管道用于整个应用程序，适用于每个控制器和每个路由处理程序。
 
@@ -444,7 +468,9 @@ export class AppModule {}
 
 ```
 
-> info **提示** 当使用这种方法为管道执行依赖注入时，请注意，无论在此构造中使用哪个模块，管道实际上都是全局的。应该在哪里做？选择定义管道（上面示例中的 `ValidationPipe`）的模块。此外，`useClass` 不是处理自定义提供程序注册的唯一方法。了解更多 [这里](/fundamentals/dependency-injection)。
+:::info 提示
+当使用这种方法为管道执行依赖注入时，请注意，无论在此构造中使用哪个模块，管道实际上都是全局的。应该在哪里做？选择定义管道（上面示例中的 `ValidationPipe`）的模块。此外，`useClass` 不是处理自定义提供程序注册的唯一方法。了解更多 [这里](/fundamentals/dependency-injection)。
+:::
 
 #### 内置的 ValidationPipe
 

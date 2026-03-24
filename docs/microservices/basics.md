@@ -39,7 +39,9 @@ bootstrap();
 
 ```
 
-> info **提示** 微服务默认使用 **TCP** 传输层。
+:::info 提示
+微服务默认使用 **TCP** 传输层。
+:::
 
 `createMicroservice()` 方法的第二个参数是一个 `options` 对象。此对象可能包含两个成员：
 
@@ -92,7 +94,9 @@ bootstrap();
   </tr>
 </table>
 
-> info **提示** 上述属性特定于 TCP 传输器。有关其他传输器可用选项的信息，请参考相关章节。
+:::info 提示
+上述属性特定于 TCP 传输器。有关其他传输器可用选项的信息，请参考相关章节。
+:::
 
 #### 消息和事件模式
 
@@ -162,7 +166,9 @@ async handleUserCreated(data: Record<string, unknown>) {
 
 ```
 
-> info **提示** 您可以为 **单个** 事件模式注册多个事件处理程序，所有这些处理程序都会自动并行触发。
+:::info 提示
+您可以为 **单个** 事件模式注册多个事件处理程序，所有这些处理程序都会自动并行触发。
+:::
 
 `handleUserCreated()` **事件处理程序** 监听 `'user_created'` 事件。事件处理程序接受一个参数，即从客户端传递的数据（在这种情况下，是通过网络发送的事件负载）。
 
@@ -181,9 +187,13 @@ getDate(@Payload() data: number[], @Ctx() context: NatsContext) {
 
 ```
 
-> info **提示** `@Payload()`、`@Ctx()` 和 `NatsContext` 是从 `@nestjs/microservices` 导入的。
+:::info 提示
+`@Payload()`、`@Ctx()` 和 `NatsContext` 是从 `@nestjs/microservices` 导入的。
+:::
 
-> info **提示** 您还可以将属性键传递给 `@Payload()` 装饰器，以从传入的负载对象中提取特定属性，例如 `@Payload('id')`。
+:::info 提示
+您还可以将属性键传递给 `@Payload()` 装饰器，以从传入的负载对象中提取特定属性，例如 `@Payload('id')`。
+:::
 
 #### 客户端（生产者类）
 
@@ -238,7 +248,9 @@ constructor(
 
 ```
 
-> info **提示** `ClientsModule` 和 `ClientProxy` 类是从 `@nestjs/microservices` 包导入的。
+:::info 提示
+`ClientsModule` 和 `ClientProxy` 类是从 `@nestjs/microservices` 包导入的。
+:::
 
 有时，您可能需要从另一个服务（例如 `ConfigService`）获取传输器配置，而不是在客户端应用程序中硬编码它。要实现这一点，您可以使用 `ClientProxyFactory` 类注册 [自定义提供者](/fundamentals/dependency-injection)。此类提供静态 `create()` 方法，该方法接受传输器选项对象并返回自定义的 `ClientProxy` 实例。
 
@@ -259,7 +271,9 @@ constructor(
 
 ```
 
-> info **提示** `ClientProxyFactory` 是从 `@nestjs/microservices` 包导入的。
+:::info 提示
+`ClientProxyFactory` 是从 `@nestjs/microservices` 包导入的。
+:::
 
 另一个选项是使用 `@Client()` 属性装饰器。
 
@@ -269,7 +283,9 @@ client: ClientProxy;
 
 ```
 
-> info **提示** `@Client()` 装饰器是从 `@nestjs/microservices` 包导入的。
+:::info 提示
+`@Client()` 装饰器是从 `@nestjs/microservices` 包导入的。
+:::
 
 使用 `@Client()` 装饰器不是首选技术，因为它更难测试且更难共享客户端实例。
 
@@ -356,7 +372,9 @@ this.client.status.subscribe((status: TcpStatus) => {
 
 ```
 
-> info **提示** `TcpStatus` 类型是从 `@nestjs/microservices` 包导入的。
+:::info 提示
+`TcpStatus` 类型是从 `@nestjs/microservices` 包导入的。
+:::
 
 同样，您可以订阅服务器的 `status` 流以接收有关服务器状态的通知。
 
@@ -388,7 +406,9 @@ server.on<TcpEvents>('error', (err) => {
 
 ```
 
-> info **提示** `TcpEvents` 类型是从 `@nestjs/microservices` 包导入的。
+:::info 提示
+`TcpEvents` 类型是从 `@nestjs/microservices` 包导入的。
+:::
 
 #### 底层驱动程序访问
 
@@ -423,7 +443,9 @@ this.client
 
 ```
 
-> info **提示** `timeout` 运算符是从 `rxjs/operators` 包导入的。
+:::info 提示
+`timeout` 运算符是从 `rxjs/operators` 包导入的。
+:::
 
 5 秒后，如果微服务没有响应，它将抛出错误。
 

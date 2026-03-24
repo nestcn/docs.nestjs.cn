@@ -5,7 +5,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "npm run check-links && rspress build && tsx scripts/copy-assets.ts",
+    "build": "npm run check-links && rspress build && tsx scripts/copy-assets.ts && tsx scripts/clean-urls.ts",
     "dev": "rspress dev",
     "preview": "rspress preview",
     "cli": "bun scripts/cli.ts",

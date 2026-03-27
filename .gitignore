@@ -14,6 +14,7 @@ doc_build/
 .idea
 
 scripts/.translation-cache.json
+scripts/.progress.json
 .env
 .agents
 progress.md

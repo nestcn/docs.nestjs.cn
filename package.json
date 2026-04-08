@@ -34,7 +34,7 @@
     "check-translation-integrity:verbose": "bun scripts/check-translation-integrity.ts --verbose"
   },
   "dependencies": {
-    "@hono/node-server": "^1.19.10",
+    "@hono/node-server": "^1.19.13",
     "@rspress/core": "^2.0.3",
     "@rspress/plugin-client-redirects": "^2.0.4",
     "dotenv": "^17.3.1",

@@ -438,13 +438,15 @@ throw new KafkaRetriableException('...');
 ```typescript
 import { Catch, ArgumentsHost, Logger } from '@nestjs/common';
 import { BaseExceptionFilter } from '@nestjs/core';
-import { KafkaContext } from '../ctx-host';
+import { KafkaContext } from '@nestjs/microservices';
+import { Producer } from 'kafkajs';
 
 @Catch()
 export class KafkaMaxRetryExceptionFilter extends BaseExceptionFilter {
   private readonly logger = new Logger(KafkaMaxRetryExceptionFilter.name);
 
   constructor(
+    private readonly producer: Producer,
     private readonly maxRetries: number,
     // 超过最大重试次数时执行的可选自定义函数
     private readonly skipHandler?: (message: any) => Promise<void>,
@@ -480,24 +482,60 @@ export class KafkaMaxRetryExceptionFilter extends BaseExceptionFilter {
       return; // 停止传播异常
     }
 
-    // 如果重试计数低于最大值，继续使用默认异常过滤器逻辑
-    super.catch(exception, host);
+    // 将消息重新发布到同一主题，并递增重试计数
+    try {
+      await this.republishWithRetry(kafkaContext, currentRetryCount + 1);
+      await this.commitOffset(kafkaContext);
+    } catch (republishError) {
+      this.logger.error('Failed to republish message for retry:', republishError);
+      // 回退到默认异常处理
+      super.catch(exception, host);
+    }
   }
 
   private getRetryCountFromContext(context: KafkaContext): number {
     const headers = context.getMessage().headers || {};
-    const retryHeader = headers['retryCount'] || headers['retry-count'];
-    return retryHeader ? Number(retryHeader) : 0;
+    const retryHeader = headers['retry-count'];
+    if (!retryHeader) {
+      return 0;
+    }
+    // 头部值是 Buffer，因此先转换为字符串
+    const value = Buffer.isBuffer(retryHeader)
+      ? retryHeader.toString()
+      : String(retryHeader);
+    return parseInt(value, 10) || 0;
+  }
+
+  private async republishWithRetry(
+    context: KafkaContext,
+    retryCount: number,
+  ): Promise<void> {
+    const topic = context.getTopic();
+    const message = context.getMessage();
+
+    await this.producer.send({
+      topic,
+      messages: [
+        {
+          key: message.key,
+          value: message.value,
+          headers: {
+            ...message.headers,
+            'retry-count': retryCount.toString(),
+          },
+        },
+      ],
+    });
   }
 
   private async commitOffset(context: KafkaContext): Promise<void> {
-    const consumer = context.getConsumer && context.getConsumer();
+    const consumer = context.getConsumer();
     if (!consumer) {
       throw new Error('Consumer instance is not available from KafkaContext.');
     }
 
-    const topic = context.getTopic && context.getTopic();
-    const partition = context.getPartition && context.getPartition();
+    const topic = context.getTopic();
+    const partition = context.getPartition();
     const message = context.getMessage();
     const offset = message.offset;
 
@@ -520,12 +558,26 @@ export class KafkaMaxRetryExceptionFilter extends BaseExceptionFilter {
 
 ```
 
-此过滤器提供了一种方法，可以最多重试处理 Kafka 事件达可配置的次数。一旦达到最大重试次数，它会触发自定义 `skipHandler`（如果提供）并提交偏移量，有效地跳过有问题的事件。这允许后续事件被处理而不会中断。
+此过滤器提供了一种方法，可以最多重试处理 Kafka 事件达可配置的次数。当发生异常时，它会将消息重新发布到相同主题，并递增 `retry-count` 头，然后提交当前偏移量。一旦达到最大重试次数，它会触发自定义 `skipHandler`（如果提供）并提交偏移量，有效地跳过有问题的事件。这允许后续事件被处理而不会中断。
 
-您可以通过将此过滤器添加到事件处理程序来集成它：
+您可以通过全局注册或在控制器级别注册此过滤器来集成它。注意，您需要提供一个 Kafka producer 实例：
 
 ```typescript
-@UseFilters(new KafkaMaxRetryExceptionFilter(5))
+import { Inject, Injectable } from '@nestjs/common';
+import { Producer } from 'kafkajs';
+
+@Injectable()
+export class AppKafkaRetryFilter extends KafkaMaxRetryExceptionFilter {
+  constructor(@Inject('KAFKA_PRODUCER') producer: Producer) {
+    super(producer, 5); // maxRetries = 5
+  }
+}
+
+```
+
+```typescript
+@Controller()
+@UseFilters(AppKafkaRetryFilter)
 export class MyEventHandler {
   @EventPattern('your-topic')
   async handleEvent(@Payload() data: any, @Ctx() context: KafkaContext) {
@@ -543,13 +595,6 @@ export class MyEventHandler {
 @EventPattern('user.created')
 async handleUserCreated(@Payload() data: IncomingMessage, @Ctx() context: KafkaContext) {
   // 业务逻辑
-
-  const { offset } = context.getMessage();
-  const partition = context.getPartition();
-  const topic = context.getTopic();
-  const consumer = context.getConsumer();
-  await consumer.commitOffsets([{ topic, partition, offset }])
-}
 
   const { offset } = context.getMessage();
   const partition = context.getPartition();

@@ -327,6 +327,19 @@ async create(@Body() createCatDto: CreateCatDto) {
 `@UsePipes()` 装饰器从 `@nestjs/common` 包中导入。
 :::
 
+`ZodValidationPipe` 也可以应用于特定参数，并与内置管道一起使用。例如，我们可能希望使用 `ParseIntPipe` 单独校验路由路径参数 `id`，同时对请求体使用 `ZodValidationPipe`：
+
+```typescript
+@Put('/:id')
+async update(
+  @Param('id', ParseIntPipe) id: number,
+  @Body(new ZodValidationPipe(createCatSchema)) body: CreateCatDto
+): void {
+  this.catsService.update(id, body);
+}
+
+```
+
 :::warning 警告
 `zod` 库要求在您的 `tsconfig.json` 文件中启用 `strictNullChecks` 配置。
 :::

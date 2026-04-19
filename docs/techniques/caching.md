@@ -249,9 +249,9 @@ $ npm install @keyv/redis
 import { Module } from '@nestjs/common';
 import { CacheModule } from '@nestjs/cache-manager';
 import { AppController } from './app.controller';
-import { createKeyv } from '@keyv/redis';
+import KeyvRedis from '@keyv/redis';
 import { Keyv } from 'keyv';
-import { CacheableMemory } from 'cacheable';
+import { KeyvCacheableMemory } from 'cacheable';
 
 @Module({
   imports: [
@@ -260,9 +260,9 @@ import { CacheableMemory } from 'cacheable';
         return {
           stores: [
             new Keyv({
-              store: new CacheableMemory({ ttl: 60000, lruSize: 5000 }),
+              store: new KeyvCacheableMemory({ ttl: 60000, lruSize: 5000 }),
             }),
-            createKeyv('redis://localhost:6379'),
+            new KeyvRedis('redis://localhost:6379'),
           ],
         };
       },
@@ -274,7 +274,7 @@ export class AppModule {}
 
 ```
 
-在此示例中，我们注册了两个存储库：`CacheableMemory` 和 `KeyvRedis`。其中 `CacheableMemory` 是一个简单的内存存储，而 `KeyvRedis` 则是 Redis 存储。`stores` 数组用于指定要使用的存储库，数组中的第一个存储库为默认存储，其余为备用存储。
+在此示例中，我们注册了两个存储库：`CacheableMemory` 和 `KeyvRedis`。其中 `CacheableMemory` 是一个简单的内存存储，它通过 `KeyvCacheableMemory` 存储适配器创建；`KeyvRedis` 则是 Redis 存储。`stores` 数组用于指定要使用的存储库，数组中的第一个存储库为默认存储，其余为备用存储。
 
 更多关于可用存储库的信息，请参阅 [Keyv 文档](https://keyv.org/docs/) 。
 

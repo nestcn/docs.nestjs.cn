@@ -34,6 +34,7 @@ export interface ValidationPipeOptions extends ValidatorOptions {
   transform?: boolean;
   disableErrorMessages?: boolean;
   exceptionFactory?: (errors: ValidationError[]) => any;
+  errorFormat?: 'list' | 'grouped';
 }
 
 ```
@@ -131,6 +132,11 @@ export interface ValidationPipeOptions extends ValidatorOptions {
     <td><code>stopAtFirstError</code></td>
     <td><code>boolean</code></td>
     <td>当设置为 true 时，给定属性的验证将在遇到第一个错误后停止。默认为 false。</td>
+  </tr>
+  <tr>
+    <td><code>errorFormat</code></td>
+    <td><code>'list' | 'grouped'</code></td>
+    <td>指定验证错误消息的格式。<code>'list'</code>（默认）返回错误消息字符串数组。<code>'grouped'</code> 返回一个对象，以属性路径为键、以未修改错误消息数组为值，能够保留自定义验证消息，而不会在前面附加父级路径前缀。</td>
   </tr>
 </table>
 

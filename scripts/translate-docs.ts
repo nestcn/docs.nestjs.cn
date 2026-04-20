@@ -63,7 +63,8 @@ class DocumentTranslator {
     const scriptDir = path.dirname(new URL(import.meta.url).pathname);
 
     this.aiClient = new AIClient({
-      apiKey: options.apiKey || process.env.NVIDIA_API_KEY,
+      apiKey: options.apiKey,
+      baseUrl: options.baseUrl,
       model: options.model || 'deepseek-ai/deepseek-v3_1',
       maxTokens: options.maxTokens || 4096,
     });
@@ -376,15 +377,28 @@ if (args.includes('--help') || args.includes('-h')) {
 选项:
   --content-dir <dir>     源文件目录 (默认: content)
   --docs-dir <dir>        目标文件目录 (默认: docs)
-  --model <model>         NVIDIA NIM 模型 (默认: deepseek-ai/deepseek-v3_1)
-  --concurrency <num>     并发请求数 (默认: 3, 受 40 RPM 限速)
-  --api-key <key>         NVIDIA API Key (或设置 NVIDIA_API_KEY 环境变量)
+  --model <model>         AI 模型 (默认: deepseek-ai/deepseek-v3_1)
+                          NVIDIA NIM: deepseek-ai/deepseek-v3_1, meta/llama-3.1-405b-instruct
+                          OpenAI: gpt-5.4-codex, gpt-4o, gpt-4-turbo, claude-3.5-sonnet
+  --base-url <url>        API 端点 (默认根据模型自动选择)
+  --concurrency <num>     并发请求数 (默认: 3, 受 RPM 限速)
+  --api-key <key>         API Key (或设置 NVIDIA_API_KEY / OPENAI_API_KEY 环境变量)
   --no-ai                 禁用 AI 翻译，仅处理格式
   --translate-english     翻译 docs 目录下的英文文件
   --force                 强制重新翻译所有文件
   --resume                从上次中断点继续翻译
   --verbose, -v           显示详细信息
   --help, -h              显示帮助信息
+
+示例:
+  # 使用默认模型 (DeepSeek V3.1)
+  bun scripts/translate-docs.ts
+
+  # 使用 GPT-5.4-codex
+  OPENAI_API_KEY=sk-xxx bun scripts/translate-docs.ts --model gpt-5.4-codex
+
+  # 使用自定义 API 端点 (中转站)
+  bun scripts/translate-docs.ts --model gpt-5.4-codex --base-url https://your-proxy.com/v1/chat/completions
 `);
   process.exit(0);
 }
@@ -397,6 +411,7 @@ const options: Partial<TranslatorOptions> = {
   docsDir: getArgValue('--docs-dir') || 'docs',
   useAI: !args.includes('--no-ai'),
   model: getArgValue('--model') || 'deepseek-ai/deepseek-v3_1',
+  baseUrl: getArgValue('--base-url'),
   concurrency: concurrencyValue ? parseInt(concurrencyValue, 10) : 3,
   translateEnglish: args.includes('--translate-english'),
   force: args.includes('--force'),

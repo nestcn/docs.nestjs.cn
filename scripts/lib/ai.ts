@@ -3,6 +3,7 @@
  *
  * 统一的 AI 翻译接口，支持：
  * - NVIDIA NIM (默认，使用 DeepSeek V3.1)
+ * - OpenAI / OpenAI 兼容 API (GPT-5.4-codex 等)
  * - 指数退避重试（3 次，针对 429/500/503）
  * - 速率限制（默认 40 RPM）
  * - 滑动窗口上下文（分段翻译时附加前段摘要）
@@ -10,6 +11,49 @@
 
 import type { AIConfig, AICompletionResponse, GlossaryData } from './types.js';
 import { getErrorMessage } from './types.js';
+
+// 支持的模型配置
+export const SUPPORTED_MODELS = {
+  // NVIDIA NIM 模型
+  'deepseek-ai/deepseek-v3_1': {
+    provider: 'nvidia',
+    name: 'DeepSeek V3.1',
+    rpmLimit: 40,
+  },
+  'meta/llama-3.1-405b-instruct': {
+    provider: 'nvidia',
+    name: 'Llama 3.1 405B',
+    rpmLimit: 40,
+  },
+  'meta/llama-3.1-70b-instruct': {
+    provider: 'nvidia',
+    name: 'Llama 3.1 70B',
+    rpmLimit: 40,
+  },
+  // OpenAI / OpenAI 兼容模型
+  'gpt-5.4-codex': {
+    provider: 'openai',
+    name: 'GPT-5.4 Codex',
+    rpmLimit: 60,
+  },
+  'gpt-4o': {
+    provider: 'openai',
+    name: 'GPT-4o',
+    rpmLimit: 60,
+  },
+  'gpt-4-turbo': {
+    provider: 'openai',
+    name: 'GPT-4 Turbo',
+    rpmLimit: 60,
+  },
+  'claude-3.5-sonnet': {
+    provider: 'openai',
+    name: 'Claude 3.5 Sonnet',
+    rpmLimit: 60,
+  },
+} as const;
+
+export type ModelId = keyof typeof SUPPORTED_MODELS;
 
 // ============================================================================
 // AI Client
@@ -19,15 +63,33 @@ export class AIClient {
   private config: AIConfig;
   private lastRequestTime = 0;
   private requestIntervalMs: number;
+  private provider: 'nvidia' | 'openai';
 
   constructor(config: Partial<AIConfig> = {}) {
+    const model = config.model || 'deepseek-ai/deepseek-v3_1';
+    const modelConfig = SUPPORTED_MODELS[model as ModelId];
+    
+    this.provider = modelConfig?.provider || 'nvidia';
+    
+    // 根据 provider 选择默认配置
+    let defaultBaseUrl: string;
+    let defaultApiKey: string;
+    
+    if (this.provider === 'openai') {
+      defaultBaseUrl = 'https://api.openai.com/v1/chat/completions';
+      defaultApiKey = process.env.OPENAI_API_KEY || '';
+    } else {
+      defaultBaseUrl = 'https://integrate.api.nvidia.com/v1/chat/completions';
+      defaultApiKey = process.env.NVIDIA_API_KEY || '';
+    }
+    
     this.config = {
-      apiKey: config.apiKey || process.env.NVIDIA_API_KEY || '',
-      baseUrl: config.baseUrl || 'https://integrate.api.nvidia.com/v1/chat/completions',
-      model: config.model || 'deepseek-ai/deepseek-v3_1',
+      apiKey: config.apiKey || defaultApiKey,
+      baseUrl: config.baseUrl || defaultBaseUrl,
+      model: model,
       maxTokens: config.maxTokens || 4096,
       temperature: config.temperature || 0.3,
-      rpmLimit: config.rpmLimit || 40,
+      rpmLimit: config.rpmLimit || modelConfig?.rpmLimit || 40,
     };
     // 计算请求间隔
     this.requestIntervalMs = Math.ceil(60_000 / this.config.rpmLimit);
@@ -35,6 +97,10 @@ export class AIClient {
 
   get isConfigured(): boolean {
     return !!this.config.apiKey;
+  }
+  
+  get modelInfo() {
+    return SUPPORTED_MODELS[this.config.model as ModelId];
   }
 
   /**
@@ -49,7 +115,8 @@ export class AIClient {
     } = {},
   ): Promise<{ content: string; usage?: AICompletionResponse['usage'] }> {
     if (!this.config.apiKey) {
-      throw new Error('API Key 未配置 (设置 NVIDIA_API_KEY 环境变量)');
+      const envVar = this.provider === 'openai' ? 'OPENAI_API_KEY' : 'NVIDIA_API_KEY';
+      throw new Error(`API Key 未配置 (设置 ${envVar} 环境变量)`);
     }
 
     const systemPrompt = this.buildSystemPrompt(options.glossary, options.previousContext);

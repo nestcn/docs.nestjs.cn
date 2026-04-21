@@ -60,6 +60,10 @@ $ npm install --save-dev @suites/unit @suites/di.nestjs @suites/doubles.sinon
 
 </details>
 
+:::info 提示
+请确保您的 `tsconfig` 的 `compilerOptions` 中启用了 `"emitDecoratorMetadata": true`（NestJS 标准配置）。
+:::
+
 #### 设置类型定义
 
 在项目根目录创建 `global.d.ts`：

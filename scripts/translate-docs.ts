@@ -175,7 +175,7 @@ class DocumentTranslator {
 
     const sourceStats = fs.statSync(sourcePath);
     const targetStats = fs.statSync(targetPath);
-    if (sourceStats.mtime > targetStats.mtime) return true;
+    if (sourceStats.mtime.getTime() !== targetStats.mtime.getTime()) return true;
 
     return false;
   }

@@ -266,7 +266,16 @@ class DocumentTranslator {
         translatedContent = await this.translateWithAI(content, relativePath);
       } else if (fs.existsSync(outputPath)) {
         const existingContent = fs.readFileSync(outputPath, 'utf8');
-        translatedContent = hasChineseContent(existingContent) ? existingContent : content;
+        const sourceHash = contentHash(content);
+        const cached = this.cache.get(relativePath, sourceHash);
+        if (cached) {
+          console.log(`  Cached (no-ai), keeping existing: ${relativePath}`);
+          translatedContent = existingContent;
+        } else {
+          console.log(`  Source changed (no-ai), using new source: ${relativePath}`);
+          translatedContent = content;
+          this.cache.set(relativePath, sourceHash, '__no-ai__');
+        }
       } else {
         translatedContent = content;
       }

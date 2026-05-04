@@ -45,7 +45,7 @@ constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 `Cache` 类是从 `cache-manager` 导入的，而 `CACHE_MANAGER` 令牌则来自 `@nestjs/cache-manager` 包。
 :::
 
-`Cache` 实例（来自 `cache-manager` 包）上的 `get` 方法用于从缓存中检索项目。如果缓存中不存在该项目，将返回 `null`。
+`Cache` 实例（来自 `cache-manager` 包）上的 `get` 方法用于从缓存中检索项目。如果缓存中不存在该项目，将返回 `undefined`（在 `cache-manager` v6 及更早版本中，之前返回的是 `null`）。迁移时请将两者都视为假值。
 
 ```typescript
 const value = await this.cacheManager.get('key');

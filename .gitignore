@@ -18,3 +18,12 @@ scripts/.progress.json
 .env
 .agents
 progress.md
+
+servers.local.md
+.mailbox/
+.agents/state/
+AGENTS.md
+.cursorrules
+CLAUDE.md
+.goosehints
+.zed/CONVENTIONS.md

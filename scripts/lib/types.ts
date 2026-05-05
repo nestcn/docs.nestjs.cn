@@ -42,7 +42,6 @@ export interface TranslatorOptions {
   translateEnglish: boolean;
   useAI: boolean;
   model: string;
-  baseUrl?: string;
   apiKey?: string;
   maxTokens: number;
   force: boolean;

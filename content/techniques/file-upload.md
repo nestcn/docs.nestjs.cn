@@ -10,7 +10,7 @@ For better type safety, let's install Multer typings package:
 $ npm i -D @types/multer
 ```
 
-With this package installed, we can now use the `Express.Multer.File` type (you can import this type as follows: `import {{ '{' }} Express {{ '}' }} from 'express'`).
+With this package installed, we can now use the `Express.Multer.File` type (you can import this type as follows: `import { Express } from 'express';`).
 
 #### Basic example
 

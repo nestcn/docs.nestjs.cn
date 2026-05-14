@@ -17,7 +17,7 @@ $ npm i -D @types/multer
 
 ```
 
-安装此包后，我们现在可以使用 `Express.Multer.File` 类型（你可以按如下方式导入此类型：`import {{ '{' }} Express {{ '}' }} from 'express'`）。
+安装此包后，我们现在可以使用 `Express.Multer.File` 类型（你可以按如下方式导入此类型：`import { Express } from 'express';`）。
 
 #### 基本示例
 

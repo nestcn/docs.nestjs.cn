@@ -137,17 +137,6 @@ export class CatsModule {
   constructor(private catsService: CatsService) {}
 }
 
-@Module({
-  controllers: [CatsController],
-  providers: [CatsService],
-})
-@Dependencies(CatsService)
-export class CatsModule {
-  constructor(catsService) {
-    this.catsService = catsService;
-  }
-}
-
 ```
 
 但是，模块类本身不能注入为提供者，因为 [循环依赖](/fundamentals/circular-dependency)。
@@ -194,21 +183,6 @@ import { Connection } from './connection.provider';
 })
 export class DatabaseModule {
   static forRoot(entities = [], options?): DynamicModule {
-    const providers = createDatabaseProviders(options, entities);
-    return {
-      module: DatabaseModule,
-      providers: providers,
-      exports: providers,
-    };
-  }
-}
-
-@Module({
-  providers: [Connection],
-  exports: [Connection],
-})
-export class DatabaseModule {
-  static forRoot(entities = [], options) {
     const providers = createDatabaseProviders(options, entities);
     return {
       module: DatabaseModule,

@@ -25,17 +25,6 @@ export class CatsService {
   }
 }
 
-@Injectable()
-export class CatsService {
-  constructor() {
-    this.cats = [];
-  }
-
-  findAll() {
-    return this.cats;
-  }
-}
-
 ```
 
 然后我们请求 Nest 将提供者注入到我们的控制器类中：
@@ -51,19 +40,6 @@ export class CatsController {
 
   @Get()
   async findAll(): Promise<Cat[]> {
-    return this.catsService.findAll();
-  }
-}
-
-@Controller('cats')
-@Dependencies(CatsService)
-export class CatsController {
-  constructor(catsService) {
-    this.catsService = catsService;
-  }
-
-  @Get()
-  async findAll() {
     return this.catsService.findAll();
   }
 }
@@ -264,15 +240,6 @@ const connectionProvider = {
 })
 export class AppModule {}
 
-@Module({
-  providers: [
-    connectionProvider,
-    MyOptionsProvider, // 基于类的提供者
-    // { provide: 'SomeOptionalProvider', useValue: 'anything' },
-  ],
-})
-export class AppModule {}
-
 ```
 
 #### 别名提供者：`useExisting`
@@ -338,12 +305,6 @@ const connectionFactory = {
 })
 export class AppModule {}
 
-@Module({
-  providers: [connectionFactory],
-  exports: ['CONNECTION'],
-})
-export class AppModule {}
-
 ```
 
 或者，使用完整的提供者对象导出：
@@ -357,12 +318,6 @@ const connectionFactory = {
   },
   inject: [OptionsProvider],
 };
-
-@Module({
-  providers: [connectionFactory],
-  exports: [connectionFactory],
-})
-export class AppModule {}
 
 @Module({
   providers: [connectionFactory],

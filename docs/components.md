@@ -31,21 +31,6 @@ export class CatsService {
   }
 }
 
-@Injectable()
-export class CatsService {
-  constructor() {
-    this.cats = [];
-  }
-
-  create(cat) {
-    this.cats.push(cat);
-  }
-
-  findAll() {
-    return this.cats;
-  }
-}
-
 ```
 
 :::info 提示
@@ -84,25 +69,6 @@ export class CatsController {
 
   @Get()
   async findAll(): Promise<Cat[]> {
-    return this.catsService.findAll();
-  }
-}
-
-@Controller('cats')
-@Dependencies(CatsService)
-export class CatsController {
-  constructor(catsService) {
-    this.catsService = catsService;
-  }
-
-  @Post()
-  @Bind(Body())
-  async create(createCatDto) {
-    this.catsService.create(createCatDto);
-  }
-
-  @Get()
-  async findAll() {
     return this.catsService.findAll();
   }
 }
@@ -158,22 +124,6 @@ export class CatsService {
   }
 
   findAll(): Cat[] {
-    return this.cats;
-  }
-}
-
-@Injectable()
-export class CatsService {
-  constructor(@Optional() @Inject('CREATE_CAT_OPTIONS') options) {
-    this.cats = [];
-    this.options = options;
-  }
-
-  create(cat) {
-    this.cats.push(cat);
-  }
-
-  findAll() {
     return this.cats;
   }
 }

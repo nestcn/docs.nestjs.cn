@@ -15,7 +15,7 @@ import { glob } from 'glob';
 
 const DOCS_DIR = path.resolve(process.cwd(), 'docs');
 
-function fixCodeBlocks(content: string): string {
+export function fixCodeBlocks(content: string): string {
   let result = content;
 
   // 1. 移除 @@switch 分支及其后面的代码块

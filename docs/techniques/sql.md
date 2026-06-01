@@ -78,16 +78,6 @@ export class AppModule {
   constructor(private dataSource: DataSource) {}
 }
 
-@Dependencies(DataSource)
-@Module({
-  imports: [TypeOrmModule.forRoot(), UsersModule],
-})
-export class AppModule {
-  constructor(dataSource) {
-    this.dataSource = dataSource;
-  }
-}
-
 ```
 
 #### 存储库模式
@@ -189,26 +179,6 @@ export class UsersService {
   }
 
   async remove(id: number): Promise<void> {
-    await this.usersRepository.delete(id);
-  }
-}
-
-@Injectable()
-@Dependencies(getRepositoryToken(User))
-export class UsersService {
-  constructor(usersRepository) {
-    this.usersRepository = usersRepository;
-  }
-
-  findAll() {
-    return this.usersRepository.find();
-  }
-
-  findOne(id) {
-    return this.usersRepository.findOneBy({ id });
-  }
-
-  async remove(id) {
     await this.usersRepository.delete(id);
   }
 }
@@ -834,14 +804,6 @@ export class AppService {
   constructor(private sequelize: Sequelize) {}
 }
 
-@Dependencies(Sequelize)
-@Injectable()
-export class AppService {
-  constructor(sequelize) {
-    this.sequelize = sequelize;
-  }
-}
-
 ```
 
 #### 模型
@@ -940,31 +902,6 @@ export class UsersService {
   }
 
   async remove(id: string): Promise<void> {
-    const user = await this.findOne(id);
-    await user.destroy();
-  }
-}
-
-@Injectable()
-@Dependencies(getModelToken(User))
-export class UsersService {
-  constructor(usersRepository) {
-    this.usersRepository = usersRepository;
-  }
-
-  async findAll() {
-    return this.userModel.findAll();
-  }
-
-  findOne(id) {
-    return this.userModel.findOne({
-      where: {
-        id,
-      },
-    });
-  }
-
-  async remove(id) {
     const user = await this.findOne(id);
     await user.destroy();
   }

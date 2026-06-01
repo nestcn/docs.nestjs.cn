@@ -23,6 +23,7 @@ import {
 import { AIClient } from './lib/ai.js';
 import { TranslationCache, ProgressTracker, contentHash } from './lib/cache.js';
 import { loadGlossary } from './lib/glossary.js';
+import { fixCodeBlocks } from './fix-code-blocks.js';
 
 dotenv.config();
 
@@ -250,8 +251,7 @@ class DocumentTranslator {
       }
 
       let content = fs.readFileSync(contentPath, 'utf8');
-      content = content.replace(/@@switch[\s\S]*?(?=```|\n\n|$)/g, '');
-      content = content.replace(/^@@filename\s*\([^)]*\)\s*\r?\n/gm, '');
+      content = fixCodeBlocks(content);
 
       const outputDir = path.dirname(outputPath);
       if (!fs.existsSync(outputDir)) {

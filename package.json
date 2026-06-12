@@ -45,7 +45,7 @@
   "devDependencies": {
     "@types/node": "^24.9.2",
     "markdown-link-check": "^3.14.2",
-    "tsx": "^4.21.0",
+    "tsx": "^4.22.4",
     "typescript": "^5.9.3"
   }
 }

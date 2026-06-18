@@ -27,3 +27,6 @@ AGENTS.md
 CLAUDE.md
 .goosehints
 .zed/CONVENTIONS.md
+tasks.md
+.agents/automations/
+.agents/goal-forge/runs/

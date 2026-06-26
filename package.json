@@ -34,18 +34,18 @@
     "check-translation-integrity:verbose": "bun scripts/check-translation-integrity.ts --verbose"
   },
   "dependencies": {
-    "@hono/node-server": "^1.19.13",
-    "@rspress/core": "^2.0.14",
-    "@rspress/plugin-client-redirects": "^2.0.4",
-    "dotenv": "^17.3.1",
-    "glob": "^11.1.0",
-    "hono": "^4.12.26",
-    "p-limit": "^7.2.0"
+    "@hono/node-server": "^2.0.6",
+    "@rspress/core": "^2.0.15",
+    "@rspress/plugin-client-redirects": "^2.0.15",
+    "dotenv": "^17.4.2",
+    "glob": "^13.0.6",
+    "hono": "^4.12.27",
+    "p-limit": "^7.3.0"
   },
   "devDependencies": {
-    "@types/node": "^24.9.2",
+    "@types/node": "^26.0.1",
     "markdown-link-check": "^3.14.2",
     "tsx": "^4.22.4",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.3"
   }
 }

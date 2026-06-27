@@ -182,7 +182,7 @@ export default () => {
 ```
 
 :::warning 注意
-Nest CLI 不会在构建过程中自动将您的"资产"（非 TS 文件）移动到 `dist` 文件夹。为确保您的 YAML 文件被复制，您必须在 `nest-cli.json` 文件的 `compilerOptions#资源` 对象中指定这一点。例如，如果 `config` 文件夹与 `src` 文件夹处于同一级别，请添加 `compilerOptions#资源`，值为 `"assets": [{{ '{' }}"include": "../config/*.yaml", "outDir": "./dist/config"{{ '}' }}]`。在此处阅读更多 [内容](/cli/workspaces#资源)。
+Nest CLI 不会在构建过程中自动将您的"资产"（非 TS 文件）移动到 `dist` 文件夹。为确保您的 YAML 文件被复制，您必须在 `nest-cli.json` 文件的 `compilerOptions#资源` 对象中指定这一点。例如，如果 `config` 文件夹与 `src` 文件夹处于同一级别，请添加 `compilerOptions#资源`，值为 `"assets": [{"include": "../config/*.yaml", "outDir": "./dist/config"}]`。在此处阅读更多 [内容](/cli/workspaces#资源)。
 :::
 
 快速说明 - 即使您在 NestJS 的 `ConfigModule` 中使用 `validationSchema` 选项，配置文件也不会自动验证。如果您需要验证或想要应用任何转换，您必须在工厂函数中处理，在那里您可以完全控制配置对象。这允许您根据需要实现任何自定义验证逻辑。
@@ -656,7 +656,7 @@ SUPPORT_EMAIL=support@${APP_URL}
 
 ```
 
-通过这种结构，变量 `SUPPORT_EMAIL` 解析为 `'support@mywebsite.com'`。注意使用 `${{ '{' }}...{{ '}' }}` 语法来触发解析 `SUPPORT_EMAIL` 定义内的 `APP_URL` 变量的值。
+通过这种结构，变量 `SUPPORT_EMAIL` 解析为 `'support@mywebsite.com'`。注意使用 `${...}` 语法来触发解析 `SUPPORT_EMAIL` 定义内的 `APP_URL` 变量的值。
 
 ::: info 提示 
 对于此功能，`@nestjs/config` 包内部使用 [dotenv-expand](https://github.com/motdotla/dotenv-expand)。

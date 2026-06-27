@@ -74,7 +74,7 @@ bootstrap();
 请注意，使用 Nest CLI 搭建的项目创建了一个初始项目结构，鼓励开发人员遵循将每个模块保存在自己专用目录中的约定。
 
 :::info 提示
-默认情况下，如果在创建应用程序时发生任何错误，你的应用将以代码 `1` 退出。如果你想让它抛出错误而不是退出，请禁用 `abortOnError` 选项（例如，`NestFactory.create(AppModule, {{ '{' }} abortOnError: false {{ '}' }})`）。
+默认情况下，如果在创建应用程序时发生任何错误，你的应用将以代码 `1` 退出。如果你想让它抛出错误而不是退出，请禁用 `abortOnError` 选项（例如，`NestFactory.create(AppModule, { abortOnError: false })`）。
 :::
 
 <app-banner-courses></app-banner-courses>

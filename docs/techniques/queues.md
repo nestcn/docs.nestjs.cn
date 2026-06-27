@@ -794,7 +794,7 @@ async transcode(job: Job<unknown>) { ... }
 ```
 
 :::warning 警告
-为同一队列定义多个消费者时，`@Process({{ '{' }} concurrency: 1 {{ '}' }})` 中的 `concurrency` 选项不会生效。最小 `concurrency` 将匹配定义的消费者数量。即使 `@Process()` 处理程序使用不同的 `name` 来处理命名作业，这也适用。
+为同一队列定义多个消费者时，`@Process({ concurrency: 1 })` 中的 `concurrency` 选项不会生效。最小 `concurrency` 将匹配定义的消费者数量。即使 `@Process()` 处理程序使用不同的 `name` 来处理命名作业，这也适用。
 :::
 
 #### 请求作用域消费者

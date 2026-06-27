@@ -18,6 +18,11 @@ const DOCS_DIR = path.resolve(process.cwd(), 'docs');
 export function fixCodeBlocks(content: string): string {
   let result = content;
 
+  // 0. 还原 Nunjucks 转义的花括号: {{ '{' }} -> {, {{ '}' }} -> }
+  // 这些是 Nunjucks/Jinja2 模板语法，RSPress (MDX) 不需要这种转义
+  result = result.replace(/\{\{ '\{' \}\}/g, '{');
+  result = result.replace(/\{\{ '\}' \}\}/g, '}');
+
   // 1. 移除 @@switch 分支及其后面的代码块
   // 匹配 @@switch 后面跟着的整个代码块（直到下一个 ```）
   result = result.replace(

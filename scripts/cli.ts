@@ -307,6 +307,9 @@ async function runFix() {
     const original = content;
 
     // --- 代码块修复 ---
+    // 还原 Nunjucks 转义的花括号
+    content = content.replace(/\{\{ '\{' \}\}/g, '{');
+    content = content.replace(/\{\{ '\}' \}\}/g, '}');
     // 移除 @@switch 分支
     content = content.replace(/@@switch\s*\r?\n```[\s\S]*?```\s*\r?\n/g, '');
     content = content.replace(/@@switch\s*\r?\n(?:(?!@@filename|```|##)[\s\S])*/g, '');

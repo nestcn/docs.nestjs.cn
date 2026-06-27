@@ -94,7 +94,7 @@ export class KillDragonCommand extends Command<{
 
 ```
 
-如你所见，`KillDragonCommand` 类扩展了 `Command` 类。`Command` 类是从 `@nestjs/cqrs` 包导出的简单实用类，允许你定义命令的返回类型。在这种情况下，返回类型是具有 `actionId` 属性的对象。现在，每当分派 `KillDragonCommand` 命令时，`CommandBus#execute()` 方法的返回类型将被推断为 `Promise<{{ '{' }} actionId: string {{ '}' }}>`。当你想从命令处理程序返回一些数据时，这很有用。
+如你所见，`KillDragonCommand` 类扩展了 `Command` 类。`Command` 类是从 `@nestjs/cqrs` 包导出的简单实用类，允许你定义命令的返回类型。在这种情况下，返回类型是具有 `actionId` 属性的对象。现在，每当分派 `KillDragonCommand` 命令时，`CommandBus#execute()` 方法的返回类型将被推断为 `Promise<{ actionId: string }>`。当你想从命令处理程序返回一些数据时，这很有用。
 
 :::info 提示
 从 `Command` 类继承是可选的。只有在你想要定义命令的返回类型时才需要。

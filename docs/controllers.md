@@ -70,7 +70,7 @@ export class CatsController {
 </table>
 
 :::warning 警告
-Nest 会检测处理程序何时使用 `@Res()` 或 `@Next()`，表明您已选择库特定选项。如果同时使用两种方法，则此单个路由的标准方法会 **自动禁用**，并且将不再按预期工作。要同时使用两种方法（例如，通过注入响应对象仅设置 cookie/标头但仍将其余部分留给框架），您必须在 `@Res({{ '{' }} passthrough: true {{ '}' }})` 装饰器中将 `passthrough` 选项设置为 `true`。
+Nest 会检测处理程序何时使用 `@Res()` 或 `@Next()`，表明您已选择库特定选项。如果同时使用两种方法，则此单个路由的标准方法会 **自动禁用**，并且将不再按预期工作。要同时使用两种方法（例如，通过注入响应对象仅设置 cookie/标头但仍将其余部分留给框架），您必须在 `@Res({ passthrough: true })` 装饰器中将 `passthrough` 选项设置为 `true`。
 :::
 
 <app-banner-devtools></app-banner-devtools>
@@ -211,7 +211,7 @@ findAll() {
 
 这种方法在 Express 和 Fastify 上都有效。然而，随着 Express（v5）的最新版本，路由系统变得更加严格。在纯 Express 中，您必须使用命名通配符来使路由工作 - 例如，`abcd/*splat`，其中 `splat` 只是通配符参数的名称，没有特殊含义。您可以随意命名它。也就是说，由于 Nest 为 Express 提供了兼容层，您仍然可以使用星号（`*`）作为通配符。
 
-当涉及到在路由 **中间** 使用的星号时，Express 需要命名通配符（例如，`ab{{ '{' }}*splat&#125;cd`），而 Fastify 根本不支持它们。
+当涉及到在路由 **中间** 使用的星号时，Express 需要命名通配符（例如，`ab{*splat&#125;cd`），而 Fastify 根本不支持它们。
 
 #### 状态码
 

@@ -12,8 +12,8 @@
 
 Express v5 最显著的更新之一是修订的路径路由匹配算法。以下变更已引入到路径字符串如何与传入请求匹配的方式：
 
-- 通配符 `*` 必须具有名称，与参数的行为匹配：使用 `/*splat` 或 `/{{ '{' }}*splat&#125;` 而不是 `/*`。`splat` 只是通配符参数的名称，没有特殊含义。你可以随意命名，例如 `*wildcard`
-- 可选字符 `?` 不再受支持，使用大括号代替：`/:file{{ '{' }}.:ext&#125;`。
+- 通配符 `*` 必须具有名称，与参数的行为匹配：使用 `/*splat` 或 `/{*splat&#125;` 而不是 `/*`。`splat` 只是通配符参数的名称，没有特殊含义。你可以随意命名，例如 `*wildcard`
+- 可选字符 `?` 不再受支持，使用大括号代替：`/:file{.:ext&#125;`。
 - 正则表达式字符不受支持。
 - 一些字符已保留以避免升级期间混淆 `(()[]?+!)`，使用 `\` 转义它们。
 - 参数名称现在支持有效的 JavaScript 标识符，或用引号括起来如 `:"this"`。
@@ -41,7 +41,7 @@ findAll() {
 ```
 
 :::warning 警告
-请注意，`*splat` 是一个命名通配符，匹配除根路径外的任何路径。如果你还需要匹配根路径（`/users`），你可以使用 `/users/{{ '{' }}*splat&#125;`，将通配符用大括号括起来（可选组）。请注意，`splat` 只是通配符参数的名称，没有特殊含义。你可以随意命名，例如 `*wildcard`。
+请注意，`*splat` 是一个命名通配符，匹配除根路径外的任何路径。如果你还需要匹配根路径（`/users`），你可以使用 `/users/{*splat&#125;`，将通配符用大括号括起来（可选组）。请注意，`splat` 只是通配符参数的名称，没有特殊含义。你可以随意命名，例如 `*wildcard`。
 :::
 
 类似地，如果你有一个在所有路由上运行的中间件，你可能需要更新路径以使用命名通配符：
@@ -60,7 +60,7 @@ forRoutes('{*splat}'); // <-- 这将在 Express v5 中工作
 
 ```
 
-请注意，`{{ '{' }}*splat&#125;` 是一个命名通配符，匹配包括根路径在内的任何路径。外部大括号使路径可选。
+请注意，`{*splat&#125;` 是一个命名通配符，匹配包括根路径在内的任何路径。外部大括号使路径可选。
 
 #### 查询参数解析
 
@@ -158,8 +158,8 @@ NestJS 11 现在使用最新版本的 [path-to-regexp](https://www.npmjs.com/pac
 
 - 去重你想要存根的动态模块
 - 使用 `module.select(ParentModule).get(Target)` 查找正确的实例
-- 使用 `module.get(Target, {{ '{' }} each: true &#125;)` 存根所有实例
-- 或者使用 `Test.createTestingModule({{ '{' }}&#125;, {{ '{' }} moduleIdGeneratorAlgorithm: 'deep-hash' &#125;)` 将测试切换回旧算法
+- 使用 `module.get(Target, { each: true &#125;)` 存根所有实例
+- 或者使用 `Test.createTestingModule({&#125;, { moduleIdGeneratorAlgorithm: 'deep-hash' &#125;)` 将测试切换回旧算法
 
 #### Reflector 类型推断
 
@@ -253,7 +253,7 @@ CacheModule.registerAsync({
 其中 `KeyvRedis` 从 `@keyv/redis` 包导入。请参阅 [缓存文档](/techniques/caching) 了解更多信息。
 
 :::warning 警告
-在此更新中，由 Keyv 库处理的缓存数据现在被构造为包含 `value` 和 `expires` 字段的对象，例如：`{{ '{' }}"value": "yourData", "expires": 1678901234567{{ '}' }}`。虽然 Keyv 在通过其 API 访问数据时自动检索 `value` 字段，但如果你直接与缓存数据交互（例如，在 cache-manager API 之外）或需要支持使用以前版本的 `@nestjs/cache-manager` 写入的数据，请注意此变更。
+在此更新中，由 Keyv 库处理的缓存数据现在被构造为包含 `value` 和 `expires` 字段的对象，例如：`{"value": "yourData", "expires": 1678901234567}`。虽然 Keyv 在通过其 API 访问数据时自动检索 `value` 字段，但如果你直接与缓存数据交互（例如，在 cache-manager API 之外）或需要支持使用以前版本的 `@nestjs/cache-manager` 写入的数据，请注意此变更。
 :::
 
 #### 配置模块

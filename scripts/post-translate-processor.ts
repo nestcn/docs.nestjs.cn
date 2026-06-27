@@ -64,6 +64,10 @@ function processFile(
       console.log(`  ⚡ 特殊文件，不替换 docs.nestjs.com 链接`);
     }
 
+    // 0. 还原 Nunjucks 转义的花括号
+    content = content.replace(/\{\{ '\{' \}\}/g, '{');
+    content = content.replace(/\{\{ '\}' \}\}/g, '}');
+
     // 1. 修正内部链接路径（非特殊文件）
     if (!isSpecial) {
       content = content.replace(

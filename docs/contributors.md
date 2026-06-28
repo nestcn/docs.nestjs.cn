@@ -464,17 +464,17 @@ docs/
     </td></tr>
 <tr>
     <td align="center">
-        <a href="https://github.com/AqingCyan">
-            <img src="https://avatars.githubusercontent.com/u/32301956?v=4" width="100;" alt="AqingCyan"/>
-            <br />
-            <sub><b>AqingCyan</b></sub>
-        </a>
-    </td>
-    <td align="center">
         <a href="https://github.com/meepobrother">
             <img src="https://avatars.githubusercontent.com/u/8385261?v=4" width="100;" alt="meepobrother"/>
             <br />
             <sub><b>meepobrother</b></sub>
+        </a>
+    </td>
+    <td align="center">
+        <a href="https://github.com/AqingCyan">
+            <img src="https://avatars.githubusercontent.com/u/32301956?v=4" width="100;" alt="AqingCyan"/>
+            <br />
+            <sub><b>AqingCyan</b></sub>
         </a>
     </td>
     <td align="center">
@@ -757,10 +757,10 @@ docs/
         </a>
     </td>
     <td align="center">
-        <a href="https://github.com/me1onpan">
-            <img src="https://avatars.githubusercontent.com/u/104211723?v=4" width="100;" alt="me1onpan"/>
+        <a href="https://github.com/muyu66">
+            <img src="https://avatars.githubusercontent.com/u/20837526?v=4" width="100;" alt="muyu66"/>
             <br />
-            <sub><b>me1onpan</b></sub>
+            <sub><b>muyu66</b></sub>
         </a>
     </td></tr>
 <tr>
@@ -1008,20 +1008,27 @@ docs/
         </a>
     </td>
     <td align="center">
+        <a href="https://github.com/Half-Sugar-Code">
+            <img src="https://avatars.githubusercontent.com/u/54879607?v=4" width="100;" alt="Half-Sugar-Code"/>
+            <br />
+            <sub><b>Half-Sugar-Code</b></sub>
+        </a>
+    </td>
+    <td align="center">
         <a href="https://github.com/Grapedge">
             <img src="https://avatars.githubusercontent.com/u/22425339?v=4" width="100;" alt="Grapedge"/>
             <br />
             <sub><b>Grapedge</b></sub>
         </a>
-    </td>
+    </td></tr>
+<tr>
     <td align="center">
         <a href="https://github.com/genalhuang">
             <img src="https://avatars.githubusercontent.com/u/46491653?v=4" width="100;" alt="genalhuang"/>
             <br />
             <sub><b>genalhuang</b></sub>
         </a>
-    </td></tr>
-<tr>
+    </td>
     <td align="center">
         <a href="https://github.com/wjw-gavin">
             <img src="https://avatars.githubusercontent.com/u/19986739?v=4" width="100;" alt="wjw-gavin"/>
@@ -1056,15 +1063,15 @@ docs/
             <br />
             <sub><b>coding-ax</b></sub>
         </a>
-    </td>
+    </td></tr>
+<tr>
     <td align="center">
         <a href="https://github.com/lemontree2000">
             <img src="https://avatars.githubusercontent.com/u/21957062?v=4" width="100;" alt="lemontree2000"/>
             <br />
             <sub><b>lemontree2000</b></sub>
         </a>
-    </td></tr>
-<tr>
+    </td>
     <td align="center">
         <a href="https://github.com/DougLee">
             <img src="https://avatars.githubusercontent.com/u/2282371?v=4" width="100;" alt="DougLee"/>
@@ -1099,15 +1106,15 @@ docs/
             <br />
             <sub><b>BYVoid</b></sub>
         </a>
-    </td>
+    </td></tr>
+<tr>
     <td align="center">
         <a href="https://github.com/caperso">
             <img src="https://avatars.githubusercontent.com/u/34877623?v=4" width="100;" alt="caperso"/>
             <br />
             <sub><b>caperso</b></sub>
         </a>
-    </td></tr>
-<tr>
+    </td>
     <td align="center">
         <a href="https://github.com/CaanDoll">
             <img src="https://avatars.githubusercontent.com/u/23540471?v=4" width="100;" alt="CaanDoll"/>
@@ -1127,13 +1134,6 @@ docs/
             <img src="https://avatars.githubusercontent.com/u/25625252?v=4" width="100;" alt="yunyu950908"/>
             <br />
             <sub><b>yunyu950908</b></sub>
-        </a>
-    </td>
-    <td align="center">
-        <a href="https://github.com/muyu66">
-            <img src="https://avatars.githubusercontent.com/u/20837526?v=4" width="100;" alt="muyu66"/>
-            <br />
-            <sub><b>muyu66</b></sub>
         </a>
     </td>
     <td align="center">
@@ -1313,6 +1313,13 @@ docs/
             <img src="https://avatars.githubusercontent.com/u/12481493?v=4" width="100;" alt="philipxyc"/>
             <br />
             <sub><b>philipxyc</b></sub>
+        </a>
+    </td>
+    <td align="center">
+        <a href="https://github.com/me1onpan">
+            <img src="https://avatars.githubusercontent.com/u/104211723?v=4" width="100;" alt="me1onpan"/>
+            <br />
+            <sub><b>me1onpan</b></sub>
         </a>
     </td></tr>
 </table>

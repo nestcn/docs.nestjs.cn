@@ -17,7 +17,7 @@
   
   <blockquote>
     <p>
-      📅 <strong>最近翻译时间:</strong> <!-- LAST_SYNC_TIME --> 2026年06月12日 14:49 <!-- /LAST_SYNC_TIME -->
+      📅 <strong>最近翻译时间:</strong> <!-- LAST_SYNC_TIME --> 2026年07月11日 13:19 <!-- /LAST_SYNC_TIME -->
       <br>
       <em>文档每日自动同步并翻译，确保与官方保持同步，同步时间：</em>
       <br>

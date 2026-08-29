@@ -22,29 +22,29 @@ To better understand what's the cost of using Nest or other, well-known librarie
 
 ```typescript
 // #1 Express
-import * as express from 'express';
+import express from 'express';
 
 async function bootstrap() {
   const app = express();
   app.get('/', (req, res) => res.send('Hello world!'));
   await new Promise<void>((resolve) => app.listen(3000, resolve));
 }
-bootstrap();
+await bootstrap();
 
 // #2 Nest (with @nestjs/platform-express)
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { AppModule } from './app.module.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { logger: ['error'] });
   await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+await bootstrap();
 
 // #3 Nest as a Standalone application (no HTTP server)
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { AppService } from './app.service';
+import { AppModule } from './app.module.js';
+import { AppService } from './app.service.js';
 
 async function bootstrap() {
   const app = await NestFactory.createApplicationContext(AppModule, {
@@ -52,13 +52,13 @@ async function bootstrap() {
   });
   console.log(app.get(AppService).getHello());
 }
-bootstrap();
+await bootstrap();
 
 // #4 Raw Node.js script
 async function bootstrap() {
   console.log('Hello world!');
 }
-bootstrap();
+await bootstrap();
 ```
 
 For all these scripts, we used the `tsc` (TypeScript) compiler and so the code remains unbundled (`webpack` isn't used).
@@ -128,7 +128,7 @@ For more complicated Nest applications, for example, with 10 resources (generate
 Thus far we covered compile-time optimizations. These are unrelated to the way you define providers and load Nest modules in your application, and that plays an essential role as your application gets bigger.
 
 For example, imagine having a database connection defined as an [asynchronous provider](/fundamentals/async-providers). Async providers are designed to delay the application start until one or more asynchronous tasks are completed.
-That means, if your serverless function on average requires 2s to connect to the database (on bootstrap), your endpoint will need at least two extra seconds (because it must wait till the connection is established) to send a response back (when it's a cold start and your application wasn't running already).
+That means, if your serverless function on average requires 2s to connect to the database (on bootstrap), your endpoint will need at least two extra seconds (because it must wait until the connection is established) to send a response back (when it's a cold start and your application wasn't running already).
 
 As you can see, the way you structure your providers is somewhat different in a **serverless environment** where bootstrap time is important.
 Another good example is if you use Redis for caching, but only in certain scenarios. Perhaps, in this case, you should not define a Redis connection as an async provider, as it would slow down the bootstrap time, even if it's not required for this specific function invocation.
@@ -215,7 +215,7 @@ With this in place, we can now navigate to the `main.ts` file and update our boo
 import { NestFactory } from '@nestjs/core';
 import serverlessExpress from '@codegenie/serverless-express';
 import { Callback, Context, Handler } from 'aws-lambda';
-import { AppModule } from './app.module';
+import { AppModule } from './app.module.js';
 
 let server: Handler;
 
@@ -239,7 +239,16 @@ export const handler: Handler = async (
 
 > info **Hint** For creating multiple serverless functions and sharing common modules between them, we recommend using the [CLI Monorepo mode](/cli/monorepo#monorepo-mode).
 
-> warning **Warning** If you use `@nestjs/swagger` package, there are a few additional steps required to make it work properly in the context of serverless function. Check out this [thread](https://github.com/nestjs/swagger/issues/199) for more information.
+> warning **Warning** If you use the `@nestjs/swagger` package, serving the Swagger UI from a serverless function requires one extra step. Behind API Gateway, the request's `originalUrl` may lack the trailing slash Swagger UI expects, which causes an endless redirect loop. Register a middleware that restores it **before** calling `SwaggerModule.setup()`:
+>
+> ```typescript
+> app.use((req, res, next) => {
+>   if (req.originalUrl === '/swagger') {
+>     req.originalUrl = '/swagger/';
+>   }
+>   next();
+> });
+> ```
 
 Next, open up the `tsconfig.json` file and make sure to enable the `esModuleInterop` option to make the `@codegenie/serverless-express` package load properly.
 
@@ -314,8 +323,8 @@ you can just use `NestFactory.createApplicationContext` (as mentioned earlier) i
 import { HttpStatus } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { Callback, Context, Handler } from 'aws-lambda';
-import { AppModule } from './app.module';
-import { AppService } from './app.service';
+import { AppModule } from './app.module.js';
+import { AppService } from './app.service.js';
 
 export const handler: Handler = async (
   event: any,

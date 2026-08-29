@@ -142,6 +142,8 @@ export class AppModule {}
 > where the guard (`RolesGuard` in the example above) is defined. Also, `useClass` is not the only way of dealing with
 > custom provider registration. Learn more [here](/fundamentals/custom-providers).
 
+> info **Hint** You can register the `APP_GUARD` token multiple times (in the same or different modules) — every registered guard runs for each request, in registration order. Also note that `APP_GUARD` (like the other `APP_*` tokens) is a pseudo-provider consumed by the framework during bootstrap: it cannot be retrieved later with `app.get()` or injected elsewhere.
+
 #### Setting roles per handler
 
 Our `RolesGuard` is working, but it's not very smart yet. We're not yet taking advantage of the most important guard feature - the [execution context](/fundamentals/execution-context). It doesn't yet know about roles, or which roles are allowed for each handler. The `CatsController`, for example, could have different permission schemes for different routes. Some might be available only for an admin user, and others could be open for everyone. How can we match roles to routes in a flexible and reusable way?
@@ -189,7 +191,7 @@ Let's now go back and tie this together with our `RolesGuard`. Currently, it sim
 @@filename(roles.guard)
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Roles } from './roles.decorator';
+import { Roles } from './roles.decorator.js';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -208,7 +210,7 @@ export class RolesGuard implements CanActivate {
 @@switch
 import { Injectable, Dependencies } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Roles } from './roles.decorator';
+import { Roles } from './roles.decorator.js';
 
 @Injectable()
 @Dependencies(Reflector)

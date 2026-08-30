@@ -165,6 +165,40 @@ Using the above, this is how the response would look:
 }
 ```
 
+#### Machine-readable error codes
+
+The `status` and `message` of an exception describe an error well enough for humans, but they are awkward for clients to branch on. Several distinct failures - an invalid email, a weak password - can all surface as `400 Bad Request`, which forces the client to parse the human-readable message string to tell them apart.
+
+To avoid that, pass an `errorCode` through the `options` parameter. It is a stable, machine-readable identifier that is serialized into the response body:
+
+```typescript
+throw new BadRequestException('Password is too weak', {
+  errorCode: 'WEAK_PASSWORD',
+});
+```
+
+The response then carries the code alongside the usual fields:
+
+```json
+{
+  "message": "Password is too weak",
+  "errorCode": "WEAK_PASSWORD",
+  "statusCode": 400
+}
+```
+
+`errorCode` is optional and can be combined with `cause` and `description`. It is also available on `HttpException` itself, so custom exceptions can set it too:
+
+```typescript
+throw new HttpException(
+  'Forbidden',
+  HttpStatus.FORBIDDEN,
+  { errorCode: 'ACCOUNT_SUSPENDED' },
+);
+```
+
+> info **Hint** Unlike `cause`, which is intended for logging and is never serialized, `errorCode` is part of the response body and is meant to be consumed by clients.
+
 #### Exception filters
 
 While the base (built-in) exception filter can automatically handle many cases for you, you may want **full control** over the exceptions layer. For example, you may want to add logging or use a different JSON schema based on some dynamic factors. **Exception filters** are designed for exactly this purpose. They let you control the exact flow of control and the content of the response sent back to the client.
@@ -292,7 +326,7 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
   await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+await bootstrap();
 ```
 
 > warning **Warning** The `useGlobalFilters()` method does not set up filters for gateways or hybrid applications.
@@ -316,6 +350,8 @@ export class AppModule {}
 ```
 
 > info **Hint** When using this approach to perform dependency injection for the filter, note that regardless of the module where this construction is employed, the filter is, in fact, global. Where should this be done? Choose the module where the filter (`HttpExceptionFilter` in the example above) is defined. Also, `useClass` is not the only way of dealing with custom provider registration. Learn more [here](/fundamentals/custom-providers).
+
+> info **Hint** Exceptions thrown from [middleware](/middleware#error-handling) are also processed by the exceptions layer. Because middleware runs before a route handler is selected, only **global** exception filters apply (`app.useGlobalFilters()` or `APP_FILTER`). Method-scoped and controller-scoped `@UseFilters()` bindings are not invoked.
 
 You can add as many filters with this technique as needed; simply add each to the providers array.
 
@@ -408,7 +444,7 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+await bootstrap();
 ```
 
 The second method is to use the `APP_FILTER` token <a href="exception-filters#binding-filters">as shown here</a>.

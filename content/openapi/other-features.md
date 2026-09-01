@@ -51,9 +51,9 @@ You can setup multiple specifications support as shown below:
 ```typescript
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { AppModule } from './app.module';
-import { CatsModule } from './cats/cats.module';
-import { DogsModule } from './dogs/dogs.module';
+import { AppModule } from './app.module.js';
+import { CatsModule } from './cats/cats.module.js';
+import { DogsModule } from './dogs/dogs.module.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -96,7 +96,7 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+await bootstrap();
 ```
 
 Now you can start your server with the following command:
@@ -119,14 +119,14 @@ To enable support for multiple specifications in the dropdown menu of the explor
 
 > info **Hint** Ensure that `swaggerOptions.urls` points to the JSON format of your Swagger documents! To specify the JSON document, use `jsonDocumentUrl` within `SwaggerCustomOptions`. For more setup options, check [here](/openapi/introduction#setup-options).
 
-Here’s how to set up multiple specifications from a dropdown in the explorer bar:
+Here's how to set up multiple specifications from a dropdown in the explorer bar:
 
 ```typescript
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { AppModule } from './app.module';
-import { CatsModule } from './cats/cats.module';
-import { DogsModule } from './dogs/dogs.module';
+import { AppModule } from './app.module.js';
+import { CatsModule } from './cats/cats.module.js';
+import { DogsModule } from './dogs/dogs.module.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -202,7 +202,7 @@ async function bootstrap() {
   await app.listen(3000);
 }
 
-bootstrap();
+await bootstrap();
 ```
 
 In this example, we set up a main API along with separate specifications for Cats and Dogs, each accessible from the dropdown in the explorer bar.

@@ -22,6 +22,7 @@ Nest comes with a number of built-in pipes that you can use out-of-the-box. You 
 Nest comes with several pipes available out-of-the-box:
 
 - `ValidationPipe`
+- `StandardSchemaValidationPipe`
 - `ParseIntPipe`
 - `ParseFloatPipe`
 - `ParseBoolPipe`
@@ -67,7 +68,7 @@ Nest will throw an exception like this:
 
 The exception will prevent the body of the `findOne()` method from executing.
 
-In the example above, we pass a class (`ParseIntPipe`), not an instance, leaving responsibility for instantiation to the framework and enabling dependency injection. As with pipes and guards, we can instead pass an in-place instance. Passing an in-place instance is useful if we want to customize the built-in pipe's behavior by passing options:
+In the example above, we pass a class (`ParseIntPipe`), not an instance, leaving responsibility for instantiation to the framework and enabling dependency injection. As with guards and exception filters, we can instead pass an in-place instance. Passing an in-place instance is useful if we want to customize the built-in pipe's behavior by passing options:
 
 ```typescript
 @Get(':id')
@@ -116,7 +117,7 @@ Above we've seen examples of binding the various `Parse*` family of built-in pip
 
 As mentioned, you can build your own custom pipes. While Nest provides a robust built-in `ParseIntPipe` and `ValidationPipe`, let's build simple custom versions of each from scratch to see how custom pipes are constructed.
 
-We start with a simple `ValidationPipe`. Initially, we'll have it simply take an input value and immediately return the same value, behaving like an identity function.
+We start with a simple `ValidationPipe`. Initially, we'll have it take an input value and return it unchanged, behaving like an identity function.
 
 ```typescript
 @@filename(validation.pipe)
@@ -153,6 +154,7 @@ export interface ArgumentMetadata {
   type: 'body' | 'query' | 'param' | 'custom';
   metatype?: Type<unknown>;
   data?: string;
+  schema?: StandardSchemaV1;
 }
 ```
 
@@ -187,9 +189,19 @@ These properties describe the currently processed argument.
       <code>@Body('string')</code>. It's
       <code>undefined</code> if you leave the decorator parenthesis empty.</td>
   </tr>
+  <tr>
+    <td>
+      <code>schema</code>
+    </td>
+    <td>
+      A Standard Schema compatible schema attached through parameter decorator options such as <code>@Body({{ '{' }} schema {{ '}' }})</code> or <code>@Param('id', {{ '{' }} schema {{ '}' }})</code>.
+    </td>
+  </tr>
 </table>
 
 > warning **Warning** TypeScript interfaces disappear during transpilation. Thus, if a method parameter's type is declared as an interface instead of a class, the `metatype` value will be `Object`.
+
+> info **Hint** The built-in `StandardSchemaValidationPipe` reads the `schema` metadata field so you can validate route parameters with any Standard Schema compatible library.
 
 #### Schema based validation
 
@@ -445,7 +457,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+await bootstrap();
 ```
 
 > warning **Notice** In the case of <a href="faq/hybrid-application">hybrid apps</a> the `useGlobalPipes()` method doesn't set up pipes for gateways and microservices. For "standard" (non-hybrid) microservice apps, `useGlobalPipes()` does mount pipes globally.

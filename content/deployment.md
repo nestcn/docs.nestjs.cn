@@ -2,6 +2,8 @@
 
 When you're ready to deploy your NestJS application to production, there are key steps you can take to ensure it runs as efficiently as possible. In this guide, we'll explore essential tips and best practices to help you deploy your NestJS application successfully.
 
+If you'd rather not manage infrastructure yourself, [Mau](https://mau.nestjs.com/ 'Deploy Nest') - our official deployment platform - gets you to production on AWS with a single command. Jump straight to [Easy deployment with Mau](/deployment#easy-deployment-with-mau), or read on for the underlying concepts that apply to any hosting choice.
+
 #### Prerequisites
 
 Before deploying your NestJS application, ensure you have:
@@ -12,14 +14,7 @@ Before deploying your NestJS application, ensure you have:
 - Any required services, like a database, set up and ready to go.
 - At least an LTS version of Node.js installed on your deployment platform.
 
-> info **Hint** If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com/ 'Deploy Nest'), our official platform for deploying NestJS applications on AWS. With Mau, deploying your NestJS application is as simple as clicking a few buttons and running a single command:
->
-> ```bash
-> $ npm install -g @nestjs/mau
-> $ mau deploy
-> ```
->
-> Once the deployment is complete, you'll have your NestJS application up and running on AWS in seconds!
+> info **Hint** With [Mau](https://mau.nestjs.com/ 'Deploy Nest'), most of the list above is handled for you: it provisions the server, the databases and brokers your app needs, and the environment variables, so the only prerequisite left is the application itself.
 
 #### Building your application
 
@@ -37,7 +32,7 @@ Upon successful compilation, you should see a `dist` directory in your project r
 
 Your production environment is where your application will be accessible to external users. This could be a cloud-based platform like [AWS](https://aws.amazon.com/) (with EC2, ECS, etc.), [Azure](https://azure.microsoft.com/), or [Google Cloud](https://cloud.google.com/), or even a dedicated server you manage, such as [Hetzner](https://www.hetzner.com/).
 
-To simplify the deployment process and avoid manual setup, you can use a service like [Mau](https://mau.nestjs.com/ 'Deploy Nest'), our official platform for deploying NestJS applications on AWS. For more details, check out [this section](todo).
+To simplify the deployment process and avoid manual setup, you can use [Mau](https://mau.nestjs.com/ 'Deploy Nest'), our official platform for deploying NestJS applications on AWS. It gives you the benefits of AWS listed below without requiring you to configure any of it yourself - see [Easy deployment with Mau](/deployment#easy-deployment-with-mau) for details.
 
 Some of the pros of using a **cloud-based platform** or service like [Mau](https://mau.nestjs.com/ 'Deploy Nest') include:
 
@@ -68,9 +63,9 @@ To run your NestJS application in production, just use the following command:
 $ node dist/main.js # Adjust this based on your entry point location
 ```
 
-This command starts your application, which will listen on the specified port (usually `3000` by default). Ensure that this matches the port you’ve configured in your application.
+This command starts your application, which will listen on the specified port (usually `3000` by default). Ensure that this matches the port you've configured in your application.
 
-Alternatively, you can use the `nest start` command. This command is a wrapper around `node dist/main.js`, but it has one key difference: it automatically runs `nest build` before starting the application, so you don’t need to manually execute `npm run build`.
+Alternatively, you can use the `nest start` command. This command is a wrapper around `node dist/main.js`, but it has one key difference: it automatically runs `nest build` before starting the application, so you don't need to manually execute `npm run build`.
 
 #### Health checks
 
@@ -95,6 +90,18 @@ Best practices for logging:
 
 For distributed applications, using a centralized logging service like ElasticSearch, Loggly, or Datadog can be incredibly useful. These tools offer powerful features like log aggregation, search, and visualization, making it easier to monitor and analyze your application's performance and behavior.
 
+#### Observability
+
+Health checks and logs tell you whether the application is up; they don't tell you which route got slower after the last deploy, which class is burning the time, or which line threw. For that, instrument the application with [NestJS Observe](https://www.observe.nestjs.com/ 'NestJS Observe'), our official observability platform: install the `@nestjs/observe` SDK, pass an API key, and requests, jobs, errors, logs, and traces start streaming to a dashboard with no manual span wiring or collector to run.
+
+```typescript
+const app = await NestFactory.create(AppModule, {
+  instrument: ObserveInstrument,
+});
+```
+
+See the [Observability](/observability/overview) chapter for the full setup, including versioning deployments with `serviceVersion` so each release is compared against the one before it.
+
 #### Scaling up or out
 
 Scaling your NestJS application effectively is crucial for handling increased traffic and ensuring optimal performance. There are two primary strategies for scaling: **vertical scaling** and **horizontal scaling**. Understanding these approaches will help you design your application to manage load efficiently.
@@ -105,7 +112,7 @@ Scaling your NestJS application effectively is crucial for handling increased tr
 - Limitations: There are physical limits to how much you can scale a single machine. Once you reach the maximum capacity, you may need to consider other options.
 - Cost-Effectiveness: For applications with moderate traffic, vertical scaling can be cost-effective, as it reduces the need for additional infrastructure.
 
-Example: If your NestJS app is hosted on a virtual machine and you notice that it’s running slowly during peak hours, you can upgrade your VM to a larger instance with more resources. To upgrade your VM, just navigate to your current provider's dashboard and select a larger instance type.
+Example: If your NestJS app is hosted on a virtual machine and you notice that it's running slowly during peak hours, you can upgrade your VM to a larger instance with more resources. To upgrade your VM, just navigate to your current provider's dashboard and select a larger instance type.
 
 **Horizontal scaling**, or "scaling out" involves adding more servers or instances to distribute the load. This strategy is widely used in cloud environments and is essential for applications expecting high traffic. Here are the benefits and considerations:
 
@@ -227,13 +234,32 @@ Cloud providers like AWS, Azure, and Google Cloud offer managed container servic
 
 #### Easy deployment with Mau
 
-[Mau](https://mau.nestjs.com/ 'Deploy Nest') is our official platform for deploying NestJS applications on [AWS](https://aws.amazon.com/). If you're not ready to manage your infrastructure manually (or just want to save time), Mau is the perfect solution for you.
+[Mau](https://mau.nestjs.com/ 'Deploy Nest') is our official platform for deploying NestJS applications on [AWS](https://aws.amazon.com/). It handles everything the previous sections described - provisioning the server, wiring up databases and brokers, managing environment variables, scaling, monitoring, and CI/CD - so you don't have to assemble it yourself.
 
-With Mau, provisioning and maintaining your infrastructure is as simple as clicking just a few buttons. Mau is designed to be simple and intuitive, so you can focus on building your applications and not worry about the underlying infrastructure. Under the hood, we use **Amazon Web Services** to provide you with a powerful and reliable platform, while abstracting away all the complexity of AWS. We take care of all the heavy lifting for you, so you can focus on building your applications and growing your business.
+##### Deploying
 
-[Mau](https://mau.nestjs.com/ 'Deploy Nest') is perfect for startups, small-to-medium businesses, large enterprises, and developers who want to get up and running quickly without having to spend a lot of time on learning and managing infrastructure. It's incredibly easy to use, and you can have your infrastructure up and running in minutes. It also leverages AWS behind the scenes, giving you all the advantages of AWS without the hassle of managing its complexities.
+As of NestJS v12, the Nest CLI ships a `deploy` command. Run it from your project root:
 
-<figure><img src="/assets/mau-metrics.png" /></figure>
+```bash
+$ nest deploy
+```
+
+If Mau isn't installed yet, the command offers to add `@nestjs/mau` as a dev dependency and then continues. Any options you pass are forwarded straight to Mau. See [nest deploy](/cli/usages#nest-deploy) for details.
+
+You can also install the CLI globally and invoke Mau directly, which is the right choice for CI environments where interactive prompts aren't available:
+
+```bash
+$ npm install -g @nestjs/mau
+$ mau deploy
+```
+
+Once the deployment completes, your application is live on AWS - typically within minutes of your first run.
+
+##### Why Mau
+
+With Mau, provisioning and maintaining your infrastructure is as simple as clicking a few buttons. Under the hood we use **Amazon Web Services** to give you a powerful and reliable platform, while abstracting away the complexity of AWS. You get the advantages of AWS without having to learn and manage its details, which makes Mau a good fit for startups, small-to-medium businesses, large enterprises, and any developer who would rather ship than configure infrastructure.
+
+<figure><img src="https://www.mau.nestjs.com/docs/applications/dashboard.png" /></figure>
 
 With [Mau](https://mau.nestjs.com/ 'Deploy Nest'), you can:
 
@@ -253,11 +279,31 @@ With [Mau](https://mau.nestjs.com/ 'Deploy Nest'), you can:
 - Setup **CI/CD pipelines** for automated deployments.
 - And much more!
 
-To deploy your NestJS application with Mau, just run the following command:
+##### How Mau maps to this guide
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+Each topic covered earlier in this chapter has a managed equivalent in Mau:
+
+<table>
+  <tr>
+    <td><a href="/deployment#node_envproduction">Environment variables</a></td>
+    <td>Set <code>NODE_ENV</code> and your secrets in the Mau dashboard instead of managing them on the server.</td>
+  </tr>
+  <tr>
+    <td><a href="/deployment#logging">Logging</a></td>
+    <td>Logs are collected and viewable in the dashboard. JSON logging is especially useful here - see the <a href="/techniques/logger">Logger chapter</a>.</td>
+  </tr>
+  <tr>
+    <td><a href="/deployment#scaling-up-or-out">Scaling</a></td>
+    <td>Built-in support for horizontal scaling: run multiple instances of your application and manage them from the dashboard.</td>
+  </tr>
+  <tr>
+    <td><a href="/deployment#health-checks">Health checks</a></td>
+    <td>Point Mau at the endpoint you expose with <a href="/recipes/terminus">Terminus</a> and unhealthy instances are handled for you.</td>
+  </tr>
+  <tr>
+    <td><a href="/deployment#some-other-tips">Monitoring and backups</a></td>
+    <td>Metrics come from AWS CloudWatch, and managed databases are backed up automatically.</td>
+  </tr>
+</table>
 
 Sign up today and [Deploy with Mau](https://mau.nestjs.com/ 'Deploy Nest') to get your NestJS applications up and running on AWS in minutes!

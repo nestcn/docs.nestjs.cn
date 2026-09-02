@@ -81,7 +81,7 @@ creationDate: Date;
 
 #### Import a custom scalar
 
-To use a custom scalar, import and register it as a resolver. We’ll use the `graphql-type-json` package for demonstration purposes. This npm package defines a `JSON` GraphQL scalar type.
+To use a custom scalar, import and register it as a resolver. We'll use the `graphql-type-json` package for demonstration purposes. This npm package defines a `JSON` GraphQL scalar type.
 
 Start by installing the package:
 
@@ -158,7 +158,7 @@ uuid: string;
 
 #### Schema first
 
-To define a custom scalar (read more about scalars [here](https://www.apollographql.com/docs/graphql-tools/scalars.html)), create a type definition and a dedicated resolver. Here (as in the official documentation), we’ll use the `graphql-type-json` package for demonstration purposes. This npm package defines a `JSON` GraphQL scalar type.
+To define a custom scalar (read more about scalars [here](https://www.apollographql.com/docs/graphql-tools/scalars.html)), create a type definition and a dedicated resolver. Here (as in the official documentation), we'll use the `graphql-type-json` package for demonstration purposes. This npm package defines a `JSON` GraphQL scalar type.
 
 Start by installing the package:
 
@@ -239,7 +239,7 @@ But, you can configure how Nest generates typings for your custom scalars when y
 
 ```typescript
 import { GraphQLDefinitionsFactory } from '@nestjs/graphql';
-import { join } from 'path';
+import { join } from 'node:path';
 
 const definitionsFactory = new GraphQLDefinitionsFactory();
 

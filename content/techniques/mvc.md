@@ -15,44 +15,44 @@ In order to create an MVC app, we also need a [template engine](https://expressj
 $ npm install --save hbs
 ```
 
-We've used the `hbs` ([Handlebars](https://github.com/pillarjs/hbs#readme)) engine, though you can use whatever fits your requirements. Once the installation process is complete, we need to configure the express instance using the following code:
+We've used the `hbs` ([Handlebars](https://github.com/pillarjs/hbs#readme)) engine, though you can use whatever fits your requirements. Once the installation process is complete, we need to configure the Express instance using the following code:
 
 ```typescript
 @@filename(main)
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'node:path';
-import { AppModule } from './app.module';
+import { AppModule } from './app.module.js';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(
     AppModule,
   );
 
-  app.useStaticAssets(join(__dirname, '..', 'public'));
-  app.setBaseViewsDir(join(__dirname, '..', 'views'));
+  app.useStaticAssets(join(import.meta.dirname, '..', 'public'));
+  app.setBaseViewsDir(join(import.meta.dirname, '..', 'views'));
   app.setViewEngine('hbs');
 
   await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+await bootstrap();
 @@switch
 import { NestFactory } from '@nestjs/core';
 import { join } from 'node:path';
-import { AppModule } from './app.module';
+import { AppModule } from './app.module.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(
     AppModule,
   );
 
-  app.useStaticAssets(join(__dirname, '..', 'public'));
-  app.setBaseViewsDir(join(__dirname, '..', 'views'));
+  app.useStaticAssets(join(import.meta.dirname, '..', 'public'));
+  app.setBaseViewsDir(join(import.meta.dirname, '..', 'views'));
   app.setViewEngine('hbs');
 
   await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+await bootstrap();
 ```
 
 We told [Express](https://github.com/expressjs/express) that the `public` directory will be used for storing static assets, `views` will contain templates, and the `hbs` template engine should be used to render HTML output.
@@ -90,9 +90,87 @@ export class AppController {
 }
 ```
 
-In this code, we are specifying the template to use in the `@Render()` decorator, and the return value of the route handler method is passed to the template for rendering. Notice that the return value is an object with a property `message`, matching the `message` placeholder we created in the template.
+In this code, we specify the template to use in the `@Render()` decorator, and the return value of the route handler method is passed to the template for rendering. Notice that the return value is an object with a `message` property, matching the `message` placeholder we created in the template.
 
 While the application is running, open your browser and navigate to `http://localhost:3000`. You should see the `Hello world!` message.
+
+#### Adding a layout
+
+The `hbs` engine supports layouts — shared wrapper templates that individual views are rendered into. To use one, set the `layout` local variable with the `setLocal()` method (Nest's wrapper around Express's [app.locals](https://expressjs.com/en/5x/api.html#app.locals)). Let's modify the previous code as follows:
+
+```typescript
+@@filename(main)
+import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create<NestExpressApplication>(
+    AppModule,
+  );
+
+  app.setLocal('layout', 'layouts/app');
+  app.useStaticAssets(join(__dirname, '..', 'public'));
+  app.setBaseViewsDir(join(__dirname, '..', 'views'));
+  app.setViewEngine('hbs');
+
+  await app.listen(process.env.PORT ?? 3000);
+}
+bootstrap();
+@@switch
+import { NestFactory } from '@nestjs/core';
+import { join } from 'path';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(
+    AppModule,
+  );
+
+  app.setLocal('layout', 'layouts/app');
+  app.useStaticAssets(join(__dirname, '..', 'public'));
+  app.setBaseViewsDir(join(__dirname, '..', 'views'));
+  app.setViewEngine('hbs');
+
+  await app.listen(process.env.PORT ?? 3000);
+}
+bootstrap();
+```
+
+Next, create a `layouts` folder and add an `app.hbs` file with the following content:
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>App</title>
+  </head>
+  <body>
+    {{ '{' }}{{ '{' }}{{ '{' }}body{{ '}' }}{{ '}' }}{{ '}' }}
+  </body>
+</html>
+```
+
+Then, update the `index.hbs` file to:
+
+```html
+{{ "{{ message }\}" }}
+```
+
+The resulting file structure looks as follows:
+
+<div class="file-tree">
+  <div class="item">views</div>
+  <div class="children">
+    <div class="item">layouts</div>
+    <div class="children">
+      <div class="item">app.hbs</div>
+    </div>
+    <div class="item">index.hbs</div>
+  </div>
+</div>
 
 #### Dynamic template rendering
 
@@ -104,7 +182,7 @@ If the application logic must dynamically decide which template to render, then 
 @@filename(app.controller)
 import { Get, Controller, Res, Render } from '@nestjs/common';
 import { Response } from 'express';
-import { AppService } from './app.service';
+import { AppService } from './app.service.js';
 
 @Controller()
 export class AppController {
@@ -126,7 +204,7 @@ A working example is available [here](https://github.com/nestjs/nest/tree/master
 
 #### Fastify
 
-As mentioned in this [chapter](/techniques/performance), we are able to use any compatible HTTP provider together with Nest. One such library is [Fastify](https://github.com/fastify/fastify). In order to create an MVC application with Fastify, we have to install the following packages:
+As mentioned in this [chapter](/techniques/performance), we can use any compatible HTTP provider together with Nest. One such library is [Fastify](https://github.com/fastify/fastify). To create an MVC application with Fastify, install the following packages:
 
 ```bash
 $ npm i --save @fastify/static @fastify/view handlebars
@@ -138,8 +216,9 @@ The next steps cover almost the same process used with Express, with minor diffe
 @@filename(main)
 import { NestFactory } from '@nestjs/core';
 import { NestFastifyApplication, FastifyAdapter } from '@nestjs/platform-fastify';
-import { AppModule } from './app.module';
+import { AppModule } from './app.module.js';
 import { join } from 'node:path';
+import Handlebars from 'handlebars';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -147,44 +226,45 @@ async function bootstrap() {
     new FastifyAdapter(),
   );
   app.useStaticAssets({
-    root: join(__dirname, '..', 'public'),
+    root: join(import.meta.dirname, '..', 'public'),
     prefix: '/public/',
   });
   app.setViewEngine({
     engine: {
-      handlebars: require('handlebars'),
+      handlebars: Handlebars,
     },
-    templates: join(__dirname, '..', 'views'),
+    templates: join(import.meta.dirname, '..', 'views'),
   });
   await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+await bootstrap();
 @@switch
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
-import { AppModule } from './app.module';
+import { AppModule } from './app.module.js';
 import { join } from 'node:path';
+import Handlebars from 'handlebars';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, new FastifyAdapter());
   app.useStaticAssets({
-    root: join(__dirname, '..', 'public'),
+    root: join(import.meta.dirname, '..', 'public'),
     prefix: '/public/',
   });
   app.setViewEngine({
     engine: {
-      handlebars: require('handlebars'),
+      handlebars: Handlebars,
     },
-    templates: join(__dirname, '..', 'views'),
+    templates: join(import.meta.dirname, '..', 'views'),
   });
   await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+await bootstrap();
 ```
 
 The Fastify API has a few differences, but the end result of these method calls is the same. One notable difference is that when using Fastify, the template name you pass into the `@Render()` decorator must include the file extension.
 
-Here’s how you can set it up:
+Here's how you can set it up:
 
 ```typescript
 @@filename(app.controller)

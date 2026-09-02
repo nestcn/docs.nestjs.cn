@@ -1,6 +1,6 @@
 ### Middleware
 
-Middleware is a function which is called **before** the route handler. Middleware functions have access to the [request](https://expressjs.com/en/4x/api.html#req) and [response](https://expressjs.com/en/4x/api.html#res) objects, and the `next()` middleware function in the application’s request-response cycle. The **next** middleware function is commonly denoted by a variable named `next`.
+Middleware is a function which is called **before** the route handler. Middleware functions have access to the [request](https://expressjs.com/en/4x/api.html#req) and [response](https://expressjs.com/en/4x/api.html#res) objects, and the `next()` middleware function in the application's request-response cycle. The **next** middleware function is commonly denoted by a variable named `next`.
 
 <figure><img class="illustrative-image" src="/assets/Middlewares_1.png" /></figure>
 
@@ -57,8 +57,8 @@ There is no place for middleware in the `@Module()` decorator. Instead, we set t
 ```typescript
 @@filename(app.module)
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
-import { LoggerMiddleware } from './common/middleware/logger.middleware';
-import { CatsModule } from './cats/cats.module';
+import { LoggerMiddleware } from './common/middleware/logger.middleware.js';
+import { CatsModule } from './cats/cats.module.js';
 
 @Module({
   imports: [CatsModule],
@@ -72,8 +72,8 @@ export class AppModule implements NestModule {
 }
 @@switch
 import { Module } from '@nestjs/common';
-import { LoggerMiddleware } from './common/middleware/logger.middleware';
-import { CatsModule } from './cats/cats.module';
+import { LoggerMiddleware } from './common/middleware/logger.middleware.js';
+import { CatsModule } from './cats/cats.module.js';
 
 @Module({
   imports: [CatsModule],
@@ -92,8 +92,8 @@ In the above example we have set up the `LoggerMiddleware` for the `/cats` route
 ```typescript
 @@filename(app.module)
 import { Module, NestModule, RequestMethod, MiddlewareConsumer } from '@nestjs/common';
-import { LoggerMiddleware } from './common/middleware/logger.middleware';
-import { CatsModule } from './cats/cats.module';
+import { LoggerMiddleware } from './common/middleware/logger.middleware.js';
+import { CatsModule } from './cats/cats.module.js';
 
 @Module({
   imports: [CatsModule],
@@ -107,8 +107,8 @@ export class AppModule implements NestModule {
 }
 @@switch
 import { Module, RequestMethod } from '@nestjs/common';
-import { LoggerMiddleware } from './common/middleware/logger.middleware';
-import { CatsModule } from './cats/cats.module';
+import { LoggerMiddleware } from './common/middleware/logger.middleware.js';
+import { CatsModule } from './cats/cats.module.js';
 
 @Module({
   imports: [CatsModule],
@@ -139,7 +139,7 @@ forRoutes({
 
 > info **Hint** `splat` is simply the name of the wildcard parameter and has no special meaning. You can name it anything you like, for example, `*wildcard`.
 
-The `'abcd/*'` route path will match `abcd/1`, `abcd/123`, `abcd/abc`, and so on. The hyphen ( `-`) and the dot (`.`) are interpreted literally by string-based paths. However, `abcd/` with no additional characters will not match the route. For this, you need to wrap the wildcard in braces to make it optional:
+The `'abcd/*splat'` route path will match `abcd/1`, `abcd/123`, `abcd/abc`, and so on. The hyphen (`-`) and the dot (`.`) are interpreted literally by string-based paths. However, `abcd/` with no additional characters will not match the route. For this, you need to wrap the wildcard in braces to make it optional:
 
 ```typescript
 forRoutes({
@@ -150,14 +150,14 @@ forRoutes({
 
 #### Middleware consumer
 
-The `MiddlewareConsumer` is a helper class. It provides several built-in methods to manage middleware. All of them can be simply **chained** in the [fluent style](https://en.wikipedia.org/wiki/Fluent_interface). The `forRoutes()` method can take a single string, multiple strings, a `RouteInfo` object, a controller class and even multiple controller classes. In most cases you'll probably just pass a list of **controllers** separated by commas. Below is an example with a single controller:
+The `MiddlewareConsumer` is a helper class. It provides several built-in methods to manage middleware. All of them can be **chained** in the [fluent style](https://en.wikipedia.org/wiki/Fluent_interface). The `forRoutes()` method can take a single string, multiple strings, a `RouteInfo` object, a controller class and even multiple controller classes. In most cases you'll probably just pass a list of **controllers** separated by commas. Below is an example with a single controller:
 
 ```typescript
 @@filename(app.module)
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
-import { LoggerMiddleware } from './common/middleware/logger.middleware';
-import { CatsModule } from './cats/cats.module';
-import { CatsController } from './cats/cats.controller';
+import { LoggerMiddleware } from './common/middleware/logger.middleware.js';
+import { CatsModule } from './cats/cats.module.js';
+import { CatsController } from './cats/cats.controller.js';
 
 @Module({
   imports: [CatsModule],
@@ -171,9 +171,9 @@ export class AppModule implements NestModule {
 }
 @@switch
 import { Module } from '@nestjs/common';
-import { LoggerMiddleware } from './common/middleware/logger.middleware';
-import { CatsModule } from './cats/cats.module';
-import { CatsController } from './cats/cats.controller';
+import { LoggerMiddleware } from './common/middleware/logger.middleware.js';
+import { CatsModule } from './cats/cats.module.js';
+import { CatsController } from './cats/cats.controller.js';
 
 @Module({
   imports: [CatsModule],
@@ -191,7 +191,7 @@ export class AppModule {
 
 #### Excluding routes
 
-At times, we may want to **exclude** certain routes from having middleware applied. This can be easily achieved using the `exclude()` method. The `exclude()` method accepts a single string, multiple strings, or a `RouteInfo` object to identify the routes to be excluded.
+At times, we may want to **exclude** certain routes from having middleware applied. Use the `exclude()` method for this. The `exclude()` method accepts a single string, multiple strings, or a `RouteInfo` object to identify the routes to be excluded.
 
 Here's an example of how to use it:
 
@@ -262,3 +262,73 @@ await app.listen(process.env.PORT ?? 3000);
 ```
 
 > info **Hint** Accessing the DI container in a global middleware is not possible. You can use a [functional middleware](middleware#functional-middleware) instead when using `app.use()`. Alternatively, you can use a class middleware and consume it with `.forRoutes('*')` within the `AppModule` (or any other module).
+
+#### Error handling
+
+When middleware throws an exception, Nest's [exceptions layer](/exception-filters) catches it and sends an appropriate response, the same way it does for exceptions thrown from a route handler. The recommended approach is to throw an `HttpException` (or a built-in subclass such as `UnauthorizedException`):
+
+```typescript
+@@filename(auth.middleware)
+import {
+  Injectable,
+  NestMiddleware,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { Request, Response, NextFunction } from 'express';
+
+@Injectable()
+export class AuthMiddleware implements NestMiddleware {
+  use(req: Request, res: Response, next: NextFunction) {
+    if (!req.headers.authorization) {
+      throw new UnauthorizedException();
+    }
+    next();
+  }
+}
+@@switch
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+
+@Injectable()
+export class AuthMiddleware {
+  use(req, res, next) {
+    if (!req.headers.authorization) {
+      throw new UnauthorizedException();
+    }
+    next();
+  }
+}
+```
+
+If the middleware is asynchronous, declare `use()` as `async` (or return a `Promise`) so a rejected promise is forwarded to the exceptions layer:
+
+```typescript
+@@filename(auth.middleware)
+@Injectable()
+export class AuthMiddleware implements NestMiddleware {
+  constructor(private readonly authService: AuthService) {}
+
+  async use(req: Request, res: Response, next: NextFunction) {
+    const user = await this.authService.verify(req.headers.authorization);
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    req['user'] = user;
+    next();
+  }
+}
+```
+
+You can also pass the error to `next()`. This is useful when wrapping existing Express-style middleware that reports failures through the callback:
+
+```typescript
+use(req: Request, res: Response, next: NextFunction) {
+  if (!req.headers.authorization) {
+    return next(new UnauthorizedException());
+  }
+  next();
+}
+```
+
+> warning **Warning** Since middleware runs before a route handler is selected, only **global** exception filters (registered with `app.useGlobalFilters()` or the `APP_FILTER` token) catch exceptions thrown from middleware. Method-scoped and controller-scoped filters are not invoked, and applying `@UseFilters()` to a middleware class has no effect.
+
+> info **Hint** Middleware registered with `app.use()` is handled by the underlying HTTP platform (Express or Fastify), not by Nest's `MiddlewareModule`. Prefer throwing (or calling `next(err)`) from middleware bound with `MiddlewareConsumer` so the exceptions layer can process the error.

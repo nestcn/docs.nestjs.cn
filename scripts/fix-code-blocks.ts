@@ -11,6 +11,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { glob } from 'glob';
 
 const DOCS_DIR = path.resolve(process.cwd(), 'docs');
@@ -92,4 +93,12 @@ async function main() {
   }
 }
 
-main();
+// 仅在直接执行本脚本时运行 CLI 入口。
+// 重要：本文件被 translate-docs.ts 等 模块 import 复用 fixCodeBlocks 函数，
+// 顶层执行 main() 会在宿主进程翻译过程中触发 process.exit()，导致翻译被静默终止。
+const isDirectExecution =
+  process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
+
+if (isDirectExecution) {
+  main();
+}

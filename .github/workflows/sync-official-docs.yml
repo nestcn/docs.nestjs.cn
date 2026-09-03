@@ -6,6 +6,12 @@ on:
     - cron: '0 2 * * *'
   workflow_dispatch:
     # 允许手动触发
+    inputs:
+      force_translation:
+        description: '强制重新翻译 docs/（即使 content/ 无变更）'
+        type: boolean
+        default: false
+        required: false
 
 jobs:
   sync-docs:
@@ -166,7 +172,7 @@ jobs:
 
       - name: Process and translate content changes
         id: translate-content
-        if: steps.sync-content.outputs.content_changed == 'true'
+        if: steps.sync-content.outputs.content_changed == 'true' || inputs.force_translation == true
         run: |
           echo "🔄 正在处理内容变更并进行翻译..."
           

@@ -357,6 +357,18 @@ To resume a paused queue, use the `resume()` method, as follows:
 await audioQueue.resume();
 ```
 
+#### Observing queues in production
+
+Queues fail in ways that HTTP endpoints do not. A job doesn't return a status code to an impatient user - it retries quietly, three times, with backoff, and the only symptom is that something downstream never happened. The two questions that matter are therefore *"is this queue keeping up?"* and *"did that job run at all?"*, and neither is answerable from the consumer's own logs.
+
+[NestJS Observe](https://www.observe.nestjs.com/ 'NestJS Observe') instruments queue consumers automatically, the same way it instruments controllers - `@Processor` classes and their handlers are recognized as jobs, so no manual span wiring is needed:
+
+- **Queue wait time is measured separately from execution time.** A job that takes 200 ms to run but sat in the queue for four minutes is a capacity problem, not a slow handler, and the two numbers are reported side by side so you can tell which one you have.
+- **Attempts and failure reasons are recorded per run.** You see that a job succeeded on attempt 3 rather than seeing only the success, which is usually the difference between "fine" and "quietly degrading".
+- **Silence is alertable.** A *job silence* rule fires when a named job hasn't reported for longer than a tolerance you choose - which is how you find out that the nightly billing consumer stopped running, on the night it stops, rather than at the end of the month.
+
+Failed jobs carry the same error card as failed requests: the resolved stack trace with source lines, the logs written during the run, and the waterfall of what the job did before it threw. See the [Observability](/observability/overview) chapter for setup.
+
 #### Separate processes
 
 Job handlers can also be run in a separate (forked) process ([source](https://docs.bullmq.io/guide/workers/sandboxed-processors)). This has several advantages:
@@ -364,7 +376,7 @@ Job handlers can also be run in a separate (forked) process ([source](https://do
 - The process is sandboxed so if it crashes it does not affect the worker.
 - You can run blocking code without affecting the queue (jobs will not stall).
 - Much better utilization of multi-core CPUs.
-- Less connections to redis.
+- Fewer connections to Redis.
 
 ```typescript
 @@filename(app.module)
@@ -376,7 +388,7 @@ import { join } from 'node:path';
   imports: [
     BullModule.registerQueue({
       name: 'audio',
-      processors: [join(__dirname, 'processor.js')],
+      processors: [join(import.meta.dirname, 'processor.js')],
     }),
   ],
 })
@@ -753,7 +765,7 @@ constructor(@Inject(JOB_REF) jobRef: Job) {
 
 #### Event listeners
 
-Bull generates a set of useful events when queue and/or job state changes occur. Nest provides a set of decorators that allow subscribing to a core set of standard events. These are exported from the `@nestjs/bull` package.
+Bull generates a set of useful events when queue and/or job state changes occur. Nest provides a set of decorators that allow you to subscribe to a core set of standard events. These are exported from the `@nestjs/bull` package.
 
 Event listeners must be declared within a <a href="techniques/queues#consumers">consumer</a> class (i.e., within a class decorated with the `@Processor()` decorator). To listen for an event, use one of the decorators in the table below to declare a handler for the event. For example, to listen to the event emitted when a job enters the active state in the `audio` queue, use the following construct:
 
@@ -860,19 +872,19 @@ Job handlers can also be run in a separate (forked) process ([source](https://gi
 - The process is sandboxed so if it crashes it does not affect the worker.
 - You can run blocking code without affecting the queue (jobs will not stall).
 - Much better utilization of multi-core CPUs.
-- Less connections to redis.
+- Fewer connections to Redis.
 
 ```ts
 @@filename(app.module)
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bull';
-import { join } from 'path';
+import { join } from 'node:path';
 
 @Module({
   imports: [
     BullModule.registerQueue({
       name: 'audio',
-      processors: [join(__dirname, 'processor.js')],
+      processors: [join(import.meta.dirname, 'processor.js')],
     }),
   ],
 })

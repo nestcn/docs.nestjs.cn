@@ -107,14 +107,14 @@ findAll() {
 
 #### Proxies
 
-If your application is running behind a proxy server, it’s essential to configure the HTTP adapter to trust the proxy. You can refer to the specific HTTP adapter options for [Express](http://expressjs.com/en/guide/behind-proxies.html) and [Fastify](https://www.fastify.io/docs/latest/Reference/Server/#trustproxy) to enable the `trust proxy` setting.
+If your application is running behind a proxy server, it's essential to configure the HTTP adapter to trust the proxy. You can refer to the specific HTTP adapter options for [Express](http://expressjs.com/en/guide/behind-proxies.html) and [Fastify](https://www.fastify.io/docs/latest/Reference/Server/#trustproxy) to enable the `trust proxy` setting.
 
 Here's an example that demonstrates how to enable `trust proxy` for the Express adapter:
 
 ```typescript
 @@filename(main)
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { AppModule } from './app.module.js';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
@@ -123,10 +123,10 @@ async function bootstrap() {
   await app.listen(3000);
 }
 
-bootstrap();
+await bootstrap();
 @@switch
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { AppModule } from './app.module.js';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
@@ -135,7 +135,7 @@ async function bootstrap() {
   await app.listen(3000);
 }
 
-bootstrap();
+await bootstrap();
 ```
 
 Enabling `trust proxy` allows you to retrieve the original IP address from the `X-Forwarded-For` header. You can also customize the behavior of your application by overriding the `getTracker()` method to extract the IP address from this header instead of relying on `req.ip`. The following example demonstrates how to achieve this for both Express and Fastify:
@@ -155,7 +155,7 @@ export class ThrottlerBehindProxyGuard extends ThrottlerGuard {
 
 > info **Hint** You can find the API of the `req` Request object for express [here](https://expressjs.com/en/api.html#req.ips) and for fastify [here](https://www.fastify.io/docs/latest/Reference/Request/).
 
-#### Websockets
+#### WebSockets
 
 This module can work with websockets, but it requires some class extension. You can extend the `ThrottlerGuard` and override the `handleRequest` method like so:
 

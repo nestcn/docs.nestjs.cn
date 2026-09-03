@@ -55,7 +55,7 @@ export const CatSchema = SchemaFactory.createForClass(Cat);
 
 > info **Hint** Note you can also generate a raw schema definition using the `DefinitionsFactory` class (from the `nestjs/mongoose`). This allows you to manually modify the schema definition generated based on the metadata you provided. This is useful for certain edge-cases where it may be hard to represent everything with decorators.
 
-The `@Schema()` decorator marks a class as a schema definition. It maps our `Cat` class to a MongoDB collection of the same name, but with an additional “s” at the end - so the final mongo collection name will be `cats`. This decorator accepts a single optional argument which is a schema options object. Think of it as the object you would normally pass as a second argument of the `mongoose.Schema` class' constructor (e.g., `new mongoose.Schema(_, options)`)). To learn more about available schema options, see [this](https://mongoosejs.com/docs/guide.html#options) chapter.
+The `@Schema()` decorator marks a class as a schema definition. It maps our `Cat` class to a MongoDB collection of the same name, but with an additional "s" at the end - so the final mongo collection name will be `cats`. This decorator accepts a single optional argument which is a schema options object. Think of it as the object you would normally pass as a second argument of the `mongoose.Schema` class' constructor (e.g., `new mongoose.Schema(_, options)`)). To learn more about available schema options, see [this](https://mongoosejs.com/docs/guide.html#options) chapter.
 
 The `@Prop()` decorator defines a property in the document. For example, in the schema definition above, we defined three properties: `name`, `age`, and `breed`. The [schema types](https://mongoosejs.com/docs/schematypes.html) for these properties are automatically inferred thanks to TypeScript metadata (and reflection) capabilities. However, in more complex scenarios in which types cannot be implicitly reflected (for example, arrays or nested object structures), types must be indicated explicitly, as follows:
 
@@ -74,8 +74,8 @@ name: string;
 In case you want to specify relation to another model, later for populating, you can use `@Prop()` decorator as well. For example, if `Cat` has `Owner` which is stored in a different collection called `owners`, the property should have type and ref. For example:
 
 ```typescript
-import * as mongoose from 'mongoose';
-import { Owner } from '../owners/schemas/owner.schema';
+import mongoose from 'mongoose';
+import { Owner } from '../owners/schemas/owner.schema.js';
 
 // inside the class definition
 @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Owner' })
@@ -89,10 +89,10 @@ In case there are multiple owners, your property configuration should look as fo
 owners: Owner[];
 ```
 
-If you don’t intend to always populate a reference to another collection, consider using `mongoose.Types.ObjectId` as the type instead:
+If you don't intend to always populate a reference to another collection, consider using `mongoose.Types.ObjectId` as the type instead:
 
 ```typescript
-@Prop({ type: { type: mongoose.Schema.Types.ObjectId, ref: 'Owner' } })
+@Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Owner' })
 // This ensures the field is not confused with a populated reference
 owner: mongoose.Types.ObjectId;
 ```
@@ -100,7 +100,7 @@ owner: mongoose.Types.ObjectId;
 Then, when you need to selectively populate it later, you can use a repository function that specifies the correct type:
 
 ```typescript
-import { Owner } from './schemas/owner.schema';
+import { Owner } from './schemas/owner.schema.js';
 
 // e.g. inside a service or repository
 async findAllPopulated() {
@@ -138,9 +138,9 @@ Let's look at the `CatsModule`:
 @@filename(cats.module)
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { CatsController } from './cats.controller';
-import { CatsService } from './cats.service';
-import { Cat, CatSchema } from './schemas/cat.schema';
+import { CatsController } from './cats.controller.js';
+import { CatsService } from './cats.service.js';
+import { Cat, CatSchema } from './schemas/cat.schema.js';
 
 @Module({
   imports: [MongooseModule.forFeature([{ name: Cat.name, schema: CatSchema }])],
@@ -159,8 +159,8 @@ Once you've registered the schema, you can inject a `Cat` model into the `CatsSe
 import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Cat } from './schemas/cat.schema';
-import { CreateCatDto } from './dto/create-cat.dto';
+import { Cat } from './schemas/cat.schema.js';
+import { CreateCatDto } from './dto/create-cat.dto.js';
 
 @Injectable()
 export class CatsService {
@@ -179,7 +179,7 @@ export class CatsService {
 import { Model } from 'mongoose';
 import { Injectable, Dependencies } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
-import { Cat } from './schemas/cat.schema';
+import { Cat } from './schemas/cat.schema.js';
 
 @Injectable()
 @Dependencies(getModelToken(Cat.name))
@@ -354,7 +354,7 @@ Like other [factory providers](https://docs.nestjs.com/fundamentals/custom-provi
           schema.pre('save', function() {
             console.log(
               `${configService.get('APP_NAME')}: Hello from pre save`,
-            ),
+            );
           });
           return schema;
         },
@@ -693,7 +693,7 @@ class Person {
 
 > info **Hint** The `@Virtual()` decorator is imported from the `@nestjs/mongoose` package.
 
-In this example, the `fullName` virtual is derived from `firstName` and `lastName`. Even though it behaves like a normal property when accessed, it’s never saved to the MongoDB document.:
+In this example, the `fullName` virtual is derived from `firstName` and `lastName`. Even though it behaves like a normal property when accessed, it's never saved to the MongoDB document.:
 
 #### Example
 

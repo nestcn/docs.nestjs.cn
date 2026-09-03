@@ -19,7 +19,7 @@ $ npm i @nestjs/observe
 
 集成分为三步。首先，调用一次 `createObserveModule()`，通常在 `app.module.ts` 或其他根级文件中。它返回一对匹配项——一个 Nest 模块和一个 `instrument` 钩子——绑定到相同的配置：
 
-```typescript
+```typescript title="app.module.ts"
 import { Module } from '@nestjs/common';
 import { createObserveModule } from '@nestjs/observe';
 import { AppController } from './app.controller.js';
@@ -44,7 +44,7 @@ export class AppModule {}
 
 其次，将 `ObserveModule.forRoot()` 导入您的根模块，并至少提供 `serviceId`（如上所示）。第三，将 `ObserveInstrument` 传递给 `NestFactory.create()`，以便 SDK 在应用开始处理流量之前附加到应用上：
 
-```typescript
+```typescript title="main.ts"
 import { NestFactory } from '@nestjs/core';
 import { AppModule, ObserveInstrument } from './app.module.js';
 
@@ -73,7 +73,7 @@ await bootstrap();
 
 这就是完整的集成。一旦应用开始接收流量，请求、错误和追踪数据会在片刻之内出现在您项目的仪表盘中——无需配置导出器，无需设计模式。`NestFactory.createMicroservice()` 和 `NestFactory.createApplicationContext()` 也接受相同的 `instrument` 选项，因此工作进程和独立应用程序以相同方式被插桩。
 
-> info **提示** `createObserveModule()` 本身接受一个选项对象，用于控制追踪 ID 的生成方式以及错误源上下文的捕获方式——请参阅下面的 [Trace correlation](#trace-correlation) 和 [Error source context](#error-source-context)。其他所有内容都通过 `ObserveModule.forRoot()` 进行配置。
+> info **提示** `createObserveModule()` 本身接受一个选项对象，用于控制追踪 ID 的生成方式以及错误源上下文的捕获方式——请参阅下面的 [Trace correlation](#追踪关联) 和 [Error source context](#错误源代码上下文)。其他所有内容都通过 `ObserveModule.forRoot()` 进行配置。
 
 #### 认证与识别应用
 
@@ -89,7 +89,7 @@ ObserveModule.forRoot({
 
 | 选项           | 类型     | 默认值  | 描述                                                                                                                                                                                                |
 | ---------------- | -------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `appKey`         | `string` | -        | 从您项目的 **API 密钥**页面生成——请参阅 [First project](/observability/overview#first-project)。请勿将其纳入源代码管理。                                                                              |
+| `appKey`         | `string` | -        | 从您项目的 **API 密钥**页面生成——请参阅 [First project](/observability/overview#第一个项目)。请勿将其纳入源代码管理。                                                                              |
 | `appSecret`      | `string` | -        | 与 `appKey` 从同一页面签发。请勿将其纳入源代码管理。                                                                                                                               |
 | `serviceId`      | `string` | 必填 | 在您的仪表盘中标识此应用。如果您运行同一服务的多个实例，请使用每个实例唯一的标识（主机名、容器 ID），以便在性能分析器中能够区分它们。 |
 | `serviceVersion` | `string` | -        | 标识部署——语义化版本、提交哈希或任何其他标识符。每个请求和任务都会记录服务它的版本，这正是 **版本发布** 视图的数据来源。              |
@@ -102,7 +102,7 @@ ObserveModule.forRoot({
 
 当凭据来自配置提供者而非直接来自 `process.env` 时，请使用 `forRootAsync()`——它接受与其他所有 Nest 动态模块相同的 `useFactory`/`inject`、`useClass` 和 `useExisting` 形式（一个实现 `ObserveOptionsFactory` 并带有 `createObserveOptions()` 方法的类），此外还支持 `extraProviders` 和 `global`：
 
-```typescript
+```typescript title="app.module.ts"
 ObserveModule.forRootAsync({
   imports: [ConfigModule],
   inject: [ConfigService],
@@ -172,13 +172,13 @@ ObserveModule.forRoot({
 | `keys` | `string[]` | - | 额外的属性键，其值会被直接遮蔽，在内置列表之上。比较时不区分大小写，并忽略 `-`/`_`，因此 `apiKey`、`api_key` 和 `API-KEY` 是一个条目。 |
 | `replacement` | `string` | `'[REDACTED]'` | 替换任何匹配项的文本。 |
 
-> info **提示** 即使关闭 `forwardLogs`，SDK 也会增强 `ConsoleLogger`，使每一行都携带当前的 trace id（`attachTraceIdToLogs`，参见 [Trace correlation](#trace-correlation)）。这使您可以将自己的日志聚合器与仪表盘中的 trace 关联起来，而无需将日志内容发送到任何地方。
+> info **提示** 即使关闭 `forwardLogs`，SDK 也会增强 `ConsoleLogger`，使每一行都携带当前的 trace id（`attachTraceIdToLogs`，参见 [Trace correlation](#追踪关联)）。这使您可以将自己的日志聚合器与仪表盘中的 trace 关联起来，而无需将日志内容发送到任何地方。
 
 #### 错误源代码上下文
 
 从控制器、解析器、任务或 span 传播出来的错误会被自动捕获。当启用 `sourceContext`（默认）时，SDK 还会读取捕获错误的每个应用内堆栈帧周围的源代码行并附加它们，这使仪表盘能够显示失败的代码以及堆栈跟踪 - 对于在生产环境中发生的失败，在您可能未检出的构建上。
 
-```typescript
+```typescript title="app.module.ts"
 export const { ObserveModule, ObserveInstrument } = createObserveModule({
   sourceContext: {
     linesOfContext: 5,
@@ -205,7 +205,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule({
 
 这些也是 `createObserveModule()` 的选项 - 它们决定了请求如何获取追踪 ID，以及该 ID 如何出现在您自己的日志中：
 
-```typescript
+```typescript title="app.module.ts"
 import { randomUUID } from 'node:crypto';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule({

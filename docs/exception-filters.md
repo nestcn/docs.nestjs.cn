@@ -117,7 +117,7 @@ async findAll() {
 
 由于错误本身已携带其代码，一键即可将整个问题交给编码代理：**复制代理提示词**会将错误、带有源代码行的精简堆栈跟踪、慢速 span 以及周围的日志打包成一个自包含的提示词，供 Claude Code、Cursor 或任何打开您仓库的工具使用。
 
-请注意，这与本章中描述的过滤器是互补关系，而非替代关系——过滤器仍然会塑造响应，而插桩则观察在到达响应过程中发生了什么。有关设置，请参阅 [Observability](/observability/overview) 章节；有关将重复出现的错误转化为可验证其自身修复的跟踪问题，请参阅 [Dashboard](/observability/dashboard#issues) 章节。
+请注意，这与本章中描述的过滤器是互补关系，而非替代关系——过滤器仍然会塑造响应，而插桩则观察在到达响应过程中发生了什么。有关设置，请参阅 [Observability](/observability/overview) 章节；有关将重复出现的错误转化为可验证其自身修复的跟踪问题，请参阅 [Dashboard](/observability/dashboard#问题) 章节。
 
 #### 自定义异常
 

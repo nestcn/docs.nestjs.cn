@@ -6,7 +6,7 @@
 
 NestJS Observe 暴露了一个只读的 [MCP](https://modelcontextprotocol.io/) 服务器，因此兼容 MCP 的客户端——Claude Code、Claude Desktop、Cursor、VS Code，或你自己编写的代理——可以直接询问有关你项目的问题，而无需你将仪表板数据复制到提示词中。回归、慢操作、错误分组、追踪、任务、告警：与仪表板显示的数据相同，范围精确到你能看到的内容。
 
-> info **提示** MCP 是将遥测数据传递给代理的两种方式之一。**复制代理提示词**按钮（参见 [Dashboard](/observability/dashboard#handing-a-failure-to-a-coding-agent)）将一页内容打包为文本，便于一次性粘贴；MCP 适用于需要持续提问的代理——追踪一条链路、检查错误是否仍在触发——而无需你逐条转达答案。
+> info **提示** MCP 是将遥测数据传递给代理的两种方式之一。**复制代理提示词**按钮（参见 [Dashboard](/observability/dashboard#将故障交给编码代理)）将一页内容打包为文本，便于一次性粘贴；MCP 适用于需要持续提问的代理——追踪一条链路、检查错误是否仍在触发——而无需你逐条转达答案。
 
 该端点在 `POST https://<api-host>/mcp` 处使用 Streamable HTTP 协议。它是无状态的——无需打开会话，无需保持连接，除了请求本身之外无需任何设置。确切的主机地址显示在仪表板中你的令牌旁边。
 

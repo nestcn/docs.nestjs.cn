@@ -379,6 +379,19 @@ const config: UserConfig = {
           ],
         },
         {
+          text: '可观测性',
+          collapsible: true,
+          collapsed: true,
+          items: [
+            { text: '概述', link: '/observability/overview' },
+            { text: 'SDK', link: '/observability/sdk' },
+            { text: '手动插桩', link: '/observability/manual-instrumentation' },
+            { text: '分布式追踪', link: '/observability/distributed-tracing' },
+            { text: '仪表盘', link: '/observability/dashboard' },
+            { text: 'MCP 服务器', link: '/observability/mcp-server' },
+          ],
+        },
+        {
           text: '迁移指南',
           link: '/migration-guide'
         },

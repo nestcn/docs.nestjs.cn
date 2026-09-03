@@ -26,4 +26,4 @@ resolve: { // see: https://webpack.js.org/configuration/resolve/
 
 ```
 
-> info **提示** [TypeORM](/techniques/database) 包有一个类似的 shim，可以在 [here](https://github.com/typeorm/typeorm/blob/master/extra/typeorm-model-shim.js) 找到。
+> info **提示** [TypeORM](/techniques/sql) 包有一个类似的 shim，可以在 [here](https://github.com/typeorm/typeorm/blob/master/extra/typeorm-model-shim.js) 找到。

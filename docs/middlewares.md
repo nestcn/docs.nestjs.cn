@@ -207,11 +207,11 @@ await app.listen(process.env.PORT ?? 3000);
 
 ```
 
-> info **提示** 在全局中间件中无法访问 DI 容器。使用 `app.use()` 时，可以使用 [functional middleware](middleware#函数式中间件) 替代。或者，你可以使用类中间件，并在 `AppModule`（或任何其他模块）中通过 `.forRoutes('*')` 来使用它。
+> info **提示** 在全局中间件中无法访问 DI 容器。使用 `app.use()` 时，可以使用 [functional middleware](#函数式中间件) 替代。或者，你可以使用类中间件，并在 `AppModule`（或任何其他模块）中通过 `.forRoutes('*')` 来使用它。
 
 #### 错误处理
 
-当中间件抛出异常时，Nest 的 [exceptions layer](/exception-filters) 会捕获它并发送适当的响应，就像处理从路由处理器抛出的异常一样。推荐的做法是抛出 `HttpException`（或内置子类，如 `UnauthorizedException`）：
+当中间件抛出异常时，Nest 的 [exceptions layer](/overview/exception-filters) 会捕获它并发送适当的响应，就像处理从路由处理器抛出的异常一样。推荐的做法是抛出 `HttpException`（或内置子类，如 `UnauthorizedException`）：
 
 ```typescript
 import {

@@ -90,11 +90,11 @@ constructor(private catsService: CatsService) {}
 
 这一行代码发生了两件事。`private` 关键字是 TypeScript 的**参数属性**：它在类上声明一个 `catsService` 成员并将构造函数参数赋值给它，因此您不必自己编写 `this.catsService = catsService`。类型注解 `CatsService` 是 Nest 实际解析的依据 - 在编译时，TypeScript 将构造函数的参数类型作为元数据发出，容器读取该元数据以确定要提供哪个提供者。
 
-> warning **警告** 由于解析由发出的类型驱动，注解必须是运行时仍然存在的内容 - 即**类**。接口或类型别名在编译期间会被擦除，因此当 `AppConfig` 是接口时，`constructor(private config: AppConfig)` 会让 Nest 无从查找，并且在启动时您会看到 *"Nest can't resolve dependencies"* 错误。当您需要注入不是类的内容时，请为其提供一个令牌，并使用 `@Inject()` 显式注入 - 请参阅 [Custom providers](/fundamentals/custom-providers)。
+> warning **警告** 由于解析由发出的类型驱动，注解必须是运行时仍然存在的内容 - 即**类**。接口或类型别名在编译期间会被擦除，因此当 `AppConfig` 是接口时，`constructor(private config: AppConfig)` 会让 Nest 无从查找，并且在启动时您会看到 *"Nest can't resolve dependencies"* 错误。当您需要注入不是类的内容时，请为其提供一个令牌，并使用 `@Inject()` 显式注入 - 请参阅 [Custom providers](/fundamentals/dependency-injection)。
 
 #### 作用域
 
-提供者通常具有与应用程序生命周期一致的生命周期（"作用域"）。当应用程序启动时，每个依赖都必须被解析，这意味着每个提供者都会被实例化。同样，当应用程序关闭时，所有提供者都会被销毁。但是，也可以使提供者成为**请求作用域**，这意味着其生命周期与特定请求绑定，而不是与应用程序的生命周期绑定。您可以在 [Injection Scopes](/fundamentals/injection-scopes) 章节中了解更多关于这些技术的信息。
+提供者通常具有与应用程序生命周期一致的生命周期（"作用域"）。当应用程序启动时，每个依赖都必须被解析，这意味着每个提供者都会被实例化。同样，当应用程序关闭时，所有提供者都会被销毁。但是，也可以使提供者成为**请求作用域**，这意味着其生命周期与特定请求绑定，而不是与应用程序的生命周期绑定。您可以在 [Injection Scopes](/fundamentals/provider-scopes) 章节中了解更多关于这些技术的信息。
 
 <app-banner-courses></app-banner-courses>
 
@@ -118,7 +118,7 @@ export class HttpService<T> {
 
 ```
 
-在上面的示例中，我们使用了自定义提供者，这就是为什么我们包含 `HTTP_OPTIONS` 自定义**令牌**。之前的示例演示了基于构造函数的注入，其中依赖通过构造函数中的类来指示。有关自定义提供者及其关联令牌如何工作的更多详细信息，请查看 [Custom Providers](/fundamentals/custom-providers) 章节。
+在上面的示例中，我们使用了自定义提供者，这就是为什么我们包含 `HTTP_OPTIONS` 自定义**令牌**。之前的示例演示了基于构造函数的注入，其中依赖通过构造函数中的类来指示。有关自定义提供者及其关联令牌如何工作的更多详细信息，请查看 [Custom Providers](/fundamentals/dependency-injection) 章节。
 
 请注意，`@Optional()` 改变的是提供者*缺失*时发生的情况，而不是提供者存在时您
 
@@ -185,5 +185,5 @@ export class AppModule {}
 
 到目前为止，我们已经介绍了 Nest 如何自动处理依赖解析的大部分细节。然而，在某些情况下，您可能需要跳出内置的依赖注入系统，手动检索或实例化提供者。下面简要讨论两种此类技术。
 
-- 要检索现有实例或动态实例化提供者，您可以使用 [Module reference](/fundamentals/module-ref)。
+- 要检索现有实例或动态实例化提供者，您可以使用 [Module reference](/fundamentals/module-reference)。
 - 要在 `bootstrap()` 函数中获取提供者（例如，用于独立应用程序或在引导过程中使用配置服务），请查看 [Standalone applications](/standalone-applications)。

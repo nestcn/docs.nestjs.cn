@@ -4,19 +4,19 @@
 
 ### 执行上下文
 
-Nest 提供了几个工具类，帮助您轻松编写可在多种应用上下文（例如，基于 Nest HTTP 服务器的、微服务的和 WebSockets 的应用上下文）中运行的应用程序。这些工具提供有关当前执行上下文的信息，可用于构建通用的 [guards](/guards)、[filters](/exception-filters) 和 [interceptors](/interceptors)，这些组件可跨广泛的控制器、方法和执行上下文工作。
+Nest 提供了几个工具类，帮助您轻松编写可在多种应用上下文（例如，基于 Nest HTTP 服务器的、微服务的和 WebSockets 的应用上下文）中运行的应用程序。这些工具提供有关当前执行上下文的信息，可用于构建通用的 [guards](/overview/guards)、[filters](/overview/exception-filters) 和 [interceptors](/overview/interceptors)，这些组件可跨广泛的控制器、方法和执行上下文工作。
 
 本章我们将介绍两个这样的类：`ArgumentsHost` 和 `ExecutionContext`。
 
 #### ArgumentsHost 类
 
-`ArgumentsHost` 类提供了检索传递给处理程序的参数的方法。它允许您选择适当的上下文（例如，HTTP、RPC（微服务）或 WebSockets）来检索参数。框架在您可能希望访问它的地方提供 `ArgumentsHost` 的实例，通常作为 `host` 参数引用。例如，[exception filter](/exception-filters#参数主机) 的 `catch()` 方法会以 `ArgumentsHost` 实例调用。
+`ArgumentsHost` 类提供了检索传递给处理程序的参数的方法。它允许您选择适当的上下文（例如，HTTP、RPC（微服务）或 WebSockets）来检索参数。框架在您可能希望访问它的地方提供 `ArgumentsHost` 的实例，通常作为 `host` 参数引用。例如，[exception filter](/overview/exception-filters#参数主机) 的 `catch()` 方法会以 `ArgumentsHost` 实例调用。
 
 `ArgumentsHost` 只是处理程序参数的抽象。例如，对于 HTTP 服务器应用程序（当使用 `@nestjs/platform-express` 时），`host` 对象封装了 Express 的 `[request, response, next]` 数组，其中 `request` 是请求对象，`response` 是响应对象，`next` 是控制应用程序请求-响应周期的函数。另一方面，对于 [GraphQL](/graphql/quick-start) 应用程序，`host` 对象包含 `[root, args, context, info]` 数组。
 
 #### 当前应用程序上下文
 
-在构建旨在跨多个应用程序上下文运行的通用 [guards](/guards)、[filters](/exception-filters) 和 [interceptors](/interceptors) 时，我们需要一种方法来确定我们的方法当前运行的应用程序类型。使用 `ArgumentsHost` 的 `getType()` 方法来完成此操作：
+在构建旨在跨多个应用程序上下文运行的通用 [guards](/overview/guards)、[filters](/overview/exception-filters) 和 [interceptors](/overview/interceptors) 时，我们需要一种方法来确定我们的方法当前运行的应用程序类型。使用 `ArgumentsHost` 的 `getType()` 方法来完成此操作：
 
 ```typescript
 if (host.getType() === 'http') {
@@ -112,7 +112,7 @@ export interface RpcArgumentsHost {
 
 #### ExecutionContext 类
 
-`ExecutionContext` 扩展了 `ArgumentsHost`，提供了有关当前执行过程的更多详细信息。与 `ArgumentsHost` 一样，Nest 在您可能需要它的地方提供 `ExecutionContext` 的实例，例如在 [guard](/guards#执行上下文) 的 `canActivate()` 方法和 [interceptor](/interceptors#执行上下文) 的 `intercept()` 方法中。它提供了以下方法：
+`ExecutionContext` 扩展了 `ArgumentsHost`，提供了有关当前执行过程的更多详细信息。与 `ArgumentsHost` 一样，Nest 在您可能需要它的地方提供 `ExecutionContext` 的实例，例如在 [guard](/overview/guards#执行上下文) 的 `canActivate()` 方法和 [interceptor](/overview/interceptors#执行上下文) 的 `intercept()` 方法中。它提供了以下方法：
 
 ```typescript
 export interface ExecutionContext extends ArgumentsHost {

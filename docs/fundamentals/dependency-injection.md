@@ -4,11 +4,11 @@
 
 ### 自定义提供者
 
-在前面的章节中，我们触及了**依赖注入（DI）**的各个方面以及它在 Nest 中的使用方式。其中一个例子就是用于将实例（通常是服务提供者）注入到类中的 [constructor based](/providers#依赖注入) 依赖注入。你可能会想到，依赖注入是 Nest 核心中一个基础性的内置功能。到目前为止，我们只探索了一种主要模式。随着你的应用程序变得越来越复杂，你可能需要利用 DI 系统的全部特性，因此让我们更详细地探讨它们。
+在前面的章节中，我们触及了**依赖注入（DI）**的各个方面以及它在 Nest 中的使用方式。其中一个例子就是用于将实例（通常是服务提供者）注入到类中的 [constructor based](/overview/providers#依赖注入) 依赖注入。你可能会想到，依赖注入是 Nest 核心中一个基础性的内置功能。到目前为止，我们只探索了一种主要模式。随着你的应用程序变得越来越复杂，你可能需要利用 DI 系统的全部特性，因此让我们更详细地探讨它们。
 
 #### DI 基础
 
-依赖注入是一种 [inversion of control (IoC)](https://en.wikipedia.org/wiki/Inversion_of_control) 技术，它将实例化依赖的任务委托给 IoC 容器（在我们的案例中，即 NestJS 运行时系统），而不是在你自己的代码中命令式地完成。让我们检查一下 [Providers chapter](/providers) 中这个示例发生了什么。
+依赖注入是一种 [inversion of control (IoC)](https://en.wikipedia.org/wiki/Inversion_of_control) 技术，它将实例化依赖的任务委托给 IoC 容器（在我们的案例中，即 NestJS 运行时系统），而不是在你自己的代码中命令式地完成。让我们检查一下 [Providers chapter](/overview/providers) 中这个示例发生了什么。
 
 首先，我们定义一个提供者。`@Injectable()` 装饰器将 `CatsService` 类标记为提供者。
 
@@ -147,7 +147,7 @@ export class AppModule {}
 
 #### 非基于类的提供者令牌
 
-到目前为止，我们使用类名作为提供者令牌（`providers` 数组中列出的提供者的 `provide` 属性的值）。这与 [constructor based injection](/providers#依赖注入) 使用的标准模式相匹配，其中令牌也是类名。（如果这个概念不完全清楚，请参阅 <a href="/fundamentals/custom-providers#di-fundamentals">DI 基础</a> 以复习令牌）。有时，我们可能希望灵活地使用字符串或符号作为 DI 令牌。例如：
+到目前为止，我们使用类名作为提供者令牌（`providers` 数组中列出的提供者的 `provide` 属性的值）。这与 [constructor based injection](/overview/providers#依赖注入) 使用的标准模式相匹配，其中令牌也是类名。（如果这个概念不完全清楚，请参阅 <a href="/fundamentals/custom-providers#di-fundamentals">DI 基础</a> 以复习令牌）。有时，我们可能希望灵活地使用字符串或符号作为 DI 令牌。例如：
 
 ```typescript
 import { connection } from './connection.js';
@@ -168,7 +168,7 @@ export class AppModule {}
 
 > warning **注意** 除了使用字符串作为令牌值之外，你还可以使用 JavaScript [symbols](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol) 或 TypeScript [enums](https://www.typescriptlang.org/docs/handbook/enums.html)。
 
-我们之前已经看到如何使用标准的 [constructor based injection](/providers#依赖注入) 模式注入提供者。这种模式**要求**依赖项必须使用类名声明。`'CONNECTION'` 自定义提供者使用字符串值的令牌。让我们看看如何注入这样的提供者。为此，我们使用 `@Inject()` 装饰器。这个装饰器接受一个参数——令牌。
+我们之前已经看到如何使用标准的 [constructor based injection](/overview/providers#依赖注入) 模式注入提供者。这种模式**要求**依赖项必须使用类名声明。`'CONNECTION'` 自定义提供者使用字符串值的令牌。让我们看看如何注入这样的提供者。为此，我们使用 `@Inject()` 装饰器。这个装饰器接受一个参数——令牌。
 
 ```typescript
 @Injectable()

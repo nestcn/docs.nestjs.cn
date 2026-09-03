@@ -6,11 +6,11 @@
 
 在 GraphQL 世界中，关于如何处理**认证**或操作的**副作用**等问题存在很多争论。我们应该在业务逻辑内部处理这些事情吗？我们应该使用高阶函数来增强查询和变更的授权逻辑吗？还是应该使用 [schema directives](https://www.apollographql.com/docs/apollo-server/schema/directives/)？这些问题没有放之四海而皆准的答案。
 
-Nest 通过其跨平台特性（如 [guards](/guards) 和 [interceptors](/interceptors)）帮助解决这些问题。其理念是减少冗余，并提供有助于构建结构良好、可读且一致的应用程序的工具。
+Nest 通过其跨平台特性（如 [guards](/overview/guards) 和 [interceptors](/overview/interceptors)）帮助解决这些问题。其理念是减少冗余，并提供有助于构建结构良好、可读且一致的应用程序的工具。
 
 #### 概述
 
-您可以像使用任何 RESTful 应用程序一样，以相同的方式将标准的 [guards](/guards)、[interceptors](/interceptors)、[filters](/exception-filters) 和 [pipes](/pipes) 与 GraphQL 一起使用。此外，您还可以利用 [custom decorators](/custom-decorators) 特性轻松创建自己的装饰器。让我们看一个示例 GraphQL 查询处理器。
+您可以像使用任何 RESTful 应用程序一样，以相同的方式将标准的 [guards](/overview/guards)、[interceptors](/overview/interceptors)、[filters](/overview/exception-filters) 和 [pipes](/pipes) 与 GraphQL 一起使用。此外，您还可以利用 [custom decorators](/custom-decorators) 特性轻松创建自己的装饰器。让我们看一个示例 GraphQL 查询处理器。
 
 ```typescript
 @Query('author')
@@ -54,7 +54,7 @@ export class AuthGuard implements CanActivate {
 
 #### 异常过滤器
 
-Nest 标准的 [exception filters](/exception-filters) 同样兼容 GraphQL 应用程序。与 `ExecutionContext` 一样，GraphQL 应用程序应将 `ArgumentsHost` 对象转换为 `GqlArgumentsHost` 对象。
+Nest 标准的 [exception filters](/overview/exception-filters) 同样兼容 GraphQL 应用程序。与 `ExecutionContext` 一样，GraphQL 应用程序应将 `ArgumentsHost` 对象转换为 `GqlArgumentsHost` 对象。
 
 ```typescript
 @Catch(HttpException)

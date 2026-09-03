@@ -49,7 +49,7 @@ export class HealthModule {}
 
 ```
 
-我们的健康检查可以使用[控制器](/controllers)执行，可以使用 [Nest CLI](/cli/overview) 轻松设置。
+我们的健康检查可以使用[控制器](/overview/controllers)执行，可以使用 [Nest CLI](/cli/overview) 轻松设置。
 
 ```bash
 $ nest g controller health

@@ -100,7 +100,7 @@ describe('CatsController', () => {
 
 > 信息 **提示** `compile()` 方法是**异步**的，因此必须等待。模块编译完成后，您可以使用 `get()` 方法检索它声明的任何**静态**实例（控制器和提供者）。
 
-`TestingModule` 继承自 [module reference](/fundamentals/module-ref) 类，因此具有动态解析作用域提供者（瞬态或请求作用域）的能力。使用 `resolve()` 方法执行此操作（`get()` 方法只能检索静态实例）。
+`TestingModule` 继承自 [module reference](/fundamentals/module-reference) 类，因此具有动态解析作用域提供者（瞬态或请求作用域）的能力。使用 `resolve()` 方法执行此操作（`get()` 方法只能检索静态实例）。
 
 ```typescript
 const moduleRef = await Test.createTestingModule({
@@ -114,9 +114,9 @@ catsService = await moduleRef.resolve(CatsService);
 
 > 警告 **警告** `resolve()` 方法从提供者自己的**DI 容器子树**返回提供者的唯一实例。每个子树都有唯一的上下文标识符。因此，如果您多次调用此方法并比较实例引用，您会发现它们不相等。
 
-> 信息 **提示** 了解更多关于模块引用功能的信息 [here](/fundamentals/module-ref)。
+> 信息 **提示** 了解更多关于模块引用功能的信息 [here](/fundamentals/module-reference)。
 
-您可以使用 [custom provider](/fundamentals/custom-providers) 覆盖任何提供者的生产版本，以进行测试。例如，您可以模拟数据库服务，而不是连接到实时数据库。我们将在下一节介绍覆盖，但它们也可用于单元测试。
+您可以使用 [custom provider](/fundamentals/dependency-injection) 覆盖任何提供者的生产版本，以进行测试。例如，您可以模拟数据库服务，而不是连接到实时数据库。我们将在下一节介绍覆盖，但它们也可用于单元测试。
 
 <app-banner-courses></app-banner-courses>
 
@@ -240,7 +240,7 @@ describe('Cats', () => {
 
 在此示例中，我们还提供了 `CatsService` 的替代（测试替身）实现，它简单地返回一个我们可以测试的硬编码值。使用 `overrideProvider()` 来提供这样的替代实现。类似地，Nest 提供了使用 `overrideModule()`、`overrideGuard()`、`overrideInterceptor()`、`overrideFilter()` 和 `overridePipe()` 方法分别覆盖模块、守卫、拦截器、过滤器和管道的方法。
 
-每个覆盖方法（除了 `overrideModule()`）都返回一个包含 3 个不同方法的对象，这些方法镜像了 [custom providers](/fundamentals/custom-providers) 中描述的方法：
+每个覆盖方法（除了 `overrideModule()`）都返回一个包含 3 个不同方法的对象，这些方法镜像了 [custom providers](/fundamentals/dependency-injection) 中描述的方法：
 
 - `useClass`：您提供一个类，该类将被实例化以提供实例来覆盖对象（提供者、守卫等）。
 - `useValue`：您提供一个实例来覆盖该对象。
@@ -356,7 +356,7 @@ const moduleRef = await Test.createTestingModule({
 
 #### 测试请求作用域的实例
 
-[Request-scoped](/fundamentals/injection-scopes) 提供者为每个传入的 **请求** 唯一创建。实例在请求完成处理后会被垃圾回收。这带来了一个问题，因为我们无法访问为被测试请求专门生成的依赖注入子树。
+[Request-scoped](/fundamentals/provider-scopes) 提供者为每个传入的 **请求** 唯一创建。实例在请求完成处理后会被垃圾回收。这带来了一个问题，因为我们无法访问为被测试请求专门生成的依赖注入子树。
 
 我们知道（基于上述章节）`resolve()` 方法可用于检索动态实例化的类。此外，如 <a href="/fundamentals/module-ref#解析作用域提供者">此处</a> 所述，我们知道可以传递唯一的上下文标识符来控制 DI 容器子树的生命周期。我们如何在测试环境中利用这一点？
 

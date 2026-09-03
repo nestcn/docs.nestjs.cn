@@ -57,7 +57,7 @@ findAll(@Res({ passthrough: true }) response: Response) {
 
 ```
 
-> 警告 **警告** 如果你想将响应处理逻辑留给框架，请记得将 `passthrough` 选项设置为 `true`，如上所示。了解更多 [here](/controllers#库特定方法)。
+> 警告 **警告** 如果你想将响应处理逻辑留给框架，请记得将 `passthrough` 选项设置为 `true`，如上所示。了解更多 [here](/overview/controllers#库特定方法)。
 
 > 信息 **提示** `@Res()` 装饰器从 `@nestjs/common` 导入，而 `Response` 从 `express` 包导入。
 
@@ -107,7 +107,7 @@ findAll(@Res({ passthrough: true }) response: FastifyReply) {
 
 要了解更多关于 `FastifyReply#setCookie()` 方法的信息，请查看此 [page](https://github.com/fastify/fastify-cookie#sending)。
 
-> 警告 **警告** 如果你想将响应处理逻辑留给框架，请记得将 `passthrough` 选项设置为 `true`，如上所示。了解更多 [here](/controllers#库特定方法)。
+> 警告 **警告** 如果你想将响应处理逻辑留给框架，请记得将 `passthrough` 选项设置为 `true`，如上所示。了解更多 [here](/overview/controllers#库特定方法)。
 
 > 信息 **提示** `@Res()` 装饰器从 `@nestjs/common` 导入，而 `FastifyReply` 从 `fastify` 包导入。
 

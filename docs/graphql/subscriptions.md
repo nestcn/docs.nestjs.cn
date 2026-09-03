@@ -275,7 +275,7 @@ type Subscription {
 
 #### PubSub
 
-我们在上面实例化了一个本地的 `PubSub` 实例。推荐的做法是将 `PubSub` 定义为 [provider](/fundamentals/custom-providers)，并通过构造函数（使用 `@Inject()` 装饰器）注入它。这使我们能够在整个应用程序中重用该实例。例如，按如下方式定义一个提供者，然后在需要的地方注入 `'PUB_SUB'`。
+我们在上面实例化了一个本地的 `PubSub` 实例。推荐的做法是将 `PubSub` 定义为 [provider](/fundamentals/dependency-injection)，并通过构造函数（使用 `@Inject()` 装饰器）注入它。这使我们能够在整个应用程序中重用该实例。例如，按如下方式定义一个提供者，然后在需要的地方注入 `'PUB_SUB'`。
 
 ```typescript
 {

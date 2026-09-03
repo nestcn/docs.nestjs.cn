@@ -19,7 +19,7 @@
 
 ```
 
-> info **提示** 了解更多关于自定义提供者语法 [here](/fundamentals/custom-providers) 的信息。
+> info **提示** 了解更多关于自定义提供者语法 [here](/fundamentals/dependency-injection) 的信息。
 
 #### 注入
 

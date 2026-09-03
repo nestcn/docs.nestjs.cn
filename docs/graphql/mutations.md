@@ -10,7 +10,7 @@
 
 #### 代码优先
 
-让我们在上一节使用的 `AuthorResolver` 中添加另一个方法（参见 [resolvers](/graphql/resolvers)）。
+让我们在上一节使用的 `AuthorResolver` 中添加另一个方法（参见 [resolvers](/graphql/resolvers-map)）。
 
 ```typescript
 @Mutation(() => Post)
@@ -31,7 +31,7 @@ type Mutation {
 
 ```
 
-`upvotePost()` 方法接受 `postId`（`Int`）作为参数，并返回更新后的 `Post` 实体。由于 [resolvers](/graphql/resolvers) 部分中解释的原因，我们必须显式设置预期的类型。
+`upvotePost()` 方法接受 `postId`（`Int`）作为参数，并返回更新后的 `Post` 实体。由于 [resolvers](/graphql/resolvers-map) 部分中解释的原因，我们必须显式设置预期的类型。
 
 如果变更需要将对象作为参数，我们可以创建一个**输入类型**。输入类型是一种特殊的对象类型，可以作为参数传入（了解更多 [here](https://graphql.org/learn/schema/#input-types)）。要声明输入类型，请使用 `@InputType()` 装饰器。
 
@@ -60,7 +60,7 @@ async upvotePost(
 
 #### 模式优先
 
-让我们扩展上一节使用的 `AuthorResolver`（参见 [resolvers](/graphql/resolvers)）。
+让我们扩展上一节使用的 `AuthorResolver`（参见 [resolvers](/graphql/resolvers-map)）。
 
 ```typescript
 @Mutation()

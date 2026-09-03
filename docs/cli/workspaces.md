@@ -104,7 +104,7 @@ Monorepo 使用工作空间的概念来管理其成员实体。工作空间由**
 - **应用程序**：一个完整的 Nest 应用程序，包含用于引导应用程序的 `main.ts` 文件。除了编译和构建方面的考虑外，工作空间中的应用程序类型项目在功能上与_标准模式_结构中的应用程序相同。
 - **库**：库是一种打包通用功能集（模块、提供者、控制器等）的方式，可在其他项目中使用。库不能独立运行，也没有 `main.ts` 文件。在 [here](/cli/libraries) 中了解更多关于库的信息。
 
-所有工作空间都有一个**默认项目**（应为应用程序类型的项目）。这由 `nest-cli.json` 文件中的顶层 `"root"` 属性定义，该属性指向默认项目的根目录（详见下文 [CLI properties](/cli/monorepo#cli-properties)）。通常，这是您最初使用的**标准模式**应用程序，后来使用 `nest generate app` 将其转换为 monorepo。当您按照这些步骤操作时，此属性会自动填充。
+所有工作空间都有一个**默认项目**（应为应用程序类型的项目）。这由 `nest-cli.json` 文件中的顶层 `"root"` 属性定义，该属性指向默认项目的根目录（详见下文 [CLI properties](/cli/workspaces#cli-properties)）。通常，这是您最初使用的**标准模式**应用程序，后来使用 `nest generate app` 将其转换为 monorepo。当您按照这些步骤操作时，此属性会自动填充。
 
 当未提供项目名称时，`nest` 命令（如 `nest build` 和 `nest start`）会使用默认项目。
 
@@ -199,7 +199,7 @@ Nest 将组织和构建及部署标准和 monorepo 结构项目所需的元数�
 | `webpackConfigPath` | string              | 用于 webpack 选项的已弃用的旧版路径。请优先使用当前设置支持的构建器特定配置。 |
 | `deleteOutDir`      | boolean             | 如果 `true`，每当调用编译器时，它将首先删除编译输出目录（如 `tsconfig.json` 中所配置，默认值为 `./dist`）。 |
 | `assets`            | array               | 每当编译步骤开始时，启用自动分发非 TypeScript 资产（在 `--watch` 模式下，增量编译时**不会**进行资产分发）。详见下文。 |
-| `watchAssets`       | boolean             | 如果 `true`，以监视模式运行，监视**所有**非 TypeScript 资产。（有关要监视的资产的更精细控制，请参阅下面的 [Assets](cli/monorepo#资源) 部分）。 |
+| `watchAssets`       | boolean             | 如果 `true`，以监视模式运行，监视**所有**非 TypeScript 资产。（有关要监视的资产的更精细控制，请参阅下面的 [Assets](#资源文件) 部分）。 |
 | `manualRestart`     | boolean             | 如果 `true`，启用快捷键 `rs` 手动重启服务器。默认值为 `false`。 |
 | `builder`           | string/object       | 指示 CLI 使用哪个 `builder` 来编译项目（`tsc`、`swc` 或 `rspack`）。要自定义构建器的行为，您可以传递一个包含两个属性的对象：`type`（`tsc`、`swc` 或 `rspack`）和 `options`。 |
 | `typeCheck`         | boolean             | 如果 `true`，为 SWC 驱动的项目启用类型检查（当 `builder` 为 `swc` 时）。默认值为 `false`。 |

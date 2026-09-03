@@ -4,7 +4,7 @@
 
 ### 异常过滤器
 
-HTTP [exception filter](/exception-filters) 层与对应的微服务层之间唯一的区别在于，你应该使用 `RpcException` 而不是抛出 `HttpException`。
+HTTP [exception filter](/overview/exception-filters) 层与对应的微服务层之间唯一的区别在于，你应该使用 `RpcException` 而不是抛出 `HttpException`。
 
 ```typescript
 throw new RpcException('Invalid credentials.');

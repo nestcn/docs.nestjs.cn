@@ -355,7 +355,7 @@ $ curl http://localhost:3000/auth/profile -H "Authorization: Bearer eyJhbGciOiJI
 
 #### 全局启用认证
 
-如果您的绝大多数端点默认应该受到保护，您可以将认证守卫注册为 [global guard](/guards#绑定守卫)，而不是在每个控制器上使用 `@UseGuards()` 装饰器，只需标记哪些路由应该是公开的。
+如果您的绝大多数端点默认应该受到保护，您可以将认证守卫注册为 [global guard](/overview/guards#绑定守卫)，而不是在每个控制器上使用 `@UseGuards()` 装饰器，只需标记哪些路由应该是公开的。
 
 首先，使用以下构造将 `AuthGuard` 注册为全局守卫（在任何模块中，例如在 `AuthModule` 中）：
 
@@ -394,7 +394,7 @@ findAll() {
 
 ```
 
-最后，我们需要 `AuthGuard` 在找到 `"isPublic"` 元数据时返回 `true`。为此，我们将使用 `Reflector` 类（更多信息请参阅 [here](/guards#putting-it-all-together)）。
+最后，我们需要 `AuthGuard` 在找到 `"isPublic"` 元数据时返回 `true`。为此，我们将使用 `Reflector` 类（更多信息请参阅 [here](/overview/guards#putting-it-all-together)）。
 
 ```typescript
 @Injectable()

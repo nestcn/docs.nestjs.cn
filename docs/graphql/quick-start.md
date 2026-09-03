@@ -8,7 +8,7 @@
 
 在本章中，我们假设你对 GraphQL 有基本的了解，并重点介绍如何使用内置的 `@nestjs/graphql` 模块。`GraphQLModule` 可以配置为使用 [Apollo](https://www.apollographql.com/) 服务器（使用 `@nestjs/apollo` 驱动程序）和 [Mercurius](https://github.com/mercurius-js/mercurius)（使用 `@nestjs/mercurius`）。我们为这些成熟的 GraphQL 包提供了官方集成，以提供一种使用 Nest 的简单方式（更多集成请参阅 [here](/graphql/quick-start#third-party-integrations)）。
 
-你也可以构建自己的专用驱动程序（更多信息请阅读 [here](/graphql/other-features#creating-a-custom-driver)）。
+你也可以构建自己的专用驱动程序（更多信息请阅读 [here](/graphql/guards-interceptors#创建自定义驱动)）。
 
 #### 安装
 
@@ -408,7 +408,7 @@ const { schema } = app.get(GraphQLSchemaHost);
 
 ```
 
-与其他工厂提供者一样，我们的工厂函数可以是 <a href="/fundamentals/custom-providers#factory-providers-usefactory">async</a>，并且可以通过 `inject` 注入依赖。
+与其他工厂提供者一样，我们的工厂函数可以是 <a href="/fundamentals/custom-providers#工厂提供者usefactory">async</a>，并且可以通过 `inject` 注入依赖。
 
 ```typescript
 GraphQLModule.forRootAsync<ApolloDriverConfig>({

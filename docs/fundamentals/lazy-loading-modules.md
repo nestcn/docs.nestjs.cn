@@ -58,7 +58,7 @@ const moduleRef = await this.lazyModuleLoader.load(() => LazyModule);
 
 其中 `lazy.module.ts` 是一个导出**常规 Nest 模块**的 TypeScript 文件（无需额外更改）。
 
-`LazyModuleLoader#load` 方法返回 `LazyModule` 的 [module reference](/fundamentals/module-ref)，它允许您浏览内部提供者列表，并使用注入令牌作为查找键获取任何提供者的引用。
+`LazyModuleLoader#load` 方法返回 `LazyModule` 的 [module reference](/fundamentals/module-reference)，它允许您浏览内部提供者列表，并使用注入令牌作为查找键获取任何提供者的引用。
 
 例如，假设我们有一个 `LazyModule`，其定义如下：
 
@@ -103,7 +103,7 @@ const lazyService = moduleRef.get(LazyService);
 
 由于 Nest 中的控制器（或 GraphQL 应用程序中的解析器）代表一组路由/路径/主题（或查询/变更），您**无法使用** `LazyModuleLoader` 类**延迟加载它们**。
 
-> 错误 **警告** 在延迟加载的模块中注册的控制器、[resolvers](/graphql/resolvers) 和 [gateways](/websockets/gateways) 将无法按预期工作。同样，您也无法按需注册中间件函数（通过实现 `MiddlewareConsumer` 接口）。
+> 错误 **警告** 在延迟加载的模块中注册的控制器、[resolvers](/graphql/resolvers-map) 和 [gateways](/websockets/gateways) 将无法按预期工作。同样，您也无法按需注册中间件函数（通过实现 `MiddlewareConsumer` 接口）。
 
 例如，假设您正在构建一个底层使用 Fastify 驱动的 REST API（HTTP 应用程序）（使用 `@nestjs/platform-fastify` 包）。Fastify 不允许您在应用程序就绪/成功监听消息后注册路由。这意味着即使我们分析了模块控制器中注册的路由映射，所有延迟加载的路由也无法访问，因为没有办法在运行时注册它们。
 

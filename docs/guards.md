@@ -55,7 +55,7 @@ export class AuthGuard {
 
 #### 执行上下文
 
-`canActivate()` 函数接受一个参数，即 `ExecutionContext` 实例。`ExecutionContext` 继承自 `ArgumentsHost`。我们之前在异常过滤器章节中见过 `ArgumentsHost`。在上面的示例中，我们只是使用之前在 `ArgumentsHost` 上定义的相同辅助方法来获取 `Request` 对象的引用。你可以回顾[异常过滤器](./exception-filters#参数主机)章节的 **Arguments host** 部分以了解更多关于此主题的信息。
+`canActivate()` 函数接受一个参数，即 `ExecutionContext` 实例。`ExecutionContext` 继承自 `ArgumentsHost`。我们之前在异常过滤器章节中见过 `ArgumentsHost`。在上面的示例中，我们只是使用之前在 `ArgumentsHost` 上定义的相同辅助方法来获取 `Request` 对象的引用。你可以回顾[异常过滤器](/overview/exception-filters#参数主机)章节的 **Arguments host** 部分以了解更多关于此主题的信息。
 
 通过扩展 `ArgumentsHost`，`ExecutionContext` 还添加了几个新的辅助方法，提供有关当前执行过程的更多详细信息。这些详细信息有助于构建更通用的守卫，可以在广泛的控制器、方法和执行上下文中工作。在[此处](/fundamentals/execution-context)了解更多关于 `ExecutionContext` 的信息。
 
@@ -231,7 +231,7 @@ throw new UnauthorizedException();
 
 ```
 
-守卫抛出的任何异常都将由[异常层](/exception-filters)处理（全局异常过滤器和应用于当前上下文的任何异常过滤器）。
+守卫抛出的任何异常都将由[异常层](/overview/exception-filters)处理（全局异常过滤器和应用于当前上下文的任何异常过滤器）。
 
 :::info 提示
 如果你正在寻找如何实现授权的实际示例，请查看[此章节](/security/authorization)。

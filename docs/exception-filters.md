@@ -340,9 +340,9 @@ export class AppModule {}
 
 ```
 
-> info **提示** 当使用此方法为过滤器执行依赖注入时，请注意，无论此构造在哪个模块中使用，过滤器实际上都是全局的。应该在哪里执行此操作？选择定义过滤器（上面的示例中的 `HttpExceptionFilter`）的模块。此外，`useClass` 不是处理自定义提供者注册的唯一方法。了解更多 [here](/fundamentals/custom-providers)。
+> info **提示** 当使用此方法为过滤器执行依赖注入时，请注意，无论此构造在哪个模块中使用，过滤器实际上都是全局的。应该在哪里执行此操作？选择定义过滤器（上面的示例中的 `HttpExceptionFilter`）的模块。此外，`useClass` 不是处理自定义提供者注册的唯一方法。了解更多 [here](/fundamentals/dependency-injection)。
 
-> info **提示** 从 [middleware](/middleware#error-handling) 抛出的异常也会由异常层处理。因为中间件在路由处理器被选择之前运行，所以只有**全局**异常过滤器适用（`app.useGlobalFilters()` 或 `APP_FILTER`）。方法作用域和控制器作用域的 `@UseFilters()` 绑定不会被调用。
+> info **提示** 从 [middleware](/overview/middlewares#错误处理) 抛出的异常也会由异常层处理。因为中间件在路由处理器被选择之前运行，所以只有**全局**异常过滤器适用（`app.useGlobalFilters()` 或 `APP_FILTER`）。方法作用域和控制器作用域的 `@UseFilters()` 绑定不会被调用。
 
 您可以根据需要添加任意数量的过滤器；只需将每个过滤器添加到 providers 数组中即可。
 

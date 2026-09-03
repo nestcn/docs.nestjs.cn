@@ -589,7 +589,7 @@ export class JwtAuthGuard extends AuthGuard(['strategy_jwt_1', 'strategy_jwt_2',
 
 #### 全局启用认证
 
-如果您的绝大多数端点默认应该受到保护，您可以将认证守卫注册为 [全局守卫](/guards#绑定守卫)，而不是在每个控制器上使用 `@UseGuards()` 装饰器，您可以简单地标记哪些路由应该是公共的。
+如果您的绝大多数端点默认应该受到保护，您可以将认证守卫注册为 [全局守卫](/overview/guards#绑定守卫)，而不是在每个控制器上使用 `@UseGuards()` 装饰器，您可以简单地标记哪些路由应该是公共的。
 
 首先，使用以下构造（在任何模块中）将 `JwtAuthGuard` 注册为全局守卫：
 
@@ -628,7 +628,7 @@ findAll() {
 
 ```
 
-最后，我们需要 `JwtAuthGuard` 在找到 `"isPublic"` 元数据时返回 `true`。为此，我们将使用 `Reflector` 类（更多信息见 [这里](/guards#putting-it-all-together)）。
+最后，我们需要 `JwtAuthGuard` 在找到 `"isPublic"` 元数据时返回 `true`。为此，我们将使用 `Reflector` 类（更多信息见 [这里](/overview/guards#putting-it-all-together)）。
 
 ```typescript
 @Injectable()

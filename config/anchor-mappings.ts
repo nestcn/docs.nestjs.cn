@@ -469,6 +469,11 @@ export const anchorMappings: Record<string, string> = {
   'custom-metrics': '自定义指标',
   'handing-a-failure-to-a-coding-agent': '将故障交给编码代理',
   'issues': '问题',
+
+  // v12 同步：AI 译文遗留的英文锚点
+  'error-handling': '错误处理',
+  'factory-providers-usefactory': '工厂提供者usefactory',
+  'creating-a-custom-driver': '创建自定义驱动',
 };
 
 // 路径映射表
@@ -478,8 +483,15 @@ export const pathMappings: Record<string, string> = {
   '/middleware': '/overview/middlewares',
   '/interceptors': '/overview/interceptors',
   '/exception-filters': '/overview/exception-filters',
+  '/providers': '/overview/providers',
   '/fundamentals/injection-scopes': '/fundamentals/provider-scopes',
+  '/fundamentals/custom-providers': '/fundamentals/dependency-injection',
+  '/fundamentals/async-providers': '/fundamentals/async-components',
+  '/fundamentals/module-ref': '/fundamentals/module-reference',
   '/techniques/database': '/techniques/sql',
+  '/graphql/resolvers': '/graphql/resolvers-map',
+  '/graphql/other-features': '/graphql/guards-interceptors',
+  '/cli/monorepo': '/cli/workspaces',
 
   // Security 路径映射
   '/security/authentication': '/security/authentication',

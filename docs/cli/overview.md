@@ -68,7 +68,7 @@ $ npm run start:dev
 | `nest build` 和 `nest start` 命令 | 目标自动默认为上下文中的（唯一）项目 | 目标默认为 monorepo 中的**默认项目** |
 | 库 | 手动管理，通常通过 npm 打包 | 内置支持，包括路径管理和打包 |
 
-阅读关于 [Workspaces](/cli/monorepo) 和 [Libraries](/cli/libraries) 的部分，以获取更详细的信息，帮助您决定哪种模式最适合您。
+阅读关于 [Workspaces](/cli/workspaces) 和 [Libraries](/cli/libraries) 的部分，以获取更详细的信息，帮助您决定哪种模式最适合您。
 
 <app-banner-courses></app-banner-courses>
 

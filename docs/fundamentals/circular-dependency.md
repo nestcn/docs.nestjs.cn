@@ -46,7 +46,7 @@ export class CommonService {
 
 #### ModuleRef 类替代方案
 
-使用 `forwardRef()` 的替代方案是重构代码，并使用 `ModuleRef` 类在（否则）循环关系的一侧检索提供者。了解更多关于 `ModuleRef` 工具类的信息 [here](/fundamentals/module-ref)。
+使用 `forwardRef()` 的替代方案是重构代码，并使用 `ModuleRef` 类在（否则）循环关系的一侧检索提供者。了解更多关于 `ModuleRef` 工具类的信息 [here](/fundamentals/module-reference)。
 
 #### 模块前向引用
 

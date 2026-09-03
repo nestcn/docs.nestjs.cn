@@ -28,7 +28,7 @@ Nest 应用程序以及每个应用程序元素都有一个由 Nest 管理的生
 | `beforeApplicationShutdown()`\* | 所有 `onModuleDestroy()` 处理器完成后（Promise 已解决或拒绝）调用；<br />一旦完成（Promise 已解决或拒绝），所有现有连接将关闭（调用 `app.close()`）。 |
 | `onApplicationShutdown()`\*     | 连接关闭后（`app.close()` 解决）调用。                                                                                                                                                          |
 
-\* 对于这些事件，如果您未显式调用 `app.close()`，则必须选择启用它们以配合系统信号（如 `SIGTERM`）工作。请参阅下面的 [Application shutdown](fundamentals/lifecycle-events#application-shutdown)。
+\* 对于这些事件，如果您未显式调用 `app.close()`，则必须选择启用它们以配合系统信号（如 `SIGTERM`）工作。请参阅下面的 [Application shutdown](#应用程序关闭)。
 
 > warning **警告** 上述生命周期钩子不会为**请求作用域**的类触发。请求作用域的类与应用程序生命周期无关，其生命周期不可预测。它们仅为每个请求创建，并在响应发送后自动进行垃圾回收。
 

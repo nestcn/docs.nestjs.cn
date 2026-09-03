@@ -459,7 +459,7 @@ const app = await NestFactory.create<NestFastifyApplication>(
 
 #### 错误处理
 
-有关处理错误（即处理异常）的单独章节，请参阅 [这里](/exception-filters)。
+有关处理错误（即处理异常）的单独章节，请参阅 [这里](/overview/exception-filters)。
 
 #### 完整资源示例
 

@@ -10,7 +10,7 @@
 
 <figure><img class="illustrative-image" src="/assets/Gateways_1.png" /></figure>
 
-> info **提示** 网关可以被视为 [providers](/providers)；这意味着它们可以通过类构造函数注入依赖。此外，网关也可以被其他类（提供者和控制器）注入。
+> info **提示** 网关可以被视为 [providers](/overview/providers)；这意味着它们可以通过类构造函数注入依赖。此外，网关也可以被其他类（提供者和控制器）注入。
 
 #### 安装
 
@@ -241,7 +241,7 @@ Nest 会在服务器实例准备好使用后自动将其分配给此属性。
 
 #### 请求作用域的网关
 
-从 NestJS v12 开始，网关支持 [request-scoped](/fundamentals/injection-scopes) 提供者。每个连接的套接字都会为每个请求作用域的依赖创建一个新实例，并且该实例在连接期间一直存在——因此它可以安全地保存每个连接的状态。
+从 NestJS v12 开始，网关支持 [request-scoped](/fundamentals/provider-scopes) 提供者。每个连接的套接字都会为每个请求作用域的依赖创建一个新实例，并且该实例在连接期间一直存在——因此它可以安全地保存每个连接的状态。
 
 使用 `REQUEST` 令牌注入套接字本身，就像在请求作用域的 HTTP 提供者中注入 HTTP 请求一样：
 

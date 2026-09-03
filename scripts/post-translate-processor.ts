@@ -92,6 +92,25 @@ function processFile(
       );
     }
 
+    // 1.5 修正根相对路径链接（AI 译文常照搬官方文档的旧路径，如
+    // /fundamentals/module-ref、/middleware，导致 rspress 构建报死链）
+    if (!isSpecial) {
+      content = content.replace(
+        /\]\(([^)#\s]*)(#[^)\s]*)?\)/g,
+        (match, rawPath: string, anchor?: string) => {
+          if (!rawPath) return match;
+          const clean = rawPath.replace(/^\.\/|^\/|^(?:\.\.\/)+/, '');
+          const mapped = pathMappings[`/${clean}`];
+          if (!mapped) return match;
+          stats.fixedLinks++;
+          if (verbose) {
+            console.log(`    🔗 路径映射: ${rawPath} → ${mapped}`);
+          }
+          return `](${mapped}${anchor ?? ''})`;
+        },
+      );
+    }
+
     // 2. 修正锚点链接（所有文件）
     content = content.replace(
       /(\.\/[^\s)]*|https?:\/\/[^\s)]*)?#([a-zA-Z0-9_-]+)/g,

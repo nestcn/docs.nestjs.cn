@@ -108,7 +108,7 @@ bootstrap();
 
 为了启用请求-响应消息类型，Nest 创建了两个逻辑通道：一个用于传输数据，另一个用于等待传入的响应。对于某些底层传输，如 [NATS](https://nats.io/)，这种双通道支持是开箱即用的。对于其他传输，Nest 通过手动创建单独的通道来补偿。虽然这很有效，但可能会引入一些开销。因此，如果您不需要请求-响应消息风格，您可能需要考虑使用基于事件的方法。
 
-要基于请求-响应范式创建消息处理程序，请使用 `@MessagePattern()` 装饰器，该装饰器从 `@nestjs/microservices` 包导入。此装饰器应仅在 [控制器](/controllers) 类中使用，因为它们充当应用程序的入口点。在提供者中使用它将无效，因为它们会被 Nest 运行时忽略。
+要基于请求-响应范式创建消息处理程序，请使用 `@MessagePattern()` 装饰器，该装饰器从 `@nestjs/microservices` 包导入。此装饰器应仅在 [控制器](/overview/controllers) 类中使用，因为它们充当应用程序的入口点。在提供者中使用它将无效，因为它们会被 Nest 运行时忽略。
 
 ```typescript
 import { Controller } from '@nestjs/common';

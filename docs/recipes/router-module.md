@@ -6,7 +6,7 @@
 
 > 信息 **提示** 本章仅适用于基于 HTTP 的应用程序。
 
-在 HTTP 应用程序（例如 REST API）中，处理程序的路由路径由控制器（在 `@Controller` 装饰器内）声明的（可选）前缀与方法装饰器中指定的任何路径（例如 `@Get('users')`）拼接而成。您可以在 [this section](/controllers#路由) 中了解更多信息。此外，您可以为应用程序中注册的所有路由定义 [global prefix](/faq/global-prefix)，或启用 [versioning](/techniques/versioning)。
+在 HTTP 应用程序（例如 REST API）中，处理程序的路由路径由控制器（在 `@Controller` 装饰器内）声明的（可选）前缀与方法装饰器中指定的任何路径（例如 `@Get('users')`）拼接而成。您可以在 [this section](/overview/controllers#路由) 中了解更多信息。此外，您可以为应用程序中注册的所有路由定义 [global prefix](/faq/global-prefix)，或启用 [versioning](/techniques/versioning)。
 
 另外，在某些边缘情况下，在模块级别定义前缀（因此对于该模块内注册的所有控制器）可能会很有用。例如，想象一个 REST 应用程序，它暴露了多个不同的端点，这些端点被应用程序中称为“Dashboard”的特定部分使用。在这种情况下，与其在每个控制器中重复 `/dashboard` 前缀，不如使用一个工具 `RouterModule` 模块，如下所示：
 

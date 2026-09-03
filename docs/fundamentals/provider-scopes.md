@@ -41,7 +41,7 @@ export class CatsService {}
 
 ```
 
-类似地，对于 [custom providers](/fundamentals/custom-providers)，在提供者注册的长格式中设置 `scope` 属性：
+类似地，对于 [custom providers](/fundamentals/dependency-injection)，在提供者注册的长格式中设置 `scope` 属性：
 
 ```typescript
 {
@@ -56,7 +56,7 @@ export class CatsService {}
 
 默认使用单例作用域，无需声明。如果您确实想将提供者声明为单例作用域，请为 `scope` 属性使用 `Scope.DEFAULT` 值。
 
-> warning **注意** WebSocket 网关不应使用请求作用域的提供者，因为它们必须作为单例运行。每个网关封装一个真实的套接字，不能多次实例化。此限制也适用于某些其他提供者，例如 [_Passport strategies_](../security/authentication#请求作用域策略) 或 _Cron 控制器_。
+> warning **注意** WebSocket 网关不应使用请求作用域的提供者，因为它们必须作为单例运行。每个网关封装一个真实的套接字，不能多次实例化。此限制也适用于某些其他提供者，例如 [_Passport strategies_](/security/authentication#请求作用域策略) 或 _Cron 控制器_。
 
 #### 控制器作用域
 
@@ -170,7 +170,7 @@ export class AppService {
 
 例如，假设您有一个由 10 个不同客户交替使用的应用程序。每个客户都有其**自己的专用数据源**，您希望确保客户 A 永远无法访问客户 B 的数据库。实现此目的的一种方法是声明一个请求作用域的“数据源”提供者，它根据请求对象确定“当前客户”并检索其对应的数据库。使用这种方法，您可以在几分钟内将应用程序转变为多租户应用程序。但是，这种方法的一个主要缺点是，由于应用程序的很大一部分组件很可能依赖于“数据源”提供者，它们将隐式地变为“请求作用域”，因此您无疑会看到应用程序性能受到影响。
 
-但是，如果我们有一个更好的解决方案呢？既然我们只有 10 个客户，难道我们不能为每个客户创建 10 个独立的 [DI sub-trees](/fundamentals/module-ref#解析作用域提供者)（而不是为每个请求重新创建每个树）吗？如果您的提供者不依赖于每个连续请求真正唯一的任何属性（例如请求 UUID），而是有一些特定的属性让我们能够聚合（分类）它们，那么就没有理由在每个传入请求上_重新创建依赖注入子树_。
+但是，如果我们有一个更好的解决方案呢？既然我们只有 10 个客户，难道我们不能为每个客户创建 10 个独立的 [DI sub-trees](/fundamentals/module-reference#解析作用域提供者)（而不是为每个请求重新创建每个树）吗？如果您的提供者不依赖于每个连续请求真正唯一的任何属性（例如请求 UUID），而是有一些特定的属性让我们能够聚合（分类）它们，那么就没有理由在每个传入请求上_重新创建依赖注入子树_。
 
 这正是**持久提供者**派上用场的地方。
 
@@ -248,7 +248,7 @@ export class CatsService {}
 
 ```
 
-类似地，对于 [custom providers](/fundamentals/custom-providers)，在提供者注册的长格式中设置 `durable` 属性：
+类似地，对于 [custom providers](/fundamentals/dependency-injection)，在提供者注册的长格式中设置 `durable` 属性：
 
 ```typescript
 {

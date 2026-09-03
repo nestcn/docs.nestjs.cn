@@ -133,7 +133,7 @@ module.exports = (options, webpack) => {
 
 到目前为止，我们涵盖了编译时优化。这些与您在应用程序中定义提供者和加载 Nest 模块的方式无关，而随着应用程序的增大，这一点起着至关重要的作用。
 
-例如，假设有一个定义为 [asynchronous provider](/fundamentals/async-providers) 的数据库连接。异步提供者旨在延迟应用程序启动，直到一个或多个异步任务完成。
+例如，假设有一个定义为 [asynchronous provider](/fundamentals/async-components) 的数据库连接。异步提供者旨在延迟应用程序启动，直到一个或多个异步任务完成。
 这意味着，如果您的 serverless 函数平均需要 2 秒来连接数据库（在启动时），那么您的端点将至少需要额外的两秒（因为它必须等待连接建立）才能发送响应（当它是冷启动且您的应用程序尚未运行时）。
 
 如您所见，在**无服务器环境**中，提供者的结构方式有所不同，因为启动时间非常重要。另一个很好的例子是，如果您使用 Redis 进行缓存，但仅在特定场景下使用。在这种情况下，也许您不应该将 Redis 连接定义为异步提供者，因为即使特定函数调用不需要它，它也会减慢启动时间。
@@ -240,7 +240,7 @@ export const handler: Handler = async (
 
 ```
 
-> info **提示** 要创建多个无服务器函数并在它们之间共享公共模块，我们建议使用 [CLI Monorepo mode](/cli/monorepo#monorepo-模式)。
+> info **提示** 要创建多个无服务器函数并在它们之间共享公共模块，我们建议使用 [CLI Monorepo mode](/cli/workspaces#monorepo-模式)。
 
 > warning **警告** 如果您使用 `@nestjs/swagger` 包，从无服务器函数提供 Swagger UI 需要额外一步。在 API Gateway 后面，请求的 `originalUrl` 可能缺少 Swagger UI 期望的尾部斜杠，这会导致无限重定向循环。请在调用 `SwaggerModule.setup()` **之前**注册一个中间件来恢复它：
 >

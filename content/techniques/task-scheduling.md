@@ -227,7 +227,7 @@ The <a href="techniques/task-scheduling#dynamic-timeouts">Dynamic API</a> also e
 
 #### Dynamic schedule module API
 
-The `@nestjs/schedule` module provides a dynamic API that enables managing declarative <a href="techniques/task-scheduling#declarative-cron-jobs">cron jobs</a>, <a href="techniques/task-scheduling#declarative-timeouts">timeouts</a> and <a href="techniques/task-scheduling#declarative-intervals">intervals</a>. The API also enables creating and managing **dynamic** cron jobs, timeouts and intervals, where the properties are defined at runtime.
+The `@nestjs/schedule` module provides a dynamic API that allows you to manage declarative <a href="techniques/task-scheduling#declarative-cron-jobs">cron jobs</a>, <a href="techniques/task-scheduling#declarative-timeouts">timeouts</a> and <a href="techniques/task-scheduling#declarative-intervals">intervals</a>. The API also allows you to create and manage **dynamic** cron jobs, timeouts and intervals, where the properties are defined at runtime.
 
 #### Dynamic cron jobs
 
@@ -414,6 +414,16 @@ getTimeouts() {
   timeouts.forEach(key => this.logger.log(`Timeout: ${key}`));
 }
 ```
+
+#### Knowing a cron job actually ran
+
+A scheduled job that throws is a problem you will hear about. A scheduled job that silently *stops being scheduled* - the process crashed, the container was descheduled, a deploy shipped a `@Cron()` expression with a typo - is a problem nobody hears about until the report it generates is missing.
+
+This is the failure mode cron monitoring exists for, and [NestJS Observe](https://www.observe.nestjs.com/ 'NestJS Observe') covers it without a third-party ping service or a heartbeat URL for the job to curl on its way out. Scheduled runs are reported as **jobs**, alongside queue consumers - each with its duration, outcome, and failure reason - and a **job silence** alert rule fires when a named job hasn't reported within a tolerance you set, anywhere from 2 minutes to 7 days - *"alert me if `daily-invoices` has not reported in the last 26 hours"*.
+
+Two details make this practical rather than noisy. A scope that has never reported anything doesn't fire, so you can add the rule before the job ships without being paged for something that isn't integrated yet. And rules carry a recurring mute schedule, so a job that legitimately doesn't run at weekends doesn't wake anyone on Saturday.
+
+A handler that needs to report its own progress can inject `TracerService` and record spans or custom metrics from inside the run - metrics in particular aren't tied to a trace, so they can be reported from cron jobs and lifecycle hooks alike. See [Manual instrumentation](/observability/manual-instrumentation) for that, and the [Observability](/observability/overview) chapter for setup.
 
 #### Example
 

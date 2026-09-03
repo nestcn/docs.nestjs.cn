@@ -111,6 +111,70 @@ When JSON logging is enabled, the log output will look like this (in a single li
 
 You can see different variants in this [Pull Request](https://github.com/nestjs/nest/pull/14121).
 
+#### Structured logging params
+
+Log messages often need to carry metadata - a user id, a request duration, a correlation id. Starting with NestJS v12, plain objects passed **after** the first message argument are treated as structured params and attached to the same log entry instead of being emitted as separate log records.
+
+```typescript
+const logger = new Logger('UserService');
+logger.log('User created', { userId: 1, email: 'foo@bar.com' });
+```
+
+In text mode, the params are appended inline to the same formatted line:
+
+```plaintext
+[Nest] 3785  - 02/26/2026, 10:04:41 AM     LOG [UserService] User created { userId: 1, email: 'foo@bar.com' }
+```
+
+When several plain objects are passed, they are merged into a single set of params:
+
+```typescript
+logger.log('Request handled', { method: 'GET' }, { path: '/api', duration: 42 });
+```
+
+```plaintext
+[Nest] 3785  - 02/26/2026, 10:04:41 AM     LOG [UserService] Request handled { method: 'GET', path: '/api', duration: 42 }
+```
+
+In JSON mode, params are nested under a `params` key by default:
+
+```json
+{
+  "level": "log",
+  "pid": 3785,
+  "timestamp": 1772089691769,
+  "message": "User created",
+  "context": "UserService",
+  "params": { "userId": 1 }
+}
+```
+
+If you would rather have them spread into the root of the JSON object - which some log aggregators prefer - enable `flattenParams`:
+
+```typescript
+new ConsoleLogger({ json: true, flattenParams: true });
+```
+
+```json
+{
+  "level": "log",
+  "pid": 3785,
+  "timestamp": 1772089691769,
+  "message": "User created",
+  "context": "UserService",
+  "userId": 1
+}
+```
+
+The relevant `ConsoleLogger` options are:
+
+| Option             | Description                                                                                                   | Default |
+| ------------------ | ------------------------------------------------------------------------------------------------------------- | ------- |
+| `structuredParams` | If enabled, plain objects logged after the message are attached to the same entry as params.                  | `true`  |
+| `flattenParams`    | If enabled, params are spread into the root of the JSON record instead of nested under `params`. JSON mode only. | `false` |
+
+> info **Hint** Only **plain objects** are treated as params. Arrays, strings, numbers, class instances, and `null` continue to be logged as separate messages, and a plain object passed as the *first* argument is still treated as the message itself. Set `structuredParams: false` to restore the pre-v12 behavior.
+
 #### Using the logger for application logging
 
 We can combine several of the techniques above to provide consistent behavior and formatting across both Nest system logging and our own application event/message logging.
@@ -258,7 +322,7 @@ For more advanced logging functionality, you'll want to take advantage of depend
 
 ```typescript
 import { Module } from '@nestjs/common';
-import { MyLogger } from './my-logger.service';
+import { MyLogger } from './my-logger.service.js';
 
 @Module({
   providers: [MyLogger],
@@ -281,7 +345,7 @@ app.useLogger(app.get(MyLogger));
 await app.listen(process.env.PORT ?? 3000);
 ```
 
-> info **Note** In the example above, we set the `bufferLogs` to `true` to make sure all logs will be buffered until a custom logger is attached (`MyLogger` in this case) and the application initialisation process either completes or fails. If the initialisation process fails, Nest will fallback to the original `ConsoleLogger` to print out any reported error messages. Also, you can set the `autoFlushLogs` to `false` (default `true`) to manually flush logs (using the `Logger.flush()` method).
+> info **Note** In the example above, we set the `bufferLogs` to `true` to make sure all logs will be buffered until a custom logger is attached (`MyLogger` in this case) and the application initialization process either completes or fails. If the initialization process fails, Nest will fallback to the original `ConsoleLogger` to print out any reported error messages. Also, you can set the `autoFlushLogs` to `false` (default `true`) to manually flush logs (using the `Logger.flush()` method).
 
 Here we use the `get()` method on the `NestApplication` instance to retrieve the singleton instance of the `MyLogger` object. This technique is essentially a way to "inject" an instance of a logger for use by Nest. The `app.get()` call retrieves the singleton instance of `MyLogger`, and depends on that instance being first injected in another module, as described above.
 
@@ -306,7 +370,7 @@ Next, create a `LoggerModule` with a construction like this:
 
 ```typescript
 import { Module } from '@nestjs/common';
-import { MyLogger } from './my-logger.service';
+import { MyLogger } from './my-logger.service.js';
 
 @Module({
   providers: [MyLogger],
@@ -319,7 +383,7 @@ Next, import the `LoggerModule` into your feature module. Since we extended defa
 
 ```typescript
 import { Injectable } from '@nestjs/common';
-import { MyLogger } from './my-logger.service';
+import { MyLogger } from './my-logger.service.js';
 
 @Injectable()
 export class CatsService {
@@ -352,6 +416,25 @@ await app.listen(process.env.PORT ?? 3000);
 ```
 
 > info **Hint** Alternatively, instead of setting `bufferLogs` to `true`, you could temporarily disable the logger with `logger: false` instruction. Be mindful that if you supply `logger: false` to `NestFactory.create`, nothing will be logged until you call `useLogger`, so you may miss some important initialization errors. If you don't mind that some of your initial messages will be logged with the default logger, you can just omit the `logger: false` option.
+
+#### Correlating logs with requests
+
+Centralizing logs solves storage, not investigation. Once every instance ships to the same place, the hard part becomes reconstructing a *single* request out of thousands of interleaved lines - which is why so much production debugging is really the work of inventing a correlation id, threading it through every log call, and hoping nothing on the path forgot to pass it along.
+
+[NestJS Observe](https://www.observe.nestjs.com/ 'NestJS Observe') removes that bookkeeping. Turn on `forwardLogs` and every line written through Nest's `Logger` is captured with the trace it was written in already attached:
+
+```typescript
+ObserveModule.forRoot({
+  serviceId: 'orders-api',
+  forwardLogs: true,
+});
+```
+
+You keep calling `this.logger.log()` with an `orderId` param exactly as before - no correlation id to generate, no context object to thread through your service layer. On an execution page the logs for that one request are then placed on the trace's own clock, each line sitting next to the span that was in flight when it was written, so "the retry warning fired *before* the timeout, not after" is something you can see instead of infer from timestamps across three log streams.
+
+Structured logging params carry through as well, so `orderId` stays a queryable field rather than being flattened into the message text. Log lines are also alertable in their own right - "tell me when `payment declined` appears more than 10 times in 15 minutes".
+
+If you would rather keep log content in your own aggregator, you do not have to forward anything: with `forwardLogs` off, the SDK still augments `ConsoleLogger` so every line carries its trace id, which is enough to jump from a line in your existing stack to the full trace in the dashboard. See the [SDK reference](/observability/sdk) for both options and their redaction settings.
 
 #### Use external logger
 

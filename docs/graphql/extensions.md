@@ -1,10 +1,12 @@
-### 扩展功能
+<!-- 此文件从 content/graphql/extensions.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-09-03T11:03:07.308Z -->
+<!-- 源文件: content/graphql/extensions.md -->
 
-:::warning 警告
-本章仅适用于代码优先方法。
-:::
+### 扩展
 
-扩展是一项**高级底层特性** ，允许您在类型配置中定义任意数据。通过为特定字段附加自定义元数据，您可以创建更复杂、通用的解决方案。例如，借助扩展功能，您可以定义访问特定字段所需的字段级角色。这些角色可在运行时反映，以确定调用者是否具备检索特定字段的足够权限。
+> warning **警告** 本章仅适用于代码优先方法。
+
+扩展是一项**高级、底层功能**，允许您在类型配置中定义任意数据。将自定义元数据附加到特定字段，可以让您创建更复杂、通用的解决方案。例如，使用扩展，您可以定义访问特定字段所需的字段级角色。这些角色可以在运行时反映出来，以确定调用者是否有足够的权限检索特定字段。
 
 #### 添加自定义元数据
 
@@ -17,20 +19,20 @@ password: string;
 
 ```
 
-在上面的示例中，我们将 `role` 元数据属性赋值为 `Role.ADMIN`。`Role` 是一个简单的 TypeScript 枚举，用于分组系统中所有可用的用户角色。
+在上面的示例中，我们将 `role` 元数据属性分配为 `Role.ADMIN` 的值。`Role` 是一个简单的 TypeScript 枚举，它对我们系统中所有可用的用户角色进行了分组。
 
-注意，除了在字段上设置元数据外，您还可以在类级别和方法级别（例如查询处理程序上）使用 `@Extensions()` 装饰器。
+请注意，除了在字段上设置元数据外，您还可以在类级别和方法级别（例如，在查询处理器上）使用 `@Extensions()` 装饰器。
 
 #### 使用自定义元数据
 
-利用自定义元数据的逻辑可以根据需要变得非常复杂。例如，您可以创建一个简单的拦截器来存储/记录每次方法调用的事件，或者创建一个[字段中间件](/graphql/field-middleware)来匹配检索字段所需的角色与调用者权限（字段级权限系统）。
+利用自定义元数据的逻辑可以根据需要变得复杂。例如，您可以创建一个简单的拦截器，用于存储/记录每次方法调用的事件，或者创建一个 [field middleware](/graphql/field-middleware)，将检索字段所需的角色与调用者的权限进行匹配（字段级权限系统）。
 
-出于演示目的，我们定义一个 `checkRoleMiddleware` 中间件，用于比较用户角色（此处硬编码）与访问目标字段所需的角色：
+为了说明目的，让我们定义一个 `checkRoleMiddleware`，它将用户的角色（此处硬编码）与访问目标字段所需的角色进行比较：
 
 ```typescript
 export const checkRoleMiddleware: FieldMiddleware = async (
   ctx: MiddlewareContext,
-  next: NextFn
+  next: NextFn,
 ) => {
   const { info } = ctx;
   const { extensions } = info.parentType.getFields()[info.fieldName];
@@ -43,7 +45,7 @@ export const checkRoleMiddleware: FieldMiddleware = async (
   if (userRole === extensions.role) {
     // or just "return null" to ignore
     throw new ForbiddenException(
-      `User does not have sufficient permissions to access "${info.fieldName}" field.`
+      `User does not have sufficient permissions to access "${info.fieldName}" field.`,
     );
   }
   return next();
@@ -51,7 +53,7 @@ export const checkRoleMiddleware: FieldMiddleware = async (
 
 ```
 
-完成上述定义后，我们可以为 `password` 字段注册中间件，如下所示：
+有了这个，我们可以为 `password` 字段注册一个中间件，如下所示：
 
 ```typescript
 @Field({ middleware: [checkRoleMiddleware] })

@@ -1,35 +1,35 @@
+<!-- 此文件从 content/devtools/overview.md 自动生成，请勿直接修改此文件 -->
+<!-- 生成时间: 2026-09-03T11:10:23.870Z -->
+<!-- 源文件: content/devtools/overview.md -->
+
 ### 概述
 
-:::info 提示
-本章介绍 Nest Devtools 与 Nest 框架的集成。如需了解 Devtools 应用程序，请访问 [Devtools](https://devtools.nestjs.com) 官网。
-:::
+> info **提示** 本章介绍 Nest Devtools 与 Nest 框架的集成。如果您正在寻找 Devtools 应用程序，请访问 [Devtools](https://devtools.nestjs.com) 网站。
 
-要开始调试本地应用程序，请打开 `main.ts` 文件，并确保在应用程序选项对象中将 `snapshot` 属性设置为 `true`，如下所示：
+Nest Devtools 为您提供应用程序内部结构的交互式、实时更新的视图——包括模块、提供者、控制器，以及将它们连接在一起的路由和事件。您无需通过导入和构造函数签名来拼凑全貌，而是可以获得一个可搜索、可筛选、可点击的实时图形。本章将引导您首次将本地应用程序连接到 Devtools。
+
+开始使用只需不到五分钟。打开您的 `main.ts` 文件，在应用程序的选项对象中将 `snapshot` 属性设置为 `true`：
 
 ```typescript
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     snapshot: true,
   });
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(3000);
 }
 
 ```
 
-这将指示框架收集必要的元数据，使 Nest Devtools 能够可视化您的应用程序图。
+这告诉 Nest 开始收集 Devtools 重建和可视化应用程序依赖图所需的元数据。
 
-接下来，让我们安装所需的依赖项：
+接下来，安装 Devtools 集成包：
 
 ```bash
 $ npm i @nestjs/devtools-integration
 
 ```
 
-:::warning 注意
-如果您的应用中使用了 `@nestjs/graphql` 包，请确保安装最新版本（`npm i @nestjs/graphql@11`）。
-:::
-
-有了这个依赖项后，让我们打开 `app.module.ts` 文件并导入刚刚安装的 `DevtoolsModule`：
+安装完成后，打开 `app.module.ts` 并导入 `DevtoolsModule`：
 
 ```typescript
 @Module({
@@ -45,63 +45,71 @@ export class AppModule {}
 
 ```
 
-:::warning 注意
- 此处检查 `NODE_ENV` 环境变量的原因是——切勿在生产环境使用此模块！
-:::
+> info **注意** 我们在这里检查 `NODE_ENV`，因为 `DevtoolsModule` 绝不应在生产环境中运行。
 
-当 `DevtoolsModule` 导入完成且应用启动运行后（`npm run start:dev`），您应当能够访问 [Devtools](https://devtools.nestjs.com) 网址并查看自省生成的图谱。
+`http` 标志控制 `DevtoolsModule` 是否暴露其内省服务器——保持禁用状态时，该模块实际上不执行任何操作，这正是您希望的安全网，以防此配置意外通过审查。也无需担心有意义的运行时开销：元数据收集仅在内省服务器实际被查询时才会启动，因此应用程序的正常请求处理不受影响。
 
-![Modules Graph.Png](/assets/devtools/modules-graph.png)
+一旦导入了 `DevtoolsModule` 并且您的应用程序已启动运行（`npm run start:dev`），请前往 [Devtools](https://devtools.nestjs.com) 观看您的内省图形生动呈现。
 
-:::info 提示
-如上方截图所示，每个模块都连接到 `InternalCoreModule`。`InternalCoreModule` 是一个始终被导入根模块的全局模块。由于它被注册为全局节点，Nest 会自动在所有模块与 `InternalCoreModule` 节点之间创建连接边。现在，若要从图中隐藏全局模块，可以使用侧边栏中的" **隐藏全局模块** "复选框。
-:::
+<figure><img src="/assets/devtools/modules-graph.png" /></figure>
 
-由此可见，`DevtoolsModule` 会让你的应用暴露一个额外的 HTTP 服务器（运行在 8000 端口），Devtools 应用将通过该端口来内省你的应用程序。
+> info **提示** 请注意，每个模块都连接到 `InternalCoreModule`——这是 Nest 始终导入到根模块的全局模块。由于它是全局注册的，Nest 会自动在它和应用程序中的每个其他模块之间绘制一条边。要减少视图杂乱，请在侧边栏中切换 **隐藏全局模块** 复选框。
 
-为确保一切按预期运行，请将视图切换为"Classes"模式。您应该会看到如下界面：
+在底层，`DevtoolsModule` 会启动一个轻量级 HTTP 服务器（端口 8000），该仪表板使用它来实时内省您的应用程序——无需额外配置。
 
-![Classes Graph.Png](/assets/devtools/classes-graph.png)
+让我们确认一切已正确连接。将图形视图切换为"类"（Classes），您应该会看到类似这样的内容：
 
-要聚焦特定节点，点击矩形框后图形界面会弹出包含 **"聚焦"** 按钮的窗口。您也可以使用侧边栏的搜索栏来定位特定节点。
+<figure><img src="/assets/devtools/classes-graph.png" /></figure>
 
-:::info 提示
-如果点击**检查**按钮，应用程序将带您进入 `/debug` 页面并自动选中该特定节点。
-:::
+点击任意节点可打开一个带有 **"聚焦"**（Focus）按钮的弹窗，该按钮可将节点在图形中隔离显示，或者使用侧边栏中的搜索栏直接跳转到特定节点。
 
-![Node Popup.Png](/assets/devtools/node-popup.png)
+> info **提示** 点击 **检查**（Inspect）将直接带您进入 `/debug` 页面并预选该节点——非常适合深入查看特定的提供者或控制器。
 
-:::info 提示
-要将图表导出为图片，请点击图表右上角的**导出为 PNG** 按钮。
-:::
+<figure><img src="/assets/devtools/node-popup.png" /></figure>
 
-使用位于侧边栏（左侧）的表单控件，您可以控制边的接近度，例如可视化特定的应用程序子树：
+> info **提示** 需要为文档或拉取请求保存快照？点击图形右下角的 **导出为 PNG**（Export as PNG）。
 
-![Subtree View.Png](/assets/devtools/subtree-view.png)
+侧边栏中的控件可让您缩小边的邻近范围——非常适合放大查看应用程序的特定分支：
 
-当团队中有**新开发人员**时，这个功能特别有用，您可以向他们展示应用程序的结构。您还可以使用此功能可视化特定模块（如 `TasksModule`）及其所有依赖项，这在将大型应用程序拆分为较小模块（例如独立的微服务）时非常实用。
+<figure><img src="/assets/devtools/subtree-view.png" /></figure>
 
-您可以通过观看此视频了解 **Graph Explorer** 功能的实际应用：
+这是让**新团队成员**快速上手的好方法——向他们准确展示应用程序是如何组合在一起的。当您要提取一个模块（例如 `TasksModule`）及其所有依赖项，以便将大型应用程序拆分为更小的服务时，此功能同样非常有用。
 
-#### 排查"无法解析依赖项"错误
+Graph Explorer 中的所有内容都与您正在运行的应用程序保持同步——刷新后，您对模块或提供者所做的任何更改都会立即反映出来。无需构建步骤或单独维护文档；图形本身就是文档。
 
-:::info 注意
-此功能支持 `@nestjs/core` 版本 ≥`v9.3.10`。
-:::
+观看 **Graph Explorer** 的实际运行：
 
-您可能遇到的最常见错误消息是关于 Nest 无法解析提供者依赖项的问题。使用 Nest Devtools，您可以轻松识别问题并学习如何解决它。
+<figure>
+  <iframe
+    width="1000"
+    height="565"
+    src="https://www.youtube.com/embed/bW8V-ssfnvM"
+    title="YouTube video player"
+    frameBorder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowFullScreen
+  ></iframe>
+</figure>
 
-首先，打开 `main.ts` 文件并按如下方式更新 `bootstrap()` 调用：
+#### 调试"Cannot resolve dependency"错误
+
+> info **注意** 适用于 `@nestjs/core` 9.3.10 及以上版本。
+
+如果您使用 Nest 已有一段时间，很可能遇到过令人头疼的 **"Cannot resolve dependency"** 错误。这通常是任何新团队成员看到的第一个错误消息，在大型应用程序中，它确实很难追踪——堆栈跟踪告诉您缺少什么，但没有说明原因，也没有说明在深层嵌套的提供者链中连接究竟在哪里断裂。Devtools 将此从猜测游戏转变为快速的视觉诊断。
+
+首先更新您在 `main.ts` 中的 `bootstrap()` 调用：
 
 ```typescript
 bootstrap().catch((err) => {
-  fs.writeFileSync('graph.json', PartialGraphHost.toString() ?? '');
+  writeFileSync('graph.json', PartialGraphHost.toString() ?? '');
   process.exit(1);
 });
 
 ```
 
-同时，请确保将 `abortOnError` 设置为 `false`：
+> info **提示** `PartialGraphHost` 从 `@nestjs/core` 导出。
+
+您还需要将 `abortOnError` 设置为 `false`：
 
 ```typescript
 const app = await NestFactory.create(AppModule, {
@@ -111,92 +119,102 @@ const app = await NestFactory.create(AppModule, {
 
 ```
 
-现在每当应用因 **"无法解析依赖项"** 错误而启动失败时，您都会在根目录中找到表示部分依赖图的 `graph.json` 文件。您可以将此文件拖放至开发者工具（请确保将当前模式从"交互式"切换为"预览"）：
+从现在开始，每当您的应用程序因 **"Cannot resolve dependency"** 错误而无法启动时，Nest 都会在项目根目录写入一个 `graph.json` 文件——一个部分图形。将其拖放到 Devtools 中（先切换为"预览"（Preview）模式而不是"交互"（Interactive）模式），即可准确查看出错位置：
 
-![Drag And Drop.Png](/assets/devtools/drag-and-drop.png)
+<figure><img src="/assets/devtools/drag-and-drop.png" /></figure>
 
-成功上传后，您将看到以下依赖图及对话框窗口：
+上传后，您将看到图形以及一个总结所发生情况的对话框：
 
-![Partial Graph Modules View.Png](/assets/devtools/partial-graph-modules-view.png)
+<figure><img src="/assets/devtools/partial-graph-modules-view.png" /></figure>
 
-如你所见，高亮的 `TasksModule` 正是我们需要查看的部分。此外，在对话框窗口中已经可以看到一些关于如何解决此问题的说明。
+高亮显示的 `TasksModule` 是您需要关注的对象——对话框已经为您提供了如何修复的提示。
 
-如果我们切换到"Classes"视图，将会看到以下内容：
+切换到"类"（Classes）视图可查看完整信息：
 
-![Partial Graph Classes View.Png](/assets/devtools/partial-graph-classes-view.png)
+<figure><img src="/assets/devtools/partial-graph-classes-view.png" /></figure>
 
-这张图表明我们想要注入到 `TasksService` 中的 `DiagnosticsService` 在 `TasksModule` 模块的上下文中未被找到，我们很可能只需要将 `DiagnosticsModule` 导入到 `TasksModule` 模块中即可解决这个问题！
+此图形清楚地表明：`DiagnosticsService`——`TasksService` 所依赖的——在 `TasksModule` 的上下文中不可用。修复方法很简单：将 `DiagnosticsModule` 导入到 `TasksModule` 中，一切就恢复正常了。
 
-#### 路由资源管理器
+原本需要在多个文件中手动追踪导入的缓慢过程——还要祈祷自己没有遗漏任何一个——现在只需几次点击即可完成。这是一个小小的流程改进，但在拥有数十个模块的代码库中，这种改进会迅速累积起来。
 
-当您导航至**路由浏览器**页面时，应该能看到所有已注册的入口点：
+#### 路由探索器
 
-![Routes.Png](/assets/devtools/routes.png)
+前往 **路由探索器**（Routes explorer）页面，查看您的应用程序注册的所有入口点：
 
-:::info 提示
-此页面不仅显示 HTTP 路由，还包括所有其他类型的入口点（例如 WebSockets、gRPC、GraphQL 解析器等）。
-:::
+<figure><img src="/assets/devtools/routes.png" /></figure>
 
-入口点按其宿主控制器分组显示。您也可以使用搜索栏查找特定入口点。
+> info **提示** 此页面不仅限于 HTTP 路由——它还涵盖 WebSockets、gRPC、GraphQL 解析器等。
 
-点击特定入口点时， **流程图**将会显示。该图展示了入口点的执行流程（例如绑定到该路由的守卫、拦截器、管道等）。这在您需要了解特定路由的请求/响应周期，或排查为何特定守卫/拦截器/管道未执行时尤为有用。
+入口点按其宿主控制器分组，您可以使用搜索栏直接跳转到所需的目标。
 
-#### 沙盒
+点击任意入口点即可查看 **流程图**（flow graph），展示其完整的执行路径——绑定到该路由的每个守卫、拦截器和管道。这是理解请求如何在应用程序中流转的最快方式，也是排查某个守卫、拦截器或管道为何未按预期触发的最快途径。
 
-要实时执行 JavaScript 代码并与您的应用程序交互，请导航至**沙盒**页面：
+此视图对于随时间自然增长的应用程序最为有用，在这些应用中，同一个守卫可能在一处应用于控制器级别，而在另一处则按路由应用。您无需阅读散落在代码库各处的装饰器，即可获得该特定路由实际解析后的执行顺序。
 
-![Sandbox.Png](/assets/devtools/sandbox.png)
+#### 游乐场
 
-该演练场可用于**实时**测试和调试 API 端点，使开发人员能够快速发现并修复问题，而无需使用例如 HTTP 客户端。我们还可以绕过认证层，因此不再需要额外的登录步骤，甚至不需要专门的测试用户账户。对于事件驱动型应用程序，我们还可以直接从演练场触发事件，并观察应用程序如何响应这些事件。
+想要在不重新部署的情况下针对您的应用程序运行代码？前往 **游乐场**（Playground）页面：
 
-所有记录的内容都会直接输出到演练场的控制台，因此我们可以轻松查看运行情况。
+<figure><img src="/assets/devtools/sandbox.png" /></figure>
 
-直接运行代码**即时（on the fly）** 查看结果，无需重新构建应用或重启服务器。
+游乐场让您可以 **实时** 测试和调试端点，无需借助单独的 HTTP 客户端即可排查问题。您可以完全绕过认证层，跳过额外的登录步骤或专用测试账户——对于事件驱动的应用程序，还可以直接从游乐场触发事件，精确查看应用程序的响应方式。
 
-![Sandbox Table.Png](/assets/devtools/sandbox-table.png)
+您的代码记录的任何内容都会实时流式传输到游乐场的控制台中，因此您始终了解底层正在发生什么。
 
-:::info 提示
-要美观地显示对象数组，可使用 `console.table()`（或直接使用 `table()`）函数。
-:::
+只需 **即时** 运行代码并立即查看结果——无需重新构建，无需重启服务器。
 
-您可以通过这个视频查看**交互式演练场（Interactive Playground）** 功能的实际应用：
+<figure><img src="/assets/devtools/sandbox-table.png" /></figure>
 
-#### Bootstrap 性能分析器
+> info **提示** 使用 `console.table()`（或直接使用 `table()`）来美化打印对象数组。
 
-要查看所有类节点（控制器、提供者、增强器等）及其对应实例化时间的列表，请导航至**启动性能**页面：
+查看 **游乐场** 的实际运行效果：
 
-![Bootstrap Performance.Png](/assets/devtools/bootstrap-performance.png)
+<figure>
+  <iframe
+    width="1000"
+    height="565"
+    src="https://www.youtube.com/embed/liSxEN_VXKM"
+    title="YouTube video player"
+    frameBorder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowFullScreen
+  ></iframe>
+</figure>
 
-当您需要识别应用启动过程中最慢的部分时（例如需要优化对无服务器环境等场景至关重要的应用启动时间），此页面尤为实用。
+#### 启动性能分析器
+
+想知道是什么拖慢了应用程序的启动速度？**启动性能**（Bootstrap performance）页面列出了每个类节点——控制器、提供者、增强器等——及其实例化时间：
+
+<figure><img src="/assets/devtools/bootstrap-performance.png" /></figure>
+
+这是发现启动过程中最慢环节的最快捷方式，当启动时间处于关键路径上时尤为重要——想想无服务器环境，每一毫秒都至关重要。
+
+启动缓慢通常由几个常见原因造成：构造函数中的大量同步工作、提供者在 `onModuleInit` 中等待缓慢的外部调用，或者仅仅是某个模块实例化了远超其所需的依赖。该页面按实例化时间排序，让这些异常项一目了然，无需您在代码库中到处添加 `console.time()` 调用。
 
 #### 审计
 
-要查看应用分析序列化图时自动生成的审计结果（错误/警告/提示），请导航至**审计**页面：
+Devtools 会自动分析您序列化后的图，并呈现值得关注的错误、警告和提示。您可以在 **审计**（Audit）页面上找到所有这些内容：
 
-![Audit.Png](/assets/devtools/audit.png)
+<figure><img src="/assets/devtools/audit.png" /></figure>
 
-:::info 提示
-上面的截图并未显示所有可用的审计规则。
-:::
+> info **提示** 上面的截图仅展示了可用审计规则的一部分。
 
-当您需要识别应用程序中的潜在问题时，本页面非常有用。
+可以将其视为应用程序架构的代码检查器——一种在问题找上门之前快速发现问题的途径。一些内置规则会标记出您原本只能通过惨痛教训才能发现的问题：某个控制器承载的路由远超其同类、某个模块引入了异常大量的依赖、名为 `SomethingGuard` 的提供者从未被实际注册为守卫，或者某个请求作用域的提供者其实更适合改用 [Durable Providers](/fundamentals/injection-scopes#持久提供者)。这些都不是测试套件能捕获的 bug，但它们正是那种会随着时间推移拖慢代码库的问题。
 
 #### 预览静态文件
 
-要将序列化图形保存到文件，请使用以下代码：
+要将序列化后的图保存到文件中，请使用以下代码：
 
 ```typescript
-await app.listen(process.env.PORT ?? 3000); // OR await app.init()
-fs.writeFileSync('./graph.json', app.get(SerializedGraph).toString());
+await app.listen(3000); // OR await app.init()
+writeFileSync('./graph.json', app.get(SerializedGraph).toString());
 
 ```
 
-:::info 提示
-`SerializedGraph` 是从 `@nestjs/core` 包中导出的。
-:::
+> info **提示** `SerializedGraph` 从 `@nestjs/core` 中导出。
 
-然后你可以拖放/上传这个文件：
+然后只需拖放（或上传）该文件：
 
-![Drag And Drop.Png](/assets/devtools/drag-and-drop.png)
+<figure><img src="/assets/devtools/drag-and-drop.png" /></figure>
 
-这在你想与他人（如同事）分享你的图表，或想离线分析时非常有用。
+当您想与同事共享图表、将其附加到错误报告中，或在离线状态下分析它时——无需让应用程序保持运行——此功能就派上了用场。

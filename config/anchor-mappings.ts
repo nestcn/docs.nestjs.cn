@@ -459,6 +459,16 @@ export const anchorMappings: Record<string, string> = {
   'non-class-based-provider-tokens': '非基于类的提供者令牌',
   'custom-method-key': '自定义方法键',
   'type-checking': '类型检查',
+
+  // Observability (可观测性)
+  'trace-correlation': '追踪关联',
+  'first-project': '第一个项目',
+  'ignoring-noisy-operations': '忽略嘈杂操作',
+  'tags-and-custom-attributes': '标签和自定义属性',
+  'error-source-context': '错误源代码上下文',
+  'custom-metrics': '自定义指标',
+  'handing-a-failure-to-a-coding-agent': '将故障交给编码代理',
+  'issues': '问题',
 };
 
 // 路径映射表

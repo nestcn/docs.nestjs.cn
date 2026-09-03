@@ -1,5 +1,5 @@
 <!-- 此文件从 content/openapi/security.md 自动生成，请勿直接修改此文件 -->
-<!-- 生成时间: 2026-03-12T13:42:20.384Z -->
+<!-- 生成时间: 2026-09-03T11:31:45.940Z -->
 <!-- 源文件: content/openapi/security.md -->
 
 ### 安全
@@ -13,7 +13,7 @@ export class CatsController {}
 
 ```
 
-在运行应用程序之前，请记住使用 `DocumentBuilder` 将安全定义添加到基础文档中：
+在运行应用程序之前，请记得使用 `DocumentBuilder` 将安全定义添加到基础文档中：
 
 ```typescript
 const options = new DocumentBuilder().addSecurity('basic', {
@@ -23,11 +23,11 @@ const options = new DocumentBuilder().addSecurity('basic', {
 
 ```
 
-一些最流行的身份验证技术是内置的（例如 `basic` 和 `bearer`），因此你不必像上面那样手动定义安全机制。
+一些最流行的认证技术是内置的（例如 `basic` 和 `bearer`），因此您不必像上面那样手动定义安全机制。
 
-#### 基本身份验证
+#### 基本认证
 
-要启用基本身份验证，请使用 `@ApiBasicAuth()`。
+要启用基本认证，请使用 `@ApiBasicAuth()`。
 
 ```typescript
 @ApiBasicAuth()
@@ -36,16 +36,16 @@ export class CatsController {}
 
 ```
 
-在运行应用程序之前，请记住使用 `DocumentBuilder` 将安全定义添加到基础文档中：
+在运行应用程序之前，请记得使用 `DocumentBuilder` 将安全定义添加到基础文档中：
 
 ```typescript
 const options = new DocumentBuilder().addBasicAuth();
 
 ```
 
-#### Bearer 身份验证
+#### Bearer 认证
 
-要启用 bearer 身份验证，请使用 `@ApiBearerAuth()`。
+要启用 Bearer 认证，请使用 `@ApiBearerAuth()`。
 
 ```typescript
 @ApiBearerAuth()
@@ -54,14 +54,14 @@ export class CatsController {}
 
 ```
 
-在运行应用程序之前，请记住使用 `DocumentBuilder` 将安全定义添加到基础文档中：
+在运行应用程序之前，请记得使用 `DocumentBuilder` 将安全定义添加到基础文档中：
 
 ```typescript
 const options = new DocumentBuilder().addBearerAuth();
 
 ```
 
-#### OAuth2 身份验证
+#### OAuth2 认证
 
 要启用 OAuth2，请使用 `@ApiOAuth2()`。
 
@@ -72,16 +72,16 @@ export class CatsController {}
 
 ```
 
-在运行应用程序之前，请记住使用 `DocumentBuilder` 将安全定义添加到基础文档中：
+在运行应用程序之前，请记得使用 `DocumentBuilder` 将安全定义添加到基础文档中：
 
 ```typescript
 const options = new DocumentBuilder().addOAuth2();
 
 ```
 
-#### Cookie 身份验证
+#### Cookie 认证
 
-要启用 cookie 身份验证，请使用 `@ApiCookieAuth()`。
+要启用 Cookie 认证，请使用 `@ApiCookieAuth()`。
 
 ```typescript
 @ApiCookieAuth()
@@ -90,7 +90,7 @@ export class CatsController {}
 
 ```
 
-在运行应用程序之前，请记住使用 `DocumentBuilder` 将安全定义添加到基础文档中：
+在运行应用程序之前，请记得使用 `DocumentBuilder` 将安全定义添加到基础文档中：
 
 ```typescript
 const options = new DocumentBuilder().addCookieAuth('optional-session-id');

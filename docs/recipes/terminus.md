@@ -88,7 +88,7 @@ export class HealthController {
   @HealthCheck()
   check() {
     return this.health.check([
-      () => this.http.pingCheck('nestjs-docs', 'https://docs.nestjs.com'),
+      () => this.http.pingCheck('nestjs-docs', './'),
     ]);
   }
 }
@@ -109,7 +109,7 @@ export class HealthModule {}
 
 ```
 
-我们的健康检查现在将向 `https://docs.nestjs.com` 地址发送 _GET_ 请求。如果我们从该地址收到健康响应，我们在 `http://localhost:3000/health` 的路由将返回以下对象，状态代码为 200。
+我们的健康检查现在将向 `./` 地址发送 _GET_ 请求。如果我们从该地址收到健康响应，我们在 `http://localhost:3000/health` 的路由将返回以下对象，状态代码为 200。
 
 ```json
 {
@@ -414,7 +414,7 @@ Terminus 只记录错误消息，例如当健康检查失败时。使用 `Termin
 在本节中，我们将引导你创建自定义日志记录器 `TerminusLogger`。此日志记录器扩展了内置日志记录器。因此，你可以选择要覆盖日志记录器的哪个部分。
 
 :::info 信息
-如果你想了解更多关于 NestJS 中自定义日志记录器的信息，[请在此处阅读更多信息](/techniques/logger#injecting-a-custom-logger)。
+如果你想了解更多关于 NestJS 中自定义日志记录器的信息，[请在此处阅读更多信息](/techniques/logger#注入自定义日志记录器)。
 :::
 
 ```typescript

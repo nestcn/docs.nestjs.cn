@@ -306,7 +306,7 @@ describe('User Service Unit Spec', () => {
 这些函数来自已安装的测试替身适配器（`@suites/doubles.jest`），它适配测试框架的原生模拟功能。
 
 :::info 提示
-`mock()` 函数是 `@golevelup/ts-jest` 中 `createMock` 的替代方案。两者都创建类型化的模拟对象。有关 `createMock` 的更多信息，请参阅[单元测试](/fundamentals/unit-testing#auto-mocking)章节。
+`mock()` 函数是 `@golevelup/ts-jest` 中 `createMock` 的替代方案。两者都创建类型化的模拟对象。有关 `createMock` 的更多信息，请参阅[单元测试](/fundamentals/unit-testing#自动模拟)章节。
 :::
 
 #### 总结

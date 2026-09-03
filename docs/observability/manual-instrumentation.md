@@ -1,6 +1,7 @@
 <!-- 此文件从 content/observability/manual-instrumentation.md 自动生成，请勿直接修改此文件 -->
 <!-- 生成时间: 2026-09-03T13:54:22.000Z -->
 <!-- 源文件: content/observability/manual-instrumentation.md -->
+<!-- 源哈希: 03805a3ee41f254c50a00338a0c526cf -->
 
 ### 手动插桩
 

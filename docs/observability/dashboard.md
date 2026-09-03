@@ -1,6 +1,7 @@
 <!-- 此文件从 content/observability/dashboard.md 自动生成，请勿直接修改此文件 -->
 <!-- 生成时间: 2026-09-03T13:54:22.000Z -->
 <!-- 源文件: content/observability/dashboard.md -->
+<!-- 源哈希: 721180bdbfa90fc2fe5529a63dce8600 -->
 
 ### 仪表盘
 

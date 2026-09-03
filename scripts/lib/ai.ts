@@ -25,7 +25,7 @@ export class AIClient {
       apiKey: config.apiKey || process.env.NVIDIA_API_KEY || '',
       baseUrl: config.baseUrl || 'https://integrate.api.nvidia.com/v1/chat/completions',
       model: config.model || 'deepseek-ai/deepseek-v4-flash-0731',
-      maxTokens: config.maxTokens || 4096,
+      maxTokens: config.maxTokens || 8192,
       temperature: config.temperature || 0.3,
       rpmLimit: config.rpmLimit || 40,
     };
@@ -142,6 +142,8 @@ Please translate the following English technical documentation to Chinese follow
         max_tokens: this.config.maxTokens,
         temperature: this.config.temperature,
       }),
+      // 限制单请求最长挂起时间（此前无超时，单个挂起请求可拖住整个翻译批次）
+      signal: AbortSignal.timeout(120_000),
     });
 
     if (!response.ok) {
@@ -178,6 +180,21 @@ Please translate the following English technical documentation to Chinese follow
     this.lastRequestTime = Date.now();
   }
 
+  /**
+   * 判断错误是否可重试：限流/过载/服务端错误，以及空响应、超时等瞬时故障。
+   * 此前仅重试 429/500/503，导致 empty content、timeout、529 直接失败。
+   */
+  private isRetryableError(err: unknown): boolean {
+    const statusCode = (err as { statusCode?: number }).statusCode;
+    if (statusCode && [429, 500, 502, 503, 529].includes(statusCode)) {
+      return true;
+    }
+    const message = getErrorMessage(err).toLowerCase();
+    return /empty content|timed?\s*out|fetch failed|network|econnreset|socket|aborted/i.test(
+      message,
+    );
+  }
+
   private async withRetry<T>(
     fn: () => Promise<T>,
     maxRetries: number,
@@ -189,16 +206,15 @@ Please translate the following English technical documentation to Chinese follow
         return await fn();
       } catch (err: unknown) {
         lastError = err;
-        const statusCode = (err as { statusCode?: number }).statusCode;
-        const isRetryable = statusCode === 429 || statusCode === 500 || statusCode === 503;
 
-        if (!isRetryable || attempt === maxRetries) {
+        if (!this.isRetryableError(err) || attempt === maxRetries) {
           throw err;
         }
 
+        const statusCode = (err as { statusCode?: number }).statusCode;
         const delay = Math.min(2000 * Math.pow(2, attempt), 30_000);
         console.warn(
-          `  ⚠️ API error (${statusCode}), retrying in ${delay / 1000}s (attempt ${attempt + 1}/${maxRetries})...`,
+          `  ⚠️ API error (${statusCode ?? getErrorMessage(err).slice(0, 60)}), retrying in ${delay / 1000}s (attempt ${attempt + 1}/${maxRetries})...`,
         );
         await new Promise((r) => setTimeout(r, delay));
       }

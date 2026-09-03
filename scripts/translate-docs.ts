@@ -66,7 +66,7 @@ class DocumentTranslator {
     this.aiClient = new AIClient({
       apiKey: options.apiKey || process.env.NVIDIA_API_KEY,
       model: options.model || 'deepseek-ai/deepseek-v4-flash-0731',
-      maxTokens: options.maxTokens || 4096,
+      maxTokens: options.maxTokens || 8192,
     });
 
     this.glossary = loadGlossary(
@@ -96,6 +96,22 @@ class DocumentTranslator {
       return cached;
     }
 
+    // 文件级重试：占位符还原失败、代码块数量不匹配等质量校验错误发生在
+    // AI 调用之后的本地校验阶段，ai.ts 内部的请求级重试覆盖不到。
+    // 对整个文件最多重试 1 次；最终失败时由调用方保留旧译文。
+    for (let attempt = 1; ; attempt++) {
+      try {
+        return await this.translateOnce(text, filePath);
+      } catch (err: unknown) {
+        if (attempt >= 2) throw err;
+        console.warn(
+          `  ⚠️ Translation of ${filePath} failed (attempt ${attempt}), retrying: ${getErrorMessage(err)}`,
+        );
+      }
+    }
+  }
+
+  private async translateOnce(text: string, filePath: string): Promise<string> {
     const sourceCodeBlockCount = countCodeBlockDelimiters(text);
     const { text: protectedText, map } = protectMarkdown(text);
 
@@ -146,7 +162,7 @@ class DocumentTranslator {
       );
     }
 
-    this.cache.set(filePath, hash, finalText);
+    this.cache.set(filePath, contentHash(text), finalText);
     if (this.verbose) console.log(`  🤖 AI translated: ${filePath}`);
     return finalText;
   }
@@ -165,6 +181,19 @@ class DocumentTranslator {
 
     const sourceContent = fs.readFileSync(sourcePath, 'utf8');
     const targetContent = fs.readFileSync(targetPath, 'utf8');
+
+    // 源内容哈希判定：译文文件头记录了翻译时所依据的源内容哈希。
+    // 哈希一致且译文结构完整即可跳过——不依赖 mtime（CI 中 checkout/cp
+    // 的时间戳不可靠，此前导致每次同步都全量重翻全部文件）。
+    const sourceHash = contentHash(fixCodeBlocks(sourceContent));
+    const targetHash = targetContent.match(/<!-- 源哈希: ([a-f0-9]{32}) -->/);
+    if (
+      targetHash &&
+      targetHash[1] === sourceHash &&
+      this.isTranslationComplete(sourceContent, targetContent)
+    ) {
+      return false;
+    }
 
     if (!this.isTranslationComplete(sourceContent, targetContent)) {
       console.log(`  ⚠️ Incomplete translation detected, will re-translate`);
@@ -196,7 +225,7 @@ class DocumentTranslator {
     return true;
   }
 
-  private processContent(content: string, filePath: string): string {
+  private processContent(content: string, filePath: string, sourceHash?: string): string {
     let processed = content;
 
     if (!filePath.includes('index.md')) {
@@ -206,7 +235,8 @@ class DocumentTranslator {
 
     if (!processed.startsWith('<!--')) {
       const timestamp = new Date().toISOString();
-      const header = `<!-- 此文件从 content/${filePath} 自动生成，请勿直接修改此文件 -->\n<!-- 生成时间: ${timestamp} -->\n<!-- 源文件: content/${filePath} -->\n\n`;
+      const hashLine = sourceHash ? `<!-- 源哈希: ${sourceHash} -->\n` : '';
+      const header = `<!-- 此文件从 content/${filePath} 自动生成，请勿直接修改此文件 -->\n<!-- 生成时间: ${timestamp} -->\n<!-- 源文件: content/${filePath} -->\n${hashLine}\n`;
 
       if (processed.startsWith('---')) {
         const secondDash = processed.indexOf('---', 3);
@@ -252,6 +282,7 @@ class DocumentTranslator {
 
       let content = fs.readFileSync(contentPath, 'utf8');
       content = fixCodeBlocks(content);
+      const sourceHash = contentHash(content);
 
       const outputDir = path.dirname(outputPath);
       if (!fs.existsSync(outputDir)) {
@@ -279,7 +310,7 @@ class DocumentTranslator {
         translatedContent = content;
       }
 
-      const finalContent = this.processContent(translatedContent, relativePath);
+      const finalContent = this.processContent(translatedContent, relativePath, sourceHash);
       fs.writeFileSync(outputPath, finalContent, 'utf8');
 
       const sourceStats = fs.statSync(contentPath);

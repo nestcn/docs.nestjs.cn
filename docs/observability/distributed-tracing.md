@@ -1,6 +1,7 @@
 <!-- 此文件从 content/observability/distributed-tracing.md 自动生成，请勿直接修改此文件 -->
 <!-- 生成时间: 2026-09-03T13:54:22.000Z -->
 <!-- 源文件: content/observability/distributed-tracing.md -->
+<!-- 源哈希: 3102512873c9542c8608d10baae65aea -->
 
 ### 分布式追踪
 

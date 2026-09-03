@@ -45,6 +45,19 @@ export function fixCodeBlocks(content: string): string {
     '\n```$2 title="$1"'
   );
 
+  // 3.5 转换代码块内部的 @@filename 行（官方文档将 @@filename 作为代码块首行）。
+  // 此前仅靠规则 4 删除该行，导致代码块丢失文件名标签（title）。
+  // TypeScript/JavaScript 块自动补全 .ts/.js 扩展名，其余保留原样。
+  result = result.replace(
+    /```(typescript|javascript)[ \t]*\r?\n(?:[ \t]*\r?\n)*@@filename[ \t]*\(([^)]+)\)[ \t]*\r?\n/g,
+    (_m: string, lang: string, name: string) => {
+      const file = /\.(ts|js|json|md|yml|yaml|html|css|txt|sh|env)$/i.test(name)
+        ? name
+        : `${name}.${lang === 'javascript' ? 'js' : 'ts'}`;
+      return `\`\`\`${lang} title="${file}"\n`;
+    },
+  );
+
   // 4. 移除独立的 @@filename 行
   result = result.replace(/^@@filename\s*\([^)]*\)\s*\r?\n/gm, '');
 

@@ -30,6 +30,7 @@ export class OrdersService {
     // ...将 traceId 转发给下一个服务
   }
 }
+
 ```
 
 它读取的上下文存储与 `getAttribute()`/`setAttribute()` 相同，但与它们不同的是，在被追踪上下文之外它不会抛出异常——而是返回 `null`，因此从启动钩子或其他未被追踪的路径转发追踪 ID 的代码，不需要为了传播一个尚不存在的 ID 而包一层 `try`/`catch`。如果您的代码中可能出现这种情况，请在设置请求头之前先对 `null` 做判断。
@@ -42,6 +43,7 @@ export class OrdersService {
 fetch(url, {
   headers: { 'x-request-id': this.tracerService.currentTraceId() },
 });
+
 ```
 
 如果您使用 [HTTP 模块](/techniques/http-module)，可以在 Axios 请求拦截器中一次性添加同一个请求头，而不必在每个调用点重复：
@@ -63,6 +65,7 @@ export class OrdersModule implements OnModuleInit {
     });
   }
 }
+
 ```
 
 > info **提示** 许多反向代理和负载均衡器（nginx、Envoy、AWS ALB）都可以配置为对每个入站请求设置 `x-request-id`。一旦这样做，您仪表盘中的追踪 ID 就会与代理访问日志中的请求 ID 一致，无需再做任何工作。
@@ -77,6 +80,7 @@ import { Metadata } from '@grpc/grpc-js';
 const metadata = new Metadata();
 metadata.set('x-request-id', this.tracerService.currentTraceId());
 this.heroesService.findOne({ id: 1 }, metadata);
+
 ```
 
 ```typescript title="app.module.ts"
@@ -91,6 +95,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule({
       : randomUUID(); // 没有传播任何 ID——这次调用开启了自己的追踪
   },
 });
+
 ```
 
 关于如何在调用的两侧读取和写入元数据，请参见 [gRPC](/microservices/grpc) 章节。
@@ -104,6 +109,7 @@ this.client.send('orders.report', {
   ...payload,
   traceId: this.tracerService.currentTraceId(),
 });
+
 ```
 
 ```typescript title="app.module.ts"
@@ -113,6 +119,7 @@ import { randomUUID } from 'node:crypto';
 export const { ObserveModule, ObserveInstrument } = createObserveModule({
   traceIdGenerator: (ctx) => ctx.getData()?.traceId ?? randomUUID(),
 });
+
 ```
 
 生成器接收的是该传输器的上下文对象，因此同一种写法对请求-响应式（`send()`）和事件式（`emit()`）消息都适用。
@@ -140,6 +147,7 @@ export class OrdersProcessor extends WorkerHost {
     // ...
   }
 }
+
 ```
 
 任务仍然会拥有自己的追踪，但这个标签是可搜索的，因此从一条缓慢的请求到它触发的任务，一次搜索即可到达。

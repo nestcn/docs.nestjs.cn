@@ -15,6 +15,7 @@ import { TracerService } from '@nestjs/observe';
 export class CatsService {
   constructor(private readonly tracerService: TracerService) {}
 }
+
 ```
 
 `TracerService` 由 `ObserveModule` 导出，因此在导入该模块的任何模块中都可以注入。每个方法都会从环境异步上下文中读取追踪信息，这意味着在请求、任务或其他被插桩操作之外调用它们会抛出异常——因为没有可附加的追踪。这是有意为之：静默丢弃一个跨度比抛出错误更难察觉。（例外是[自定义指标](#自定义指标)，它们不与追踪绑定。）
@@ -30,6 +31,7 @@ async findOne(id: string, activeUser: ActiveUserData) {
     return this.catsRepository.findOne(id);
   });
 }
+
 ```
 
 跨度按调用栈嵌套——一个 `createSpan()` 出现在另一个 `createSpan()` 的回调中，就成为后者的子跨度，这正是追踪详情页上瀑布图的成因。回调可以是同步的，也可以是异步的。自动插桩的跨度（控制器方法、提供者、数据库调用）与您的自定义跨度会归入同一棵树，因此手工命名的跨度会准确地出现在它实际运行的位置，与其他一切相对。
@@ -41,6 +43,7 @@ async findOne(id: string, activeUser: ActiveUserData) {
 ```typescript
 const span = await this.tracerService.activeSpan();
 span.addTags({ cacheHit: 'false' });
+
 ```
 
 如果当前追踪没有活动跨度，它会抛出异常。
@@ -62,6 +65,7 @@ try {
     retryable: 'true',
   });
 }
+
 ```
 
 该错误会附加到当前追踪上，可选的标签也随之记录；如果启用了 [`sourceContext`](/observability/sdk#错误源代码上下文)，它还会获得与其他被捕获错误相同的源代码上下文处理。
@@ -74,6 +78,7 @@ try {
 this.tracerService.setAttribute('tenantId', tenant.id);
 // ...稍后，在同一请求的另一个服务中
 const tenantId = this.tracerService.getAttribute('tenantId');
+
 ```
 
 `getAttribute()` 对从未设置过的键返回 `undefined`。两者在被追踪上下文之外调用时都会抛出异常。
@@ -96,6 +101,7 @@ export class CheckoutService {
     this.tracerService.setAttribute('flags.betaCheckout', true);
   }
 }
+
 ```
 
 > info **提示** `ObserveModule` 同样导出了追踪上下文所在的 `AsyncLocalStorage` 实例。`setAttribute()`/`getAttribute()` 是访问它的受支持方式；只有当您需要它们未暴露的能力时，才直接注入该存储。如果您已经在使用 [异步本地存储](/recipes/async-local-storage) 配方中描述的模式，这个存储可以取代您手工实现的那一个。
@@ -136,6 +142,7 @@ try {
   // 丢掉缓慢的失败样本，正是延迟摘要"自我美化"的原因。
   latency.observe(performance.now() - startedAt);
 }
+
 ```
 
 调用 `counter('orders.placed')` 两次会返回同一个实例，因此无需在字段中保存引用——不过在热路径上保存引用开销更低。在后续调用中传入属性会就地更新现有指标的描述和标签。

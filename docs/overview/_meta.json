@@ -2,7 +2,12 @@
   "index",
   "first-steps",
   "controllers",
-  "providers", 
+  "providers",
   "modules",
-  "middlewares"
+  "middlewares",
+  "exception-filters",
+  "pipes",
+  "guards",
+  "interceptors",
+  "custom-decorators"
 ]

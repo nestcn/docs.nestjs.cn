@@ -2,6 +2,165 @@
 title: 管道
 ---
 
+### 管道
+
+管道是一个使用 `@Injectable()` 装饰器注解的类，它实现了 `PipeTransform` 接口。
+
+<figure>
+  <img class="illustrative-image" src="/assets/Pipe_1.png" />
+</figure>
+
+管道有两个典型用例：
+
+- **转换**：将输入数据转换为所需的形式（例如，从字符串转换为整数）
+- **验证**：评估输入数据，如果有效，则原样传递；否则，抛出异常
+
+在这两种情况下，管道都对 <a href="controllers#路由参数">控制器路由处理程序</a> 正在处理的 `arguments` 进行操作。Nest 在调用方法之前插入管道，管道接收发往该方法的参数并对其进行操作。任何转换或验证操作都在此时进行，之后路由处理程序会使用任何（可能经过转换的）参数被调用。
+
+Nest 提供了许多内置管道，您可以直接使用。您也可以构建自己的自定义管道。在本章中，我们将介绍内置管道，并展示如何将它们绑定到路由处理程序。然后，我们将研究几个自定义构建的管道，以展示如何从头开始构建一个管道。
+
+:::info 提示
+管道在异常区域内运行。这意味着当管道抛出异常时，它会由异常层（全局异常过滤器和应用于当前上下文的任何 [异常过滤器](/exception-filters)）处理。鉴于上述情况，很明显，当在管道中抛出异常时，控制器方法不会被执行。这为您提供了一种最佳实践技术，用于在系统边界验证从外部源进入应用程序的数据。
+:::
+
+#### 内置管道
+
+Nest 提供了几个开箱即用的管道：
+
+- `ValidationPipe`
+- `ParseIntPipe`
+- `ParseFloatPipe`
+- `ParseBoolPipe`
+- `ParseArrayPipe`
+- `ParseUUIDPipe`
+- `ParseEnumPipe`
+- `DefaultValuePipe`
+- `ParseFilePipe`
+- `ParseDatePipe`
+
+它们从 `@nestjs/common` 包中导出。
+
+让我们快速了解一下使用 `ParseIntPipe`。这是 **转换** 用例的一个示例，其中管道确保方法处理程序参数被转换为 JavaScript 整数（如果转换失败则抛出异常）。在本章后面，我们将展示 `ParseIntPipe` 的简单自定义实现。下面的示例技术也适用于其他内置转换管道（`ParseBoolPipe`、`ParseFloatPipe`、`ParseEnumPipe`、`ParseArrayPipe`、`ParseDatePipe` 和 `ParseUUIDPipe`，我们在本章中将它们称为 `Parse*` 管道）。
+
+#### 绑定管道
+
+要使用管道，我们需要将管道类的实例绑定到适当的上下文。在我们的 `ParseIntPipe` 示例中，我们希望将管道与特定的路由处理程序方法相关联，并确保它在方法调用之前运行。我们通过以下构造来实现，我们将其称为在方法参数级别绑定管道：
+
+```typescript
+@Get(':id')
+async findOne(@Param('id', ParseIntPipe) id: number) {
+  return this.catsService.findOne(id);
+}
+
+```
+
+这确保以下两个条件之一为真：要么我们在 `findOne()` 方法中接收的参数是数字（正如我们在调用 `this.catsService.findOne()` 时所期望的那样），要么在路由处理程序被调用之前抛出异常。
+
+例如，假设路由被调用如下：
+
+```bash
+GET localhost:3000/abc
+
+```
+
+Nest 将抛出如下异常：
+
+```json
+{
+  "statusCode": 400,
+  "message": "Validation failed (numeric string is expected)",
+  "error": "Bad Request"
+}
+
+```
+
+该异常将阻止 `findOne()` 方法的主体执行。
+
+在上面的示例中，我们传递了一个类（`ParseIntPipe`），而不是一个实例，将实例化的责任留给框架并启用依赖注入。与管道和守卫一样，我们也可以传递一个内联实例。如果我们想通过传递选项来自定义内置管道的行为，传递内联实例会很有用：
+
+```typescript
+@Get(':id')
+async findOne(
+  @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }))
+  id: number,
+) {
+  return this.catsService.findOne(id);
+}
+
+```
+
+绑定其他转换管道（所有 **Parse\*** 管道）的工作方式类似。这些管道都在验证路由参数、查询字符串参数和请求体值的上下文中工作。
+
+例如，对于查询字符串参数：
+
+```typescript
+@Get()
+async findOne(@Query('id', ParseIntPipe) id: number) {
+  return this.catsService.findOne(id);
+}
+
+```
+
+下面是使用 `ParseUUIDPipe` 解析字符串参数并验证它是否为 UUID 的示例。
+
+```typescript
+@Get(':uuid')
+async findOne(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
+  return this.catsService.findOne(uuid);
+}
+
+```
+
+:::info 提示
+当使用 `ParseUUIDPipe()` 时，您正在解析版本 3、4 或 5 的 UUID，如果您只需要特定版本的 UUID，您可以在管道选项中传递版本。
+:::
+
+上面我们已经看到了绑定各种内置 `Parse*` 家族管道的示例。绑定验证管道略有不同；我们将在以下部分讨论这一点。
+
+:::info 提示
+另请参阅 [验证技术](/techniques/validation) 以获取验证管道的大量示例。
+:::
+
+#### 自定义管道
+
+如前所述，您可以构建自己的自定义管道。虽然 Nest 提供了强大的内置 `ParseIntPipe` 和 `ValidationPipe`，但让我们从头开始构建它们的简单自定义版本，以了解如何构建自定义管道。
+
+我们从一个简单的 `ValidationPipe` 开始。最初，我们让它简单地接受输入值并立即返回相同的值，表现得像一个恒等函数。
+
+```typescript
+import { PipeTransform, Injectable, ArgumentMetadata } from '@nestjs/common';
+
+@Injectable()
+export class ValidationPipe implements PipeTransform {
+  transform(value: any, metadata: ArgumentMetadata) {
+    return value;
+  }
+}
+
+```
+
+:::info 提示
+`PipeTransform<T, R>` 是任何管道必须实现的通用接口。通用接口使用 `T` 表示输入 `value` 的类型，`R` 表示 `transform()` 方法的返回类型。
+:::
+
+每个管道都必须实现 `transform()` 方法以履行 `PipeTransform` 接口契约。此方法有两个参数：
+
+- `value`
+- `metadata`
+
+`value` 参数是当前处理的方法参数（在被路由处理方法接收之前），`metadata` 是当前处理的方法参数的元数据。元数据对象具有以下属性：
+
+```typescript
+export interface ArgumentMetadata {
+  type: 'body' | 'query' | 'param' | 'custom';
+  metatype?: Type<unknown>;
+  data?: string;
+}
+
+```
+
+这些属性描述了当前处理的参数。
+
 | 属性       | 描述                                                                                                                             |
 | ---------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | `type`     | 表示该参数是否为请求体 `@Body()`，查询 `@Query()` 参数 `@Param()` 或自定义参数（了解更多[此处](/overview/custom-decorators) ）。 |
